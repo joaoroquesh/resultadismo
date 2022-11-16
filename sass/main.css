@@ -1,0 +1,85 @@
+:root {
+  --dark:$dark;
+}
+
+* {
+  all: inset;
+}
+
+body {
+  background: #E5E5E5;
+  color: #232323;
+  font-family: "Ubuntu", sans-serif;
+}
+
+.btn-click {
+  box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+}
+.btn-click:hover {
+  transform: translateX(2px) translateY(2px);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+.btn-click:active {
+  transform: translateX(4px) translateY(4px);
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);
+}
+.btn-click:focus, .btn-click:not(:disabled):not(.disabled):active:focus {
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1);
+}
+
+/* ELEMENTS*/
+#menu {
+  height: 20vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#content {
+  height: 60vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#content .card {
+  background: #E5E5E5;
+  width: 100%;
+  max-width: 500px;
+  padding: 3rem 2rem;
+  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+}
+#content .card input {
+  background: transparent;
+  border: 1px solid #232323;
+  text-align: center;
+}
+#content .card input:focus {
+  box-shadow: 0 0 0 0.2rem #06DDBB;
+}
+#content .card .btn {
+  width: 100%;
+  background: #232323;
+  border: none;
+}
+#content .card .btn:hover {
+  background: #1CB19C;
+}
+
+footer {
+  height: 20vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+footer .darkgreen {
+  color: #1CB19C;
+}
+footer a {
+  color: #1CB19C;
+}
+footer a:hover {
+  color: #06DDBB;
+  text-decoration: none;
+}/*# sourceMappingURL=main.css.map */
