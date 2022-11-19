@@ -16,10 +16,14 @@ $transparent:rgba(0,0,0,0);
   --dark:$dark;
 
 }
-*{
-  all: inset;
+html{
+  width: 100vw;
+  overflow-x: hidden;
 }
+
 body{
+  width: 100vw;
+  overflow-x: hidden;
   background: $light;
   color: $dark;
   font-family: 'Ubuntu', sans-serif;

@@ -2,11 +2,14 @@
   --dark:$dark;
 }
 
-* {
-  all: inset;
+html {
+  width: 100vw;
+  overflow-x: hidden;
 }
 
 body {
+  width: 100vw;
+  overflow-x: hidden;
   background: #E5E5E5;
   color: #232323;
   font-family: "Ubuntu", sans-serif;
