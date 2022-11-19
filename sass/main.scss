@@ -1,9 +1,14 @@
 
-$dark:#232323;
+$white:#FFF;
 $light:#E5E5E5;
+$medium:#CCCCCC;
+$darkgray:#999999;
+$dark:#232323;
 $green:#06DDBB;
 $darkgreen:#1CB19C;
-
+$cravada:#BF9000;
+$saldo:#38761D;
+$acerto:#134F5C;
 
 
 :root{
@@ -42,6 +47,50 @@ body{
   border-radius: 1rem;
 }
 
+.bg-cravada{
+  background-color: $cravada!important;
+}
+.bg-saldo{
+  background-color: $saldo!important;
+}
+.bg-acerto{
+  background-color: $acerto!important;
+}
+.bg-light{
+  background-color: $light!important;
+}
+.bg-dark{
+  background-color: $dark!important;
+}
+.bg-green{
+  background-color: $green!important;
+}
+.bg-darkgreen{
+  background-color: $darkgreen!important;
+}
+
+.c-cravada{
+  color: $cravada!important;
+}
+.c-saldo{
+  color: $saldo!important;
+}
+.c-acerto{
+  color: $acerto!important;
+}
+.c-light{
+  color: $light!important;
+}
+.c-dark{
+  color: $dark!important;
+}
+.c-green{
+  color: $green!important;
+}
+.c-darkgreen{
+  color: $darkgreen!important;
+}
+
 
 /* ELEMENTS*/
 
@@ -54,7 +103,7 @@ body{
   .navbar{
     box-shadow: 0px 0px 2px rgb(0 0 0 / 14%), 0px 2px 2px rgb(0 0 0 / 12%), 0px 1px 3px rgb(0 0 0 / 20%);
   }
-  
+
   .nav-link{
     color: $dark;
 
@@ -83,7 +132,7 @@ body{
     max-width: 800px;
     padding: 3rem 2rem;
     box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
+
 
     @media (max-width:425px) {
       padding: 2rem 1rem;
@@ -105,6 +154,18 @@ body{
         background: $darkgreen;
       }
     }
+  }
+
+  .pontuacao{
+
+    
+    .circle{
+      height: 20px;
+      width: 20px;
+      border-radius: 20px;
+      margin-right: 10px;
+    }
+    
   }
 }
 
