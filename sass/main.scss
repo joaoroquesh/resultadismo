@@ -35,6 +35,13 @@ body{
   }
 }
 
+.round-05{
+  border-radius: 0.5rem;
+}
+.round-1{
+  border-radius: 1rem;
+}
+
 
 /* ELEMENTS*/
 
@@ -43,6 +50,21 @@ body{
   display: flex;
   justify-content: center;
   align-items: center;
+
+  .nav-link{
+    color: $dark;
+
+    &:hover{
+      color: $darkgreen;
+    }
+    &.disabled{
+      color:rgba(0,0,0,.3)!important;
+    }
+  }
+
+  .nav-space{
+    height: 98px;
+  }
 }
   
 #content{
@@ -63,14 +85,6 @@ body{
       padding: 2rem 1rem;
     }
 
-    iframe{
-      width: 100%;
-      height: 1250px;
-
-      @media (max-width:425px) {
-        width: 1650px;
-      }
-    }
     input{
       background: transparent;
       border: 1px solid $dark;

@@ -28,11 +28,31 @@ body {
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1);
 }
 
+.round-05 {
+  border-radius: 0.5rem;
+}
+
+.round-1 {
+  border-radius: 1rem;
+}
+
 /* ELEMENTS*/
 #menu {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+#menu .nav-link {
+  color: #232323;
+}
+#menu .nav-link:hover {
+  color: #1CB19C;
+}
+#menu .nav-link.disabled {
+  color: rgba(0, 0, 0, 0.3) !important;
+}
+#menu .nav-space {
+  height: 98px;
 }
 
 #content {
@@ -51,15 +71,6 @@ body {
 @media (max-width: 425px) {
   #content .card {
     padding: 2rem 1rem;
-  }
-}
-#content .card iframe {
-  width: 100%;
-  height: 1250px;
-}
-@media (max-width: 425px) {
-  #content .card iframe {
-    width: 1650px;
   }
 }
 #content .card input {
