@@ -171,8 +171,8 @@ body {
   background: #1CB19C;
 }
 #content .pontuacao .circle {
-  height: 20px;
-  width: 20px;
+  height: 16px;
+  width: 16px;
   border-radius: 20px;
   margin-right: 10px;
 }
