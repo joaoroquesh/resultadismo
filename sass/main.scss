@@ -40,6 +40,11 @@ body{
   }
 }
 
+.btn-primary{
+  background-color: $darkgreen;
+  border: 1px solid $darkgreen;
+}
+
 .round-05{
   border-radius: 0.5rem;
 }
