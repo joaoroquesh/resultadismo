@@ -12,6 +12,10 @@ body {
   font-family: "Ubuntu", sans-serif;
 }
 
+:focus-visible {
+  outline: 1px auto #1CB19C;
+}
+
 .btn-click {
   box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease-in-out;
@@ -30,7 +34,18 @@ body {
 
 .btn-primary {
   background-color: #1CB19C;
-  border: 1px solid #1CB19C;
+  border: 2px solid #1CB19C;
+  color: #FFF;
+}
+.btn-primary:hover {
+  background-color: rgba(0, 0, 0, 0);
+  border: 2px solid #1CB19C;
+  color: #1CB19C;
+}
+.btn-primary:active, .btn-primary:not(:disabled):not(.disabled).active, .btn-primary:not(:disabled):not(.disabled):active, .show > .btn-primary.dropdown-toggle {
+  background-color: #1CB19C;
+  border: 2px solid #1CB19C;
+  color: #232323;
 }
 
 .round-05 {

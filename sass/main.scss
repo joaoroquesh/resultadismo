@@ -9,6 +9,7 @@ $darkgreen:#1CB19C;
 $cravada:#BF9000;
 $saldo:#38761D;
 $acerto:#134F5C;
+$transparent:rgba(0,0,0,0);
 
 
 :root{
@@ -22,6 +23,9 @@ body{
   background: $light;
   color: $dark;
   font-family: 'Ubuntu', sans-serif;
+}
+:focus-visible {
+  outline: 1px auto $darkgreen;
 }
 .btn-click{
   box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.2);
@@ -42,7 +46,20 @@ body{
 
 .btn-primary{
   background-color: $darkgreen;
-  border: 1px solid $darkgreen;
+  border: 2px solid $darkgreen;
+  color: $white;
+  
+  &:hover{
+    background-color: $transparent;
+    border: 2px solid $darkgreen;
+    color: $darkgreen;
+  }
+
+  &:active, &:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active, .show>&.dropdown-toggle{
+    background-color: $darkgreen;
+  border: 2px solid $darkgreen;
+  color: $dark;
+  }
 }
 
 .round-05{
