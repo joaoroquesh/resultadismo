@@ -20,7 +20,6 @@ a {
 }
 a:hover {
   color: #1CB19C;
-  font-weight: bold;
 }
 
 :focus-visible {
@@ -205,9 +204,6 @@ a:hover {
   width: 100%;
   background: #232323;
   border: none;
-}
-#content .card .btn:hover {
-  background: #1CB19C;
 }
 #content .pontuacao .circle {
   height: 16px;
