@@ -212,6 +212,49 @@ a:hover {
   margin-right: 10px;
 }
 
+#classificacao .card {
+  padding: 2rem 1rem !important;
+}
+#classificacao .scroll {
+  padding: 0rem 1rem !important;
+  max-height: 500px;
+  overflow: scroll;
+}
+#classificacao .table {
+  border-collapse: separate;
+  border-spacing: 0px 10px;
+}
+#classificacao .table thead tr {
+  background: #E5E5E5 !important;
+}
+#classificacao .table tbody {
+  max-height: 600px;
+  overflow: scroll;
+}
+#classificacao .table tbody tr {
+  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
+  border-radius: 0.5rem;
+}
+#classificacao .table tbody tr:nth-child(1) {
+  color: #BF9000 !important;
+}
+#classificacao .table tbody tr:nth-child(2), #classificacao .table tbody tr:nth-child(3), #classificacao .table tbody tr:nth-child(4) {
+  color: #38761D !important;
+}
+#classificacao .table th:nth-child(3), #classificacao .table td:nth-child(3) {
+  font-weight: bold;
+  color: #1CB19C !important;
+}
+#classificacao .table th:nth-child(4), #classificacao .table td:nth-child(4) {
+  color: #BF9000 !important;
+}
+#classificacao .table th:nth-child(5), #classificacao .table td:nth-child(5) {
+  color: #38761D !important;
+}
+#classificacao .table th:nth-child(6), #classificacao .table td:nth-child(6) {
+  color: #134F5C !important;
+}
+
 footer {
   display: flex;
   justify-content: center;
