@@ -226,6 +226,7 @@ a:hover {
 }
 #classificacao .table thead tr {
   background: #E5E5E5 !important;
+  box-shadow: -10px 0px 0px #E5E5E5, 10px 0px 0px #E5E5E5, 10px -10px 0px #E5E5E5, -10px -10px 0px #E5E5E5;
 }
 #classificacao .table tbody {
   max-height: 600px;
