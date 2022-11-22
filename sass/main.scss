@@ -262,6 +262,9 @@ a{
     padding: 0rem 1rem!important;
     max-height: 50vh;
     overflow: scroll;
+    &::-webkit-scrollbar{
+      display: none;
+    }
     @media (max-width:425px) {
       padding: 0rem .1rem!important;
     }
