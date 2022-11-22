@@ -240,10 +240,10 @@ a{
     text-decoration: none!important;
     transition: all .3s ease-in-out;
     &:hover{
-      margin-right: .5rem!important;
+      margin-right: .25rem!important;
     }
     &:active{
-      margin-top: 1rem!important;
+      margin-top: .5rem!important;
     }
   }
   .intro{
@@ -303,7 +303,17 @@ a{
     }
 
     th, td{
-      
+      @media (max-width:365px) {
+        padding: 0.5rem;
+      }
+      vertical-align: middle;
+      text-align: center;
+      &:nth-child(1){
+        padding-right: 0!important;
+      }
+      &:nth-child(2){
+        text-align: left;
+      }
       &:nth-child(3){
         font-weight: bold;
         color: $darkgreen!important;

@@ -217,10 +217,10 @@ a:hover {
   transition: all 0.3s ease-in-out;
 }
 #classificacao .atualizar:hover {
-  margin-right: 0.5rem !important;
+  margin-right: 0.25rem !important;
 }
 #classificacao .atualizar:active {
-  margin-top: 1rem !important;
+  margin-top: 0.5rem !important;
 }
 #classificacao .intro {
   max-width: 600px;
@@ -271,6 +271,21 @@ a:hover {
 }
 #classificacao .table tbody tr:nth-child(2), #classificacao .table tbody tr:nth-child(3), #classificacao .table tbody tr:nth-child(4) {
   color: #38761D !important;
+}
+#classificacao .table th, #classificacao .table td {
+  vertical-align: middle;
+  text-align: center;
+}
+@media (max-width: 365px) {
+  #classificacao .table th, #classificacao .table td {
+    padding: 0.5rem;
+  }
+}
+#classificacao .table th:nth-child(1), #classificacao .table td:nth-child(1) {
+  padding-right: 0 !important;
+}
+#classificacao .table th:nth-child(2), #classificacao .table td:nth-child(2) {
+  text-align: left;
 }
 #classificacao .table th:nth-child(3), #classificacao .table td:nth-child(3) {
   font-weight: bold;
