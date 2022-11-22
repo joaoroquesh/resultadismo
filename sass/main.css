@@ -230,7 +230,12 @@ a:hover {
   padding: 2rem 1rem !important;
   display: inline-grid;
 }
-@media (max-width: 425px) {
+@media (max-width: 380px) {
+  #classificacao .card {
+    padding: 0rem 1rem 1rem 1rem !important;
+  }
+}
+@media (max-width: 340px) {
   #classificacao .card {
     padding: 0rem 0.5rem 1rem 0.5rem !important;
   }
@@ -243,7 +248,7 @@ a:hover {
 #classificacao .scroll::-webkit-scrollbar {
   display: none;
 }
-@media (max-width: 425px) {
+@media (max-width: 380px) {
   #classificacao .scroll {
     padding: 0rem 0.1rem !important;
   }
@@ -276,9 +281,14 @@ a:hover {
   vertical-align: middle;
   text-align: center;
 }
-@media (max-width: 365px) {
+@media (max-width: 410px) {
   #classificacao .table th, #classificacao .table td {
-    padding: 0.5rem;
+    padding: 0.6rem;
+  }
+}
+@media (max-width: 360px) {
+  #classificacao .table th, #classificacao .table td {
+    padding: 0.6rem 0.5rem;
   }
 }
 #classificacao .table th:nth-child(1), #classificacao .table td:nth-child(1) {

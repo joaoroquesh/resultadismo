@@ -254,7 +254,10 @@ a{
     padding: 2rem 1rem!important;
     display: inline-grid;
 
-    @media (max-width:425px) {
+    @media (max-width:380px) {
+      padding: 0rem 1rem 1rem 1rem !important;
+    }
+    @media (max-width:340px) {
       padding: 0rem .5rem 1rem .5rem !important;
     }
   }
@@ -265,7 +268,7 @@ a{
     &::-webkit-scrollbar{
       display: none;
     }
-    @media (max-width:425px) {
+    @media (max-width:380px) {
       padding: 0rem .1rem!important;
     }
   }
@@ -303,8 +306,11 @@ a{
     }
 
     th, td{
-      @media (max-width:365px) {
-        padding: 0.5rem;
+      @media (max-width:410px) {
+        padding: 0.6rem;
+      }
+      @media (max-width:360px) {
+        padding: 0.6rem 0.5rem;
       }
       vertical-align: middle;
       text-align: center;
