@@ -2,12 +2,12 @@ $( document ).ready(function() {
 
   const url ='https://script.googleusercontent.com/macros/echo?user_content_key=LjTtc6OpvJI3Jqp4wK3fpWlrFnFIpuEfsvtU5MMdo7q39FsAwePEXzubU2GjsUikMqqOO--9v7HcODnkRX0cCzZCeykwZmWnm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnOrK8Sz279c9adskH55hnF9MoYrHD91IwEBnMTZfHczrkUqwBVuHtBfz7K7OVHY-GrmsLHKHXYNERl2louKEv-oPp-vE3a0lxdz9Jw9Md8uu&lib=MZJdNykQjw8RX6aFaQzkrGvlUalP-BxzV';
 
-   var model = "<tr><th scope='row'>{pos}</th>"+
+   var model = "<tr><td>{pos}</td>"+
               "<td>{usuario}</td>"+
-              "<td scope='row'>{ponto}</td>"+
-              "<td scope='row'>{cravadas}</td>"+
-              "<td scope='row'>{saldo}</td>"+
-              "<td scope='row'>{acertos}</td></tr>";
+              "<td>{ponto}</td>"+
+              "<td>{cravadas}</td>"+
+              "<td>{saldo}</td>"+
+              "<td>{acertos}</td></tr>";
             
 
 
@@ -30,6 +30,7 @@ $( document ).ready(function() {
 
                   
               })
+              $('.preloader').fadeOut(500);
           })
           
 
