@@ -40,123 +40,134 @@ a{
 :focus-visible {
   outline: 1px auto $darkgreen;
 }
-.btn-click-sm{
-  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
-  transition:all 0.3s ease-in-out;
+.btn-{
 
-  &:hover{
-    transform: translateX(2px) translateY(2px);
-    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
-  }
-  &:active{
-    transform: translateX(4px) translateY(4px);
-    box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);
-  }
-  &:focus,&:not(:disabled):not(.disabled):active:focus{
-    box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1);
-  }
-}
-.btn-click{
-  box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.2);
-  transition:all 0.3s ease-in-out;
-
-  &:hover{
-    transform: translateX(2px) translateY(2px);
-    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-  }
-  &:active{
-    transform: translateX(4px) translateY(4px);
-    box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);
-  }
-  &:focus,&:not(:disabled):not(.disabled):active:focus{
-    box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1);
-  }
-}
-
-.btn-primary{
-  background-color: $darkgreen;
-  border: 2px solid $darkgreen;
-  color: $white;
+  &click-sm{
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+    transition:all 0.3s ease-in-out;
   
-  &:hover{
-    background-color: $transparent;
+    &:hover{
+      transform: translateX(2px) translateY(2px);
+      box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+    }
+    &:active{
+      transform: translateX(4px) translateY(4px);
+      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);
+    }
+    &:focus,&:not(:disabled):not(.disabled):active:focus{
+      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1);
+    }
+  }
+  &click{
+    box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.2);
+    transition:all 0.3s ease-in-out;
+  
+    &:hover{
+      transform: translateX(2px) translateY(2px);
+      box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    }
+    &:active{
+      transform: translateX(4px) translateY(4px);
+      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);
+    }
+    &:focus,&:not(:disabled):not(.disabled):active:focus{
+      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1);
+    }
+  }
+  
+  &primary{
+    background-color: $darkgreen;
     border: 2px solid $darkgreen;
-    color: $darkgreen;
-  }
-
-  &:active, &:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active, .show>&.dropdown-toggle{
-    background-color: $darkgreen;
-  border: 2px solid $darkgreen;
-  color: $dark;
-  }
-}
-.btn-outline-primary{
-  
-  border: 1px solid $darkgreen;
-  color: $darkgreen;
-  
-  &:hover{
-    background-color: $darkgreen;
-    border: 1px solid $darkgreen;
     color: $white;
+    
+    &:hover{
+      background-color: $transparent;
+      border: 2px solid $darkgreen;
+      color: $darkgreen;
+    }
+  
+    &:active, &:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active, .show>&.dropdown-toggle{
+      background-color: $darkgreen;
+    border: 2px solid $darkgreen;
+    color: $dark;
+    }
   }
-
-  &:active, &:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active, .show>&.dropdown-toggle{
-    background-color: $darkgreen;
-  border: 1px solid $darkgreen;
-  color: $dark;
+  &outline-primary{
+    
+    border: 1px solid $darkgreen;
+    color: $darkgreen;
+    
+    &:hover{
+      background-color: $darkgreen;
+      border: 1px solid $darkgreen;
+      color: $white;
+    }
+  
+    &:active, &:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active, .show>&.dropdown-toggle{
+      background-color: $darkgreen;
+    border: 1px solid $darkgreen;
+    color: $dark;
+    }
   }
 }
 
-.round-05{
-  border-radius: 0.5rem;
-}
-.round-1{
-  border-radius: 1rem;
-}
-
-.bg-cravada{
-  background-color: $cravada!important;
-}
-.bg-saldo{
-  background-color: $saldo!important;
-}
-.bg-acerto{
-  background-color: $acerto!important;
-}
-.bg-light{
-  background-color: $light!important;
-}
-.bg-dark{
-  background-color: $dark!important;
-}
-.bg-green{
-  background-color: $green!important;
-}
-.bg-darkgreen{
-  background-color: $darkgreen!important;
+.round-{
+  &05{
+    border-radius: 0.5rem;
+  }
+  &1{
+    border-radius: 1rem;
+  }
 }
 
-.c-cravada{
-  color: $cravada!important;
+.bg-{
+
+  &cravada{
+    background-color: $cravada!important;
+  }
+  &saldo{
+    background-color: $saldo!important;
+  }
+  &acerto{
+    background-color: $acerto!important;
+  }
+  &light{
+    background-color: $light!important;
+  }
+  &dark{
+    background-color: $dark!important;
+  }
+  &green{
+    background-color: $green!important;
+  }
+  &darkgreen{
+    background-color: $darkgreen!important;
+  }
 }
-.c-saldo{
-  color: $saldo!important;
-}
-.c-acerto{
-  color: $acerto!important;
-}
-.c-light{
-  color: $light!important;
-}
-.c-dark{
-  color: $dark!important;
-}
-.c-green{
-  color: $green!important;
-}
-.c-darkgreen{
-  color: $darkgreen!important;
+
+.c-{
+
+  &cravada{
+    color: $cravada!important;
+  }
+  &saldo{
+    color: $saldo!important;
+  }
+  &acerto{
+    color: $acerto!important;
+  }
+  &light{
+    color: $light!important;
+  }
+  &dark{
+    color: $dark!important;
+  }
+  &green{
+    color: $green!important;
+  }
+  &darkgreen{
+    color: $darkgreen!important;
+  }
 }
 
 
@@ -358,6 +369,7 @@ footer{
 
 
 
+
 .preloader{
   background-color: #232323;
   bottom: 0;
@@ -370,47 +382,45 @@ footer{
     transform: scale(1.5);
   }
   
+  span{
+    background: #e1e1e1;
+    border-radius: 100%;
+    height: 60px;
+    width: 200px;
+    line-height: 60px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    text-align: center;
+    color: #ffffff;
+    font-size: 24px;
+    margin: auto;
+    -webkit-animation: mymove 1.5s infinite linear;
+    animation: mymove 1.5s infinite linear;
+    img{
+      margin-top: 0px;
+    }
+    p{
+      color:#5f5f5f;
+      
+    }
+  }
+  .content-preloader{
+    position: relative;
+    text-align: center;
+    margin-top: 15%;
+    width: 80px;
+    margin-left: auto;
+    margin-right: auto;
+  }
   .icone{
+    position: absolute;
+    top: 28px;
+    left: 24px;
     transform: scale(2);
   }
-}
-.preloader span{
-  background: #e1e1e1;
-  border-radius: 100%;
-  height: 60px;
-  width: 200px;
-  line-height: 60px;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  text-align: center;
-  color: #ffffff;
-  font-size: 24px;
-  margin: auto;
-  -webkit-animation: mymove 1.5s infinite linear;
-  animation: mymove 1.5s infinite linear;
-}
-.preloader span img{
-  margin-top: 0px;
-}
-.preloader span p{
-  color:#5f5f5f;
-  
-}
-.content-preloader{
-  position: relative;
-  text-align: center;
-  margin-top: 15%;
-  width: 80px;
-  margin-left: auto;
-  margin-right: auto;
-}
-.preloader .content-preloader .icone{
-  position: absolute;
-  top: 28px;
-  left: 24px;
 }
 .spinner{
   --spinner-size: 5;
@@ -423,22 +433,22 @@ footer{
   width: 1em;
   height: 1em;
   border-radius: 50%;
-}
-.spinner .line{
-  fill: none;
-  stroke: var(--line-color);
-  stroke-width: var(--ring-size);
-  opacity: var(--line-alpha);
-  stroke-linecap: round;
-  transform-origin: 50% 50%;
-  transform: rotate3d(0, 0, 1, 0deg);
-  animation: 2156ms spinner-arc ease-in-out infinite, 1829ms spinner-rotate linear infinite;
-}
-.spinner .ring{
-  fill: none;
-  stroke: var(--ring-color);
-  stroke-width: var(--ring-size);
-  opacity: var(--ring-alpha);
+  .line{
+    fill: none;
+    stroke: var(--line-color);
+    stroke-width: var(--ring-size);
+    opacity: var(--line-alpha);
+    stroke-linecap: round;
+    transform-origin: 50% 50%;
+    transform: rotate3d(0, 0, 1, 0deg);
+    animation: 2156ms spinner-arc ease-in-out infinite, 1829ms spinner-rotate linear infinite;
+  }
+  .ring{
+    fill: none;
+    stroke: var(--ring-color);
+    stroke-width: var(--ring-size);
+    opacity: var(--ring-alpha);
+  }
 }
 @keyframes spinner-rotate{
   to{

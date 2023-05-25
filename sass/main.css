@@ -41,7 +41,6 @@ a:hover {
 .btn-click-sm:focus, .btn-click-sm:not(:disabled):not(.disabled):active:focus {
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1);
 }
-
 .btn-click {
   box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease-in-out;
@@ -57,7 +56,6 @@ a:hover {
 .btn-click:focus, .btn-click:not(:disabled):not(.disabled):active:focus {
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1);
 }
-
 .btn-primary {
   background-color: #1CB19C;
   border: 2px solid #1CB19C;
@@ -73,7 +71,6 @@ a:hover {
   border: 2px solid #1CB19C;
   color: #232323;
 }
-
 .btn-outline-primary {
   border: 1px solid #1CB19C;
   color: #1CB19C;
@@ -92,7 +89,6 @@ a:hover {
 .round-05 {
   border-radius: 0.5rem;
 }
-
 .round-1 {
   border-radius: 1rem;
 }
@@ -100,27 +96,21 @@ a:hover {
 .bg-cravada {
   background-color: #BF9000 !important;
 }
-
 .bg-saldo {
   background-color: #38761D !important;
 }
-
 .bg-acerto {
   background-color: #134F5C !important;
 }
-
 .bg-light {
   background-color: #E5E5E5 !important;
 }
-
 .bg-dark {
   background-color: #232323 !important;
 }
-
 .bg-green {
   background-color: #06DDBB !important;
 }
-
 .bg-darkgreen {
   background-color: #1CB19C !important;
 }
@@ -128,27 +118,21 @@ a:hover {
 .c-cravada {
   color: #BF9000 !important;
 }
-
 .c-saldo {
   color: #38761D !important;
 }
-
 .c-acerto {
   color: #134F5C !important;
 }
-
 .c-light {
   color: #E5E5E5 !important;
 }
-
 .c-dark {
   color: #232323 !important;
 }
-
 .c-green {
   color: #06DDBB !important;
 }
-
 .c-darkgreen {
   color: #1CB19C !important;
 }
@@ -339,10 +323,6 @@ footer a:hover {
 .preloader .preview {
   transform: scale(1.5);
 }
-.preloader .icone {
-  transform: scale(2);
-}
-
 .preloader span {
   background: #e1e1e1;
   border-radius: 100%;
@@ -360,16 +340,13 @@ footer a:hover {
   margin: auto;
   animation: mymove 1.5s infinite linear;
 }
-
 .preloader span img {
   margin-top: 0px;
 }
-
 .preloader span p {
   color: #5f5f5f;
 }
-
-.content-preloader {
+.preloader .content-preloader {
   position: relative;
   text-align: center;
   margin-top: 15%;
@@ -377,11 +354,11 @@ footer a:hover {
   margin-left: auto;
   margin-right: auto;
 }
-
-.preloader .content-preloader .icone {
+.preloader .icone {
   position: absolute;
   top: 28px;
   left: 24px;
+  transform: scale(2);
 }
 
 .spinner {
@@ -396,7 +373,6 @@ footer a:hover {
   height: 1em;
   border-radius: 50%;
 }
-
 .spinner .line {
   fill: none;
   stroke: var(--line-color);
@@ -407,7 +383,6 @@ footer a:hover {
   transform: rotate3d(0, 0, 1, 0deg);
   animation: 2156ms spinner-arc ease-in-out infinite, 1829ms spinner-rotate linear infinite;
 }
-
 .spinner .ring {
   fill: none;
   stroke: var(--ring-color);
