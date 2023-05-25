@@ -358,7 +358,6 @@ footer a:hover {
   color: #ffffff;
   font-size: 24px;
   margin: auto;
-  -webkit-animation: mymove 1.5s infinite linear;
   animation: mymove 1.5s infinite linear;
 }
 
@@ -406,8 +405,7 @@ footer a:hover {
   stroke-linecap: round;
   transform-origin: 50% 50%;
   transform: rotate3d(0, 0, 1, 0deg);
-  -webkit-animation: 2156ms spinner-arc ease-in-out infinite, 1829ms spinner-rotate linear infinite;
-          animation: 2156ms spinner-arc ease-in-out infinite, 1829ms spinner-rotate linear infinite;
+  animation: 2156ms spinner-arc ease-in-out infinite, 1829ms spinner-rotate linear infinite;
 }
 
 .spinner .ring {
@@ -417,25 +415,9 @@ footer a:hover {
   opacity: var(--ring-alpha);
 }
 
-@-webkit-keyframes spinner-rotate {
-  to {
-    transform: rotate3d(0, 0, 1, 360deg);
-  }
-}
-
 @keyframes spinner-rotate {
   to {
     transform: rotate3d(0, 0, 1, 360deg);
-  }
-}
-@-webkit-keyframes spinner-arc {
-  from {
-    stroke-dasharray: 0 150;
-    stroke-dashoffset: 0;
-  }
-  to {
-    stroke-dasharray: 100 150;
-    stroke-dashoffset: -140;
   }
 }
 @keyframes spinner-arc {
