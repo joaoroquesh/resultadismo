@@ -1,0 +1,5395 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "codigo": "RO",
+      "nome": "Resultadismo",
+      "imagem": "https://i.ibb.co/Xt4KHsH/Prancheta-preta.png"
+    },
+    {
+      "codigo": "CP",
+      "nome": "Copa dos Palpites",
+      "imagem": "https://i.ibb.co/gZs6Sn2/copa.png"
+    },
+    {
+      "codigo": "RT",
+      "nome": "Resultadão",
+      "imagem": "https://i.ibb.co/fNmJJnr/resultada-o.png"
+    },
+    {
+      "codigo": "RA",
+      "nome": "Resultadão A",
+      "imagem": "https://i.ibb.co/PN4FCyF/resultada-o-a.png"
+    },
+    {
+      "codigo": "RB",
+      "nome": "Resultadão B",
+      "imagem": "https://i.ibb.co/F8107y1/resultada-o-b.png"
+    },
+    {
+      "codigo": "SR",
+      "nome": "Super Copão",
+      "imagem": "https://i.ibb.co/mJxwV1g/Super-Copa.png"
+    },
+    {
+      "codigo": "BA",
+      "nome": "Brasileirão A",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/325/image"
+    },
+    {
+      "codigo": "BB",
+      "nome": "Brasileirão B",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/390/image"
+    },
+    {
+      "codigo": "BC",
+      "nome": "Brasileirão C",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/1281/image"
+    },
+    {
+      "codigo": "BD",
+      "nome": "Brasileirão D",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/10326/image"
+    },
+    {
+      "codigo": "CB",
+      "nome": "Copa do Brasil",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/373/image"
+    },
+    {
+      "codigo": "NO",
+      "nome": "Nordestão",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/1596/image"
+    },
+    {
+      "codigo": "SP",
+      "nome": "Paulista",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/372/image"
+    },
+    {
+      "codigo": "RJ",
+      "nome": "Carioca",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/92/image"
+    },
+    {
+      "codigo": "MG",
+      "nome": "Mineiro",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/379/image"
+    },
+    {
+      "codigo": "RS",
+      "nome": "Gaúcho",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/377/image"
+    },
+    {
+      "codigo": "LB",
+      "nome": "Libertadores",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/384/image"
+    },
+    {
+      "codigo": "SL",
+      "nome": "Sul-Americana",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/480/image"
+    },
+    {
+      "codigo": "EN",
+      "nome": "Premier League",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/17/image"
+    },
+    {
+      "codigo": "ES",
+      "nome": "La Liga",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/8/image"
+    },
+    {
+      "codigo": "FR",
+      "nome": "Ligue 1",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/34/image"
+    },
+    {
+      "codigo": "IT",
+      "nome": "Serie A",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/23/image"
+    },
+    {
+      "codigo": "AL",
+      "nome": "Bundesliga",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/35/image"
+    },
+    {
+      "codigo": "CH",
+      "nome": "Champions",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/7/image"
+    },
+    {
+      "codigo": "EL",
+      "nome": "Europa League",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/679/image"
+    },
+    {
+      "codigo": "MU",
+      "nome": "Mundial",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/357/image"
+    },
+    {
+      "codigo": "SE",
+      "nome": "Seleções",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/851/image/dark"
+    },
+    {
+      "codigo": "EC",
+      "nome": "Eurocopa",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/1/image"
+    },
+    {
+      "codigo": "CA",
+      "nome": "Copa América",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/133/image"
+    },
+    {
+      "codigo": "AF",
+      "nome": "Copa Africana",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/270/image"
+    },
+    {
+      "codigo": "EM",
+      "nome": "Eliminatórias",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/295/image"
+    },
+    {
+      "codigo": "CM",
+      "nome": "Copa do Mundo",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/16/image"
+    },
+    {
+      "codigo": "AL",
+      "nome": "Alternativos",
+      "imagem": "https://cdn-icons-png.flaticon.com/512/53/53283.png"
+    },
+    {
+      "codigo": "CO",
+      "nome": "Copinha",
+      "imagem": "https://upload.wikimedia.org/wikipedia/pt/0/02/Copinha-2022.png"
+    },
+    {
+      "codigo": "NA",
+      "nome": "Nations League",
+      "imagem": "https://api.sofascore.app/api/v1/unique-tournament/10783/image"
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "fadautofn@gmail.com",
+      "nome": "Adauto Farias",
+      "imagem": "https://www.resultadismo.com/images/escudos/AdautoF.png"
+    },
+    {
+      "codigo": "alangripp@gmail.com",
+      "nome": "Alan Gripp",
+      "imagem": "https://www.resultadismo.com/images/escudos/AlanG.png"
+    },
+    {
+      "codigo": "",
+      "nome": "Bruno Lara",
+      "imagem": "https://i.ibb.co/nfJDTmh/BrunoL.png"
+    },
+    {
+      "codigo": "",
+      "nome": "Cadu Barros",
+      "imagem": "https://i.ibb.co/9ndnqqc/Cadu.png"
+    },
+    {
+      "codigo": "cayquemelosh@gmail.com",
+      "nome": "Cayque Melo",
+      "imagem": "https://www.resultadismo.com/images/escudos/CayqueM.png"
+    },
+    {
+      "codigo": "",
+      "nome": "Diógenes",
+      "imagem": "https://i.ibb.co/nCqTBZJ/Diogenes.png"
+    },
+    {
+      "codigo": "",
+      "nome": "Elias Rodrigues",
+      "imagem": "https://i.ibb.co/Czx7rs7/EliasR.png"
+    },
+    {
+      "codigo": "emersonsilva8795@gmail.com",
+      "nome": "Emerson Silva",
+      "imagem": "https://www.resultadismo.com/images/escudos/EmersonS.png"
+    },
+    {
+      "codigo": "",
+      "nome": "Filipe Azevedo",
+      "imagem": "https://i.ibb.co/Dr0hdbB/Filipe.png"
+    },
+    {
+      "codigo": "",
+      "nome": "Gabriel Rizzi",
+      "imagem": "https://i.ibb.co/vxCgNW0/GRizzi.png"
+    },
+    {
+      "codigo": "gabrieltxr97@gmail.com",
+      "nome": "Gabriel Teixeira",
+      "imagem": "https://www.resultadismo.com/images/escudos/GabrielT.png"
+    },
+    {
+      "codigo": "gabrielmorelshalom@gmail.com",
+      "nome": "Gabriel Morel",
+      "imagem": "https://www.resultadismo.com/images/escudos/GabrielM.png"
+    },
+    {
+      "codigo": "gustavosousash@gmail.com",
+      "nome": "Gustavo Sousa",
+      "imagem": "https://www.resultadismo.com/images/escudos/GustavoS.png"
+    },
+    {
+      "codigo": "jbrunocouto@gmail.com",
+      "nome": "João Bruno",
+      "imagem": "https://www.resultadismo.com/images/escudos/JoaoB.png"
+    },
+    {
+      "codigo": "joao.crf93@gmail.com",
+      "nome": "João Roque",
+      "imagem": "https://www.resultadismo.com/images/escudos/JoaoR.png"
+    },
+    {
+      "codigo": "luanhatsuo.sh@gmail.com",
+      "nome": "Luan Hatsuo",
+      "imagem": "https://www.resultadismo.com/images/escudos/LuanH.png"
+    },
+    {
+      "codigo": "",
+      "nome": "Luiz Guilherme",
+      "imagem": "https://i.ibb.co/0hYKCjL/Guilherme.png"
+    },
+    {
+      "codigo": "fcomatheuscosta@gmail.com",
+      "nome": "Matheus Costa",
+      "imagem": "https://www.resultadismo.com/images/escudos/MatheusC.png"
+    },
+    {
+      "codigo": "josebertoldoneto@gmail.com",
+      "nome": "Neto Bertoldo",
+      "imagem": "https://www.resultadismo.com/images/escudos/NetoB.png"
+    },
+    {
+      "codigo": "",
+      "nome": "Rafael Laucksen",
+      "imagem": "https://i.ibb.co/6F2N4VG/RafaL.png"
+    },
+    {
+      "codigo": "",
+      "nome": "Ramon Acioli",
+      "imagem": "https://i.ibb.co/SV28FDX/Ramon.png"
+    },
+    {
+      "codigo": "",
+      "nome": "Saul Nascimento",
+      "imagem": "https://i.ibb.co/WHmndPQ/Saul.png"
+    },
+    {
+      "codigo": "thiagocarvalho.sh@gmail.com",
+      "nome": "Thiago Carvalho",
+      "imagem": "https://www.resultadismo.com/images/escudos/ThiagoC.png"
+    },
+    {
+      "codigo": "wellingtondiassh@gmail.com",
+      "nome": "Wellington Dias",
+      "imagem": "https://www.resultadismo.com/images/escudos/WellingtonD.png"
+    },
+    {
+      "codigo": "mateuspessoashalom@gmail.com",
+      "nome": "Mateus Pessoa",
+      "imagem": "https://www.resultadismo.com/images/escudos/MateusP.png"
+    },
+    {
+      "codigo": "rafaelpessoada.s@gmail.com",
+      "nome": "Rafael Pessoa",
+      "imagem": "https://www.resultadismo.com/images/escudos/padrao.png"
+    },
+    {
+      "codigo": "",
+      "nome": "Jogador 28",
+      "imagem": "https://www.resultadismo.com/images/escudos/padrao.png"
+    },
+    {
+      "codigo": "",
+      "nome": "Jogador 29",
+      "imagem": "https://www.resultadismo.com/images/escudos/padrao.png"
+    },
+    {
+      "codigo": "",
+      "nome": "Jogador 30",
+      "imagem": "https://www.resultadismo.com/images/escudos/padrao.png"
+    },
+    {
+      "codigo": "",
+      "nome": "Jogador 31",
+      "imagem": "https://www.resultadismo.com/images/escudos/padrao.png"
+    },
+    {
+      "codigo": "",
+      "nome": "Jogador 32",
+      "imagem": "https://www.resultadismo.com/images/escudos/padrao.png"
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "4deJulho",
+      "nome": "4 de Julho",
+      "imagem": "https://api.sofascore.app/api/v1/team/65504/image"
+    },
+    {
+      "codigo": "9deOctubre",
+      "nome": "9 de Octubre",
+      "imagem": "https://api.sofascore.app/api/v1/team/339975/image"
+    },
+    {
+      "codigo": "ABC",
+      "nome": "ABC",
+      "imagem": "https://api.sofascore.app/api/v1/team/21838/image"
+    },
+    {
+      "codigo": "Afogados",
+      "nome": "Afogados",
+      "imagem": "https://api.sofascore.app/api/v1/team/242130/image"
+    },
+    {
+      "codigo": "ÁfricadoSul",
+      "nome": "África do Sul",
+      "imagem": "https://api.sofascore.app/api/v1/team/4736/image"
+    },
+    {
+      "codigo": "ÁguaSanta",
+      "nome": "Água Santa",
+      "imagem": "https://api.sofascore.app/api/v1/team/135510/image"
+    },
+    {
+      "codigo": "ÁguiaNegra",
+      "nome": "Águia Negra",
+      "imagem": "https://api.sofascore.app/api/v1/team/21839/image"
+    },
+    {
+      "codigo": "AimoréRS",
+      "nome": "Aimoré | RS",
+      "imagem": "https://api.sofascore.app/api/v1/team/133870/image"
+    },
+    {
+      "codigo": "Ajaccio",
+      "nome": "Ajaccio",
+      "imagem": "https://api.sofascore.app/api/v1/team/1660/image"
+    },
+    {
+      "codigo": "Ajax",
+      "nome": "Ajax",
+      "imagem": "https://api.sofascore.app/api/v1/team/2953/image"
+    },
+    {
+      "codigo": "AlAhly",
+      "nome": "Al Ahly",
+      "imagem": "https://api.sofascore.app/api/v1/team/6910/image"
+    },
+    {
+      "codigo": "AlDuhail",
+      "nome": "Al Duhail",
+      "imagem": "https://api.sofascore.app/api/v1/team/44441/image"
+    },
+    {
+      "codigo": "AlHilal",
+      "nome": "Al Hilal",
+      "imagem": "https://api.sofascore.app/api/v1/team/21895/image"
+    },
+    {
+      "codigo": "AlJazira",
+      "nome": "Al Jazira",
+      "imagem": "https://api.sofascore.app/api/v1/team/8090/image"
+    },
+    {
+      "codigo": "Alavés",
+      "nome": "Alavés",
+      "imagem": "https://api.sofascore.app/api/v1/team/2885/image"
+    },
+    {
+      "codigo": "Albânia",
+      "nome": "Albânia",
+      "imagem": "https://api.sofascore.app/api/v1/team/4690/image"
+    },
+    {
+      "codigo": "Alemanha",
+      "nome": "Alemanha",
+      "imagem": "https://api.sofascore.app/api/v1/team/4711/image"
+    },
+    {
+      "codigo": "AlianzaLima",
+      "nome": "Alianza Lima",
+      "imagem": "https://api.sofascore.app/api/v1/team/2311/image"
+    },
+    {
+      "codigo": "Almería",
+      "nome": "Almería",
+      "imagem": "https://api.sofascore.app/api/v1/team/2858/image"
+    },
+    {
+      "codigo": "Altos",
+      "nome": "Altos",
+      "imagem": "https://api.sofascore.app/api/v1/team/228199/image"
+    },
+    {
+      "codigo": "AlwaysR.",
+      "nome": "Always R.",
+      "imagem": "https://api.sofascore.app/api/v1/team/268083/image"
+    },
+    {
+      "codigo": "AméricaCali",
+      "nome": "América Cali",
+      "imagem": "https://api.sofascore.app/api/v1/team/6102/image"
+    },
+    {
+      "codigo": "AméricaMineiro",
+      "nome": "América Mineiro",
+      "imagem": "https://api.sofascore.app/api/v1/team/1973/image"
+    },
+    {
+      "codigo": "AméricaRN",
+      "nome": "América-RN",
+      "imagem": "https://api.sofascore.app/api/v1/team/2023/image"
+    },
+    {
+      "codigo": "Andorra",
+      "nome": "Andorra",
+      "imagem": "https://api.sofascore.app/api/v1/team/4818/image"
+    },
+    {
+      "codigo": "Angers",
+      "nome": "Angers",
+      "imagem": "https://api.sofascore.app/api/v1/team/1684/image"
+    },
+    {
+      "codigo": "Antofagasta",
+      "nome": "Antofagasta",
+      "imagem": "https://api.sofascore.app/api/v1/team/5601/image"
+    },
+    {
+      "codigo": "Aparecidense",
+      "nome": "Aparecidense",
+      "imagem": "https://api.sofascore.app/api/v1/team/32794/image"
+    },
+    {
+      "codigo": "ArábiaSaudita",
+      "nome": "Arábia Saudita",
+      "imagem": "https://api.sofascore.app/api/v1/team/4834/image"
+    },
+    {
+      "codigo": "Aragua",
+      "nome": "Aragua",
+      "imagem": "https://api.sofascore.app/api/v1/team/6228/image"
+    },
+    {
+      "codigo": "Argélia",
+      "nome": "Argélia",
+      "imagem": "https://api.sofascore.app/api/v1/team/4691/image"
+    },
+    {
+      "codigo": "Argentina",
+      "nome": "Argentina",
+      "imagem": "https://api.sofascore.app/api/v1/team/4819/image"
+    },
+    {
+      "codigo": "ArgentinosJr.",
+      "nome": "Argentinos Jr.",
+      "imagem": "https://api.sofascore.app/api/v1/team/3216/image"
+    },
+    {
+      "codigo": "Armênia",
+      "nome": "Armênia",
+      "imagem": "https://api.sofascore.app/api/v1/team/4740/image"
+    },
+    {
+      "codigo": "Arsenal",
+      "nome": "Arsenal",
+      "imagem": "https://api.sofascore.app/api/v1/team/42/image"
+    },
+    {
+      "codigo": "ArsenalSar.",
+      "nome": "Arsenal Sar.",
+      "imagem": "https://api.sofascore.app/api/v1/team/3221/image"
+    },
+    {
+      "codigo": "ASPirae",
+      "nome": "AS Pirae",
+      "imagem": "https://api.sofascore.app/api/v1/team/149162/image"
+    },
+    {
+      "codigo": "ASA",
+      "nome": "ASA",
+      "imagem": "https://api.sofascore.app/api/v1/team/2019/image"
+    },
+    {
+      "codigo": "AstonVilla",
+      "nome": "Aston Villa",
+      "imagem": "https://api.sofascore.app/api/v1/team/40/image"
+    },
+    {
+      "codigo": "Atalanta",
+      "nome": "Atalanta",
+      "imagem": "https://api.sofascore.app/api/v1/team/2686/image"
+    },
+    {
+      "codigo": "Athletic",
+      "nome": "Athletic",
+      "imagem": "https://api.sofascore.app/api/v1/team/2825/image"
+    },
+    {
+      "codigo": "AthleticMG",
+      "nome": "Athletic-MG",
+      "imagem": "https://api.sofascore.app/api/v1/team/342775/image"
+    },
+    {
+      "codigo": "Athletico",
+      "nome": "Athletico",
+      "imagem": "https://api.sofascore.app/api/v1/team/1967/image"
+    },
+    {
+      "codigo": "AtléticoAlagoinhas",
+      "nome": "Atlético Alagoinhas",
+      "imagem": "https://api.sofascore.app/api/v1/team/306005/image"
+    },
+    {
+      "codigo": "AtléticoCearense",
+      "nome": "Atlético Cearense",
+      "imagem": "https://api.sofascore.app/api/v1/team/212493/image"
+    },
+    {
+      "codigo": "AtléticoGoianiense",
+      "nome": "Atlético Goianiense",
+      "imagem": "https://api.sofascore.app/api/v1/team/7314/image"
+    },
+    {
+      "codigo": "AtléticoMadrid",
+      "nome": "Atlético Madrid",
+      "imagem": "https://api.sofascore.app/api/v1/team/2836/image"
+    },
+    {
+      "codigo": "AtléticoMineiro",
+      "nome": "Atlético Mineiro",
+      "imagem": "https://api.sofascore.app/api/v1/team/1977/image"
+    },
+    {
+      "codigo": "Aucas",
+      "nome": "Aucas",
+      "imagem": "https://api.sofascore.app/api/v1/team/5249/image"
+    },
+    {
+      "codigo": "Audax",
+      "nome": "Audax",
+      "imagem": "https://api.sofascore.app/api/v1/team/85341/image"
+    },
+    {
+      "codigo": "Augsburg",
+      "nome": "Augsburg",
+      "imagem": "https://api.sofascore.app/api/v1/team/2600/image"
+    },
+    {
+      "codigo": "Austrália",
+      "nome": "Austrália",
+      "imagem": "https://api.sofascore.app/api/v1/team/4741/image"
+    },
+    {
+      "codigo": "Áustria",
+      "nome": "Áustria",
+      "imagem": "https://api.sofascore.app/api/v1/team/4718/image"
+    },
+    {
+      "codigo": "Avaí",
+      "nome": "Avaí",
+      "imagem": "https://api.sofascore.app/api/v1/team/7315/image"
+    },
+    {
+      "codigo": "Ayacucho",
+      "nome": "Ayacucho",
+      "imagem": "https://api.sofascore.app/api/v1/team/33894/image"
+    },
+    {
+      "codigo": "Azerbaijão",
+      "nome": "Azerbaijão",
+      "imagem": "https://api.sofascore.app/api/v1/team/4742/image"
+    },
+    {
+      "codigo": "Azuriz",
+      "nome": "Azuriz",
+      "imagem": "https://api.sofascore.app/api/v1/team/375853/image"
+    },
+    {
+      "codigo": "Bahia",
+      "nome": "Bahia",
+      "imagem": "https://api.sofascore.app/api/v1/team/1955/image"
+    },
+    {
+      "codigo": "BahiadeFeira",
+      "nome": "Bahia de Feira",
+      "imagem": "https://api.sofascore.app/api/v1/team/39638/image"
+    },
+    {
+      "codigo": "Banfield",
+      "nome": "Banfield",
+      "imagem": "https://api.sofascore.app/api/v1/team/3219/image"
+    },
+    {
+      "codigo": "Bangu",
+      "nome": "Bangu",
+      "imagem": "https://api.sofascore.app/api/v1/team/1993/image"
+    },
+    {
+      "codigo": "Barcelona",
+      "nome": "Barcelona",
+      "imagem": "https://api.sofascore.app/api/v1/team/2817/image"
+    },
+    {
+      "codigo": "BarcelonaEQD",
+      "nome": "Barcelona | EQD",
+      "imagem": "https://api.sofascore.app/api/v1/team/5250/image"
+    },
+    {
+      "codigo": "Bayern",
+      "nome": "Bayern",
+      "imagem": "https://api.sofascore.app/api/v1/team/2672/image"
+    },
+    {
+      "codigo": "Bélgica",
+      "nome": "Bélgica",
+      "imagem": "https://api.sofascore.app/api/v1/team/4717/image"
+    },
+    {
+      "codigo": "Benfica",
+      "nome": "Benfica",
+      "imagem": "https://api.sofascore.app/api/v1/team/3006/image"
+    },
+    {
+      "codigo": "Besiktas",
+      "nome": "Besiktas",
+      "imagem": "https://api.sofascore.app/api/v1/team/3050/image"
+    },
+    {
+      "codigo": "Betis",
+      "nome": "Betis",
+      "imagem": "https://api.sofascore.app/api/v1/team/2816/image"
+    },
+    {
+      "codigo": "Bielefeld",
+      "nome": "Bielefeld",
+      "imagem": "https://api.sofascore.app/api/v1/team/2540/image"
+    },
+    {
+      "codigo": "Bielorrússia",
+      "nome": "Bielorrússia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/997_imgbank_flag.png"
+    },
+    {
+      "codigo": "Binacional",
+      "nome": "Binacional",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/81443_imgbank.png"
+    },
+    {
+      "codigo": "BoaEsporte",
+      "nome": "Boa Esporte",
+      "imagem": "https://api.sofascore.app/api/v1/team/21854/image"
+    },
+    {
+      "codigo": "Boavista",
+      "nome": "Boavista",
+      "imagem": "https://api.sofascore.app/api/v1/team/6977/image"
+    },
+    {
+      "codigo": "BocaJuniors",
+      "nome": "Boca Juniors",
+      "imagem": "https://api.sofascore.app/api/v1/team/3202/image"
+    },
+    {
+      "codigo": "Bochum",
+      "nome": "Bochum",
+      "imagem": "https://api.sofascore.app/api/v1/team/2542/image"
+    },
+    {
+      "codigo": "Bodø/Glimt",
+      "nome": "Bodø/Glimt",
+      "imagem": "https://api.sofascore.app/api/v1/team/656/image"
+    },
+    {
+      "codigo": "Bolívar",
+      "nome": "Bolívar",
+      "imagem": "http://www.ogol.com.br/img/logos/equipas/2373_imgbank.png"
+    },
+    {
+      "codigo": "Bolívia",
+      "nome": "Bolívia",
+      "imagem": "https://api.sofascore.app/api/v1/team/4746/image"
+    },
+    {
+      "codigo": "Bologna",
+      "nome": "Bologna",
+      "imagem": "https://api.sofascore.app/api/v1/team/2685/image"
+    },
+    {
+      "codigo": "Bordeaux",
+      "nome": "Bordeaux",
+      "imagem": "https://upload.wikimedia.org/wikipedia/pt/f/f3/Girondins_Bordeaux.png"
+    },
+    {
+      "codigo": "Bosnia",
+      "nome": "Bosnia",
+      "imagem": "https://api.sofascore.app/api/v1/team/4479/image"
+    },
+    {
+      "codigo": "BósniaeHerz.",
+      "nome": "Bósnia e Herz.",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/998_imgbank_flag.png"
+    },
+    {
+      "codigo": "Botafogo",
+      "nome": "Botafogo",
+      "imagem": "https://api.sofascore.app/api/v1/team/1958/image"
+    },
+    {
+      "codigo": "BotafogoPB",
+      "nome": "Botafogo | PB",
+      "imagem": "https://api.sofascore.app/api/v1/team/49196/image"
+    },
+    {
+      "codigo": "BotafogoSP",
+      "nome": "Botafogo SP",
+      "imagem": "https://api.sofascore.app/api/v1/team/1979/image"
+    },
+    {
+      "codigo": "Bournemouth",
+      "nome": "Bournemouth",
+      "imagem": "https://upload.wikimedia.org/wikipedia/pt/thumb/9/98/AfcBournemouth.png/120px-AfcBournemouth.png"
+    },
+    {
+      "codigo": "Braga",
+      "nome": "Braga",
+      "imagem": "https://api.sofascore.app/api/v1/team/2999/image"
+    },
+    {
+      "codigo": "Brasil",
+      "nome": "Brasil",
+      "imagem": "https://api.sofascore.app/api/v1/team/4748/image"
+    },
+    {
+      "codigo": "BrasilRS",
+      "nome": "Brasil | RS",
+      "imagem": "https://api.sofascore.app/api/v1/team/1986/image"
+    },
+    {
+      "codigo": "Brasiliense",
+      "nome": "Brasiliense",
+      "imagem": "https://api.sofascore.app/api/v1/team/2024/image"
+    },
+    {
+      "codigo": "Brentford",
+      "nome": "Brentford",
+      "imagem": "https://api.sofascore.app/api/v1/team/50/image"
+    },
+    {
+      "codigo": "Brighton",
+      "nome": "Brighton",
+      "imagem": "https://api.sofascore.app/api/v1/team/30/image"
+    },
+    {
+      "codigo": "Brugge",
+      "nome": "Brugge",
+      "imagem": "https://api.sofascore.app/api/v1/team/2888/image"
+    },
+    {
+      "codigo": "Brusque",
+      "nome": "Brusque",
+      "imagem": "https://api.sofascore.app/api/v1/team/21884/image"
+    },
+    {
+      "codigo": "Bulgária",
+      "nome": "Bulgária",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/817_imgbank_flag.png"
+    },
+    {
+      "codigo": "BurkinaFaso",
+      "nome": "Burkina Faso",
+      "imagem": "https://api.sofascore.app/api/v1/team/4749/image"
+    },
+    {
+      "codigo": "Burnley",
+      "nome": "Burnley",
+      "imagem": "https://api.sofascore.app/api/v1/team/6/image"
+    },
+    {
+      "codigo": "CaboVerde",
+      "nome": "Cabo Verde",
+      "imagem": "https://api.sofascore.app/api/v1/team/4753/image"
+    },
+    {
+      "codigo": "Cádiz",
+      "nome": "Cádiz",
+      "imagem": "https://api.sofascore.app/api/v1/team/4488/image"
+    },
+    {
+      "codigo": "Cagliari",
+      "nome": "Cagliari",
+      "imagem": "https://api.sofascore.app/api/v1/team/2719/image"
+    },
+    {
+      "codigo": "Caldense",
+      "nome": "Caldense",
+      "imagem": "https://api.sofascore.app/api/v1/team/39621/image"
+    },
+    {
+      "codigo": "Camarões",
+      "nome": "Camarões",
+      "imagem": "https://api.sofascore.app/api/v1/team/4751/image"
+    },
+    {
+      "codigo": "Camboriú",
+      "nome": "Camboriú",
+      "imagem": "https://api.sofascore.app/api/v1/team/61720/image"
+    },
+    {
+      "codigo": "Campinense",
+      "nome": "Campinense",
+      "imagem": "https://api.sofascore.app/api/v1/team/34010/image"
+    },
+    {
+      "codigo": "Canaã",
+      "nome": "Canaã",
+      "imagem": "https://api.sofascore.app/api/v1/team/337348/image"
+    },
+    {
+      "codigo": "Canadá",
+      "nome": "Canadá",
+      "imagem": "https://api.sofascore.app/api/v1/team/4752/image"
+    },
+    {
+      "codigo": "Caracas",
+      "nome": "Caracas",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2402_imgbank.png"
+    },
+    {
+      "codigo": "Cardiff",
+      "nome": "Cardiff",
+      "imagem": "https://api.sofascore.app/api/v1/team/61/image"
+    },
+    {
+      "codigo": "Cascavel",
+      "nome": "Cascavel",
+      "imagem": "https://api.sofascore.app/api/v1/team/21891/image"
+    },
+    {
+      "codigo": "Catar",
+      "nome": "Catar",
+      "imagem": "https://api.sofascore.app/api/v1/team/4792/image"
+    },
+    {
+      "codigo": "Caucaia",
+      "nome": "Caucaia",
+      "imagem": "https://upload.wikimedia.org/wikipedia/pt/thumb/f/fb/CaucaiaEC2019.png/120px-CaucaiaEC2019.png"
+    },
+    {
+      "codigo": "Caxias",
+      "nome": "Caxias",
+      "imagem": "https://api.sofascore.app/api/v1/team/2000/image"
+    },
+    {
+      "codigo": "Cazaquistão",
+      "nome": "Cazaquistão",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/1007_imgbank_flag.png"
+    },
+    {
+      "codigo": "Ceará",
+      "nome": "Ceará",
+      "imagem": "https://api.sofascore.app/api/v1/team/2001/image"
+    },
+    {
+      "codigo": "Ceilândia",
+      "nome": "Ceilândia",
+      "imagem": "https://api.sofascore.app/api/v1/team/35279/image"
+    },
+    {
+      "codigo": "Celta",
+      "nome": "Celta",
+      "imagem": "https://api.sofascore.app/api/v1/team/2821/image"
+    },
+    {
+      "codigo": "Celtic",
+      "nome": "Celtic",
+      "imagem": "https://api.sofascore.app/api/v1/team/2352/image"
+    },
+    {
+      "codigo": "CerroPorteño",
+      "nome": "Cerro Porteño",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2328_imgbank.png"
+    },
+    {
+      "codigo": "Chapadinha",
+      "nome": "Chapadinha",
+      "imagem": "https://api.sofascore.app/api/v1/team/404691/image"
+    },
+    {
+      "codigo": "Chapecoense",
+      "nome": "Chapecoense",
+      "imagem": "https://api.sofascore.app/api/v1/team/21845/image"
+    },
+    {
+      "codigo": "Chelsea",
+      "nome": "Chelsea",
+      "imagem": "https://api.sofascore.app/api/v1/team/38/image"
+    },
+    {
+      "codigo": "Chile",
+      "nome": "Chile",
+      "imagem": "https://api.sofascore.app/api/v1/team/4754/image"
+    },
+    {
+      "codigo": "Cianorte",
+      "nome": "Cianorte",
+      "imagem": "https://api.sofascore.app/api/v1/team/21892/image"
+    },
+    {
+      "codigo": "ClermontFoot",
+      "nome": "Clermont Foot",
+      "imagem": "https://upload.wikimedia.org/wikipedia/pt/2/21/Clermont_Foot_63_logo.png"
+    },
+    {
+      "codigo": "ClubAmérica",
+      "nome": "Club América",
+      "imagem": "https://api.sofascore.app/api/v1/team/1939/image"
+    },
+    {
+      "codigo": "Coimbra",
+      "nome": "Coimbra",
+      "imagem": "https://api.sofascore.app/api/v1/team/336563/image"
+    },
+    {
+      "codigo": "ColoColo",
+      "nome": "Colo Colo",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2261_imgbank.png"
+    },
+    {
+      "codigo": "Colômbia",
+      "nome": "Colômbia",
+      "imagem": "https://api.sofascore.app/api/v1/team/4820/image"
+    },
+    {
+      "codigo": "Colón",
+      "nome": "Colón",
+      "imagem": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Escudo_Colon_Con_Estrella.png/120px-Escudo_Colon_Con_Estrella.png"
+    },
+    {
+      "codigo": "Comores",
+      "nome": "Comores",
+      "imagem": "https://api.sofascore.app/api/v1/team/23494/image"
+    },
+    {
+      "codigo": "Confiança",
+      "nome": "Confiança",
+      "imagem": "https://api.sofascore.app/api/v1/team/2017/image"
+    },
+    {
+      "codigo": "Copenhagen",
+      "nome": "Copenhagen",
+      "imagem": "https://api.sofascore.app/api/v1/team/1284/image"
+    },
+    {
+      "codigo": "CoréiadoSul",
+      "nome": "Coréia do Sul",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/861_imgbank_flag.png"
+    },
+    {
+      "codigo": "Corinthians",
+      "nome": "Corinthians",
+      "imagem": "https://api.sofascore.app/api/v1/team/1957/image"
+    },
+    {
+      "codigo": "Coritiba",
+      "nome": "Coritiba",
+      "imagem": "https://api.sofascore.app/api/v1/team/1982/image"
+    },
+    {
+      "codigo": "Coruripe",
+      "nome": "Coruripe",
+      "imagem": "https://api.sofascore.app/api/v1/team/21847/image"
+    },
+    {
+      "codigo": "CostadoMarfim",
+      "nome": "Costa do Marfim",
+      "imagem": "https://api.sofascore.app/api/v1/team/4768/image"
+    },
+    {
+      "codigo": "CostaRica",
+      "nome": "Costa Rica",
+      "imagem": "https://api.sofascore.app/api/v1/team/4756/image"
+    },
+    {
+      "codigo": "CRB",
+      "nome": "CRB",
+      "imagem": "https://api.sofascore.app/api/v1/team/22032/image"
+    },
+    {
+      "codigo": "Cremonese",
+      "nome": "Cremonese",
+      "imagem": "https://api.sofascore.app/api/v1/team/2761/image"
+    },
+    {
+      "codigo": "Criciúma",
+      "nome": "Criciúma",
+      "imagem": "https://api.sofascore.app/api/v1/team/1984/image"
+    },
+    {
+      "codigo": "Croácia",
+      "nome": "Croácia",
+      "imagem": "https://api.sofascore.app/api/v1/team/4715/image"
+    },
+    {
+      "codigo": "Cruzeiro",
+      "nome": "Cruzeiro",
+      "imagem": "https://api.sofascore.app/api/v1/team/1954/image"
+    },
+    {
+      "codigo": "CrystalPalace",
+      "nome": "Crystal Palace",
+      "imagem": "https://api.sofascore.app/api/v1/team/7/image"
+    },
+    {
+      "codigo": "CSA",
+      "nome": "CSA",
+      "imagem": "http://www.ogol.com.br/img/logos/equipas/3217_imgbank.png"
+    },
+    {
+      "codigo": "Cuiabá",
+      "nome": "Cuiabá",
+      "imagem": "https://api.sofascore.app/api/v1/team/49202/image"
+    },
+    {
+      "codigo": "DefensayJusticia",
+      "nome": "Defensa y Justicia",
+      "imagem": "http://www.ogol.com.br/img/logos/equipas/9311_imgbank.png"
+    },
+    {
+      "codigo": "Delfín",
+      "nome": "Delfín",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/23594_imgbank.png"
+    },
+    {
+      "codigo": "Democrata",
+      "nome": "Democrata",
+      "imagem": "https://api.sofascore.app/api/v1/team/21848/image"
+    },
+    {
+      "codigo": "Dep.Cali",
+      "nome": "Dep. Cali",
+      "imagem": "https://api.sofascore.app/api/v1/team/6112/image"
+    },
+    {
+      "codigo": "Dep.Lara",
+      "nome": "Dep. Lara",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/31259_imgbank.png"
+    },
+    {
+      "codigo": "Dep.Táchira",
+      "nome": "Dep. Táchira",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2409_imgbank.png"
+    },
+    {
+      "codigo": "Dep.Tolima",
+      "nome": "Dep. Tolima",
+      "imagem": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Escudo_Deportes_Tolima_Sin_A%C3%B1o_2.png/200px-Escudo_Deportes_Tolima_Sin_A%C3%B1o_2.png"
+    },
+    {
+      "codigo": "DerbyCounty",
+      "nome": "Derby County",
+      "imagem": "https://api.sofascore.app/api/v1/team/27/image"
+    },
+    {
+      "codigo": "DesportivoBrasil",
+      "nome": "Desportivo Brasil",
+      "imagem": "https://api.sofascore.app/api/v1/team/137260/image"
+    },
+    {
+      "codigo": "Din.Zagreb",
+      "nome": "Din. Zagreb",
+      "imagem": "https://api.sofascore.app/api/v1/team/2032/image"
+    },
+    {
+      "codigo": "Dinamarca",
+      "nome": "Dinamarca",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/819_imgbank_flag.png"
+    },
+    {
+      "codigo": "Dortmund",
+      "nome": "Dortmund",
+      "imagem": "https://api.sofascore.app/api/v1/team/2673/image"
+    },
+    {
+      "codigo": "DynamoKyiv",
+      "nome": "Dynamo Kyiv",
+      "imagem": "https://api.sofascore.app/api/v1/team/3305/image"
+    },
+    {
+      "codigo": "EAU",
+      "nome": "EAU",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/869_imgbank_flag.png"
+    },
+    {
+      "codigo": "ECS.Bernardo",
+      "nome": "EC S. Bernardo",
+      "imagem": "https://api.sofascore.app/api/v1/team/283064/image"
+    },
+    {
+      "codigo": "Egito",
+      "nome": "Egito",
+      "imagem": "https://api.sofascore.app/api/v1/team/4758/image"
+    },
+    {
+      "codigo": "Elche",
+      "nome": "Elche",
+      "imagem": "https://api.sofascore.app/api/v1/team/2846/image"
+    },
+    {
+      "codigo": "Emelec",
+      "nome": "Emelec",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2366_imgbank.png"
+    },
+    {
+      "codigo": "Empoli",
+      "nome": "Empoli",
+      "imagem": "https://api.sofascore.app/api/v1/team/2705/image"
+    },
+    {
+      "codigo": "Equador",
+      "nome": "Equador",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/938_imgbank_flag.png"
+    },
+    {
+      "codigo": "Escócia",
+      "nome": "Escócia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/820_imgbank_flag.png"
+    },
+    {
+      "codigo": "Eslováquia",
+      "nome": "Eslováquia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/1017_imgbank_flag.png"
+    },
+    {
+      "codigo": "Eslovênia",
+      "nome": "Eslovênia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/821_imgbank_flag.png"
+    },
+    {
+      "codigo": "Espanha",
+      "nome": "Espanha",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/822_imgbank_flag.png"
+    },
+    {
+      "codigo": "Espanyol",
+      "nome": "Espanyol",
+      "imagem": "https://api.sofascore.app/api/v1/team/2814/image"
+    },
+    {
+      "codigo": "EsportivoRS",
+      "nome": "Esportivo | RS",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3233_imgbank.png"
+    },
+    {
+      "codigo": "Estônia",
+      "nome": "Estônia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/1000_imgbank_flag.png"
+    },
+    {
+      "codigo": "EstrelaVermelha",
+      "nome": "Estrela Vermelha",
+      "imagem": "https://api.sofascore.app/api/v1/team/5149/image"
+    },
+    {
+      "codigo": "Estudiantes",
+      "nome": "Estudiantes",
+      "imagem": "https://api.sofascore.app/api/v1/team/3206/image"
+    },
+    {
+      "codigo": "EUA",
+      "nome": "EUA",
+      "imagem": "https://api.sofascore.app/api/v1/team/4724/image"
+    },
+    {
+      "codigo": "Everton",
+      "nome": "Everton",
+      "imagem": "https://api.sofascore.app/api/v1/team/48/image"
+    },
+    {
+      "codigo": "EvertonCHI",
+      "nome": "Everton | CHI",
+      "imagem": "https://api.sofascore.app/api/v1/team/5032/image"
+    },
+    {
+      "codigo": "Falcon",
+      "nome": "Falcon",
+      "imagem": "https://api.sofascore.app/api/v1/team/390343/image"
+    },
+    {
+      "codigo": "Fenerbahçe",
+      "nome": "Fenerbahçe",
+      "imagem": "https://api.sofascore.app/api/v1/team/3052/image"
+    },
+    {
+      "codigo": "Ferroviária",
+      "nome": "Ferroviária",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/15766_imgbank.png"
+    },
+    {
+      "codigo": "Ferroviário",
+      "nome": "Ferroviário",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3241_imgbank.png"
+    },
+    {
+      "codigo": "Feyenoord",
+      "nome": "Feyenoord",
+      "imagem": "https://upload.wikimedia.org/wikipedia/pt/thumb/0/03/Feyenoord.png/120px-Feyenoord.png"
+    },
+    {
+      "codigo": "Figueirense",
+      "nome": "Figueirense",
+      "imagem": "http://www.ogol.com.br/img/logos/equipas/2238_imgbank.png"
+    },
+    {
+      "codigo": "Finlândia",
+      "nome": "Finlândia",
+      "imagem": "http://www.ogol.com.br/img/logos/equipas/823_imgbank_flag.png"
+    },
+    {
+      "codigo": "Fiorentina",
+      "nome": "Fiorentina",
+      "imagem": "https://upload.wikimedia.org/wikipedia/commons/0/03/2022_ACF_Fiorentina_logo.png"
+    },
+    {
+      "codigo": "Flamengo",
+      "nome": "Flamengo",
+      "imagem": "https://www.zerozero.pt/img/logos/equipas/2240_imgbank_1683625259.png"
+    },
+    {
+      "codigo": "FlamengoSP",
+      "nome": "Flamengo | SP",
+      "imagem": "https://api.sofascore.app/api/v1/team/221658/image"
+    },
+    {
+      "codigo": "Floresta",
+      "nome": "Floresta",
+      "imagem": "https://upload.wikimedia.org/wikipedia/pt/thumb/8/86/Floresta_Esporte_Clube.png/120px-Floresta_Esporte_Clube.png"
+    },
+    {
+      "codigo": "Fluminense",
+      "nome": "Fluminense",
+      "imagem": "https://api.sofascore.app/api/v1/team/1961/image"
+    },
+    {
+      "codigo": "FluminensePI",
+      "nome": "Fluminense | PI",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3248_imgbank.png"
+    },
+    {
+      "codigo": "FluminenseFeira",
+      "nome": "Fluminense Feira",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3247_imgbank.png"
+    },
+    {
+      "codigo": "Forest",
+      "nome": "Forest",
+      "imagem": "https://api.sofascore.app/api/v1/team/14/image"
+    },
+    {
+      "codigo": "Fortaleza",
+      "nome": "Fortaleza",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2239_imgbank.png"
+    },
+    {
+      "codigo": "França",
+      "nome": "França",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/824_imgbank_flag.png"
+    },
+    {
+      "codigo": "Francana",
+      "nome": "Francana",
+      "imagem": "https://api.sofascore.app/api/v1/team/307233/image"
+    },
+    {
+      "codigo": "Frankfurt",
+      "nome": "Frankfurt",
+      "imagem": "https://api.sofascore.app/api/v1/team/2674/image"
+    },
+    {
+      "codigo": "Freiburg",
+      "nome": "Freiburg",
+      "imagem": "https://api.sofascore.app/api/v1/team/2538/image"
+    },
+    {
+      "codigo": "Fulham",
+      "nome": "Fulham",
+      "imagem": "https://api.sofascore.app/api/v1/team/43/image"
+    },
+    {
+      "codigo": "Fürth",
+      "nome": "Fürth",
+      "imagem": "https://api.sofascore.app/api/v1/team/2551/image"
+    },
+    {
+      "codigo": "Gabão",
+      "nome": "Gabão",
+      "imagem": "https://api.sofascore.app/api/v1/team/4761/image"
+    },
+    {
+      "codigo": "Galatasaray",
+      "nome": "Galatasaray",
+      "imagem": "https://api.sofascore.app/api/v1/team/3061/image"
+    },
+    {
+      "codigo": "Galvez",
+      "nome": "Galvez",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/61587_imgbank.png"
+    },
+    {
+      "codigo": "Gambia",
+      "nome": "Gambia",
+      "imagem": "https://api.sofascore.app/api/v1/team/4762/image"
+    },
+    {
+      "codigo": "Gana",
+      "nome": "Gana",
+      "imagem": "https://api.sofascore.app/api/v1/team/4764/image"
+    },
+    {
+      "codigo": "Gen.Caballero",
+      "nome": "Gen. Caballero",
+      "imagem": "https://api.sofascore.app/api/v1/team/387619/image"
+    },
+    {
+      "codigo": "Genoa",
+      "nome": "Genoa",
+      "imagem": "https://api.sofascore.app/api/v1/team/2713/image"
+    },
+    {
+      "codigo": "Geórgia",
+      "nome": "Geórgia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/1002_imgbank_flag.png"
+    },
+    {
+      "codigo": "Getafe",
+      "nome": "Getafe",
+      "imagem": "https://api.sofascore.app/api/v1/team/2859/image"
+    },
+    {
+      "codigo": "Gibraltar",
+      "nome": "Gibraltar",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/77534_imgbank_flag.png"
+    },
+    {
+      "codigo": "Girona",
+      "nome": "Girona",
+      "imagem": "https://api.sofascore.app/api/v1/team/24264/image"
+    },
+    {
+      "codigo": "Globo",
+      "nome": "Globo",
+      "imagem": "https://upload.wikimedia.org/wikipedia/pt/thumb/0/08/GloboFC2020.png/120px-GloboFC2020.png"
+    },
+    {
+      "codigo": "Glória",
+      "nome": "Glória",
+      "imagem": "https://api.sofascore.app/api/v1/team/212494/image"
+    },
+    {
+      "codigo": "Goianésia",
+      "nome": "Goianésia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3258_imgbank.png"
+    },
+    {
+      "codigo": "Goiás",
+      "nome": "Goiás",
+      "imagem": "https://i.pinimg.com/originals/f6/56/89/f656896524222b8b1b25f4e3bdf3e627.png"
+    },
+    {
+      "codigo": "Granada",
+      "nome": "Granada",
+      "imagem": "https://api.sofascore.app/api/v1/team/33779/image"
+    },
+    {
+      "codigo": "Grécia",
+      "nome": "Grécia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/1003_imgbank_flag.png"
+    },
+    {
+      "codigo": "Grem.Anápolis",
+      "nome": "Grem. Anápolis",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/9091_imgbank.png"
+    },
+    {
+      "codigo": "Grêmio",
+      "nome": "Grêmio",
+      "imagem": "https://api.sofascore.app/api/v1/team/5926/image"
+    },
+    {
+      "codigo": "Guabirá",
+      "nome": "Guabirá",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2382_imgbank.png"
+    },
+    {
+      "codigo": "Guaireña",
+      "nome": "Guaireña",
+      "imagem": "https://api.sofascore.app/api/v1/team/249194/image"
+    },
+    {
+      "codigo": "Guarani",
+      "nome": "Guarani",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2242_imgbank.png"
+    },
+    {
+      "codigo": "GuaraníPAR",
+      "nome": "Guaraní | PAR",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2329_imgbank.png"
+    },
+    {
+      "codigo": "GuaranyRS",
+      "nome": "Guarany | RS",
+      "imagem": "https://api.sofascore.app/api/v1/team/232080/image"
+    },
+    {
+      "codigo": "Guiné",
+      "nome": "Guiné",
+      "imagem": "https://api.sofascore.app/api/v1/team/4826/image"
+    },
+    {
+      "codigo": "GuinéEquatorial",
+      "nome": "Guiné Equatorial",
+      "imagem": "https://api.sofascore.app/api/v1/team/8032/image"
+    },
+    {
+      "codigo": "Hertha",
+      "nome": "Hertha",
+      "imagem": "https://api.sofascore.app/api/v1/team/2528/image"
+    },
+    {
+      "codigo": "HJK",
+      "nome": "HJK",
+      "imagem": "https://api.sofascore.app/api/v1/team/2242/image"
+    },
+    {
+      "codigo": "Hoffenhein",
+      "nome": "Hoffenhein",
+      "imagem": "https://api.sofascore.app/api/v1/team/2569/image"
+    },
+    {
+      "codigo": "Holanda",
+      "nome": "Holanda",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/825_imgbank_flag.png"
+    },
+    {
+      "codigo": "Honduras",
+      "nome": "Honduras",
+      "imagem": "https://api.sofascore.app/api/v1/team/4827/image"
+    },
+    {
+      "codigo": "Hungria",
+      "nome": "Hungria",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/1004_imgbank_flag.png"
+    },
+    {
+      "codigo": "Iape",
+      "nome": "Iape",
+      "imagem": "https://api.sofascore.app/api/v1/team/404697/image"
+    },
+    {
+      "codigo": "Ind.delValle",
+      "nome": "Ind. del Valle",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/23001_imgbank.png"
+    },
+    {
+      "codigo": "Ind.Medellín",
+      "nome": "Ind. Medellín",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2296_imgbank.png"
+    },
+    {
+      "codigo": "Ind.Petrolero",
+      "nome": "Ind. Petrolero",
+      "imagem": "https://api.sofascore.app/api/v1/team/372975/image"
+    },
+    {
+      "codigo": "Independiente",
+      "nome": "Independiente",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2211_imgbank.png"
+    },
+    {
+      "codigo": "Inglaterra",
+      "nome": "Inglaterra",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/826_imgbank_flag.png"
+    },
+    {
+      "codigo": "Inter",
+      "nome": "Inter",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/63_imgbank.png"
+    },
+    {
+      "codigo": "InterLimeira",
+      "nome": "Inter Limeira",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3291_imgbank.png"
+    },
+    {
+      "codigo": "Internacional",
+      "nome": "Internacional",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2245_imgbank.png"
+    },
+    {
+      "codigo": "Interporto",
+      "nome": "Interporto",
+      "imagem": "https://api.sofascore.app/api/v1/team/144728/image"
+    },
+    {
+      "codigo": "Irã",
+      "nome": "Irã",
+      "imagem": "https://api.sofascore.app/api/v1/team/4766/image"
+    },
+    {
+      "codigo": "Irlanda",
+      "nome": "Irlanda",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/1005_imgbank_flag.png"
+    },
+    {
+      "codigo": "IrlandadoNorte",
+      "nome": "Irlanda do Norte",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/1014_imgbank_flag.png"
+    },
+    {
+      "codigo": "Islândia",
+      "nome": "Islândia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/827_imgbank_flag.png"
+    },
+    {
+      "codigo": "Itália",
+      "nome": "Itália",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/828_imgbank_flag.png"
+    },
+    {
+      "codigo": "Ituano",
+      "nome": "Ituano",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2543_imgbank.png"
+    },
+    {
+      "codigo": "Jacuipense",
+      "nome": "Jacuipense",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3311_imgbank.png"
+    },
+    {
+      "codigo": "Jamaica",
+      "nome": "Jamaica",
+      "imagem": "https://api.sofascore.app/api/v1/team/4769/image"
+    },
+    {
+      "codigo": "Japão",
+      "nome": "Japão",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/875_imgbank_flag.png"
+    },
+    {
+      "codigo": "Joinville",
+      "nome": "Joinville",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3317_imgbank.png"
+    },
+    {
+      "codigo": "JorgeW.",
+      "nome": "Jorge W.",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2372_imgbank.png"
+    },
+    {
+      "codigo": "Juazeirense",
+      "nome": "Juazeirense",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/33837_imgbank.png"
+    },
+    {
+      "codigo": "JuniorB.",
+      "nome": "Junior B.",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2295_imgbank.png"
+    },
+    {
+      "codigo": "Juventude",
+      "nome": "Juventude",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2246_imgbank.png"
+    },
+    {
+      "codigo": "Juventus",
+      "nome": "Juventus",
+      "imagem": "https://api.sofascore.app/api/v1/team/2687/image"
+    },
+    {
+      "codigo": "JuventusSP",
+      "nome": "Juventus | SP",
+      "imagem": "https://api.sofascore.app/api/v1/team/224009/image"
+    },
+    {
+      "codigo": "Köln",
+      "nome": "Köln",
+      "imagem": "https://api.sofascore.app/api/v1/team/2671/image"
+    },
+    {
+      "codigo": "Kosovo",
+      "nome": "Kosovo",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/90525_imgbank_flag.png"
+    },
+    {
+      "codigo": "LaEquidad",
+      "nome": "La Equidad",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2325_imgbank.png"
+    },
+    {
+      "codigo": "LaGuaira",
+      "nome": "La Guaira",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/15415_imgbank.gif"
+    },
+    {
+      "codigo": "Lanús",
+      "nome": "Lanús",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2212_imgbank.png"
+    },
+    {
+      "codigo": "Lazio",
+      "nome": "Lazio",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/65_imgbank.png"
+    },
+    {
+      "codigo": "LDU",
+      "nome": "LDU",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2361_imgbank.png"
+    },
+    {
+      "codigo": "Lecce",
+      "nome": "Lecce",
+      "imagem": "https://api.sofascore.app/api/v1/team/2689/image"
+    },
+    {
+      "codigo": "Leeds",
+      "nome": "Leeds",
+      "imagem": "https://api.sofascore.app/api/v1/team/34/image"
+    },
+    {
+      "codigo": "Leicester",
+      "nome": "Leicester",
+      "imagem": "https://api.sofascore.app/api/v1/team/31/image"
+    },
+    {
+      "codigo": "Lens",
+      "nome": "Lens",
+      "imagem": "https://api.sofascore.app/api/v1/team/1648/image"
+    },
+    {
+      "codigo": "Letônia",
+      "nome": "Letônia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/1008_imgbank_flag.png"
+    },
+    {
+      "codigo": "Levante",
+      "nome": "Levante",
+      "imagem": "https://api.sofascore.app/api/v1/team/2849/image"
+    },
+    {
+      "codigo": "Leverkusen",
+      "nome": "Leverkusen",
+      "imagem": "https://api.sofascore.app/api/v1/team/2681/image"
+    },
+    {
+      "codigo": "Libertad",
+      "nome": "Libertad",
+      "imagem": "https://upload.wikimedia.org/wikipedia/pt/thumb/e/e6/17830.png/200px-17830.png"
+    },
+    {
+      "codigo": "Liechtenstein",
+      "nome": "Liechtenstein",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/1009_imgbank_flag.png"
+    },
+    {
+      "codigo": "Lille",
+      "nome": "Lille",
+      "imagem": "https://api.sofascore.app/api/v1/team/1643/image"
+    },
+    {
+      "codigo": "Linense",
+      "nome": "Linense",
+      "imagem": "https://api.sofascore.app/api/v1/team/307162/image"
+    },
+    {
+      "codigo": "Lituânia",
+      "nome": "Lituânia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/1010_imgbank_flag.png"
+    },
+    {
+      "codigo": "Liverpool",
+      "nome": "Liverpool",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/85_imgbank.png"
+    },
+    {
+      "codigo": "Londrina",
+      "nome": "Londrina",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3327_imgbank.png"
+    },
+    {
+      "codigo": "Lorient",
+      "nome": "Lorient",
+      "imagem": "https://upload.wikimedia.org/wikipedia/pt/a/a6/FC_Lorient.png"
+    },
+    {
+      "codigo": "Ludogorets",
+      "nome": "Ludogorets",
+      "imagem": "https://api.sofascore.app/api/v1/team/43840/image"
+    },
+    {
+      "codigo": "Luton",
+      "nome": "Luton",
+      "imagem": "https://api.sofascore.app/api/v1/team/72/image"
+    },
+    {
+      "codigo": "Luverdense",
+      "nome": "Luverdense",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/13679_imgbank.png"
+    },
+    {
+      "codigo": "Luxemburgo",
+      "nome": "Luxemburgo",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/1011_imgbank_flag.png"
+    },
+    {
+      "codigo": "Lyon",
+      "nome": "Lyon",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/121_imgbank.png"
+    },
+    {
+      "codigo": "M'gladbach",
+      "nome": "M'gladbach",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/110_imgbank.png"
+    },
+    {
+      "codigo": "Macaé",
+      "nome": "Macaé",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3331_imgbank.png"
+    },
+    {
+      "codigo": "MaccabiHaifa",
+      "nome": "Maccabi Haifa",
+      "imagem": "https://api.sofascore.app/api/v1/team/5197/image"
+    },
+    {
+      "codigo": "Macedônia",
+      "nome": "Macedônia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/1001_imgbank_flag.png"
+    },
+    {
+      "codigo": "Madureira",
+      "nome": "Madureira",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3332_imgbank.png"
+    },
+    {
+      "codigo": "Mainz05",
+      "nome": "Mainz 05",
+      "imagem": "https://api.sofascore.app/api/v1/team/2556/image"
+    },
+    {
+      "codigo": "Malawi",
+      "nome": "Malawi",
+      "imagem": "https://api.sofascore.app/api/v1/team/8043/image"
+    },
+    {
+      "codigo": "Mali",
+      "nome": "Mali",
+      "imagem": "https://api.sofascore.app/api/v1/team/4831/image"
+    },
+    {
+      "codigo": "Mallorca",
+      "nome": "Mallorca",
+      "imagem": "https://api.sofascore.app/api/v1/team/2826/image"
+    },
+    {
+      "codigo": "Malmö",
+      "nome": "Malmö",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/1100_imgbank.png"
+    },
+    {
+      "codigo": "Manaus",
+      "nome": "Manaus",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/85493_imgbank.png"
+    },
+    {
+      "codigo": "ManchesterCity",
+      "nome": "Manchester City",
+      "imagem": "https://api.sofascore.app/api/v1/team/17/image"
+    },
+    {
+      "codigo": "ManchesterUnited",
+      "nome": "Manchester United",
+      "imagem": "https://api.sofascore.app/api/v1/team/35/image"
+    },
+    {
+      "codigo": "Maringá",
+      "nome": "Maringá",
+      "imagem": "https://api.sofascore.app/api/v1/team/135324/image"
+    },
+    {
+      "codigo": "Marrocos",
+      "nome": "Marrocos",
+      "imagem": "https://api.sofascore.app/api/v1/team/4778/image"
+    },
+    {
+      "codigo": "Marseille",
+      "nome": "Marseille",
+      "imagem": "https://api.sofascore.app/api/v1/team/1641/image"
+    },
+    {
+      "codigo": "Mauá",
+      "nome": "Mauá",
+      "imagem": "https://api.sofascore.app/api/v1/team/326975/image"
+    },
+    {
+      "codigo": "Melgar",
+      "nome": "Melgar",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2354_imgbank.png"
+    },
+    {
+      "codigo": "Metropolitanos",
+      "nome": "Metropolitanos",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/78383_imgbank.png"
+    },
+    {
+      "codigo": "Metz",
+      "nome": "Metz",
+      "imagem": "https://api.sofascore.app/api/v1/team/1651/image"
+    },
+    {
+      "codigo": "México",
+      "nome": "México",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/831_imgbank_flag.png"
+    },
+    {
+      "codigo": "Middlesbrough",
+      "nome": "Middlesbrough",
+      "imagem": "https://api.sofascore.app/api/v1/team/36/image"
+    },
+    {
+      "codigo": "Midtjylland",
+      "nome": "Midtjylland",
+      "imagem": "https://api.sofascore.app/api/v1/team/1289/image"
+    },
+    {
+      "codigo": "Milan",
+      "nome": "Milan",
+      "imagem": "https://api.sofascore.app/api/v1/team/2692/image"
+    },
+    {
+      "codigo": "Millionarios",
+      "nome": "Millionarios",
+      "imagem": "https://api.sofascore.app/api/v1/team/6117/image"
+    },
+    {
+      "codigo": "Mirassol",
+      "nome": "Mirassol",
+      "imagem": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/MirassolFCnovo.png/120px-MirassolFCnovo.png"
+    },
+    {
+      "codigo": "Monaco",
+      "nome": "Monaco",
+      "imagem": "https://upload.wikimedia.org/wikipedia/pt/6/6f/ASMonacoFC2021.png"
+    },
+    {
+      "codigo": "Montenegro",
+      "nome": "Montenegro",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/10191_imgbank_flag.png"
+    },
+    {
+      "codigo": "Monterrey",
+      "nome": "Monterrey",
+      "imagem": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Club_de_F%C3%BAtbol_Monterrey_2019_Logo.svg/120px-Club_de_F%C3%BAtbol_Monterrey_2019_Logo.svg.png"
+    },
+    {
+      "codigo": "Montpellier",
+      "nome": "Montpellier",
+      "imagem": "https://api.sofascore.app/api/v1/team/1642/image"
+    },
+    {
+      "codigo": "Monza",
+      "nome": "Monza",
+      "imagem": "https://api.sofascore.app/api/v1/team/2729/image"
+    },
+    {
+      "codigo": "MotoClub",
+      "nome": "Moto Club",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3353_imgbank.png"
+    },
+    {
+      "codigo": "Murici",
+      "nome": "Murici",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3355_imgbank.png"
+    },
+    {
+      "codigo": "Nacional",
+      "nome": "Nacional",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2393_imgbank.png"
+    },
+    {
+      "codigo": "Nantes",
+      "nome": "Nantes",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/125_imgbank.png"
+    },
+    {
+      "codigo": "Napoli",
+      "nome": "Napoli",
+      "imagem": "https://api.sofascore.app/api/v1/team/2714/image"
+    },
+    {
+      "codigo": "Náutico",
+      "nome": "Náutico",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2247_imgbank.png"
+    },
+    {
+      "codigo": "Newcastle",
+      "nome": "Newcastle",
+      "imagem": "https://api.sofascore.app/api/v1/team/39/image"
+    },
+    {
+      "codigo": "NewellsOB",
+      "nome": "Newells OB",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2213_imgbank.png"
+    },
+    {
+      "codigo": "Nice",
+      "nome": "Nice",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/126_imgbank.png"
+    },
+    {
+      "codigo": "Nigeria",
+      "nome": "Nigeria",
+      "imagem": "https://api.sofascore.app/api/v1/team/4785/image"
+    },
+    {
+      "codigo": "Noruega",
+      "nome": "Noruega",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/832_imgbank_flag.png"
+    },
+    {
+      "codigo": "Norwich",
+      "nome": "Norwich",
+      "imagem": "https://api.sofascore.app/api/v1/team/263/image"
+    },
+    {
+      "codigo": "NovaIguaçu",
+      "nome": "Nova Iguaçu",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3363_imgbank.png"
+    },
+    {
+      "codigo": "NovaVenécia",
+      "nome": "Nova Venécia",
+      "imagem": "https://api.sofascore.app/api/v1/team/396645/image"
+    },
+    {
+      "codigo": "NovaZelândia",
+      "nome": "Nova Zelândia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/890_imgbank_flag.png"
+    },
+    {
+      "codigo": "NovoHamburgo",
+      "nome": "Novo Hamburgo",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3365_imgbank.png"
+    },
+    {
+      "codigo": "Novorizontino",
+      "nome": "Novorizontino",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/24836_imgbank.png"
+    },
+    {
+      "codigo": "Oeste",
+      "nome": "Oeste",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3368_imgbank.png"
+    },
+    {
+      "codigo": "Olimpia",
+      "nome": "Olimpia",
+      "imagem": "https://api.sofascore.app/api/v1/team/5997/image"
+    },
+    {
+      "codigo": "Olympiacos",
+      "nome": "Olympiacos",
+      "imagem": "https://api.sofascore.app/api/v1/team/3245/image"
+    },
+    {
+      "codigo": "Omonia",
+      "nome": "Omonia",
+      "imagem": "https://api.sofascore.app/api/v1/team/3395/image"
+    },
+    {
+      "codigo": "Operário",
+      "nome": "Operário",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/14554_imgbank.png"
+    },
+    {
+      "codigo": "OrientePetrolero",
+      "nome": "Oriente Petrolero",
+      "imagem": "https://api.sofascore.app/api/v1/team/33820/image"
+    },
+    {
+      "codigo": "Osasuna",
+      "nome": "Osasuna",
+      "imagem": "https://api.sofascore.app/api/v1/team/2820/image"
+    },
+    {
+      "codigo": "PaísdeGales",
+      "nome": "País de Gales",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/833_imgbank_flag.png"
+    },
+    {
+      "codigo": "Palestino",
+      "nome": "Palestino",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2266_imgbank.png"
+    },
+    {
+      "codigo": "Palmeiras",
+      "nome": "Palmeiras",
+      "imagem": "https://api.sofascore.app/api/v1/team/1963/image"
+    },
+    {
+      "codigo": "Paraguai",
+      "nome": "Paraguai",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/834_imgbank_flag.png"
+    },
+    {
+      "codigo": "Paraná",
+      "nome": "Paraná",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2249_imgbank.png"
+    },
+    {
+      "codigo": "Patrocinense",
+      "nome": "Patrocinense",
+      "imagem": "https://api.sofascore.app/api/v1/team/274036/image"
+    },
+    {
+      "codigo": "Paysandu",
+      "nome": "Paysandu",
+      "imagem": "http://www.ogol.com.br/img/logos/equipas/8920_imgbank.png"
+    },
+    {
+      "codigo": "Pelotas",
+      "nome": "Pelotas",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3390_imgbank.png"
+    },
+    {
+      "codigo": "Peñarol",
+      "nome": "Peñarol",
+      "imagem": "https://api.sofascore.app/api/v1/team/3227/image"
+    },
+    {
+      "codigo": "Peru",
+      "nome": "Peru",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/939_imgbank_flag.png"
+    },
+    {
+      "codigo": "Peterborough",
+      "nome": "Peterborough",
+      "imagem": "https://api.sofascore.app/api/v1/team/54/image"
+    },
+    {
+      "codigo": "Plymouth",
+      "nome": "Plymouth",
+      "imagem": "https://api.sofascore.app/api/v1/team/71/image"
+    },
+    {
+      "codigo": "Polônia",
+      "nome": "Polônia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/835_imgbank_flag.png"
+    },
+    {
+      "codigo": "PontePreta",
+      "nome": "Ponte Preta",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2251_imgbank.png"
+    },
+    {
+      "codigo": "Porto",
+      "nome": "Porto",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/9_imgbank.png"
+    },
+    {
+      "codigo": "PortoVelho",
+      "nome": "Porto Velho",
+      "imagem": "https://api.sofascore.app/api/v1/team/339705/image"
+    },
+    {
+      "codigo": "Portugal",
+      "nome": "Portugal",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/811_imgbank_flag.png"
+    },
+    {
+      "codigo": "PortuguesaRJ",
+      "nome": "Portuguesa | RJ",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3408_imgbank.png"
+    },
+    {
+      "codigo": "PortuguesaSP",
+      "nome": "Portuguesa | SP",
+      "imagem": "https://api.sofascore.app/api/v1/team/224011/image"
+    },
+    {
+      "codigo": "PousoAlegre",
+      "nome": "Pouso Alegre",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/30794_imgbank.png"
+    },
+    {
+      "codigo": "PSG",
+      "nome": "PSG",
+      "imagem": "https://api.sofascore.app/api/v1/team/1644/image"
+    },
+    {
+      "codigo": "PSV",
+      "nome": "PSV",
+      "imagem": "https://upload.wikimedia.org/wikipedia/pt/thumb/c/ca/PSV_Eindhoven_escudo.png/150px-PSV_Eindhoven_escudo.png"
+    },
+    {
+      "codigo": "Racing",
+      "nome": "Racing",
+      "imagem": "https://api.sofascore.app/api/v1/team/3215/image"
+    },
+    {
+      "codigo": "Rangers",
+      "nome": "Rangers",
+      "imagem": "https://api.sofascore.app/api/v1/team/2351/image"
+    },
+    {
+      "codigo": "RayoVallecano",
+      "nome": "Rayo Vallecano",
+      "imagem": "https://api.sofascore.app/api/v1/team/2818/image"
+    },
+    {
+      "codigo": "RBBragantino",
+      "nome": "RB Bragantino",
+      "imagem": "https://api.sofascore.app/api/v1/team/1999/image"
+    },
+    {
+      "codigo": "RBLeipzig",
+      "nome": "RB Leipzig",
+      "imagem": "https://upload.wikimedia.org/wikipedia/pt/6/65/RB_Leipzig_2020_Logo.png"
+    },
+    {
+      "codigo": "RBNewYork",
+      "nome": "RB New York",
+      "imagem": "https://upload.wikimedia.org/wikipedia/pt/5/54/Red_Bull_New_York.PNG"
+    },
+    {
+      "codigo": "RBSalzburg",
+      "nome": "RB Salzburg",
+      "imagem": "https://api.sofascore.app/api/v1/team/2046/image"
+    },
+    {
+      "codigo": "RealMadrid",
+      "nome": "Real Madrid",
+      "imagem": "https://api.sofascore.app/api/v1/team/2829/image"
+    },
+    {
+      "codigo": "RealNoroeste",
+      "nome": "Real Noroeste",
+      "imagem": "https://api.sofascore.app/api/v1/team/65494/image"
+    },
+    {
+      "codigo": "RealSociedad",
+      "nome": "Real Sociedad",
+      "imagem": "https://api.sofascore.app/api/v1/team/2824/image"
+    },
+    {
+      "codigo": "Remo",
+      "nome": "Remo",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3423_imgbank.png"
+    },
+    {
+      "codigo": "Rentistas",
+      "nome": "Rentistas",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/5785_imgbank.png"
+    },
+    {
+      "codigo": "Rep.Tcheca",
+      "nome": "Rep. Tcheca",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/836_imgbank_flag.png"
+    },
+    {
+      "codigo": "Resende",
+      "nome": "Resende",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/12036_imgbank.png"
+    },
+    {
+      "codigo": "Retrô",
+      "nome": "Retrô",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/240756_imgbank.png"
+    },
+    {
+      "codigo": "RioBranco",
+      "nome": "Rio Branco",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3426_imgbank.png"
+    },
+    {
+      "codigo": "RiverURU",
+      "nome": "River | URU",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2399_imgbank.png"
+    },
+    {
+      "codigo": "RiverPlate",
+      "nome": "River Plate",
+      "imagem": "https://api.sofascore.app/api/v1/team/3211/image"
+    },
+    {
+      "codigo": "Roma",
+      "nome": "Roma",
+      "imagem": "https://api.sofascore.app/api/v1/team/2702/image"
+    },
+    {
+      "codigo": "Romênia",
+      "nome": "Romênia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/837_imgbank_flag.png"
+    },
+    {
+      "codigo": "Romênia",
+      "nome": "Romênia",
+      "imagem": "https://api.sofascore.app/api/v1/team/4477/image"
+    },
+    {
+      "codigo": "RosarioCentral",
+      "nome": "Rosario Central",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2219_imgbank.png"
+    },
+    {
+      "codigo": "Rússia",
+      "nome": "Rússia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/838_imgbank_flag.png"
+    },
+    {
+      "codigo": "SaintÉtienne",
+      "nome": "Saint-Étienne",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3823_imgbank.png"
+    },
+    {
+      "codigo": "Salernitana",
+      "nome": "Salernitana",
+      "imagem": "https://api.sofascore.app/api/v1/team/2710/image"
+    },
+    {
+      "codigo": "Salgueiro",
+      "nome": "Salgueiro",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/13685_imgbank.png"
+    },
+    {
+      "codigo": "SampaioCorrêa",
+      "nome": "Sampaio Corrêa",
+      "imagem": "https://api.sofascore.app/api/v1/team/2005/image"
+    },
+    {
+      "codigo": "Sampdoria",
+      "nome": "Sampdoria",
+      "imagem": "https://api.sofascore.app/api/v1/team/2711/image"
+    },
+    {
+      "codigo": "SanLorenzo",
+      "nome": "San Lorenzo",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2220_imgbank.png"
+    },
+    {
+      "codigo": "SanMarino",
+      "nome": "San Marino",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/1015_imgbank_flag.png"
+    },
+    {
+      "codigo": "SantaCruz",
+      "nome": "Santa Cruz",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2253_imgbank.png"
+    },
+    {
+      "codigo": "SantaFé",
+      "nome": "Santa Fé",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2302_imgbank.png"
+    },
+    {
+      "codigo": "SantoAndré",
+      "nome": "Santo André",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3452_imgbank.png"
+    },
+    {
+      "codigo": "Santos",
+      "nome": "Santos",
+      "imagem": "https://api.sofascore.app/api/v1/team/1968/image"
+    },
+    {
+      "codigo": "SãoBento",
+      "nome": "São Bento",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3457_imgbank.png"
+    },
+    {
+      "codigo": "SãoBernardo",
+      "nome": "São Bernardo",
+      "imagem": "https://api.sofascore.app/api/v1/team/47504/image"
+    },
+    {
+      "codigo": "SãoCaetano",
+      "nome": "São Caetano",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2255_imgbank.png"
+    },
+    {
+      "codigo": "SãoJosé",
+      "nome": "São José",
+      "imagem": "http://www.ogol.com.br/img/logos/equipas/3463_imgbank.png"
+    },
+    {
+      "codigo": "SãoLuiz",
+      "nome": "São Luiz",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3465_imgbank.png"
+    },
+    {
+      "codigo": "SãoPaulo",
+      "nome": "São Paulo",
+      "imagem": "https://api.sofascore.app/api/v1/team/1981/image"
+    },
+    {
+      "codigo": "SãoRaimundo",
+      "nome": "São Raimundo",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3471_imgbank.png"
+    },
+    {
+      "codigo": "Sassuolo",
+      "nome": "Sassuolo",
+      "imagem": "https://api.sofascore.app/api/v1/team/2793/image"
+    },
+    {
+      "codigo": "Schalke04",
+      "nome": "Schalke 04",
+      "imagem": "https://api.sofascore.app/api/v1/team/2530/image"
+    },
+    {
+      "codigo": "Senegal",
+      "nome": "Senegal",
+      "imagem": "https://api.sofascore.app/api/v1/team/4739/image"
+    },
+    {
+      "codigo": "Sergipe",
+      "nome": "Sergipe",
+      "imagem": "http://www.ogol.com.br/img/logos/equipas/3473_imgbank.png"
+    },
+    {
+      "codigo": "Sérvia",
+      "nome": "Sérvia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/1016_imgbank_flag.png"
+    },
+    {
+      "codigo": "Sevilla",
+      "nome": "Sevilla",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/53_imgbank.png"
+    },
+    {
+      "codigo": "Shakhtar",
+      "nome": "Shakhtar",
+      "imagem": "https://api.sofascore.app/api/v1/team/3313/image"
+    },
+    {
+      "codigo": "Sheriff",
+      "nome": "Sheriff",
+      "imagem": "https://api.sofascore.app/api/v1/team/5173/image"
+    },
+    {
+      "codigo": "Sousa",
+      "nome": "Sousa",
+      "imagem": "https://api.sofascore.app/api/v1/team/21864/image"
+    },
+    {
+      "codigo": "Southamptom",
+      "nome": "Southamptom",
+      "imagem": "https://api.sofascore.app/api/v1/team/45/image"
+    },
+    {
+      "codigo": "SpartaPraha",
+      "nome": "Sparta Praha",
+      "imagem": "https://api.sofascore.app/api/v1/team/2218/image"
+    },
+    {
+      "codigo": "Spezia",
+      "nome": "Spezia",
+      "imagem": "https://api.sofascore.app/api/v1/team/2735/image"
+    },
+    {
+      "codigo": "Sport",
+      "nome": "Sport",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2257_imgbank.png"
+    },
+    {
+      "codigo": "Sporting",
+      "nome": "Sporting",
+      "imagem": "https://api.sofascore.app/api/v1/team/3001/image"
+    },
+    {
+      "codigo": "Spt.Cristal",
+      "nome": "Spt. Cristal",
+      "imagem": "http://www.ogol.com.br/img/logos/equipas/2351_imgbank.png"
+    },
+    {
+      "codigo": "Spt.Huancayo",
+      "nome": "Spt. Huancayo",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/23223_imgbank.png"
+    },
+    {
+      "codigo": "StadeBrestois",
+      "nome": "Stade Brestois",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3840_imgbank.png"
+    },
+    {
+      "codigo": "StadedeReims",
+      "nome": "Stade de Reims",
+      "imagem": "https://upload.wikimedia.org/wikipedia/pt/5/58/Logo_Stade_de_Reims_2020.png"
+    },
+    {
+      "codigo": "StadeRennais",
+      "nome": "Stade Rennais",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/128_imgbank.png"
+    },
+    {
+      "codigo": "Strasbourg",
+      "nome": "Strasbourg",
+      "imagem": "https://api.sofascore.app/api/v1/team/1659/image"
+    },
+    {
+      "codigo": "Stuttgart",
+      "nome": "Stuttgart",
+      "imagem": "https://api.sofascore.app/api/v1/team/2677/image"
+    },
+    {
+      "codigo": "Suécia",
+      "nome": "Suécia",
+      "imagem": "https://api.sofascore.app/api/v1/team/4688/image"
+    },
+    {
+      "codigo": "Suíça",
+      "nome": "Suíça",
+      "imagem": "https://api.sofascore.app/api/v1/team/4699/image"
+    },
+    {
+      "codigo": "Talleres",
+      "nome": "Talleres",
+      "imagem": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Escudo_Talleres_2015.svg/120px-Escudo_Talleres_2015.svg.png"
+    },
+    {
+      "codigo": "Taubaté",
+      "nome": "Taubaté",
+      "imagem": "https://api.sofascore.app/api/v1/team/253145/image"
+    },
+    {
+      "codigo": "TheStrongest",
+      "nome": "The Strongest",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2371_imgbank.png"
+    },
+    {
+      "codigo": "Tigre",
+      "nome": "Tigre",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/9657_imgbank.png"
+    },
+    {
+      "codigo": "Tigres",
+      "nome": "Tigres",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2517_imgbank.png"
+    },
+    {
+      "codigo": "Tocantinópolis",
+      "nome": "Tocantinópolis",
+      "imagem": "https://api.sofascore.app/api/v1/team/215371/image"
+    },
+    {
+      "codigo": "Tombense",
+      "nome": "Tombense",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3497_imgbank.png"
+    },
+    {
+      "codigo": "Torino",
+      "nome": "Torino",
+      "imagem": "https://api.sofascore.app/api/v1/team/2696/image"
+    },
+    {
+      "codigo": "Torque",
+      "nome": "Torque",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/46218_imgbank.png"
+    },
+    {
+      "codigo": "Tottenham",
+      "nome": "Tottenham",
+      "imagem": "https://api.sofascore.app/api/v1/team/33/image"
+    },
+    {
+      "codigo": "Treze",
+      "nome": "Treze",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3499_imgbank.png"
+    },
+    {
+      "codigo": "Troyes",
+      "nome": "Troyes",
+      "imagem": "https://api.sofascore.app/api/v1/team/1652/image"
+    },
+    {
+      "codigo": "TunaLuso",
+      "nome": "Tuna Luso",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3501_imgbank.png"
+    },
+    {
+      "codigo": "Tunisia",
+      "nome": "Tunisia",
+      "imagem": "https://api.sofascore.app/api/v1/team/4729/image"
+    },
+    {
+      "codigo": "Tuntum",
+      "nome": "Tuntum",
+      "imagem": "https://api.sofascore.app/api/v1/team/393948/image"
+    },
+    {
+      "codigo": "Turquia",
+      "nome": "Turquia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/840_imgbank_flag.png"
+    },
+    {
+      "codigo": "Uberlândia",
+      "nome": "Uberlândia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3505_imgbank.png"
+    },
+    {
+      "codigo": "Ucrânia",
+      "nome": "Ucrânia",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/841_imgbank_flag.png"
+    },
+    {
+      "codigo": "Udinese",
+      "nome": "Udinese",
+      "imagem": "https://api.sofascore.app/api/v1/team/2695/image"
+    },
+    {
+      "codigo": "Ulsan",
+      "nome": "Ulsan",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/5211_imgbank.png"
+    },
+    {
+      "codigo": "Un.LaCalera",
+      "nome": "Un. La Calera",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2284_imgbank.png"
+    },
+    {
+      "codigo": "UniãoFrederiquense",
+      "nome": "União Frederiquense",
+      "imagem": "https://api.sofascore.app/api/v1/team/480384/image"
+    },
+    {
+      "codigo": "UniãoRondonópolis",
+      "nome": "União Rondonópolis",
+      "imagem": "https://api.sofascore.app/api/v1/team/34007/image"
+    },
+    {
+      "codigo": "UnionBerlin",
+      "nome": "Union Berlin",
+      "imagem": "https://api.sofascore.app/api/v1/team/2547/image"
+    },
+    {
+      "codigo": "UniónSantaFé",
+      "nome": "Unión Santa Fé",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2222_imgbank.png"
+    },
+    {
+      "codigo": "UniversidadCatólica",
+      "nome": "Universidad Católica",
+      "imagem": "https://api.sofascore.app/api/v1/team/3151/image"
+    },
+    {
+      "codigo": "UniversidadCatólicadelEcuador",
+      "nome": "Universidad Católica del Ecuador",
+      "imagem": "https://api.sofascore.app/api/v1/team/21942/image"
+    },
+    {
+      "codigo": "Universitário",
+      "nome": "Universitário",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/2350_imgbank.png"
+    },
+    {
+      "codigo": "URT",
+      "nome": "URT",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3520_imgbank.png"
+    },
+    {
+      "codigo": "Uruguai",
+      "nome": "Uruguai",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/940_imgbank_flag.png"
+    },
+    {
+      "codigo": "USA",
+      "nome": "USA",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/934_imgbank_flag.png"
+    },
+    {
+      "codigo": "USG",
+      "nome": "USG",
+      "imagem": "https://api.sofascore.app/api/v1/team/4860/image"
+    },
+    {
+      "codigo": "Valencia",
+      "nome": "Valencia",
+      "imagem": "https://api.sofascore.app/api/v1/team/2828/image"
+    },
+    {
+      "codigo": "Valladolid",
+      "nome": "Valladolid",
+      "imagem": "https://api.sofascore.app/api/v1/team/2831/image"
+    },
+    {
+      "codigo": "Vasco",
+      "nome": "Vasco",
+      "imagem": "https://api.sofascore.app/api/v1/team/1974/image"
+    },
+    {
+      "codigo": "VélezSarsfield",
+      "nome": "Vélez Sarsfield",
+      "imagem": "https://api.sofascore.app/api/v1/team/3208/image"
+    },
+    {
+      "codigo": "Venezia",
+      "nome": "Venezia",
+      "imagem": "https://api.sofascore.app/api/v1/team/2688/image"
+    },
+    {
+      "codigo": "Venezuela",
+      "nome": "Venezuela",
+      "imagem": "https://api.sofascore.app/api/v1/team/4722/image"
+    },
+    {
+      "codigo": "Verona",
+      "nome": "Verona",
+      "imagem": "https://api.sofascore.app/api/v1/team/2701/image"
+    },
+    {
+      "codigo": "ViktoriaPlzeň",
+      "nome": "Viktoria Plzeň",
+      "imagem": "https://api.sofascore.app/api/v1/team/4502/image"
+    },
+    {
+      "codigo": "VilaNova",
+      "nome": "Vila Nova",
+      "imagem": "https://api.sofascore.app/api/v1/team/2021/image"
+    },
+    {
+      "codigo": "VillaNova",
+      "nome": "Villa Nova",
+      "imagem": "https://api.sofascore.app/api/v1/team/7316/image"
+    },
+    {
+      "codigo": "Villarreal",
+      "nome": "Villarreal",
+      "imagem": "https://api.sofascore.app/api/v1/team/2819/image"
+    },
+    {
+      "codigo": "Vitória",
+      "nome": "Vitória",
+      "imagem": "https://api.sofascore.app/api/v1/team/1962/image"
+    },
+    {
+      "codigo": "VitóriaConquista",
+      "nome": "Vitória Conquista",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/13686_imgbank.png"
+    },
+    {
+      "codigo": "VoltaRedonda",
+      "nome": "Volta Redonda",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3538_imgbank.png"
+    },
+    {
+      "codigo": "Votuporanguense",
+      "nome": "Votuporanguense",
+      "imagem": "https://api.sofascore.app/api/v1/team/253190/image"
+    },
+    {
+      "codigo": "Watford",
+      "nome": "Watford",
+      "imagem": "https://api.sofascore.app/api/v1/team/24/image"
+    },
+    {
+      "codigo": "WerderBremen",
+      "nome": "Werder Bremen",
+      "imagem": "https://api.sofascore.app/api/v1/team/2534/image"
+    },
+    {
+      "codigo": "WestHam",
+      "nome": "West Ham",
+      "imagem": "https://api.sofascore.app/api/v1/team/37/image"
+    },
+    {
+      "codigo": "Wolfsburg",
+      "nome": "Wolfsburg",
+      "imagem": "https://api.sofascore.app/api/v1/team/2524/image"
+    },
+    {
+      "codigo": "Wolverhampton",
+      "nome": "Wolverhampton",
+      "imagem": "https://api.sofascore.app/api/v1/team/3/image"
+    },
+    {
+      "codigo": "WydadCasab.",
+      "nome": "Wydad Casab.",
+      "imagem": "https://upload.wikimedia.org/wikipedia/pt/thumb/e/e3/Wydad_AC.png/150px-Wydad_AC.png"
+    },
+    {
+      "codigo": "YoungBoys",
+      "nome": "Young Boys",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/1102_imgbank.png"
+    },
+    {
+      "codigo": "Ypiranga",
+      "nome": "Ypiranga",
+      "imagem": "https://www.ogol.com.br/img/logos/equipas/3541_imgbank.png"
+    },
+    {
+      "codigo": "Zenit",
+      "nome": "Zenit",
+      "imagem": "https://api.sofascore.app/api/v1/team/2321/image"
+    },
+    {
+      "codigo": "Zurich",
+      "nome": "Zurich",
+      "imagem": "https://api.sofascore.app/api/v1/team/2450/image"
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    },
+    {
+      "codigo": "",
+      "nome": "",
+      "imagem": ""
+    }
+  ]
+}
