@@ -436,6 +436,11 @@ a:hover {
   background: linear-gradient(to right, transparent 0%, #E5E5E5 80%);
   pointer-events: none;
 }
+@media (max-width: 576px) {
+  #classificacao .tab-pane:after {
+    width: 50px;
+  }
+}
 #classificacao .tab-pane .nav-pills {
   overflow-x: scroll;
   flex-wrap: nowrap;
