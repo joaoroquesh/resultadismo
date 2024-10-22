@@ -397,6 +397,11 @@ a:hover {
   background: #E5E5E5;
   z-index: 99;
 }
+@media (max-width: 767px) {
+  #classificacao #content-fixed.fixed-top {
+    top: 82px;
+  }
+}
 #classificacao #content-space {
   height: 171px;
 }

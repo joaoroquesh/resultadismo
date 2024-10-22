@@ -278,6 +278,10 @@ a {
     top: 98px;
     background: $light;
     z-index: 99;
+
+    @media (max-width:767px) {
+      top: 82px;
+    }
   }
 
   #content-space{
