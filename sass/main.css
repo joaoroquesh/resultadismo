@@ -388,7 +388,20 @@ a:hover {
   margin-right: 10px;
 }
 
-#classificacao .nav-link {
+#classificacao #menu .container {
+  background: #E5E5E5;
+  z-index: 999;
+}
+#classificacao #content-fixed.fixed-top {
+  top: 98px;
+  background: #E5E5E5;
+  z-index: 99;
+}
+#classificacao #content-space {
+  height: 171px;
+}
+#classificacao-top nav .nav-link {
+  background: transparent !important;
   width: 32%;
   border-bottom: 1px solid transparent;
   display: flex;
@@ -398,56 +411,56 @@ a:hover {
   border-right: 0 !important;
   border-left: 0 !important;
 }
-#classificacao .nav-link.active {
+#classificacao-top nav .nav-link.active {
   color: #1CB19C;
   border-bottom: 2px solid #1CB19C !important;
   background: transparent;
   font-weight: 700;
   position: relative;
 }
-#classificacao .nav-link:hover {
+#classificacao-top nav .nav-link:hover {
   border-bottom: 1px solid #1CB19C;
 }
-#classificacao .atualizar {
-  text-decoration: none !important;
-  transition: all 0.3s ease-in-out;
+#classificacao .tab-pane {
+  position: relative;
+  /* width */
 }
-#classificacao .atualizar:hover {
-  margin-right: 0.25rem !important;
+#classificacao .tab-pane:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 150px;
+  height: 100%;
+  background: linear-gradient(to right, transparent 0%, #E5E5E5 80%);
+  pointer-events: none;
 }
-#classificacao .atualizar:active {
-  margin-top: 0.5rem !important;
+#classificacao .tab-pane .nav-pills {
+  overflow-x: scroll;
+  flex-wrap: nowrap;
+  gap: var(--size-2);
 }
-#classificacao .intro {
-  max-width: 600px;
+#classificacao .tab-pane .nav-pills::-webkit-scrollbar, #classificacao .tab-pane .nav-pills::-webkit-scrollbar-track, #classificacao .tab-pane .nav-pills::-webkit-scrollbar-thumb {
+  width: 0;
+  height: 0;
 }
-#classificacao .card {
-  max-width: 600px;
-  padding: 2rem 1rem !important;
-  display: inline-grid;
+#classificacao .tab-pane .nav-pills .nav-item {
+  text-wrap: nowrap;
 }
-@media (max-width: 380px) {
-  #classificacao .card {
-    padding: 0rem 1rem 1rem 1rem !important;
-  }
+#classificacao .tab-pane .nav-pills .nav-link {
+  border: 1px solid transparent;
+  border-radius: var(--size-2);
+  transition: var(--transition-2);
+  font-weight: 500;
 }
-@media (max-width: 340px) {
-  #classificacao .card {
-    padding: 0rem 0.5rem 1rem 0.5rem !important;
-  }
+#classificacao .tab-pane .nav-pills .nav-link.active {
+  border: 1px solid #1CB19C;
+  background: #1CB19C;
+  position: relative;
 }
-#classificacao .scroll {
-  padding: 0rem 1rem !important;
-  max-height: 50vh;
-  overflow: scroll;
-}
-#classificacao .scroll::-webkit-scrollbar {
-  display: none;
-}
-@media (max-width: 380px) {
-  #classificacao .scroll {
-    padding: 0rem 0.1rem !important;
-  }
+#classificacao .tab-pane .nav-pills .nav-link:hover {
+  border: 1px solid #1CB19C;
 }
 #classificacao .table {
   color: #232323;
@@ -533,14 +546,18 @@ a:hover {
   }
 }
 
-select, input {
+select,
+input {
   padding: var(--size-2) var(--size-3);
   border-radius: var(--size-2);
   background: transparent;
   border: 1px solid #232323;
   text-align: center;
 }
-select:focus, select :focus-visible, input:focus, input :focus-visible {
+select:focus,
+select :focus-visible,
+input:focus,
+input :focus-visible {
   outline: 1px auto #1CB19C;
 }
 

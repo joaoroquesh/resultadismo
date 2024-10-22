@@ -59,41 +59,74 @@
 
 
 
-  <section id="home">
+  <section id="classificacao" class="classificacao">
 
     <section id="main">
 
 
       <section id="menu"></section>
 
-      <section id="content">
+      <section id="content-fixed" class="fixed-top">
         <div class="container">
           <div class="row">
             <div class="col px-3 d-flex flex-column justify-content-center align-items-center">
 
-              <div id="classificacao">
+              <div id="classificacao-top" class="w-100 classificacao">
                 <nav>
                   <div class="nav nav-tabs d-flex justify-content-around" id="nav-tab" role="tablist">
-                    <button class="nav-link active" id="nav-geral-tab" data-toggle="tab" data-target="#nav-geral" type="button" role="tab" aria-controls="nav-geral" aria-selected="true">Geral</button>
-                    <button class="nav-link" id="nav-campeonato-tab" data-toggle="tab" data-target="#nav-campeonato" type="button" role="tab" aria-controls="nav-campeonato" aria-selected="false">Campeonato</button>
-                    <button class="nav-link" id="nav-mes-tab" data-toggle="tab" data-target="#nav-mes" type="button" role="tab" aria-controls="nav-mes" aria-selected="false">Mês</button>
+                    <button class="nav-link active" id="nav-mes-tab" data-toggle="tab" data-target="#nav-mes"
+                      type="button" role="tab" aria-controls="nav-mes" aria-selected="true">Mês</button>
+                    <button class="nav-link" id="nav-campeonato-tab" data-toggle="tab" data-target="#nav-campeonato"
+                      type="button" role="tab" aria-controls="nav-campeonato" aria-selected="false">Campeonato</button>
+                    <button class="nav-link" id="nav-geral-tab" data-toggle="tab" data-target="#nav-geral" type="button"
+                      role="tab" aria-controls="nav-geral" aria-selected="false">Geral</button>
                   </div>
                 </nav>
                 <div class="tab-content" id="nav-tabContent">
-                  <div class="tab-pane fade show active" id="nav-geral" role="tabpanel" aria-labelledby="nav-geral-tab"></div>
-                  <div class="tab-pane fade text-center pt-3" id="nav-campeonato" role="tabpanel" aria-labelledby="nav-campeonato-tab">
-                    <select id="filtroCampeonato">
-                      <option value="">Selecione um campeonato</option>
-                    </select>
+
+                  <div class="tab-pane fade text-right pt-3 show active" id="nav-mes" role="tabpanel"
+                    aria-labelledby="nav-mes-tab">
+
+                    <ul class="nav nav-pills" id="filtroMes" role="tablist">
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="pills-10-tab" data-toggle="pill" type="button" role="tab"
+                          aria-selected="true">Outubro</button>
+                      </li>
+                    </ul>
                   </div>
-                  <div class="tab-pane fade text-right pt-3" id="nav-mes" role="tabpanel" aria-labelledby="nav-mes-tab">
-                    <select id="filtroMes">
-                      <option value="">Selecione um mês</option>
-                    </select>
+
+                  <div class="tab-pane fade text-center pt-3" id="nav-campeonato" role="tabpanel"
+                    aria-labelledby="nav-campeonato-tab">
+
+                    <ul class="nav nav-pills" id="filtroCampeonato" role="tablist">
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="pills-ro-tab" data-toggle="pill" type="button" role="tab"
+                          aria-selected="true">Resultadismo</button>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-ba-tab" data-toggle="pill" type="button" role="tab"
+                          aria-selected="false">Brasileirão A</button>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-${dados.data.codigo}-tab" data-toggle="pill" type="button"
+                          role="tab" aria-selected="false">${dados.data.nome}</button>
+                      </li>
+                    </ul>
                   </div>
+
+                  <div class="tab-pane fade text-center pt-3" id="nav-geral" role="tabpanel"
+                    aria-labelledby="nav-geral-tab">
+                    <ul class="nav nav-pills" role="tablist">
+                      <li class="nav-item w-100" role="presentation">
+                        <button class="nav-link w-100 active" id="pills-ouro-tab" style="z-index: 999;"
+                          data-toggle="pill" type="button" role="tab" aria-selected="true">Bola de Ouro</button>
+                      </li>
+                    </ul>
+                  </div>
+
                 </div>
-                <div class="table-responsive-sm p-1">
-                  <table class="display table">
+                <div class="table-responsive-sm">
+                  <table class="display table m-0">
                     <thead>
                       <tr>
                         <th></th>
@@ -105,16 +138,29 @@
                         <th>Acertos</th>
                       </tr>
                     </thead>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <div id="content-space"></div>
+
+      <section id="content">
+        <div class="container">
+          <div class="row">
+            <div class="col px-3 d-flex flex-column justify-content-center align-items-center">
+              <div class="w-100 classificacao">
+                <div class="table-responsive-sm p-1">
+                  <table class="display table">
                     <tbody></tbody>
                   </table>
                 </div>
               </div>
-              <!-- <div class="card round-05 my-5" data-aos="fade-down">
-              <h4 class="mx-auto py-5">
-                Confira a Classificação na planilha:
-              </h4>
-              <a href="https://docs.google.com/spreadsheets/d/1md7qlwt3Bg3KVm2TfbHbPL4MwULrsFZqzkYiY4uLRek/edit?usp=sharing" class="btn btn-primary">Acesse aqui</a>
-            </div> -->
 
             </div>
           </div>
@@ -175,6 +221,41 @@
   <script src="js/classificacao.js"></script>
   <script src="js/main.js"></script>
 
+  <script>
+    document.querySelectorAll('.nav-pills').forEach(scrollablePills => {
+  let isDown = false;
+  let startX;
+  let scrollLeft;
+
+  scrollablePills.addEventListener('mousedown', (e) => {
+    isDown = true;
+    scrollablePills.classList.add('active');
+    startX = e.pageX - scrollablePills.offsetLeft;
+    scrollLeft = scrollablePills.scrollLeft;
+    scrollablePills.style.cursor = 'grabbing'; // Muda o cursor ao clicar
+  });
+
+  scrollablePills.addEventListener('mouseleave', () => {
+    isDown = false;
+    scrollablePills.style.cursor = 'grab'; // Reseta o cursor
+  });
+
+  scrollablePills.addEventListener('mouseup', () => {
+    isDown = false;
+    scrollablePills.style.cursor = 'grab'; // Reseta o cursor
+  });
+
+  scrollablePills.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - scrollablePills.offsetLeft;
+    const walk = (x - startX) * 2; // Multiplique por 2 para aumentar a sensibilidade ao arrastar
+    scrollablePills.scrollLeft = scrollLeft - walk;
+  });
+});
+
+
+  </script>
 
   <script>
     $("#menu").load("menu.html");

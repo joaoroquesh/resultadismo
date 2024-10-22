@@ -2,6 +2,9 @@ $(document).ready(function () {
     $(document).on('pontosPronto', function () {
         if (typeof window.pontos !== 'undefined' && window.pontos.data) {
             construirClassificacao(window.pontos.data);
+            listarCampeonatos(window.pontos.data);
+            listarMeses(window.pontos.data);
+            ativarControleVisualizacao();
         } else {
             console.error("Os dados de pontos não foram carregados corretamente.");
         }
@@ -60,30 +63,30 @@ function construirClassificacao(pontosData) {
         }
     });
 
-    // Construir o HTML da tabela de classificação
-    let tbody = $('#classificacao tbody');
+    // Construir o HTML da tabela de classificação, excluindo jogadores com 0 pontos
+    let tbody = $('tbody');
     tbody.empty(); // Limpar qualquer conteúdo existente
 
     classificacaoArray.forEach((jogador, index) => {
-        let nome = jogador.email;
-        let escudo = 'https://www.resultadismo.com/images/escudos/padrao.png';
+        if (jogador.pontuacao > 0) { // Excluir jogadores com 0 pontos
+            let nome = jogador.email;
+            let escudo = 'https://www.resultadismo.com/images/escudos/padrao.png';
 
-        let linha = `
-            <tr>
-                <td><img src="${escudo}" data-codigo="${nome}" alt="Escudo" width="30"></td>
-                <td>${index + 1}</td>
-                <td data-codigo="${nome}"></td>
-                <td>${jogador.pontuacao}</td>
-                <td>${jogador.cravadas}</td>
-                <td>${jogador.saldos}</td>
-                <td>${jogador.acertos}</td>
-            </tr>
-        `;
-        tbody.append(linha);
+            let linha = `
+                <tr>
+                    <td><img src="${escudo}" data-codigo="${nome}" alt="Escudo" width="30"></td>
+                    <td>${index + 1}°</td>
+                    <td data-codigo="${nome}"></td>
+                    <td>${jogador.pontuacao}</td>
+                    <td>${jogador.cravadas}</td>
+                    <td>${jogador.saldos}</td>
+                    <td>${jogador.acertos}</td>
+                </tr>
+            `;
+            tbody.append(linha);
+        }
     });
 
-    
-    
     // Chamar a função para atualizar os elementos com base nos dados disponíveis
     if (typeof window.dados !== 'undefined' && window.dados.data) { 
         atualizarElementosGlobais(window.dados);
@@ -114,22 +117,24 @@ function listarCampeonatos(pontosData) {
     // Ordenar os nomes dos campeonatos em ordem alfabética
     nomesCampeonatos.sort((a, b) => a.nome.localeCompare(b.nome));
 
-    // Listar os nomes dos campeonatos encontrados no console
-    console.log("Nomes dos campeonatos encontrados:", nomesCampeonatos);
-
-    // Construir o filtro de seleção de campeonatos
-    let selectCampeonato = $('#filtroCampeonato');
-    selectCampeonato.empty();
-    selectCampeonato.append('<option value="">Selecione um campeonato</option>');
-    nomesCampeonatos.forEach(campeonato => {
-        selectCampeonato.append(`<option value="${campeonato.codigo}">${campeonato.nome}</option>`);
+    // Construir o filtro de seleção de campeonatos como botões
+    let filtroCampeonato = $('#filtroCampeonato');
+    filtroCampeonato.empty();
+    nomesCampeonatos.forEach((campeonato, index) => {
+        let li = `
+            <li class="nav-item" role="presentation">
+                <button class="nav-link ${index === 0 ? 'active' : ''}" id="pills-${campeonato.codigo}-tab" data-toggle="pill" type="button" role="tab" aria-selected="${index === 0}">${campeonato.nome}</button>
+            </li>
+        `;
+        filtroCampeonato.append(li);
     });
 
     // Adicionar evento de filtro para a classificação
-    selectCampeonato.on('change', function () {
-        let campeonatoSelecionado = $(this).val();
-        if (campeonatoSelecionado) {
-            let pontosFiltrados = pontosData.filter(jogo => jogo.codigo.slice(0, 2) === campeonatoSelecionado);
+    filtroCampeonato.on('click', '.nav-link', function () {
+        let campeonatoSelecionado = $(this).text();
+        let codigoSelecionado = $(this).attr('id').split('-')[1];
+        if (codigoSelecionado) {
+            let pontosFiltrados = pontosData.filter(jogo => jogo.codigo.slice(0, 2) === codigoSelecionado);
             construirClassificacao(pontosFiltrados);
         } else {
             construirClassificacao(pontosData);
@@ -151,30 +156,57 @@ function listarMeses(pontosData) {
         }
     });
 
-    // Obter os nomes dos meses e ordenar em ordem cronológica
-    let nomesMeses = Array.from(meses).sort((a, b) => a - b).map(mes => {
+    // Obter os nomes dos meses e ordenar em ordem decrescente
+    let nomesMeses = Array.from(meses).sort((a, b) => b - a).map(mes => {
         return { codigo: mes, nome: obterNomeMes(mes) };
     });
 
     // Listar os nomes dos meses encontrados no console
     console.log("Meses encontrados:", nomesMeses);
 
-    // Construir o filtro de seleção de meses
-    let selectMes = $('#filtroMes');
-    selectMes.empty();
-    selectMes.append('<option value="">Selecione um mês</option>');
-    nomesMeses.forEach(mes => {
-        selectMes.append(`<option value="${mes.codigo}">${mes.nome}</option>`);
+    // Construir o filtro de seleção de meses como botões
+    let filtroMes = $('#filtroMes');
+    filtroMes.empty();
+    nomesMeses.forEach((mes, index) => {
+        let li = `
+            <li class="nav-item" role="presentation">
+                <button class="nav-link ${index === 0 ? 'active' : ''}" id="pills-${mes.codigo}-tab" data-toggle="pill" type="button" role="tab" aria-selected="${index === 0}">${mes.nome}</button>
+            </li>
+        `;
+        filtroMes.append(li);
     });
 
     // Adicionar evento de filtro para a classificação
-    selectMes.on('change', function () {
-        let mesSelecionado = $(this).val();
-        if (mesSelecionado) {
-            let pontosFiltrados = pontosData.filter(jogo => jogo.data.split('/')[1] === mesSelecionado);
+    filtroMes.on('click', '.nav-link', function () {
+        let mesSelecionado = $(this).text();
+        let codigoSelecionado = $(this).attr('id').split('-')[1];
+        if (codigoSelecionado) {
+            let pontosFiltrados = pontosData.filter(jogo => jogo.data.split('/')[1] === codigoSelecionado);
             construirClassificacao(pontosFiltrados);
         } else {
             construirClassificacao(pontosData);
+        }
+    });
+
+    // Aplicar filtro inicial para o mês mais recente
+    if (nomesMeses.length > 0) {
+        let mesInicial = nomesMeses[0].codigo;
+        let pontosFiltrados = pontosData.filter(jogo => jogo.data.split('/')[1] === mesInicial);
+        construirClassificacao(pontosFiltrados);
+    }
+}
+
+function ativarControleVisualizacao() {
+    // Controlar a visualização com base nas abas selecionadas
+    $('#nav-tab button').on('click', function () {
+        let abaSelecionada = $(this).attr('id');
+        if (abaSelecionada === 'nav-mes-tab') {
+            $('#filtroMes .nav-link.active').click();
+        } else if (abaSelecionada === 'nav-campeonato-tab') {
+            $('#filtroCampeonato .nav-link:first').click();
+        } else if (abaSelecionada === 'nav-geral-tab') {
+            // Mostrar classificação geral sem filtro
+            construirClassificacao(window.pontos.data);
         }
     });
 }
@@ -208,47 +240,3 @@ function obterNomeMes(mes) {
     };
     return meses[mes] || '';
 }
-
-
-
-
-// $( document ).ready(function() {
-
-//   const url ='https://script.googleusercontent.com/macros/echo?user_content_key=LjTtc6OpvJI3Jqp4wK3fpWlrFnFIpuEfsvtU5MMdo7q39FsAwePEXzubU2GjsUikMqqOO--9v7HcODnkRX0cCzZCeykwZmWnm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnOrK8Sz279c9adskH55hnF9MoYrHD91IwEBnMTZfHczrkUqwBVuHtBfz7K7OVHY-GrmsLHKHXYNERl2louKEv-oPp-vE3a0lxdz9Jw9Md8uu&lib=MZJdNykQjw8RX6aFaQzkrGvlUalP-BxzV';
-
-//    var model = "<tr><td>{pos}</td>"+
-//               "<td>{usuario}</td>"+
-//               "<td>{ponto}</td>"+
-//               "<td>{cravadas}</td>"+
-//               "<td>{saldo}</td>"+
-//               "<td>{acertos}</td></tr>";
-            
-
-
-//   $(".list-results-content").empty();  
-
-
-//       fetch(url).then(rep => rep.json())
-//           .then((data) => {
-//               data.data.forEach((el) => {
-                
-//                  line = model;
-//                  line = line.replace("{pos}", el.pos);
-//                  line = line.replace("{usuario}", el.usuario);
-//                  line = line.replace("{nome}", el.nome);
-//                  line = line.replace("{ponto}", el.ponto);
-//                  line = line.replace("{cravadas}", el.cravadas);
-//                  line = line.replace("{saldo}", el.saldo);
-//                  line = line.replace("{acertos}", el.acertos);
-//                  $(".infos-dados").append(line);
-
-                  
-//               })
-//               $('.preloader').fadeOut(500);
-//           })
-          
-
-
-// });  
-
-
