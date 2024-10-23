@@ -358,6 +358,11 @@ a:hover {
 #menu .nav-space {
   height: 98px;
 }
+@media (max-width: 767px) {
+  #menu .nav-space {
+    height: 82px;
+  }
+}
 
 #content {
   display: flex;
@@ -403,7 +408,21 @@ a:hover {
   }
 }
 #classificacao #content-space {
-  height: 171px;
+  height: 100px;
+}
+#classificacao .classificacao {
+  position: relative;
+  height: calc(100dvh - 198px);
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+@media (max-width: 767px) {
+  #classificacao .classificacao {
+    height: calc(100dvh - 182px);
+  }
+}
+#classificacao .classificacao::-webkit-scrollbar {
+  display: none;
 }
 #classificacao-top nav .nav-link {
   background: transparent !important;
@@ -477,9 +496,55 @@ a:hover {
   border-collapse: separate;
   border-spacing: 0px 10px;
 }
+#classificacao .table thead {
+  position: sticky;
+  top: 0;
+}
 #classificacao .table thead tr {
   background: #E5E5E5 !important;
   box-shadow: -10px 0px 0px #E5E5E5, 10px 0px 0px #E5E5E5, 10px -10px 0px #E5E5E5, -10px -10px 0px #E5E5E5;
+}
+#classificacao .table thead th {
+  position: relative;
+}
+#classificacao .table thead th::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (max-width: 567px) {
+  #classificacao .table thead th:nth-child(n+4):nth-child(-n+7) {
+    color: transparent !important;
+  }
+}
+@media (max-width: 567px) {
+  #classificacao .table thead th:nth-child(4)::after {
+    content: "P";
+    color: #1CB19C !important;
+  }
+}
+@media (max-width: 567px) {
+  #classificacao .table thead th:nth-child(5)::after {
+    content: "C";
+    color: #BF9000 !important;
+  }
+}
+@media (max-width: 567px) {
+  #classificacao .table thead th:nth-child(6)::after {
+    content: "S";
+    color: #38761D !important;
+  }
+}
+@media (max-width: 567px) {
+  #classificacao .table thead th:nth-child(7)::after {
+    content: "A";
+    color: #134F5C !important;
+  }
 }
 #classificacao .table tbody {
   max-height: 600px;
@@ -514,33 +579,40 @@ a:hover {
 }
 #classificacao .table th:nth-child(1),
 #classificacao .table td:nth-child(1) {
+  width: var(--t-size);
   padding-right: 0 !important;
 }
 #classificacao .table th:nth-child(2),
 #classificacao .table td:nth-child(2) {
+  width: var(--t-size);
   font-weight: bold;
 }
 #classificacao .table th:nth-child(3),
 #classificacao .table td:nth-child(3) {
   text-align: left;
-  color: #232323 !important;
+  color: #232323;
 }
 #classificacao .table th:nth-child(4),
 #classificacao .table td:nth-child(4) {
   font-weight: bold;
-  color: #1CB19C !important;
+  color: #1CB19C;
 }
 #classificacao .table th:nth-child(5),
 #classificacao .table td:nth-child(5) {
-  color: #BF9000 !important;
+  color: #BF9000;
 }
 #classificacao .table th:nth-child(6),
 #classificacao .table td:nth-child(6) {
-  color: #38761D !important;
+  color: #38761D;
 }
 #classificacao .table th:nth-child(7),
 #classificacao .table td:nth-child(7) {
-  color: #134F5C !important;
+  color: #134F5C;
+}
+#classificacao .table th:nth-child(n+4):nth-child(-n+7),
+#classificacao .table td:nth-child(n+4):nth-child(-n+7) {
+  width: var(--n-size);
+  max-width: var(--n-size);
 }
 @media (max-width: 576px) {
   #classificacao .table th:nth-child(n+4):nth-child(-n+7),
@@ -587,13 +659,60 @@ footer a:hover {
   text-decoration: none;
 }
 
-#carregando {
+.loading * {
+  transition: var(--transition-2);
+}
+.loading #carregando {
+  z-index: 999;
+  display: block;
   position: fixed;
   bottom: 1rem;
   left: 1rem;
   border-radius: 0.5rem;
   box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
   border: 1px solid #1CB19C;
+}
+.loading .skeleton {
+  position: relative;
+  overflow: hidden;
+  border: 0 !important;
+  color: transparent !important;
+  border-radius: var(--size-2) !important;
+}
+.loading .skeleton.btn, .loading .skeleton.nav-link {
+  background-color: #CCCCCC !important;
+}
+.loading .skeleton:before, .loading .skeleton:after {
+  content: "";
+  position: absolute;
+  display: block;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--size-2);
+}
+.loading .skeleton:before {
+  z-index: 1;
+  background-color: #CCCCCC !important;
+}
+.loading .skeleton:after {
+  z-index: 2;
+  background-image: linear-gradient(120deg, transparent 25%, rgba(255, 255, 255, 0.6) 50%, transparent 75%);
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  0% {
+    left: -150%;
+  }
+  100% {
+    left: 150%;
+  }
+}
+
+#carregando {
+  display: none;
 }
 
 .preloader {

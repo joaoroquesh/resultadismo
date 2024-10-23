@@ -13,7 +13,7 @@ $(document).ready(function () {
     let carregados = 0;
 
     // Primeiro: Carregar dados locais e disponibilizar globalmente
-    carregarDadosLocais('pontos', localPontos);
+    // carregarDadosLocais('pontos', localPontos);
     carregarDadosLocais('dados', localDados);
     carregarDadosLocais('jogos', localJogos);
 
@@ -65,7 +65,7 @@ $(document).ready(function () {
             }
 
             // Ocultar o elemento de carregamento quando tudo estiver atualizado
-            $('#carregando').addClass('d-none');
+            $('body').removeClass('loading');
             console.log("Todos os dados foram atualizados.");
         }
     });

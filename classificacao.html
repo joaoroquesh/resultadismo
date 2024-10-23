@@ -55,11 +55,11 @@
 </script>
 
 
-<body>
+<body class="loading">
 
 
 
-  <section id="classificacao" class="classificacao">
+  <section id="classificacao">
 
     <section id="main">
 
@@ -71,7 +71,7 @@
           <div class="row">
             <div class="col px-3 d-flex flex-column justify-content-center align-items-center">
 
-              <div id="classificacao-top" class="w-100 classificacao">
+              <div id="classificacao-top" class="w-100">
                 <nav>
                   <div class="nav nav-tabs d-flex justify-content-around" id="nav-tab" role="tablist">
                     <button class="nav-link active" id="nav-mes-tab" data-toggle="tab" data-target="#nav-mes"
@@ -89,8 +89,8 @@
 
                     <ul class="nav nav-pills" id="filtroMes" role="tablist">
                       <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="pills-10-tab" data-toggle="pill" type="button" role="tab"
-                          aria-selected="true">Outubro</button>
+                        <button class="nav-link skeleton active" id="pills-10-tab" data-toggle="pill" type="button" role="tab"
+                          aria-selected="true">Dezembro</button>
                       </li>
                     </ul>
                   </div>
@@ -100,16 +100,8 @@
 
                     <ul class="nav nav-pills" id="filtroCampeonato" role="tablist">
                       <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="pills-ro-tab" data-toggle="pill" type="button" role="tab"
-                          aria-selected="true">Resultadismo</button>
-                      </li>
-                      <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="pills-ba-tab" data-toggle="pill" type="button" role="tab"
-                          aria-selected="false">Brasileirão A</button>
-                      </li>
-                      <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="pills-${dados.data.codigo}-tab" data-toggle="pill" type="button"
-                          role="tab" aria-selected="false">${dados.data.nome}</button>
+                        <button class="nav-link skeleton active" id="pills-ro-tab" data-toggle="pill" type="button" role="tab"
+                          aria-selected="true">Campeonatos</button>
                       </li>
                     </ul>
                   </div>
@@ -118,27 +110,12 @@
                     aria-labelledby="nav-geral-tab">
                     <ul class="nav nav-pills" role="tablist">
                       <li class="nav-item w-100" role="presentation">
-                        <button class="nav-link w-100 active" id="pills-ouro-tab" style="z-index: 999;"
+                        <button class="nav-link w-100 skeleton active" id="pills-ouro-tab" style="z-index: 999;"
                           data-toggle="pill" type="button" role="tab" aria-selected="true">Bola de Ouro</button>
                       </li>
                     </ul>
                   </div>
 
-                </div>
-                <div class="table-responsive-sm">
-                  <table class="display table m-0">
-                    <thead>
-                      <tr>
-                        <th></th>
-                        <th></th>
-                        <th>Clubista</th>
-                        <th>Pontuação</th>
-                        <th>Cravadas</th>
-                        <th>Saldos</th>
-                        <th>Acertos</th>
-                      </tr>
-                    </thead>
-                  </table>
                 </div>
               </div>
 
@@ -155,11 +132,97 @@
           <div class="row">
             <div class="col px-3 d-flex flex-column justify-content-center align-items-center">
               <div class="w-100 classificacao">
-                <div class="table-responsive-sm p-1">
+                <div class="p-1">
                   <table class="display table">
-                    <tbody></tbody>
+                    <thead class="skeleton">
+                      <tr>
+                        <th></th>
+                        <th></th>
+                        <th>Clubista</th>
+                        <th>Pontuação</th>
+                        <th>Cravadas</th>
+                        <th>Saldos</th>
+                        <th>Acertos</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      <tr class="skeleton">
+                        <td>
+                          &nbsp;
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                      </tr>
+
+                      <tr class="skeleton">
+                        <td>
+                          &nbsp;
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                      </tr>
+
+                      <tr class="skeleton">
+                        <td>
+                          &nbsp;
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                      </tr>
+
+                    </tbody>
                   </table>
                 </div>
+                <footer></footer>
               </div>
 
             </div>
@@ -201,7 +264,7 @@
         </div>
       </div>
 
-      <footer></footer>
+
 
 
 
@@ -223,36 +286,36 @@
 
   <script>
     document.querySelectorAll('.nav-pills').forEach(scrollablePills => {
-  let isDown = false;
-  let startX;
-  let scrollLeft;
+      let isDown = false;
+      let startX;
+      let scrollLeft;
 
-  scrollablePills.addEventListener('mousedown', (e) => {
-    isDown = true;
-    scrollablePills.classList.add('active');
-    startX = e.pageX - scrollablePills.offsetLeft;
-    scrollLeft = scrollablePills.scrollLeft;
-    scrollablePills.style.cursor = 'grabbing'; // Muda o cursor ao clicar
-  });
+      scrollablePills.addEventListener('mousedown', (e) => {
+        isDown = true;
+        scrollablePills.classList.add('active');
+        startX = e.pageX - scrollablePills.offsetLeft;
+        scrollLeft = scrollablePills.scrollLeft;
+        scrollablePills.style.cursor = 'grabbing'; // Muda o cursor ao clicar
+      });
 
-  scrollablePills.addEventListener('mouseleave', () => {
-    isDown = false;
-    scrollablePills.style.cursor = 'grab'; // Reseta o cursor
-  });
+      scrollablePills.addEventListener('mouseleave', () => {
+        isDown = false;
+        scrollablePills.style.cursor = 'grab'; // Reseta o cursor
+      });
 
-  scrollablePills.addEventListener('mouseup', () => {
-    isDown = false;
-    scrollablePills.style.cursor = 'grab'; // Reseta o cursor
-  });
+      scrollablePills.addEventListener('mouseup', () => {
+        isDown = false;
+        scrollablePills.style.cursor = 'grab'; // Reseta o cursor
+      });
 
-  scrollablePills.addEventListener('mousemove', (e) => {
-    if (!isDown) return;
-    e.preventDefault();
-    const x = e.pageX - scrollablePills.offsetLeft;
-    const walk = (x - startX) * 2; // Multiplique por 2 para aumentar a sensibilidade ao arrastar
-    scrollablePills.scrollLeft = scrollLeft - walk;
-  });
-});
+      scrollablePills.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - scrollablePills.offsetLeft;
+        const walk = (x - startX) * 2; // Multiplique por 2 para aumentar a sensibilidade ao arrastar
+        scrollablePills.scrollLeft = scrollLeft - walk;
+      });
+    });
 
 
   </script>
