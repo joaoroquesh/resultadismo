@@ -568,7 +568,7 @@ a:hover {
 @media (max-width: 410px) {
   #classificacao .table th,
   #classificacao .table td {
-    padding: 0.5rem 0rem;
+    padding: 0.5rem 0.1rem;
   }
 }
 #classificacao .table th:nth-child(1),
@@ -624,7 +624,7 @@ a:hover {
 @media (max-width: 410px) {
   #classificacao .table th:nth-child(n+4):nth-child(-n+7),
   #classificacao .table td:nth-child(n+4):nth-child(-n+7) {
-    max-width: 43px;
+    max-width: 40px;
   }
 }
 
