@@ -511,16 +511,16 @@ a {
 
 
       @media (max-width:410px) {
-        padding: 0.6rem;
-      }
-
-      @media (max-width:360px) {
-        padding: 0.6rem 0.5rem;
+        padding: 0.5rem 0rem;
+        // font-size: var(--font-size-sm);
       }
 
       &:nth-child(1) {
         width: var(--t-size);
         padding-right: 0 !important;
+        @media (max-width:410px) {
+          padding-left: .25rem;
+        }
       }
 
       &:nth-child(2) {

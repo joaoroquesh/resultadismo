@@ -568,19 +568,19 @@ a:hover {
 @media (max-width: 410px) {
   #classificacao .table th,
   #classificacao .table td {
-    padding: 0.6rem;
-  }
-}
-@media (max-width: 360px) {
-  #classificacao .table th,
-  #classificacao .table td {
-    padding: 0.6rem 0.5rem;
+    padding: 0.5rem 0rem;
   }
 }
 #classificacao .table th:nth-child(1),
 #classificacao .table td:nth-child(1) {
   width: var(--t-size);
   padding-right: 0 !important;
+}
+@media (max-width: 410px) {
+  #classificacao .table th:nth-child(1),
+  #classificacao .table td:nth-child(1) {
+    padding-left: 0.25rem;
+  }
 }
 #classificacao .table th:nth-child(2),
 #classificacao .table td:nth-child(2) {
