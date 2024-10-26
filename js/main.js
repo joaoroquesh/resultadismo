@@ -59,6 +59,8 @@ $(document).ready(function () {
                 construirClassificacao(window.pontos.data);
                 listarCampeonatos(window.pontos.data)
                 listarMeses(window.pontos.data)
+
+                ativarControleVisualizacao();
             }
             if (typeof window.jogos !== 'undefined' && window.jogos.data) {
                 // Caso haja outra função para processar os jogos, pode ser chamada aqui
