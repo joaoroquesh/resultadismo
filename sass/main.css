@@ -393,23 +393,21 @@ a:hover {
   margin-right: 10px;
 }
 
-#classificacao #menu .container {
-  background: #E5E5E5;
-  z-index: 999;
-}
-#classificacao #content-fixed.fixed-top {
+#content-fixed.fixed-top {
   top: 98px;
   background: #E5E5E5;
   z-index: 99;
 }
 @media (max-width: 767px) {
-  #classificacao #content-fixed.fixed-top {
+  #content-fixed.fixed-top {
     top: 82px;
   }
 }
-#classificacao #content-space {
+
+#content-space {
   height: 100px;
 }
+
 #classificacao .classificacao {
   position: relative;
   height: calc(100dvh - 198px);

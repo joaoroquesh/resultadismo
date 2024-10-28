@@ -278,26 +278,23 @@ a {
   }
 }
 
+
+#content-fixed.fixed-top {
+  top: 98px;
+  background: $light;
+  z-index: 99;
+
+  @media (max-width:767px) {
+    top: 82px;
+  }
+}
+
+#content-space {
+  height: 100px;
+}
+
 #classificacao {
 
-  #menu .container {
-    background: $light;
-    z-index: 999;
-  }
-
-  #content-fixed.fixed-top {
-    top: 98px;
-    background: $light;
-    z-index: 99;
-
-    @media (max-width:767px) {
-      top: 82px;
-    }
-  }
-
-  #content-space {
-    height: 100px;
-  }
 
   .classificacao {
     position: relative;
