@@ -343,9 +343,14 @@ function listarPalpites(jogo) {
               } else if ((golsMandantePalpite - golsVisitantePalpite) === (golsMandanteReal - golsVisitanteReal) && (golsMandantePalpite > golsVisitantePalpite) === (golsMandanteReal > golsVisitanteReal)) {
                   classePontuacao = 'saldo';
                   pontos = 2;
-              } else if ((golsMandantePalpite > golsVisitantePalpite) === (golsMandanteReal > golsVisitanteReal) || (golsMandantePalpite === golsVisitantePalpite && golsMandanteReal === golsVisitanteReal)) {
-                  classePontuacao = 'acerto';
-                  pontos = 1;
+              } else if (
+                (golsMandantePalpite > golsVisitantePalpite && golsMandanteReal > golsVisitanteReal) ||
+                (golsMandantePalpite < golsVisitantePalpite && golsMandanteReal < golsVisitanteReal)
+              ) {
+                  if (golsMandanteReal !== golsVisitanteReal) { // Não é um empate
+                      classePontuacao = 'acerto';
+                      pontos = 1;
+                  }
               }
           }
 
@@ -386,4 +391,6 @@ function listarPalpites(jogo) {
 
   return palpitesHTML;
 }
+
+
 
