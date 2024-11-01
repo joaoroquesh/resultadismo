@@ -94,7 +94,7 @@ $colors: (
     }
   }
 
-  --color-brand-main: var(--persian-green-600);
+  --color-brand-main: var(--persian-primary-light-600);
 --color-brand-opposite: var(--victoria-700);
 --color-brand-complementary: var(--lima-500);
 --color-brand-supplementary: var(--rio-grande-600);
@@ -128,11 +128,11 @@ $colors: (
 --color-function-disabled-text: var(--mine-shaft-400);
 --color-function-disabled-border: var(--mine-shaft-300);
 
---color-function-primary-darkest: var(--persian-green-800);
---color-function-primary-action: var(--persian-green-600);
---color-function-primary-default: var(--persian-green-700);
---color-function-primary-active: var(--persian-green-500);
---color-function-primary-lightest: var(--persian-green-50);
+--color-function-primary-darkest: var(--persian-primary-light-800);
+--color-function-primary-action: var(--persian-primary-light-600);
+--color-function-primary-default: var(--persian-primary-light-700);
+--color-function-primary-active: var(--persian-primary-light-500);
+--color-function-primary-lightest: var(--persian-primary-light-50);
 
 --color-function-secondary-darkest: var(--victoria-800);
 --color-function-secondary-action: var(--victoria-600);
@@ -143,8 +143,8 @@ $colors: (
 --color-function-tertiary-darkest: var(--cyprus-800);
 --color-function-tertiary-action: var(--cyprus-600);
 --color-function-tertiary-default: var(--cyprus-700);
---color-function-tertiary-active: var(--persian-green-500);
---color-function-tertiary-lightest: var(--persian-green-400);
+--color-function-tertiary-active: var(--persian-primary-light-500);
+--color-function-tertiary-lightest: var(--persian-primary-light-400);
 
 --color-surface-text-default-low: var(--mine-shaft-400);
 --color-surface-text-default-medium: var(--mine-shaft-600);
@@ -152,7 +152,7 @@ $colors: (
 
 --color-surface-text-highlight-low: var(--athens-gray-50);
 --color-surface-text-highlight-medium: var(--cyprus-600);
---color-surface-text-highlight-high: var(--persian-green-600);
+--color-surface-text-highlight-high: var(--persian-primary-light-600);
 
 --color-surface-background-low: var(--mine-shaft-50);
 --color-surface-background-medium: var(--athens-gray-100);
@@ -174,9 +174,9 @@ $colors: (
 --color-surface-support-3-medium: var(--mine-shaft-400);
 --color-surface-support-3-high: var(--mine-shaft-900);
 
---color-surface-support-4-low: var(--persian-green-50);
---color-surface-support-4-medium: var(--persian-green-600);
---color-surface-support-4-high: var(--persian-green-950);
+--color-surface-support-4-low: var(--persian-primary-light-50);
+--color-surface-support-4-medium: var(--persian-primary-light-600);
+--color-surface-support-4-high: var(--persian-primary-light-950);
 
 --color-surface-support-5-low: var(--lima-50);
 --color-surface-support-5-medium: var(--lima-600);
@@ -258,3 +258,37 @@ $colors: (
   --box-shadow-sm: 0 2px 8px rgba(128, 128, 128, 0.2);
 
 }
+
+
+$white: var(--star-dust-50);
+$light:  var(--star-dust-100);
+$medium: var(--star-dust-200);
+$darkgray: var(--star-dust-400);
+$dark: var(--star-dust-950);
+$primary-light: var(--turquoise-500);
+$primary:#1CB19C;
+$primary: var(--turquoise-600);
+$cravada:#BF9000;
+$saldo:#38761D;
+$acerto:#134F5C;
+$transparent:rgba(0, 0, 0, 0);
+
+$size-0:var(--size-0);
+$size-1:var(--size-1);
+$size-2:var(--size-2);
+$size-3:var(--size-3);
+$size-4:var(--size-4);
+$size-5:var(--size-5);
+
+
+$font-size-xs:var(--font-size-xs);
+$font-size-sm:var(--font-size-sm);
+$font-size-bs:var(--font-size-bs);
+$font-size-1:var(--font-size-1);
+$font-size-2:var(--font-size-2);
+$font-size-3:var(--font-size-3);
+$font-size-4:var(--font-size-4);
+$font-size-5:var(--font-size-5);
+$font-size-6:var(--font-size-6);
+$font-size-lg:var(--font-size-lg);
+$font-size-xl:var(--font-size-xl);

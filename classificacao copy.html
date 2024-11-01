@@ -74,44 +74,44 @@
               <div id="navegacao" class="w-100 navegacao">
                 <nav>
                   <div class="nav nav-tabs d-flex justify-content-around" id="nav-tab" role="tablist">
-                    <button class="nav-link active" id="nav-A-tab" data-toggle="tab" data-target="#nav-A" type="button"
-                      role="tab" aria-controls="nav-A" aria-selected="true">Série A</button>
-                    <button class="nav-link" id="nav-B-tab" data-toggle="tab" data-target="#nav-B" type="button"
-                      role="tab" aria-controls="nav-B" aria-selected="false">Série B</button>
-                    <button class="nav-link" id="nav-C-tab" data-toggle="tab" data-target="#nav-C" type="button"
-                      role="tab" aria-controls="nav-C" aria-selected="false">Série C</button>
+                    <button class="nav-link active" id="nav-mes-tab" data-toggle="tab" data-target="#nav-mes"
+                      type="button" role="tab" aria-controls="nav-mes" aria-selected="true">Mês</button>
+                    <button class="nav-link" id="nav-campeonato-tab" data-toggle="tab" data-target="#nav-campeonato"
+                      type="button" role="tab" aria-controls="nav-campeonato" aria-selected="false">Campeonato</button>
+                    <!-- <button class="nav-link" id="nav-geral-tab" data-toggle="tab" data-target="#nav-geral" type="button"
+                      role="tab" aria-controls="nav-geral" aria-selected="false">Geral</button> -->
                   </div>
                 </nav>
                 <div class="tab-content" id="nav-tabContent">
 
-                  <div class="tab-pane selecao fade text-right pt-3 show active" id="nav-A" role="tabpanel"
-                    aria-labelledby="nav-A-tab">
+                  <div class="tab-pane selecao fade text-right pt-3 show active" id="nav-mes" role="tabpanel"
+                    aria-labelledby="nav-mes-tab">
 
-                    <ul class="nav nav-pills pr-5" id="filtroA" role="tablist">
+                    <ul class="nav nav-pills pr-5" id="filtroMes" role="tablist">
                       <li class="nav-item" role="presentation">
-                        <button class="nav-link skeleton active" id="pills-mesAtualA-tab" data-toggle="pill"
-                          type="button" role="tab" aria-selected="true">${mesAtual}</button>
+                        <button class="nav-link skeleton active" id="pills-10-tab" data-toggle="pill" type="button" role="tab"
+                          aria-selected="true">Dezembro</button>
                       </li>
                     </ul>
                   </div>
 
-                  <div class="tab-pane selecao fade text-center pt-3" id="nav-B" role="tabpanel"
-                    aria-labelledby="nav-B-tab">
+                  <div class="tab-pane selecao fade text-center pt-3" id="nav-campeonato" role="tabpanel"
+                    aria-labelledby="nav-campeonato-tab">
 
-                    <ul class="nav nav-pills pr-5" id="filtroB" role="tablist">
+                    <ul class="nav nav-pills pr-5" id="filtroCampeonato" role="tablist">
                       <li class="nav-item" role="presentation">
-                        <button class="nav-link skeleton active" id="pills-mesAtualB-tab" data-toggle="pill"
-                          type="button" role="tab" aria-selected="true">${mesAtual}</button>
+                        <button class="nav-link skeleton active" id="pills-ro-tab" data-toggle="pill" type="button" role="tab"
+                          aria-selected="true">Campeonatos</button>
                       </li>
                     </ul>
                   </div>
 
-                  <div class="tab-pane selecao fade text-center pt-3" id="nav-C" role="tabpanel"
-                    aria-labelledby="nav-C-tab">
-                    <ul class="nav nav-pills pr-5" id="filtroC" role="tablist">
-                      <li class="nav-item" role="presentation">
-                        <button class="nav-link skeleton active" id="pills-mesAtualC-tab" data-toggle="pill"
-                          type="button" role="tab" aria-selected="true">${mesAtual}</button>
+                  <div class="tab-pane selecao fade text-center pt-3" id="nav-geral" role="tabpanel"
+                    aria-labelledby="nav-geral-tab">
+                    <ul class="nav nav-pills" role="tablist">
+                      <li class="nav-item w-100" role="presentation">
+                        <button class="nav-link w-100 skeleton active" id="pills-ouro-tab" style="z-index: 999;"
+                          data-toggle="pill" type="button" role="tab" aria-selected="true">Bola de Ouro</button>
                       </li>
                     </ul>
                   </div>

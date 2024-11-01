@@ -1,23 +1,6 @@
 @import 'essencial/root';
+@import 'essencial/utilities';
 
-$white:#FFF;
-$light:#E5E5E5;
-$medium:#CCCCCC;
-$darkgray:#999999;
-$dark:#232323;
-$green:#06DDBB;
-$darkgreen:#1CB19C;
-$cravada:#BF9000;
-$saldo:#38761D;
-$acerto:#134F5C;
-$transparent:rgba(0, 0, 0, 0);
-
-$size-0:var(--size-0);
-$size-1:var(--size-1);
-$size-2:var(--size-2);
-$size-3:var(--size-3);
-$size-4:var(--size-4);
-$size-5:var(--size-5);
 
 :root {
   --dark: $dark;
@@ -38,173 +21,28 @@ body {
 }
 
 a {
-  color: $darkgreen;
+  color: $primary;
 
   &:hover {
-    color: $darkgreen;
+    color: $primary;
   }
 }
 
+button {
+
+  &:focus,
+  &:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+}
+
+:focus,
 :focus-visible {
-  outline: 1px auto $darkgreen;
+  outline: 1px auto $primary;
 }
 
-.btn- {
 
-  &click-sm {
-    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease-in-out;
-
-    &:hover {
-      transform: translateX(2px) translateY(2px);
-      box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
-    }
-
-    &:active {
-      transform: translateX(4px) translateY(4px);
-      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);
-    }
-
-    &:focus,
-    &:not(:disabled):not(.disabled):active:focus {
-      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1);
-    }
-  }
-
-  &click {
-    box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease-in-out;
-
-    &:hover {
-      transform: translateX(2px) translateY(2px);
-      box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-    }
-
-    &:active {
-      transform: translateX(4px) translateY(4px);
-      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);
-    }
-
-    &:focus,
-    &:not(:disabled):not(.disabled):active:focus {
-      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1);
-    }
-  }
-
-  &primary {
-    background-color: $darkgreen;
-    border: 2px solid $darkgreen;
-    color: $white;
-
-    &:hover {
-      background-color: $transparent;
-      border: 2px solid $darkgreen;
-      color: $darkgreen;
-    }
-
-    &:active,
-    &:not(:disabled):not(.disabled).active,
-    &:not(:disabled):not(.disabled):active,
-    .show>&.dropdown-toggle {
-      background-color: $darkgreen;
-      border: 2px solid $darkgreen;
-      color: $dark;
-    }
-  }
-
-  &outline-primary {
-
-    border: 1px solid $darkgreen;
-    color: $darkgreen;
-
-    &:hover {
-      background-color: $darkgreen;
-      border: 1px solid $darkgreen;
-      color: $white;
-    }
-
-    &:active,
-    &:not(:disabled):not(.disabled).active,
-    &:not(:disabled):not(.disabled):active,
-    .show>&.dropdown-toggle {
-      background-color: $darkgreen;
-      border: 1px solid $darkgreen;
-      color: $dark;
-    }
-  }
-}
-
-.round- {
-  &05 {
-    border-radius: 0.5rem;
-  }
-
-  &1 {
-    border-radius: 1rem;
-  }
-}
-
-.bg- {
-
-  &cravada {
-    background-color: $cravada !important;
-  }
-
-  &saldo {
-    background-color: $saldo !important;
-  }
-
-  &acerto {
-    background-color: $acerto !important;
-  }
-
-  &light {
-    background-color: $light !important;
-  }
-
-  &dark {
-    background-color: $dark !important;
-  }
-
-  &green {
-    background-color: $green !important;
-  }
-
-  &darkgreen {
-    background-color: $darkgreen !important;
-  }
-}
-
-.c- {
-
-  &cravada {
-    color: $cravada !important;
-  }
-
-  &saldo {
-    color: $saldo !important;
-  }
-
-  &acerto {
-    color: $acerto !important;
-  }
-
-  &light {
-    color: $light !important;
-  }
-
-  &dark {
-    color: $dark !important;
-  }
-
-  &green {
-    color: $green !important;
-  }
-
-  &darkgreen {
-    color: $darkgreen !important;
-  }
-}
 
 
 /* ELEMENTS*/
@@ -215,6 +53,11 @@ a {
   justify-content: center;
   align-items: center;
 
+
+  .container{
+    background: $light;
+  }
+
   .navbar {
     box-shadow: 0px 0px 2px rgb(0 0 0 / 14%), 0px 2px 2px rgb(0 0 0 / 12%), 0px 1px 3px rgb(0 0 0 / 20%);
   }
@@ -223,7 +66,7 @@ a {
     color: $dark;
 
     &:hover {
-      color: $darkgreen;
+      color: $primary;
     }
 
     &.disabled {
@@ -249,8 +92,7 @@ a {
   .card {
     background: $light;
     width: 100%;
-    max-width: 500px;
-    padding: 3rem 2rem;
+    border-radius: var(--size-3);
     box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
 
 
@@ -260,7 +102,7 @@ a {
 
     .btn {
       width: 100%;
-      background: $dark;
+      // background: $dark;
       border: none;
     }
   }
@@ -312,94 +154,7 @@ a {
 
   }
 
-  &-top {
-    nav {
-      .nav {
-        &-link {
-          background: transparent !important;
-          width: 32%;
-          border-bottom: 1px solid transparent;
-          display: flex;
-          justify-content: center;
-          transition: var(--transition-2);
 
-          border-top: 0 !important;
-          border-right: 0 !important;
-          border-left: 0 !important;
-
-          &.active {
-            color: $darkgreen;
-            border-bottom: 2px solid $darkgreen !important;
-            background: transparent;
-            font-weight: 700;
-            position: relative;
-          }
-
-          &:hover {
-            border-bottom: 1px solid $darkgreen;
-          }
-        }
-      }
-    }
-
-  }
-
-  .tab-pane {
-    position: relative;
-
-    /* width */
-
-    &:after {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      width: 150px;
-      height: 100%;
-      background: linear-gradient(to right, transparent 0%, $light 80%);
-      pointer-events: none;
-
-      @media (max-width:576px) {
-        width: 50px;
-      }
-    }
-
-
-    .nav-pills {
-      overflow-x: scroll;
-      flex-wrap: nowrap;
-      gap: var(--size-2);
-
-      &::-webkit-scrollbar,
-      &::-webkit-scrollbar-track,
-      &::-webkit-scrollbar-thumb {
-        width: 0;
-        height: 0;
-      }
-
-      .nav-item {
-        text-wrap: nowrap;
-      }
-
-      .nav-link {
-        border: 1px solid transparent;
-        border-radius: var(--size-2);
-        transition: var(--transition-2);
-        font-weight: 500;
-
-        &.active {
-          border: 1px solid $darkgreen;
-          background: $darkgreen;
-          position: relative;
-        }
-
-        &:hover {
-          border: 1px solid $darkgreen;
-        }
-      }
-    }
-  }
 
   .table {
     // display: inline !important;
@@ -440,7 +195,7 @@ a {
           @media (max-width:567px) {
             &::after {
               content: "P";
-              color: $darkgreen !important;
+              color: $primary !important;
             }
           }
         }
@@ -508,21 +263,21 @@ a {
 
 
       @media (max-width:410px) {
-        padding: 0.5rem 0.1rem;
+        padding: $size-2 0.1rem;
         // font-size: var(--font-size-sm);
       }
 
       &:nth-child(1) {
         width: var(--t-size);
+        font-weight: bold;
         padding-right: 0 !important;
-        @media (max-width:410px) {
-          padding-left: .25rem;
-        }
+        padding-left: $size-2;
+
       }
 
       &:nth-child(2) {
         width: var(--t-size);
-        font-weight: bold;
+        padding: 0 !important;
       }
 
       &:nth-child(3) {
@@ -533,7 +288,7 @@ a {
 
       &:nth-child(4) {
         font-weight: bold;
-        color: $darkgreen;
+        color: $primary;
 
       }
 
@@ -570,6 +325,280 @@ a {
   }
 }
 
+.navegacao {
+  nav {
+    .nav {
+      &-link {
+        background: transparent !important;
+        width: 32%;
+        border-bottom: 1px solid transparent;
+        display: flex;
+        justify-content: center;
+        transition: var(--transition-2);
+
+        border-top: 0 !important;
+        border-right: 0 !important;
+        border-left: 0 !important;
+
+        &.active {
+          color: $primary;
+          border-bottom: 2px solid $primary !important;
+          background: transparent;
+          font-weight: 700;
+          position: relative;
+        }
+
+
+        &:hover {
+          border-bottom: 1px solid $primary;
+        }
+      }
+    }
+  }
+
+}
+
+.selecao {
+  position: relative;
+
+  /* width */
+
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 150px;
+    height: 100%;
+    background: linear-gradient(to right, transparent 0%, $light 80%);
+    pointer-events: none;
+
+    @media (max-width:576px) {
+      width: 50px;
+    }
+  }
+
+
+  .nav-pills {
+    overflow-x: scroll;
+    flex-wrap: nowrap;
+    gap: var(--size-2);
+
+    &::-webkit-scrollbar,
+    &::-webkit-scrollbar-track,
+    &::-webkit-scrollbar-thumb {
+      width: 0;
+      height: 0;
+    }
+
+    .nav-item {
+      text-wrap: nowrap;
+    }
+
+    .nav-link {
+      background: $light;
+      border: 1px solid $medium;
+      border-radius: var(--size-2);
+      transition: var(--transition-2);
+      font-weight: 500;
+
+      &.active {
+        border: 1px solid $primary;
+        background: $primary;
+        position: relative;
+      }
+
+      &:hover {
+        border: 1px solid $primary;
+      }
+    }
+  }
+}
+
+.card {
+  &-game {
+    padding: $size-3;
+    // padding-bottom: 0;
+
+    &-label{
+      font-size: var(--font-size-sm);
+    }
+    
+    &-result {
+      --team-size:60px;
+      height: 100px;
+      display: flex;
+      justify-content: space-between;
+      padding-bottom: $size-3;
+
+      &-team {
+        // flex: 0 0 30%;
+        width: 30%;
+        position: relative;
+        padding: $size-2;
+
+        &-name {
+          position: absolute;
+          bottom: calc($size-3 * -1);
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: var(--font-size-xs);
+          text-wrap: nowrap;
+        }
+
+        img {
+          max-width: var(--team-size);
+          max-height: var(--team-size);
+        }
+
+      }
+
+      &-score {
+        display: flex;
+        align-items: center;
+        gap: $size-3;
+
+        padding: $size-2;
+
+        span {
+          height: var(--team-size);
+          width: var(--team-size);
+          max-width: var(--team-size);
+          color: $dark;
+          border: 1px solid $primary;
+          border-radius: $size-3;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: $font-size-3;
+        }
+      }
+    }
+
+  }
+
+  &.game {
+    .card {
+      &-header {
+        border: 0px;
+        background: $medium;
+        padding: 0;
+
+        .btn {
+          position: relative;
+          padding: $size-2 $size-4;
+          // color: $primary;
+          font-weight: bold;
+
+          &:after,
+          &:before {
+            --minus-size: 12px;
+            content: "";
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'%3E%3Cpath d='M1,8.39v-2.78h12v2.78H1Z' fill='black'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-size: cover;
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            translate: 0 -50%;
+            width: var(--minus-size);
+            height: var(--minus-size);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: 0.3s ease-in-out;
+          }
+
+          &.collapsed {
+            &:after {
+              rotate: -90deg;
+            }
+
+            &:before {
+              rotate: -180deg;
+            }
+          }
+        }
+      }
+
+      &-body {
+        padding: $size-3;
+        table {
+          td {
+            vertical-align: middle;
+            text-align: center;
+            padding: 0;
+
+            &:nth-child(1) {
+              width: 50px;
+              max-width: 50px;
+            }
+
+            &:nth-child(2) {
+              text-align: left;
+              font-size: var(--font-size-sm);
+            }
+
+            .cravada,
+            .saldo,
+            .acerto {
+              position: relative;
+              display: flex;
+              justify-content: center;
+              font-weight: bold;
+              border-radius: $size-2;
+
+              &:after {
+                content: '';
+                position: absolute;
+                top: -10px;
+                right: -10px;
+                color: $light;
+                width: 20px;
+                height: 20px;
+                background: $primary;
+                font-size: 10px;
+                border-radius: 100px;
+                padding: 2px;
+                font-weight: normal;
+                scale: .8;
+              }
+            }
+
+            .cravada {
+              color: $light;
+              background: $cravada;
+
+              &:after {
+                content: '+3';
+              }
+            }
+
+            .saldo {
+              color: $saldo;
+              border: 1px solid $saldo;
+
+              &:after {
+                content: '+2';
+              }
+            }
+
+            .acerto {
+              font-weight: normal;
+              color: $acerto;
+              border: 1px solid $acerto;
+
+              &:after {
+                content: '+1';
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
 
 select,
 input {
@@ -581,9 +610,9 @@ input {
 
   &:focus,
   :focus-visible {
-    outline: 1px auto $darkgreen;
+    outline: 1px auto $primary;
     ;
-    // box-shadow: 0 0 0 0.2rem $darkgreen;
+    // box-shadow: 0 0 0 0.2rem $primary;
   }
 
 }
@@ -594,22 +623,22 @@ footer {
   justify-content: center;
   align-items: center;
 
-  .darkgreen {
-    color: $darkgreen;
+  .primary {
+    color: $primary;
   }
 
   a {
-    color: $darkgreen;
+    color: $primary;
 
     &:hover {
-      color: $green;
+      color: $primary-light;
       text-decoration: none;
     }
   }
 }
 
 .loading {
-  *{
+  * {
     transition: var(--transition-2);
   }
 
@@ -621,7 +650,7 @@ footer {
     left: 1rem;
     border-radius: 0.5rem;
     box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
-    border: 1px solid $darkgreen;
+    border: 1px solid $primary;
   }
 
   .skeleton {
@@ -629,13 +658,15 @@ footer {
     overflow: hidden;
     border: 0 !important;
     color: transparent !important;
-    border-radius: $size-2!important;
-    
-    &.btn, &.nav-link{
-      background-color: $medium!important;
+    border-radius: $size-2 !important;
+
+    &.btn,
+    &.nav-link {
+      background-color: $medium !important;
     }
-    
-    &:before, &:after{
+
+    &:before,
+    &:after {
       content: '';
       position: absolute;
       display: block;
@@ -645,25 +676,27 @@ footer {
       width: 100%;
       height: 100%;
       border-radius: $size-2;
-      
+
     }
-    &:before{
+
+    &:before {
       z-index: 1;
-      background-color: $medium!important;
+      background-color: $medium !important;
     }
+
     &:after {
       z-index: 2;
       background-image: linear-gradient(120deg, transparent 25%, rgba(255, 255, 255, 0.6) 50%, transparent 75%);
       animation: shimmer 1.5s infinite;
     }
   }
-  
-  
+
+
   @keyframes shimmer {
     0% {
       left: -150%;
     }
-  
+
     100% {
       left: 150%;
     }

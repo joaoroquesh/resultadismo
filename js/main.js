@@ -13,9 +13,7 @@ $(document).ready(function () {
     let carregados = 0;
 
     // Primeiro: Carregar dados locais e disponibilizar globalmente
-    // carregarDadosLocais('pontos', localPontos);
     carregarDadosLocais('dados', localDados);
-    carregarDadosLocais('jogos', localJogos);
 
     // Depois: Atualizar os dados de forma assíncrona das URLs e salvar no cache
     atualizarDadosAssincronos('pontos', APIpontos);
@@ -55,35 +53,21 @@ $(document).ready(function () {
             if (typeof window.dados !== 'undefined' && window.dados.data) {
                 atualizarElementosGlobais(window.dados);
             }
-            if (typeof window.pontos !== 'undefined' && window.pontos.data) {
-                construirClassificacao(window.pontos.data);
-                listarCampeonatos(window.pontos.data)
-                listarMeses(window.pontos.data)
-
-                ativarControleVisualizacao();
-            }
-            if (typeof window.jogos !== 'undefined' && window.jogos.data) {
-                // Caso haja outra função para processar os jogos, pode ser chamada aqui
-            }
-
+            
             // Ocultar o elemento de carregamento quando tudo estiver atualizado
-            $('body').removeClass('loading');
+            // $('body').removeClass('loading');
             console.log("Todos os dados foram atualizados.");
         }
     });
 
     // Atualizar elementos globais e carregar classificação inicial com os dados locais
-    $(document).on('dadosPronto pontosPronto jogosPronto', function () {
+    $(document).on('dadosPronto pontosPronto', function () {
         if (typeof window.dados !== 'undefined' && window.dados.data) {
             atualizarElementosGlobais(window.dados);
         }
         if (typeof window.pontos !== 'undefined' && window.pontos.data) {
             construirClassificacao(window.pontos.data);
         }
-        if (typeof window.jogos !== 'undefined' && window.jogos.data) {
-            // Caso haja outra função para processar os jogos, pode ser chamada aqui
-        }
-
     });
 });
 
@@ -139,7 +123,3 @@ $(document).on('dadosProntos', function() {
         atualizarElementosGlobais(window.dados);
     }
 });
-
-
-
-
