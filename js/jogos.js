@@ -258,10 +258,8 @@ function getNomeMes(mes) {
 }
 
 function getDiaSemana(jogosData, dia, mes) {
-  const jogo = jogosData.find(j => j.data === `${dia}/${mes}`);
-  if (!jogo) return '';
-
-  const dataPartida = new Date(jogo.hora);
+  const anoAtual = new Date().getFullYear();
+  const dataPartida = new Date(`${anoAtual}-${mes}-${dia}T00:00:00`);
   const diasSemana = ['dom.', 'seg.', 'ter.', 'qua.', 'qui.', 'sex.', 'sab.'];
   return diasSemana[dataPartida.getDay()];
 }
