@@ -458,13 +458,13 @@
 }
 
 .bg-cravada {
-  background-color: #BF9000 !important;
+  background-color: var(--pizza-600) !important;
 }
 .bg-saldo {
-  background-color: #38761D !important;
+  background-color: var(--bilbao-700) !important;
 }
 .bg-acerto {
-  background-color: #134F5C !important;
+  background-color: var(--blue-dianne-900) !important;
 }
 .bg-light {
   background-color: var(--star-dust-100) !important;
@@ -480,13 +480,13 @@
 }
 
 .c-cravada {
-  color: #BF9000 !important;
+  color: var(--pizza-600) !important;
 }
 .c-saldo {
-  color: #38761D !important;
+  color: var(--bilbao-700) !important;
 }
 .c-acerto {
-  color: #134F5C !important;
+  color: var(--blue-dianne-900) !important;
 }
 .c-light {
   color: var(--star-dust-100) !important;
@@ -1628,19 +1628,19 @@ button:focus, button:focus-visible {
 @media (max-width: 567px) {
   #classificacao .table thead th:nth-child(5)::after {
     content: "C";
-    color: #BF9000 !important;
+    color: var(--pizza-600) !important;
   }
 }
 @media (max-width: 567px) {
   #classificacao .table thead th:nth-child(6)::after {
     content: "S";
-    color: #38761D !important;
+    color: var(--bilbao-700) !important;
   }
 }
 @media (max-width: 567px) {
   #classificacao .table thead th:nth-child(7)::after {
     content: "A";
-    color: #134F5C !important;
+    color: var(--blue-dianne-900) !important;
   }
 }
 #classificacao .table tbody {
@@ -1652,10 +1652,16 @@ button:focus, button:focus-visible {
   border-radius: 0.5rem;
 }
 #classificacao .table tbody tr:nth-child(1) {
-  color: #BF9000 !important;
+  color: var(--pizza-600) !important;
 }
-#classificacao .table tbody tr:nth-child(2), #classificacao .table tbody tr:nth-child(3), #classificacao .table tbody tr:nth-child(4) {
-  color: #38761D !important;
+#classificacao .table tbody tr:nth-child(2) {
+  color: var(--bilbao-700) !important;
+}
+#classificacao .table tbody tr:nth-last-child(2) {
+  color: var(--punch-400) !important;
+}
+#classificacao .table tbody tr:nth-last-child(1) {
+  color: var(--punch-700) !important;
 }
 #classificacao .table th,
 #classificacao .table td {
@@ -1692,15 +1698,15 @@ button:focus, button:focus-visible {
 }
 #classificacao .table th:nth-child(5),
 #classificacao .table td:nth-child(5) {
-  color: #BF9000;
+  color: var(--pizza-600);
 }
 #classificacao .table th:nth-child(6),
 #classificacao .table td:nth-child(6) {
-  color: #38761D;
+  color: var(--bilbao-700);
 }
 #classificacao .table th:nth-child(7),
 #classificacao .table td:nth-child(7) {
-  color: #134F5C;
+  color: var(--blue-dianne-900);
 }
 #classificacao .table th:nth-child(n+4):nth-child(-n+7),
 #classificacao .table td:nth-child(n+4):nth-child(-n+7) {
@@ -1916,22 +1922,22 @@ button:focus, button:focus-visible {
 }
 .card.game .card-body table td .cravada {
   color: var(--star-dust-100);
-  background: #BF9000;
+  background: var(--pizza-600);
 }
 .card.game .card-body table td .cravada:after {
   content: "+3";
 }
 .card.game .card-body table td .saldo {
-  color: #38761D;
-  border: 1px solid #38761D;
+  color: var(--bilbao-700);
+  border: 1px solid var(--bilbao-700);
 }
 .card.game .card-body table td .saldo:after {
   content: "+2";
 }
 .card.game .card-body table td .acerto {
   font-weight: normal;
-  color: #134F5C;
-  border: 1px solid #134F5C;
+  color: var(--blue-dianne-900);
+  border: 1px solid var(--blue-dianne-900);
 }
 .card.game .card-body table td .acerto:after {
   content: "+1";

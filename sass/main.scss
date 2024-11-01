@@ -240,14 +240,21 @@ button {
 
         &:nth-child(1) {
           color: $cravada !important;
-
         }
 
-        &:nth-child(2),
-        &:nth-child(3),
-        &:nth-child(4) {
+        &:nth-child(2) {
           color: $saldo !important;
         }
+
+        &:nth-last-child(2) {
+          color: $danger-light !important;
+        }
+
+        &:nth-last-child(1) {
+          color: $danger !important;
+        }
+
+
 
       }
 

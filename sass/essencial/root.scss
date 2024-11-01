@@ -268,9 +268,11 @@ $dark: var(--star-dust-950);
 $primary-light: var(--turquoise-500);
 $primary:#1CB19C;
 $primary: var(--turquoise-600);
-$cravada:#BF9000;
-$saldo:#38761D;
-$acerto:#134F5C;
+$cravada:var(--pizza-600);
+$saldo:var(--bilbao-700);
+$acerto:var(--blue-dianne-900);
+$danger-light: var(--punch-300);
+$danger: var(--punch-700);
 $transparent:rgba(0, 0, 0, 0);
 
 $size-0:var(--size-0);
