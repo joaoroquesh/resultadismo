@@ -1658,7 +1658,7 @@ button:focus, button:focus-visible {
   color: var(--bilbao-700) !important;
 }
 #classificacao .table tbody tr:nth-last-child(2) {
-  color: var(--punch-400) !important;
+  color: var(--punch-300) !important;
 }
 #classificacao .table tbody tr:nth-last-child(1) {
   color: var(--punch-700) !important;
@@ -1902,6 +1902,7 @@ button:focus, button:focus-visible {
   justify-content: center;
   font-weight: bold;
   border-radius: var(--size-2);
+  color: var(--star-dust-100);
 }
 .card.game .card-body table td .cravada:after,
 .card.game .card-body table td .saldo:after,
@@ -1921,23 +1922,20 @@ button:focus, button:focus-visible {
   scale: 0.8;
 }
 .card.game .card-body table td .cravada {
-  color: var(--star-dust-100);
   background: var(--pizza-600);
 }
 .card.game .card-body table td .cravada:after {
   content: "+3";
 }
 .card.game .card-body table td .saldo {
-  color: var(--bilbao-700);
-  border: 1px solid var(--bilbao-700);
+  background: var(--bilbao-700);
 }
 .card.game .card-body table td .saldo:after {
   content: "+2";
 }
 .card.game .card-body table td .acerto {
   font-weight: normal;
-  color: var(--blue-dianne-900);
-  border: 1px solid var(--blue-dianne-900);
+  background: var(--blue-dianne-900);
 }
 .card.game .card-body table td .acerto:after {
   content: "+1";

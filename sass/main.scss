@@ -555,6 +555,7 @@ button {
               justify-content: center;
               font-weight: bold;
               border-radius: $size-2;
+              color: $light;
 
               &:after {
                 content: '';
@@ -574,7 +575,7 @@ button {
             }
 
             .cravada {
-              color: $light;
+              
               background: $cravada;
 
               &:after {
@@ -583,8 +584,8 @@ button {
             }
 
             .saldo {
-              color: $saldo;
-              border: 1px solid $saldo;
+              background: $saldo;
+              // border: 1px solid $saldo;
 
               &:after {
                 content: '+2';
@@ -593,8 +594,8 @@ button {
 
             .acerto {
               font-weight: normal;
-              color: $acerto;
-              border: 1px solid $acerto;
+              background: $acerto;
+              // border: 1px solid $acerto;
 
               &:after {
                 content: '+1';

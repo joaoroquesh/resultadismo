@@ -1,10 +1,12 @@
 $(document).ready(function () {
   $(document).on('jogosPronto', function () {
     if (typeof window.jogos !== 'undefined' && window.jogos.data) {
+      // debugger
       gerarNavegacao(window.jogos.data);
-      listarJogos(window.jogos.data);
+      // listarJogos(window.jogos.data);
       ativarControleVisualizacaoJogos();
       atualizarElementosGlobais(window.dados);
+      selecionarDiaHoje();
     } else {
       console.error("Os dados dos jogos não foram carregados corretamente.");
     }
@@ -24,9 +26,10 @@ $(document).ready(function () {
       }
       if (typeof window.jogos !== 'undefined' && window.jogos.data) {
         gerarNavegacao(window.jogos.data);
-        listarJogos(window.jogos.data);
+        // listarJogos(window.jogos.data);
         ativarControleVisualizacaoJogos();
         atualizarElementosGlobais(window.dados);
+        selecionarDiaHoje();
       }
       $('body').removeClass('loading');
       console.log("Todos os dados foram atualizados.");
@@ -94,12 +97,18 @@ function gerarNavegacao(jogosData) {
   });
 }
 
-function listarJogos(jogosData) {
+function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
   let accordionGames = $('#accordionGames');
   accordionGames.empty(); // Limpar conteúdo existente
 
   jogosData.forEach(jogo => {
     if (jogo.codigo && jogo.codigo !== '#N/A') { // Adicionar verificação para ignorar códigos inválidos
+      if (diaSelecionado && mesSelecionado) {
+        let [dia, mes] = jogo.data.split('/');
+        if (dia !== diaSelecionado || mes !== mesSelecionado) {
+          return;
+        }
+      }
       let codigo = jogo.codigo || '-';
       let data = jogo.data || '-';
       let completo = jogo.completo || '-';
@@ -107,7 +116,7 @@ function listarJogos(jogosData) {
       let mandante = jogo.mandante ? jogo.mandante.replace(/\s|\-|\|/g, '') : '-';
       let visitante = jogo.visitante ? jogo.visitante.replace(/\s|\-|\|/g, '') : '-';
       let campeonato = jogo.campeonato || '-';
-      let resultado = jogo.resultados || '-';
+      let resultado = jogo.resultado || '-';
 
       let mandanteGols = resultado !== '-' && resultado.includes('x') ? resultado.split('x')[0].trim() : '-';
       let visitanteGols = resultado !== '-' && resultado.includes('x') ? resultado.split('x')[1].trim() : '-';
@@ -185,14 +194,35 @@ function ativarControleVisualizacaoJogos() {
     $('.tab-pane').removeClass('show active');
     $(targetTab).addClass('show active');
 
-    // Atualizar a lista de jogos de acordo com o mês selecionado
+    // Selecionar o dia mais próximo do dia de hoje
     let mesSelecionado = $(this).attr('id').split('-')[1];
-    let jogosFiltradosPorMes = window.jogos.data.filter(jogo => {
-      return jogo.data.split('/')[1] === mesSelecionado;
+    let hoje = new Date();
+    let diaHoje = hoje.getDate().toString().padStart(2, '0');
+    let mesAtual = (hoje.getMonth() + 1).toString().padStart(2, '0');
+    let diasNoMes = $(targetTab).find('.nav-item button');
+    let diaSelecionado = null;
+    let menorDiferenca = Number.MAX_SAFE_INTEGER;
+
+    diasNoMes.each(function () {
+      let dia = parseInt($(this).text().split(' ')[1]);
+      let dataJogo = new Date(hoje.getFullYear(), mesSelecionado - 1, dia);
+      let diferenca = Math.abs(dataJogo - hoje);
+
+      if (diferenca < menorDiferenca) {
+        menorDiferenca = diferenca;
+        diaSelecionado = $(this);
+      }
     });
 
-    // Atualiza a lista de jogos para o mês
-    listarJogos(jogosFiltradosPorMes);
+    if (diaSelecionado) {
+      diasNoMes.removeClass('active');
+      diaSelecionado.addClass('active');
+    }
+
+    let diaSelecionadoTexto = diaSelecionado ? diaSelecionado.text().split(' ')[1] : null;
+
+    // Atualiza a lista de jogos para o dia selecionado
+    listarJogos(window.jogos.data, diaSelecionadoTexto, mesSelecionado);
     atualizarElementosGlobais(window.dados);
   });
 
@@ -201,17 +231,13 @@ function ativarControleVisualizacaoJogos() {
     let diaSelecionado = $(this).text().trim().split(' ')[1];
     let mesSelecionado = $(this).closest('.tab-pane').attr('id').split('-')[1];
 
-    let jogosFiltradosPorDia = window.jogos.data.filter(jogo => {
-      let diaJogo = jogo.data.split('/')[0];
-      let mesJogo = jogo.data.split('/')[1];
-      return diaJogo === diaSelecionado && mesJogo === mesSelecionado;
-    });
-
     // Atualiza a lista de jogos para o dia selecionado
-    listarJogos(jogosFiltradosPorDia);
+    listarJogos(window.jogos.data, diaSelecionado, mesSelecionado);
     atualizarElementosGlobais(window.dados);
   });
 }
+
+
 
 function getNomeMes(mes) {
   const nomesMeses = {
@@ -240,24 +266,126 @@ function getDiaSemana(jogosData, dia, mes) {
   return diasSemana[dataPartida.getDay()];
 }
 
+function selecionarDiaHoje() {
+  const hoje = new Date();
+  const diaHoje = hoje.getDate().toString().padStart(2, '0');
+  const mesHoje = (hoje.getMonth() + 1).toString().padStart(2, '0');
+
+  // Selecionar o mês mais próximo
+  let tabMes = $(`#nav-${mesHoje}-tab`);
+  if (!tabMes.length) {
+    const mesesDisponiveis = $('#nav-tab .nav-link');
+    let mesMaisProximo = null;
+    let diferencaMinima = Infinity;
+
+    mesesDisponiveis.each(function () {
+      const mes = $(this).attr('id').split('-')[1];
+      const diferenca = Math.abs(parseInt(mes) - parseInt(mesHoje));
+      if (diferenca < diferencaMinima) {
+        diferencaMinima = diferenca;
+        mesMaisProximo = $(this);
+      }
+    });
+
+    tabMes = mesMaisProximo;
+  }
+
+  // Selecionar a tab do mês
+  if (tabMes.length) {
+    tabMes.click();
+  }
+
+  // Selecionar o dia mais próximo
+  setTimeout(() => {
+    let tabDia = $(`#pills-${diaHoje}-${mesHoje}-tab`);
+    if (!tabDia.length) {
+      const diasDisponiveis = $(`#filtroMes${mesHoje} .nav-link`);
+      let diaMaisProximo = null;
+      let diferencaMinima = Infinity;
+
+      diasDisponiveis.each(function () {
+        const dia = $(this).text().trim().split(' ')[1];
+        const diferenca = Math.abs(parseInt(dia) - parseInt(diaHoje));
+        if (diferenca < diferencaMinima) {
+          diferencaMinima = diferenca;
+          diaMaisProximo = $(this);
+        }
+      });
+
+      tabDia = diaMaisProximo;
+    }
+
+    // Selecionar o dia no mês
+    if (tabDia && tabDia.length) {
+      tabDia.click();
+    }
+  }, 100);
+}
+
+
 function listarPalpites(jogo) {
-  let palpitesHTML = '';
+  let palpites = [];
+
+  // Definir regras de pontuação
+  let resultadoReal = jogo.resultado;
 
   for (let chave in jogo) {
       if (chave.includes('@') && jogo[chave] !== "") {
-          palpitesHTML += `
-              <tr>
-                  <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${chave}" alt="Escudo" width="32"></td>
-                  <td data-codigo="${chave}"></td>
-                  <td>
-                      <span class="">
-                          ${jogo[chave]}
-                      </span>
-                  </td>
-              </tr>
-          `;
+          let palpiteJogador = jogo[chave];
+          let classePontuacao = '';
+          let pontos = 0;
+
+          if (resultadoReal && palpiteJogador && resultadoReal !== '-') {
+              const [golsMandanteReal, golsVisitanteReal] = resultadoReal.split('x').map(Number);
+              const [golsMandantePalpite, golsVisitantePalpite] = palpiteJogador.split('x').map(Number);
+
+              if (golsMandantePalpite === golsMandanteReal && golsVisitantePalpite === golsVisitanteReal) {
+                  classePontuacao = 'cravada';
+                  pontos = 3;
+              } else if ((golsMandantePalpite - golsVisitantePalpite) === (golsMandanteReal - golsVisitanteReal) && (golsMandantePalpite > golsVisitantePalpite) === (golsMandanteReal > golsVisitanteReal)) {
+                  classePontuacao = 'saldo';
+                  pontos = 2;
+              } else if ((golsMandantePalpite > golsVisitantePalpite) === (golsMandanteReal > golsVisitanteReal) || (golsMandantePalpite === golsVisitantePalpite && golsMandanteReal === golsVisitanteReal)) {
+                  classePontuacao = 'acerto';
+                  pontos = 1;
+              }
+          }
+
+          palpites.push({
+              chave,
+              palpite: jogo[chave],
+              classePontuacao,
+              pontos,
+              golsMandantePalpite: parseInt(palpiteJogador.split('x')[0]),
+              golsVisitantePalpite: parseInt(palpiteJogador.split('x')[1])
+          });
       }
   }
 
+  // Ordenar palpites por pontuação e critérios de desempate
+  palpites.sort((a, b) => {
+      if (b.pontos !== a.pontos) {
+          return b.pontos - a.pontos;
+      } else if (a.golsMandantePalpite !== b.golsMandantePalpite) {
+          return b.golsMandantePalpite - a.golsMandantePalpite;
+      } else if (a.golsMandantePalpite === a.golsVisitantePalpite) {
+          return -1; // Empate
+      } else {
+          return a.golsVisitantePalpite - b.golsVisitantePalpite;
+      }
+  });
+
+  // Construir HTML dos palpites
+  let palpitesHTML = palpites.map(({ chave, palpite, classePontuacao }) => {
+      return `
+          <tr>
+              <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${chave}" alt="Escudo" width="32"></td>
+              <td data-codigo="${chave}"></td>
+              ${resultadoReal && resultadoReal !== '' ? `<td><span class="${classePontuacao}">${palpite}</span></td>` : ''}
+          </tr>
+      `;
+  }).join('');
+
   return palpitesHTML;
 }
+
