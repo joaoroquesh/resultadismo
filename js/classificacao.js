@@ -54,16 +54,15 @@ function construirClassificacaoPorDivisaoFiltradaPorMes(pontosData, dadosData, d
         C: {}
     };
 
-    // Organizar os dados dos jogadores por divisão
-    let jogadoresPorDivisao = {
-        A: [],
-        B: [],
-        C: []
-    };
-
+    // Inicializar todos os jogadores na classificação, mesmo com pontuação zero
     dadosData.forEach(jogador => {
         if (jogador.divisao && classificacao[jogador.divisao]) {
-            jogadoresPorDivisao[jogador.divisao].push(jogador);
+            classificacao[jogador.divisao][jogador.codigo] = {
+                pontuacao: 0,
+                cravadas: 0,
+                saldos: 0,
+                acertos: 0
+            };
         }
     });
 
@@ -104,8 +103,8 @@ function construirClassificacaoPorDivisaoFiltradaPorMes(pontosData, dadosData, d
 
     // Construir a tabela de classificação para cada divisão
     if (divisaoSelecionada) {
-        let classificacaoArray = Object.entries(classificacao[divisaoSelecionada]).map(([email, stats]) => {
-            return { email, ...stats };
+        let classificacaoArray = Object.entries(classificacao[divisaoSelecionada]).map(([codigo, stats]) => {
+            return { codigo, ...stats };
         });
 
         // Ordenar a classificação com base na pontuação e critérios de desempate
@@ -126,7 +125,7 @@ function construirClassificacaoPorDivisaoFiltradaPorMes(pontosData, dadosData, d
         tbody.empty(); // Limpar qualquer conteúdo existente
 
         classificacaoArray.forEach((jogador, index) => {
-            let nome = jogador.email;
+            let nome = jogador.codigo;
             let escudo = 'https://www.resultadismo.com/images/escudos/padrao.png';
 
             let linha = `
@@ -147,6 +146,7 @@ function construirClassificacaoPorDivisaoFiltradaPorMes(pontosData, dadosData, d
         atualizarElementosGlobais(dadosData);
     }
 }
+
 
 function ativarControleVisualizacao() {
     // Controle de navegação por divisão
