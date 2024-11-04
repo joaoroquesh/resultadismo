@@ -1483,6 +1483,7 @@ body {
   background: var(--star-dust-100);
   color: var(--star-dust-950);
   font-family: "Ubuntu", sans-serif;
+  text-wrap: balance;
 }
 
 a {

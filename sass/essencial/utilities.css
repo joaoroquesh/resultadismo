@@ -229,77 +229,77 @@
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1);
 }
 .btn-primary {
-  background-color: #1CB19C;
-  border: 2px solid #1CB19C;
-  color: #FFF;
+  background-color: var(--turquoise-600);
+  border: 2px solid var(--turquoise-600);
+  color: var(--star-dust-50);
 }
 .btn-primary:hover {
   background-color: rgba(0, 0, 0, 0);
-  border: 2px solid #1CB19C;
-  color: #1CB19C;
+  border: 2px solid var(--turquoise-600);
+  color: var(--turquoise-600);
 }
 .btn-primary:active, .btn-primary:not(:disabled):not(.disabled).active, .btn-primary:not(:disabled):not(.disabled):active, .show > .btn-primary.dropdown-toggle {
-  background-color: #1CB19C;
-  border: 2px solid #1CB19C;
-  color: #232323;
+  background-color: var(--turquoise-600);
+  border: 2px solid var(--turquoise-600);
+  color: var(--star-dust-950);
 }
 .btn-outline-primary {
-  border: 1px solid #1CB19C;
-  color: #1CB19C;
+  border: 1px solid var(--turquoise-600);
+  color: var(--turquoise-600);
 }
 .btn-outline-primary:hover {
-  background-color: #1CB19C;
-  border: 1px solid #1CB19C;
-  color: #FFF;
+  background-color: var(--turquoise-600);
+  border: 1px solid var(--turquoise-600);
+  color: var(--star-dust-50);
 }
 .btn-outline-primary:active, .btn-outline-primary:not(:disabled):not(.disabled).active, .btn-outline-primary:not(:disabled):not(.disabled):active, .show > .btn-outline-primary.dropdown-toggle {
-  background-color: #1CB19C;
-  border: 1px solid #1CB19C;
-  color: #232323;
+  background-color: var(--turquoise-600);
+  border: 1px solid var(--turquoise-600);
+  color: var(--star-dust-950);
 }
 
 .bg-cravada {
-  background-color: #BF9000 !important;
+  background-color: var(--pizza-600) !important;
 }
 .bg-saldo {
-  background-color: #38761D !important;
+  background-color: var(--bilbao-700) !important;
 }
 .bg-acerto {
-  background-color: #134F5C !important;
+  background-color: var(--blue-dianne-900) !important;
 }
 .bg-light {
-  background-color: #E5E5E5 !important;
+  background-color: var(--star-dust-100) !important;
 }
 .bg-dark {
-  background-color: #232323 !important;
+  background-color: var(--star-dust-950) !important;
 }
 .bg-primary-light {
-  background-color: #06DDBB !important;
+  background-color: var(--turquoise-500) !important;
 }
 .bg-primary {
-  background-color: #1CB19C !important;
+  background-color: var(--turquoise-600) !important;
 }
 
 .c-cravada {
-  color: #BF9000 !important;
+  color: var(--pizza-600) !important;
 }
 .c-saldo {
-  color: #38761D !important;
+  color: var(--bilbao-700) !important;
 }
 .c-acerto {
-  color: #134F5C !important;
+  color: var(--blue-dianne-900) !important;
 }
 .c-light {
-  color: #E5E5E5 !important;
+  color: var(--star-dust-100) !important;
 }
 .c-dark {
-  color: #232323 !important;
+  color: var(--star-dust-950) !important;
 }
 .c-primary-light {
-  color: #06DDBB !important;
+  color: var(--turquoise-500) !important;
 }
 .c-primary {
-  color: #1CB19C !important;
+  color: var(--turquoise-600) !important;
 }
 
 /* COR, PESO E RADIUS DA BORDA */
