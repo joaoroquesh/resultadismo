@@ -19,6 +19,10 @@ body {
   color: $dark;
   font-family: 'Ubuntu', sans-serif;
   text-wrap: balance;
+
+  @media (max-width:576px) {
+    font-size: $font-size-sm;
+  }
 }
 
 a {
@@ -55,7 +59,7 @@ button {
   align-items: center;
 
 
-  .container{
+  .container {
     background: $light;
   }
 
@@ -239,20 +243,93 @@ button {
         box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
         border-radius: .5rem;
 
+        td {
+          line-height: $line-height-tight;
+
+          &:nth-child(1) {
+            position: relative;
+
+            @media (max-width:410px) {
+              font-size: $font-size-xs;
+            }
+
+            &:after {
+              content: "";
+              position: absolute;
+              top: calc(50%);
+              left: calc(50%);
+              translate: -50% -50%;
+              width: $size-xxs;
+              height: $size-xxs;
+              border-radius: $size-quarck;
+              z-index: -1;
+
+              @media (max-width:410px) {
+                border-radius: calc($size-nano - 2px);
+                width: 22px;
+                height: 22px;
+              }
+            }
+          }
+        }
+
         &:nth-child(1) {
+
           color: $cravada !important;
+
+          td {
+            &:nth-child(1) {
+              color: $light !important;
+
+              &:after {
+                background: $cravada !important;
+              }
+            }
+          }
+
+
         }
 
         &:nth-child(2) {
           color: $saldo !important;
+
+          td {
+            &:nth-child(1) {
+              color: $light !important;
+
+              &:after {
+                background: $saldo !important;
+              }
+            }
+          }
         }
 
         &:nth-last-child(2) {
-          color: $danger-light !important;
+          color: $danger-dark !important;
+
+          td {
+            &:nth-child(1) {
+              color: $light !important;
+
+              &:after {
+                background: $danger-dark !important;
+              }
+            }
+          }
         }
 
         &:nth-last-child(1) {
           color: $danger !important;
+
+          td {
+            &:nth-child(1) {
+              color: $light !important;
+
+              &:after {
+                background: $danger !important;
+              }
+            }
+          }
         }
 
 
@@ -278,8 +355,9 @@ button {
       &:nth-child(1) {
         width: var(--t-size);
         font-weight: bold;
-        padding-right: 0 !important;
-        padding-left: $size-2;
+        padding: $size-2;
+        // padding-right: 0 !important;
+        // padding-left: $size-2;
 
       }
 
@@ -429,12 +507,12 @@ button {
     padding: $size-3;
     // padding-bottom: 0;
 
-    &-label{
+    &-label {
       font-size: var(--font-size-sm);
     }
-    
+
     &-result {
-      --team-size:60px;
+      --team-size: 60px;
       height: 100px;
       display: flex;
       justify-content: space-between;
@@ -532,6 +610,7 @@ button {
 
       &-body {
         padding: $size-3;
+
         table {
           td {
             vertical-align: middle;
@@ -576,7 +655,7 @@ button {
             }
 
             .cravada {
-              
+
               background: $cravada;
 
               &:after {

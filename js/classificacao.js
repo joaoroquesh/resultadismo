@@ -1,12 +1,12 @@
 $(document).ready(function () {
-    $(document).on('pontosPronto', function () {
-        if (typeof window.pontos !== 'undefined' && window.pontos.data) {
+    $(document).on('jogosPronto', function () {
+        if (typeof window.jogos !== 'undefined' && window.jogos.data) {
             listarMesAtual();
-            construirClassificacaoPorDivisaoFiltradaPorMes(window.pontos.data, window.dados.data, 'A');
+            construirClassificacaoPorDivisaoFiltradaPorMes(window.jogos.data, window.dados.data, 'A');
             ativarControleVisualizacao();
             atualizarElementosGlobais(window.dados);
         } else {
-            console.error("Os dados de pontos não foram carregados corretamente.");
+            console.error("Os dados dos jogos não foram carregados corretamente.");
         }
     });
 
@@ -19,13 +19,11 @@ $(document).ready(function () {
             if (typeof window.dados !== 'undefined' && window.dados.data) {
                 atualizarElementosGlobais(window.dados);
             }
-            if (typeof window.pontos !== 'undefined' && window.pontos.data) {
+            if (typeof window.jogos !== 'undefined' && window.jogos.data) {
                 listarMesAtual();
-                construirClassificacaoPorDivisaoFiltradaPorMes(window.pontos.data, window.dados.data, 'A');
+                construirClassificacaoPorDivisaoFiltradaPorMes(window.jogos.data, window.dados.data, 'A');
                 ativarControleVisualizacao();
                 atualizarElementosGlobais(window.dados);
-            }
-            if (typeof window.jogos !== 'undefined' && window.jogos.data) {
             }
             $('body').removeClass('loading');
             console.log("Todos os dados foram atualizados.");
@@ -44,7 +42,7 @@ function listarMesAtual() {
     $('#pills-mesAtualC-tab').text(mesNome);
 }
 
-function construirClassificacaoPorDivisaoFiltradaPorMes(pontosData, dadosData, divisaoSelecionada = null) {
+function construirClassificacaoPorDivisaoFiltradaPorMes(jogosData, dadosData, divisaoSelecionada = null) {
     let dataAtual = new Date();
     let mesAtual = (dataAtual.getMonth() + 1).toString().padStart(2, '0');
     
@@ -61,16 +59,20 @@ function construirClassificacaoPorDivisaoFiltradaPorMes(pontosData, dadosData, d
                 pontuacao: 0,
                 cravadas: 0,
                 saldos: 0,
-                acertos: 0
+                acertos: 0,
+                jogos: 0,
+                palpitesComPontos: 0
             };
         }
     });
 
     // Processar cada jogo para acumular a pontuação, cravadas, saldos e acertos dos jogadores por divisão e mês atual
-    pontosData.forEach(jogo => {
+    jogosData.forEach(jogo => {
         if (jogo.data.split('/')[1] === mesAtual) {
+            let resultadoReal = jogo.resultado;
             for (let chave in jogo) {
-                if (chave.includes('@') && jogo[chave] !== "" && !isNaN(jogo[chave])) {
+                if (chave.includes('@') && jogo[chave] !== "") {
+                    let palpiteJogador = jogo[chave];
                     let jogador = dadosData.find(j => j.codigo === chave);
                     if (jogador && jogador.divisao && classificacao[jogador.divisao]) {
                         if (!classificacao[jogador.divisao][chave]) {
@@ -78,33 +80,54 @@ function construirClassificacaoPorDivisaoFiltradaPorMes(pontosData, dadosData, d
                                 pontuacao: 0,
                                 cravadas: 0,
                                 saldos: 0,
-                                acertos: 0
+                                acertos: 0,
+                                jogos: 0,
+                                palpitesComPontos: 0
                             };
                         }
 
-                        const pontuacao = parseInt(jogo[chave]);
+                        classificacao[jogador.divisao][chave].jogos += 1;
+
+                        const [golsMandanteReal, golsVisitanteReal] = resultadoReal.split('x').map(Number);
+                        const [golsMandantePalpite, golsVisitantePalpite] = palpiteJogador.split('x').map(Number);
+
+                        let pontuacao = 0;
+
+                        if (golsMandantePalpite === golsMandanteReal && golsVisitantePalpite === golsVisitanteReal) {
+                            pontuacao = 3;
+                            classificacao[jogador.divisao][chave].cravadas += 1;
+                        } else if ((golsMandantePalpite - golsVisitantePalpite) === (golsMandanteReal - golsVisitanteReal) && (golsMandantePalpite > golsVisitantePalpite) === (golsMandanteReal > golsVisitanteReal)) {
+                            pontuacao = 2;
+                            classificacao[jogador.divisao][chave].saldos += 1;
+                        } else if (
+                            (golsMandantePalpite > golsVisitantePalpite && golsMandanteReal > golsVisitanteReal) ||
+                            (golsMandantePalpite < golsVisitantePalpite && golsMandanteReal < golsVisitanteReal)
+                        ) {
+                            if (golsMandanteReal !== golsVisitanteReal) { // Não é um empate
+                                pontuacao = 1;
+                                classificacao[jogador.divisao][chave].acertos += 1;
+                            }
+                        }
+
+                        if (pontuacao > 0) {
+                            classificacao[jogador.divisao][chave].palpitesComPontos += 1;
+                        }
 
                         // Atualizar pontuação total do jogador
                         classificacao[jogador.divisao][chave].pontuacao += pontuacao;
-
-                        // Atualizar estatísticas específicas
-                        if (pontuacao === 3) {
-                            classificacao[jogador.divisao][chave].cravadas += 1;
-                        } else if (pontuacao === 2) {
-                            classificacao[jogador.divisao][chave].saldos += 1;
-                        } else if (pontuacao === 1) {
-                            classificacao[jogador.divisao][chave].acertos += 1;
-                        }
                     }
                 }
             }
         }
     });
+    
 
     // Construir a tabela de classificação para cada divisão
     if (divisaoSelecionada) {
         let classificacaoArray = Object.entries(classificacao[divisaoSelecionada]).map(([codigo, stats]) => {
-            return { codigo, ...stats };
+            let aproveitamento = stats.jogos > 0 ? ((stats.pontuacao / (stats.jogos * 3)) * 100).toFixed(2) : 0;
+            let acertividade = stats.palpitesComPontos > 0 ? ((stats.palpitesComPontos / stats.jogos) * 100).toFixed(2) : 0;
+            return { codigo, ...stats, aproveitamento: parseFloat(aproveitamento), acertividade: parseFloat(acertividade) };
         });
 
         // Ordenar a classificação com base na pontuação e critérios de desempate
@@ -115,8 +138,14 @@ function construirClassificacaoPorDivisaoFiltradaPorMes(pontosData, dadosData, d
                 return b.cravadas - a.cravadas;
             } else if (b.saldos !== a.saldos) {
                 return b.saldos - a.saldos;
-            } else {
+            } else if (b.acertos !== a.acertos) {
                 return b.acertos - a.acertos;
+            } else if (b.aproveitamento !== a.aproveitamento) {
+                return b.aproveitamento - a.aproveitamento;
+            } else if (b.acertividade !== a.acertividade) {
+                return b.acertividade - a.acertividade;
+            } else {
+                return b.jogos - a.jogos;
             }
         });
 
@@ -137,6 +166,8 @@ function construirClassificacaoPorDivisaoFiltradaPorMes(pontosData, dadosData, d
                     <td>${jogador.cravadas}</td>
                     <td>${jogador.saldos}</td>
                     <td>${jogador.acertos}</td>
+                    <!-- <td>${jogador.aproveitamento}%</td>
+                    <td>${jogador.acertividade}%</td> -->
                 </tr>
             `;
             tbody.append(linha);
@@ -156,7 +187,7 @@ function ativarControleVisualizacao() {
         $(targetTab).addClass('show active');
 
         let divisao = targetTab.replace('#nav-', '');
-        construirClassificacaoPorDivisaoFiltradaPorMes(window.pontos.data, window.dados.data, divisao);
+        construirClassificacaoPorDivisaoFiltradaPorMes(window.jogos.data, window.dados.data, divisao);
         atualizarElementosGlobais(window.dados);
     });
 }

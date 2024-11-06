@@ -196,15 +196,7 @@ $colors: (
 --color-surface-balance-debit-low: var(--violet-red-50);
 --color-surface-balance-debit-medium: var(--violet-red-600);
 
-
-  --size-0: 0rem;
-  --size-1: 0.25rem;
-  --size-2: 0.5rem;
-  --size-3: 1rem;
-  --size-4: 1.5rem;
-  --size-5: 3rem;
-
-  /* @link https://utopia.fyi/type/calculator?c=320,16,1.18,1240,18,1.22285,8,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
+/* @link https://utopia.fyi/type/calculator?c=320,16,1.18,1240,18,1.22285,8,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
 
   /* Step Xsmall: 11.6px → 13px */
   --font-size-xs: clamp(0.725rem, 0.70rem + 0.06vw, 0.8125rem);
@@ -232,6 +224,56 @@ $colors: (
   --font-size-base: var(--font-size-bs);
   --font-size-minor: var(--font-size-xs);
   --font-size-small: var(--font-size-sm);
+  
+
+  --size-0: 0rem;
+  --size-1: 0.25rem;
+  --size-2: 0.5rem;
+  --size-3: 1rem;
+  --size-4: 1.5rem;
+  --size-5: 3rem;
+
+  --size-none: 0;
+  --size-quarck: 4px;
+  --size-nano: 8px;
+  --size-xxxs: 16px;
+  --size-xxs: 24px;
+  --size-xs: 32px;
+  --size-sm: 40px;
+  --size-md: 48px;
+  --size-lg: 56px;
+  --size-xl: 64px;
+  --size-xxl: 80px;
+  --size-xxxl: 120px;
+  --size-huge: 160px;
+  --size-giant: 200px;
+
+  --border-radius-none: 0;
+  --border-radius-xs: 6px;
+  --border-radius-sm: 8px;
+  --border-radius-md: 16px;
+  --border-radius-lg: 24px;
+  --border-radius-pill: 1000px;
+  --border-radius-circular: 50%;
+
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 22px;
+  --font-size-xxl: 28px;
+  --font-size-xxxl: 52px;
+  --font-size-3xl: 32px;
+  --font-size-4xl: 40px;
+  --font-size-5xl: 52px;
+  --font-size-6xl: 64px;
+
+  --line-height-tight: 100%;
+  --line-height-medium: 120%;
+  --line-height-distant: 150%;
+  --line-height-super-distant: 200%;
+
+  
 
 
   --font-sans: 'Sicoob sans',
@@ -273,6 +315,7 @@ $saldo:var(--bilbao-700);
 $acerto:var(--blue-dianne-900);
 $danger-light: var(--punch-300);
 $danger: var(--punch-700);
+$danger-dark: var(--punch-950);
 $transparent:rgba(0, 0, 0, 0);
 
 $size-0:var(--size-0);
@@ -294,3 +337,43 @@ $font-size-5:var(--font-size-5);
 $font-size-6:var(--font-size-6);
 $font-size-lg:var(--font-size-lg);
 $font-size-xl:var(--font-size-xl);
+
+$size-none: var(--size-none);
+$size-quarck: var(--size-quarck);
+$size-nano: var(--size-nano);
+$size-xxxs: var(--size-xxxs);
+$size-xxs: var(--size-xxs);
+$size-xs: var(--size-xs);
+$size-sm: var(--size-sm);
+$size-md: var(--size-md);
+$size-lg: var(--size-lg);
+$size-xl: var(--size-xl);
+$size-xxl: var(--size-xxl);
+$size-xxxl: var(--size-xxxl);
+$size-huge: var(--size-huge);
+$size-giant: var(--size-giant);
+
+$border-radius-none: var(--border-radius-none);
+$border-radius-xs: var(--border-radius-xs);
+$border-radius-sm: var(--border-radius-sm);
+$border-radius-md: var(--border-radius-md);
+$border-radius-lg: var(--border-radius-lg);
+$border-radius-pill: var(--border-radius-pill);
+$border-radius-circular: var(--border-radius-circular);
+
+$font-size-xs: var(--font-size-xs);
+$font-size-sm: var(--font-size-sm);
+$font-size-md: var(--font-size-md);
+$font-size-lg: var(--font-size-lg);
+$font-size-xl: var(--font-size-xl);
+$font-size-xxl: var(--font-size-xxl);
+$font-size-xxxl: var(--font-size-xxxl);
+$font-size-3xl: var(--font-size-3xl);
+$font-size-4xl: var(--font-size-4xl);
+$font-size-5xl: var(--font-size-5xl);
+$font-size-6xl: var(--font-size-6xl);
+
+$line-height-tight: var(--line-height-tight);
+$line-height-medium: var(--line-height-medium);
+$line-height-distant: var(--line-height-distant);
+$line-height-super-distant: var(--line-height-super-distant);
