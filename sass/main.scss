@@ -20,7 +20,7 @@ body {
   font-family: 'Ubuntu', sans-serif;
   text-wrap: balance;
 
-  @media (max-width:576px) {
+  @media (max-width:992px) {
     font-size: $font-size-sm;
   }
 }
@@ -265,9 +265,9 @@ button {
               z-index: -1;
 
               @media (max-width:410px) {
-                border-radius: calc($size-nano - 2px);
-                width: 22px;
-                height: 22px;
+                // border-radius: calc($size-nano - 2px);
+                // width: 22px;
+                // height: 22px;
               }
             }
           }
@@ -348,14 +348,14 @@ button {
 
 
       @media (max-width:410px) {
-        padding: $size-2 0.1rem;
+        // padding: $size-2 0.1rem;
         // font-size: var(--font-size-sm);
       }
 
       &:nth-child(1) {
         width: var(--t-size);
         font-weight: bold;
-        padding: $size-2;
+        // padding: $size-2;
         // padding-right: 0 !important;
         // padding-left: $size-2;
 

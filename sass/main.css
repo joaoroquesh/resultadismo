@@ -1557,7 +1557,7 @@ body {
   font-family: "Ubuntu", sans-serif;
   text-wrap: balance;
 }
-@media (max-width: 576px) {
+@media (max-width: 992px) {
   body {
     font-size: var(--font-size-sm);
   }
@@ -1751,13 +1751,6 @@ button:focus, button:focus-visible {
   border-radius: var(--size-quarck);
   z-index: -1;
 }
-@media (max-width: 410px) {
-  #classificacao .table tbody tr td:nth-child(1):after {
-    border-radius: calc(var(--size-nano) - 2px);
-    width: 22px;
-    height: 22px;
-  }
-}
 #classificacao .table tbody tr:nth-child(1) {
   color: var(--pizza-600) !important;
 }
@@ -1799,17 +1792,10 @@ button:focus, button:focus-visible {
   vertical-align: middle;
   text-align: center;
 }
-@media (max-width: 410px) {
-  #classificacao .table th,
-  #classificacao .table td {
-    padding: var(--size-2) 0.1rem;
-  }
-}
 #classificacao .table th:nth-child(1),
 #classificacao .table td:nth-child(1) {
   width: var(--t-size);
   font-weight: bold;
-  padding: var(--size-2);
 }
 #classificacao .table th:nth-child(2),
 #classificacao .table td:nth-child(2) {
