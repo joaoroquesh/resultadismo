@@ -132,7 +132,7 @@ function construirClassificacao(jogosData) {
 
         let linha = `
             <tr>
-                <td class="empty">&nbsp;</td>
+                <td>&nbsp;</td>
                 <td><img src="${escudo}" data-codigo="${nome}" alt="Escudo" width="30"></td>
                 <td data-codigo="${nome}"></td>
             </tr>
