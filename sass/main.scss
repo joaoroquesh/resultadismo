@@ -270,6 +270,7 @@ button {
                 height: 22px;
               }
             }
+
           }
         }
 
@@ -283,6 +284,11 @@ button {
 
               &:after {
                 background: $cravada !important;
+              }
+              &.empty{
+                &:after {
+                  background: $light!important;
+                }
               }
             }
           }
@@ -300,6 +306,11 @@ button {
               &:after {
                 background: $saldo !important;
               }
+              &.empty{
+                &:after {
+                  background: $light!important;
+                }
+              }
             }
           }
         }
@@ -314,6 +325,11 @@ button {
               &:after {
                 background: $danger-dark !important;
               }
+              &.empty{
+                &:after {
+                  background: $light!important;
+                }
+              }
             }
           }
         }
@@ -327,6 +343,11 @@ button {
 
               &:after {
                 background: $danger !important;
+              }
+              &.empty{
+                &:after {
+                  background: $light!important;
+                }
               }
             }
           }

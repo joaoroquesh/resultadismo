@@ -1767,6 +1767,9 @@ button:focus, button:focus-visible {
 #classificacao .table tbody tr:nth-child(1) td:nth-child(1):after {
   background: var(--pizza-600) !important;
 }
+#classificacao .table tbody tr:nth-child(1) td:nth-child(1).empty:after {
+  background: var(--star-dust-100) !important;
+}
 #classificacao .table tbody tr:nth-child(2) {
   color: var(--bilbao-700) !important;
 }
@@ -1775,6 +1778,9 @@ button:focus, button:focus-visible {
 }
 #classificacao .table tbody tr:nth-child(2) td:nth-child(1):after {
   background: var(--bilbao-700) !important;
+}
+#classificacao .table tbody tr:nth-child(2) td:nth-child(1).empty:after {
+  background: var(--star-dust-100) !important;
 }
 #classificacao .table tbody tr:nth-last-child(2) {
   color: var(--punch-950) !important;
@@ -1785,6 +1791,9 @@ button:focus, button:focus-visible {
 #classificacao .table tbody tr:nth-last-child(2) td:nth-child(1):after {
   background: var(--punch-950) !important;
 }
+#classificacao .table tbody tr:nth-last-child(2) td:nth-child(1).empty:after {
+  background: var(--star-dust-100) !important;
+}
 #classificacao .table tbody tr:nth-last-child(1) {
   color: var(--punch-700) !important;
 }
@@ -1793,6 +1802,9 @@ button:focus, button:focus-visible {
 }
 #classificacao .table tbody tr:nth-last-child(1) td:nth-child(1):after {
   background: var(--punch-700) !important;
+}
+#classificacao .table tbody tr:nth-last-child(1) td:nth-child(1).empty:after {
+  background: var(--star-dust-100) !important;
 }
 #classificacao .table th,
 #classificacao .table td {
