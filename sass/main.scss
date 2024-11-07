@@ -125,6 +125,14 @@ button {
   }
 }
 
+#regras{
+
+  .accordion{
+    --bs-accordion-bg:transparent;
+    --bs-accordion-active-bg: transparent;
+    --bs-accordion-active-color: var(--turquoise-600);
+  }
+}
 
 #content-fixed.fixed-top {
   top: 98px;

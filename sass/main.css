@@ -1637,6 +1637,12 @@ button:focus, button:focus-visible {
   margin-right: 10px;
 }
 
+#regras .accordion {
+  --bs-accordion-bg:transparent;
+  --bs-accordion-active-bg: transparent;
+  --bs-accordion-active-color: var(--turquoise-600);
+}
+
 #content-fixed.fixed-top {
   top: 98px;
   background: var(--star-dust-100);
