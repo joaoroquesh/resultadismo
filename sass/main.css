@@ -1720,7 +1720,7 @@ button:focus, button:focus-visible {
 }
 @media (max-width: 767px) {
   #content-fixed.fixed-top {
-    top: 82px;
+    top: 74px;
   }
 }
 
