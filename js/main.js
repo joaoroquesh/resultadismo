@@ -123,3 +123,17 @@ $(document).on('dadosProntos', function() {
         atualizarElementosGlobais(window.dados);
     }
 });
+
+
+$(document).ready(function() {
+    // Seu código jQuery aqui
+    const currentPath = window.location.pathname;
+    const menuItems = document.querySelectorAll('.nav-item .nav-link');
+  
+    menuItems.forEach((link) => {
+      if (link.getAttribute('href') === currentPath) {
+        link.classList.add('active');
+      }
+    });
+  });
+  
