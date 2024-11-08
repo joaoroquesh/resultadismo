@@ -1634,11 +1634,14 @@ button:focus, button:focus-visible {
   fill: var(--turquoise-600);
 }
 #menu .nav-link.active {
-  color: var(--star-dust-950) !important;
-  fill: var(--star-dust-950) !important;
+  color: var(--star-dust-100) !important;
+  fill: var(--star-dust-100) !important;
   font-weight: bold;
   background: var(--turquoise-600);
   border-radius: 0.5rem;
+}
+#menu .nav-link.active img {
+  filter: invert(1);
 }
 #menu .nav-link.disabled {
   color: rgba(0, 0, 0, 0.3) !important;

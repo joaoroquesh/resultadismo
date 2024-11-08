@@ -152,11 +152,15 @@ button {
     }
 
     &.active {
-      color: $dark!important;
-      fill: $dark!important;
+      color: $light!important;
+      fill: $light!important;
       font-weight: bold;
       background: var(--turquoise-600);
       border-radius: .5rem;
+
+      img{
+        filter: invert(1);
+      }
     }
 
     &.disabled {
