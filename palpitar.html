@@ -103,14 +103,27 @@
   <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script> -->
-  
+    <script src="script/main.js?v=07112024"></script>
 
-  <script>
-    $("#menu").load("components/menu.html");
-    $("footer").load("components/footer.html");
-    // $("#carregando").load("components/carregando.html");
-  </script>
-  <script src="script/main.js?v=07112024"></script>
+    <script>
+      $(document).ready(function () {
+        // Carregar o menu e, em seguida, adicionar a classe 'active' ao link correspondente
+        $("#menu").load("components/menu.html", function () {
+          const currentPath = window.location.pathname;
+          const menuItems = document.querySelectorAll('.nav-item .nav-link');
+  
+          menuItems.forEach((link) => {
+            const linkPath = link.getAttribute('href');
+            if (linkPath === currentPath || currentPath.endsWith(linkPath)) {
+              link.classList.add('active');
+            }
+          });
+        });
+      });
+      $("footer").load("components/footer.html");
+      // $("#carregando").load("components/carregando.html");
+    </script>
+  
 
 
 
