@@ -52,44 +52,44 @@ button {
 
 /* ELEMENTS*/
 
+// #menu {
+
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+
+
+//   .container {
+//     background: $light;
+//   }
+
+//   .navbar {
+//     --bs-navbar-padding-x: 1rem;
+//     box-shadow: 0px 0px 2px rgb(0 0 0 / 14%), 0px 2px 2px rgb(0 0 0 / 12%), 0px 1px 3px rgb(0 0 0 / 20%);
+//   }
+
+//   .nav-link {
+//     color: $dark;
+
+//     &:hover {
+//       color: $primary;
+//     }
+
+//     &.disabled {
+//       color: rgba(0, 0, 0, .3) !important;
+//     }
+//   }
+
+//   .nav-space {
+//     height: 98px;
+
+//     @media (max-width:767px) {
+//       height: 82px;
+//     }
+//   }
+// }
+
 #menu {
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-
-  .container {
-    background: $light;
-  }
-
-  .navbar {
-    --bs-navbar-padding-x: 1rem;
-    box-shadow: 0px 0px 2px rgb(0 0 0 / 14%), 0px 2px 2px rgb(0 0 0 / 12%), 0px 1px 3px rgb(0 0 0 / 20%);
-  }
-
-  .nav-link {
-    color: $dark;
-
-    &:hover {
-      color: $primary;
-    }
-
-    &.disabled {
-      color: rgba(0, 0, 0, .3) !important;
-    }
-  }
-
-  .nav-space {
-    height: 98px;
-
-    @media (max-width:767px) {
-      height: 82px;
-    }
-  }
-}
-
-#menu-mob {
 
   display: flex;
   justify-content: center;
@@ -162,7 +162,7 @@ button {
     height: 98px;
 
     @media (max-width:767px) {
-      height: 82px;
+      height: 74px;
     }
   }
 }
@@ -207,9 +207,49 @@ button {
 #regras {
 
   .accordion {
-    --bs-accordion-bg: transparent;
-    --bs-accordion-active-bg: transparent;
-    --bs-accordion-active-color: var(--turquoise-600);
+    
+    &-item, &-body{
+      padding: .5rem;
+    }
+
+    &-button{
+      position: relative;
+      color: $primary;
+
+      &.collapsed{
+        color: $dark;
+      }
+
+      &:after,
+      &:before {
+        --minus-size: 16px;
+        content: "";
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'%3E%3Cpath d='M1,8.39v-2.78h12v2.78H1Z' fill='black'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-size: cover;
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        translate: 0 -50%;
+        width: var(--minus-size);
+        height: var(--minus-size);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: 0.3s ease-in-out;
+      }
+
+      &.collapsed {
+        &:after {
+          rotate: -90deg;
+        }
+        &:before {
+          rotate: -180deg;
+        }
+      }
+    }
+
+
   }
 }
 
