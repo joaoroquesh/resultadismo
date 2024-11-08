@@ -125,13 +125,14 @@ $(document).on('dadosProntos', function() {
 });
 
 
-$(document).ready(function() {
-    // Seu código jQuery aqui
+document.addEventListener('DOMContentLoaded', function() {
+    // Código atualizado para adicionar a classe 'active' ao link correspondente
     const currentPath = window.location.pathname;
     const menuItems = document.querySelectorAll('.nav-item .nav-link');
   
     menuItems.forEach((link) => {
-      if (link.getAttribute('href') === currentPath) {
+      const linkPath = link.getAttribute('href');
+      if (linkPath === currentPath || currentPath.endsWith(linkPath)) {
         link.classList.add('active');
       }
     });

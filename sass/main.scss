@@ -126,13 +126,6 @@ button {
     }
   }
 
-  .nav-item{
-    margin-inline: .5rem;
-
-    @media (max-width:992px) {
-      margin-inline: .25rem;
-    }
-  }
 
   .nav-link {
     display: flex;
@@ -141,16 +134,26 @@ button {
     gap: .25rem;
     color: $dark;
     fill: $dark;
+    padding-inline: .5rem;
 
+    
     @media (max-width:992px) {
       flex-direction: column;
       font-size: .7rem;
-      padding: 0;
+      padding: .25rem;
     }
 
     &:hover {
       color: $primary;
       fill: $primary;
+    }
+
+    &.active {
+      color: $dark!important;
+      fill: $dark!important;
+      font-weight: bold;
+      background: var(--turquoise-600);
+      border-radius: .5rem;
     }
 
     &.disabled {

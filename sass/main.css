@@ -1610,14 +1610,6 @@ button:focus, button:focus-visible {
     justify-content: space-between;
   }
 }
-#menu .nav-item {
-  margin-inline: 0.5rem;
-}
-@media (max-width: 992px) {
-  #menu .nav-item {
-    margin-inline: 0.25rem;
-  }
-}
 #menu .nav-link {
   display: flex;
   align-items: center;
@@ -1625,17 +1617,25 @@ button:focus, button:focus-visible {
   gap: 0.25rem;
   color: var(--star-dust-950);
   fill: var(--star-dust-950);
+  padding-inline: 0.5rem;
 }
 @media (max-width: 992px) {
   #menu .nav-link {
     flex-direction: column;
     font-size: 0.7rem;
-    padding: 0;
+    padding: 0.25rem;
   }
 }
 #menu .nav-link:hover {
   color: var(--turquoise-600);
   fill: var(--turquoise-600);
+}
+#menu .nav-link.active {
+  color: var(--star-dust-950) !important;
+  fill: var(--star-dust-950) !important;
+  font-weight: bold;
+  background: var(--turquoise-600);
+  border-radius: 0.5rem;
 }
 #menu .nav-link.disabled {
   color: rgba(0, 0, 0, 0.3) !important;
