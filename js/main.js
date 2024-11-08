@@ -1,3 +1,18 @@
+$(document).ready(function() {
+    // Carregar o menu e, em seguida, adicionar a classe 'active' ao link correspondente
+    $("#menu").load("components/menu.html", function() {
+      const currentPath = window.location.pathname;
+      const menuItems = document.querySelectorAll('.nav-item .nav-link');
+  
+      menuItems.forEach((link) => {
+        const linkPath = link.getAttribute('href');
+        if (linkPath === currentPath || currentPath.endsWith(linkPath)) {
+          link.classList.add('active');
+        }
+      });
+    });
+  });
+
 $(document).ready(function () {
     // URLs dos JSONs atualizados
     const APIpontos = "https://script.google.com/macros/s/AKfycbwz50LSFr5lQP0TfWqzKKOmQQ5cT_ltXhZU-MbsHDFxuvoOXpU6CbDIqZ231oHTw-w/exec";
@@ -125,16 +140,7 @@ $(document).on('dadosProntos', function() {
 });
 
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Código atualizado para adicionar a classe 'active' ao link correspondente
-    const currentPath = window.location.pathname;
-    const menuItems = document.querySelectorAll('.nav-item .nav-link');
+
   
-    menuItems.forEach((link) => {
-      const linkPath = link.getAttribute('href');
-      if (linkPath === currentPath || currentPath.endsWith(linkPath)) {
-        link.classList.add('active');
-      }
-    });
-  });
+  
   
