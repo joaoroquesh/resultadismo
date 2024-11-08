@@ -1610,6 +1610,9 @@ button:focus, button:focus-visible {
     justify-content: space-between;
   }
 }
+#menu li.nav-item {
+  width: 100%;
+}
 #menu .nav-link {
   display: flex;
   align-items: center;

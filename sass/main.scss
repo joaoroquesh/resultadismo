@@ -126,7 +126,10 @@ button {
     }
   }
 
-
+  li.nav-item {
+    width: 100%;
+  }
+  
   .nav-link {
     display: flex;
     align-items: center;
