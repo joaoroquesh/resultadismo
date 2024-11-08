@@ -126,7 +126,7 @@ button {
     }
   }
 
-  li.nav-item {
+  .nav-item {
     width: 100%;
   }
 
@@ -142,7 +142,7 @@ button {
     
     @media (max-width:992px) {
       flex-direction: column;
-      font-size: .7rem;
+      font-size: .65rem;
       padding: .25rem;
     }
 
