@@ -123,7 +123,7 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
 
       let cardHTML = `
               <div class="card game p-0">
-                  <div class="card-game d-flex flex-column gap-3">
+                  <div class="card-game d-flex flex-column">
                       <div class="card-game-label d-flex gap-2 center-s">
                           <div class="card-game-label-hour">
                               ${hora}
@@ -134,7 +134,7 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
                           </div>
                       </div>
                       <div class="card-game-result">
-                          <div class="card-game-result-team team-home center-s">
+                          <div class="card-game-result-team team-home">
                               <img src="" data-codigo="${mandante}" alt=""
                                   class="card-game-result-team-img team-home">
                               <span class="card-game-result-team-name team-home" data-codigo="${mandante}"></span>
@@ -143,7 +143,7 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
                               <span class="team-home">${mandanteGols}</span>
                               <span class="team-away">${visitanteGols}</span>
                           </div>
-                          <div class="card-game-result-team team-away center-s">
+                          <div class="card-game-result-team team-away">
                               <img src="" data-codigo="${visitante}" alt=""
                                   class="card-game-result-team-img team-away">
                               <span class="card-game-result-team-name team-away" data-codigo="${visitante}"></span>

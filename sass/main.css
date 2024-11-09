@@ -1692,10 +1692,10 @@ button:focus, button:focus-visible {
 #regras .accordion-button.collapsed {
   color: var(--star-dust-950);
 }
-#regras .accordion-button:after, #regras .accordion-button:before {
+#regras .accordion-button:before {
   --minus-size: 16px;
   content: "";
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'%3E%3Cpath d='M1,8.39v-2.78h12v2.78H1Z' fill='black'/%3E%3C/svg%3E");
+  background-image: url('data:image/svg+xml,%3Csvg id="arrow" viewBox="0 0 16 16" height="24px" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath class="st0" fill="%23232323" d="M7.3,10.4l-3.8-3.9c-.3-.3-.3-.8,0-1.1s.8-.3,1.1,0l3.5,3.5,3.5-3.5c.3-.3.8-.3,1.1,0s.3.8,0,1.1l-4,4c-.1.1-.3.3-.6.3s-.6-.2-.8-.4Z"/%3E%3C/svg%3E');
   background-repeat: no-repeat;
   background-size: cover;
   position: absolute;
@@ -1708,11 +1708,6 @@ button:focus, button:focus-visible {
   justify-content: center;
   align-items: center;
   transition: 0.3s ease-in-out;
-}
-#regras .accordion-button.collapsed:after {
-  rotate: -90deg;
-}
-#regras .accordion-button.collapsed:before {
   rotate: -180deg;
 }
 
@@ -1922,6 +1917,299 @@ button:focus, button:focus-visible {
   }
 }
 
+#jogos .accordion {
+  gap: var(--size-3);
+}
+#jogos .card-game {
+  padding: var(--size-3);
+  gap: var(--size-3);
+}
+#jogos .card-game-label {
+  font-size: var(--font-size-sm);
+}
+#jogos .card-game-result {
+  --team-size: 60px;
+  height: 100px;
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: var(--size-3);
+}
+#jogos .card-game-result-team {
+  width: 30%;
+  position: relative;
+  padding: var(--size-2);
+}
+#jogos .card-game-result-team-name {
+  position: absolute;
+  bottom: calc(var(--size-3) * -1);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--font-size-xs);
+  text-wrap: nowrap;
+}
+#jogos .card-game-result-team img {
+  max-width: var(--team-size);
+  max-height: var(--team-size);
+}
+#jogos .card-game-result-score {
+  display: flex;
+  align-items: center;
+  gap: var(--size-3);
+  padding: var(--size-2);
+}
+#jogos .card-game-result-score span {
+  height: var(--team-size);
+  width: var(--team-size);
+  max-width: var(--team-size);
+  color: var(--star-dust-950);
+  border: 1px solid var(--turquoise-600);
+  border-radius: var(--size-3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: var(--font-size-3);
+}
+#jogos .card.game .card-header {
+  border: 0px;
+  background: var(--star-dust-200);
+  padding: 0;
+}
+#jogos .card.game .card-header .btn {
+  position: relative;
+  padding: var(--size-2) var(--size-4);
+  font-weight: bold;
+}
+#jogos .card.game .card-header .btn:before {
+  --minus-size: 16px;
+  content: "";
+  background-image: url('data:image/svg+xml,%3Csvg id="arrow" viewBox="0 0 16 16" height="24px" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath class="st0" fill="%23232323" d="M7.3,10.4l-3.8-3.9c-.3-.3-.3-.8,0-1.1s.8-.3,1.1,0l3.5,3.5,3.5-3.5c.3-.3.8-.3,1.1,0s.3.8,0,1.1l-4,4c-.1.1-.3.3-.6.3s-.6-.2-.8-.4Z"/%3E%3C/svg%3E');
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  translate: 0 -50%;
+  width: var(--minus-size);
+  height: var(--minus-size);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.3s ease-in-out;
+  rotate: -180deg;
+}
+#jogos .card.game .card-header .btn.collapsed:before {
+  rotate: 0deg;
+}
+#jogos .card.game .card-body {
+  padding: var(--size-3);
+}
+#jogos .card.game .card-body table td {
+  vertical-align: middle;
+  text-align: center;
+  padding: 0;
+}
+#jogos .card.game .card-body table td:nth-child(1) {
+  width: 50px;
+  max-width: 50px;
+}
+#jogos .card.game .card-body table td:nth-child(2) {
+  text-align: left;
+  font-size: var(--font-size-sm);
+}
+#jogos .card.game .card-body table td .cravada,
+#jogos .card.game .card-body table td .saldo,
+#jogos .card.game .card-body table td .acerto {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  font-weight: bold;
+  border-radius: var(--size-2);
+  color: var(--star-dust-100);
+}
+#jogos .card.game .card-body table td .cravada:after,
+#jogos .card.game .card-body table td .saldo:after,
+#jogos .card.game .card-body table td .acerto:after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  color: var(--star-dust-100);
+  width: 20px;
+  height: 20px;
+  background: var(--turquoise-600);
+  font-size: 10px;
+  border-radius: 100px;
+  padding: 2px;
+  font-weight: normal;
+  scale: 0.8;
+}
+#jogos .card.game .card-body table td .cravada {
+  background: var(--pizza-600);
+}
+#jogos .card.game .card-body table td .cravada:after {
+  content: "+3";
+}
+#jogos .card.game .card-body table td .saldo {
+  background: var(--bilbao-700);
+}
+#jogos .card.game .card-body table td .saldo:after {
+  content: "+2";
+}
+#jogos .card.game .card-body table td .acerto {
+  font-weight: normal;
+  background: var(--blue-dianne-900);
+}
+#jogos .card.game .card-body table td .acerto:after {
+  content: "+1";
+}
+#jogos #arrow {
+  rotate: 180deg;
+}
+#jogos.closed #arrow {
+  rotate: 0deg;
+}
+#jogos.closed #content-space {
+  height: 0px !important;
+}
+#jogos.closed .accordion {
+  gap: var(--size-2);
+}
+#jogos.closed .card-game {
+  padding: var(--size-2);
+  gap: var(--size-2);
+}
+#jogos.closed .card-game-label {
+  font-size: var(--font-size-xs);
+}
+#jogos.closed .card-game-result {
+  --team-size: 30px;
+  height: -moz-fit-content;
+  height: fit-content;
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: var(--size-0);
+}
+#jogos.closed .card-game-result-team {
+  width: 50%;
+  position: relative;
+  padding: var(--size-0) var(--size-2);
+  display: flex;
+  align-items: center;
+  gap: var(--size-2);
+}
+#jogos.closed .card-game-result-team.team-away {
+  flex-direction: row-reverse;
+  text-align: end;
+}
+#jogos.closed .card-game-result-team-name {
+  position: relative;
+  bottom: auto;
+  left: auto;
+  transform: translateX(0);
+  font-size: var(--font-size-xs);
+  line-height: 1;
+  text-wrap: wrap;
+}
+#jogos.closed .card-game-result-team img {
+  max-width: var(--team-size);
+  max-height: var(--team-size);
+}
+#jogos.closed .card-game-result-score {
+  display: flex;
+  align-items: center;
+  gap: var(--size-2);
+  padding: var(--size-0) var(--size-1);
+}
+#jogos.closed .card-game-result-score span {
+  height: var(--team-size);
+  width: var(--team-size);
+  max-width: var(--team-size);
+  color: var(--star-dust-950);
+  border: 1px solid var(--turquoise-600);
+  border-radius: var(--size-1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: var(--font-size-6);
+}
+#jogos.closed .card.game .card {
+  position: relative;
+}
+#jogos.closed .card.game .card-header {
+  position: absolute;
+  width: 100%;
+  background: transparent;
+}
+#jogos.closed .card.game .card-header .btn {
+  position: relative;
+  padding: var(--size-1) var(--size-4);
+  color: transparent;
+  font-size: var(--font-size-xs);
+  font-weight: bold;
+}
+#jogos.closed .card.game .card-body {
+  padding: var(--size-3);
+}
+#jogos.closed .card.game .card-body table td {
+  vertical-align: middle;
+  text-align: center;
+  padding: 0;
+}
+#jogos.closed .card.game .card-body table td:nth-child(1) {
+  width: 50px;
+  max-width: 50px;
+}
+#jogos.closed .card.game .card-body table td:nth-child(2) {
+  text-align: left;
+  font-size: var(--font-size-sm);
+}
+#jogos.closed .card.game .card-body table td .cravada,
+#jogos.closed .card.game .card-body table td .saldo,
+#jogos.closed .card.game .card-body table td .acerto {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  font-weight: bold;
+  border-radius: var(--size-2);
+  color: var(--star-dust-100);
+}
+#jogos.closed .card.game .card-body table td .cravada:after,
+#jogos.closed .card.game .card-body table td .saldo:after,
+#jogos.closed .card.game .card-body table td .acerto:after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  color: var(--star-dust-100);
+  width: 20px;
+  height: 20px;
+  background: var(--turquoise-600);
+  font-size: 10px;
+  border-radius: 100px;
+  padding: 2px;
+  font-weight: normal;
+  scale: 0.8;
+}
+#jogos.closed .card.game .card-body table td .cravada {
+  background: var(--pizza-600);
+}
+#jogos.closed .card.game .card-body table td .cravada:after {
+  content: "+3";
+}
+#jogos.closed .card.game .card-body table td .saldo {
+  background: var(--bilbao-700);
+}
+#jogos.closed .card.game .card-body table td .saldo:after {
+  content: "+2";
+}
+#jogos.closed .card.game .card-body table td .acerto {
+  font-weight: normal;
+  background: var(--blue-dianne-900);
+}
+#jogos.closed .card.game .card-body table td .acerto:after {
+  content: "+1";
+}
+
 .navegacao nav .nav-link {
   background: transparent !important;
   width: 32%;
@@ -1992,150 +2280,6 @@ button:focus, button:focus-visible {
   border: 1px solid var(--turquoise-600);
 }
 
-.card-game {
-  padding: var(--size-3);
-}
-.card-game-label {
-  font-size: var(--font-size-sm);
-}
-.card-game-result {
-  --team-size: 60px;
-  height: 100px;
-  display: flex;
-  justify-content: space-between;
-  padding-bottom: var(--size-3);
-}
-.card-game-result-team {
-  width: 30%;
-  position: relative;
-  padding: var(--size-2);
-}
-.card-game-result-team-name {
-  position: absolute;
-  bottom: calc(var(--size-3) * -1);
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: var(--font-size-xs);
-  text-wrap: nowrap;
-}
-.card-game-result-team img {
-  max-width: var(--team-size);
-  max-height: var(--team-size);
-}
-.card-game-result-score {
-  display: flex;
-  align-items: center;
-  gap: var(--size-3);
-  padding: var(--size-2);
-}
-.card-game-result-score span {
-  height: var(--team-size);
-  width: var(--team-size);
-  max-width: var(--team-size);
-  color: var(--star-dust-950);
-  border: 1px solid var(--turquoise-600);
-  border-radius: var(--size-3);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: var(--font-size-3);
-}
-.card.game .card-header {
-  border: 0px;
-  background: var(--star-dust-200);
-  padding: 0;
-}
-.card.game .card-header .btn {
-  position: relative;
-  padding: var(--size-2) var(--size-4);
-  font-weight: bold;
-}
-.card.game .card-header .btn:after, .card.game .card-header .btn:before {
-  --minus-size: 12px;
-  content: "";
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'%3E%3Cpath d='M1,8.39v-2.78h12v2.78H1Z' fill='black'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-size: cover;
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  translate: 0 -50%;
-  width: var(--minus-size);
-  height: var(--minus-size);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: 0.3s ease-in-out;
-}
-.card.game .card-header .btn.collapsed:after {
-  rotate: -90deg;
-}
-.card.game .card-header .btn.collapsed:before {
-  rotate: -180deg;
-}
-.card.game .card-body {
-  padding: var(--size-3);
-}
-.card.game .card-body table td {
-  vertical-align: middle;
-  text-align: center;
-  padding: 0;
-}
-.card.game .card-body table td:nth-child(1) {
-  width: 50px;
-  max-width: 50px;
-}
-.card.game .card-body table td:nth-child(2) {
-  text-align: left;
-  font-size: var(--font-size-sm);
-}
-.card.game .card-body table td .cravada,
-.card.game .card-body table td .saldo,
-.card.game .card-body table td .acerto {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  font-weight: bold;
-  border-radius: var(--size-2);
-  color: var(--star-dust-100);
-}
-.card.game .card-body table td .cravada:after,
-.card.game .card-body table td .saldo:after,
-.card.game .card-body table td .acerto:after {
-  content: "";
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  color: var(--star-dust-100);
-  width: 20px;
-  height: 20px;
-  background: var(--turquoise-600);
-  font-size: 10px;
-  border-radius: 100px;
-  padding: 2px;
-  font-weight: normal;
-  scale: 0.8;
-}
-.card.game .card-body table td .cravada {
-  background: var(--pizza-600);
-}
-.card.game .card-body table td .cravada:after {
-  content: "+3";
-}
-.card.game .card-body table td .saldo {
-  background: var(--bilbao-700);
-}
-.card.game .card-body table td .saldo:after {
-  content: "+2";
-}
-.card.game .card-body table td .acerto {
-  font-weight: normal;
-  background: var(--blue-dianne-900);
-}
-.card.game .card-body table td .acerto:after {
-  content: "+1";
-}
-
 select,
 input {
   padding: var(--size-2) var(--size-3);
@@ -2165,6 +2309,11 @@ footer a {
 footer a:hover {
   color: var(--turquoise-500);
   text-decoration: none;
+}
+@media (max-width: 992px) {
+  footer {
+    color: transparent;
+  }
 }
 
 .loading * {
