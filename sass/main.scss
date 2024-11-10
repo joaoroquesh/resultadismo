@@ -52,42 +52,6 @@ button {
 
 /* ELEMENTS*/
 
-// #menu {
-
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-
-
-//   .container {
-//     background: $light;
-//   }
-
-//   .navbar {
-//     --bs-navbar-padding-x: 1rem;
-//     box-shadow: 0px 0px 2px rgb(0 0 0 / 14%), 0px 2px 2px rgb(0 0 0 / 12%), 0px 1px 3px rgb(0 0 0 / 20%);
-//   }
-
-//   .nav-link {
-//     color: $dark;
-
-//     &:hover {
-//       color: $primary;
-//     }
-
-//     &.disabled {
-//       color: rgba(0, 0, 0, .3) !important;
-//     }
-//   }
-
-//   .nav-space {
-//     height: 98px;
-
-//     @media (max-width:767px) {
-//       height: 82px;
-//     }
-//   }
-// }
 
 #menu {
 
@@ -227,9 +191,6 @@ button {
       position: relative;
       color: $primary;
 
-      &.collapsed {
-        color: $dark;
-      }
 
       &:before {
         --minus-size: 16px;
@@ -249,6 +210,13 @@ button {
         align-items: center;
         transition: 0.3s ease-in-out;
         rotate: -180deg;
+      }
+
+      &.collapsed {
+        color: $dark;
+        &:before {
+          rotate: 0deg;
+        }
       }
     }
 
@@ -623,7 +591,6 @@ button {
             // color: $primary;
             font-weight: bold;
 
-            // &:after,
             &:before {
               --minus-size: 16px;
               content: "";

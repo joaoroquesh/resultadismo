@@ -1689,9 +1689,6 @@ button:focus, button:focus-visible {
   position: relative;
   color: var(--turquoise-600);
 }
-#regras .accordion-button.collapsed {
-  color: var(--star-dust-950);
-}
 #regras .accordion-button:before {
   --minus-size: 16px;
   content: "";
@@ -1709,6 +1706,12 @@ button:focus, button:focus-visible {
   align-items: center;
   transition: 0.3s ease-in-out;
   rotate: -180deg;
+}
+#regras .accordion-button.collapsed {
+  color: var(--star-dust-950);
+}
+#regras .accordion-button.collapsed:before {
+  rotate: 0deg;
 }
 
 #content-fixed.fixed-top {

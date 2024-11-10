@@ -427,11 +427,13 @@
   document.addEventListener("DOMContentLoaded", function () {
       const toggler = document.getElementById("toggler");
       const jogos = document.getElementById("jogos");
+      const contentFixed = document.getElementById("content-fixed");
       
       // Recuperar estado do localStorage
       const isClosed = localStorage.getItem("jogosClosed");
       if (isClosed === "false") {
           jogos.classList.remove("closed");
+          contentFixed.classList.add("show");
       } else {
           jogos.classList.add("closed");
       }
