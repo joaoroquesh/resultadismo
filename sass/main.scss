@@ -516,6 +516,10 @@ button {
   }
 
   .card {
+    
+    *{
+      transition: var(--transition-1);
+    }
     &-game {
       padding: $size-3;
       gap: $size-3;
@@ -624,6 +628,7 @@ button {
           padding: $size-3;
 
           table {
+            margin: 0;
             td {
               vertical-align: middle;
               text-align: center;

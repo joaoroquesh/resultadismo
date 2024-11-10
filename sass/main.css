@@ -1923,6 +1923,9 @@ button:focus, button:focus-visible {
 #jogos .accordion {
   gap: var(--size-3);
 }
+#jogos .card * {
+  transition: var(--transition-1);
+}
 #jogos .card-game {
   padding: var(--size-3);
   gap: var(--size-3);
@@ -2005,6 +2008,9 @@ button:focus, button:focus-visible {
 }
 #jogos .card.game .card-body {
   padding: var(--size-3);
+}
+#jogos .card.game .card-body table {
+  margin: 0;
 }
 #jogos .card.game .card-body table td {
   vertical-align: middle;
