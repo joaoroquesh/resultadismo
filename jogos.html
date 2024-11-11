@@ -68,13 +68,13 @@
 
       <section id="menu"></section>
 
-      <section id="content-fixed" class="fixed-top collapse">
+      <section id="content-fixed" class="fixed-top">
         <div class="container">
           <div class="row">
             <div class="col px-3 pb-3 d-flex flex-column justify-content-center align-items-center">
 
-              <div id="navegacao" class="w-100 navegacao">
-                <nav>
+              <div id="navegacao" class="w-100 navegacao ">
+                <nav id="meses" class="collapse">
                   <div class="nav nav-tabs d-flex justify-content-around" id="nav-tab" role="tablist">
                     <button class="nav-link skeleton active" id="nav-${mes-atual}-tab" data-toggle="tab"
                       data-target="#nav-${mes-atual}" type="button" role="tab" aria-controls="nav-${mes-atual}"
@@ -157,7 +157,7 @@
         <div class="container">
           <div class="row">
             <div class="col d-flex flex-column justify-content-center align-items-center">
-              <div id="toggler" class="btn btn-outline-primary w-25 mt-3" data-toggle="collapse" data-target="#content-fixed">
+              <div id="toggler" class="btn btn-outline-primary w-25" data-toggle="collapse" data-target="#meses">
                 <svg id="arrow" viewBox="0 0 16 16" height="16px">
                   <path class="st0" fill="#323232" d="M7.3,10.4l-3.8-3.9c-.3-.3-.3-.8,0-1.1s.8-.3,1.1,0l3.5,3.5,3.5-3.5c.3-.3.8-.3,1.1,0s.3.8,0,1.1l-4,4c-.1.1-.3.3-.6.3s-.6-.2-.8-.4Z"/>
                 </svg>
@@ -427,13 +427,13 @@
   document.addEventListener("DOMContentLoaded", function () {
       const toggler = document.getElementById("toggler");
       const jogos = document.getElementById("jogos");
-      const contentFixed = document.getElementById("content-fixed");
+      const meses = document.getElementById("meses");
       
       // Recuperar estado do localStorage
       const isClosed = localStorage.getItem("jogosClosed");
       if (isClosed === "false") {
           jogos.classList.remove("closed");
-          contentFixed.classList.add("show");
+          meses.classList.add("show");
       } else {
           jogos.classList.add("closed");
       }

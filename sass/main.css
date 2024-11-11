@@ -2078,7 +2078,7 @@ button:focus, button:focus-visible {
   rotate: 0deg;
 }
 #jogos.closed #content-space {
-  height: 0px !important;
+  height: 71px !important;
 }
 #jogos.closed .accordion {
   gap: var(--size-2);
