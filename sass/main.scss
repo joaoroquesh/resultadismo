@@ -257,8 +257,39 @@ button {
 
   }
 
+  .classificacao-divisao{
+    tbody{
+      tr{
+        &:nth-last-child(2) {
+          color: $danger-dark !important;
 
+          td {
+            &:nth-child(1) {
+              color: $light !important;
 
+              &:after {
+                background: $danger-dark !important;
+              }
+            }
+          }
+        }
+
+        &:nth-last-child(1), &:nth-child(n+7) {
+          color: $danger !important;
+
+          td {
+            &:nth-child(1) {
+              color: $light !important;
+
+              &:after {
+                background: $danger !important;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
   .table {
     // display: inline !important;
     color: $dark;
@@ -401,36 +432,6 @@ button {
             }
           }
         }
-
-        &:nth-last-child(2) {
-          color: $danger-dark !important;
-
-          td {
-            &:nth-child(1) {
-              color: $light !important;
-
-              &:after {
-                background: $danger-dark !important;
-              }
-            }
-          }
-        }
-
-        &:nth-last-child(1) {
-          color: $danger !important;
-
-          td {
-            &:nth-child(1) {
-              color: $light !important;
-
-              &:after {
-                background: $danger !important;
-              }
-            }
-          }
-        }
-
-
 
       }
 
@@ -1043,6 +1044,7 @@ footer {
     border-radius: 0.5rem;
     box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
     border: 1px solid $primary;
+    width: calc(100% - 32px);
 
     @media (max-width:992px) {
       bottom: calc(1rem + 70px);
