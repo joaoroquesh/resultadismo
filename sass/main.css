@@ -2249,26 +2249,35 @@ button:focus, button:focus-visible {
   position: relative;
   /* width */
 }
-.selecao:after {
+.selecao:after, .selecao:before {
   content: "";
   position: absolute;
   top: 0;
-  right: 0;
   bottom: 0;
   width: 150px;
-  height: 100%;
-  background: linear-gradient(to right, transparent 0%, var(--star-dust-100) 80%);
+  height: 102%;
+  z-index: 1;
   pointer-events: none;
 }
 @media (max-width: 576px) {
-  .selecao:after {
+  .selecao:after, .selecao:before {
     width: 50px;
   }
+}
+.selecao:after {
+  right: -2px;
+  background: linear-gradient(to right, transparent 0%, var(--star-dust-100) 80%);
+}
+.selecao:before {
+  left: -2px;
+  background: linear-gradient(to left, transparent 0%, var(--star-dust-100) 80%);
 }
 .selecao .nav-pills {
   overflow-x: scroll;
   flex-wrap: nowrap;
   gap: var(--size-2);
+  flex-direction: row-reverse;
+  padding-right: 42px;
 }
 .selecao .nav-pills::-webkit-scrollbar, .selecao .nav-pills::-webkit-scrollbar-track, .selecao .nav-pills::-webkit-scrollbar-thumb {
   width: 0;

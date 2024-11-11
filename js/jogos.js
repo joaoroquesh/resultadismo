@@ -89,7 +89,7 @@ function gerarNavegacao(jogosData) {
     navTabContent.append(`
           <div class="tab-pane selecao fade text-right ${showClass}" id="nav-${mes}" role="tabpanel"
               aria-labelledby="nav-${mes}-tab">
-              <ul class="nav nav-pills pr-5" id="filtroMes${mes}" role="tablist">
+              <ul class="nav nav-pills" id="filtroMes${mes}" role="tablist">
                   ${diasHTML}
               </ul>
           </div>
@@ -186,7 +186,6 @@ function formatarHora(horaISO) {
   return `${horas.toString().padStart(2, '0')}h${minutos.toString().padStart(2, '0')}`;
 }
 
-
 function ativarControleVisualizacaoJogos() {
   // Controle de navegação por mês
   $('#nav-tab .nav-link').off('click').on('click', function () {
@@ -236,7 +235,6 @@ function ativarControleVisualizacaoJogos() {
     atualizarElementosGlobais(window.dados);
   });
 }
-
 
 
 function getNomeMes(mes) {
@@ -293,7 +291,7 @@ function selecionarDiaHoje() {
     tabMes.click();
   }
 
-  // Selecionar o dia mais próximo
+  // Selecionar o dia mais próximo e centralizar na visualização
   setTimeout(() => {
     let tabDia = $(`#pills-${diaHoje}-${mesHoje}-tab`);
     if (!tabDia.length) {
@@ -313,12 +311,14 @@ function selecionarDiaHoje() {
       tabDia = diaMaisProximo;
     }
 
-    // Selecionar o dia no mês
+    // Selecionar o dia no mês e centralizar
     if (tabDia && tabDia.length) {
       tabDia.click();
+      tabDia[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, 100);
 }
+
 
 
 function listarPalpites(jogo) {

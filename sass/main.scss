@@ -937,15 +937,14 @@ button {
 
   /* width */
 
-  &:after {
+  &:after, &:before {
     content: '';
     position: absolute;
     top: 0;
-    right: 0;
     bottom: 0;
     width: 150px;
-    height: 100%;
-    background: linear-gradient(to right, transparent 0%, $light 80%);
+    height: 102%;
+    z-index: 1;
     pointer-events: none;
 
     @media (max-width:576px) {
@@ -953,11 +952,22 @@ button {
     }
   }
 
+  &:after {
+    right: -2px;
+    background: linear-gradient(to right, transparent 0%, $light 80%);
+  }
+  &:before {
+    left: -2px;
+    background: linear-gradient(to left, transparent 0%, $light 80%);
+  }
+
 
   .nav-pills {
     overflow-x: scroll;
     flex-wrap: nowrap;
     gap: var(--size-2);
+    flex-direction: row-reverse;
+    padding-right: 42px;
 
     &::-webkit-scrollbar,
     &::-webkit-scrollbar-track,
