@@ -87,7 +87,7 @@ function gerarNavegacao(jogosData) {
     }).join('');
 
     navTabContent.append(`
-          <div class="tab-pane selecao fade text-right pt-3 ${showClass}" id="nav-${mes}" role="tabpanel"
+          <div class="tab-pane selecao fade text-right ${showClass}" id="nav-${mes}" role="tabpanel"
               aria-labelledby="nav-${mes}-tab">
               <ul class="nav nav-pills pr-5" id="filtroMes${mes}" role="tablist">
                   ${diasHTML}

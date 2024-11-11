@@ -1563,6 +1563,10 @@ body {
   }
 }
 
+* {
+  transition: var(--transition-1);
+}
+
 a {
   color: var(--turquoise-600);
 }
@@ -1726,7 +1730,7 @@ button:focus, button:focus-visible {
 }
 
 #content-space {
-  height: 100px;
+  height: 104px;
 }
 
 #classificacao .classificacao {
@@ -2078,7 +2082,7 @@ button:focus, button:focus-visible {
   rotate: 0deg;
 }
 #jogos.closed #content-space {
-  height: 71px !important;
+  height: 55px !important;
 }
 #jogos.closed .accordion {
   gap: var(--size-2);

@@ -24,6 +24,9 @@ body {
     font-size: $font-size-sm;
   }
 }
+*{
+  transition: var(--transition-1);
+}
 
 a {
   color: $primary;
@@ -235,7 +238,7 @@ button {
 }
 
 #content-space {
-  height: 100px;
+  height: 104px;
 }
 
 #classificacao {
@@ -716,7 +719,7 @@ button {
     }
 
     #content-space {
-      height: 71px !important;
+      height: 55px !important;
     }
 
     .accordion {
