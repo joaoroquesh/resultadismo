@@ -236,7 +236,6 @@ function ativarControleVisualizacaoJogos() {
   });
 }
 
-
 function getNomeMes(mes) {
   const nomesMeses = {
     '01': 'Janeiro',
@@ -336,7 +335,6 @@ function selecionarDiaHoje() {
     }
   }, 100);
 }
-
 
 function listarPalpites(jogo) {
   let palpites = [];
