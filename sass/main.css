@@ -2277,7 +2277,6 @@ button:focus, button:focus-visible {
   flex-wrap: nowrap;
   gap: var(--size-2);
   flex-direction: row-reverse;
-  padding-right: 42px;
 }
 .selecao .nav-pills::-webkit-scrollbar, .selecao .nav-pills::-webkit-scrollbar-track, .selecao .nav-pills::-webkit-scrollbar-thumb {
   width: 0;
@@ -2285,6 +2284,12 @@ button:focus, button:focus-visible {
 }
 .selecao .nav-pills .nav-item {
   text-wrap: nowrap;
+}
+.selecao .nav-pills .nav-item:nth-child(1) {
+  margin-right: 42px;
+}
+.selecao .nav-pills .nav-item:nth-last-child(1) {
+  margin-left: 42px;
 }
 .selecao .nav-pills .nav-link {
   background: var(--star-dust-100);

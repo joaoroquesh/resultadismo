@@ -291,16 +291,29 @@ function selecionarDiaHoje() {
     tabMes.click();
   }
 
-  // Selecionar o dia mais próximo e centralizar na visualização
+  // Selecionar o dia de hoje ou o mais próximo e centralizar na visualização
   setTimeout(() => {
     let tabDia = $(`#pills-${diaHoje}-${mesHoje}-tab`);
+    const navPillsContainer = $(`#filtroMes${mesHoje}`); // Contêiner .nav-pills
+
+    // Remover .active de todos os dias para evitar duplicação
+    navPillsContainer.find('.nav-link').removeClass('active');
+
+    // Caso o dia de hoje não esteja disponível, escolher o mais próximo
     if (!tabDia.length) {
-      const diasDisponiveis = $(`#filtroMes${mesHoje} .nav-link`);
+      const diasDisponiveis = navPillsContainer.find('.nav-link');
       let diaMaisProximo = null;
       let diferencaMinima = Infinity;
 
       diasDisponiveis.each(function () {
         const dia = $(this).text().trim().split(' ')[1];
+        
+        // Priorizar o dia exato, se disponível
+        if (parseInt(dia) === parseInt(diaHoje)) {
+          diaMaisProximo = $(this);
+          return false; // Sair do loop se encontrar o dia de hoje
+        }
+
         const diferenca = Math.abs(parseInt(dia) - parseInt(diaHoje));
         if (diferenca < diferencaMinima) {
           diferencaMinima = diferenca;
@@ -311,14 +324,18 @@ function selecionarDiaHoje() {
       tabDia = diaMaisProximo;
     }
 
-    // Selecionar o dia no mês e centralizar
+    // Centralizar o dia selecionado no contêiner .nav-pills
     if (tabDia && tabDia.length) {
-      tabDia.click();
-      tabDia[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      tabDia.addClass('active'); // Marca o dia como ativo
+      const offsetLeft = tabDia.position().left;
+      const containerWidth = navPillsContainer.width();
+      const tabDiaWidth = tabDia.outerWidth();
+      const scrollPosition = offsetLeft - (containerWidth / 2) + (tabDiaWidth / 2);
+
+      navPillsContainer.animate({ scrollLeft: scrollPosition }, 300);
     }
   }, 100);
 }
-
 
 
 function listarPalpites(jogo) {

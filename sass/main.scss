@@ -967,7 +967,7 @@ button {
     flex-wrap: nowrap;
     gap: var(--size-2);
     flex-direction: row-reverse;
-    padding-right: 42px;
+    // padding-inline: 42px;
 
     &::-webkit-scrollbar,
     &::-webkit-scrollbar-track,
@@ -978,6 +978,13 @@ button {
 
     .nav-item {
       text-wrap: nowrap;
+
+      &:nth-child(1){
+        margin-right: 42px;
+      }
+      &:nth-last-child(1){
+        margin-left: 42px;
+      }
     }
 
     .nav-link {
