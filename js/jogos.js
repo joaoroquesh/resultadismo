@@ -6,7 +6,7 @@ $(document).ready(function () {
       // listarJogos(window.jogos.data);
       ativarControleVisualizacaoJogos();
       atualizarElementosGlobais(window.dados);
-      selecionarDiaHoje();
+      selecionarDiaHoje(true);
     } else {
       console.error("Os dados dos jogos não foram carregados corretamente.");
     }
@@ -29,7 +29,7 @@ $(document).ready(function () {
         // listarJogos(window.jogos.data);
         ativarControleVisualizacaoJogos();
         atualizarElementosGlobais(window.dados);
-        selecionarDiaHoje();
+        selecionarDiaHoje(true);
       }
       $('body').removeClass('loading');
       console.log("Todos os dados foram atualizados.");
@@ -261,7 +261,7 @@ function getDiaSemana(jogosData, dia, mes) {
   return diasSemana[dataPartida.getDay()];
 }
 
-function selecionarDiaHoje() {
+function selecionarDiaHoje(isInitialLoad = false) {
   const hoje = new Date();
   const diaHoje = hoje.getDate().toString().padStart(2, '0');
   const mesHoje = (hoje.getMonth() + 1).toString().padStart(2, '0');
@@ -286,8 +286,11 @@ function selecionarDiaHoje() {
   }
 
   // Selecionar a tab do mês
-  if (tabMes.length) {
+  if (tabMes.length && isInitialLoad) {
     tabMes.click();
+  } else {
+    $('.tab-pane').removeClass('show active');
+    $(`#nav-${mesHoje}`).addClass('show active');
   }
 
   // Selecionar o dia de hoje ou o mais próximo e centralizar na visualização
@@ -384,13 +387,22 @@ function listarPalpites(jogo) {
   palpites.sort((a, b) => {
       if (b.pontos !== a.pontos) {
           return b.pontos - a.pontos;
-      } else if (a.golsMandantePalpite !== b.golsMandantePalpite) {
-          return b.golsMandantePalpite - a.golsMandantePalpite;
-      } else if (a.golsMandantePalpite === a.golsVisitantePalpite) {
-          return -1; // Empate
-      } else {
-          return a.golsVisitantePalpite - b.golsVisitantePalpite;
       }
+      // Critério de desempate: Vitória do mandante, empate, vitória do visitante
+      const saldoGolsA = a.golsMandantePalpite - a.golsVisitantePalpite;
+      const saldoGolsB = b.golsMandantePalpite - b.golsVisitantePalpite;
+
+      if (saldoGolsB !== saldoGolsA) {
+          return saldoGolsB - saldoGolsA;
+      }
+      // Se o saldo for igual, verificar a quantidade de gols do mandante
+      if (a.golsMandantePalpite !== b.golsMandantePalpite) {
+          return b.golsMandantePalpite - a.golsMandantePalpite;
+      }
+      // Caso sejam empates, verificar a quantidade de gols totais
+      const totalGolsA = a.golsMandantePalpite + a.golsVisitantePalpite;
+      const totalGolsB = b.golsMandantePalpite + b.golsVisitantePalpite;
+      return totalGolsB - totalGolsA;
   });
 
   // Construir HTML dos palpites
@@ -406,6 +418,7 @@ function listarPalpites(jogo) {
 
   return palpitesHTML;
 }
+
 
 
 
