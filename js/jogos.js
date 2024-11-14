@@ -205,7 +205,7 @@ function ativarControleVisualizacaoJogos() {
     diasNoMes.each(function () {
       let dia = parseInt($(this).text().split(' ')[1]);
       let dataJogo = new Date(hoje.getFullYear(), mesSelecionado - 1, dia);
-      let diferenca = Math.abs(dataJogo - hoje);
+      let diferenca = Math.abs(dataJogo.setHours(0, 0, 0, 0) - hoje.setHours(0, 0, 0, 0));
 
       if (diferenca < menorDiferenca) {
         menorDiferenca = diferenca;
@@ -263,6 +263,7 @@ function getDiaSemana(jogosData, dia, mes) {
 
 function selecionarDiaHoje(isInitialLoad = false) {
   const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0); // Zerar horas para comparar apenas datas
   const diaHoje = hoje.getDate().toString().padStart(2, '0');
   const mesHoje = (hoje.getMonth() + 1).toString().padStart(2, '0');
 

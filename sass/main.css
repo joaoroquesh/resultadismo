@@ -1733,6 +1733,9 @@ button:focus, button:focus-visible {
   height: 104px;
 }
 
+#classificacao #content-space {
+  height: 56px;
+}
 #classificacao .classificacao {
   position: relative;
   height: calc(100dvh - 198px);
