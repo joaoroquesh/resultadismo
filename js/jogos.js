@@ -263,7 +263,7 @@ function getDiaSemana(jogosData, dia, mes) {
 
 function selecionarDiaHoje(isInitialLoad = false) {
   const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0); // Zerar horas para comparar apenas datas
+  hoje.setHours(0, 0, 0, 0);
   const diaHoje = hoje.getDate().toString().padStart(2, '0');
   const mesHoje = (hoje.getMonth() + 1).toString().padStart(2, '0');
 
