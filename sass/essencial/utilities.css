@@ -339,6 +339,27 @@
 }
 
 /* COR, PESO E RADIUS DA BORDA */
+.border-cravada {
+  border-color: var(--pizza-600) !important;
+}
+.border-saldo {
+  border-color: var(--bilbao-700) !important;
+}
+.border-acerto {
+  border-color: var(--blue-dianne-900) !important;
+}
+.border-light {
+  border-color: var(--star-dust-100) !important;
+}
+.border-dark {
+  border-color: var(--star-dust-950) !important;
+}
+.border-primary-light {
+  border-color: var(--turquoise-500) !important;
+}
+.border-primary {
+  border-color: var(--turquoise-600) !important;
+}
 .border-left-0, .border-left-none {
   border-style: solid !important;
   border-left-width: 0px !important;

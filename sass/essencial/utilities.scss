@@ -150,6 +150,33 @@
 /* COR, PESO E RADIUS DA BORDA */
 .border {
 
+  &-cravada {
+    border-color: $cravada !important;
+  }
+
+  &-saldo {
+    border-color: $saldo !important;
+  }
+
+  &-acerto {
+    border-color: $acerto !important;
+  }
+
+  &-light {
+    border-color: $light !important;
+  }
+
+  &-dark {
+    border-color: $dark !important;
+  }
+
+  &-primary-light {
+    border-color: $primary-light !important;
+  }
+
+  &-primary {
+    border-color: $primary !important;
+  }
 
   &-left {
 

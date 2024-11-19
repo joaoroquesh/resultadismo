@@ -475,6 +475,7 @@ button {
         text-align: left;
         //font-weight: bold;
         color: $dark;
+        padding: .75rem .25rem;
       }
 
       &:nth-child(4) {
@@ -514,6 +515,240 @@ button {
     }
 
   }
+}
+
+#copa{
+  .navegacao{
+
+    nav {
+
+      .nav-link{
+        width: 25%;
+      }
+    }
+  }
+  .selecao {
+    &:after, &:before{
+      display: none;
+    }
+  }
+
+  #content-space {
+    height: 56px;
+  }
+
+  .table {
+    // display: inline !important;
+    color: $dark;
+    border-collapse: separate;
+    border-spacing: 0px 10px;
+    margin: 0;
+
+    thead {
+      position: sticky;
+      top: 0;
+
+      tr {
+        background: $light !important;
+        box-shadow: -10px 0px 0px $light, 10px 0px 0px $light, 10px -10px 0px $light, -10px -10px 0px $light;
+      }
+
+      th {
+        position: relative;
+        padding-block: 0.25rem!important;
+
+        &::after {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        @media (max-width:567px) {
+          &:nth-child(n+4):nth-child(-n+7) {
+            color: transparent !important;
+          }
+        }
+
+        &:nth-child(4) {
+          @media (max-width:567px) {
+            &::after {
+              content: "P";
+              color: $primary !important;
+            }
+          }
+        }
+
+        &:nth-child(5) {
+          @media (max-width:567px) {
+            &::after {
+              content: "C";
+              color: $cravada !important;
+            }
+          }
+        }
+
+        &:nth-child(6) {
+          @media (max-width:567px) {
+            &::after {
+              content: "S";
+              color: $saldo !important;
+            }
+          }
+        }
+
+        &:nth-child(7) {
+          @media (max-width:567px) {
+            &::after {
+              content: "A";
+              color: $acerto !important;
+            }
+          }
+        }
+
+      }
+    }
+
+    tbody {
+      max-height: 600px;
+      overflow: scroll;
+
+      tr {
+        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
+        border-radius: .5rem;
+
+        td {
+          line-height: $line-height-tight;
+
+          &:nth-child(1) {
+            position: relative;
+
+            @media (max-width:410px) {
+              font-size: $font-size-xs;
+            }
+
+            &:after {
+              content: "";
+              position: absolute;
+              top: calc(50%);
+              left: calc(50%);
+              translate: -50% -50%;
+              width: $size-xxs;
+              height: $size-xxs;
+              border-radius: $size-quarck;
+              z-index: -1;
+
+              @media (max-width:410px) {
+                // border-radius: calc($size-nano - 2px);
+                // width: 22px;
+                // height: 22px;
+              }
+            }
+          }
+        }
+
+        &:nth-child(1) {
+
+          color: $cravada !important;
+
+          td {
+            &:nth-child(1) {
+              color: $light !important;
+
+              &:after {
+                background: $cravada !important;
+              }
+            }
+          }
+
+
+        }
+
+        &:nth-child(2) {
+          color: $saldo !important;
+
+          td {
+            &:nth-child(1) {
+              color: $light !important;
+
+              &:after {
+                background: $saldo !important;
+              }
+            }
+          }
+        }
+
+      }
+
+
+    }
+
+    th,
+    td {
+      vertical-align: middle;
+      text-align: center;
+
+
+      &:nth-child(1) {
+        width: var(--t-size);
+        font-weight: bold;
+
+      }
+
+      &:nth-child(2) {
+        width: var(--t-size);
+        padding: 0 !important;
+      }
+
+      &:nth-child(3) {
+        text-align: left;
+        //font-weight: bold;
+        color: $dark;
+        padding: .75rem .25rem;
+      }
+
+      &:nth-child(4) {
+        font-weight: bold;
+        color: $primary;
+
+      }
+
+      &:nth-child(5) {
+        color: $cravada;
+      }
+
+      &:nth-child(6) {
+        color: $saldo;
+      }
+
+      &:nth-child(7) {
+        color: $acerto;
+      }
+
+      &:nth-child(n+4):nth-child(-n+7) {
+        width: var(--n-size);
+        max-width: var(--n-size);
+        // display: inline-flex;
+        // justify-content: center;
+
+        @media (max-width:576px) {
+          max-width: 46px;
+          overflow: hidden;
+        }
+
+        @media (max-width:410px) {
+          max-width: 40px;
+        }
+      }
+
+    }
+
+  }
+
 }
 
 #jogos {
