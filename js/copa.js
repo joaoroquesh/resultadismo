@@ -1,22 +1,22 @@
 $(document).ready(function () {
-  $(document).on('copaPronto', function () {
-      if (typeof window.copa !== 'undefined' && window.copa.data && typeof window.dados !== 'undefined' && window.dados.data) {
-          ativarControleVisualizacaoCopa();
-          construirClassificacaoCopa(window.copa.data, 'oitavas', window.dados.data);
+  $(document).on('jogosPronto', function () {
+      if (typeof window.jogos !== 'undefined' && window.jogos.data) {
+          preencherClassificacoes(window.dados.data);
+          atualizarFiltrosDatas(window.dados.data);
       } else {
-          console.error("Os dados da Copa não foram carregados corretamente.");
+          console.error("Os dados dos jogos não foram carregados corretamente.");
       }
   });
 
   // Contador de JSONs carregados
   let carregados = 0;
 
-  $(document).on('dadosAtualizado pontosAtualizado copaAtualizado', function () {
+  $(document).on('dadosAtualizado pontosAtualizado jogosAtualizado', function () {
       carregados++;
       if (carregados === 3) {
-          if (typeof window.copa !== 'undefined' && window.copa.data && typeof window.dados !== 'undefined' && window.dados.data) {
-              ativarControleVisualizacaoCopa();
-              construirClassificacaoCopa(window.copa.data, 'oitavas', window.dados.data);
+          if (typeof window.dados !== 'undefined' && window.dados.data) {
+              preencherClassificacoes(window.dados.data);
+              atualizarFiltrosDatas(window.dados.data);
           }
           $('body').removeClass('loading');
           console.log("Todos os dados foram atualizados.");
@@ -24,157 +24,131 @@ $(document).ready(function () {
   });
 });
 
-function construirClassificacaoCopa(jogosData, faseSelecionada, dadosData) {
-  let classificacao = {
-      oitavas: {},
-      quartas: {},
-      semi: {},
-      final: {}
-  };
+function preencherClassificacoes(dadosData) {
+  // Obter a data inicial e final do período da copa a partir dos dados
+  let jogadorComData = dadosData.find(item => item.codigo === 'CP');
+  let dataInicio, dataFim;
+  if (jogadorComData && jogadorComData.copa) {
+      dataInicio = new Date(jogadorComData.copa);
+      dataFim = new Date(dataInicio);
+      dataFim.setDate(dataInicio.getDate() + 6);
+  }
 
-  let dataInicio = new Date(dadosData.find(d => d.nome === 'Copa').copa.split('/').reverse().join('-'));
+  let classificacao = {};
 
-  // Definir as datas de cada fase
-  let datasFases = {
-      oitavas: [new Date(dataInicio), new Date(dataInicio.setDate(dataInicio.getDate() + 6))],
-      quartas: [new Date(dataInicio.setDate(dataInicio.getDate() + 1)), new Date(dataInicio.setDate(dataInicio.getDate() + 6))],
-      semi: [new Date(dataInicio.setDate(dataInicio.getDate() + 1)), new Date(dataInicio.setDate(dataInicio.getDate() + 6))],
-      final: [new Date(dataInicio.setDate(dataInicio.getDate() + 1)), new Date(dataInicio.setDate(dataInicio.getDate() + 6))]
-  };
-
-  // Inicializar todos os jogadores na classificação, mesmo com pontuação zero
-  dadosData.forEach(jogador => {
-      if (jogador.copa) {
-          classificacao.oitavas[jogador.codigo] = classificacao.quartas[jogador.codigo] = classificacao.semi[jogador.codigo] = classificacao.final[jogador.codigo] = {
-              pontuacao: 0,
-              cravadas: 0,
-              saldos: 0,
-              acertos: 0
-          };
-      }
-  });
-
-  // Preencher as tabelas dos jogos com os jogadores que têm o respectivo valor na chave "copa"
+  // Preencher as classificações dos jogos com os jogadores que têm o respectivo valor na chave "copa"
   for (let i = 1; i <= 8; i++) {
-      let jogadores = dadosData.filter(jogador => jogador.copa === i);
+      let jogadores = dadosData.filter(jogador => jogador.copa == i);
       if (jogadores.length === 2) {
+          classificacao[i] = jogadores.map(jogador => {
+              let pontos = calcularPontosDia(jogador, dataInicio);
+              return {
+                  nome: jogador.codigo,
+                  pontos: pontos.pontuacao,
+                  cravadas: pontos.cravadas,
+                  saldos: pontos.saldos,
+                  acertos: pontos.acertos
+              };
+          });
+
+          // Ordenar jogadores por pontuação e critérios de desempate
+          classificacao[i].sort((a, b) => {
+              if (b.pontos !== a.pontos) {
+                  return b.pontos - a.pontos;
+              } else if (b.cravadas !== a.cravadas) {
+                  return b.cravadas - a.cravadas;
+              } else if (b.saldos !== a.saldos) {
+                  return b.saldos - a.saldos;
+              } else if (b.acertos !== a.acertos) {
+                  return b.acertos - a.acertos;
+              } else {
+                  return 0;
+              }
+          });
+
           let tbody = $(`#jogo${i} tbody`);
           tbody.empty(); // Limpar qualquer conteúdo existente
 
-          jogadores.forEach((jogador, index) => {
-              let nome = jogador.codigo;
+          classificacao[i].forEach((jogador, index) => {
               let escudo = 'https://www.resultadismo.com/images/escudos/padrao.png';
-
               let linha = `
                   <tr>
                       <td>${index + 1}°</td>
-                      <td><img src="${escudo}" data-codigo="${nome}" alt="Escudo" width="30"></td>
-                      <td data-codigo="${nome}">${nome}</td>
-                      <td>${jogador.pontuacao || 0}</td>
-                      <td>${jogador.cravadas || 0}</td>
-                      <td>${jogador.saldos || 0}</td>
-                      <td>${jogador.acertos || 0}</td>
+                      <td><img src="${escudo}" data-codigo="${jogador.nome}" alt="Escudo" width="30"></td>
+                      <td data-codigo="${jogador.nome}">${jogador.nome}</td>
+                      <td>${jogador.pontos}</td>
+                      <td>${jogador.cravadas}</td>
+                      <td>${jogador.saldos}</td>
+                      <td>${jogador.acertos}</td>
                   </tr>
               `;
               tbody.append(linha);
           });
       }
   }
+}
 
-  // Processar cada jogo para acumular a pontuação, cravadas, saldos e acertos dos jogadores por fase e datas definidas
-  jogosData.forEach(jogo => {
-      let dataJogo = new Date(jogo.data.split('/').reverse().join('-'));
-      if (dataJogo >= datasFases[faseSelecionada][0] && dataJogo <= datasFases[faseSelecionada][1]) {
-          let resultadoReal = jogo.resultado;
-          for (let chave in jogo) {
-              if (chave.includes('@') && jogo[chave] !== "") {
-                  let palpiteJogador = jogo[chave];
-                  if (!classificacao[faseSelecionada][chave]) {
-                      classificacao[faseSelecionada][chave] = {
-                          pontuacao: 0,
-                          cravadas: 0,
-                          saldos: 0,
-                          acertos: 0
-                      };
-                  }
+function calcularPontosDia(jogador, dataInicio) {
+  // Inicializar os pontos do jogador
+  let pontos = {
+      pontuacao: 0,
+      cravadas: 0,
+      saldos: 0,
+      acertos: 0
+  };
 
-                  const [golsMandanteReal, golsVisitanteReal] = resultadoReal.split('x').map(Number);
-                  const [golsMandantePalpite, golsVisitantePalpite] = palpiteJogador.split('x').map(Number);
+  // Filtrar os jogos que estão apenas na data especificada
+  let jogosNoDia = filtrarJogosPorDia(dataInicio);
 
-                  let pontuacao = 0;
+  // Calcular os pontos com base nos jogos filtrados
+  jogosNoDia.forEach(jogo => {
+      if (jogador.codigo && jogo[jogador.codigo]) {
+          let palpiteJogador = jogo[jogador.codigo];
+          if (palpiteJogador && jogo.resultado) {
+              const [golsMandanteReal, golsVisitanteReal] = jogo.resultado.split('x').map(Number);
+              const [golsMandantePalpite, golsVisitantePalpite] = palpiteJogador.split('x').map(Number);
 
-                  if (golsMandantePalpite === golsMandanteReal && golsVisitantePalpite === golsVisitanteReal) {
-                      pontuacao = 3;
-                      classificacao[faseSelecionada][chave].cravadas += 1;
-                  } else if ((golsMandantePalpite - golsVisitantePalpite) === (golsMandanteReal - golsVisitanteReal) && (golsMandantePalpite > golsVisitantePalpite) === (golsMandanteReal > golsVisitanteReal)) {
-                      pontuacao = 2;
-                      classificacao[faseSelecionada][chave].saldos += 1;
-                  } else if (
-                      (golsMandantePalpite > golsVisitantePalpite && golsMandanteReal > golsVisitanteReal) ||
-                      (golsMandantePalpite < golsVisitantePalpite && golsMandanteReal < golsVisitanteReal)
-                  ) {
-                      if (golsMandanteReal !== golsVisitanteReal) { // Não é um empate
-                          pontuacao = 1;
-                          classificacao[faseSelecionada][chave].acertos += 1;
-                      }
-                  }
-
-                  // Atualizar pontuação total do jogador
-                  classificacao[faseSelecionada][chave].pontuacao += pontuacao;
+              if (golsMandantePalpite === golsMandanteReal && golsVisitantePalpite === golsVisitanteReal) {
+                  pontos.pontuacao += 3;
+                  pontos.cravadas += 1;
+              } else if ((golsMandantePalpite - golsVisitantePalpite) === (golsMandanteReal - golsVisitanteReal)) {
+                  pontos.pontuacao += 2;
+                  pontos.saldos += 1;
+              } else if (
+                  (golsMandantePalpite > golsVisitantePalpite && golsMandanteReal > golsVisitanteReal) ||
+                  (golsMandantePalpite < golsVisitantePalpite && golsMandanteReal < golsVisitanteReal)
+              ) {
+                  pontos.pontuacao += 1;
+                  pontos.acertos += 1;
               }
           }
       }
   });
 
-  // Construir a tabela de classificação para a fase selecionada
-  let classificacaoArray = Object.entries(classificacao[faseSelecionada]).map(([codigo, stats]) => {
-      return { codigo, ...stats };
-  });
-
-  // Ordenar a classificação com base na pontuação e critérios de desempate
-  classificacaoArray.sort((a, b) => {
-      if (b.pontuacao !== a.pontuacao) {
-          return b.pontuacao - a.pontuacao;
-      } else if (b.cravadas !== a.cravadas) {
-          return b.cravadas - a.cravadas;
-      } else if (b.saldos !== a.saldos) {
-          return b.saldos - a.saldos;
-      } else {
-          return b.acertos - a.acertos;
-      }
-  });
-
-  // Construir o HTML da tabela de classificação para a fase
-  let tbody = $(`#jogo1 tbody, #jogo2 tbody`);
-  tbody.empty(); // Limpar qualquer conteúdo existente
-
-  classificacaoArray.forEach((jogador, index) => {
-      let nome = jogador.codigo;
-      let escudo = 'https://www.resultadismo.com/images/escudos/padrao.png';
-
-      let linha = `
-          <tr>
-              <td>${index + 1}°</td>
-              <td><img src="${escudo}" data-codigo="${nome}" alt="Escudo" width="30"></td>
-              <td data-codigo="${nome}"></td>
-              <td>${jogador.pontuacao}</td>
-              <td>${jogador.cravadas}</td>
-              <td>${jogador.saldos}</td>
-              <td>${jogador.acertos}</td>
-          </tr>
-      `;
-      tbody.append(linha);
-  });
+  return pontos;
 }
 
-function ativarControleVisualizacaoCopa() {
-  // Controle de navegação por fase
-  $('#nav-tab .nav-link').off('click').on('click', function () {
-      let targetTab = $(this).attr('data-target');
-      $('.tab-pane').removeClass('show active');
-      $(targetTab).addClass('show active');
+function filtrarJogosPorDia(dataInicio) {
+  if (typeof window.jogos !== 'undefined' && window.jogos.data) {
+      return window.jogos.data.filter(jogo => {
+          if (jogo.data) {
+              let dataJogo = new Date(jogo.data.split('/').reverse().join('-'));
+              return dataJogo.toDateString() === dataInicio.toDateString();
+          }
+          return false;
+      });
+  }
+  return [];
+}
 
-      let fase = targetTab.replace('#nav-', '');
-      construirClassificacaoCopa(window.copa.data, fase, window.dados.data);
-  });
+function atualizarFiltrosDatas(dadosData) {
+  // Atualizar os valores de #pills-oitavas-tab para a data referente ao filtro da pontuação
+  let jogadorComData = dadosData.find(item => item.codigo === 'CP');
+  if (jogadorComData && jogadorComData.copa) {
+      let dataInicial = new Date(jogadorComData.copa);
+      let dataFinal = new Date(dataInicial);
+      dataFinal.setDate(dataInicial.getDate() + 6);
+      let dataTexto = `${dataInicial.getDate().toString().padStart(2, '0')}/${(dataInicial.getMonth() + 1).toString().padStart(2, '0')} a ${dataFinal.getDate().toString().padStart(2, '0')}/${(dataFinal.getMonth() + 1).toString().padStart(2, '0')}`;
+      $('#pills-oitavas-tab').text(dataTexto);
+  }
 }

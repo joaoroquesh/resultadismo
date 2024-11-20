@@ -660,7 +660,7 @@ button {
               color: $light !important;
 
               &:after {
-                background: $cravada !important;
+                background: $primary !important;
               }
             }
           }
@@ -673,10 +673,10 @@ button {
 
           td {
             &:nth-child(1) {
-              color: $light !important;
+              color: $dark !important;
 
               &:after {
-                background: $saldo !important;
+                // background: $saldo !important;
               }
             }
           }

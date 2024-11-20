@@ -2052,16 +2052,13 @@ button:focus, button:focus-visible {
   color: var(--star-dust-100) !important;
 }
 #copa .table tbody tr:nth-child(1) td:nth-child(1):after {
-  background: var(--pizza-600) !important;
+  background: var(--turquoise-600) !important;
 }
 #copa .table tbody tr:nth-child(2) {
   color: var(--bilbao-700) !important;
 }
 #copa .table tbody tr:nth-child(2) td:nth-child(1) {
-  color: var(--star-dust-100) !important;
-}
-#copa .table tbody tr:nth-child(2) td:nth-child(1):after {
-  background: var(--bilbao-700) !important;
+  color: var(--star-dust-950) !important;
 }
 #copa .table th,
 #copa .table td {
