@@ -6,7 +6,7 @@ $colors: (
     300: #52f6d5,
     400: #1ee3c0,
     500: #06ddbb,
-    600: #01a08a,
+    600: #1CB19C,
     700: #067f70,
     800: #0a655b,
     900: #0e534c,
@@ -299,6 +299,9 @@ $colors: (
   --box-shadow-xs: 0 2px 4px rgba(128, 128, 128, 0.2);
   --box-shadow-sm: 0 2px 8px rgba(128, 128, 128, 0.2);
 
+
+  --primary:var(--turquoise-600);
+  --secondary: var(--star-dust-950);
 }
 
 
@@ -308,8 +311,10 @@ $medium: var(--star-dust-200);
 $darkgray: var(--star-dust-400);
 $dark: var(--star-dust-950);
 $primary-light: var(--turquoise-500);
+
 $primary:#1CB19C;
 $primary: var(--turquoise-600);
+$secondary: var(--star-dust-950);
 $cravada:var(--pizza-600);
 $saldo:var(--bilbao-700);
 $acerto:var(--blue-dianne-900);

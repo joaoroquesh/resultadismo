@@ -6,7 +6,7 @@
   --turquoise-300: #52f6d5;
   --turquoise-400: #1ee3c0;
   --turquoise-500: #06ddbb;
-  --turquoise-600: #01a08a;
+  --turquoise-600: #1CB19C;
   --turquoise-700: #067f70;
   --turquoise-800: #0a655b;
   --turquoise-900: #0e534c;
@@ -232,4 +232,6 @@
   --box-shadow-4: 0 24px 48px rgba(0, 0, 0, 0.1);
   --box-shadow-xs: 0 2px 4px rgba(128, 128, 128, 0.2);
   --box-shadow-sm: 0 2px 8px rgba(128, 128, 128, 0.2);
+  --primary:var(--turquoise-600);
+  --secondary: var(--star-dust-950);
 }/*# sourceMappingURL=root.css.map */

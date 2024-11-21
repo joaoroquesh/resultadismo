@@ -6,7 +6,7 @@
   --turquoise-300: #52f6d5;
   --turquoise-400: #1ee3c0;
   --turquoise-500: #06ddbb;
-  --turquoise-600: #01a08a;
+  --turquoise-600: #1CB19C;
   --turquoise-700: #067f70;
   --turquoise-800: #0a655b;
   --turquoise-900: #0e534c;
@@ -232,6 +232,8 @@
   --box-shadow-4: 0 24px 48px rgba(0, 0, 0, 0.1);
   --box-shadow-xs: 0 2px 4px rgba(128, 128, 128, 0.2);
   --box-shadow-sm: 0 2px 8px rgba(128, 128, 128, 0.2);
+  --primary:var(--turquoise-600);
+  --secondary: var(--star-dust-950);
 }
 
 :root {
@@ -241,7 +243,7 @@
   --turquoise-300: #52f6d5;
   --turquoise-400: #1ee3c0;
   --turquoise-500: #06ddbb;
-  --turquoise-600: #01a08a;
+  --turquoise-600: #1CB19C;
   --turquoise-700: #067f70;
   --turquoise-800: #0a655b;
   --turquoise-900: #0e534c;
@@ -467,6 +469,8 @@
   --box-shadow-4: 0 24px 48px rgba(0, 0, 0, 0.1);
   --box-shadow-xs: 0 2px 4px rgba(128, 128, 128, 0.2);
   --box-shadow-sm: 0 2px 8px rgba(128, 128, 128, 0.2);
+  --primary:var(--turquoise-600);
+  --secondary: var(--star-dust-950);
 }
 
 .btn-click-sm {
@@ -2021,13 +2025,22 @@ button:focus, button:focus-visible {
 }
 #copa .table tbody tr {
   box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
-  border-radius: 0.5rem;
+  border-radius: var(--size-2);
+}
+#copa .table tbody tr.vencedor {
+  outline: 2px solid var(--turquoise-600);
+  background: var(--turquoise-600);
+}
+#copa .table tbody tr.vencedor td:nth-child(3), #copa .table tbody tr.vencedor td:nth-child(4) {
+  color: var(--star-dust-100) !important;
 }
 #copa .table tbody tr td {
   line-height: var(--line-height-tight);
+  border: 0;
 }
 #copa .table tbody tr td:nth-child(1) {
   position: relative;
+  border-radius: var(--size-2) 0 0 var(--size-2);
 }
 @media (max-width: 410px) {
   #copa .table tbody tr td:nth-child(1) {
@@ -2044,6 +2057,9 @@ button:focus, button:focus-visible {
   height: var(--size-xxs);
   border-radius: var(--size-quarck);
   z-index: -1;
+}
+#copa .table tbody tr td:nth-last-child(1) {
+  border-radius: 0 var(--size-2) var(--size-2) 0;
 }
 #copa .table tbody tr:nth-child(1) {
   color: var(--pizza-600) !important;

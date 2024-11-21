@@ -59,6 +59,7 @@ function calcularDatasFases(dadosData) {
     }
 }
 
+
 function preencherClassificacoes(dadosData) {
     let classificacao = {};
 
@@ -113,80 +114,43 @@ function preencherClassificacoes(dadosData) {
         }
     }
 
-    // Avançar jogadores para as fases seguintes se necessário
     let dataHoje = new Date();
+
+    // Quartas de final (jogos 9 a 12)
     if (datasFases.oitavas.fim && dataHoje > datasFases.oitavas.fim) {
-        // Quartas de final (jogos 9 a 12)
-        if (dataHoje > datasFases.oitavas.fim && dataHoje <= datasFases.quartas.fim) {
-            for (let i = 9; i <= 12; i++) {
-                let jogoAnterior1 = classificacao[i - 8];
-                let jogoAnterior2 = classificacao[i - 7];
-                if (jogoAnterior1 && jogoAnterior2) {
-                    let vencedores = [jogoAnterior1[0], jogoAnterior2[0]];
-                    classificacao[i] = vencedores;
+        for (let i = 9; i <= 12; i++) {
+            let jogoAnterior1 = classificacao[(i - 8) * 2 - 1];
+            let jogoAnterior2 = classificacao[(i - 8) * 2];
+            if (jogoAnterior1 && jogoAnterior2) {
+                let vencedores = [jogoAnterior1[0], jogoAnterior2[0]].map(jogador => {
+                    let pontos = calcularPontosJogosNoPeriodo(jogador, datasFases.quartas.inicio, datasFases.quartas.fim);
+                    return {
+                        ...jogador,
+                        pontos: pontos.pontuacao,
+                        cravadas: pontos.cravadas,
+                        saldos: pontos.saldos,
+                        acertos: pontos.acertos
+                    };
+                });
 
-                    let tbody = $(`#jogo${i} tbody`);
-                    tbody.empty();
+                // Ordenar jogadores por pontuação e critérios de desempate
+                vencedores.sort((a, b) => {
+                    if (b.pontos !== a.pontos) {
+                        return b.pontos - a.pontos;
+                    } else if (b.cravadas !== a.cravadas) {
+                        return b.cravadas - a.cravadas;
+                    } else if (b.saldos !== a.saldos) {
+                        return b.saldos - a.saldos;
+                    } else if (b.acertos !== a.acertos) {
+                        return b.acertos - a.acertos;
+                    } else {
+                        return 0;
+                    }
+                });
 
-                    vencedores.forEach((jogador, index) => {
-                        let escudo = 'https://www.resultadismo.com/images/escudos/padrao.png';
-                        let linha = `
-                            <tr>
-                                <td>${index + 1}°</td>
-                                <td><img src="${escudo}" data-codigo="${jogador.nome}" alt="Escudo" width="30"></td>
-                                <td data-codigo="${jogador.nome}">${jogador.nome}</td>
-                                <td>${jogador.pontos}</td>
-                                <td>${jogador.cravadas}</td>
-                                <td>${jogador.saldos}</td>
-                                <td>${jogador.acertos}</td>
-                            </tr>
-                        `;
-                        tbody.append(linha);
-                    });
-                }
-            }
-        }
+                classificacao[i] = vencedores;
 
-        // Semifinais (jogos 13 e 14)
-        if (dataHoje > datasFases.quartas.fim && dataHoje <= datasFases.semi.fim) {
-            for (let i = 13; i <= 14; i++) {
-                let jogoAnterior1 = classificacao[i - 4];
-                let jogoAnterior2 = classificacao[i - 3];
-                if (jogoAnterior1 && jogoAnterior2) {
-                    let vencedores = [jogoAnterior1[0], jogoAnterior2[0]];
-                    classificacao[i] = vencedores;
-
-                    let tbody = $(`#jogo${i} tbody`);
-                    tbody.empty();
-
-                    vencedores.forEach((jogador, index) => {
-                        let escudo = 'https://www.resultadismo.com/images/escudos/padrao.png';
-                        let linha = `
-                            <tr>
-                                <td>${index + 1}°</td>
-                                <td><img src="${escudo}" data-codigo="${jogador.nome}" alt="Escudo" width="30"></td>
-                                <td data-codigo="${jogador.nome}">${jogador.nome}</td>
-                                <td>${jogador.pontos}</td>
-                                <td>${jogador.cravadas}</td>
-                                <td>${jogador.saldos}</td>
-                                <td>${jogador.acertos}</td>
-                            </tr>
-                        `;
-                        tbody.append(linha);
-                    });
-                }
-            }
-        }
-
-        // Final (jogo 15)
-        if (dataHoje > datasFases.semi.fim) {
-            let jogoAnterior13 = classificacao[13];
-            let jogoAnterior14 = classificacao[14];
-            if (jogoAnterior13 && jogoAnterior14) {
-                let vencedores = [jogoAnterior13[0], jogoAnterior14[0]];
-                classificacao[15] = vencedores;
-
-                let tbody = $(`#jogo15 tbody`);
+                let tbody = $(`#jogo${i} tbody`);
                 tbody.empty();
 
                 vencedores.forEach((jogador, index) => {
@@ -207,9 +171,122 @@ function preencherClassificacoes(dadosData) {
             }
         }
     }
+
+    // Semifinais (jogos 13 e 14)
+    if (datasFases.quartas.fim && dataHoje > datasFases.quartas.fim) {
+        for (let i = 13; i <= 14; i++) {
+            let jogoAnterior1 = classificacao[(i - 12) * 2 + 8 - 1];
+            let jogoAnterior2 = classificacao[(i - 12) * 2 + 8];
+            if (jogoAnterior1 && jogoAnterior2) {
+                let vencedores = [jogoAnterior1[0], jogoAnterior2[0]].map(jogador => {
+                    let pontos = calcularPontosJogosNoPeriodo(jogador, datasFases.semi.inicio, datasFases.semi.fim);
+                    return {
+                        ...jogador,
+                        pontos: pontos.pontuacao,
+                        cravadas: pontos.cravadas,
+                        saldos: pontos.saldos,
+                        acertos: pontos.acertos
+                    };
+                });
+
+                // Ordenar jogadores por pontuação e critérios de desempate
+                vencedores.sort((a, b) => {
+                    if (b.pontos !== a.pontos) {
+                        return b.pontos - a.pontos;
+                    } else if (b.cravadas !== a.cravadas) {
+                        return b.cravadas - a.cravadas;
+                    } else if (b.saldos !== a.saldos) {
+                        return b.saldos - a.saldos;
+                    } else if (b.acertos !== a.acertos) {
+                        return b.acertos - a.acertos;
+                    } else {
+                        return 0;
+                    }
+                });
+
+                classificacao[i] = vencedores;
+
+                let tbody = $(`#jogo${i} tbody`);
+                tbody.empty();
+
+                vencedores.forEach((jogador, index) => {
+                    let escudo = 'https://www.resultadismo.com/images/escudos/padrao.png';
+                    let linha = `
+                        <tr>
+                            <td>${index + 1}°</td>
+                            <td><img src="${escudo}" data-codigo="${jogador.nome}" alt="Escudo" width="30"></td>
+                            <td data-codigo="${jogador.nome}">${jogador.nome}</td>
+                            <td>${jogador.pontos}</td>
+                            <td>${jogador.cravadas}</td>
+                            <td>${jogador.saldos}</td>
+                            <td>${jogador.acertos}</td>
+                        </tr>
+                    `;
+                    tbody.append(linha);
+                });
+            }
+        }
+    }
+
+    // Final (jogo 15)
+    if (datasFases.semi.fim && dataHoje > datasFases.semi.fim) {
+        let jogoAnterior13 = classificacao[13];
+        let jogoAnterior14 = classificacao[14];
+        if (jogoAnterior13 && jogoAnterior14) {
+            let vencedores = [jogoAnterior13[0], jogoAnterior14[0]].map(jogador => {
+                let pontos = calcularPontosJogosNoPeriodo(jogador, datasFases.final.inicio, datasFases.final.fim);
+                return {
+                    ...jogador,
+                    pontos: pontos.pontuacao,
+                    cravadas: pontos.cravadas,
+                    saldos: pontos.saldos,
+                    acertos: pontos.acertos
+                };
+            });
+
+            // Ordenar jogadores por pontuação e critérios de desempate
+            vencedores.sort((a, b) => {
+                if (b.pontos !== a.pontos) {
+                    return b.pontos - a.pontos;
+                } else if (b.cravadas !== a.cravadas) {
+                    return b.cravadas - a.cravadas;
+                } else if (b.saldos !== a.saldos) {
+                    return b.saldos - a.saldos;
+                } else if (b.acertos !== a.acertos) {
+                    return b.acertos - a.acertos;
+                } else {
+                    return 0;
+                }
+            });
+
+            classificacao[15] = vencedores;
+
+            let tbody = $(`#jogo15 tbody`);
+            tbody.empty();
+
+            vencedores.forEach((jogador, index) => {
+                let escudo = 'https://www.resultadismo.com/images/escudos/padrao.png';
+                let linha = `
+                    <tr>
+                        <td>${index + 1}°</td>
+                        <td><img src="${escudo}" data-codigo="${jogador.nome}" alt="Escudo" width="30"></td>
+                        <td data-codigo="${jogador.nome}">${jogador.nome}</td>
+                        <td>${jogador.pontos}</td>
+                        <td>${jogador.cravadas}</td>
+                        <td>${jogador.saldos}</td>
+                        <td>${jogador.acertos}</td>
+                    </tr>
+                `;
+                tbody.append(linha);
+            });
+        }
+    }
 }
 
+
+
 function calcularPontosJogosNoPeriodo(jogador, dataInicial, dataFinal) {
+    
     // Inicializar os pontos do jogador
     let pontos = {
         pontuacao: 0,
@@ -220,25 +297,31 @@ function calcularPontosJogosNoPeriodo(jogador, dataInicial, dataFinal) {
 
     // Filtrar os jogos que estão dentro do período especificado
     let jogosNoPeriodo = filtrarJogosPorPeriodo(dataInicial, dataFinal);
-
+    
     // Calcular os pontos com base nos jogos filtrados
+    
     jogosNoPeriodo.forEach(jogo => {
-        if (jogador.codigo && jogo[jogador.codigo]) {
-            let palpiteJogador = jogo[jogador.codigo];
+        
+        if (jogador.nome && jogo[jogador.nome]) {
+            
+            let palpiteJogador = jogo[jogador.nome];
             if (palpiteJogador && jogo.resultado) {
                 const [golsMandanteReal, golsVisitanteReal] = jogo.resultado.split('x').map(Number);
                 const [golsMandantePalpite, golsVisitantePalpite] = palpiteJogador.split('x').map(Number);
 
                 if (golsMandantePalpite === golsMandanteReal && golsVisitantePalpite === golsVisitanteReal) {
+                    
                     pontos.pontuacao += 3;
                     pontos.cravadas += 1;
                 } else if ((golsMandantePalpite - golsVisitantePalpite) === (golsMandanteReal - golsVisitanteReal)) {
+                    
                     pontos.pontuacao += 2;
                     pontos.saldos += 1;
                 } else if (
                     (golsMandantePalpite > golsVisitantePalpite && golsMandanteReal > golsVisitanteReal) ||
                     (golsMandantePalpite < golsVisitantePalpite && golsMandanteReal < golsVisitanteReal)
                 ) {
+                    
                     pontos.pontuacao += 1;
                     pontos.acertos += 1;
                 }
@@ -248,6 +331,7 @@ function calcularPontosJogosNoPeriodo(jogador, dataInicial, dataFinal) {
 
     return pontos;
 }
+
 
 function filtrarJogosPorPeriodo(dataInicial, dataFinal) {
     if (typeof window.jogos !== 'undefined' && window.jogos.data) {
@@ -261,6 +345,8 @@ function filtrarJogosPorPeriodo(dataInicial, dataFinal) {
     }
     return [];
 }
+
+
 
 function atualizarFiltrosDatas() {
     if (datasFases.oitavas) {
