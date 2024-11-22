@@ -88,7 +88,7 @@ function atualizarTabAtiva() {
     }
 
     // Remover a classe ativa de todas as tabs e conteúdos
-    $('.nav-link').removeClass('active');
+    $('#nav-tab .nav-link').removeClass('active');
     $('.tab-pane').removeClass('show active');
 
     // Adicionar a classe ativa na tab e no conteúdo correspondente
