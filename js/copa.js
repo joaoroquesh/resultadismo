@@ -62,15 +62,24 @@ function calcularDatasFases(dadosData) {
 
 function preencherClassificacoes(dadosData) {
     let classificacao = {};
+    let dataHoje = new Date();
+    dataHoje.setFullYear(2001);
 
-    // Preencher as classificações dos jogos com os jogadores que têm o respectivo valor na chave "copa"
+    // Log para verificar dataHoje e datas das fases
+    console.log("Data de hoje:", dataHoje);
+    console.log("Datas das fases:", datasFases);
+
+    let dataHojeFormatada = dataHoje.toISOString().split('T')[0];
+
+    // Oitavas de final (jogos 1 a 8)
+
     for (let i = 1; i <= 8; i++) {
         let jogadores = dadosData.filter(jogador => jogador.copa == i);
         if (jogadores.length === 2) {
             classificacao[i] = jogadores.map(jogador => {
                 let pontos = calcularPontosJogosNoPeriodo(jogador, datasFases.oitavas.inicio, datasFases.oitavas.fim);
                 return {
-                    nome: jogador.codigo,
+                    ...jogador,
                     pontos: pontos.pontuacao,
                     cravadas: pontos.cravadas,
                     saldos: pontos.saldos,
@@ -99,25 +108,24 @@ function preencherClassificacoes(dadosData) {
             classificacao[i].forEach((jogador, index) => {
                 let escudo = 'https://www.resultadismo.com/images/escudos/padrao.png';
                 let linha = `
-                    <tr>
-                        <td>${index + 1}°</td>
-                        <td><img src="${escudo}" data-codigo="${jogador.nome}" alt="Escudo" width="30"></td>
-                        <td data-codigo="${jogador.nome}">${jogador.nome}</td>
-                        <td>${jogador.pontos}</td>
-                        <td>${jogador.cravadas}</td>
-                        <td>${jogador.saldos}</td>
-                        <td>${jogador.acertos}</td>
-                    </tr>
-                `;
+                        <tr>
+                            <td>${index + 1}°</td>
+                            <td><img src="${escudo}" data-codigo="${jogador.codigo}" alt="Escudo" width="30"></td>
+                            <td data-codigo="${jogador.codigo}">${jogador.codigo}</td>
+                            <td>${jogador.pontos}</td>
+                            <td>${jogador.cravadas}</td>
+                            <td>${jogador.saldos}</td>
+                            <td>${jogador.acertos}</td>
+                        </tr>
+                    `;
                 tbody.append(linha);
             });
         }
     }
 
-    let dataHoje = new Date();
 
     // Quartas de final (jogos 9 a 12)
-    if (datasFases.oitavas.fim && dataHoje > datasFases.oitavas.fim) {
+    if (dataHojeFormatada >= datasFases.quartas.inicio.toISOString().split('T')[0]) {
         for (let i = 9; i <= 12; i++) {
             let jogoAnterior1 = classificacao[(i - 8) * 2 - 1];
             let jogoAnterior2 = classificacao[(i - 8) * 2];
@@ -158,8 +166,8 @@ function preencherClassificacoes(dadosData) {
                     let linha = `
                         <tr>
                             <td>${index + 1}°</td>
-                            <td><img src="${escudo}" data-codigo="${jogador.nome}" alt="Escudo" width="30"></td>
-                            <td data-codigo="${jogador.nome}">${jogador.nome}</td>
+                            <td><img src="${escudo}" data-codigo="${jogador.codigo}" alt="Escudo" width="30"></td>
+                            <td data-codigo="${jogador.codigo}">${jogador.codigo}</td>
                             <td>${jogador.pontos}</td>
                             <td>${jogador.cravadas}</td>
                             <td>${jogador.saldos}</td>
@@ -173,7 +181,7 @@ function preencherClassificacoes(dadosData) {
     }
 
     // Semifinais (jogos 13 e 14)
-    if (datasFases.quartas.fim && dataHoje > datasFases.quartas.fim) {
+    if (dataHojeFormatada >= datasFases.semi.inicio.toISOString().split('T')[0]) {
         for (let i = 13; i <= 14; i++) {
             let jogoAnterior1 = classificacao[(i - 12) * 2 + 8 - 1];
             let jogoAnterior2 = classificacao[(i - 12) * 2 + 8];
@@ -214,8 +222,8 @@ function preencherClassificacoes(dadosData) {
                     let linha = `
                         <tr>
                             <td>${index + 1}°</td>
-                            <td><img src="${escudo}" data-codigo="${jogador.nome}" alt="Escudo" width="30"></td>
-                            <td data-codigo="${jogador.nome}">${jogador.nome}</td>
+                            <td><img src="${escudo}" data-codigo="${jogador.codigo}" alt="Escudo" width="30"></td>
+                            <td data-codigo="${jogador.codigo}">${jogador.codigo}</td>
                             <td>${jogador.pontos}</td>
                             <td>${jogador.cravadas}</td>
                             <td>${jogador.saldos}</td>
@@ -229,7 +237,7 @@ function preencherClassificacoes(dadosData) {
     }
 
     // Final (jogo 15)
-    if (datasFases.semi.fim && dataHoje > datasFases.semi.fim) {
+    if (dataHojeFormatada >= datasFases.final.inicio.toISOString().split('T')[0]) {
         let jogoAnterior13 = classificacao[13];
         let jogoAnterior14 = classificacao[14];
         if (jogoAnterior13 && jogoAnterior14) {
@@ -269,8 +277,8 @@ function preencherClassificacoes(dadosData) {
                 let linha = `
                     <tr>
                         <td>${index + 1}°</td>
-                        <td><img src="${escudo}" data-codigo="${jogador.nome}" alt="Escudo" width="30"></td>
-                        <td data-codigo="${jogador.nome}">${jogador.nome}</td>
+                        <td><img src="${escudo}" data-codigo="${jogador.codigo}" alt="Escudo" width="30"></td>
+                        <td data-codigo="${jogador.codigo}">${jogador.codigo}</td>
                         <td>${jogador.pontos}</td>
                         <td>${jogador.cravadas}</td>
                         <td>${jogador.saldos}</td>
@@ -284,9 +292,8 @@ function preencherClassificacoes(dadosData) {
 }
 
 
-
 function calcularPontosJogosNoPeriodo(jogador, dataInicial, dataFinal) {
-    
+
     // Inicializar os pontos do jogador
     let pontos = {
         pontuacao: 0,
@@ -297,36 +304,35 @@ function calcularPontosJogosNoPeriodo(jogador, dataInicial, dataFinal) {
 
     // Filtrar os jogos que estão dentro do período especificado
     let jogosNoPeriodo = filtrarJogosPorPeriodo(dataInicial, dataFinal);
-    
+
     // Calcular os pontos com base nos jogos filtrados
-    
     jogosNoPeriodo.forEach(jogo => {
-        
-        if (jogador.nome && jogo[jogador.nome]) {
-            
-            let palpiteJogador = jogo[jogador.nome];
+
+        if (jogador.codigo && jogo[jogador.codigo]) {
+            let palpiteJogador = jogo[jogador.codigo];
             if (palpiteJogador && jogo.resultado) {
                 const [golsMandanteReal, golsVisitanteReal] = jogo.resultado.split('x').map(Number);
                 const [golsMandantePalpite, golsVisitantePalpite] = palpiteJogador.split('x').map(Number);
 
                 if (golsMandantePalpite === golsMandanteReal && golsVisitantePalpite === golsVisitanteReal) {
-                    
+
                     pontos.pontuacao += 3;
                     pontos.cravadas += 1;
                 } else if ((golsMandantePalpite - golsVisitantePalpite) === (golsMandanteReal - golsVisitanteReal)) {
-                    
+
                     pontos.pontuacao += 2;
                     pontos.saldos += 1;
                 } else if (
                     (golsMandantePalpite > golsVisitantePalpite && golsMandanteReal > golsVisitanteReal) ||
                     (golsMandantePalpite < golsVisitantePalpite && golsMandanteReal < golsVisitanteReal)
                 ) {
-                    
+
                     pontos.pontuacao += 1;
                     pontos.acertos += 1;
                 }
             }
         }
+
     });
 
     return pontos;
@@ -336,11 +342,8 @@ function calcularPontosJogosNoPeriodo(jogador, dataInicial, dataFinal) {
 function filtrarJogosPorPeriodo(dataInicial, dataFinal) {
     if (typeof window.jogos !== 'undefined' && window.jogos.data) {
         return window.jogos.data.filter(jogo => {
-            if (jogo.data) {
-                let dataJogo = new Date(jogo.data.split('/').reverse().join('-'));
-                return dataJogo >= dataInicial && dataJogo <= dataFinal;
-            }
-            return false;
+            let dataJogo = new Date(jogo.data.split('/').reverse().join('-'));
+            return dataJogo >= dataInicial && dataJogo <= dataFinal;
         });
     }
     return [];
