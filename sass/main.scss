@@ -24,7 +24,8 @@ body {
     font-size: $font-size-sm;
   }
 }
-*{
+
+* {
   transition: var(--transition-1);
 }
 
@@ -198,7 +199,7 @@ button {
       &:before {
         --minus-size: 16px;
         content: "";
-        
+
         background-image: url('data:image/svg+xml,%3Csvg id="arrow" viewBox="0 0 16 16" height="24px" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath class="st0" fill="%23232323" d="M7.3,10.4l-3.8-3.9c-.3-.3-.3-.8,0-1.1s.8-.3,1.1,0l3.5,3.5,3.5-3.5c.3-.3.8-.3,1.1,0s.3.8,0,1.1l-4,4c-.1.1-.3.3-.6.3s-.6-.2-.8-.4Z"/%3E%3C/svg%3E');
         background-repeat: no-repeat;
         background-size: cover;
@@ -217,6 +218,7 @@ button {
 
       &.collapsed {
         color: $dark;
+
         &:before {
           rotate: 0deg;
         }
@@ -263,9 +265,9 @@ button {
 
   }
 
-  .classificacao-divisao{
-    tbody{
-      tr{
+  .classificacao-divisao {
+    tbody {
+      tr {
         &:nth-last-child(2) {
           color: $danger-dark !important;
 
@@ -280,7 +282,8 @@ button {
           }
         }
 
-        &:nth-last-child(1), &:nth-child(n+7) {
+        &:nth-last-child(1),
+        &:nth-child(n+7) {
           color: $danger !important;
 
           td {
@@ -296,6 +299,7 @@ button {
       }
     }
   }
+
   .table {
     // display: inline !important;
     color: $dark;
@@ -517,19 +521,115 @@ button {
   }
 }
 
-#copa{
-  .navegacao{
+#copa {
+  .navegacao {
 
     nav {
 
-      .nav-link{
+      .nav-link {
         width: 25%;
+
+        &.final {
+          &.active {
+            color: $cravada;
+            border-bottom: 2px solid $cravada !important;
+          }
+        }
       }
     }
   }
+
   .selecao {
-    &:after, &:before{
+
+    &:after,
+    &:before {
       display: none;
+    }
+
+    &.vencedor {
+
+      tbody {
+        tr {
+          &:nth-child(1) {
+            outline: 2px solid $primary;
+            background: $primary;
+
+            td {
+
+              &:nth-child(3),
+              &:nth-child(4),
+              &:nth-child(5) {
+                color: $light !important;
+              }
+            }
+          }
+        }
+      }
+
+      &#nav-final {
+        tbody {
+          tr {
+            &:nth-child(1) {
+              outline: 2px solid $cravada;
+              background: $cravada;
+
+              td {
+
+                &:nth-child(3),
+                &:nth-child(4),
+                &:nth-child(5) {
+                  color: $light !important;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    &.andamento {
+
+      tbody {
+        tr {
+          &:nth-child(1) {
+            outline: 2px solid $primary;
+            // background: $primary;
+
+            td {
+
+              &:nth-child(3),
+              &:nth-child(4) {
+                //  color: $light!important;
+              }
+            }
+          }
+        }
+      }
+
+      &#nav-final {
+        tbody {
+          tr {
+            &:nth-child(1) {
+              outline: 2px solid $cravada;
+              // background: $cravada;
+
+              td {
+
+                &:nth-child(3),
+                &:nth-child(4) {
+                  //  color: $dark!important;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .nav-link {
+      &.final {
+        border: 1px solid $cravada !important;
+      }
     }
   }
 
@@ -555,7 +655,7 @@ button {
 
       th {
         position: relative;
-        padding-block: 0.25rem!important;
+        padding-block: 0.25rem !important;
 
         &::after {
           position: absolute;
@@ -621,17 +721,6 @@ button {
         box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
         border-radius: $size-2;
 
-        &.vencedor{
-         outline: 2px solid $primary;   
-         background: $primary;
-
-         td{
-          &:nth-child(3), &:nth-child(4) {
-            color: $light!important;
-          }
-         }
-        }
-
         td {
           line-height: $line-height-tight;
           border: 0;
@@ -662,7 +751,8 @@ button {
               }
             }
           }
-          &:nth-last-child(1){
+
+          &:nth-last-child(1) {
             border-radius: 0 $size-2 $size-2 0;
           }
         }
@@ -774,10 +864,11 @@ button {
   }
 
   .card {
-    
-    *{
+
+    * {
       transition: var(--transition-1);
     }
+
     &-game {
       padding: $size-3;
       gap: $size-3;
@@ -856,7 +947,7 @@ button {
             &:before {
               --minus-size: 16px;
               content: "";
-              
+
               background-image: url('data:image/svg+xml,%3Csvg id="arrow" viewBox="0 0 16 16" height="24px" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath class="st0" fill="%23232323" d="M7.3,10.4l-3.8-3.9c-.3-.3-.3-.8,0-1.1s.8-.3,1.1,0l3.5,3.5,3.5-3.5c.3-.3.8-.3,1.1,0s.3.8,0,1.1l-4,4c-.1.1-.3.3-.6.3s-.6-.2-.8-.4Z"/%3E%3C/svg%3E');
               background-repeat: no-repeat;
               background-size: cover;
@@ -887,6 +978,7 @@ button {
 
           table {
             margin: 0;
+
             td {
               vertical-align: middle;
               text-align: center;
@@ -1157,27 +1249,29 @@ button {
       right: -2px;
       background: linear-gradient(to right, transparent 0%, $light 80%);
     }
+
     &:before {
       left: -2px;
       background: linear-gradient(to left, transparent 0%, $light 80%);
     }
-  
-  
+
+
     .nav-pills {
 
       flex-direction: row-reverse;
-  
+
 
       .nav-item {
-  
-        &:nth-child(1){
+
+        &:nth-child(1) {
           margin-right: 42px;
         }
-        &:nth-last-child(1){
+
+        &:nth-last-child(1) {
           margin-left: 42px;
         }
       }
-  
+
     }
   }
 
@@ -1221,7 +1315,8 @@ button {
 
   /* width */
 
-  &:after, &:before {
+  &:after,
+  &:before {
     content: '';
     position: absolute;
     top: 0;

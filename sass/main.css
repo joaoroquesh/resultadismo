@@ -1956,8 +1956,35 @@ button:focus, button:focus-visible {
 #copa .navegacao nav .nav-link {
   width: 25%;
 }
+#copa .navegacao nav .nav-link.final.active {
+  color: var(--pizza-600);
+  border-bottom: 2px solid var(--pizza-600) !important;
+}
 #copa .selecao:after, #copa .selecao:before {
   display: none;
+}
+#copa .selecao.vencedor tbody tr:nth-child(1) {
+  outline: 2px solid var(--turquoise-600);
+  background: var(--turquoise-600);
+}
+#copa .selecao.vencedor tbody tr:nth-child(1) td:nth-child(3), #copa .selecao.vencedor tbody tr:nth-child(1) td:nth-child(4), #copa .selecao.vencedor tbody tr:nth-child(1) td:nth-child(5) {
+  color: var(--star-dust-100) !important;
+}
+#copa .selecao.vencedor#nav-final tbody tr:nth-child(1) {
+  outline: 2px solid var(--pizza-600);
+  background: var(--pizza-600);
+}
+#copa .selecao.vencedor#nav-final tbody tr:nth-child(1) td:nth-child(3), #copa .selecao.vencedor#nav-final tbody tr:nth-child(1) td:nth-child(4), #copa .selecao.vencedor#nav-final tbody tr:nth-child(1) td:nth-child(5) {
+  color: var(--star-dust-100) !important;
+}
+#copa .selecao.andamento tbody tr:nth-child(1) {
+  outline: 2px solid var(--turquoise-600);
+}
+#copa .selecao.andamento#nav-final tbody tr:nth-child(1) {
+  outline: 2px solid var(--pizza-600);
+}
+#copa .selecao .nav-link.final {
+  border: 1px solid var(--pizza-600) !important;
 }
 #copa #content-space {
   height: 56px;
@@ -2026,13 +2053,6 @@ button:focus, button:focus-visible {
 #copa .table tbody tr {
   box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
   border-radius: var(--size-2);
-}
-#copa .table tbody tr.vencedor {
-  outline: 2px solid var(--turquoise-600);
-  background: var(--turquoise-600);
-}
-#copa .table tbody tr.vencedor td:nth-child(3), #copa .table tbody tr.vencedor td:nth-child(4) {
-  color: var(--star-dust-100) !important;
 }
 #copa .table tbody tr td {
   line-height: var(--line-height-tight);

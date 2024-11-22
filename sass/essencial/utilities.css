@@ -233,6 +233,7 @@
   --box-shadow-xs: 0 2px 4px rgba(128, 128, 128, 0.2);
   --box-shadow-sm: 0 2px 8px rgba(128, 128, 128, 0.2);
   --primary:var(--turquoise-600);
+  --secondary: var(--star-dust-950);
 }
 
 .btn-click-sm {

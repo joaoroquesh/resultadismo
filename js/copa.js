@@ -4,6 +4,8 @@ $(document).ready(function () {
             calcularDatasFases(window.dados.data);
             preencherClassificacoes(window.dados.data);
             atualizarFiltrosDatas();
+            atualizarTabAtiva();
+            atualizarVencedorTabs();
         } else {
             console.error("Os dados dos jogos não foram carregados corretamente.");
         }
@@ -19,6 +21,8 @@ $(document).ready(function () {
                 calcularDatasFases(window.dados.data);
                 preencherClassificacoes(window.dados.data);
                 atualizarFiltrosDatas();
+                atualizarTabAtiva();
+                atualizarVencedorTabs();
             }
             $('body').removeClass('loading');
             console.log("Todos os dados foram atualizados.");
@@ -56,9 +60,61 @@ function calcularDatasFases(dadosData) {
             semi: { inicio: dataInicioSemi, fim: dataFimSemi },
             final: { inicio: dataInicioFinal, fim: dataFimFinal }
         };
+        console.log("Datas das fases calculadas:", datasFases);
     }
 }
 
+function atualizarTabAtiva() {
+    let dataHoje = new Date();
+    dataHoje.setFullYear(2001);
+    let dataHojeFormatada = dataHoje.toISOString().split('T')[0];
+
+    let tabAtiva = '#nav-oitavas-tab';
+
+    if (dataHojeFormatada >= datasFases.oitavas.inicio.toISOString().split('T')[0] && dataHojeFormatada <= datasFases.oitavas.fim.toISOString().split('T')[0]) {
+        $('#nav-oitavas').addClass('andamento');
+    }
+    if (dataHojeFormatada >= datasFases.quartas.inicio.toISOString().split('T')[0] && dataHojeFormatada <= datasFases.quartas.fim.toISOString().split('T')[0]) {
+        tabAtiva = '#nav-quartas-tab';
+        $('#nav-quartas').addClass('andamento');
+    } else if (dataHojeFormatada >= datasFases.semi.inicio.toISOString().split('T')[0] && dataHojeFormatada <= datasFases.semi.fim.toISOString().split('T')[0]) {
+        tabAtiva = '#nav-semi-tab';
+        $('#nav-semi').addClass('andamento');
+    } else if (dataHojeFormatada >= datasFases.final.inicio.toISOString().split('T')[0] && dataHojeFormatada <= datasFases.final.fim.toISOString().split('T')[0]) {
+        tabAtiva = '#nav-final-tab';
+        $('#nav-final').addClass('andamento');
+    } else if (dataHojeFormatada > datasFases.final.fim.toISOString().split('T')[0]) {
+        tabAtiva = '#nav-final-tab';
+    }
+
+    // Remover a classe ativa de todas as tabs e conteúdos
+    $('.nav-link').removeClass('active');
+    $('.tab-pane').removeClass('show active');
+
+    // Adicionar a classe ativa na tab e no conteúdo correspondente
+    $(tabAtiva).addClass('active');
+    $($(tabAtiva).data('target')).addClass('show active');
+}
+
+function atualizarVencedorTabs() {
+    let dataHoje = new Date();
+    dataHoje.setFullYear(2001);
+    let dataHojeFormatada = dataHoje.toISOString().split('T')[0];
+
+    // Adicionar a classe vencedor se a fase já terminou
+    if (dataHojeFormatada > datasFases.oitavas.fim.toISOString().split('T')[0]) {
+        $('#nav-oitavas').addClass('vencedor');
+    }
+    if (dataHojeFormatada > datasFases.quartas.fim.toISOString().split('T')[0]) {
+        $('#nav-quartas').addClass('vencedor');
+    }
+    if (dataHojeFormatada > datasFases.semi.fim.toISOString().split('T')[0]) {
+        $('#nav-semi').addClass('vencedor');
+    }
+    if (dataHojeFormatada > datasFases.final.fim.toISOString().split('T')[0]) {
+        $('#nav-final').addClass('vencedor');
+    }
+}
 
 function preencherClassificacoes(dadosData) {
     let classificacao = {};
