@@ -1717,6 +1717,7 @@ button:focus, button:focus-visible {
 #regras .accordion-button {
   position: relative;
   color: var(--turquoise-600);
+  padding-right: 2.5rem;
 }
 #regras .accordion-button:before {
   --minus-size: 16px;

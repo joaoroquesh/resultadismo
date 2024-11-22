@@ -194,7 +194,7 @@ button {
     &-button {
       position: relative;
       color: $primary;
-
+      padding-right: 2.5rem;
 
       &:before {
         --minus-size: 16px;
