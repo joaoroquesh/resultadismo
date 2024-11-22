@@ -555,12 +555,8 @@ button {
             background: $primary;
 
             td {
-
-              &:nth-child(3),
-              &:nth-child(4),
-              &:nth-child(5) {
                 color: $light !important;
-              }
+              
             }
           }
         }
@@ -574,12 +570,7 @@ button {
               background: $cravada;
 
               td {
-
-                &:nth-child(3),
-                &:nth-child(4),
-                &:nth-child(5) {
                   color: $light !important;
-                }
               }
             }
           }

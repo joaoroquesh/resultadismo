@@ -1967,14 +1967,14 @@ button:focus, button:focus-visible {
   outline: 2px solid var(--turquoise-600);
   background: var(--turquoise-600);
 }
-#copa .selecao.vencedor tbody tr:nth-child(1) td:nth-child(3), #copa .selecao.vencedor tbody tr:nth-child(1) td:nth-child(4), #copa .selecao.vencedor tbody tr:nth-child(1) td:nth-child(5) {
+#copa .selecao.vencedor tbody tr:nth-child(1) td {
   color: var(--star-dust-100) !important;
 }
 #copa .selecao.vencedor#nav-final tbody tr:nth-child(1) {
   outline: 2px solid var(--pizza-600);
   background: var(--pizza-600);
 }
-#copa .selecao.vencedor#nav-final tbody tr:nth-child(1) td:nth-child(3), #copa .selecao.vencedor#nav-final tbody tr:nth-child(1) td:nth-child(4), #copa .selecao.vencedor#nav-final tbody tr:nth-child(1) td:nth-child(5) {
+#copa .selecao.vencedor#nav-final tbody tr:nth-child(1) td {
   color: var(--star-dust-100) !important;
 }
 #copa .selecao.andamento tbody tr:nth-child(1) {
