@@ -56,7 +56,8 @@ $(document).ready(function () {
             }
             
             // Ocultar o elemento de carregamento quando tudo estiver atualizado
-            // $('body').removeClass('loading');
+            $('body').removeClass('loading');
+            $('body').removeClass('atualizando');
             console.log("Todos os dados foram atualizados.");
         }
     });
