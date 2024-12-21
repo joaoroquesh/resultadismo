@@ -1,34 +1,11 @@
 $(document).ready(function () {
-    $(document).on('jogosPronto', function () {
-        if (typeof window.jogos !== 'undefined' && window.jogos.data) {
-            listarMesAtual();
-            construirClassificacaoPorDivisaoFiltradaPorMes(window.jogos.data, window.dados.data, 'A');
-            ativarControleVisualizacao();
-            atualizarElementosGlobais(window.dados);
-        } else {
-            console.error("Os dados dos jogos não foram carregados corretamente.");
-        }
-    });
-    
-    // Contador de JSONs carregados
-    let carregados = 0;
-  
-    $(document).on('dadosAtualizado pontosAtualizado jogosAtualizado', function () {
-        carregados++;
-        if (carregados === 3) {
-            if (typeof window.dados !== 'undefined' && window.dados.data) {
-                atualizarElementosGlobais(window.dados);
-            }
-            if (typeof window.jogos !== 'undefined' && window.jogos.data) {
-                listarMesAtual();
-                construirClassificacaoPorDivisaoFiltradaPorMes(window.jogos.data, window.dados.data, 'A');
-                ativarControleVisualizacao();
-                atualizarElementosGlobais(window.dados);
-            }
-            $('body').removeClass('loading');
-            console.log("Todos os dados foram atualizados.");
-        }
-    });
+    if (!window.pageFunctions) window.pageFunctions = {};
+    window.pageFunctions.classificacao = [
+        listarMesAtual,
+        () => construirClassificacaoPorDivisaoFiltradaPorMes(window.jogos.data, window.dados.data, 'A'),
+        ativarControleVisualizacao,
+        () => atualizarElementosGlobais(window.dados),
+    ];
 });
 
 function listarMesAtual() {

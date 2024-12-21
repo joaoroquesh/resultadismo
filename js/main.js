@@ -124,9 +124,3 @@ $(document).on('dadosProntos', function() {
         atualizarElementosGlobais(window.dados);
     }
 });
-
-
-
-  
-  
-  

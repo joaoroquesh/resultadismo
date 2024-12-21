@@ -2178,6 +2178,7 @@ button:focus, button:focus-visible {
   width: 30%;
   position: relative;
   padding: var(--size-2);
+  text-align: center;
 }
 #jogos .card-game-result-team-name {
   position: absolute;
@@ -2582,22 +2583,6 @@ footer a:hover {
 .loading * {
   transition: var(--transition-2);
 }
-.loading #carregando {
-  z-index: 999;
-  display: block;
-  position: fixed;
-  bottom: 1rem;
-  left: 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--turquoise-600);
-  width: calc(100% - 32px);
-}
-@media (max-width: 992px) {
-  .loading #carregando {
-    bottom: calc(1rem + 70px);
-  }
-}
 .loading .skeleton {
   position: relative;
   overflow: hidden;
@@ -2634,6 +2619,38 @@ footer a:hover {
   }
   100% {
     left: 150%;
+  }
+}
+
+.atualizando #carregando {
+  z-index: 999;
+  display: block;
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--turquoise-600);
+  width: calc(100% - 32px);
+}
+.atualizando #carregando.erro svg, .atualizando #carregando.success svg {
+  width: 32px;
+  height: 32px;
+}
+.atualizando #carregando.erro {
+  border: 1px solid var(--punch-700);
+  fill: var(--punch-700);
+}
+.atualizando #carregando.success {
+  border: 1px solid var(--pizza-600);
+  fill: var(--pizza-600);
+}
+.atualizando #carregando-text {
+  color: var(--star-dust-950);
+}
+@media (max-width: 992px) {
+  .atualizando #carregando {
+    bottom: calc(1rem + 70px);
   }
 }
 
