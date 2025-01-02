@@ -1,44 +1,13 @@
-$(document).ready(function () {
-  $(document).on('jogosPronto', function () {
-    if (typeof window.dados !== 'undefined' && window.dados.data) {
-      atualizarElementosGlobais(window.dados);
-    }
-    if (typeof window.jogos !== 'undefined' && window.jogos.data) {
-      // debugger
-      gerarNavegacao(window.jogos.data);
-      // listarJogos(window.jogos.data);
-      ativarControleVisualizacaoJogos();
-      atualizarElementosGlobais(window.dados);
-      selecionarDiaHoje(true);
-    } else {
-      console.error("Os dados dos jogos não foram carregados corretamente.");
-    }
-  });
 
-  // Contador de JSONs carregados
-  let carregados = 0;
-  
-  $(document).on('dadosAtualizado pontosAtualizado jogosAtualizado', function () {
-    carregados++;
-    if (carregados === 3) {
-      if (typeof window.dados !== 'undefined' && window.dados.data) {
-        atualizarElementosGlobais(window.dados);
-      }
-      if (typeof window.pontos !== 'undefined' && window.pontos.data) {
 
-      }
-      if (typeof window.jogos !== 'undefined' && window.jogos.data) {
-        gerarNavegacao(window.jogos.data);
-        // listarJogos(window.jogos.data);
-        ativarControleVisualizacaoJogos();
-        atualizarElementosGlobais(window.dados);
-        selecionarDiaHoje(true);
-      }
-      $('body').removeClass('loading');
-      console.log("Todos os dados foram atualizados.");
-    }
-  });
-});
+function executarFuncoesPagina() {
+  atualizarElementosGlobais(window.dados);
+  gerarNavegacao(window.jogos.data);
+  // listarJogos(window.jogos.data);
+  ativarControleVisualizacaoJogos();
+  atualizarElementosGlobais(window.dados);
+  selecionarDiaHoje(true);
+}
 
 function gerarNavegacao(jogosData) {
   let mesesDisponiveis = new Set();
@@ -313,7 +282,7 @@ function selecionarDiaHoje(isInitialLoad = false) {
 
       diasDisponiveis.each(function () {
         const dia = $(this).text().trim().split(' ')[1];
-        
+
         // Priorizar o dia exato, se disponível
         if (parseInt(dia) === parseInt(diaHoje)) {
           diaMaisProximo = $(this);
@@ -350,68 +319,68 @@ function listarPalpites(jogo) {
   let resultadoReal = jogo.resultado;
 
   for (let chave in jogo) {
-      if (chave.includes('@') && jogo[chave] !== "") {
-          let palpiteJogador = jogo[chave];
-          let classePontuacao = '';
-          let pontos = 0;
+    if (chave.includes('@') && jogo[chave] !== "") {
+      let palpiteJogador = jogo[chave];
+      let classePontuacao = '';
+      let pontos = 0;
 
-          if (resultadoReal && palpiteJogador && resultadoReal !== '-') {
-              const [golsMandanteReal, golsVisitanteReal] = resultadoReal.split('x').map(Number);
-              const [golsMandantePalpite, golsVisitantePalpite] = palpiteJogador.split('x').map(Number);
+      if (resultadoReal && palpiteJogador && resultadoReal !== '-') {
+        const [golsMandanteReal, golsVisitanteReal] = resultadoReal.split('x').map(Number);
+        const [golsMandantePalpite, golsVisitantePalpite] = palpiteJogador.split('x').map(Number);
 
-              if (golsMandantePalpite === golsMandanteReal && golsVisitantePalpite === golsVisitanteReal) {
-                  classePontuacao = 'cravada';
-                  pontos = 3;
-              } else if ((golsMandantePalpite - golsVisitantePalpite) === (golsMandanteReal - golsVisitanteReal) && (golsMandantePalpite > golsVisitantePalpite) === (golsMandanteReal > golsVisitanteReal)) {
-                  classePontuacao = 'saldo';
-                  pontos = 2;
-              } else if (
-                (golsMandantePalpite > golsVisitantePalpite && golsMandanteReal > golsVisitanteReal) ||
-                (golsMandantePalpite < golsVisitantePalpite && golsMandanteReal < golsVisitanteReal)
-              ) {
-                  if (golsMandanteReal !== golsVisitanteReal) { // Não é um empate
-                      classePontuacao = 'acerto';
-                      pontos = 1;
-                  }
-              }
+        if (golsMandantePalpite === golsMandanteReal && golsVisitantePalpite === golsVisitanteReal) {
+          classePontuacao = 'cravada';
+          pontos = 3;
+        } else if ((golsMandantePalpite - golsVisitantePalpite) === (golsMandanteReal - golsVisitanteReal) && (golsMandantePalpite > golsVisitantePalpite) === (golsMandanteReal > golsVisitanteReal)) {
+          classePontuacao = 'saldo';
+          pontos = 2;
+        } else if (
+          (golsMandantePalpite > golsVisitantePalpite && golsMandanteReal > golsVisitanteReal) ||
+          (golsMandantePalpite < golsVisitantePalpite && golsMandanteReal < golsVisitanteReal)
+        ) {
+          if (golsMandanteReal !== golsVisitanteReal) { // Não é um empate
+            classePontuacao = 'acerto';
+            pontos = 1;
           }
-
-          palpites.push({
-              chave,
-              palpite: jogo[chave],
-              classePontuacao,
-              pontos,
-              golsMandantePalpite: parseInt(palpiteJogador.split('x')[0]),
-              golsVisitantePalpite: parseInt(palpiteJogador.split('x')[1])
-          });
+        }
       }
+
+      palpites.push({
+        chave,
+        palpite: jogo[chave],
+        classePontuacao,
+        pontos,
+        golsMandantePalpite: parseInt(palpiteJogador.split('x')[0]),
+        golsVisitantePalpite: parseInt(palpiteJogador.split('x')[1])
+      });
+    }
   }
 
   // Ordenar palpites por pontuação e critérios de desempate
   palpites.sort((a, b) => {
-      if (b.pontos !== a.pontos) {
-          return b.pontos - a.pontos;
-      }
-      // Critério de desempate: Vitória do mandante, empate, vitória do visitante
-      const saldoGolsA = a.golsMandantePalpite - a.golsVisitantePalpite;
-      const saldoGolsB = b.golsMandantePalpite - b.golsVisitantePalpite;
+    if (b.pontos !== a.pontos) {
+      return b.pontos - a.pontos;
+    }
+    // Critério de desempate: Vitória do mandante, empate, vitória do visitante
+    const saldoGolsA = a.golsMandantePalpite - a.golsVisitantePalpite;
+    const saldoGolsB = b.golsMandantePalpite - b.golsVisitantePalpite;
 
-      if (saldoGolsB !== saldoGolsA) {
-          return saldoGolsB - saldoGolsA;
-      }
-      // Se o saldo for igual, verificar a quantidade de gols do mandante
-      if (a.golsMandantePalpite !== b.golsMandantePalpite) {
-          return b.golsMandantePalpite - a.golsMandantePalpite;
-      }
-      // Caso sejam empates, verificar a quantidade de gols totais
-      const totalGolsA = a.golsMandantePalpite + a.golsVisitantePalpite;
-      const totalGolsB = b.golsMandantePalpite + b.golsVisitantePalpite;
-      return totalGolsB - totalGolsA;
+    if (saldoGolsB !== saldoGolsA) {
+      return saldoGolsB - saldoGolsA;
+    }
+    // Se o saldo for igual, verificar a quantidade de gols do mandante
+    if (a.golsMandantePalpite !== b.golsMandantePalpite) {
+      return b.golsMandantePalpite - a.golsMandantePalpite;
+    }
+    // Caso sejam empates, verificar a quantidade de gols totais
+    const totalGolsA = a.golsMandantePalpite + a.golsVisitantePalpite;
+    const totalGolsB = b.golsMandantePalpite + b.golsVisitantePalpite;
+    return totalGolsB - totalGolsA;
   });
 
   // Construir HTML dos palpites
   let palpitesHTML = palpites.map(({ chave, palpite, classePontuacao }) => {
-      return `
+    return `
           <tr>
               <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${chave}" alt="Escudo" width="32"></td>
               <td data-codigo="${chave}"></td>
@@ -421,6 +390,34 @@ function listarPalpites(jogo) {
   }).join('');
 
   return palpitesHTML;
+}
+
+function atualizarElementosGlobais(dados) {
+  // Verificar se os dados e a chave 'data' estão definidos
+  if (!dados || !Array.isArray(dados.data)) {
+    console.error("Os dados fornecidos são inválidos ou estão indefinidos.");
+    return;
+  }
+
+  // Iterar sobre todos os elementos que tenham o atributo data-codigo
+  $('[data-codigo]').each(function () {
+    const codigo = $(this).data('codigo');
+    const elemento = $(this);
+
+    // Percorrer todos os itens disponíveis nos dados
+    dados.data.forEach(item => {
+      // Comparar o código do elemento com o código no item
+      if (item.codigo === codigo) {
+        if (elemento.is('img')) {
+          // Se for uma tag img, definir o atributo src como a URL da imagem
+          elemento.attr('src', item.imagem);
+        } else {
+          // Se não for uma tag img, definir o texto do elemento como o nome
+          elemento.text(item.nome);
+        }
+      }
+    });
+  });
 }
 
 

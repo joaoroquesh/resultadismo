@@ -17,9 +17,6 @@ $(document).ready(function () {
         carregados++;
         if (carregados === 3) {
             if (typeof window.dados !== 'undefined' && window.dados.data) {
-                atualizarElementosGlobais(window.dados);
-            }
-            if (typeof window.jogos !== 'undefined' && window.jogos.data) {                
                 listarCampeonatos(window.jogos.data);
                 construirClassificacao(window.jogos.data);
                 ativarControleVisualizacao();
@@ -30,10 +27,19 @@ $(document).ready(function () {
         }
     });
 
+    
+});
+
+function executarFuncoesPagina() {
+    atualizarElementosGlobais(window.dados);
+    listarCampeonatos(window.jogos.data);
+    construirClassificacao(window.jogos.data);
+    ativarControleVisualizacao();
+    
     // Definir aba de visualização inicial como 'nav-geral-tab'
     $('#nav-geral-tab').click();
     $('#nav-geral-tab').trigger('click');
-});
+}
 
 function construirClassificacao(jogosData) {
     let classificacao = {};
@@ -353,22 +359,49 @@ function ativarControleVisualizacao() {
     });
 
     // Filtrar classificação com base no campeonato clicado
-$('#filtroCampeonato').on('click', '.nav-link', function () {
-    const campeonatoSelecionado = $(this).text();
-    const codigoSelecionado = $(this).attr('id').split('-')[1];
-    
-    // Filtrar os jogos do campeonato selecionado
-    let jogosFiltrados = window.jogos.data.filter(jogo => jogo.codigo.slice(0, 2) === codigoSelecionado);
+    $('#filtroCampeonato').on('click', '.nav-link', function () {
+        const campeonatoSelecionado = $(this).text();
+        const codigoSelecionado = $(this).attr('id').split('-')[1];
 
-    // Verificar se o campeonato é liberado ou fechado
-    if ($(this).hasClass('liberado')) {
-        construirClassificacaofinal(jogosFiltrados);
-        $('.p-1').attr('id', 'classificacao');
-    } else {
-        construirClassificacao(jogosFiltrados);
-        $('.p-1').removeAttr('id');
-    }
-});
+        // Filtrar os jogos do campeonato selecionado
+        let jogosFiltrados = window.jogos.data.filter(jogo => jogo.codigo.slice(0, 2) === codigoSelecionado);
+
+        // Verificar se o campeonato é liberado ou fechado
+        if ($(this).hasClass('liberado')) {
+            construirClassificacaofinal(jogosFiltrados);
+            $('.p-1').attr('id', 'classificacao');
+        } else {
+            construirClassificacao(jogosFiltrados);
+            $('.p-1').removeAttr('id');
+        }
+    });
 
 }
 
+function atualizarElementosGlobais(dados) {
+    // Verificar se os dados e a chave 'data' estão definidos
+    if (!dados || !Array.isArray(dados.data)) {
+        console.error("Os dados fornecidos são inválidos ou estão indefinidos.");
+        return;
+    }
+
+    // Iterar sobre todos os elementos que tenham o atributo data-codigo
+    $('[data-codigo]').each(function () {
+        const codigo = $(this).data('codigo');
+        const elemento = $(this);
+
+        // Percorrer todos os itens disponíveis nos dados
+        dados.data.forEach(item => {
+            // Comparar o código do elemento com o código no item
+            if (item.codigo === codigo) {
+                if (elemento.is('img')) {
+                    // Se for uma tag img, definir o atributo src como a URL da imagem
+                    elemento.attr('src', item.imagem);
+                } else {
+                    // Se não for uma tag img, definir o texto do elemento como o nome
+                    elemento.text(item.nome);
+                }
+            }
+        });
+    });
+}

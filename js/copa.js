@@ -1,40 +1,22 @@
-$(document).ready(function () {
-    $(document).on('jogosPronto', function () {
-        if (typeof window.jogos !== 'undefined' && window.jogos.data) {
-            calcularDatasFases(window.dados.data);
-            preencherClassificacoes(window.dados.data);
-            atualizarFiltrosDatas();
-            atualizarTabAtiva();
-            atualizarVencedorTabs();
-        } else {
-            console.error("Os dados dos jogos não foram carregados corretamente.");
-        }
-    });
 
-    // Contador de JSONs carregados
-    let carregados = 0;
 
-    $(document).on('dadosAtualizado pontosAtualizado jogosAtualizado', function () {
-        carregados++;
-        if (carregados === 3) {
-            if (typeof window.dados !== 'undefined' && window.dados.data) {
-                calcularDatasFases(window.dados.data);
-                preencherClassificacoes(window.dados.data);
-                atualizarFiltrosDatas();
-                atualizarTabAtiva();
-                atualizarVencedorTabs();
-            }
-            $('body').removeClass('loading');
-            console.log("Todos os dados foram atualizados.");
-        }
-    });
-});
+function executarFuncoesPagina() {
+    calcularDatasFases(window.dados.data);
+    preencherClassificacoes(window.dados.data);
+    atualizarFiltrosDatas();
+    atualizarTabAtiva();
+    atualizarVencedorTabs();
+    atualizarElementosGlobais(window.dados);
 
-function ajustarAnoPara2024(data) {
+}
+
+
+
+function ajustarAnoPara2025(data) {
     if (!(data instanceof Date)) {
         data = new Date(data);
     }
-    data.setFullYear(2024);
+    data.setFullYear(2025);
     return data;
 }
 
@@ -43,23 +25,23 @@ let datasFases = {};
 function calcularDatasFases(dadosData) {
     let jogadorComData = dadosData.find(item => item.codigo === 'CP');
     if (jogadorComData && jogadorComData.copa) {
-        let dataInicioOitavas = ajustarAnoPara2024(new Date(jogadorComData.copa.split('/').reverse().join('-')));
-        let dataFimOitavas = ajustarAnoPara2024(new Date(dataInicioOitavas));
+        let dataInicioOitavas = ajustarAnoPara2025(new Date(jogadorComData.copa.split('/').reverse().join('-')));
+        let dataFimOitavas = ajustarAnoPara2025(new Date(dataInicioOitavas));
         dataFimOitavas.setDate(dataFimOitavas.getDate() + 6);
 
-        let dataInicioQuartas = ajustarAnoPara2024(new Date(dataFimOitavas));
+        let dataInicioQuartas = ajustarAnoPara2025(new Date(dataFimOitavas));
         dataInicioQuartas.setDate(dataInicioQuartas.getDate() + 1);
-        let dataFimQuartas = ajustarAnoPara2024(new Date(dataInicioQuartas));
+        let dataFimQuartas = ajustarAnoPara2025(new Date(dataInicioQuartas));
         dataFimQuartas.setDate(dataFimQuartas.getDate() + 6);
 
-        let dataInicioSemi = ajustarAnoPara2024(new Date(dataFimQuartas));
+        let dataInicioSemi = ajustarAnoPara2025(new Date(dataFimQuartas));
         dataInicioSemi.setDate(dataInicioSemi.getDate() + 1);
-        let dataFimSemi = ajustarAnoPara2024(new Date(dataInicioSemi));
+        let dataFimSemi = ajustarAnoPara2025(new Date(dataInicioSemi));
         dataFimSemi.setDate(dataFimSemi.getDate() + 6);
 
-        let dataInicioFinal = ajustarAnoPara2024(new Date(dataFimSemi));
+        let dataInicioFinal = ajustarAnoPara2025(new Date(dataFimSemi));
         dataInicioFinal.setDate(dataInicioFinal.getDate() + 1);
-        let dataFimFinal = ajustarAnoPara2024(new Date(dataInicioFinal));
+        let dataFimFinal = ajustarAnoPara2025(new Date(dataInicioFinal));
         dataFimFinal.setDate(dataFimFinal.getDate() + 6);
 
 
@@ -75,7 +57,7 @@ function calcularDatasFases(dadosData) {
 
 function atualizarTabAtiva() {
     let dataHoje = new Date();
-    dataHoje.setFullYear(2024);
+    dataHoje.setFullYear(2025);
     let dataHojeFormatada = dataHoje.toISOString().split('T')[0];
 
     let tabAtiva = '#nav-oitavas-tab';
@@ -106,28 +88,28 @@ function atualizarTabAtiva() {
 }
 
 function atualizarVencedorTabs() {
-    let dataHoje = ajustarAnoPara2024(new Date());
-let dataHojeFormatada = dataHoje.toISOString().split('T')[0];
+    let dataHoje = ajustarAnoPara2025(new Date());
+    let dataHojeFormatada = dataHoje.toISOString().split('T')[0];
 
-if (dataHojeFormatada > ajustarAnoPara2024(datasFases.oitavas.fim).toISOString().split('T')[0]) {
-    $('#nav-oitavas').addClass('vencedor');
-}
-if (dataHojeFormatada > ajustarAnoPara2024(datasFases.quartas.fim).toISOString().split('T')[0]) {
-    $('#nav-quartas').addClass('vencedor');
-}
-if (dataHojeFormatada > ajustarAnoPara2024(datasFases.semi.fim).toISOString().split('T')[0]) {
-    $('#nav-semi').addClass('vencedor');
-}
-if (dataHojeFormatada > ajustarAnoPara2024(datasFases.final.fim).toISOString().split('T')[0]) {
-    $('#nav-final').addClass('vencedor');
-}
+    if (dataHojeFormatada > ajustarAnoPara2025(datasFases.oitavas.fim).toISOString().split('T')[0]) {
+        $('#nav-oitavas').addClass('vencedor');
+    }
+    if (dataHojeFormatada > ajustarAnoPara2025(datasFases.quartas.fim).toISOString().split('T')[0]) {
+        $('#nav-quartas').addClass('vencedor');
+    }
+    if (dataHojeFormatada > ajustarAnoPara2025(datasFases.semi.fim).toISOString().split('T')[0]) {
+        $('#nav-semi').addClass('vencedor');
+    }
+    if (dataHojeFormatada > ajustarAnoPara2025(datasFases.final.fim).toISOString().split('T')[0]) {
+        $('#nav-final').addClass('vencedor');
+    }
 
 }
 
 function preencherClassificacoes(dadosData) {
     let classificacao = {};
     let dataHoje = new Date();
-    dataHoje.setFullYear(2024);
+    dataHoje.setFullYear(2025);
 
     // Log para verificar dataHoje e datas das fases
     console.log("Data de hoje:", dataHoje);
@@ -404,16 +386,15 @@ function calcularPontosJogosNoPeriodo(jogador, dataInicial, dataFinal) {
 
 function filtrarJogosPorPeriodo(dataInicial, dataFinal) {
     let jogos = window.jogos.data || [];
-    let dataInicialTime = ajustarAnoPara2024(dataInicial).getTime();
-    let dataFinalTime = ajustarAnoPara2024(dataFinal).getTime();
+    let dataInicialTime = ajustarAnoPara2025(dataInicial).getTime();
+    let dataFinalTime = ajustarAnoPara2025(dataFinal).getTime();
 
     return jogos.filter(jogo => {
-        let dataJogo = ajustarAnoPara2024(new Date(jogo.data.split('/').reverse().join('-')));
+        let dataJogo = ajustarAnoPara2025(new Date(jogo.data.split('/').reverse().join('-')));
         let dataJogoTime = dataJogo.getTime();
         return dataJogoTime >= dataInicialTime && dataJogoTime <= dataFinalTime;
     });
 }
-
 
 function atualizarFiltrosDatas() {
     if (datasFases.oitavas) {
@@ -435,4 +416,32 @@ function atualizarFiltrosDatas() {
         let dataTextofinal = `${datasFases.final.inicio.getDate().toString().padStart(2, '0')}/${(datasFases.final.inicio.getMonth() + 1).toString().padStart(2, '0')} a ${datasFases.final.fim.getDate().toString().padStart(2, '0')}/${(datasFases.final.fim.getMonth() + 1).toString().padStart(2, '0')}`;
         $('#pills-final-tab').text(dataTextofinal);
     }
+}
+
+function atualizarElementosGlobais(dados) {
+    // Verificar se os dados e a chave 'data' estão definidos
+    if (!dados || !Array.isArray(dados.data)) {
+        console.error("Os dados fornecidos são inválidos ou estão indefinidos.");
+        return;
+    }
+
+    // Iterar sobre todos os elementos que tenham o atributo data-codigo
+    $('[data-codigo]').each(function () {
+        const codigo = $(this).data('codigo');
+        const elemento = $(this);
+
+        // Percorrer todos os itens disponíveis nos dados
+        dados.data.forEach(item => {
+            // Comparar o código do elemento com o código no item
+            if (item.codigo === codigo) {
+                if (elemento.is('img')) {
+                    // Se for uma tag img, definir o atributo src como a URL da imagem
+                    elemento.attr('src', item.imagem);
+                } else {
+                    // Se não for uma tag img, definir o texto do elemento como o nome
+                    elemento.text(item.nome);
+                }
+            }
+        });
+    });
 }

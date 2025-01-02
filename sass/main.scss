@@ -1417,7 +1417,7 @@ footer {
 
   .skeleton {
     position: relative;
-    overflow: hidden;
+    overflow: hidden!important;
     border: 0 !important;
     color: transparent !important;
     border-radius: $size-2 !important;

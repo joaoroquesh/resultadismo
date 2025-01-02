@@ -1,35 +1,10 @@
-$(document).ready(function () {
-    $(document).on('jogosPronto', function () {
-        if (typeof window.jogos !== 'undefined' && window.jogos.data) {
-            listarMesAtual();
-            construirClassificacaoPorDivisaoFiltradaPorMes(window.jogos.data, window.dados.data, 'A');
-            ativarControleVisualizacao();
-            atualizarElementosGlobais(window.dados);
-        } else {
-            console.error("Os dados dos jogos não foram carregados corretamente.");
-        }
-    });
-    
-    // Contador de JSONs carregados
-    let carregados = 0;
-  
-    $(document).on('dadosAtualizado pontosAtualizado jogosAtualizado', function () {
-        carregados++;
-        if (carregados === 3) {
-            if (typeof window.dados !== 'undefined' && window.dados.data) {
-                atualizarElementosGlobais(window.dados);
-            }
-            if (typeof window.jogos !== 'undefined' && window.jogos.data) {
-                listarMesAtual();
-                construirClassificacaoPorDivisaoFiltradaPorMes(window.jogos.data, window.dados.data, 'A');
-                ativarControleVisualizacao();
-                atualizarElementosGlobais(window.dados);
-            }
-            $('body').removeClass('loading');
-            console.log("Todos os dados foram atualizados.");
-        }
-    });
-});
+
+function executarFuncoesPagina() {
+    listarMesAtual();
+    construirClassificacaoPorDivisaoFiltradaPorMes(window.jogos.data, window.dados.data, 'A');
+    ativarControleVisualizacao();
+    atualizarElementosGlobais(window.dados);
+}
 
 function listarMesAtual() {
     let dataAtual = new Date();
@@ -45,7 +20,7 @@ function listarMesAtual() {
 function construirClassificacaoPorDivisaoFiltradaPorMes(jogosData, dadosData, divisaoSelecionada = null) {
     let dataAtual = new Date();
     let mesAtual = (dataAtual.getMonth() + 1).toString().padStart(2, '0');
-    
+
     let classificacao = {
         A: {},
         B: {},
@@ -120,7 +95,7 @@ function construirClassificacaoPorDivisaoFiltradaPorMes(jogosData, dadosData, di
             }
         }
     });
-    
+
 
     // Construir a tabela de classificação para cada divisão
     if (divisaoSelecionada) {
@@ -208,4 +183,32 @@ function getNomeMes(mes) {
         '12': 'Dezembro'
     };
     return meses[mes] || '';
+}
+
+function atualizarElementosGlobais(dados) {
+    // Verificar se os dados e a chave 'data' estão definidos
+    if (!dados || !Array.isArray(dados.data)) {
+        console.error("Os dados fornecidos são inválidos ou estão indefinidos.");
+        return;
+    }
+
+    // Iterar sobre todos os elementos que tenham o atributo data-codigo
+    $('[data-codigo]').each(function () {
+        const codigo = $(this).data('codigo');
+        const elemento = $(this);
+
+        // Percorrer todos os itens disponíveis nos dados
+        dados.data.forEach(item => {
+            // Comparar o código do elemento com o código no item
+            if (item.codigo === codigo) {
+                if (elemento.is('img')) {
+                    // Se for uma tag img, definir o atributo src como a URL da imagem
+                    elemento.attr('src', item.imagem);
+                } else {
+                    // Se não for uma tag img, definir o texto do elemento como o nome
+                    elemento.text(item.nome);
+                }
+            }
+        });
+    });
 }

@@ -1,41 +1,15 @@
-$(document).ready(function () {
-    $(document).on('jogosPronto', function () {
-        if (typeof window.jogos !== 'undefined' && window.jogos.data) {
-            construirClassificacao(window.jogos.data);
-            listarCampeonatos(window.jogos.data);
-            listarMeses(window.jogos.data);
-            ativarControleVisualizacao();
-            atualizarElementosGlobais(window.dados);
-        } else {
-            console.error("Os dados dos jogos não foram carregados corretamente.");
-        }
-    });
 
-    // Contador de JSONs carregados
-    let carregados = 0;
-  
-    $(document).on('dadosAtualizado pontosAtualizado jogosAtualizado', function () {
-        carregados++;
-        if (carregados === 3) {
-            if (typeof window.dados !== 'undefined' && window.dados.data) {
-                atualizarElementosGlobais(window.dados);
-            }
-            if (typeof window.jogos !== 'undefined' && window.jogos.data) {
-                listarMeses(window.jogos.data);
-                listarCampeonatos(window.jogos.data);
-                construirClassificacao(window.jogos.data);
-                ativarControleVisualizacao();
-                atualizarElementosGlobais(window.dados);
-            }
-            $('body').removeClass('loading');
-            console.log("Todos os dados foram atualizados.");
-        }
-    });
 
+function executarFuncoesPagina() {
+    atualizarElementosGlobais(window.dados);
+    listarCampeonatos(window.jogos.data);
+    construirClassificacao(window.jogos.data);
+    ativarControleVisualizacao();
+    
     // Definir aba de visualização inicial como 'nav-geral-tab'
     $('#nav-geral-tab').click();
     $('#nav-geral-tab').trigger('click');
-});
+}
 
 
 function construirClassificacao(jogosData) {
@@ -160,14 +134,12 @@ function listarCampeonatos(jogosData) {
         }
     });
 
-
     // Obter os nomes dos campeonatos do JSON de dados
     let nomesCampeonatos = [];
     campeonatos.forEach(codigo => {
         let nomeCampeonato = obterNomeCampeonato(codigo);
         if (nomeCampeonato) {
             nomesCampeonatos.push({ codigo, nome: nomeCampeonato });
-            
         }
     });
 
@@ -271,7 +243,6 @@ function obterNomeCampeonato(codigo) {
         for (let item of window.dados.data) {
             if (item.codigo === codigo) {
                 return item.nome;
-                
             }
         }
     }
@@ -294,4 +265,32 @@ function obterNomeMes(mes) {
         '12': 'Dezembro'
     };
     return meses[mes] || '';
+}
+
+function atualizarElementosGlobais(dados) {
+    // Verificar se os dados e a chave 'data' estão definidos
+    if (!dados || !Array.isArray(dados.data)) {
+        console.error("Os dados fornecidos são inválidos ou estão indefinidos.");
+        return;
+    }
+
+    // Iterar sobre todos os elementos que tenham o atributo data-codigo
+    $('[data-codigo]').each(function () {
+        const codigo = $(this).data('codigo');
+        const elemento = $(this);
+
+        // Percorrer todos os itens disponíveis nos dados
+        dados.data.forEach(item => {
+            // Comparar o código do elemento com o código no item
+            if (item.codigo === codigo) {
+                if (elemento.is('img')) {
+                    // Se for uma tag img, definir o atributo src como a URL da imagem
+                    elemento.attr('src', item.imagem);
+                } else {
+                    // Se não for uma tag img, definir o texto do elemento como o nome
+                    elemento.text(item.nome);
+                }
+            }
+        });
+    });
 }

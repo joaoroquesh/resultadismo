@@ -2585,7 +2585,7 @@ footer a:hover {
 }
 .loading .skeleton {
   position: relative;
-  overflow: hidden;
+  overflow: hidden !important;
   border: 0 !important;
   color: transparent !important;
   border-radius: var(--size-2) !important;
