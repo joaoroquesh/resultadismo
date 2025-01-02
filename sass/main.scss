@@ -265,9 +265,26 @@ button {
 
   }
 
-  .classificacao-divisao {
+  #classificacaoA {
     tbody {
       tr {
+        &:nth-child(1) {
+
+          color: $cravada !important;
+
+          td {
+            &:nth-child(1) {
+              color: $light !important;
+
+              &:after {
+                background: $cravada !important;
+              }
+            }
+          }
+
+
+        }
+
         &:nth-last-child(2) {
           color: $danger-dark !important;
 
@@ -283,7 +300,7 @@ button {
         }
 
         &:nth-last-child(1),
-        &:nth-child(n+7) {
+        &:nth-child(n+8) {
           color: $danger !important;
 
           td {
@@ -296,6 +313,41 @@ button {
             }
           }
         }
+      }
+    }
+  }
+
+  #classificacaoB {
+    tbody {
+      tr {
+        &:nth-child(1) {
+
+          td {
+            &:nth-child(1) {
+              color: $light !important;
+
+              &:after {
+                background: $primary !important;
+              }
+            }
+          }
+
+        }
+
+        &:nth-child(2) {
+
+          td {
+            &:nth-child(1) {
+              color: $dark !important;
+
+              &:after {
+                background: $primary-light !important;
+              }
+            }
+          }
+
+        }
+
       }
     }
   }
@@ -394,6 +446,7 @@ button {
 
             &:after {
               content: "";
+              background: $medium !important;
               position: absolute;
               top: calc(50%);
               left: calc(50%);
@@ -412,36 +465,8 @@ button {
           }
         }
 
-        &:nth-child(1) {
 
-          color: $cravada !important;
-
-          td {
-            &:nth-child(1) {
-              color: $light !important;
-
-              &:after {
-                background: $cravada !important;
-              }
-            }
-          }
-
-
-        }
-
-        &:nth-child(2) {
-          color: $saldo !important;
-
-          td {
-            &:nth-child(1) {
-              color: $light !important;
-
-              &:after {
-                background: $saldo !important;
-              }
-            }
-          }
-        }
+        
 
       }
 

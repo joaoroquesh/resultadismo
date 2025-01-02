@@ -1776,23 +1776,44 @@ button:focus, button:focus-visible {
 #classificacao .classificacao::-webkit-scrollbar {
   display: none;
 }
-#classificacao .classificacao-divisao tbody tr:nth-last-child(2) {
+#classificacao #classificacaoA tbody tr:nth-child(1) {
+  color: var(--pizza-600) !important;
+}
+#classificacao #classificacaoA tbody tr:nth-child(1) td:nth-child(1) {
+  color: var(--star-dust-100) !important;
+}
+#classificacao #classificacaoA tbody tr:nth-child(1) td:nth-child(1):after {
+  background: var(--pizza-600) !important;
+}
+#classificacao #classificacaoA tbody tr:nth-last-child(2) {
   color: var(--punch-950) !important;
 }
-#classificacao .classificacao-divisao tbody tr:nth-last-child(2) td:nth-child(1) {
+#classificacao #classificacaoA tbody tr:nth-last-child(2) td:nth-child(1) {
   color: var(--star-dust-100) !important;
 }
-#classificacao .classificacao-divisao tbody tr:nth-last-child(2) td:nth-child(1):after {
+#classificacao #classificacaoA tbody tr:nth-last-child(2) td:nth-child(1):after {
   background: var(--punch-950) !important;
 }
-#classificacao .classificacao-divisao tbody tr:nth-last-child(1), #classificacao .classificacao-divisao tbody tr:nth-child(n+7) {
+#classificacao #classificacaoA tbody tr:nth-last-child(1), #classificacao #classificacaoA tbody tr:nth-child(n+8) {
   color: var(--punch-700) !important;
 }
-#classificacao .classificacao-divisao tbody tr:nth-last-child(1) td:nth-child(1), #classificacao .classificacao-divisao tbody tr:nth-child(n+7) td:nth-child(1) {
+#classificacao #classificacaoA tbody tr:nth-last-child(1) td:nth-child(1), #classificacao #classificacaoA tbody tr:nth-child(n+8) td:nth-child(1) {
   color: var(--star-dust-100) !important;
 }
-#classificacao .classificacao-divisao tbody tr:nth-last-child(1) td:nth-child(1):after, #classificacao .classificacao-divisao tbody tr:nth-child(n+7) td:nth-child(1):after {
+#classificacao #classificacaoA tbody tr:nth-last-child(1) td:nth-child(1):after, #classificacao #classificacaoA tbody tr:nth-child(n+8) td:nth-child(1):after {
   background: var(--punch-700) !important;
+}
+#classificacao #classificacaoB tbody tr:nth-child(1) td:nth-child(1) {
+  color: var(--star-dust-100) !important;
+}
+#classificacao #classificacaoB tbody tr:nth-child(1) td:nth-child(1):after {
+  background: var(--turquoise-600) !important;
+}
+#classificacao #classificacaoB tbody tr:nth-child(2) td:nth-child(1) {
+  color: var(--star-dust-950) !important;
+}
+#classificacao #classificacaoB tbody tr:nth-child(2) td:nth-child(1):after {
+  background: var(--turquoise-500) !important;
 }
 #classificacao .table {
   color: var(--star-dust-950);
@@ -1870,6 +1891,7 @@ button:focus, button:focus-visible {
 }
 #classificacao .table tbody tr td:nth-child(1):after {
   content: "";
+  background: var(--star-dust-200) !important;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1878,24 +1900,6 @@ button:focus, button:focus-visible {
   height: var(--size-xxs);
   border-radius: var(--size-quarck);
   z-index: -1;
-}
-#classificacao .table tbody tr:nth-child(1) {
-  color: var(--pizza-600) !important;
-}
-#classificacao .table tbody tr:nth-child(1) td:nth-child(1) {
-  color: var(--star-dust-100) !important;
-}
-#classificacao .table tbody tr:nth-child(1) td:nth-child(1):after {
-  background: var(--pizza-600) !important;
-}
-#classificacao .table tbody tr:nth-child(2) {
-  color: var(--bilbao-700) !important;
-}
-#classificacao .table tbody tr:nth-child(2) td:nth-child(1) {
-  color: var(--star-dust-100) !important;
-}
-#classificacao .table tbody tr:nth-child(2) td:nth-child(1):after {
-  background: var(--bilbao-700) !important;
 }
 #classificacao .table th,
 #classificacao .table td {

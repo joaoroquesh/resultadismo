@@ -56,7 +56,7 @@
 </script>
 
 
-<body class="loading atualizando" data-page="classificacao">
+<body class="loading atualizando">
 
 
 
@@ -83,41 +83,7 @@
                       role="tab" aria-controls="nav-C" aria-selected="false">Liga C</button> -->
                   </div>
                 </nav>
-                <div class="tab-content d-none" id="nav-tabContent">
-
-                  <div class="tab-pane selecao fade text-right pt-3 show active" id="nav-A" role="tabpanel"
-                    aria-labelledby="nav-A-tab">
-
-                    <ul class="nav nav-pills pr-5" id="filtroA" role="tablist">
-                      <li class="nav-item" role="presentation">
-                        <button class="nav-link skeleton active" id="pills-mesAtualA-tab" data-toggle="pill"
-                          type="button" role="tab" aria-selected="true">${mesAtual}</button>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div class="tab-pane selecao fade text-center pt-3" id="nav-B" role="tabpanel"
-                    aria-labelledby="nav-B-tab">
-
-                    <ul class="nav nav-pills pr-5" id="filtroB" role="tablist">
-                      <li class="nav-item" role="presentation">
-                        <button class="nav-link skeleton active" id="pills-mesAtualB-tab" data-toggle="pill"
-                          type="button" role="tab" aria-selected="true">${mesAtual}</button>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div class="tab-pane selecao fade text-center pt-3" id="nav-C" role="tabpanel"
-                    aria-labelledby="nav-C-tab">
-                    <ul class="nav nav-pills pr-5" id="filtroC" role="tablist">
-                      <li class="nav-item" role="presentation">
-                        <button class="nav-link skeleton active" id="pills-mesAtualC-tab" data-toggle="pill"
-                          type="button" role="tab" aria-selected="true">${mesAtual}</button>
-                      </li>
-                    </ul>
-                  </div>
-
-                </div>
+                
               </div>
             </div>
           </div>
@@ -131,105 +97,217 @@
         <div class="container">
           <div class="row">
             <div class="col px-2 d-flex flex-column justify-content-center align-items-center">
-              <div class="w-100 classificacao classificacao-divisao">
-                <div class="p-1">
-                  <table class="display table">
-                    <thead class="">
-                      <tr>
-                        <th>&nbsp;</th>
-                        <th>&nbsp;</th>
-                        <th>Clubista</th>
-                        <th>Pontuação</th>
-                        <th>Cravadas</th>
-                        <th>Saldos</th>
-                        <th>Acertos</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+              <div class="tab-content" id="nav-tabContent">
 
-                      <tr class="skeleton">
-                        <td>
-                          &nbsp;
-                        </td>
-                        <td>
-                          &nbsp;
-                        </td>
-                        <td>
-                          &nbsp;
-                        </td>
-                        <td>
-                          &nbsp;
-                        </td>
-                        <td>
-                          &nbsp;
-                        </td>
-                        <td>
-                          &nbsp;
-                        </td>
-                        <td>
-                          &nbsp;
-                        </td>
-                      </tr>
-
-                      <tr class="skeleton">
-                        <td>
-                          &nbsp;
-                        </td>
-                        <td>
-                          &nbsp;
-                        </td>
-                        <td>
-                          &nbsp;
-                        </td>
-                        <td>
-                          &nbsp;
-                        </td>
-                        <td>
-                          &nbsp;
-                        </td>
-                        <td>
-                          &nbsp;
-                        </td>
-                        <td>
-                          &nbsp;
-                        </td>
-                      </tr>
-
-                      <tr class="skeleton">
-                        <td>
-                          &nbsp;
-                        </td>
-                        <td>
-                          &nbsp;
-                        </td>
-                        <td>
-                          &nbsp;
-                        </td>
-                        <td>
-                          &nbsp;
-                        </td>
-                        <td>
-                          &nbsp;
-                        </td>
-                        <td>
-                          &nbsp;
-                        </td>
-                        <td>
-                          &nbsp;
-                        </td>
-                      </tr>
-
-                    </tbody>
-                  </table>
+                <div class="tab-pane fade text-right show active" id="nav-A" role="tabpanel"
+                  aria-labelledby="nav-A-tab">
+                  <div class="w-100 classificacao classificacao-divisao">
+                    <div class="p-1">
+                      <table class="display table" id="classificacaoA">
+                        <thead class="">
+                          <tr>
+                            <th>&nbsp;</th>
+                            <th>&nbsp;</th>
+                            <th>Clubista</th>
+                            <th>Pontuação</th>
+                            <th>Cravadas</th>
+                            <th>Saldos</th>
+                            <th>Acertos</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+    
+                          <tr class="skeleton">
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                          </tr>
+    
+                          <tr class="skeleton">
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                          </tr>
+    
+                          <tr class="skeleton">
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                          </tr>
+    
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                
                 </div>
-                <div class="center-s pt-5">
-                  <a class="btn btn-outline-primary btn-click" href="https://docs.google.com/spreadsheets/d/1md7qlwt3Bg3KVm2TfbHbPL4MwULrsFZqzkYiY4uLRek/edit?gid=765676955#gid=765676955" target="_blank">
-                    Acesso ao histórico
-                  </a>
+
+                <div class="tab-pane fade text-center" id="nav-B" role="tabpanel"
+                  aria-labelledby="nav-B-tab">
+                  <div class="w-100 classificacao classificacao-divisao">
+                    <div class="p-1">
+                      <table class="display table" id="classificacaoB">
+                        <thead class="">
+                          <tr>
+                            <th>&nbsp;</th>
+                            <th>&nbsp;</th>
+                            <th>Clubista</th>
+                            <th>Pontuação</th>
+                            <th>Cravadas</th>
+                            <th>Saldos</th>
+                            <th>Acertos</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+    
+                          <tr class="skeleton">
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                          </tr>
+    
+                          <tr class="skeleton">
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                          </tr>
+    
+                          <tr class="skeleton">
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                          </tr>
+    
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                
                 </div>
-                <footer></footer>
+
+                <!-- <div class="tab-pane selecao fade text-center pt-3" id="nav-C" role="tabpanel"
+                  aria-labelledby="nav-C-tab">
+                
+                </div> -->
+
               </div>
-
+              
+              
+              
+              <div class="center-s pt-5">
+                <a class="btn btn-outline-primary btn-click" href="https://docs.google.com/spreadsheets/d/1md7qlwt3Bg3KVm2TfbHbPL4MwULrsFZqzkYiY4uLRek/edit?gid=765676955#gid=765676955" target="_blank">
+                  Acesso ao histórico
+                </a>
+              </div>
+              <footer></footer>
             </div>
           </div>
 
