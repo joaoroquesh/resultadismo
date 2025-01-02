@@ -4,7 +4,6 @@ $(document).ready(function () {
       atualizarElementosGlobais(window.dados);
     }
     if (typeof window.jogos !== 'undefined' && window.jogos.data) {
-      // debugger
       gerarNavegacao(window.jogos.data);
       // listarJogos(window.jogos.data);
       ativarControleVisualizacaoJogos();

@@ -160,12 +160,14 @@ function listarCampeonatos(jogosData) {
         }
     });
 
+
     // Obter os nomes dos campeonatos do JSON de dados
     let nomesCampeonatos = [];
     campeonatos.forEach(codigo => {
         let nomeCampeonato = obterNomeCampeonato(codigo);
         if (nomeCampeonato) {
             nomesCampeonatos.push({ codigo, nome: nomeCampeonato });
+            
         }
     });
 
@@ -269,6 +271,7 @@ function obterNomeCampeonato(codigo) {
         for (let item of window.dados.data) {
             if (item.codigo === codigo) {
                 return item.nome;
+                
             }
         }
     }
