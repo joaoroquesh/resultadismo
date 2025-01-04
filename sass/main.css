@@ -1610,6 +1610,14 @@ button:focus, button:focus-visible {
 }
 
 /* ELEMENTS*/
+.manutencao {
+  background: var(--star-dust-100);
+  position: fixed;
+  height: 100vh;
+  width: 100vw;
+  z-index: 999;
+}
+
 #menu {
   display: flex;
   justify-content: center;

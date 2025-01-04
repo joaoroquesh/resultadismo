@@ -55,7 +55,13 @@ button {
 
 
 /* ELEMENTS*/
-
+.manutencao{
+  background: $light;
+  position: fixed;
+  height: 100vh;
+  width: 100vw;
+  z-index: 999;
+}
 
 #menu {
 
