@@ -30,6 +30,27 @@ $(document).ready(function () {
         console.log("Loading retirado");
     }
 
+    function checkLoginStatus() {
+        const loggedInUser = localStorage.getItem('logado');
+        const jogadorElements = document.querySelectorAll('.jogador');
+      
+        if (loggedInUser) {
+          console.log(`Usuário logado: ${loggedInUser}`);
+          
+          // Set data-codigo attribute for all .jogador elements
+          jogadorElements.forEach(jogador => {
+            jogador.setAttribute('data-codigo', loggedInUser);
+          });
+        } else {
+          console.log('Usuário deslogado');
+        }
+      
+        atualizarElementosGlobais(dados)
+      }
+      
+      // Call the function to check login status
+      checkLoginStatus();
+
     function carregarDados(url, key) {
         $.getJSON(url, function (data) {
             // Atualiza localStorage e dispara evento
@@ -84,31 +105,32 @@ $(document).ready(function () {
         setTimeout(() => $('body').removeClass('atualizando'), 3000);
     }
 
-    // function atualizarElementosGlobais(dados) {
-    //     // Verificar se os dados e a chave 'data' estão definidos
-    //     if (!dados || !Array.isArray(dados.data)) {
-    //         console.error("Os dados fornecidos são inválidos ou estão indefinidos.");
-    //         return;
-    //     }
+    function atualizarElementosGlobais(dados) {
+        // Verificar se os dados e a chave 'data' estão definidos
+        if (!dados || !Array.isArray(dados.data)) {
+          console.error("Os dados fornecidos são inválidos ou estão indefinidos.");
+          return;
+        }
+      
+        // Iterar sobre todos os elementos que tenham o atributo data-codigo
+        $('[data-codigo]').each(function () {
+          const codigo = $(this).data('codigo');
+          const elemento = $(this);
+      
+          // Percorrer todos os itens disponíveis nos dados
+          dados.data.forEach(item => {
+            // Comparar o código do elemento com o código no item
+            if (item.codigo === codigo) {
+              if (elemento.is('img')) {
+                // Se for uma tag img, definir o atributo src como a URL da imagem
+                elemento.attr('src', item.imagem);
+              } else {
+                // Se não for uma tag img, definir o texto do elemento como o nome
+                elemento.text(item.nome);
+              }
+            }
+          });
+        });
+      }
 
-    //     // Iterar sobre todos os elementos que tenham o atributo data-codigo
-    //     $('[data-codigo]').each(function () {
-    //         const codigo = $(this).data('codigo');
-    //         const elemento = $(this);
-
-    //         // Percorrer todos os itens disponíveis nos dados
-    //         dados.data.forEach(item => {
-    //             // Comparar o código do elemento com o código no item
-    //             if (item.codigo === codigo) {
-    //                 if (elemento.is('img')) {
-    //                     // Se for uma tag img, definir o atributo src como a URL da imagem
-    //                     elemento.attr('src', item.imagem);
-    //                 } else {
-    //                     // Se não for uma tag img, definir o texto do elemento como o nome
-    //                     elemento.text(item.nome);
-    //                 }
-    //             }
-    //         });
-    //     });
-    // }
 });

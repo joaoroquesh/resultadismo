@@ -7,6 +7,7 @@ function executarFuncoesPagina() {
   ativarControleVisualizacaoJogos();
   atualizarElementosGlobais(window.dados);
   selecionarDiaHoje(true);
+  dataCodigo()
 }
 
 function gerarNavegacao(jogosData) {
