@@ -12,7 +12,7 @@ document.querySelector('.form').addEventListener('submit', function (event) {
     (user) => user.codigo === emailInput && user.senha.toString() === passwordInput
   );
 
-  const infoElement = document.querySelector('.info');
+  const infoElement = document.querySelector('.info-text');
 
   if (user) {
     // User found, store email in localStorage
