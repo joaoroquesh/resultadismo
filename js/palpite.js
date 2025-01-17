@@ -1,7 +1,7 @@
 
 
 function executarFuncoesPagina() {
-  atualizarElementosGlobais(window.dados);
+  
   gerarNavegacao(window.jogos.data);
   listarJogos(window.jogos.data);
   ativarControleVisualizacaoJogos();

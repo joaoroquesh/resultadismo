@@ -1,0 +1,59 @@
+<div class="container fixed-top">
+    <div class="row py-1 py-lg-3">
+        <div class="col">
+            <nav class="navbar border-radius-2 navbar-light bg-light">
+                <a class="navbar-brand" href="http://www.resultadismo.com">
+                    <img src="images/resultadismo.png" height="40" class="d-inline-block align-top" alt="">
+                </a>
+                <a class="navbar-toggler">
+                    <img src="../images/icons/login.svg" class="jogador-logado" alt="">
+                </a>
+            </nav>
+        </div>
+    </div>
+</div>
+<div class="nav-space"></div>
+
+<div id="header-options">
+  
+    <div class="options-wrapper d-sm-block d-none">
+      <!-- Sidebar  -->
+      <nav id="sidebar-options" class="">
+          <div onclick="fecharOptions()" id="dismiss">
+              <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 0 352 512"><path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>
+          </div>
+          <ul class="mt-5 nav p-4">
+            <li class="nav-link">
+                <a onclick="deslogar()" class="fs-sm">
+                    <img src="../images/icons/login.svg" alt=""> Deslogar
+                </a>
+            </li>
+                    
+          </ul>
+      </nav>
+      
+  </div>
+  
+  <div onclick="fecharOptions()" class="overlay"></div>
+    
+  </div>
+
+  <script>
+    function abrirOptions() {
+      var sidebarOptions = document.querySelector('#sidebar-options');
+      var overlay = document.querySelector('.overlay');
+      sidebarOptions.classList.add("active");
+      overlay.classList.add("active");
+    }
+    function fecharOptions() {
+      var sidebarOptions = document.querySelector('#sidebar-options');
+      var overlay = document.querySelector('.overlay');
+      sidebarOptions.classList.remove("active");
+      overlay.classList.remove("active");
+    }
+
+    function deslogar() {
+      localStorage.setItem('logado', "");
+      window.location.href = '/login';
+    }
+  </script>

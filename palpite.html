@@ -8,10 +8,9 @@
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
   integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"> -->
-  <!-- <link rel="stylesheet" href="css/owl.carousel.min.css">
-  <link rel="stylesheet" href="css/owl.theme.default.css"> -->
-  <!-- <link rel="stylesheet" href="css/aos.css"> -->
-  <link rel="stylesheet" href="sass/main.css?v=07112024">
+
+  <link rel="stylesheet" href="sass/main.css">
+  <link rel="stylesheet" href="sass/components/header.css">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.0/css/all.css"
     integrity="sha384-Mmxa0mLqhmOeaE8vgOSbKacftZcsNYDjQzuCOm6D02luYSzBG8vpaOykv9lFQ51Y" crossorigin="anonymous">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,10 +26,10 @@
 
   <meta property="og:site_name" content="Resultadismo">
   <meta name="site_name" content="Resultadismo">
-  <meta property="og:title" content="Resultadismo | Jogos" />
-  <meta name="title" content="Resultadismo | Jogos" />
-  <meta property="og:description" content="Veja os palpites de cada jogo no Resultadismo dos Clubistash">
-  <meta name="description" content="Veja os palpites de cada jogo no Resultadismo dos Clubistash">
+  <meta property="og:title" content="Resultadismo | Palpites" />
+  <meta name="title" content="Resultadismo | Palpites" />
+  <meta property="og:description" content="Faça os seus palpites e acompanhe os jogos">
+  <meta name="description" content="Faça os seus palpites e acompanhe os jogos">
   <meta property="og:url" content="https://www.resultadismo.com/" />
   <meta name="url" content="https://www.resultadismo.com/" />
   <meta property="og:image" itemprop="image" content="https://www.resultadismo.com/images/logo.jpg" />
@@ -65,81 +64,15 @@
 
     <section id="main">
 
-
+      <section id="header"></section>
       <section id="menu"></section>
 
-      <section id="content-fixed" class="fixed-top">
+      <section id="content-fixed" class="fixed-top d-none">
         <div class="container">
           <div class="row">
             <div class="col px-3 py-2 d-flex flex-column justify-content-center align-items-center">
 
-              <div id="navegacao" class="w-100 navegacao ">
-                <nav id="meses" class="collapse pb-2">
-                  <div class="nav nav-tabs d-flex justify-content-around" id="nav-tab" role="tablist">
-                    <button class="nav-link skeleton active" id="nav-${mes-atual}-tab" data-toggle="tab"
-                      data-target="#nav-${mes-atual}" type="button" role="tab" aria-controls="nav-${mes-atual}"
-                      aria-selected="true">mes</button>
-                    <button class="nav-link skeleton" id="nav-${mes-passado}-tab" data-toggle="tab"
-                      data-target="#nav-${mes-passado}" type="button" role="tab" aria-controls="nav-${mes-passado}"
-                      aria-selected="false">mes</button>
-                    <button class="nav-link skeleton" id="nav-${mes-anterior}-tab" data-toggle="tab"
-                      data-target="#nav-${mes-anterior}" type="button" role="tab" aria-controls="nav-${mes-anterior}"
-                      aria-selected="false">mes</button>
-                  </div>
-                </nav>
-                <div class="tab-content" id="nav-tabContent">
 
-                  <div class="tab-pane selecao fade text-right show active" id="nav-${mes-atual}" role="tabpanel"
-                    aria-labelledby="nav-${mes-atual}-tab">
-
-                    <ul class="nav nav-pills p-0" id="filtroMes${mes-atual}" role="tablist">
-                      <li class="nav-item" role="presentation">
-                        <button class="nav-link skeleton active" id="pills-00jan-tab" data-toggle="pill"
-                          type="button" role="tab" aria-selected="true">dom. 00</button>
-                      </li>
-                      <li class="nav-item" role="presentation">
-                        <button class="nav-link skeleton" id="pills-00jan-tab" data-toggle="pill" type="button"
-                          role="tab" aria-selected="true">dom. 00</button>
-                      </li>
-                      <li class="nav-item" role="presentation">
-                        <button class="nav-link skeleton" id="pills-00jan-tab" data-toggle="pill" type="button"
-                          role="tab" aria-selected="true">dom. 00</button>
-                      </li>
-                      <li class="nav-item" role="presentation">
-                        <button class="nav-link skeleton" id="pills-00jan-tab" data-toggle="pill" type="button"
-                          role="tab" aria-selected="true">dom. 00</button>
-                      </li>
-                      <li class="nav-item" role="presentation">
-                        <button class="nav-link skeleton" id="pills-00jan-tab" data-toggle="pill" type="button"
-                          role="tab" aria-selected="true">dom. 00</button>
-                      </li>
-                      <li class="nav-item" role="presentation">
-                        <button class="nav-link skeleton" id="pills-00jan-tab" data-toggle="pill"
-                          type="button" role="tab" aria-selected="true">dom. 00</button>
-                      </li>
-                      <li class="nav-item" role="presentation">
-                        <button class="nav-link skeleton" id="pills-00jan-tab" data-toggle="pill" type="button"
-                          role="tab" aria-selected="true">dom. 00</button>
-                      </li>
-                      <li class="nav-item" role="presentation">
-                        <button class="nav-link skeleton" id="pills-00jan-tab" data-toggle="pill" type="button"
-                          role="tab" aria-selected="true">dom. 00</button>
-                      </li>
-                      <li class="nav-item" role="presentation">
-                        <button class="nav-link skeleton" id="pills-00jan-tab" data-toggle="pill" type="button"
-                          role="tab" aria-selected="true">dom. 00</button>
-                      </li>
-                      <li class="nav-item" role="presentation">
-                        <button class="nav-link skeleton" id="pills-00jan-tab" data-toggle="pill" type="button"
-                          role="tab" aria-selected="true">dom. 00</button>
-                      </li>
-                    </ul>
-                  </div>
-
-
-
-                </div>
-              </div>
 
             </div>
           </div>
@@ -154,10 +87,10 @@
         <div class="container">
           <div class="row">
             <div class="col d-flex flex-column justify-content-center align-items-center">
-              
-              <img src="" alt="" width="100px" height="100px" class="jogador skeleton m-4">
-              <p class="jogador"></p>
-              
+
+              <img src="images/icon.png" alt="" width="100px" height="100px" class="jogador-logado skeleton m-4">
+              <p class="jogador-logado"></p>
+
               <form action="https://api.sheetmonkey.io/form/56gBGHF5pN3iPaRtgWiwEa" method="post">
                 <!-- Put HTML input fields in here and see how they fill up your sheet -->
                 <label>Example Field: <input type="text" name="Example Header" required /></label>
@@ -186,13 +119,16 @@
   <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script> -->
-  <script src="js/main.js?v=07112024"></script>
-  <script src="js/jogos.js?v=07112024"></script>
+  <script>
+    function executarFuncoesPagina() {
+      console.log('vazio');
+    }
+  </script>
 
   <script>
     $(document).ready(function () {
       // Carregar o menu e, em seguida, adicionar a classe 'active' ao link correspondente
-      $("#menu").load("components/menu.html", function () {
+      $("#menu").load("components/menu-new.html", function () {
         const currentPath = window.location.pathname;
         const menuItems = document.querySelectorAll('.nav-item .nav-link');
 
@@ -203,69 +139,53 @@
           }
         });
       });
+
+      $("#header").load("components/header.html", function () {
+        const loggedInUser = localStorage.getItem('logado');
+        const jogadorElements = document.querySelectorAll('.jogador-logado');
+
+        if (loggedInUser) {
+          
+          jogadorElements.forEach(jogador => {
+            jogador.setAttribute('data-codigo', loggedInUser);
+          });
+          $('[data-codigo]').each(function () {
+            const codigo = $(this).data('codigo');
+            const elemento = $(this);
+            window.dados.data.forEach(item => {
+              if (item.codigo === codigo) {
+                if (elemento.is('img')) {
+                  elemento.attr('src', item.imagem);
+                }
+              }
+            });
+          });
+          $('.navbar-toggler').addClass('logado');
+        } else {
+          console.log('Usuário deslogado');
+        }
+
+        // Add event listener for .navbar-toggler after header is loaded
+        document.querySelector('.navbar-toggler').addEventListener('click', function () {
+          if (!loggedInUser) {
+            // Redirect to /login if no user is logged in
+            window.location.href = '/login';
+          } else {
+            // Execute openOptions() if user is logged in
+            abrirOptions();
+          }
+        });
+      });
+
+      // atualizarElementosGlobais(window.dados);
+
     });
+
     $("footer").load("components/footer.html");
     $("#carregando").load("components/carregando.html");
   </script>
 
-<script>
-
-async function enviarFormulario() {
-      const formData = {
-        answers: {
-          nome: document.getElementById('name').value,
-          email: document.getElementById('email').value
-        }
-      };
-
-      try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbxQs5CpyZ7mYS3sbzgoKmH8oHOn7jvpFMKS4HfJxfCr3ux40LcGMwtTnKoRPgiObFJq/exec', {
-          method: "POST",
-          body: JSON.stringify(formData),
-          headers: {
-            "Content-Type": "application/json"
-          }
-        });
-
-        const result = await response.json();
-        alert(result.status === "Sucesso" ? "Dados enviados com sucesso!" : "Erro ao enviar os dados.");
-      } catch (error) {
-        console.error("Erro:", error);
-        alert("Erro ao enviar os dados.");
-      }
-    }
-</script>
-
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-      const toggler = document.getElementById("toggler");
-      const jogos = document.getElementById("jogos");
-      const meses = document.getElementById("meses");
-      
-      // Recuperar estado do localStorage
-      const isClosed = localStorage.getItem("jogosClosed");
-      if (isClosed === "false") {
-          jogos.classList.remove("closed");
-          meses.classList.add("show");
-      } else {
-          jogos.classList.add("closed");
-      }
-
-      // Evento de clique para alternar a classe
-      toggler.addEventListener("click", function () {
-          jogos.classList.toggle("closed");
-          
-          // Salvar o estado no localStorage
-          const closed = jogos.classList.contains("closed");
-          localStorage.setItem("jogosClosed", closed);
-      });
-  });
-</script>
-
-
-
-
-
+  <script src="js/main.js"></script>
 
 </body>
 

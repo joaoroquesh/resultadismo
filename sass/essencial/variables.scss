@@ -1,0 +1,159 @@
+$colors: (
+  turquoise: (
+    50: #effefa,
+    100: #c8fff0,
+    200: #91fee4,
+    300: #52f6d5,
+    400: #1ee3c0,
+    500: #06ddbb,
+    600: #1CB19C,
+    700: #067f70,
+    800: #0a655b,
+    900: #0e534c,
+    950: #003330
+    ),
+  star-dust: (
+    50: #f0f0f0,
+    100: #e5e5e5,
+    200: #d1d1d1,
+    300: #b0b0b0,
+    400: #999999,
+    500: #6d6d6d,
+    600: #5d5d5d,
+    700: #4f4f4f,
+    800: #454545,
+    900: #3d3d3d,
+    950: #232323
+    ),
+  pizza: (
+    50: #fefee8,
+    100: #ffffc2,
+    200: #fffb88,
+    300: #fff243,
+    400: #ffe110,
+    500: #efc703,
+    600: #bf9000,
+    700: #a46f04,
+    800: #87560c,
+    900: #734710,
+    950: #432505
+    ),
+  bilbao: (
+    50: #f1fbea,
+    100: #e0f6d1,
+    200: #c3efa7,
+    300: #9de274,
+    400: #7ad249,
+    500: #5bb72b,
+    600: #43921e,
+    700: #38761d,
+    800: #2e591b,
+    900: #284c1b,
+    950: #12290a
+    ),
+  blue-dianne: (
+    50: #ecfffe,
+    100: #cefffe,
+    200: #a4fcfd,
+    300: #65f8fb,
+    400: #1feaf1,
+    500: #03ccd7,
+    600: #05a4b5,
+    700: #0c8292,
+    800: #136877,
+    900: #134f5c,
+    950: #073945
+    ),
+  punch: (
+    50: #fff1f1,
+    100: #ffe0e0,
+    200: #ffc7c7,
+    300: #ffa0a0,
+    400: #ff6969,
+    500: #f93a3a,
+    600: #e21818,
+    700: #c21313,
+    800: #a01414,
+    900: #851717,
+    950: #490606,
+    )
+);
+
+
+$white: var(--star-dust-50);
+$light:  var(--star-dust-100);
+$medium: var(--star-dust-200);
+$darkgray: var(--star-dust-400);
+$dark: var(--star-dust-950);
+$primary-light: var(--turquoise-500);
+
+$primary:#1CB19C;
+$primary: var(--turquoise-600);
+$secondary: var(--star-dust-950);
+$cravada:var(--pizza-600);
+$saldo:var(--bilbao-700);
+$acerto:var(--blue-dianne-900);
+$danger-light: var(--punch-300);
+$danger: var(--punch-700);
+$danger-dark: var(--punch-950);
+$transparent:rgba(0, 0, 0, 0);
+
+$size-0:var(--size-0);
+$size-1:var(--size-1);
+$size-2:var(--size-2);
+$size-3:var(--size-3);
+$size-4:var(--size-4);
+$size-5:var(--size-5);
+
+
+$font-size-xs:var(--font-size-xs);
+$font-size-sm:var(--font-size-sm);
+$font-size-bs:var(--font-size-bs);
+$font-size-1:var(--font-size-1);
+$font-size-2:var(--font-size-2);
+$font-size-3:var(--font-size-3);
+$font-size-4:var(--font-size-4);
+$font-size-5:var(--font-size-5);
+$font-size-6:var(--font-size-6);
+$font-size-lg:var(--font-size-lg);
+$font-size-xl:var(--font-size-xl);
+
+$size-none: var(--size-none);
+$size-quarck: var(--size-quarck);
+$size-nano: var(--size-nano);
+$size-xxxs: var(--size-xxxs);
+$size-xxs: var(--size-xxs);
+$size-xs: var(--size-xs);
+$size-sm: var(--size-sm);
+$size-md: var(--size-md);
+$size-lg: var(--size-lg);
+$size-xl: var(--size-xl);
+$size-xxl: var(--size-xxl);
+$size-xxxl: var(--size-xxxl);
+$size-huge: var(--size-huge);
+$size-giant: var(--size-giant);
+
+$border-radius-none: var(--border-radius-none);
+$border-radius-xs: var(--border-radius-xs);
+$border-radius-sm: var(--border-radius-sm);
+$border-radius-md: var(--border-radius-md);
+$border-radius-lg: var(--border-radius-lg);
+$border-radius-pill: var(--border-radius-pill);
+$border-radius-circular: var(--border-radius-circular);
+
+$font-size-xs: var(--font-size-xs);
+$font-size-sm: var(--font-size-sm);
+$font-size-md: var(--font-size-md);
+$font-size-lg: var(--font-size-lg);
+$font-size-xl: var(--font-size-xl);
+$font-size-xxl: var(--font-size-xxl);
+$font-size-xxxl: var(--font-size-xxxl);
+$font-size-3xl: var(--font-size-3xl);
+$font-size-4xl: var(--font-size-4xl);
+$font-size-5xl: var(--font-size-5xl);
+$font-size-6xl: var(--font-size-6xl);
+
+$line-height-tight: var(--line-height-tight);
+$line-height-medium: var(--line-height-medium);
+$line-height-distant: var(--line-height-distant);
+$line-height-super-distant: var(--line-height-super-distant);
