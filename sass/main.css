@@ -215,6 +215,35 @@
   border: 1px solid var(--turquoise-600);
   color: var(--star-dust-950);
 }
+.btn-secondary {
+  background-color: var(--star-dust-950);
+  border: 2px solid var(--star-dust-950);
+  color: var(--star-dust-50);
+}
+.btn-secondary:hover {
+  background-color: rgba(0, 0, 0, 0);
+  border: 2px solid var(--star-dust-950);
+  color: var(--star-dust-950);
+}
+.btn-secondary:active, .btn-secondary:not(:disabled):not(.disabled).active, .btn-secondary:not(:disabled):not(.disabled):active, .show > .btn-secondary.dropdown-toggle {
+  background-color: var(--star-dust-950);
+  border: 2px solid var(--star-dust-950);
+  color: var(--star-dust-950);
+}
+.btn-outline-secondary {
+  border: 1px solid var(--star-dust-950);
+  color: var(--star-dust-950);
+}
+.btn-outline-secondary:hover {
+  background-color: var(--star-dust-950);
+  border: 1px solid var(--star-dust-950);
+  color: var(--star-dust-50);
+}
+.btn-outline-secondary:active, .btn-outline-secondary:not(:disabled):not(.disabled).active, .btn-outline-secondary:not(:disabled):not(.disabled):active, .show > .btn-outline-secondary.dropdown-toggle {
+  background-color: var(--star-dust-950);
+  border: 1px solid var(--star-dust-950);
+  color: var(--star-dust-950);
+}
 
 .bg-cravada {
   background-color: var(--pizza-600) !important;
