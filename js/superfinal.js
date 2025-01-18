@@ -36,9 +36,9 @@ function calcularClassificacaoSuperFinal() {
         { codigo: "wellingtondiasdigital@gmail.com", nome: "Wellington Dias" }
     ];
 
-    const classificacao = jogadores.map(jogador => {
+    const classificacao = jogadores.map((jogador, index) => {
         const pontos = calcularPontosJogosNoPeriodo(jogador, dataInicioFinal, dataFimFinal);
-        return { ...jogador, ...pontos };
+        return { ...jogador, ...pontos, index };
     });
 
     atualizarTabelaClassificacao(classificacao);
@@ -91,11 +91,12 @@ function filtrarJogosPorPeriodo(dataInicial, dataFinal) {
 }
 
 function atualizarTabelaClassificacao(classificacao) {
+    let escudo = 'https://www.resultadismo.com/images/escudos/padrao.png';
     const tabela = document.querySelector("#jogo tbody");
     tabela.innerHTML = classificacao.map(jogador => `
         <tr>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
+            <td>${jogador.index + 1}°</td>
+            <td><img src="${escudo}" data-codigo="${jogador.codigo}" alt="Escudo" width="30"></td>
             <td>${jogador.nome}</td>
             <td>${jogador.pontuacao}</td>
             <td>${jogador.cravadas}</td>
