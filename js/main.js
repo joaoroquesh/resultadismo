@@ -1,8 +1,8 @@
 $(document).ready(function () {
     const apiUrls = {
-        pontos: "https://script.googleusercontent.com/macros/echo?user_content_key=tSV0mi-DgT_sJlVAQRPYnoVwW3J9JpRlwGqZV_P1-9Znj5YE4wDCaBgPTSKvdphTnoZWSg_sLdWkj8x3RALWWmOdi--0ZJcCm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnLAHC7_wmPxFrFpJk8nbhU47u6hLhjuBTk8jWURADh61V_QzAwUW--m7PrIYvKVA79BnK4mIkwBxjnDKeGOOAEKKQO8bQgGrXAE&lib=M0568tv4iNvDjBAwuHpI1JfwLva-v4JqO",
-        dados: "https://script.googleusercontent.com/macros/echo?user_content_key=PuNoQxfhdWWzeRvu2Tq38xtWsk62HBjo0PY-4G_OHVTtKyNkddD4d_9y6mIaApQKjLYSugQd7Mz9FIjKUxsvnJtQj1k5wIpKm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnKU8A-p2s-Pqj1AZntNev_-xDtMRq8ZkrD8TAWRcXB-zW07RTG4DpE_GxVgkiZ1y1bK4-eOOpQHd16CSO9H1CyXBHYybmSt8Tdz9Jw9Md8uuAQ&lib=MJ3rBxtvNQqJNzhQjru9qivlUalP-BxzV",
-        jogos: "https://script.googleusercontent.com/macros/echo?user_content_key=tSV0mi-DgT_sJlVAQRPYnoVwW3J9JpRlwGqZV_P1-9Znj5YE4wDCaBgPTSKvdphTnoZWSg_sLdWkj8x3RALWWmOdi--0ZJcCm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnLAHC7_wmPxFrFpJk8nbhU47u6hLhjuBTk8jWURADh61V_QzAwUW--m7PrIYvKVA79BnK4mIkwBxjnDKeGOOAEKKQO8bQgGrXAE&lib=M0568tv4iNvDjBAwuHpI1JfwLva-v4JqO"
+        dados: "https://script.google.com/macros/s/AKfycbz8G_SAowaGbTXSoL1Up7RnnDpEL5CGhzSc9VeLKpTm5bLqPAMWLtqS2zQBWw0NjdHCpg/exec",
+        jogos: "https://script.google.com/macros/s/AKfycby8KiefFil0gElim5WOmU6rxeaYGezA1qy-MCMhsSN8f33VN449grLj-q6rFhgO3_MC/exec",
+        // pontos: "https://script.google.com/macros/s/AKfycbwz50LSFr5lQP0TfWqzKKOmQQ5cT_ltXhZU-MbsHDFxuvoOXpU6CbDIqZ231oHTw-w/exec"
     };
 
     let carregados = 0;
@@ -70,7 +70,7 @@ $(document).ready(function () {
     }
 
     function verificarConclusao() {
-        if (carregados === 3) {
+        if (carregados === 2) {
             if (!erro) {
                 executarFuncoesPagina(); // Executar após conclusão
                 mostrarSucessoCarregamento();
