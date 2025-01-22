@@ -90,6 +90,7 @@ function construirClassificacaoPorDivisao(jogosData, dadosData) {
             return { codigo, ...stats, aproveitamento: parseFloat(aproveitamento), acertividade: parseFloat(acertividade) };
         });
 
+        // Ordenar a classificação com base na pontuação e critérios de desempate
         classificacaoArray.sort((a, b) => {
             if (b.pontuacao !== a.pontuacao) {
                 return b.pontuacao - a.pontuacao;
@@ -99,6 +100,10 @@ function construirClassificacaoPorDivisao(jogosData, dadosData) {
                 return b.saldos - a.saldos;
             } else if (b.acertos !== a.acertos) {
                 return b.acertos - a.acertos;
+            } else if (b.aproveitamento !== a.aproveitamento) {
+                return b.aproveitamento - a.aproveitamento;
+            } else if (b.acertividade !== a.acertividade) {
+                return b.acertividade - a.acertividade;
             } else {
                 return b.jogos - a.jogos;
             }

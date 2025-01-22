@@ -36,11 +36,37 @@ function calcularClassificacaoSuperFinal() {
         { codigo: "wellingtondiasdigital@gmail.com", nome: "Wellington Dias" }
     ];
 
-    const classificacao = jogadores.map((jogador, index) => {
+    let classificacao = jogadores.map(jogador => {
         const pontos = calcularPontosJogosNoPeriodo(jogador, dataInicioFinal, dataFimFinal);
-        return { ...jogador, ...pontos, index };
+        const jogos = pontos.jogos || 0;
+        const palpitesComPontos = pontos.acertos + pontos.cravadas + pontos.saldos;
+
+        const aproveitamento = jogos > 0 ? ((pontos.pontuacao / (jogos * 3)) * 100).toFixed(2) : 0;
+        const acertividade = jogos > 0 ? ((palpitesComPontos / jogos) * 100).toFixed(2) : 0;
+
+        return { ...jogador, ...pontos, aproveitamento: parseFloat(aproveitamento), acertividade: parseFloat(acertividade) };
     });
 
+    // Ordenar a classificação com base na pontuação e critérios de desempate
+    classificacao.sort((a, b) => {
+        if (b.pontuacao !== a.pontuacao) {
+            return b.pontuacao - a.pontuacao;
+        } else if (b.cravadas !== a.cravadas) {
+            return b.cravadas - a.cravadas;
+        } else if (b.saldos !== a.saldos) {
+            return b.saldos - a.saldos;
+        } else if (b.acertos !== a.acertos) {
+            return b.acertos - a.acertos;
+        } else if (b.aproveitamento !== a.aproveitamento) {
+            return b.aproveitamento - a.aproveitamento;
+        } else if (b.acertividade !== a.acertividade) {
+            return b.acertividade - a.acertividade;
+        } else {
+            return 0;
+        }
+    });
+
+    // Atualizar a tabela com a classificação corrigida
     atualizarTabelaClassificacao(classificacao);
 }
 
@@ -49,13 +75,15 @@ function calcularPontosJogosNoPeriodo(jogador, dataInicial, dataFinal) {
         pontuacao: 0,
         cravadas: 0,
         saldos: 0,
-        acertos: 0
+        acertos: 0,
+        jogos: 0
     };
 
     const jogosNoPeriodo = filtrarJogosPorPeriodo(dataInicial, dataFinal);
 
     jogosNoPeriodo.forEach(jogo => {
         if (jogo[jogador.codigo]) {
+            pontos.jogos += 1;
             const palpiteJogador = jogo[jogador.codigo];
             const [golsMandanteReal, golsVisitanteReal] = jogo.resultado.split('x').map(Number);
             const [golsMandantePalpite, golsVisitantePalpite] = palpiteJogador.split('x').map(Number);
@@ -93,15 +121,19 @@ function filtrarJogosPorPeriodo(dataInicial, dataFinal) {
 function atualizarTabelaClassificacao(classificacao) {
     let escudo = 'https://www.resultadismo.com/images/escudos/padrao.png';
     const tabela = document.querySelector("#jogo tbody");
-    tabela.innerHTML = classificacao.map(jogador => `
+    tabela.innerHTML = classificacao.map((jogador, index) => `
         <tr>
-            <td>${jogador.index + 1}°</td>
+            <td>${index + 1}°</td>
             <td><img src="${escudo}" data-codigo="${jogador.codigo}" alt="Escudo" width="30"></td>
             <td>${jogador.nome}</td>
             <td>${jogador.pontuacao}</td>
             <td>${jogador.cravadas}</td>
             <td>${jogador.saldos}</td>
             <td>${jogador.acertos}</td>
+            <!--
+            <td>${jogador.aproveitamento}%</td>
+            <td>${jogador.acertividade}%</td>
+            -->
         </tr>
     `).join("");
 }
