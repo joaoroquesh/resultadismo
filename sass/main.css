@@ -1352,6 +1352,26 @@ input :focus-visible {
   outline: 1px auto var(--turquoise-600);
 }
 
+tr.pago td:nth-child(3) {
+  text-wrap-mode: nowrap;
+  position: relative;
+}
+tr.pago td:nth-child(3)::after {
+  content: "$";
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: var(--size-1);
+  font-size: var(--font-size-xs);
+  font-weight: bold;
+  border-radius: var(--size-4);
+  background-color: var(--pizza-600);
+  color: var(--star-dust-100);
+  scale: 0.8;
+}
+
 footer {
   display: flex;
   justify-content: center;

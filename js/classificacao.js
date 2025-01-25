@@ -23,7 +23,8 @@ function construirClassificacaoPorDivisao(jogosData, dadosData) {
                 saldos: 0,
                 acertos: 0,
                 jogos: 0,
-                palpitesComPontos: 0
+                palpitesComPontos: 0,
+                pagoliga: jogador.pagoliga || ""
             };
         }
     });
@@ -113,8 +114,9 @@ function construirClassificacaoPorDivisao(jogosData, dadosData) {
         tbody.empty();
 
         classificacaoArray.forEach((jogador, index) => {
+            console.log(jogador);
             let linha = `
-                <tr>
+                <tr class="${jogador.pagoliga}">
                     <td>${index + 1}°</td>
                     <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${jogador.codigo}" alt="Escudo" width="30"></td>
                     <td data-codigo="${jogador.codigo}"></td>

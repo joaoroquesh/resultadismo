@@ -154,7 +154,7 @@ function preencherClassificacoes(dadosData) {
             classificacao[i].forEach((jogador, index) => {
                 let escudo = 'https://www.resultadismo.com/images/escudos/padrao.png';
                 let linha = `
-                        <tr>
+                        <tr class="${jogador.pagocopa}">
                             <td>${index + 1}°</td>
                             <td><img src="${escudo}" data-codigo="${jogador.codigo}" alt="Escudo" width="30"></td>
                             <td data-codigo="${jogador.codigo}">${jogador.codigo}</td>
@@ -210,7 +210,7 @@ function preencherClassificacoes(dadosData) {
                 vencedores.forEach((jogador, index) => {
                     let escudo = 'https://www.resultadismo.com/images/escudos/padrao.png';
                     let linha = `
-                        <tr>
+                        <tr class="${jogador.pagocopa}">
                             <td>${index + 1}°</td>
                             <td><img src="${escudo}" data-codigo="${jogador.codigo}" alt="Escudo" width="30"></td>
                             <td data-codigo="${jogador.codigo}">${jogador.codigo}</td>
@@ -266,7 +266,7 @@ function preencherClassificacoes(dadosData) {
                 vencedores.forEach((jogador, index) => {
                     let escudo = 'https://www.resultadismo.com/images/escudos/padrao.png';
                     let linha = `
-                        <tr>
+                        <tr class="${jogador.pagocopa}">
                             <td>${index + 1}°</td>
                             <td><img src="${escudo}" data-codigo="${jogador.codigo}" alt="Escudo" width="30"></td>
                             <td data-codigo="${jogador.codigo}">${jogador.codigo}</td>
@@ -321,7 +321,7 @@ function preencherClassificacoes(dadosData) {
             vencedores.forEach((jogador, index) => {
                 let escudo = 'https://www.resultadismo.com/images/escudos/padrao.png';
                 let linha = `
-                    <tr>
+                    <tr class="${jogador.pagocopa}">
                         <td>${index + 1}°</td>
                         <td><img src="${escudo}" data-codigo="${jogador.codigo}" alt="Escudo" width="30"></td>
                         <td data-codigo="${jogador.codigo}">${jogador.codigo}</td>
