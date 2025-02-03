@@ -28,14 +28,8 @@
     gap: .25rem;
     color: $dark;
     fill: $dark;
-    padding-inline: .5rem;
+    padding-inline: $size-3;
 
-
-    @media (max-width:992px) {
-      flex-direction: column;
-      font-size: .65rem;
-      padding: .25rem;
-    }
 
     &:hover {
       color: $primary;
