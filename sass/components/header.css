@@ -16,7 +16,7 @@
 #header .nav-link {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: start;
   gap: 0.25rem;
   color: var(--star-dust-950);
   fill: var(--star-dust-950);
@@ -54,29 +54,8 @@
     height: 74px;
   }
 }
-
-#menu .navbar {
-  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
-}
-#menu .navbar-collapse {
-  display: flex !important;
-  position: fixed;
-  bottom: 0.25rem;
-  left: 0;
-  right: 0;
-}
-#menu .navbar-collapse .navbar-nav {
-  flex-direction: row;
-  padding: 0.5rem;
-  background: var(--star-dust-100);
-  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
-  width: calc(100% - 2rem);
-  max-width: 690px;
-  justify-content: space-between;
-}
-
 #header-options {
-  z-index: 1000 !important;
+  z-index: 99999 !important;
 }
 #header-options .wrapper-alice {
   z-index: 1010;
@@ -155,4 +134,29 @@
   z-index: 1001;
   opacity: 1;
   transition: all 0.5s ease-in-out;
+}
+
+#menu {
+  position: relative;
+  z-index: 9999;
+}
+#menu .navbar {
+  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
+}
+#menu .navbar-collapse {
+  z-index: 9999;
+  display: flex !important;
+  position: fixed;
+  bottom: 0.25rem;
+  left: 0;
+  right: 0;
+}
+#menu .navbar-collapse .navbar-nav {
+  flex-direction: row;
+  padding: 0.5rem;
+  background: var(--star-dust-100);
+  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
+  width: calc(100% - 2rem);
+  max-width: 690px;
+  justify-content: space-between;
 }/*# sourceMappingURL=header.css.map */

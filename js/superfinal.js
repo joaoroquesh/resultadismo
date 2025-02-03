@@ -20,8 +20,8 @@ function ajustarFusoHorario(data) {
     return data;
 }
 
-const dataInicioFinal = ajustarAnoPara2025(new Date("2025-01-20"));
-const dataFimFinal = ajustarAnoPara2025(new Date("2025-01-26"));
+const dataInicioFinal = ajustarAnoPara2025(new Date("2025-02-10"));
+const dataFimFinal = ajustarAnoPara2025(new Date("2025-02-17"));
 
 function atualizarVencedorTabs() {
     const dataHoje = ajustarAnoPara2025(new Date());
@@ -33,7 +33,7 @@ function atualizarVencedorTabs() {
 function calcularClassificacaoSuperFinal() {
     const jogadores = [
         { codigo: "luanhatsuo.sh@gmail.com", nome: "Luan Hatsuo" },
-        { codigo: "wellingtondiasdigital@gmail.com", nome: "Wellington Dias" }
+        { codigo: "fadautofn@gmail.com", nome: "Adauto Farias" }
     ];
 
     let classificacao = jogadores.map(jogador => {

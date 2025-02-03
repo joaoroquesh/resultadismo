@@ -19,7 +19,7 @@ document.querySelector('.form').addEventListener('submit', function (event) {
     localStorage.setItem('logado', user.codigo);
 
     // Redirect or display success message (adjust as needed)
-    window.location.href = '/palpite'; // Replace with the desired page
+    window.location.href = '/jogos'; // Replace with the desired page
   } else {
     // User not found, display error message
     infoElement.textContent = 'Nenhuma conta encontrada';
@@ -27,6 +27,13 @@ document.querySelector('.form').addEventListener('submit', function (event) {
   }
 });
 
+$(document).ready(function () {
+  const logado = localStorage.getItem('logado');
+
+  if (logado && logado.trim() !== '') {
+    window.location.href = '/jogos';
+  }
+});
 
 
 function executarFuncoesPagina() {
