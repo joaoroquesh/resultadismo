@@ -3,6 +3,7 @@
 function executarFuncoesPagina() {
     atualizarElementosGlobais(window.dados);
     listarCampeonatos(window.jogos.data);
+    listarMeses(window.jogos.data);
     construirClassificacao(window.jogos.data);
     ativarControleVisualizacao();
     
@@ -10,7 +11,6 @@ function executarFuncoesPagina() {
     $('#nav-geral-tab').click();
     $('#nav-geral-tab').trigger('click');
 }
-
 
 function construirClassificacao(jogosData) {
     let classificacao = {};
