@@ -1,34 +1,3 @@
-$(document).ready(function () {
-    $(document).on('jogosPronto', function () {
-        if (typeof window.jogos !== 'undefined' && window.jogos.data) {
-            construirClassificacao(window.jogos.data);
-            listarCampeonatos(window.jogos.data);
-            ativarControleVisualizacao();
-            atualizarElementosGlobais(window.dados);
-        } else {
-            console.error("Os dados dos jogos não foram carregados corretamente.");
-        }
-    });
-
-    // Contador de JSONs carregados
-    let carregados = 0;
-
-    $(document).on('dadosAtualizado pontosAtualizado jogosAtualizado', function () {
-        carregados++;
-        if (carregados === 3) {
-            if (typeof window.dados !== 'undefined' && window.dados.data) {
-                listarCampeonatos(window.jogos.data);
-                construirClassificacao(window.jogos.data);
-                ativarControleVisualizacao();
-                atualizarElementosGlobais(window.dados);
-            }
-            $('body').removeClass('loading');
-            console.log("Todos os dados foram atualizados.");
-        }
-    });
-
-    
-});
 
 function executarFuncoesPagina() {
     atualizarElementosGlobais(window.dados);
