@@ -286,7 +286,7 @@ footer {
     margin-left: auto;
     margin-right: auto;
   }
-  
+
   .icone {
     position: absolute;
     top: 28px;
@@ -1421,10 +1421,11 @@ footer {
             display: flex;
             align-items: center;
             gap: $size-2;
+            flex-direction: row-reverse;
 
             &.team-away {
-              flex-direction: row-reverse;
-              text-align: end;
+              flex-direction: row;
+              // text-align: end;
             }
 
             &-name {

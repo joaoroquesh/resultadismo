@@ -2478,10 +2478,10 @@ footer a:hover {
   display: flex;
   align-items: center;
   gap: var(--size-2);
+  flex-direction: row-reverse;
 }
 #jogos.closed .card-game-result-team.team-away {
-  flex-direction: row-reverse;
-  text-align: end;
+  flex-direction: row;
 }
 #jogos.closed .card-game-result-team-name {
   position: relative;
