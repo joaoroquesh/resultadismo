@@ -315,9 +315,22 @@ function selecionarDiaHoje(isInitialLoad = false) {
 function listarPalpites(jogo) {
   let palpites = [];
   let resultadoReal = jogo.resultado;
-  let horarioJogo = new Date(jogo.hora).getTime();
-  let agora = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
-  let horaAtual = new Date(agora).getTime();
+  let [diaJogo, mesJogo] = jogo.data.split('/').map(Number);
+  let anoAtual = new Date().getFullYear();
+
+  // Extrair a hora e minutos diretamente da string do JSON (ISO format)
+  let horaPartida = new Date(jogo.hora);
+  let hora = horaPartida.getUTCHours();
+  let minuto = horaPartida.getUTCMinutes();
+
+  // Criar um objeto Date para o horário do jogo no fuso de Brasília
+  let horarioJogo = new Date(anoAtual, mesJogo - 1, diaJogo, hora, minuto).getTime();
+  let horaAtual = Date.now(); // Obtendo timestamp correto do momento atual
+
+  console.log("horaAtual:", horaAtual);
+  console.log("horarioJogo:", horarioJogo);
+  console.log("diferenca:", (horarioJogo - horaAtual) / (1000 * 60 * 60 * 24));
+  console.log(horaAtual <= horarioJogo ? true : false);
 
   for (let chave in jogo) {
     if (chave.includes('@') && jogo[chave] !== "") {
@@ -335,24 +348,21 @@ function listarPalpites(jogo) {
         } else if ((golsMandantePalpite - golsVisitantePalpite) === (golsMandanteReal - golsVisitanteReal) && (golsMandantePalpite > golsVisitantePalpite) === (golsMandanteReal > golsVisitanteReal)) {
           classePontuacao = 'saldo';
           pontos = 2;
-        } else if (
-          (golsMandantePalpite > golsVisitantePalpite && golsMandanteReal > golsVisitanteReal) ||
-          (golsMandantePalpite < golsVisitantePalpite && golsMandanteReal < golsVisitanteReal)
-        ) {
-          if (golsMandanteReal !== golsVisitanteReal) { // Não é um empate
+        } else if ((golsMandantePalpite > golsVisitantePalpite && golsMandanteReal > golsVisitanteReal) || (golsMandantePalpite < golsVisitantePalpite && golsMandanteReal < golsVisitanteReal)) {
+          if (golsMandanteReal !== golsVisitanteReal) {
             classePontuacao = 'acerto';
             pontos = 1;
           }
         }
       }
 
+      
+
       palpites.push({
         chave,
         palpite: jogo[chave],
         classePontuacao,
-        pontos,
-        golsMandantePalpite: parseInt(palpiteJogador.split('x')[0]),
-        golsVisitantePalpite: parseInt(palpiteJogador.split('x')[1])
+        pontos
       });
     }
   }
@@ -379,13 +389,12 @@ function listarPalpites(jogo) {
     return totalGolsB - totalGolsA;
   });
 
-  // Construir HTML dos palpites
   let palpitesHTML = palpites.map(({ chave, palpite, classePontuacao }) => {
     return `
       <tr>
         <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${chave}" alt="Escudo" width="32"></td>
         <td data-codigo="${chave}"></td>
-        <td>${horaAtual >= horarioJogo ? `<span class="${classePontuacao}">${palpite}</span>` : ''}</td>
+        <td>${horaAtual >= horarioJogo ? `<span class="${classePontuacao}">${palpite}</span>` : `<span class="oculto"></span>`}</td>
       </tr>
     `;
   }).join('');
