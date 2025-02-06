@@ -2331,6 +2331,9 @@ footer a:hover {
   border: 1px solid var(--punch-700);
   color: var(--punch-700);
 }
+#jogos .card.breve td:last-child {
+  display: none;
+}
 #jogos .card-game {
   padding: var(--size-2);
   gap: var(--size-2);

@@ -1238,6 +1238,14 @@ footer {
       }
     }
 
+    &.breve{
+      td{
+        &:last-child{
+          display: none;
+        }
+      }
+    }
+
     &-game {
       padding: $size-2;
       gap: $size-2;
