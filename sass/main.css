@@ -2505,7 +2505,7 @@ footer a:hover {
   rotate: 0deg;
 }
 #jogos.closed #content-space {
-  height: 55px !important;
+  height: 0px !important;
 }
 #jogos .selecao:after {
   right: -2px;

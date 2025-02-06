@@ -150,12 +150,11 @@ function formatarHora(horaISO) {
   if (!horaISO) return '-';
 
   const data = new Date(horaISO);
+  const dataBrasilia = new Date(data.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
 
-  // Ajuste para garantir que a hora seja mostrada corretamente no fuso horário local
-  let horas = data.getHours();
-  let minutos = data.getMinutes();
+  let horas = dataBrasilia.getHours();
+  let minutos = dataBrasilia.getMinutes();
 
-  // Formatar em "16h00"
   return `${horas.toString().padStart(2, '0')}h${minutos.toString().padStart(2, '0')}`;
 }
 
@@ -315,9 +314,10 @@ function selecionarDiaHoje(isInitialLoad = false) {
 
 function listarPalpites(jogo) {
   let palpites = [];
-
-  // Definir regras de pontuação
   let resultadoReal = jogo.resultado;
+  let horarioJogo = new Date(jogo.hora).getTime();
+  let agora = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
+  let horaAtual = new Date(agora).getTime();
 
   for (let chave in jogo) {
     if (chave.includes('@') && jogo[chave] !== "") {
@@ -382,12 +382,12 @@ function listarPalpites(jogo) {
   // Construir HTML dos palpites
   let palpitesHTML = palpites.map(({ chave, palpite, classePontuacao }) => {
     return `
-          <tr>
-              <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${chave}" alt="Escudo" width="32"></td>
-              <td data-codigo="${chave}"></td>
-              ${resultadoReal && resultadoReal !== '' ? `<td><span class="${classePontuacao}">${palpite}</span></td>` : ''}
-          </tr>
-      `;
+      <tr>
+        <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${chave}" alt="Escudo" width="32"></td>
+        <td data-codigo="${chave}"></td>
+        <td>${horaAtual >= horarioJogo ? `<span class="${classePontuacao}">${palpite}</span>` : ''}</td>
+      </tr>
+    `;
   }).join('');
 
   return palpitesHTML;
