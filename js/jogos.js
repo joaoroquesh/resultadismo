@@ -85,6 +85,7 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
       let data = jogo.data || '-';
       let completo = jogo.completo || '-';
       let hora = formatarHora(jogo.hora) || '-';
+      let andamento = jogo.andamento || '-';
       let mandante = jogo.mandante ? jogo.mandante.replace(/\s|\-|\|/g, '') : '-';
       let visitante = jogo.visitante ? jogo.visitante.replace(/\s|\-|\|/g, '') : '-';
       let campeonato = jogo.campeonato || '-';
@@ -94,7 +95,7 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
       let visitanteGols = resultado !== '-' && resultado.includes('x') ? resultado.split('x')[1].trim() : '-';
 
       let cardHTML = `
-              <div class="card game p-0">
+              <div class="card game ${andamento} p-0">
                   <div class="card-game d-flex flex-column">
                       <div class="card-game-label d-flex gap-2 center-s">
                           <div class="card-game-label-hour">

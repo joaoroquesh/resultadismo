@@ -2293,38 +2293,80 @@ footer a:hover {
 }
 
 #jogos .accordion {
-  gap: var(--size-3);
+  gap: var(--size-2);
+}
+#jogos .card {
+  max-width: 400px;
+  height: -moz-fit-content;
+  height: fit-content;
 }
 #jogos .card * {
   transition: var(--transition-1);
 }
+#jogos .card.Finalizado {
+  background: var(--star-dust-200);
+}
+#jogos .card.Finalizado .card-game-result-score span {
+  border: var(--star-dust-950) solid 1px;
+}
+#jogos .card.vivo {
+  border: 1px solid var(--punch-700);
+}
+#jogos .card.vivo .card-header {
+  position: relative;
+}
+#jogos .card.vivo .card-header::before {
+  content: "Ao vivo";
+  position: absolute;
+  top: 50%;
+  left: var(--size-2);
+  translate: 0 -50%;
+  background: var(--punch-700);
+  color: var(--star-dust-100);
+  padding: var(--size-0) var(--size-2);
+  border-radius: var(--size-5);
+  font-size: var(--font-size-xs);
+}
+#jogos .card.vivo .card-game-result-score span {
+  border: 1px solid var(--punch-700);
+  color: var(--punch-700);
+}
 #jogos .card-game {
-  padding: var(--size-3);
-  gap: var(--size-3);
+  padding: var(--size-2);
+  gap: var(--size-2);
 }
 #jogos .card-game-label {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
 }
 #jogos .card-game-result {
-  --team-size: 60px;
-  height: 100px;
+  --team-size: 30px;
+  height: -moz-fit-content;
+  height: fit-content;
   display: flex;
-  justify-content: space-between;
-  padding-bottom: var(--size-3);
+  justify-content: center;
+  padding-bottom: var(--size-0);
 }
 #jogos .card-game-result-team {
-  width: 30%;
+  width: 50%;
+  min-width: 120px;
   position: relative;
-  padding: var(--size-2);
-  text-align: center;
+  padding: var(--size-0) var(--size-2);
+  display: flex;
+  align-items: center;
+  gap: var(--size-2);
+}
+#jogos .card-game-result-team.team-home {
+  flex-direction: row-reverse;
+  text-align: end;
 }
 #jogos .card-game-result-team-name {
-  position: absolute;
-  bottom: calc(var(--size-3) * -1);
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
+  bottom: auto;
+  left: auto;
+  transform: translateX(0);
   font-size: var(--font-size-xs);
-  text-wrap: nowrap;
+  line-height: 1;
+  text-wrap: wrap;
 }
 #jogos .card-game-result-team img {
   max-width: var(--team-size);
@@ -2333,8 +2375,8 @@ footer a:hover {
 #jogos .card-game-result-score {
   display: flex;
   align-items: center;
-  gap: var(--size-3);
-  padding: var(--size-2);
+  gap: var(--size-2);
+  padding: var(--size-0) var(--size-1);
 }
 #jogos .card-game-result-score span {
   height: var(--team-size);
@@ -2342,20 +2384,27 @@ footer a:hover {
   max-width: var(--team-size);
   color: var(--star-dust-950);
   border: 1px solid var(--turquoise-600);
-  border-radius: var(--size-3);
+  border-radius: var(--size-1);
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: var(--font-size-3);
+  font-size: var(--font-size-6);
+}
+#jogos .card.game .card {
+  position: relative;
 }
 #jogos .card.game .card-header {
+  position: absolute;
+  width: 100%;
+  background: transparent;
   border: 0px;
-  background: var(--star-dust-200);
   padding: 0;
 }
 #jogos .card.game .card-header .btn {
   position: relative;
-  padding: var(--size-2) var(--size-4);
+  padding: var(--size-1) var(--size-4);
+  color: transparent;
+  font-size: var(--font-size-xs);
   font-weight: bold;
 }
 #jogos .card.game .card-header .btn:before {
@@ -2383,7 +2432,12 @@ footer a:hover {
   padding: var(--size-3);
 }
 #jogos .card.game .card-body table {
-  margin: 0;
+  border-collapse: separate;
+  border-spacing: var(--size-1);
+}
+#jogos .card.game .card-body table tr {
+  box-shadow: var(--box-shadow-1);
+  border-radius: var(--size-2);
 }
 #jogos .card.game .card-body table td {
   vertical-align: middle;
@@ -2452,144 +2506,6 @@ footer a:hover {
 }
 #jogos.closed #content-space {
   height: 55px !important;
-}
-#jogos.closed .accordion {
-  gap: var(--size-2);
-}
-#jogos.closed .card-game {
-  padding: var(--size-2);
-  gap: var(--size-2);
-}
-#jogos.closed .card-game-label {
-  font-size: var(--font-size-xs);
-}
-#jogos.closed .card-game-result {
-  --team-size: 30px;
-  height: -moz-fit-content;
-  height: fit-content;
-  display: flex;
-  justify-content: space-between;
-  padding-bottom: var(--size-0);
-}
-#jogos.closed .card-game-result-team {
-  width: 50%;
-  position: relative;
-  padding: var(--size-0) var(--size-2);
-  display: flex;
-  align-items: center;
-  gap: var(--size-2);
-  flex-direction: row-reverse;
-}
-#jogos.closed .card-game-result-team.team-away {
-  flex-direction: row;
-}
-#jogos.closed .card-game-result-team-name {
-  position: relative;
-  bottom: auto;
-  left: auto;
-  transform: translateX(0);
-  font-size: var(--font-size-xs);
-  line-height: 1;
-  text-wrap: wrap;
-}
-#jogos.closed .card-game-result-team img {
-  max-width: var(--team-size);
-  max-height: var(--team-size);
-}
-#jogos.closed .card-game-result-score {
-  display: flex;
-  align-items: center;
-  gap: var(--size-2);
-  padding: var(--size-0) var(--size-1);
-}
-#jogos.closed .card-game-result-score span {
-  height: var(--team-size);
-  width: var(--team-size);
-  max-width: var(--team-size);
-  color: var(--star-dust-950);
-  border: 1px solid var(--turquoise-600);
-  border-radius: var(--size-1);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: var(--font-size-6);
-}
-#jogos.closed .card.game .card {
-  position: relative;
-}
-#jogos.closed .card.game .card-header {
-  position: absolute;
-  width: 100%;
-  background: transparent;
-}
-#jogos.closed .card.game .card-header .btn {
-  position: relative;
-  padding: var(--size-1) var(--size-4);
-  color: transparent;
-  font-size: var(--font-size-xs);
-  font-weight: bold;
-}
-#jogos.closed .card.game .card-body {
-  padding: var(--size-3);
-}
-#jogos.closed .card.game .card-body table td {
-  vertical-align: middle;
-  text-align: center;
-  padding: 0;
-}
-#jogos.closed .card.game .card-body table td:nth-child(1) {
-  width: 50px;
-  max-width: 50px;
-}
-#jogos.closed .card.game .card-body table td:nth-child(2) {
-  text-align: left;
-  font-size: var(--font-size-sm);
-}
-#jogos.closed .card.game .card-body table td .cravada,
-#jogos.closed .card.game .card-body table td .saldo,
-#jogos.closed .card.game .card-body table td .acerto {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  font-weight: bold;
-  border-radius: var(--size-2);
-  color: var(--star-dust-100);
-}
-#jogos.closed .card.game .card-body table td .cravada:after,
-#jogos.closed .card.game .card-body table td .saldo:after,
-#jogos.closed .card.game .card-body table td .acerto:after {
-  content: "";
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  color: var(--star-dust-100);
-  width: 20px;
-  height: 20px;
-  background: var(--turquoise-600);
-  font-size: 10px;
-  border-radius: 100px;
-  padding: 2px;
-  font-weight: normal;
-  scale: 0.8;
-}
-#jogos.closed .card.game .card-body table td .cravada {
-  background: var(--pizza-600);
-}
-#jogos.closed .card.game .card-body table td .cravada:after {
-  content: "+3";
-}
-#jogos.closed .card.game .card-body table td .saldo {
-  background: var(--bilbao-700);
-}
-#jogos.closed .card.game .card-body table td .saldo:after {
-  content: "+2";
-}
-#jogos.closed .card.game .card-body table td .acerto {
-  font-weight: normal;
-  background: var(--blue-dianne-900);
-}
-#jogos.closed .card.game .card-body table td .acerto:after {
-  content: "+1";
 }
 #jogos .selecao:after {
   right: -2px;

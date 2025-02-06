@@ -29,18 +29,19 @@ body {
   transition: var(--transition-1);
 }
 
-.navbar-toggler{
+.navbar-toggler {
   padding: var(--size-2);
   height: calc(24px + var(--size-2) + var(--size-2));
   width: calc(24px + var(--size-2) + var(--size-2));
 
-  img{
+  img {
     height: 24px;
   }
 
-  &.logado{
+  &.logado {
     padding: var(--size-0);
-    img{
+
+    img {
       height: 38px;
     }
   }
@@ -87,13 +88,13 @@ input {
 
 }
 
-tr.pago{
-  td{
-    &:nth-child(3){
+tr.pago {
+  td {
+    &:nth-child(3) {
       text-wrap-mode: nowrap;
       position: relative;
 
-      &::after{
+      &::after {
         content: '$';
         // position: absolute;
         width: 22px;
@@ -145,7 +146,7 @@ footer {
 
   .skeleton {
     position: relative;
-    overflow: hidden!important;
+    overflow: hidden !important;
     border: 0 !important;
     color: transparent !important;
     border-radius: $size-2 !important;
@@ -193,7 +194,7 @@ footer {
   }
 }
 
-.atualizando{
+.atualizando {
   #carregando {
     z-index: 999;
     display: block;
@@ -209,24 +210,28 @@ footer {
       bottom: calc(.5rem + 70px);
     }
 
-    &.erro, &.success{
-      svg{
-        width:32px;
-        height:32px;
+    &.erro,
+    &.success {
+      svg {
+        width: 32px;
+        height: 32px;
       }
     }
-    &.erro{
+
+    &.erro {
       border: 1px solid $danger;
       fill: $danger;
     }
-    &.success{
+
+    &.success {
       border: 1px solid $cravada;
       fill: $cravada;
     }
 
-    &-text{
+    &-text {
       color: $dark;
     }
+
     @media (max-width:992px) {
       bottom: calc(1rem + 70px);
     }
@@ -350,13 +355,13 @@ footer {
   }
 }
 
-.fixed-top{
+.fixed-top {
   z-index: 1000;
 }
 
 
 /* ELEMENTS*/
-.manutencao{
+.manutencao {
   background: $light;
   position: fixed;
   height: 100vh;
@@ -773,7 +778,7 @@ footer {
         }
 
 
-        
+
 
       }
 
@@ -887,8 +892,8 @@ footer {
             background: $primary;
 
             td {
-                color: $light !important;
-              
+              color: $light !important;
+
             }
           }
         }
@@ -902,7 +907,7 @@ footer {
               background: $cravada;
 
               td {
-                  color: $light !important;
+                color: $light !important;
               }
             }
           }
@@ -1183,45 +1188,96 @@ footer {
 #jogos {
 
   .accordion {
-    gap: $size-3;
+    gap: $size-2;
   }
 
   .card {
+    max-width: 400px;
+    height: fit-content;
 
     * {
       transition: var(--transition-1);
     }
 
+    &.Finalizado{
+      background: $medium;
+
+      .card-game-result-score{
+        span{
+          border: $dark solid 1px;
+          // color: $primary;
+          // background: $darkgray;
+        }
+      }
+    }
+
+    &.vivo{
+      border: 1px solid $danger;
+      
+      .card-header{
+        position: relative;
+
+        &::before{
+          content: "Ao vivo";
+          position: absolute;
+          top: 50%;
+          left: $size-2;
+          translate: 0 -50%;
+          background: $danger;
+          color: $light;
+          padding: $size-0 $size-2;
+          border-radius: $size-5;
+          font-size: $font-size-xs;
+        }
+      }
+      .card-game-result-score{
+        span{
+          border: 1px solid $danger;
+          color: $danger;
+        }
+      }
+    }
+
     &-game {
-      padding: $size-3;
-      gap: $size-3;
+      padding: $size-2;
+      gap: $size-2;
       // padding-bottom: 0;
 
       &-label {
-        font-size: var(--font-size-sm);
+        font-size: var(--font-size-xs);
       }
 
       &-result {
-        --team-size: 60px;
-        height: 100px;
+        --team-size: 30px;
+        height: fit-content;
         display: flex;
-        justify-content: space-between;
-        padding-bottom: $size-3;
+        justify-content: center;
+        padding-bottom: $size-0;
 
         &-team {
           // flex: 0 0 30%;
-          width: 30%;
+          width: 50%;
+          min-width: 120px;
           position: relative;
-          padding: $size-2;
-          text-align: center;
+          padding: $size-0 $size-2;
+          display: flex;
+          align-items: center;
+          gap: $size-2;
+
+
+          &.team-home {
+            flex-direction: row-reverse;
+            text-align: end;
+          }
 
           &-name {
-            position: absolute;
-            bottom: calc($size-3 * -1);
-            left: 50%;
-            transform: translateX(-50%);
+            position: relative;
+            bottom: auto;
+            left: auto;
+            transform: translateX(0);
             font-size: var(--font-size-xs);
-            text-wrap: nowrap;
+            line-height: 1;
+            text-wrap: wrap;
           }
 
           img {
@@ -1234,9 +1290,8 @@ footer {
         &-score {
           display: flex;
           align-items: center;
-          gap: $size-3;
-
-          padding: $size-2;
+          gap: $size-2;
+          padding: $size-0 $size-1;
 
           span {
             height: var(--team-size);
@@ -1244,11 +1299,11 @@ footer {
             max-width: var(--team-size);
             color: $dark;
             border: 1px solid $primary;
-            border-radius: $size-3;
+            border-radius: $size-1;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: $font-size-3;
+            font-size: $font-size-6;
           }
         }
       }
@@ -1256,16 +1311,22 @@ footer {
     }
 
     &.game {
+
       .card {
+        position: relative;
+
         &-header {
+          position: absolute;
+          width: 100%;
+          background: transparent;
           border: 0px;
-          background: $medium;
           padding: 0;
 
           .btn {
             position: relative;
-            padding: $size-2 $size-4;
-            // color: $primary;
+            padding: $size-1 $size-4;
+            color: transparent;
+            font-size: var(--font-size-xs);
             font-weight: bold;
 
             &:before {
@@ -1294,6 +1355,7 @@ footer {
                 rotate: 0deg;
               }
             }
+
           }
         }
 
@@ -1301,7 +1363,13 @@ footer {
           padding: $size-3;
 
           table {
-            margin: 0;
+            border-collapse: separate;
+            border-spacing: $size-1;
+
+            tr {
+              box-shadow: $box-shadow-1;
+              border-radius: $size-2;
+            }
 
             td {
               vertical-align: middle;
@@ -1392,180 +1460,8 @@ footer {
       height: 55px !important;
     }
 
-    .accordion {
-      gap: $size-2;
-    }
 
-    .card {
-      &-game {
-        padding: $size-2;
-        gap: $size-2;
-        // padding-bottom: 0;
 
-        &-label {
-          font-size: var(--font-size-xs);
-        }
-
-        &-result {
-          --team-size: 30px;
-          height: fit-content;
-          display: flex;
-          justify-content: space-between;
-          padding-bottom: $size-0;
-
-          &-team {
-            // flex: 0 0 30%;
-            width: 50%;
-            position: relative;
-            padding: $size-0 $size-2;
-            display: flex;
-            align-items: center;
-            gap: $size-2;
-            flex-direction: row-reverse;
-
-            &.team-away {
-              flex-direction: row;
-              // text-align: end;
-            }
-
-            &-name {
-              position: relative;
-              bottom: auto;
-              left: auto;
-              transform: translateX(0);
-              font-size: var(--font-size-xs);
-              line-height: 1;
-              text-wrap: wrap;
-            }
-
-            img {
-              max-width: var(--team-size);
-              max-height: var(--team-size);
-            }
-
-          }
-
-          &-score {
-            display: flex;
-            align-items: center;
-            gap: $size-2;
-            padding: $size-0 $size-1;
-
-            span {
-              height: var(--team-size);
-              width: var(--team-size);
-              max-width: var(--team-size);
-              color: $dark;
-              border: 1px solid $primary;
-              border-radius: $size-1;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              font-size: $font-size-6;
-            }
-          }
-        }
-
-      }
-
-      &.game {
-        .card {
-          position: relative;
-
-          &-header {
-            position: absolute;
-            width: 100%;
-            background: transparent;
-
-            .btn {
-              position: relative;
-              padding: $size-1 $size-4;
-              color: transparent;
-              font-size: var(--font-size-xs);
-              font-weight: bold;
-
-            }
-          }
-
-          &-body {
-            padding: $size-3;
-
-            table {
-              td {
-                vertical-align: middle;
-                text-align: center;
-                padding: 0;
-
-                &:nth-child(1) {
-                  width: 50px;
-                  max-width: 50px;
-                }
-
-                &:nth-child(2) {
-                  text-align: left;
-                  font-size: var(--font-size-sm);
-                }
-
-                .cravada,
-                .saldo,
-                .acerto {
-                  position: relative;
-                  display: flex;
-                  justify-content: center;
-                  font-weight: bold;
-                  border-radius: $size-2;
-                  color: $light;
-
-                  &:after {
-                    content: '';
-                    position: absolute;
-                    top: -10px;
-                    right: -10px;
-                    color: $light;
-                    width: 20px;
-                    height: 20px;
-                    background: $primary;
-                    font-size: 10px;
-                    border-radius: 100px;
-                    padding: 2px;
-                    font-weight: normal;
-                    scale: .8;
-                  }
-                }
-
-                .cravada {
-
-                  background: $cravada;
-
-                  &:after {
-                    content: '+3';
-                  }
-                }
-
-                .saldo {
-                  background: $saldo;
-                  // border: 1px solid $saldo;
-
-                  &:after {
-                    content: '+2';
-                  }
-                }
-
-                .acerto {
-                  font-weight: normal;
-                  background: $acerto;
-                  // border: 1px solid $acerto;
-
-                  &:after {
-                    content: '+1';
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
   }
 
   .selecao {
@@ -1699,5 +1595,3 @@ footer {
     }
   }
 }
-
-
