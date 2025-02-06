@@ -131,7 +131,7 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
                   </div>
                   <div id="collapse${codigo}" class="collapse" aria-labelledby="heading${codigo}" data-parent="#accordionGames">
                       <div class="card-body">
-                          <table class="table">
+                          <table class="table table-borderless">
                               <tbody>
                                   ${listarPalpites(jogo)}
                               </tbody>
