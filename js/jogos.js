@@ -330,7 +330,7 @@ function listarPalpites(jogo) {
   console.log("horaAtual:", horaAtual);
   console.log("horarioJogo:", horarioJogo);
   console.log("diferenca:", (horarioJogo - horaAtual) / (1000 * 60 * 60 * 24));
-  console.log(horaAtual <= horarioJogo ? true : false);
+  console.log(horaAtual > horarioJogo ? true : false);
 
   for (let chave in jogo) {
     if (chave.includes('@') && jogo[chave] !== "") {
@@ -394,7 +394,7 @@ function listarPalpites(jogo) {
       <tr>
         <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${chave}" alt="Escudo" width="32"></td>
         <td data-codigo="${chave}"></td>
-        <td>${horaAtual >= horarioJogo ? `<span class="${classePontuacao}">${palpite}</span>` : `<span class="oculto"></span>`}</td>
+        <td><span class="${classePontuacao}">${palpite}</span></td>
       </tr>
     `;
   }).join('');

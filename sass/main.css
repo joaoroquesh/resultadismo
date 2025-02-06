@@ -1883,9 +1883,9 @@ footer a:hover {
   background: var(--star-dust-100);
   z-index: 99;
 }
-@media (max-width: 767px) {
+@media (max-width: 992px) {
   #content-fixed.fixed-top {
-    top: 74px;
+    top: 65px;
   }
 }
 
