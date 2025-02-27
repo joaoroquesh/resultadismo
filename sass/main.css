@@ -2334,6 +2334,9 @@ footer a:hover {
 #jogos .card.breve td:last-child {
   display: none;
 }
+#jogos .card.breve .logado td:last-child {
+  display: table-cell;
+}
 #jogos .card-game {
   padding: var(--size-2);
   gap: var(--size-2);

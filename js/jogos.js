@@ -1,5 +1,3 @@
-
-
 function executarFuncoesPagina() {
   atualizarElementosGlobais(window.dados);
   gerarNavegacao(window.jogos.data);
@@ -315,6 +313,11 @@ function selecionarDiaHoje(isInitialLoad = false) {
 function listarPalpites(jogo) {
   let palpites = [];
   let resultadoReal = jogo.resultado;
+  let andamento = jogo.andamento;
+  let logado = localStorage.getItem('logado');
+
+  let nomesMap = Object.fromEntries(window.dados.data.map(({ codigo, nome }) => [codigo, nome]));
+
   let [diaJogo, mesJogo] = jogo.data.split('/').map(Number);
   let anoAtual = new Date().getFullYear();
 
@@ -327,16 +330,14 @@ function listarPalpites(jogo) {
   let horarioJogo = new Date(anoAtual, mesJogo - 1, diaJogo, hora, minuto).getTime();
   let horaAtual = Date.now(); // Obtendo timestamp correto do momento atual
 
-  console.log("horaAtual:", horaAtual);
-  console.log("horarioJogo:", horarioJogo);
-  console.log("diferenca:", (horarioJogo - horaAtual) / (1000 * 60 * 60 * 24));
-  console.log(horaAtual > horarioJogo ? true : false);
-
   for (let chave in jogo) {
     if (chave.includes('@') && jogo[chave] !== "") {
       let palpiteJogador = jogo[chave];
       let classePontuacao = '';
       let pontos = 0;
+
+      let golsMandantePalpite = 0;
+      let golsVisitantePalpite = 0;
 
       if (resultadoReal && palpiteJogador && resultadoReal !== '-') {
         const [golsMandanteReal, golsVisitanteReal] = resultadoReal.split('x').map(Number);
@@ -356,42 +357,56 @@ function listarPalpites(jogo) {
         }
       }
 
-      
-
       palpites.push({
         chave,
+        // nome,
         palpite: jogo[chave],
         classePontuacao,
-        pontos
+        pontos,
+        golsMandantePalpite,
+        golsVisitantePalpite
       });
     }
   }
 
-  // Ordenar palpites por pontuação e critérios de desempate
+  // Parse the goals from palpite string
+  palpites.forEach(p => {
+    // Parse the goals from palpite string
+    const [mandante, visitante] = p.palpite.split('x').map(Number);
+    p.golsMandantePalpite = mandante;
+    p.golsVisitantePalpite = visitante;
+  });
+
   palpites.sort((a, b) => {
+    // First criterion: points
     if (b.pontos !== a.pontos) {
       return b.pontos - a.pontos;
     }
-    // Critério de desempate: Vitória do mandante, empate, vitória do visitante
-    const saldoGolsA = a.golsMandantePalpite - a.golsVisitantePalpite;
-    const saldoGolsB = b.golsMandantePalpite - b.golsVisitantePalpite;
 
-    if (saldoGolsB !== saldoGolsA) {
-      return saldoGolsB - saldoGolsA;
+    // Second criterion: goal difference order (mandante win → draw → visitante win)
+    const saldoA = a.golsMandantePalpite - a.golsVisitantePalpite;
+    const saldoB = b.golsMandantePalpite - b.golsVisitantePalpite;
+    if (saldoA !== saldoB) {
+      return saldoB - saldoA; // Descending order: mandante win (+) → draw (0) → visitante win (-)
     }
-    // Se o saldo for igual, verificar a quantidade de gols do mandante
+
+    // Third criterion: more goals (mandante first, then visitante)
     if (a.golsMandantePalpite !== b.golsMandantePalpite) {
       return b.golsMandantePalpite - a.golsMandantePalpite;
     }
-    // Caso sejam empates, verificar a quantidade de gols totais
-    const totalGolsA = a.golsMandantePalpite + a.golsVisitantePalpite;
-    const totalGolsB = b.golsMandantePalpite + b.golsVisitantePalpite;
-    return totalGolsB - totalGolsA;
+    if (a.golsVisitantePalpite !== b.golsVisitantePalpite) {
+      return a.golsVisitantePalpite - b.golsVisitantePalpite;
+    }
+
+    // Fourth criterion: alphabetical order of keys
+    return a.chave.localeCompare(b.chave);
   });
+  console.log(palpites);
 
   let palpitesHTML = palpites.map(({ chave, palpite, classePontuacao }) => {
+    let classeLogado = logado === chave ? 'logado' : '';
     return `
-      <tr>
+      <tr class="${classeLogado}">
         <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${chave}" alt="Escudo" width="32"></td>
         <td data-codigo="${chave}"></td>
         <td><span class="${classePontuacao}">${palpite}</span></td>
@@ -429,7 +444,4 @@ function atualizarElementosGlobais(dados) {
     });
   });
 }
-
-
-
 

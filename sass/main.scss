@@ -1244,6 +1244,13 @@ footer {
           display: none;
         }
       }
+      .logado{
+        td{
+          &:last-child{
+            display: table-cell;
+          }
+        }
+      }
     }
 
     &-game {
