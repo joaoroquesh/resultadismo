@@ -7,11 +7,12 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-  integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"> -->
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"> -->
   <!-- <link rel="stylesheet" href="css/owl.carousel.min.css">
   <link rel="stylesheet" href="css/owl.theme.default.css"> -->
   <!-- <link rel="stylesheet" href="css/aos.css"> -->
   <link rel="stylesheet" href="sass/main.css?v=07112024">
+  <link rel="stylesheet" href="sass/pages/login.css">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.0/css/all.css"
     integrity="sha384-Mmxa0mLqhmOeaE8vgOSbKacftZcsNYDjQzuCOm6D02luYSzBG8vpaOykv9lFQ51Y" crossorigin="anonymous">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,12 +28,13 @@
   <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
   <link rel="manifest" href="favicon/site.webmanifest">
 
+
   <meta property="og:site_name" content="Resultadismo">
   <meta name="site_name" content="Resultadismo">
-  <meta property="og:title" content="Resultadismo" />
-  <meta name="title" content="Resultadismo" />
-  <meta property="og:description" content="">
-  <meta name="description" content="">
+  <meta property="og:title" content="Resultadismo | Login" />
+  <meta name="title" content="Resultadismo | Login" />
+  <meta property="og:description" content="Faça login ou crie sua conta para jogar">
+  <meta name="description" content="Faça login ou crie sua conta para jogar">
   <meta property="og:url" content="https://www.resultadismo.com/" />
   <meta name="url" content="https://www.resultadismo.com/" />
   <meta property="og:image" itemprop="image" content="https://www.resultadismo.com/images/logo.jpg" />
@@ -43,7 +45,7 @@
   <meta property="og:image:height" content="300">
   <meta property="og:type" content="website" />
 
-  <title>Resultadismo</title>
+  <title>Resultadismo | Login</title>
 </head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-P86V27WXK2"></script>
@@ -56,11 +58,11 @@
 </script>
 
 
-<body>
+<body class="loading atualizando">
 
 
 
-  <section id="regras">
+  <section id="login">
 
     <section id="main">
 
@@ -69,566 +71,58 @@
 
       <section id="content">
         <div class="container">
-          <div class="row">
-            <div class="col d-flex flex-column justify-content-center align-items-center">
-              <div>
+          <div class="row py-4">
+            <div class="col center-s">
+              
+              <form class="form">
+                <div class="flex-column">
+                  <label class="m-0">Email </label>
+                </div>
+                <div class="inputForm">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" viewBox="0 0 32 32" height="20">
+                    <g data-name="Layer 3" id="Layer_3">
+                      <path
+                        d="m30.853 13.87a15 15 0 0 0 -29.729 4.082 15.1 15.1 0 0 0 12.876 12.918 15.6 15.6 0 0 0 2.016.13 14.85 14.85 0 0 0 7.715-2.145 1 1 0 1 0 -1.031-1.711 13.007 13.007 0 1 1 5.458-6.529 2.149 2.149 0 0 1 -4.158-.759v-10.856a1 1 0 0 0 -2 0v1.726a8 8 0 1 0 .2 10.325 4.135 4.135 0 0 0 7.83.274 15.2 15.2 0 0 0 .823-7.455zm-14.853 8.13a6 6 0 1 1 6-6 6.006 6.006 0 0 1 -6 6z">
+                      </path>
+                    </g>
+                  </svg>
+                  <input placeholder="Digite seu email" required class="input" id="email" type="email">
+                </div>
 
-                <h1 class="mb-3">
-                  Como funciona
-                </h1>
-                <p class="mb-4">
-                  O <i>Resultadismo</i> é um jogo onde os usuários podem inserir palpites em partidas de futebol,
-                  somando pontos de acordo com seus acertos, e assim competir com amigos e outros usuários
-                  diversos.
+                <div class="flex-column">
+                  <label class="m-0">Senha</label>
+                </div>
+                <div class="inputForm">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" viewBox="-64 0 512 512" height="20">
+                    <path
+                      d="m336 512h-288c-26.453125 0-48-21.523438-48-48v-224c0-26.476562 21.546875-48 48-48h288c26.453125 0 48 21.523438 48 48v224c0 26.476562-21.546875 48-48 48zm-288-288c-8.8125 0-16 7.167969-16 16v224c0 8.832031 7.1875 16 16 16h288c8.8125 0 16-7.167969 16-16v-224c0-8.832031-7.1875-16-16-16zm0 0">
+                    </path>
+                    <path
+                      d="m304 224c-8.832031 0-16-7.167969-16-16v-80c0-52.929688-43.070312-96-96-96s-96 43.070312-96 96v80c0 8.832031-7.167969 16-16 16s-16-7.167969-16-16v-80c0-70.59375 57.40625-128 128-128s128 57.40625 128 128v80c0 8.832031-7.167969 16-16 16zm0 0">
+                    </path>
+                  </svg>
+                  <input placeholder="Digite sua senha" required class="input" id="senha" type="password" minlength="4">
+                </div>
+
+                <div class="flex-row">
+                  
+                  <a href="/novaconta" class="span">Esqueceu a senha?</a>
+                </div>
+                <button class="btn btn-primary button-submit skeleton" type="submit" id="login">Acessar minha conta</button>
+                <p class="info">
+                  <span class="info-text">Ainda não tem conta?</span> <a href="novaconta" class="span">Crie agora</a>
                 </p>
-                <div class="card p-0 p-lg-4 round-05 overflow-hidden">
-
-
-                  <div class="accordion accordion-flush" id="accordionRegras">
-                    <div class="accordion-item">
-                      <h2 class="accordion-header">
-                        <button class="accordion-button btn btn-block text-left collapsed" type="button"
-                          data-toggle="collapse" data-target="#collapseOne" aria-expanded="true"
-                          aria-controls="collapseOne">
-                          <h5 class="mb-0">
-                            a Pontuação:
-                          </h5>
-                        </button>
-                      </h2>
-                      <div id="collapseOne" class="accordion-collapse collapse" data-parent="#accordionRegras">
-                        <div class="accordion-body">
-
-                          <div class="accordion accordion-flush" id="accordionPontos">
-                            <div class="accordion-item">
-                              <h2 class="accordion-header">
-                                <button class="accordion-button btn btn-block text-left collapsed" type="button"
-                                  data-toggle="collapse" data-target="#pontosOne" aria-expanded="false"
-                                  aria-controls="pontosOne">
-                                  <div class="pontuacao">
-                                    <div class="d-flex align-items-center">
-                                      <span class="circle bg-cravada"></span>&nbsp;
-                                      <h5 class="m-0 c-cravada">
-                                        Cravada
-                                      </h5>&nbsp;
-                                      <h5 class="mb-0 c-darkgreen">
-                                        <i>
-                                          +3 pontos
-                                        </i>
-                                      </h5>
-                                    </div>
-
-                                  </div>
-                                </button>
-                              </h2>
-                              <div id="pontosOne" class="accordion-collapse collapse" data-parent="#accordionPontos">
-                                <div class="accordion-body">
-                                  <p class="">
-                                    Acertar o placar exato da partida. O placar da partida e o palpite do jogador devem
-                                    ser exatamente
-                                    iguais.
-                                  </p>
-                                  <p class="ex">
-                                    Exemplo:<br>
-                                    <i>Palpite:</i> <span>2x1</span><br>
-                                    <i>Resultado real:</i> <span>2x1</span>
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div class="accordion-item">
-                              <h2 class="accordion-header">
-                                <button class="accordion-button btn btn-block text-left collapsed" type="button"
-                                  data-toggle="collapse" data-target="#pontosTwo" aria-expanded="false"
-                                  aria-controls="pontosTwo">
-                                  <div class="pontuacao">
-                                    <div class="d-flex align-items-center">
-                                      <span class="circle bg-saldo"></span>&nbsp;
-                                      <h5 class="m-0 c-saldo">
-                                        Saldo
-                                      </h5>&nbsp;
-                                      <h5 class="mb-0 c-darkgreen">
-                                        <i>
-                                          +2 pontos
-                                        </i>
-                                      </h5>
-                                    </div>
-
-                                  </div>
-                                </button>
-                              </h2>
-                              <div id="pontosTwo" class="accordion-collapse collapse" data-parent="#accordionPontos">
-                                <div class="accordion-body">
-                                  <p class="">
-                                    Acertar o vencedor do confronto junto a diferença de gols entre os times.
-                                  </p>
-                                  <p class="ex">
-                                    Exemplo:<br>
-                                    <i>Palpite:</i> <span>1x0</span><br>
-                                    <i>Resultado real:</i> <span>3x2</span>
-                                    <br>
-                                    ou
-                                    <br>
-                                    <i>Palpite:</i> <span>1x1</span><br>
-                                    <i>Resultado real:</i> <span>0x0</span>
-                                  </p>
-
-                                </div>
-                              </div>
-                            </div>
-
-                            <div class="accordion-item">
-                              <h2 class="accordion-header">
-                                <button class="accordion-button btn btn-block text-left collapsed" type="button"
-                                  data-toggle="collapse" data-target="#pontosThree" aria-expanded="false"
-                                  aria-controls="pontosThree">
-                                  <div class="pontuacao">
-                                    <div class="d-flex align-items-center">
-                                      <span class="circle bg-acerto"></span>&nbsp;
-                                      <h5 class="m-0 c-acerto">
-                                        Acerto
-                                      </h5>&nbsp;
-                                      <h5 class="mb-0 c-darkgreen">
-                                        <i>
-                                          +1 ponto
-                                        </i>
-                                      </h5>
-                                    </div>
-
-                                  </div>
-                                </button>
-                              </h2>
-                              <div id="pontosThree" class="accordion-collapse collapse" data-parent="#accordionPontos">
-                                <div class="accordion-body">
-
-                                  <p class="">
-                                    Acertar o vencedor da partida mas errar a diferença de gols entre os times.
-                                  </p>
-                                  <p class="ex">
-                                    Exemplo:<br>
-                                    <i>Palpite:</i> <span>2x0</span><br>
-                                    <i>Resultado real:</i> <span>2x1</span>
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div class="mt-3">
-                            <h6>
-                              <i>
-                                Observações
-                              </i>
-                            </h6>
-
-                            <ul>
-                              <li>
-                                A pontuação não é cumulativa, em cada jogo poderá apenas 1 das opções de pontuação
-                                especificada.
-                              </li>
-
-                              <li>
-                                <i>
-                                  Em Jogos com prorrogação:
-                                </i><br>
-                                O placar considerado como resultado do jogo no Resutadismo em jogos com prorrogação será
-                                o do
-                                tempo regulamentar de 90 minutos somado ao placar do tempo da prorrogação, quando
-                                houver.
-                              </li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="accordion-item">
-                      <h2 class="accordion-header">
-                        <button class="accordion-button btn btn-block text-left collapsed" type="button"
-                          data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false"
-                          aria-controls="collapseTwo">
-                          <h5 class="mb-0">
-                            a Classificação:
-                          </h5>
-                        </button>
-                      </h2>
-                      <div id="collapseTwo" class="accordion-collapse collapse" data-parent="#accordionRegras">
-                        <div class="accordion-body">
-                          <p class="m-0">
-                            Critérios de desempate na classificação:
-                          </p>
-                          <ol>
-                            <li>
-                              Pontos ganhos
-                            </li>
-                            <li>
-                              Número de Cravadas
-                            </li>
-                            <li>
-                              Número de Saldos
-                            </li>
-                            <!-- <li>
-                              Número de Acertos
-                            </li> -->
-                            <li>
-                              Porcentagem de Aproveitamento*
-                            </li>
-                            <li>
-                              Porcentagem de Acertividade**
-                            </li>
-                            <!-- <li>
-                              Pontuação no ano
-                            </li> -->
-                            <li>
-                              Usuário mais antigo no jogo
-                            </li>
-
-                          </ol>
-                          <span class="small">
-                            *<b>Aproveitamento</b> é a pontuação dividida por 3x o número de jogos palpitados
-                          </span>
-                          <span class="small mb-3">
-                            **<b>Acertividade</b> é o número de jogos em que pontuou dividido pelo número de jogos
-                            palpitados
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="accordion-item">
-                      <h2 class="accordion-header">
-                        <button class="accordion-button btn btn-block text-left collapsed" type="button"
-                          data-toggle="collapse" data-target="#collapseThree" aria-expanded="false"
-                          aria-controls="collapseThree">
-                          <h5 class="mb-0">
-                            o Limite de horário para Palpites
-                          </h5>
-                        </button>
-                      </h2>
-                      <div id="collapseThree" class="accordion-collapse collapse" data-parent="#accordionRegras">
-                        <div class="accordion-body">
-                          <p class="">
-                            O mercado de palpites será fechado geralmente 1 hora antes do primeiro jogo do dia, com o
-                            horário
-                            exato sendo anunciado pelo administrador no início de cada dia. Após o fechamento, poderão ser enviados palpites para os administradores no privado para inclusão, desde que antes do início da respectiva partida.
-                          </p>
-                          <p class="">
-                            Caso o mercado não seja fechado corretamente por falha administrativa e os jogos permaneçam
-                            disponíveis após o início das partidas, os palpites feitos após o começo dos jogos serão
-                            invalidados.
-                          </p>
-                          <p class="">
-                            A visualização dos palpites por jogo de cada jogador ficarão disponiveis após o fechamento
-                            do mercado do dia.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="accordion-item">
-                      <h2 class="accordion-header">
-                        <button class="accordion-button btn btn-block text-left collapsed" type="button"
-                          data-toggle="collapse" data-target="#collapseFour" aria-expanded="false"
-                          aria-controls="collapseFour">
-                          <h5 class="mb-0">
-                            as Formas de competição
-                          </h5>
-                        </button>
-                      </h2>
-                      <div id="collapseFour" class="accordion-collapse collapse" data-parent="#accordionRegras">
-                        <div class="accordion-body">
-                          <p class="">
-                            O jogo possui 3 formas de competição entre os usuários
-                          </p>
-
-                          <div class="accordion accordion-flush" id="accordionCompeticoes">
-                            <div class="accordion-item">
-                              <h2 class="accordion-header">
-                                <button class="accordion-button btn btn-block text-left collapsed" type="button"
-                                  data-toggle="collapse" data-target="#competicoesOne" aria-expanded="false"
-                                  aria-controls="competicoesOne">
-                                  <h5 class="mb-0">
-                                    Resultadão
-                                  </h5>
-                                </button>
-                              </h2>
-                              <div id="competicoesOne" class="accordion-collapse collapse"
-                                data-parent="#accordionCompeticoes">
-                                <div class="accordion-body">
-                                  <p>
-                                    Torneio de pontos corridos entre os usuários de uma federação fracionado em
-                                    divisões.
-                                  </p>
-                                  <ul>
-                                    <li>
-                                      Início: a partir do primeiro dia do mês
-                                    </li>
-                                    <li>
-                                      Fim: último dia do mês
-                                    </li>
-                                    <li>
-                                      Criação de divisões:
-
-                                      <ul>
-                                        <li>
-                                          Número mínimo de usuários por divisão: 4
-                                        </li>
-                                        <li>
-                                          A partir de 12 usuários se criará uma Liga B com 4 usuários no mínimo, fixando a Liga A com 8 participantes.
-                                        </li>
-                                        <li>
-                                          A partir de 20 usuários se criará uma Liga C com 4 usuários no mínimo e sem limites de máximo, fixando a Liga A e B com 8 participantes cada.
-                                        </li>
-                                        <li>
-                                          Novos usuários serão alocados na última divisão, sem limite de participantes durante a competição, podendo ingressar a qualquer momento.
-                                        </li>
-                                      </ul>
-                                    </li>
-                                  
-                                  </ul>
-                                  <p class="small">
-                                    Obs.: A mudança no número de usuários por divisão pode ser avaliada com os
-                                    participantes da liga ao final da temporada. Nesse caso, aumenta-se o número de
-                                    acessos, sem evitar nenhum rebaixamento.
-                                  </p>
-
-                                  <h6 class="mb-3">
-                                    dos Acessos & Rebaixamentos:
-                                  </h6>
-
-                                  <ul>
-                                    <li>
-                                      Os torneios serão mensais, com campeões, acessos e rebaixamentos mensais.
-                                    </li>
-                                    <li>
-                                      O 1° lugar das divisões de acesso subirá diretamente e o 8° lugar será rebaixado
-                                      diretamente (Exceto na Liga C, que não existe rebaixamento).
-                                    </li>
-                                    <li>
-                                      O 2° lugar das divisões de acesso subirá caso tenha mais pontos que o 7° lugar da
-                                      divisão superior, ao qual será rebaixado.
-                                    </li>
-                                    <li>
-                                      Os times que terminarem o mês sem palpitar, com zero pontos, serão automaticamente
-                                      rebaixados
-                                      dando acesso aos times que pontuaram na divisão inferior.
-                                    </li>
-
-                                  </ul>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div class="accordion-item">
-                              <h2 class="accordion-header">
-                                <button class="accordion-button btn btn-block text-left collapsed" type="button"
-                                  data-toggle="collapse" data-target="#competicoesTwo" aria-expanded="false"
-                                  aria-controls="competicoesTwo">
-                                  <h5 class="mb-0">
-                                    Copa dos Palpites
-                                  </h5>
-                                </button>
-                              </h2>
-                              <div id="competicoesTwo" class="accordion-collapse collapse"
-                                data-parent="#accordionCompeticoes">
-                                <div class="accordion-body">
-                                  <p>
-                                    Torneio de mata mata entre os usuários de uma federação
-                                  </p>
-                                  <ul>
-                                    <li>
-                                      Início: Primeira segunda-feira do mês
-                                    </li>
-                                    <li>
-                                      Fim: 28 dias após o início da Copa
-                                    </li>
-                                    <li>
-                                      Limite de participantes: 16
-                                    </li>
-                                    <li>
-                                      Os 16 melhores usuários do ranking geral do mês anterior (contando todas as
-                                      divisões) irão participar do torneio que será em formato de mata mata
-                                    </li>
-                                    <li>
-                                      Avança de fase quem tiver mais pontos somados no confronto na semana
-                                    </li>
-                                    <li>
-                                      Os confrontos da primeira fase (oitavas de final) serão definidos por sorteio, que ocorrerá em qualquer data após a conclusão dos jogos do mês anterior e antes da primeira segunda feira do mês que se iniciará a Copa. Escolha da data fica a critério dos administradores.
-
-                                      <ul>
-                                        <li>
-                                          Se a primeira segunda-feira for dia 01, o sorteio pode ser realizado no domingo anterior, após a conclusão dos jogos, de noite, ou no mais tardar, na segunda (01) de manhã, antes do início do primeiro jogo.
-                                        </li>
-                                      </ul>
-                                    </li>
-                                    <li>
-                                      Os usuários serão divididos em 2 potes para o sorteio:
-                                      <ul>
-                                        <li>
-                                          Pote A: 1° ao 8° colocado do ranking geral do mês
-                                        </li>
-                                        <li>
-                                          Pote B: 9° ao 16° colocado do ranking geral do mês
-                                        </li>
-                                        <li>
-                                          O sorteio será feito com confrontos entre usuários do Pote A vs usuário do
-                                          Pote B
-                                        </li>
-                                      </ul>
-
-                                    </li>
-                                    <li>
-                                      Datas:
-                                      <ul>
-                                        <li>
-                                          Semana 1: Oitavas de final
-                                        </li>
-                                        <li>
-                                          Semana 2: Quartas
-                                        </li>
-                                        <li>
-                                          Semana 3: Semifinais
-                                        </li>
-                                        <li>
-                                          Semana 4: Final
-                                        </li>
-                                      </ul>
-
-                                    </li>
-                                  </ul>
-
-                                </div>
-                              </div>
-                            </div>
-
-                            <div class="accordion-item">
-                              <h2 class="accordion-header">
-                                <button class="accordion-button btn btn-block text-left collapsed" type="button"
-                                  data-toggle="collapse" data-target="#competicoesThree" aria-expanded="false"
-                                  aria-controls="competicoesThree">
-                                  <h5 class="mb-0">
-                                    Premiações
-                                  </h5>
-                                </button>
-                              </h2>
-                              <div id="competicoesThree" class="accordion-collapse collapse"
-                                data-parent="#accordionCompeticoes">
-                                <div class="accordion-body">
-
-                                  <div class="accordion accordion-flush" id="accordionFlushExample">
-                                    <div class="accordion-item">
-                                      <h2 class="accordion-header">
-                                        <button class="accordion-button btn btn-block text-left collapsed" type="button"
-                                          data-toggle="collapse" data-target="#flush-collapseOne" aria-expanded="false"
-                                          aria-controls="flush-collapseOne">
-                                          <h5>
-                                            por Campeonatos
-                                          </h5>
-                                        </button>
-                                      </h2>
-                                      <div id="flush-collapseOne" class="accordion-collapse collapse"
-                                        data-parent="#accordionFlushExample">
-                                        <div class="accordion-body">
-                                          <p>
-                                            Cada campeonato real terá uma classificação específica com um usuário
-                                            vencedor ao término da competição.
-                                          </p>
-                                          <p class="small">
-                                            Exemplo: a Copa Libertadores terá uma classificação específica para cada
-                                            edição contabilizando os pontos de cada usuário computados apenas nos jogos
-                                            da competição, tendo o usuário vencedor aquele que mais somar pontos ao fim
-                                            do campeonato.
-                                          </p>
-                                          <ul>
-                                            <li>
-                                              Início: a partir do primeiro palpite feito naquele campeonato em
-                                              específico
-                                            </li>
-                                            <li>
-                                              Fim: ao término do campeonato
-                                            </li>
-                                            <li>
-                                              Os postulantes ao título de cada campeonato serão expostos antes da última
-                                              rodada ou antes do último jogo da final de cada campeonato, sem a
-                                              exposição das pontuações, apenas exibindo os nomes em ordem alfabética.
-                                            </li>
-                                          </ul>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div class="accordion-item">
-                                      <h2 class="accordion-header">
-                                        <button class="accordion-button btn btn-block text-left collapsed" type="button"
-                                          data-toggle="collapse" data-target="#flush-collapseTwo" aria-expanded="false"
-                                          aria-controls="flush-collapseTwo">
-                                          <h5>
-                                            Palpite de ouro
-                                          </h5>
-                                        </button>
-                                      </h2>
-                                      <div id="flush-collapseTwo" class="accordion-collapse collapse"
-                                        data-parent="#accordionFlushExample">
-                                        <div class="accordion-body">
-                                          <p>
-                                            O usuário que somar mais pontos durante todo o ano, levando em conta todos
-                                            campeonatos, levará o “Palpite de Ouro”. Esse título será entregue
-                                            independente da divisão mensal que o usuário campeão estiver.
-                                          </p>
-                                          <ul>
-                                            <li>
-                                              Início: a partir do primeiro palpite do ano
-                                            </li>
-                                            <li>
-                                              Fim: dia 31/12
-                                            </li>
-                                            <li>
-                                              O top 4 do Palpite de Ouro (Os 4 usuários maiores pontuadores) ficará
-                                              exposto durante o ano todo. Os nomes serão exibidos em ordem alfabética
-                                              sem a exposição das pontuações
-                                            </li>
-                                            <li>
-                                              O ganhador será revelado ao final do ano, no dia 31/12
-                                            </li>
-                                          </ul>
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                  </div>
-
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-
-
-
-
-                </div>
-
-                <div class="center-s pt-5">
-                  <a class="btn btn-outline-primary btn-click" href="https://docs.google.com/spreadsheets/d/1md7qlwt3Bg3KVm2TfbHbPL4MwULrsFZqzkYiY4uLRek/edit?gid=2096223451#gid=2096223451" target="_blank">
-                    Acesso ao anexo
-                  </a>
-                </div>
-              </div>
-
+                
+              </form>
             </div>
           </div>
         </div>
 
       </section>
 
-
-
+      <div id="carregando"></div>
 
       <footer></footer>
-
 
 
     </section>
@@ -643,22 +137,8 @@
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script> -->
   <script src="js/main.js?v=07112024"></script>
+  <script src="js/login.js"></script>
   <script src="js/components.js"></script>
-
-  <script>
-    $(document).ready(function () {
-      // Seu código jQuery aqui
-      const currentPath = window.location.pathname;
-      const menuItems = document.querySelectorAll('.nav-item .nav-link');
-
-      menuItems.forEach((link) => {
-        if (link.getAttribute('href') === currentPath) {
-          link.classList.add('active');
-        }
-      });
-    });
-
-  </script>
 
 </body>
 
