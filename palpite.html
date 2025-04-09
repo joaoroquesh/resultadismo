@@ -106,12 +106,12 @@
                   e.preventDefault();
 
                   const data = {
-                    codigo: form.codigo.value,
+                    nome: form.codigo.value,
                     email: form.email.value,
-                    mandante: form.palpite.value
+                    palpite: form.palpite.value
                   };
 
-                  fetch('https://script.google.com/macros/s/AKfycbyvvgWRmBoRRuJCoZ8D5scd0dBzu18HcORButXyCkjXxThBp338_UwcEeGNVGUwSntEtA/exec', {
+                  fetch('https://script.google.com/macros/s/AKfycbzu4ex8hBj8VovzH40-Q067Xa2Kngx1MJZxG0gRWc5YNcpi6HZOZ9qk2uJ5mJw77VUOcA/exec', {
                     method: 'POST',
                     body: JSON.stringify(data)
                   })
@@ -126,34 +126,7 @@
                     });
                 });
 
-
-                
-
               </script>
-              <style>
-                .code-container {
-                  display: flex;
-                  justify-content: space-between;
-                  max-width: 400px;
-                  margin: 0 auto;
-                }
-
-                .code-input {
-                  width: 2.5rem;
-                  height: 2.5rem;
-                  text-align: center;
-                  font-size: 1.5rem;
-                  border: 2px solid #cccccc;
-                  border-radius: 4px;
-                  outline: none;
-                  transition: border-color 0.2s;
-                  padding: 0;
-                }
-
-                .code-input:focus {
-                  border-color: #0066ff;
-                }
-              </style>
 
             </div>
           </div>

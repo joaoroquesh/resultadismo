@@ -113,11 +113,12 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
                                   class="card-game-result-team-img team-home">
                               <span class="card-game-result-team-name team-home" data-codigo="${mandante}"></span>
                           </div>
-                          <form id="palpiteForm" class="card-game-result-score code-inputs">
+                          <form id="palpiteForm${codigo}" class="card-game-result-score code-inputs">
                               <input type="hidden" class="user-loged" name="email" value="${user}" />
                               <input type="hidden" class="codigo-jogo" name="codigo" value="${codigo}" />
                               <input type="number" class="team-home d-inline code-input code-input-home" name="mandante" placeholder="-" value="${mandanteGols}">
                               <input type="number" class="team-away d-inlline code-input code-input-away" name="visitante" placeholder="-" value="${visitanteGols}">
+                              <input type="hidden" class="palpite-final" name="palpite" value="" />
                           </form>
                           <div class="card-game-result-team team-away">
                               <img src="" data-codigo="${visitante}" alt=""
@@ -465,48 +466,48 @@ function inicializarEventosInputs() {
   document.querySelectorAll("form.code-inputs").forEach(form => {
     // Seleciona somente os inputs de palpite (os que o usuário preenche) deste formulário
     const formInputs = form.querySelectorAll(".code-input");
-    
-    // Para cada input dentro deste formulário
+
+    // Para cada input dentro deste formulário – configura comportamento individual
     formInputs.forEach((input, index) => {
       // Impede que o scroll (wheel) altere o valor do input
       input.addEventListener("wheel", function (e) {
         e.preventDefault();
       });
-      
+
       // Evento "input": Limita o valor a 1 dígito e, se concluído, passa o foco para o próximo input do mesmo form
       input.addEventListener("input", function () {
         let valueStr = String(input.value);
-        
+
         // Remove qualquer ocorrência de "-" (sinal negativo)
         if (valueStr.includes("-")) {
           valueStr = valueStr.replace(/-/g, "");
           input.value = valueStr;
         }
-        
+
         // Se o usuário inserir mais de um caractere (por exemplo, ao colar), mantém apenas o primeiro
         if (valueStr.length > 1) {
           input.value = valueStr.slice(0, 1);
           console.log(`Input ${index} corrigido para: ${input.value}`);
         }
-        
+
         // Se este input já possui 1 dígito e não for o último do grupo, avança o foco para o próximo input deste formulário
         if (input.value.length === 1 && index < formInputs.length - 1) {
           formInputs[index + 1].focus();
           console.log(`Focando input ${index + 1}`);
         }
       });
-      
+
       // Evento "keydown": Se já houver 1 dígito e o usuário digitar outro número, sobrescreve o valor
       input.addEventListener("keydown", function (e) {
         const allowedKeys = ["Backspace", "Delete", "Tab", "ArrowLeft", "ArrowRight", "Home", "End"];
         if (allowedKeys.includes(e.key)) return;
-        
+
         // Impede a digitação do sinal negativo
         if (e.key === "-") {
           e.preventDefault();
           return;
         }
-        
+
         // Se já houver 1 dígito e o usuário digitar um número, sobrescreve o valor
         if (input.value.length === 1 && /[0-9]/.test(e.key)) {
           e.preventDefault();
@@ -519,49 +520,63 @@ function inicializarEventosInputs() {
           }
         }
       });
-      
-      // Evento "blur": Ao sair de qualquer input do grupo, preenche com "0" os inputs vazios e, se ambos (pelo menos os 2 principais)
-      // tiverem valor, envia o formulário automaticamente.
-      input.addEventListener("blur", function () {
-        setTimeout(() => {
-          // Preenche com "0" os inputs vazios deste formulário (apenas os palpites, não os hidden)
+    });
+
+    // Evento "focusout" no formulário: Dispara quando o foco sai de TODOS os inputs do form
+    form.addEventListener("focusout", function () {
+      // Aguarda um tempo para que a transição de foco ocorra
+      setTimeout(() => {
+        // Se nenhum elemento dentro do form estiver com foco...
+        if (!form.contains(document.activeElement)) {
+          // Preenche com "0" os inputs vazios deste formulário
           formInputs.forEach((inp, idx) => {
             if (inp.value.trim() === "") {
               inp.value = "0";
-              console.log(`Input ${idx} do form preenchido com 0 por blur.`);
+              console.log(`Input ${idx} do form preenchido com 0 (focusout).`);
             }
           });
-          
-          // Agora, se os dois inputs de palpite estiverem preenchidos, envia o formulário automaticamente
-          // Considerando que os campos de palpite tenham os nomes "mandante" e "visitante"
+
+          // Atualiza o input oculto "palpite" com o valor dos inputs de palpite no formato "mandante x visitante"
           const mandanteInput = form.querySelector('[name="mandante"]');
           const visitanteInput = form.querySelector('[name="visitante"]');
-          if (mandanteInput && visitanteInput) {
-            const mandante = mandanteInput.value.trim();
-            const visitante = visitanteInput.value.trim();
-            
-            if (mandante !== "" && visitante !== "") {
+          const palpiteInput = form.querySelector('[name="palpite"]');
+          if (mandanteInput && visitanteInput && palpiteInput) {
+            palpiteInput.value = `${mandanteInput.value}x${visitanteInput.value}`;
+            console.log("Palpite atualizado:", palpiteInput.value);
+          }
+
+          // Apenas envia se os dois inputs principais estiverem preenchidos (mesmo que com "0")
+          if (mandanteInput && visitanteInput && mandanteInput.value.trim() !== "" && visitanteInput.value.trim() !== "") {
+            // Evita envios repetidos usando um flag armazenado no dataset do form
+            if (!form.dataset.submitted) {
+              form.dataset.submitted = "true";
               console.log("Ambos os inputs preenchidos. Iniciando envio automático...");
-              // Monta o objeto de dados conforme os nomes esperados pelo Apps Script.
+
+              // Monta o objeto de dados com base nos campos do formulário
               const data = {
                 email: form.querySelector('[name="email"]') ? form.querySelector('[name="email"]').value : "",
                 codigo: form.querySelector('[name="codigo"]') ? form.querySelector('[name="codigo"]').value : "",
-                mandante: mandante,
-                visitante: visitante
+                mandante: mandanteInput.value,
+                visitante: visitanteInput.value,
+                palpite: palpiteInput.value
               };
-              
-              // Envia os dados via fetch com o payload em JSON
-              fetch('https://script.google.com/macros/s/AKfycbyvvgWRmBoRRuJCoZ8D5scd0dBzu18HcORButXyCkjXxThBp338_UwcEeGNVGUwSntEtA/exec', {
+
+              // Envia os dados via fetch. Como o Apps Script espera JSON (e faz JSON.parse), usamos JSON.stringify.
+              // Para contornar o problema de CORS, usamos mode: 'no-cors' (note que a resposta será opaca).
+              fetch('https://script.google.com/macros/s/AKfycbzu4ex8hBj8VovzH40-Q067Xa2Kngx1MJZxG0gRWc5YNcpi6HZOZ9qk2uJ5mJw77VUOcA/exec', {
                 method: 'POST',
+                // mode: 'no-cors',
                 headers: {
                   'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(data)
               })
               .then(response => response.json())
-              .then(result => {
+              .then(() => {
                 alert('Palpite enviado com sucesso!');
-                form.reset(); // Limpa o formulário
+                // form.reset();
+                // Reseta o flag para permitir futuros envios, se necessário
+                form.dataset.submitted = "";
               })
               .catch(error => {
                 console.error('Erro ao enviar:', error);
@@ -569,10 +584,11 @@ function inicializarEventosInputs() {
               });
             }
           }
-        }, 100); // Pequeno delay para permitir que o foco mude entre os inputs, se necessário
-      });
+        }
+      }, 200); // Delay de 200ms para aguardar a transição de foco
     });
   });
 }
+
 
 
