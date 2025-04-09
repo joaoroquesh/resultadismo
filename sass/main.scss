@@ -24,6 +24,23 @@ body {
   @media (max-width:992px) {
     font-size: $font-size-sm;
   }
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  /* Track */
+  &::-webkit-scrollbar-track {
+    background: $white;
+    background: linear-gradient(to right, transparent 30%, $primary 50%, transparent 70%);
+    background: -webkit-gradient(left top, right top, color-stop(30%, transparent), color-stop(50%, $primary, color-stop(70%, transparent)))
+  }
+
+  /* Handle */
+  &::-webkit-scrollbar-thumb {
+    background: $darkgray;
+    border-radius: 10px;
+  }
 }
 
 * {
@@ -115,6 +132,35 @@ tr.pago {
     }
   }
 }
+
+.scrollable {
+  overflow-y: auto;
+
+  /* width */
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  /* Track */
+  &::-webkit-scrollbar-track {
+    background: $white;
+    background: linear-gradient(left, transparent 30%, $primary 50%, transparent 70%);
+    background: -webkit-gradient(left top, right top, color-stop(30%, transparent), color-stop(50%, $primary, color-stop(70%, transparent)))
+  }
+
+  /* Handle */
+  &::-webkit-scrollbar-thumb {
+    background: $darkgray;
+    border-radius: 10px;
+    transition: var(--transition-2);
+
+    &:hover {
+      background: $primary;
+    }
+  }
+}
+
+
 
 footer {
 
@@ -1200,11 +1246,11 @@ footer {
       transition: var(--transition-1);
     }
 
-    &.Finalizado{
+    &.Finalizado {
       background: $medium;
 
-      .card-game-result-score{
-        span{
+      .card-game-result-score {
+        span {
           border: $dark solid 1px;
           // color: $primary;
           // background: $darkgray;
@@ -1212,13 +1258,13 @@ footer {
       }
     }
 
-    &.vivo{
+    &.vivo {
       border: 1px solid $danger;
-      
-      .card-header{
+
+      .card-header {
         position: relative;
 
-        &::before{
+        &::before {
           content: "Ao vivo";
           position: absolute;
           top: 50%;
@@ -1231,26 +1277,38 @@ footer {
           font-size: $font-size-xs;
         }
       }
-      .card-game-result-score{
-        span{
+
+      .card-game-result-score {
+        span {
           border: 1px solid $danger;
+          color: $danger;
+        }
+      }
+
+      .card-game-real {
+        &-score {
           color: $danger;
         }
       }
     }
 
-    &.breve{
-      td{
-        &:last-child{
+    &.breve {
+      td {
+        &:last-child {
           display: none;
         }
       }
-      .logado{
-        td{
-          &:last-child{
+
+      .logado {
+        td {
+          &:last-child {
             display: table-cell;
           }
         }
+      }
+
+      .card-game-real {
+        display: none;
       }
     }
 
@@ -1309,7 +1367,8 @@ footer {
           gap: $size-2;
           padding: $size-0 $size-1;
 
-          span {
+          span,
+          input {
             height: var(--team-size);
             width: var(--team-size);
             max-width: var(--team-size);
@@ -1320,6 +1379,14 @@ footer {
             justify-content: center;
             align-items: center;
             font-size: $font-size-6;
+            padding: var(--size-0);
+
+            &::-webkit-inner-spin-button,
+            &::-webkit-outer-spin-button {
+              -webkit-appearance: none;
+              margin: 0;
+            }
+
           }
         }
       }
@@ -1377,6 +1444,10 @@ footer {
 
         &-body {
           padding: $size-3;
+          max-height: calc(100dvh - 350px);
+          overflow-y: scroll;
+          mask-image: linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgb(0, 0, 0) 12.5%, rgb(0, 0, 0) 87.5%, rgba(0, 0, 0, 0) 100%);
+
 
           table {
             border-collapse: separate;

@@ -91,12 +91,70 @@
               <img src="images/icon.png" alt="" width="100px" height="100px" class="jogador-logado skeleton m-4">
               <p class="jogador-logado"></p>
 
-              <form action="https://api.sheetmonkey.io/form/56gBGHF5pN3iPaRtgWiwEa" method="post">
-                <!-- Put HTML input fields in here and see how they fill up your sheet -->
-                <label>Example Field: <input type="text" name="Example Header" required /></label>
-                <input type="hidden" name="Created" value="x-sheetmonkey-current-date-time" />
-                <input type="submit" value="Submit" />
+
+              <form id="palpiteForm">
+                <input type="text" name="codigo" placeholder="Seu codigo" required />
+                <input type="email" name="email" placeholder="Seu email" required />
+                <input type="text" name="palpite" placeholder="Palpite ex: 2x1" required />
+                <button class="btn btn-primary" type="submit">Enviar</button>
               </form>
+
+              <script>
+                const form = document.getElementById('palpiteForm');
+
+                form.addEventListener('submit', function (e) {
+                  e.preventDefault();
+
+                  const data = {
+                    codigo: form.codigo.value,
+                    email: form.email.value,
+                    mandante: form.palpite.value
+                  };
+
+                  fetch('https://script.google.com/macros/s/AKfycbyvvgWRmBoRRuJCoZ8D5scd0dBzu18HcORButXyCkjXxThBp338_UwcEeGNVGUwSntEtA/exec', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                  })
+                    .then(response => response.json())
+                    .then(result => {
+                      alert('Palpite enviado com sucesso!');
+                      form.reset();
+                    })
+                    .catch(error => {
+                      console.error('Erro ao enviar:', error);
+                      alert('Erro ao enviar o palpite.');
+                    });
+                });
+
+
+                
+
+              </script>
+              <style>
+                .code-container {
+                  display: flex;
+                  justify-content: space-between;
+                  max-width: 400px;
+                  margin: 0 auto;
+                }
+
+                .code-input {
+                  width: 2.5rem;
+                  height: 2.5rem;
+                  text-align: center;
+                  font-size: 1.5rem;
+                  border: 2px solid #cccccc;
+                  border-radius: 4px;
+                  outline: none;
+                  transition: border-color 0.2s;
+                  padding: 0;
+                }
+
+                .code-input:focus {
+                  border-color: #0066ff;
+                }
+              </style>
+
             </div>
           </div>
         </div>
@@ -127,6 +185,68 @@
       console.log('vazio');
     }
   </script>
+
+
+  <!-- <script>
+    document.getElementById("form").addEventListener("submit", function (e) {
+      e.preventDefault(); // Prevent the default form submission
+      document.getElementById("message").textContent = "Submitting..";
+      document.getElementById("message").style.display = "block";
+      document.getElementById("submit-button").disabled = true;
+
+      // Collect the form data
+      var formData = new FormData(this);
+      var keyValuePairs = [];
+      for (var pair of formData.entries()) {
+        keyValuePairs.push(pair[0] + "=" + pair[1]);
+      }
+
+      var formDataString = keyValuePairs.join("&");
+
+      // Send a POST request to your Google Apps Script
+      fetch(
+        "https://script.google.com/macros/s/AKfycbwCzCgIX4446pZhIZVjQq_mjkmNe0wt1i8ajnN3i041ynxxX7yq2B-i1-TDMHBQ0xJDbw/exec",
+        {
+          redirect: "follow",
+          method: "POST",
+          body: formDataString,
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8",
+          },
+        }
+      )
+        .then(function (response) {
+          // Check if the request was successful
+          if (response) {
+            return response; // Assuming your script returns JSON response
+          } else {
+            throw new Error("Failed to submit the form.");
+          }
+        })
+        .then(function (data) {
+          // Display a success message
+          document.getElementById("message").textContent =
+            "Data submitted successfully!";
+          document.getElementById("message").style.display = "block";
+          document.getElementById("message").style.backgroundColor = "green";
+          document.getElementById("message").style.color = "beige";
+          document.getElementById("submit-button").disabled = false;
+          document.getElementById("form").reset();
+
+          setTimeout(function () {
+            document.getElementById("message").textContent = "";
+            document.getElementById("message").style.display = "none";
+          }, 2600);
+        })
+        .catch(function (error) {
+          // Handle errors, you can display an error message here
+          console.error(error);
+          document.getElementById("message").textContent =
+            "An error occurred while submitting the form.";
+          document.getElementById("message").style.display = "block";
+        });
+    });
+  </script> -->
 
   <script src="js/components.js"></script>
 </body>

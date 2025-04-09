@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+  integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"> -->
+  <!-- <link rel="stylesheet" href="css/owl.carousel.min.css">
+  <link rel="stylesheet" href="css/owl.theme.default.css"> -->
+  <!-- <link rel="stylesheet" href="css/aos.css"> -->
+  <link rel="stylesheet" href="sass/main.css?v=07112024">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.0/css/all.css"
+    integrity="sha384-Mmxa0mLqhmOeaE8vgOSbKacftZcsNYDjQzuCOm6D02luYSzBG8vpaOykv9lFQ51Y" crossorigin="anonymous">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
+    rel="stylesheet">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+  <link rel="manifest" href="favicon/site.webmanifest">
+
+  <meta property="og:site_name" content="Resultadismo">
+  <meta name="site_name" content="Resultadismo">
+  <meta property="og:title" content="Resultadismo | Jogos" />
+  <meta name="title" content="Resultadismo | Jogos" />
+  <meta property="og:description" content="Veja os palpites de cada jogo no Resultadismo dos Clubistash">
+  <meta name="description" content="Veja os palpites de cada jogo no Resultadismo dos Clubistash">
+  <meta property="og:url" content="https://www.resultadismo.com/" />
+  <meta name="url" content="https://www.resultadismo.com/" />
+  <meta property="og:image" itemprop="image" content="https://www.resultadismo.com/images/logo.jpg" />
+  <meta name="image" itemprop="image" content="https://www.resultadismo.com/images/logo.jpg" />
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="image:type" content="image/jpeg">
+  <meta property="og:image:width" content="300">
+  <meta property="og:image:height" content="300">
+  <meta property="og:type" content="website" />
+
+  <title>Resultadismo | Jogos</title>
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P86V27WXK2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  gtag('js', new Date());
+
+  gtag('config', 'G-P86V27WXK2');
+</script>
+
+
+<body class="loading atualizando">
+
+  <div class="manutencao d-none">
+    <h2 class="m-0">
+      EM MANUTENÇÃO
+    </h2>
+  </div>
+
+  <section id="jogos" class="closed">
+
+    <section id="main">
+      
+      
+      <section id="header"></section>
+      <section id="menu"></section>
+
+      <section id="content-fixed" class="fixed-top">
+        <div class="container">
+          <div class="row">
+            <div class="col px-3 d-flex flex-column justify-content-center align-items-center">
+
+              <div id="navegacao" class="w-100 navegacao py-2 collapse">
+                <nav id="meses" class=" pb-2">
+                  <div class="nav nav-tabs d-flex justify-content-around" id="nav-tab" role="tablist">
+                    <button class="nav-link skeleton active" id="nav-${mes-atual}-tab" data-toggle="tab"
+                      data-target="#nav-${mes-atual}" type="button" role="tab" aria-controls="nav-${mes-atual}"
+                      aria-selected="true">mes</button>
+                    <button class="nav-link skeleton" id="nav-${mes-passado}-tab" data-toggle="tab"
+                      data-target="#nav-${mes-passado}" type="button" role="tab" aria-controls="nav-${mes-passado}"
+                      aria-selected="false">mes</button>
+                    <button class="nav-link skeleton" id="nav-${mes-anterior}-tab" data-toggle="tab"
+                      data-target="#nav-${mes-anterior}" type="button" role="tab" aria-controls="nav-${mes-anterior}"
+                      aria-selected="false">mes</button>
+                  </div>
+                </nav>
+                <div class="tab-content" id="nav-tabContent">
+
+                  <div class="tab-pane selecao fade text-right show active" id="nav-${mes-atual}" role="tabpanel"
+                    aria-labelledby="nav-${mes-atual}-tab">
+
+                    <ul class="nav nav-pills p-0" id="filtroMes${mes-atual}" role="tablist">
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link skeleton active" id="pills-00jan-tab" data-toggle="pill"
+                          type="button" role="tab" aria-selected="true">dom. 00</button>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link skeleton" id="pills-00jan-tab" data-toggle="pill" type="button"
+                          role="tab" aria-selected="true">dom. 00</button>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link skeleton" id="pills-00jan-tab" data-toggle="pill" type="button"
+                          role="tab" aria-selected="true">dom. 00</button>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link skeleton" id="pills-00jan-tab" data-toggle="pill" type="button"
+                          role="tab" aria-selected="true">dom. 00</button>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link skeleton" id="pills-00jan-tab" data-toggle="pill" type="button"
+                          role="tab" aria-selected="true">dom. 00</button>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link skeleton" id="pills-00jan-tab" data-toggle="pill"
+                          type="button" role="tab" aria-selected="true">dom. 00</button>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link skeleton" id="pills-00jan-tab" data-toggle="pill" type="button"
+                          role="tab" aria-selected="true">dom. 00</button>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link skeleton" id="pills-00jan-tab" data-toggle="pill" type="button"
+                          role="tab" aria-selected="true">dom. 00</button>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link skeleton" id="pills-00jan-tab" data-toggle="pill" type="button"
+                          role="tab" aria-selected="true">dom. 00</button>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link skeleton" id="pills-00jan-tab" data-toggle="pill" type="button"
+                          role="tab" aria-selected="true">dom. 00</button>
+                      </li>
+                    </ul>
+                  </div>
+
+
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <div id="content-space"></div>
+
+
+      <section id="content">
+        <div class="container">
+          <div class="row">
+            <div class="col d-flex flex-column justify-content-center align-items-center">
+              <div id="toggler" class="btn btn-outline-primary" data-toggle="collapse" data-target="#navegacao">
+                Ver outras datas
+                <svg id="arrow" viewBox="0 0 16 16" height="16px">
+                  <path class="st0" fill="#323232" d="M7.3,10.4l-3.8-3.9c-.3-.3-.3-.8,0-1.1s.8-.3,1.1,0l3.5,3.5,3.5-3.5c.3-.3.8-.3,1.1,0s.3.8,0,1.1l-4,4c-.1.1-.3.3-.6.3s-.6-.2-.8-.4Z"/>
+                </svg>
+              </div>
+              <div class="accordion mt-3 d-flex flex-wrap justify-content-center w-100" id="accordionGames">
+
+                <div class="card game skeleton p-0">
+                  <div class="card-game d-flex flex-column">
+                    <div class="card-game-label d-flex gap-2 center-s">
+                      <div class="card-game-label-hour">
+                        16h00
+                      </div>
+                      <span>|</span>
+                      <div class="card-game-label-tournament">
+                        Champions
+                      </div>
+                    </div>
+                    <div class="card-game-result">
+                      <div class="card-game-result-team team-home">
+                        <img src="https://api.sofascore.app/api/v1/team/17/image" alt=""
+                          class="card-game-result-team-img team-home">
+                        <span class="card-game-result-team-name team-home">Manchester City</span>
+                      </div>
+                      <input type="text">
+                      <div class="card-game-result-score">
+                        <span class="team-home">0</span>
+                        <span class="team-away">0</span>
+                      </div>
+                      <div class="card-game-result-team team-away">
+                        <img src="https://api.sofascore.app/api/v1/team/2697/image" alt=""
+                          class="card-game-result-team-img team-away">
+                        <span class="card-game-result-team-name team-away">Inter</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-header" id="headingCod">
+                    <button class="btn text-center fs-sm collapsed" type="button" data-toggle="collapse"
+                      data-target="#collapseCod" aria-expanded="true" aria-controls="collapseCod">
+                      Palpites da galera
+                    </button>
+                  </div>
+
+                  <div id="collapseCod" class="collapse" aria-labelledby="headingCod" data-parent="#accordionGames">
+                    <div class="card-body">
+                      <table class="table">
+                        <tbody>
+                          <tr>
+                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
+                                alt="Escudo" width="32"></td>
+                            <td data-codigo="${nome}">Alan Gripp</td>
+                            <td>
+                              <span class="">
+                                2x1
+                              </span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
+                                alt="Escudo" width="32"></td>
+                            <td data-codigo="${nome}">Gabriel Morel</td>
+                            <td>
+                              <span class="">
+                                2x1
+                              </span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
+                                alt="Escudo" width="32"></td>
+                            <td data-codigo="${nome}">Matheus Pessoa</td>
+                            <td>
+                              <span class="">
+                                2x1
+                              </span>
+                            </td>
+                          </tr>
+
+                          <tr>
+                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
+                                alt="Escudo" width="32"></td>
+                            <td data-codigo="${nome}">João Bruno</td>
+                            <td>
+                              <span class="">
+                                2x0
+                              </span>
+                            </td>
+                          </tr>
+
+                          <tr>
+                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
+                                alt="Escudo" width="32"></td>
+                            <td data-codigo="${nome}">Matheus Costa</td>
+                            <td>
+                              <span class="">
+                                2x0
+                              </span>
+                            </td>
+                          </tr>
+
+                          <tr>
+                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
+                                alt="Escudo" width="32"></td>
+                            <td data-codigo="${nome}">Emerson Silva</td>
+                            <td>
+                              <span class="">
+                                3x1
+                              </span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
+                                alt="Escudo" width="32"></td>
+                            <td data-codigo="${nome}">Gustavo Sousa</td>
+                            <td>
+                              <span class="">
+                                3x1
+                              </span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
+                                alt="Escudo" width="32"></td>
+                            <td data-codigo="${nome}">João Roque</td>
+                            <td>
+                              <span class="">
+                                3x1
+                              </span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
+                                alt="Escudo" width="32"></td>
+                            <td data-codigo="${nome}">Luan Hatsuo</td>
+                            <td>
+                              <span class="">
+                                3x1
+                              </span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
+                                alt="Escudo" width="32"></td>
+                            <td data-codigo="${nome}">Neto Bertoldo</td>
+                            <td>
+                              <span class="">
+                                3x0
+                              </span>
+                            </td>
+                          </tr>
+
+                          <tr>
+                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
+                                alt="Escudo" width="32"></td>
+                            <td data-codigo="${nome}">Adauto Farias</td>
+                            <td>
+                              <span class="">
+                                4x1
+                              </span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card game skeleton p-0">
+                  <div class="card-game d-flex flex-column gap-3">
+                    <div class="card-game-label d-flex gap-2 center-s">
+                      <div class="card-game-label-hour">
+                        ${hora}
+                      </div>
+                      <span>|</span>
+                      <div class="card-game-label-tournament" data-codigo="${campeonato.nome}"></div>
+                    </div>
+                    <div class="card-game-result">
+                      <div class="card-game-result-team team-home">
+                        <img src="" data-codigo="${home.nome}" alt="" class="card-game-result-team-img team-home">
+                        <span class="card-game-result-team-name team-home" data-codigo="${home.nome}"></span>
+                      </div>
+                      <div class="card-game-result-score">
+                        <span class="team-home">${home.resultado}</span>
+                        <span class="team-away">${away.resultado}</span>
+                      </div>
+                      <div class="card-game-result-team team-away">
+                        <img src="" data-codigo="${away.nome}" alt="" class="card-game-result-team-img team-away">
+                        <span class="card-game-result-team-name team-away" data-codigo="${away.nome}"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-header" id="heading${codigo}">
+                    <h2 class="mb-0">
+                      <button class="btn text-center fs-sm collapsed" type="button" data-toggle="collapse"
+                        data-target="#collapse${codigo}" aria-expanded="true" aria-controls="collapse${codigo}">
+                        Palpites da galera
+                      </button>
+                    </h2>
+                  </div>
+
+                  <div id="collapse${codigo}" class="collapse" aria-labelledby="heading${codigo}"
+                    data-parent="#accordionGames">
+                    <div class="card-body">
+                      <table class="table">
+                        <tbody>
+                          <tr>
+                            <td><img src="" data-codigo="${nome}" alt="Escudo" width="32"></td>
+                            <td data-codigo="${nome}"></td>
+                            <td>
+                              <span class="">
+                                ${jogador.palpite}
+                              </span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div id="carregando"></div>
+
+      <footer></footer>
+
+
+
+    </section>
+
+  </section>
+
+  <script src="script/jquery.3.5.1.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+    crossorigin="anonymous"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script> -->
+  <script src="js/main.js?v=07112024"></script>
+  <script src="js/jogos-palpite.js?v=07112024"></script>
+  <script src="js/components.js"></script>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      const toggler = document.getElementById("toggler");
+      const jogos = document.getElementById("jogos");
+      const navegacao = document.getElementById("navegacao");
+      
+      // Recuperar estado do localStorage
+      const isClosed = localStorage.getItem("jogosClosed");
+      if (isClosed === "false") {
+          jogos.classList.remove("closed");
+          navegacao.classList.add("show");
+      } else {
+          jogos.classList.add("closed");
+      }
+
+      // Evento de clique para alternar a classe
+      toggler.addEventListener("click", function () {
+          jogos.classList.toggle("closed");
+          
+          // Salvar o estado no localStorage
+          const closed = jogos.classList.contains("closed");
+          localStorage.setItem("jogosClosed", closed);
+      });
+  });
+</script>
+
+<script>
+  const form = document.getElementById('palpiteForm');
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const data = {
+      nome: form.nome.value,
+      email: form.email.value,
+      palpite: form.palpite.value
+    };
+
+    fetch('https://script.google.com/macros/s/AKfycbyvvgWRmBoRRuJCoZ8D5scd0dBzu18HcORButXyCkjXxThBp338_UwcEeGNVGUwSntEtA/exec', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(result => {
+        alert('Palpite enviado com sucesso!');
+        form.reset();
+      })
+      .catch(error => {
+        console.error('Erro ao enviar:', error);
+        alert('Erro ao enviar o palpite.');
+      });
+  });
+
+
+</script>
+
+
+
+
+
+
+
+</body>
+
+</html>

@@ -1450,11 +1450,25 @@ body {
   color: var(--star-dust-950);
   font-family: "Ubuntu", sans-serif;
   text-wrap: balance;
+  /* Track */
+  /* Handle */
 }
 @media (max-width: 992px) {
   body {
     font-size: var(--font-size-sm);
   }
+}
+body::-webkit-scrollbar {
+  width: 5px;
+}
+body::-webkit-scrollbar-track {
+  background: var(--star-dust-50);
+  background: linear-gradient(to right, transparent 30%, var(--turquoise-600) 50%, transparent 70%);
+  background: -webkit-gradient(left top, right top, color-stop(30%, transparent), color-stop(50%, var(--turquoise-600), color-stop(70%, transparent)));
+}
+body::-webkit-scrollbar-thumb {
+  background: var(--star-dust-400);
+  border-radius: 10px;
 }
 
 * {
@@ -1527,6 +1541,30 @@ tr.pago td:nth-child(3)::after {
   background-color: var(--pizza-600);
   color: var(--star-dust-100);
   scale: 0.8;
+}
+
+.scrollable {
+  overflow-y: auto;
+  /* width */
+  /* Track */
+  /* Handle */
+}
+.scrollable::-webkit-scrollbar {
+  width: 5px;
+}
+.scrollable::-webkit-scrollbar-track {
+  background: var(--star-dust-50);
+  background: linear-gradient(left, transparent 30%, var(--turquoise-600) 50%, transparent 70%);
+  background: -webkit-gradient(left top, right top, color-stop(30%, transparent), color-stop(50%, var(--turquoise-600), color-stop(70%, transparent)));
+}
+.scrollable::-webkit-scrollbar-thumb {
+  background: var(--star-dust-400);
+  border-radius: 10px;
+  -webkit-transition: var(--transition-2);
+  transition: var(--transition-2);
+}
+.scrollable::-webkit-scrollbar-thumb:hover {
+  background: var(--turquoise-600);
 }
 
 footer {
@@ -2332,11 +2370,17 @@ footer a:hover {
   border: 1px solid var(--punch-700);
   color: var(--punch-700);
 }
+#jogos .card.vivo .card-game-real-score {
+  color: var(--punch-700);
+}
 #jogos .card.breve td:last-child {
   display: none;
 }
 #jogos .card.breve .logado td:last-child {
   display: table-cell;
+}
+#jogos .card.breve .card-game-real {
+  display: none;
 }
 #jogos .card-game {
   padding: var(--size-2);
@@ -2385,7 +2429,8 @@ footer a:hover {
   gap: var(--size-2);
   padding: var(--size-0) var(--size-1);
 }
-#jogos .card-game-result-score span {
+#jogos .card-game-result-score span,
+#jogos .card-game-result-score input {
   height: var(--team-size);
   width: var(--team-size);
   max-width: var(--team-size);
@@ -2396,6 +2441,13 @@ footer a:hover {
   justify-content: center;
   align-items: center;
   font-size: var(--font-size-6);
+  padding: var(--size-0);
+}
+#jogos .card-game-result-score span::-webkit-inner-spin-button, #jogos .card-game-result-score span::-webkit-outer-spin-button,
+#jogos .card-game-result-score input::-webkit-inner-spin-button,
+#jogos .card-game-result-score input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 #jogos .card.game .card {
   position: relative;
@@ -2437,6 +2489,10 @@ footer a:hover {
 }
 #jogos .card.game .card-body {
   padding: var(--size-3);
+  max-height: calc(100dvh - 350px);
+  overflow-y: scroll;
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgb(0, 0, 0) 12.5%, rgb(0, 0, 0) 87.5%, rgba(0, 0, 0, 0) 100%);
+          mask-image: linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgb(0, 0, 0) 12.5%, rgb(0, 0, 0) 87.5%, rgba(0, 0, 0, 0) 100%);
 }
 #jogos .card.game .card-body table {
   border-collapse: separate;
