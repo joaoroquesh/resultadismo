@@ -1319,6 +1319,9 @@ footer {
       padding: $size-2;
       gap: $size-2;
       // padding-bottom: 0;
+      &::before, &::after{
+        scale: .8;
+      }
 
       &.salvando{
         &::before{

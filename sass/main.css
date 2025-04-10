@@ -2391,6 +2391,9 @@ footer a:hover {
   padding: var(--size-2);
   gap: var(--size-2);
 }
+#jogos .card-game::before, #jogos .card-game::after {
+  scale: 0.8;
+}
 #jogos .card-game.salvando::before {
   content: "";
   position: absolute;

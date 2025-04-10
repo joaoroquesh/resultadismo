@@ -95,6 +95,15 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
       let mandanteGols = resultado !== '-' && resultado.includes('x') ? resultado.split('x')[0].trim() : '-';
       let visitanteGols = resultado !== '-' && resultado.includes('x') ? resultado.split('x')[1].trim() : '-';
 
+      // Palpites do usuário logado
+      let userPalpite = jogo[user] || '-';
+      let userMandanteGols = '-';
+      let userVisitanteGols = '-';
+
+      if (userPalpite !== '-' && userPalpite.includes('x')) {
+        [userMandanteGols, userVisitanteGols] = userPalpite.split('x').map(p => p.trim());
+      }
+
       let cardHTML = `
               <div class="card game ${andamento} p-0">
                   <div class="card-game d-flex flex-column">
@@ -116,8 +125,8 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
                           <form id="palpiteForm${codigo}" class="card-game-result-score code-inputs">
                               <input type="hidden" class="user-loged" name="email" value="${user}" />
                               <input type="hidden" class="codigo-jogo" name="codigo" value="${codigo}" />
-                              <input type="number" class="team-home d-inline code-input code-input-home" name="mandante" placeholder="-" value="${mandanteGols}">
-                              <input type="number" class="team-away d-inlline code-input code-input-away" name="visitante" placeholder="-" value="${visitanteGols}">
+                              <input type="number" class="team-home d-inline code-input code-input-home" name="mandante" placeholder="-" value="${userMandanteGols}">
+                              <input type="number" class="team-away d-inlline code-input code-input-away" name="visitante" placeholder="-" value="${userVisitanteGols}">
                               <input type="hidden" class="palpite-final" name="palpite" value="" />
                           </form>
                           <div class="card-game-result-team team-away">
