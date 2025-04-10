@@ -2387,8 +2387,78 @@ footer a:hover {
   display: none;
 }
 #jogos .card-game {
+  position: relative;
   padding: var(--size-2);
   gap: var(--size-2);
+}
+#jogos .card-game.salvando::before {
+  content: "";
+  position: absolute;
+  top: var(--size-2);
+  left: var(--size-2);
+  width: var(--size-3);
+  height: var(--size-3);
+  background: transparent;
+  border-radius: 100px;
+  border: 3px solid transparent;
+  border-top-color: var(--turquoise-600);
+  animation: load 0.5s linear infinite;
+}
+#jogos .card-game.salvando::after {
+  content: "salvando...";
+  position: absolute;
+  top: var(--size-2);
+  left: calc(var(--size-3) + var(--size-3));
+  font-size: var(--font-size-xs);
+  color: var(--turquoise-600);
+}
+@keyframes load {
+  0% {
+    rotate: 0deg;
+  }
+  100% {
+    rotate: 360deg;
+  }
+}
+#jogos .card-game.salvo::before {
+  content: "";
+  position: absolute;
+  top: var(--size-2);
+  left: var(--size-2);
+  width: var(--size-3);
+  height: var(--size-3);
+  background: var(--pizza-600);
+  border-radius: 100px;
+  border: 3px solid var(--pizza-600);
+  font-size: var(--font-size-xs);
+}
+#jogos .card-game.salvo::after {
+  content: "salvo";
+  position: absolute;
+  top: var(--size-2);
+  left: calc(var(--size-3) + var(--size-3));
+  font-size: var(--font-size-xs);
+  color: var(--pizza-600);
+}
+#jogos .card-game.erro::before {
+  content: "";
+  position: absolute;
+  top: var(--size-2);
+  left: var(--size-2);
+  width: var(--size-3);
+  height: var(--size-3);
+  background: var(--punch-700);
+  border-radius: 100px;
+  border: 3px solid var(--punch-700);
+  font-size: var(--font-size-xs);
+}
+#jogos .card-game.erro::after {
+  content: "salvo";
+  position: absolute;
+  top: var(--size-2);
+  left: calc(var(--size-3) + var(--size-3));
+  font-size: var(--font-size-xs);
+  color: var(--punch-700);
 }
 #jogos .card-game-label {
   font-size: var(--font-size-xs);

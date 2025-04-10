@@ -461,89 +461,117 @@ function atualizarElementosGlobais(dados) {
   });
 }
 
-function inicializarEventosInputs() {
-  // delegação → vale para forms criados depois também
-  document.addEventListener('input',  tratarDigitacao, {capture:true});
-  document.addEventListener('keydown',tratarKeyDown,  {capture:true});
-  document.addEventListener('focusout',tratarFocusOut,true);
-}
-
-/* ----------  UX dos inputs (1 dígito, avançar foco, etc.) ---------- */
-function tratarDigitacao(e){
-  const inp   = e.target;
-  if (!inp.classList.contains('code-input')) return;
-
-  inp.value = inp.value.replace(/[^0-9]/g,'').slice(0,1);      // 1 dígito
-  const formInputs = inp.closest('form').querySelectorAll('.code-input');
-  const idx        = [...formInputs].indexOf(inp);
-
-  if (inp.value && idx < formInputs.length-1) formInputs[idx+1].focus();
-}
-
-function tratarKeyDown(e){
-  const inp = e.target;
-  if (!inp.classList.contains('code-input')) return;
-
-  if (/^[0-9]$/.test(e.key) && inp.value.length===1){
-    e.preventDefault();
-    inp.value = e.key;
-    const nxt = inp.nextElementSibling;
-    if (nxt && nxt.classList.contains('code-input')) nxt.focus();
+/* ============================================================
+   1)  Liga todos os listeners (delegação -> serve para cards
+       já existentes e para os que forem criados depois)
+   ============================================================ */
+   function inicializarEventosInputs () {
+    document.addEventListener('input',   tratarDigitacao,  {capture:true});
+    document.addEventListener('keydown', tratarKeyDown,    {capture:true});
+    document.addEventListener('focusout',tratarFocusOut,   true);
   }
-  if (e.key==='-' ) e.preventDefault();
-}
-
-/* ----------  Quando o usuário sai do grupo de inputs ---------- */
-function tratarFocusOut(e){
-  const form = e.target.closest('form.code-inputs');
-  if (!form) return;
-
-  // executa apenas quando NENHUM elemento do form tem foco
-  setTimeout(() => {
-    if (form.contains(document.activeElement)) return;
-
-    const mand = form.querySelector('[name="mandante"]');
-    const vist = form.querySelector('[name="visitante"]');
-    const palp = form.querySelector('[name="palpite"]');
-
-    // completa vazios com 0
-    [mand,vist].forEach(inp => { if (inp.value==='') inp.value='0'; });
-    palp.value = `${mand.value}x${vist.value}`;
-
-    // envia apenas se ambos preenchidos e ainda não enviado
-    if (mand.value!=='' && vist.value!=='' && !form.dataset.submitted){
-      form.dataset.submitted = '1';          // trava contra duplo‑clique
-      enviarPalpite(form).finally(()=>{      // destrava depois de resposta
-        delete form.dataset.submitted;
-      });
+  
+  /* ============================================================
+     2)  UX: 1 dígito por input, avanço de foco automático
+     ============================================================ */
+  function tratarDigitacao (e){
+    const inp = e.target;
+    if (!inp.classList.contains('code-input')) return;
+  
+    inp.value = inp.value.replace(/[^0-9]/g,'').slice(0,1);       // 1 dígito
+  
+    const formInputs = inp.closest('form').querySelectorAll('.code-input');
+    const idx        = [...formInputs].indexOf(inp);
+    if (inp.value && idx < formInputs.length-1) formInputs[idx+1].focus();
+  }
+  
+  function tratarKeyDown (e){
+    const inp = e.target;
+    if (!inp.classList.contains('code-input')) return;
+  
+    if (/^[0-9]$/.test(e.key) && inp.value.length===1){
+      e.preventDefault();
+      inp.value = e.key;
+      const nxt = inp.nextElementSibling;
+      if (nxt && nxt.classList.contains('code-input')) nxt.focus();
     }
-  },200);
-}
-
-/* ----------  Envio propriamente dito ---------- */
-async function enviarPalpite(form){
-  const payload = JSON.stringify({
-    email    : form.email.value,
-    codigo   : form.codigo.value,
-    mandante : form.mandante.value,
-    visitante: form.visitante.value,
-    palpite  : form.palpite.value
-  });
-
-  try{
-    const res  = await fetch('https://script.google.com/macros/s/AKfycbwu1MXJ5HCOQQWwAXMU9xAwCszJ3WPUJRlo2SaIAGerBJLrkWmyqYJ9KZoGF1Tk7Xbrkg/exec',{
-      method : 'POST',
-      headers: { 'Content-Type':'text/plain;charset=utf-8' }, // requisição “simple”
-      body   : payload
-    });
-    const json = await res.json();          // {"ok":true}
-    if (json.ok) console.log('Palpite gravado!',payload);
-    else         console.warn('Servidor respondeu erro',json);
-  }catch(err){
-    console.error('Falha ao enviar palpite',err);
+    if (e.key==='-') e.preventDefault();
   }
-}
-
-
-
-
+  
+  /* ============================================================
+     3)  Quando o usuário sai do grupo de inputs
+         – agenda envio em 3 s
+         – adiciona / remove classes de estado (.salvando, .salvo, .erro)
+     ============================================================ */
+  function tratarFocusOut (e){
+    const form = e.target.closest('form.code-inputs');
+    if (!form) return;
+  
+    setTimeout(() => {
+      if (form.contains(document.activeElement)) return;   // ainda há foco interno
+  
+      const mand = form.mandante;
+      const vist = form.visitante;
+      const palp = form.palpite;
+  
+      /* completa vazios com 0 */
+      [mand,vist].forEach(inp => { if (inp.value==='') inp.value='0'; });
+      palp.value = `${mand.value}x${vist.value}`;
+  
+      /* se já existe timer pendente, reinicia  */
+      if (form.dataset.timerId){
+        clearTimeout(+form.dataset.timerId);
+        delete form.dataset.timerId;
+      }
+  
+      /* só agenda se ambos preenchidos */
+      if (mand.value!=='' && vist.value!==''){
+        const card = form.closest('.card-game');
+        card.classList.remove('erro','salvo');   // limpa estados anteriores
+        card.classList.add('salvando');
+  
+        /* agenda envio em 3 s */
+        const id = setTimeout(()=>{
+          enviarPalpite(form, card);
+          delete form.dataset.timerId;
+        }, 3000);
+  
+        form.dataset.timerId = id;               // guarda para poder cancelar
+      }
+    }, 200);  // espera a transição de foco terminar
+  }
+  
+  /* ============================================================
+     4)  Envio propriamente dito
+     ============================================================ */
+  async function enviarPalpite(form, card){
+    const payload = JSON.stringify({
+      email    : form.email.value,
+      codigo   : form.codigo.value,
+      mandante : form.mandante.value,
+      visitante: form.visitante.value,
+      palpite  : form.palpite.value
+    });
+  
+    try{
+      const res  = await fetch(
+        'https://script.google.com/macros/s/AKfycbwu1MXJ5HCOQQWwAXMU9xAwCszJ3WPUJRlo2SaIAGerBJLrkWmyqYJ9KZoGF1Tk7Xbrkg/exec',
+        { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:payload }
+      );
+      const json = await res.json();             // espera {ok:true}
+  
+      card.classList.remove('salvando');
+      if (json.ok){
+        card.classList.add('salvo');
+        console.log('Palpite gravado',payload);
+      }else{
+        card.classList.add('erro');
+        console.warn('Servidor respondeu erro',json);
+      }
+    }catch(err){
+      card.classList.remove('salvando');
+      card.classList.add('erro');
+      console.error('Falha ao enviar palpite',err);
+    }
+  }
+  

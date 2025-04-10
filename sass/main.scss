@@ -1315,9 +1315,89 @@ footer {
     }
 
     &-game {
+      position: relative;
       padding: $size-2;
       gap: $size-2;
       // padding-bottom: 0;
+
+      &.salvando{
+        &::before{
+          content: '';
+          position: absolute;
+          top: $size-2;
+          left: $size-2;
+          width: $size-3;
+          height: $size-3;
+          background: transparent;
+          border-radius: 100px;
+          border: 3px solid transparent;
+          border-top-color: $primary;
+          animation: load .5s linear infinite;
+        }
+        &::after{
+          content: 'salvando...';
+          position: absolute;
+          top: $size-2;
+          left: calc($size-3 + $size-3);
+          font-size: $font-size-xs;
+          color: $primary;
+        }
+        @keyframes load {
+          0%{
+            rotate: 0deg;
+          }
+          100%{
+            rotate: 360deg;
+          }
+        }
+      }
+      &.salvo{
+        &::before{
+          content: '';
+          position: absolute;
+          top: $size-2;
+          left: $size-2;
+          width: $size-3;
+          height: $size-3;
+          background: $cravada;
+          border-radius: 100px;
+          border: 3px solid $cravada;
+          font-size: $font-size-xs;
+          // animation: load .5s linear infinite;
+        }
+        &::after{
+          content: 'salvo';
+          position: absolute;
+          top: $size-2;
+          left: calc($size-3 + $size-3);
+          font-size: $font-size-xs;
+          color: $cravada;
+        }
+      }
+      &.erro{
+        &::before{
+          content: '';
+          position: absolute;
+          top: $size-2;
+          left: $size-2;
+          width: $size-3;
+          height: $size-3;
+          background: $danger;
+          border-radius: 100px;
+          border: 3px solid $danger;
+          font-size: $font-size-xs;
+          // animation: load .5s linear infinite;
+        }
+        &::after{
+          content: 'salvo';
+          position: absolute;
+          top: $size-2;
+          left: calc($size-3 + $size-3);
+          font-size: $font-size-xs;
+          color: $danger;
+        }
+      }
+
 
       &-label {
         font-size: var(--font-size-xs);
