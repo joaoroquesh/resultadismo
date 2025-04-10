@@ -93,40 +93,46 @@
 
 
               <form id="palpiteForm">
-                <input type="text" name="codigo" placeholder="Seu codigo" required />
-                <input type="email" name="email" placeholder="Seu email" required />
-                <input type="text" name="palpite" placeholder="Palpite ex: 2x1" required />
-                <button class="btn btn-primary" type="submit">Enviar</button>
+                <input type="text" name="nome" placeholder="Seu nome" required>
+                <input type="email" name="email" placeholder="Seu e‑mail" required>
+                <input type="text" name="palpite" placeholder="Ex.: 2x1" required>
+                <button type="submit">Enviar</button>
               </form>
 
               <script>
                 const form = document.getElementById('palpiteForm');
+                const url = 'https://script.google.com/macros/s/AKfycbwu1MXJ5HCOQQWwAXMU9xAwCszJ3WPUJRlo2SaIAGerBJLrkWmyqYJ9KZoGF1Tk7Xbrkg/exec';
 
-                form.addEventListener('submit', function (e) {
+                form.addEventListener('submit', async (e) => {
                   e.preventDefault();
 
-                  const data = {
-                    nome: form.codigo.value,
+                  const payload = JSON.stringify({
+                    nome: form.nome.value,
                     email: form.email.value,
                     palpite: form.palpite.value
-                  };
+                  });
 
-                  fetch('https://script.google.com/macros/s/AKfycbzu4ex8hBj8VovzH40-Q067Xa2Kngx1MJZxG0gRWc5YNcpi6HZOZ9qk2uJ5mJw77VUOcA/exec', {
-                    method: 'POST',
-                    body: JSON.stringify(data)
-                  })
-                    .then(response => response.json())
-                    .then(result => {
-                      alert('Palpite enviado com sucesso!');
-                      form.reset();
-                    })
-                    .catch(error => {
-                      console.error('Erro ao enviar:', error);
-                      alert('Erro ao enviar o palpite.');
+                  try {
+                    const res = await fetch(url, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // “simple request”
+                      body: payload
                     });
-                });
 
+                    const json = await res.json();              // já é permitido ler
+                    console.table(json.log);           // <-- vê tudo no console
+                    alert(json.ok ? 'Sucesso!' : 'Falhou – veja console');
+                    form.reset();
+                  } catch (err) {
+                    console.error(err);
+                    alert('Erro ao enviar o palpite.');
+                  }
+                });
               </script>
+
+
+
+
 
             </div>
           </div>
