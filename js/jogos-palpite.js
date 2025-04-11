@@ -143,7 +143,7 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
               <img src="" data-codigo="${mandante}" alt="" class="card-game-result-team-img team-home">
               <span class="card-game-result-team-name team-home" data-codigo="${mandante}"></span>
             </div>
-            <form id="palpiteForm${codigo}" class="card-game-result-score code-inputs">
+            <form id="palpiteForm${codigo}" class="card-game-result-score code-inputs skeleton">
               <input type="hidden" class="user-loged" name="email" value="${user}" />
               <input type="hidden" class="codigo-jogo" name="codigo" value="${codigo}" />
               <input type="number" class="team-home d-inline code-input code-input-home" name="mandante" placeholder="-" value="${userMandanteGols}">
