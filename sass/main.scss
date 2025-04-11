@@ -1357,13 +1357,15 @@ footer {
       position: relative;
       padding: $size-2;
       gap: $size-2;
+
       // padding-bottom: 0;
-      &::before, &::after{
+      &::before,
+      &::after {
         scale: .8;
       }
 
-      &.salvando{
-        &::before{
+      &.salvando {
+        &::before {
           content: '';
           position: absolute;
           top: $size-2;
@@ -1376,7 +1378,8 @@ footer {
           border-top-color: $primary;
           animation: load .5s linear infinite;
         }
-        &::after{
+
+        &::after {
           content: 'salvando...';
           position: absolute;
           top: $size-2;
@@ -1384,17 +1387,20 @@ footer {
           font-size: $font-size-xs;
           color: $primary;
         }
+
         @keyframes load {
-          0%{
+          0% {
             rotate: 0deg;
           }
-          100%{
+
+          100% {
             rotate: 360deg;
           }
         }
       }
-      &.salvo{
-        &::before{
+
+      &.salvo {
+        &::before {
           content: '';
           position: absolute;
           top: $size-2;
@@ -1407,7 +1413,8 @@ footer {
           font-size: $font-size-xs;
           // animation: load .5s linear infinite;
         }
-        &::after{
+
+        &::after {
           content: 'salvo';
           position: absolute;
           top: $size-2;
@@ -1416,8 +1423,9 @@ footer {
           color: $cravada;
         }
       }
-      &.erro{
-        &::before{
+
+      &.erro {
+        &::before {
           content: '';
           position: absolute;
           top: $size-2;
@@ -1430,7 +1438,8 @@ footer {
           font-size: $font-size-xs;
           // animation: load .5s linear infinite;
         }
-        &::after{
+
+        &::after {
           content: 'salvo';
           position: absolute;
           top: $size-2;
@@ -1653,6 +1662,77 @@ footer {
               }
             }
           }
+        }
+      }
+
+      &.cravada,
+      &.saldo,
+      &.acerto {
+        position: relative;
+
+
+        &:after {
+
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          color: var(--star-dust-100);
+          width: 29px;
+          height: 29px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: $font-size-xs;
+          border-radius: 0 0 8px 0;
+          padding: 2px;
+          font-weight: bold;
+        }
+
+        &.vivo {
+          &:after {
+            display: none;
+          }
+        }
+      }
+
+      &.cravada {
+        border: 1px solid $cravada;
+
+        input {
+          border: 1px solid $cravada;
+        }
+
+        &:after {
+          background: $cravada;
+          content: '+3';
+        }
+      }
+
+      &.saldo {
+        border: 1px solid $saldo;
+
+        input {
+          border: 1px solid $saldo;
+        }
+
+        &:after {
+          background: $saldo;
+          content: '+2';
+        }
+      }
+
+      &.acerto {
+        border: 1px solid $acerto;
+
+        input {
+          border: 1px solid $acerto;
+        }
+
+        &:after {
+          font-weight: normal;
+          background: $acerto;
+          content: '+1';
         }
       }
     }

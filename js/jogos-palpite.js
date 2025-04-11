@@ -71,101 +71,118 @@ function gerarNavegacao(jogosData) {
 
 function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
   let accordionGames = $('#accordionGames');
-  accordionGames.empty(); // Limpar conteúdo existente
+  accordionGames.empty();
 
-  jogosData.forEach(jogo => {
-    if (jogo.codigo && jogo.codigo !== '#N/A') { // Adicionar verificação para ignorar códigos inválidos
-      if (diaSelecionado && mesSelecionado) {
-        let [dia, mes] = jogo.data.split('/');
-        if (dia !== diaSelecionado || mes !== mesSelecionado) {
-          return;
+  const user = localStorage.getItem('logado');
+
+  // 1. Ordenar os jogos pelo horário (jogo.hora convertido para Date)
+  const jogosOrdenados = jogosData
+    .filter(j => j.codigo && j.codigo !== '#N/A') // ignora inválidos
+    .sort((a, b) => new Date(a.hora) - new Date(b.hora));
+
+  jogosOrdenados.forEach(jogo => {
+    if (diaSelecionado && mesSelecionado) {
+      const [dia, mes] = jogo.data.split('/');
+      if (dia !== diaSelecionado || mes !== mesSelecionado) return;
+    }
+
+    const codigo = jogo.codigo || '-';
+    const data = jogo.data || '-';
+    const completo = jogo.completo || '-';
+    const hora = formatarHora(jogo.hora) || '-';
+    const andamento = jogo.andamento || '-';
+    const mandante = jogo.mandante ? jogo.mandante.replace(/\s|\-|\|/g, '') : '-';
+    const visitante = jogo.visitante ? jogo.visitante.replace(/\s|\-|\|/g, '') : '-';
+    const campeonato = jogo.campeonato || '-';
+    const resultado = jogo.resultado || '-';
+
+    // Gols reais
+    let mandanteGols = '-';
+    let visitanteGols = '-';
+    if (resultado !== '-' && resultado.includes('x')) {
+      [mandanteGols, visitanteGols] = resultado.split('x').map(g => g.trim());
+    }
+
+    // Palpite do usuário logado
+    const userPalpite = jogo[user] || '-';
+    let userMandanteGols = '-';
+    let userVisitanteGols = '-';
+    if (userPalpite !== '-' && userPalpite.includes('x')) {
+      [userMandanteGols, userVisitanteGols] = userPalpite.split('x').map(p => p.trim());
+    }
+
+    // Classe de pontuação do usuário
+    let classePontuacao = '';
+    if (resultado !== '-' && userPalpite !== '-' && resultado.includes('x') && userPalpite.includes('x')) {
+      const [realMandante, realVisitante] = resultado.split('x').map(Number);
+      const [palpiteMandante, palpiteVisitante] = userPalpite.split('x').map(Number);
+
+      if (palpiteMandante === realMandante && palpiteVisitante === realVisitante) {
+        classePontuacao = 'cravada';
+      } else if ((palpiteMandante - palpiteVisitante) === (realMandante - realVisitante) &&
+                 (palpiteMandante > palpiteVisitante) === (realMandante > realVisitante)) {
+        classePontuacao = 'saldo';
+      } else if ((palpiteMandante > palpiteVisitante && realMandante > realVisitante) ||
+                 (palpiteMandante < palpiteVisitante && realMandante < realVisitante)) {
+        if (realMandante !== realVisitante) {
+          classePontuacao = 'acerto';
         }
       }
-      let user = localStorage.getItem('logado');
-      let codigo = jogo.codigo || '-';
-      let data = jogo.data || '-';
-      let completo = jogo.completo || '-';
-      let hora = formatarHora(jogo.hora) || '-';
-      let andamento = jogo.andamento || '-';
-      let mandante = jogo.mandante ? jogo.mandante.replace(/\s|\-|\|/g, '') : '-';
-      let visitante = jogo.visitante ? jogo.visitante.replace(/\s|\-|\|/g, '') : '-';
-      let campeonato = jogo.campeonato || '-';
-      let resultado = jogo.resultado || '-';
-
-      let mandanteGols = resultado !== '-' && resultado.includes('x') ? resultado.split('x')[0].trim() : '-';
-      let visitanteGols = resultado !== '-' && resultado.includes('x') ? resultado.split('x')[1].trim() : '-';
-
-      // Palpites do usuário logado
-      let userPalpite = jogo[user] || '-';
-      let userMandanteGols = '-';
-      let userVisitanteGols = '-';
-
-      if (userPalpite !== '-' && userPalpite.includes('x')) {
-        [userMandanteGols, userVisitanteGols] = userPalpite.split('x').map(p => p.trim());
-      }
-
-      let cardHTML = `
-              <div class="card game ${andamento} p-0">
-                  <div class="card-game d-flex flex-column">
-                      <div class="card-game-label d-flex gap-2 center-s">
-                          <div class="card-game-label-hour">
-                              ${hora}
-                          </div>
-                          <span>|</span>
-                          <div class="card-game-label-tournament">
-                              ${campeonato}
-                          </div>
-                      </div>
-                      <div class="card-game-result">
-                          <div class="card-game-result-team team-home">
-                              <img src="" data-codigo="${mandante}" alt=""
-                                  class="card-game-result-team-img team-home">
-                              <span class="card-game-result-team-name team-home" data-codigo="${mandante}"></span>
-                          </div>
-                          <form id="palpiteForm${codigo}" class="card-game-result-score code-inputs skeleton">
-                              <input type="hidden" class="user-loged" name="email" value="${user}" />
-                              <input type="hidden" class="codigo-jogo" name="codigo" value="${codigo}" />
-                              <input type="number" class="team-home d-inline code-input code-input-home skeleton" name="mandante" placeholder="-" value="${userMandanteGols}">
-                              <input type="number" class="team-away d-inlline code-input code-input-away skeleton" name="visitante" placeholder="-" value="${userVisitanteGols}">
-                              <input type="hidden" class="palpite-final" name="palpite" value="" />
-                          </form>
-                          <div class="card-game-result-team team-away">
-                              <img src="" data-codigo="${visitante}" alt=""
-                                  class="card-game-result-team-img team-away">
-                              <span class="card-game-result-team-name team-away" data-codigo="${visitante}"></span>
-                          </div>
-                      </div>
-                      <div class="card-game-real ">
-                      <p class="text-center fs-sm m-0">
-                        Resultado real
-                      </p>
-                      <div class="card-game-real-score fw-700 center-s">
-                        <span class="team-home">${mandanteGols}</span>
-                        x
-                        <span class="team-away">${visitanteGols}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="card-header" id="heading${codigo}">
-                      <button class="btn text-center fs-sm collapsed" type="button" data-toggle="collapse"
-                          data-target="#collapse${codigo}" aria-expanded="true" aria-controls="collapse${codigo}">
-                          Palpites da galera
-                      </button>
-                  </div>
-                  <div id="collapse${codigo}" class="collapse" aria-labelledby="heading${codigo}" data-parent="#accordionGames">
-                      <div class="card-body scrollable">
-                          <table class="table table-borderless">
-                              <tbody>
-                                  ${listarPalpites(jogo)}
-                              </tbody>
-                          </table>
-                      </div>
-                  </div>
-              </div>
-          `;
-
-      accordionGames.append(cardHTML);
     }
+
+    let cardHTML = `
+      <div class="card game ${andamento} ${classePontuacao} p-0">
+        <div class="card-game d-flex flex-column">
+          <div class="card-game-label d-flex gap-2 center-s">
+            <div class="card-game-label-hour">${hora}</div>
+            <span>|</span>
+            <div class="card-game-label-tournament">${campeonato}</div>
+          </div>
+          <div class="card-game-result">
+            <div class="card-game-result-team team-home">
+              <img src="" data-codigo="${mandante}" alt="" class="card-game-result-team-img team-home">
+              <span class="card-game-result-team-name team-home" data-codigo="${mandante}"></span>
+            </div>
+            <form id="palpiteForm${codigo}" class="card-game-result-score code-inputs">
+              <input type="hidden" class="user-loged" name="email" value="${user}" />
+              <input type="hidden" class="codigo-jogo" name="codigo" value="${codigo}" />
+              <input type="number" class="team-home d-inline code-input code-input-home" name="mandante" placeholder="-" value="${userMandanteGols}">
+              <input type="number" class="team-away d-inline code-input code-input-away" name="visitante" placeholder="-" value="${userVisitanteGols}">
+              <input type="hidden" class="palpite-final" name="palpite" value="" />
+            </form>
+            <div class="card-game-result-team team-away">
+              <img src="" data-codigo="${visitante}" alt="" class="card-game-result-team-img team-away">
+              <span class="card-game-result-team-name team-away" data-codigo="${visitante}"></span>
+            </div>
+          </div>
+          <div class="card-game-real">
+            <p class="text-center fs-sm m-0">Resultado real</p>
+            <div class="card-game-real-score fw-700 center-s">
+              <span class="team-home">${mandanteGols}</span>
+              x
+              <span class="team-away">${visitanteGols}</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-header" id="heading${codigo}">
+          <button class="btn text-center fs-sm collapsed" type="button" data-toggle="collapse"
+            data-target="#collapse${codigo}" aria-expanded="true" aria-controls="collapse${codigo}">
+            Palpites da galera
+          </button>
+        </div>
+        <div id="collapse${codigo}" class="collapse" aria-labelledby="heading${codigo}" data-parent="#accordionGames">
+          <div class="card-body scrollable">
+            <table class="table table-borderless">
+              <tbody>
+                ${listarPalpites(jogo)}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+
+    accordionGames.append(cardHTML);
   });
 }
 

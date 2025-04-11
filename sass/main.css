@@ -2668,6 +2668,59 @@ footer a:hover {
 #jogos .card.game .card-body table td .acerto:after {
   content: "+1";
 }
+#jogos .card.game.cravada, #jogos .card.game.saldo, #jogos .card.game.acerto {
+  position: relative;
+}
+#jogos .card.game.cravada:after, #jogos .card.game.saldo:after, #jogos .card.game.acerto:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--star-dust-100);
+  width: 29px;
+  height: 29px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: var(--font-size-xs);
+  border-radius: 0 0 8px 0;
+  padding: 2px;
+  font-weight: bold;
+}
+#jogos .card.game.cravada.vivo:after, #jogos .card.game.saldo.vivo:after, #jogos .card.game.acerto.vivo:after {
+  display: none;
+}
+#jogos .card.game.cravada {
+  border: 1px solid var(--pizza-600);
+}
+#jogos .card.game.cravada input {
+  border: 1px solid var(--pizza-600);
+}
+#jogos .card.game.cravada:after {
+  background: var(--pizza-600);
+  content: "+3";
+}
+#jogos .card.game.saldo {
+  border: 1px solid var(--bilbao-700);
+}
+#jogos .card.game.saldo input {
+  border: 1px solid var(--bilbao-700);
+}
+#jogos .card.game.saldo:after {
+  background: var(--bilbao-700);
+  content: "+2";
+}
+#jogos .card.game.acerto {
+  border: 1px solid var(--blue-dianne-900);
+}
+#jogos .card.game.acerto input {
+  border: 1px solid var(--blue-dianne-900);
+}
+#jogos .card.game.acerto:after {
+  font-weight: normal;
+  background: var(--blue-dianne-900);
+  content: "+1";
+}
 #jogos #arrow {
   rotate: 180deg;
 }
