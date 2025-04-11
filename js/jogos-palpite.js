@@ -184,6 +184,48 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
 
     accordionGames.append(cardHTML);
   });
+  
+  try {
+    let totalPontosDia = 0;
+    const user = localStorage.getItem('logado');
+    
+    jogosOrdenados.forEach(jogo => {
+      if (diaSelecionado && mesSelecionado) {
+        const [dia, mes] = jogo.data.split('/');
+        if (dia !== diaSelecionado || mes !== mesSelecionado) return;
+      }
+  
+      const resultado = jogo.resultado;
+      const palpite = jogo[user];
+  
+      if (resultado && resultado.includes('x') && palpite && palpite.includes('x')) {
+        const [gmr, gvr] = resultado.split('x').map(Number);
+        const [gmp, gvp] = palpite.split('x').map(Number);
+  
+        if (gmp === gmr && gvp === gvr) {
+          totalPontosDia += 3;
+        } else if ((gmp - gvp) === (gmr - gvr) && (gmp > gvp) === (gmr > gvr)) {
+          totalPontosDia += 2;
+        } else if ((gmp > gvp && gmr > gvr) || (gmp < gvp && gmr < gvr)) {
+          if (gmr !== gvr) totalPontosDia += 1;
+        }
+      }
+    });
+  
+    const pontosDiaEl = $('#pontos-dia');
+    if (pontosDiaEl.length) {
+      const texto = totalPontosDia === 1 ? '1 ponto' : `${totalPontosDia} pontos`;
+      pontosDiaEl
+        .text(texto)
+        .removeClass('btn-primary btn-outline-primary')
+        .addClass(totalPontosDia > 0 ? 'btn-primary' : 'btn-outline-primary')
+        .show();
+    }
+  } catch (e) {
+    console.error('Erro ao calcular e exibir pontos do dia:', e);
+  }
+  
+
 }
 
 function formatarHora(horaISO) {
