@@ -120,10 +120,10 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
       if (palpiteMandante === realMandante && palpiteVisitante === realVisitante) {
         classePontuacao = 'cravada';
       } else if ((palpiteMandante - palpiteVisitante) === (realMandante - realVisitante) &&
-                 (palpiteMandante > palpiteVisitante) === (realMandante > realVisitante)) {
+        (palpiteMandante > palpiteVisitante) === (realMandante > realVisitante)) {
         classePontuacao = 'saldo';
       } else if ((palpiteMandante > palpiteVisitante && realMandante > realVisitante) ||
-                 (palpiteMandante < palpiteVisitante && realMandante < realVisitante)) {
+        (palpiteMandante < palpiteVisitante && realMandante < realVisitante)) {
         if (realMandante !== realVisitante) {
           classePontuacao = 'acerto';
         }
@@ -184,24 +184,24 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
 
     accordionGames.append(cardHTML);
   });
-  
+
   try {
     let totalPontosDia = 0;
     const user = localStorage.getItem('logado');
-    
+
     jogosOrdenados.forEach(jogo => {
       if (diaSelecionado && mesSelecionado) {
         const [dia, mes] = jogo.data.split('/');
         if (dia !== diaSelecionado || mes !== mesSelecionado) return;
       }
-  
+
       const resultado = jogo.resultado;
       const palpite = jogo[user];
-  
+
       if (resultado && resultado.includes('x') && palpite && palpite.includes('x')) {
         const [gmr, gvr] = resultado.split('x').map(Number);
         const [gmp, gvp] = palpite.split('x').map(Number);
-  
+
         if (gmp === gmr && gvp === gvr) {
           totalPontosDia += 3;
         } else if ((gmp - gvp) === (gmr - gvr) && (gmp > gvp) === (gmr > gvr)) {
@@ -211,7 +211,7 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
         }
       }
     });
-  
+
     const pontosDiaEl = $('#pontos-dia');
     if (pontosDiaEl.length) {
       const texto = totalPontosDia === 1 ? '1 ponto' : `${totalPontosDia} pontos`;
@@ -224,7 +224,7 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
   } catch (e) {
     console.error('Erro ao calcular e exibir pontos do dia:', e);
   }
-  
+
 
 }
 
@@ -530,116 +530,193 @@ function atualizarElementosGlobais(dados) {
 }
 
 /* ============================================================
+   Actualiza apenas o que mudou nos cards já existentes
+   ============================================================ */
+   function atualizarJogosIncremental (novosDados) {
+    const logado = localStorage.getItem('logado');
+  
+    novosDados.forEach(jogo => {
+      if (!jogo.codigo || jogo.codigo === '#N/A') return;
+  
+      const $card = $(`#heading${jogo.codigo}`).closest('.card.game');
+  
+      /* 2.1 – se o card ainda não existe (jogo novo no dia) ---------- */
+      if (!$card.length) {
+        // ➜ opcional: se quiser acrescentar cards novos no dia aberto:
+        // listarJogos([jogo], diaActual, mesActual);  // append
+        return;
+      }
+  
+      /* 2.2 – actualiza hora, resultado real e estado ---------------- */
+      $card.find('.card-game-label-hour').text(formatarHora(jogo.hora));
+  
+      const [gm='-', gv='-'] = (jogo.resultado||'-').split('x').map(t=>t.trim());
+      $card.find('.card-game-real-score .team-home').text(gm);
+      $card.find('.card-game-real-score .team-away').text(gv);
+  
+      $card.removeClass('Finalizado EmAndamento Previsto')
+           .addClass(jogo.andamento || '');
+  
+      /* 2.3 – palpite do utilizador logado --------------------------- */
+      if (logado) {
+        const palpite = jogo[logado] || '-';
+        const [pm='-', pv='-'] = palpite.includes('x') ? palpite.split('x') : ['',''];
+        const $form = $(`#palpiteForm${jogo.codigo}`);
+        if ($form.length) {
+          $form.find('.code-input-home').val(pm);
+          $form.find('.code-input-away').val(pv);
+        }
+      }
+  
+      /* 2.4 – tabela de palpites da galera --------------------------- */
+      $card.find('tbody').html(listarPalpites(jogo));
+  
+      /* 2.5 – classe de pontuação do logado (cravada/saldo/acerto) --- */
+      $card.removeClass('cravada saldo acerto')
+           .addClass(calcClassePontuacao(jogo, logado)); // usa a mesma lógica
+    });
+  
+    /* 2.6 – recalcula os pontos do dia que está aberto -------------- */
+    const mesSel = $('#nav-tab .nav-link.active').attr('id').split('-')[1];
+    const diaSel = $('.tab-pane.show.active .nav-link.active').text().split(' ')[1];
+    calcularMostrarPontosDia(novosDados, diaSel, mesSel);
+  }
+  
+
+/* ============================================================
+   Atualiza o JSON de jogos em memória + localStorage
+   ============================================================ */
+function atualizarPalpiteLocal({ email, codigo, palpite }) {
+  if (!window.jogos || !Array.isArray(window.jogos.data)) return;
+
+  const jogo = window.jogos.data.find(j => j.codigo === codigo);
+  if (jogo) {
+    jogo[email] = palpite;                       // grava no objeto em memória
+    localStorage.setItem('jogos', JSON.stringify(window.jogos)); // persiste
+  }
+}
+
+/* ============================================================
    1)  Liga todos os listeners (delegação -> serve para cards
        já existentes e para os que forem criados depois)
    ============================================================ */
-   function inicializarEventosInputs () {
-    document.addEventListener('input',   tratarDigitacao,  {capture:true});
-    document.addEventListener('keydown', tratarKeyDown,    {capture:true});
-    document.addEventListener('focusout',tratarFocusOut,   true);
+function inicializarEventosInputs() {
+  document.addEventListener('input', tratarDigitacao, { capture: true });
+  document.addEventListener('keydown', tratarKeyDown, { capture: true });
+  document.addEventListener('focusout', tratarFocusOut, true);
+}
+
+/* ============================================================
+   2)  UX: 1 dígito por input, avanço de foco automático
+   ============================================================ */
+function tratarDigitacao(e) {
+  const inp = e.target;
+  if (!inp.classList.contains('code-input')) return;
+
+  inp.value = inp.value.replace(/[^0-9]/g, '').slice(0, 1);       // 1 dígito
+
+  const formInputs = inp.closest('form').querySelectorAll('.code-input');
+  const idx = [...formInputs].indexOf(inp);
+  if (inp.value && idx < formInputs.length - 1) formInputs[idx + 1].focus();
+}
+
+function tratarKeyDown(e) {
+  const inp = e.target;
+  if (!inp.classList.contains('code-input')) return;
+
+  if (/^[0-9]$/.test(e.key) && inp.value.length === 1) {
+    e.preventDefault();
+    inp.value = e.key;
+    const nxt = inp.nextElementSibling;
+    if (nxt && nxt.classList.contains('code-input')) nxt.focus();
   }
-  
-  /* ============================================================
-     2)  UX: 1 dígito por input, avanço de foco automático
-     ============================================================ */
-  function tratarDigitacao (e){
-    const inp = e.target;
-    if (!inp.classList.contains('code-input')) return;
-  
-    inp.value = inp.value.replace(/[^0-9]/g,'').slice(0,1);       // 1 dígito
-  
-    const formInputs = inp.closest('form').querySelectorAll('.code-input');
-    const idx        = [...formInputs].indexOf(inp);
-    if (inp.value && idx < formInputs.length-1) formInputs[idx+1].focus();
-  }
-  
-  function tratarKeyDown (e){
-    const inp = e.target;
-    if (!inp.classList.contains('code-input')) return;
-  
-    if (/^[0-9]$/.test(e.key) && inp.value.length===1){
-      e.preventDefault();
-      inp.value = e.key;
-      const nxt = inp.nextElementSibling;
-      if (nxt && nxt.classList.contains('code-input')) nxt.focus();
+  if (e.key === '-') e.preventDefault();
+}
+
+/* ============================================================
+   3)  Quando o usuário sai do grupo de inputs
+       – agenda envio em 3 s
+       – adiciona / remove classes de estado (.salvando, .salvo, .erro)
+   ============================================================ */
+function tratarFocusOut(e) {
+  const form = e.target.closest('form.code-inputs');
+  if (!form) return;
+
+  setTimeout(() => {
+    if (form.contains(document.activeElement)) return;   // ainda há foco interno
+
+    const mand = form.mandante;
+    const vist = form.visitante;
+    const palp = form.palpite;
+
+    /* completa vazios com 0 */
+    [mand, vist].forEach(inp => { if (inp.value === '') inp.value = '0'; });
+    palp.value = `${mand.value}x${vist.value}`;
+
+    /* se já existe timer pendente, reinicia  */
+    if (form.dataset.timerId) {
+      clearTimeout(+form.dataset.timerId);
+      delete form.dataset.timerId;
     }
-    if (e.key==='-') e.preventDefault();
-  }
-  
-  /* ============================================================
-     3)  Quando o usuário sai do grupo de inputs
-         – agenda envio em 3 s
-         – adiciona / remove classes de estado (.salvando, .salvo, .erro)
-     ============================================================ */
-  function tratarFocusOut (e){
-    const form = e.target.closest('form.code-inputs');
-    if (!form) return;
-  
-    setTimeout(() => {
-      if (form.contains(document.activeElement)) return;   // ainda há foco interno
-  
-      const mand = form.mandante;
-      const vist = form.visitante;
-      const palp = form.palpite;
-  
-      /* completa vazios com 0 */
-      [mand,vist].forEach(inp => { if (inp.value==='') inp.value='0'; });
-      palp.value = `${mand.value}x${vist.value}`;
-  
-      /* se já existe timer pendente, reinicia  */
-      if (form.dataset.timerId){
-        clearTimeout(+form.dataset.timerId);
+
+    /* só agenda se ambos preenchidos */
+    if (mand.value !== '' && vist.value !== '') {
+      const card = form.closest('.card-game');
+      card.classList.remove('erro', 'salvo');   // limpa estados anteriores
+      card.classList.add('salvando');
+
+      /* agenda envio em 3 s */
+      const id = setTimeout(() => {
+        enviarPalpite(form, card);
         delete form.dataset.timerId;
-      }
-  
-      /* só agenda se ambos preenchidos */
-      if (mand.value!=='' && vist.value!==''){
-        const card = form.closest('.card-game');
-        card.classList.remove('erro','salvo');   // limpa estados anteriores
-        card.classList.add('salvando');
-  
-        /* agenda envio em 3 s */
-        const id = setTimeout(()=>{
-          enviarPalpite(form, card);
-          delete form.dataset.timerId;
-        }, 3000);
-  
-        form.dataset.timerId = id;               // guarda para poder cancelar
-      }
-    }, 200);  // espera a transição de foco terminar
-  }
-  
-  /* ============================================================
-     4)  Envio propriamente dito
-     ============================================================ */
-  async function enviarPalpite(form, card){
-    const payload = JSON.stringify({
-      email    : form.email.value,
-      codigo   : form.codigo.value,
-      mandante : form.mandante.value,
-      visitante: form.visitante.value,
-      palpite  : form.palpite.value
-    });
-  
-    try{
-      const res  = await fetch(
-        'https://script.google.com/macros/s/AKfycbwu1MXJ5HCOQQWwAXMU9xAwCszJ3WPUJRlo2SaIAGerBJLrkWmyqYJ9KZoGF1Tk7Xbrkg/exec',
-        { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:payload }
-      );
-      const json = await res.json();             // espera {ok:true}
-  
-      card.classList.remove('salvando');
-      if (json.ok){
-        card.classList.add('salvo');
-        console.log('Palpite gravado',payload);
-      }else{
-        card.classList.add('erro');
-        console.warn('Servidor respondeu erro',json);
-      }
-    }catch(err){
-      card.classList.remove('salvando');
-      card.classList.add('erro');
-      console.error('Falha ao enviar palpite',err);
+      }, 3000);
+
+      form.dataset.timerId = id;               // guarda para poder cancelar
     }
+  }, 200);  // espera a transição de foco terminar
+}
+
+/* ============================================================
+   4)  Envio propriamente dito
+   ============================================================ */
+async function enviarPalpite(form, card) {
+  const payload = JSON.stringify({
+    email: form.email.value,
+    codigo: form.codigo.value,
+    mandante: form.mandante.value,
+    visitante: form.visitante.value,
+    palpite: form.palpite.value
+  });
+
+  try {
+    const res = await fetch(
+      'https://script.google.com/macros/s/AKfycbwu1MXJ5HCOQQWwAXMU9xAwCszJ3WPUJRlo2SaIAGerBJLrkWmyqYJ9KZoGF1Tk7Xbrkg/exec',
+      { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }
+    );
+    const json = await res.json();             // espera {ok:true}
+
+    card.classList.remove('salvando');
+
+    if (json.ok) {
+      card.classList.add('salvo');
+      const id = setTimeout(() => {
+        card.classList.remove('salvo');
+      }, 2000);
+
+      /* 👉 grava no JSON/Storage */
+      atualizarPalpiteLocal({
+        email: form.email.value,
+        codigo: form.codigo.value,
+        palpite: form.palpite.value
+      });
+      console.log('Palpite gravado', payload);
+    } else {
+      card.classList.add('erro');
+      console.warn('Servidor respondeu erro', json);
+    }
+  } catch (err) {
+    card.classList.remove('salvando');
+    card.classList.add('erro');
+    console.error('Falha ao enviar palpite', err);
   }
-  
+}

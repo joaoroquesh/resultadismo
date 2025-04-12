@@ -42,6 +42,20 @@
   <meta property="og:type" content="website" />
 
   <title>Resultadismo | Jogos</title>
+
+  <script>
+    (function () {
+      // Pega o valor salvo com a chave 'logado'
+      const loggedFlag = localStorage.getItem('logado');
+  
+      // Se não existir ou for string vazia, manda pra home
+      if (!loggedFlag || loggedFlag.trim() === '') {
+        // replace() não deixa a página atual no histórico
+        window.location.replace('https://www.resultadismo.com/');
+      }
+    })();
+  </script>
+  
 </head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-P86V27WXK2"></script>
@@ -546,41 +560,6 @@
       });
   });
 </script>
-
-<script>
-  const form = document.getElementById('palpiteForm');
-
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    const data = {
-      nome: form.nome.value,
-      email: form.email.value,
-      palpite: form.palpite.value
-    };
-
-    fetch('https://script.google.com/macros/s/AKfycbyvvgWRmBoRRuJCoZ8D5scd0dBzu18HcORButXyCkjXxThBp338_UwcEeGNVGUwSntEtA/exec', {
-      method: 'POST',
-      body: JSON.stringify(data)
-    })
-      .then(response => response.json())
-      .then(result => {
-        alert('Palpite enviado com sucesso!');
-        form.reset();
-      })
-      .catch(error => {
-        console.error('Erro ao enviar:', error);
-        alert('Erro ao enviar o palpite.');
-      });
-  });
-
-
-</script>
-
-
-
-
-
 
 
 </body>

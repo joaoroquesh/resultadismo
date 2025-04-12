@@ -51,13 +51,36 @@ $(document).ready(function () {
     // Call the function to check login status
     checkLoginStatus();
 
+    /* ------------------------------------------------------------------
+   1)  Controla se é a 1.ª vez que cada recurso é carregado
+   ------------------------------------------------------------------ */
+    const jaMontado = { dados: false, jogos: false };
     function carregarDados(url, key) {
         $.getJSON(url, function (data) {
-            // Atualiza localStorage e dispara evento
+            /* salva/actualiza localStorage e memória ---------------------- */
             localStorage.setItem(key, JSON.stringify(data));
             window[key] = data;
+
+            /* dispara evento “pronto” p/ quem precisar ouvir -------------- */
             $(document).trigger(`${key}Pronto`);
-            console.log(`${key} Atualizado localStorage`);
+
+            /* ----------------------------------------------------------------
+               PRIMEIRO carregamento → monta tudo normalmente
+               PRÓXIMOS carregamentos → apenas sincroniza o que mudou
+               ---------------------------------------------------------------- */
+            if (!jaMontado[key]) {
+                jaMontado[key] = true;                    // marca como já montado
+
+                /* quando ambos os JSON chegarem pela 1.ª vez */
+                if (jaMontado.dados && jaMontado.jogos) {
+                    executarFuncoesPagina();                // monta navegação + cards
+                    $('body').removeClass('loading');
+                }
+            } else {
+                /* já existe DOM → faz update incremental */
+                if (key === 'dados') atualizarElementosGlobais(data);     // já existe
+                if (key === 'jogos') atualizarJogosIncremental(data.data);
+            }
         }).fail(function () {
             erro = true;
             mostrarErroCarregamento();
@@ -123,7 +146,7 @@ $(document).ready(function () {
                     if (elemento.is('img')) {
                         // Se for uma tag img, definir o atributo src como a URL da imagem
                         elemento.attr('src', item.imagem);
-                        
+
                     } else {
                         // Se não for uma tag img, definir o texto do elemento como o nome
                         elemento.text(item.nome);
@@ -138,57 +161,57 @@ $(document).ready(function () {
 $(document).ready(function () {
     // Carregar o menu e, em seguida, adicionar a classe 'active' ao link correspondente
     $("#menu").load("components/menu-new.html", function () {
-      const currentPath = window.location.pathname;
-      const menuItems = document.querySelectorAll('.nav-item .nav-link');
+        const currentPath = window.location.pathname;
+        const menuItems = document.querySelectorAll('.nav-item .nav-link');
 
-      menuItems.forEach((link) => {
-        const linkPath = link.getAttribute('href');
-        if (linkPath === currentPath || currentPath.endsWith(linkPath)) {
-          link.classList.add('active');
-        }
-      });
+        menuItems.forEach((link) => {
+            const linkPath = link.getAttribute('href');
+            if (linkPath === currentPath || currentPath.endsWith(linkPath)) {
+                link.classList.add('active');
+            }
+        });
     });
 
     $("#header").load("components/header.html", function () {
-      const loggedInUser = localStorage.getItem('logado');
-      const jogadorElements = document.querySelectorAll('.jogador-logado');
+        const loggedInUser = localStorage.getItem('logado');
+        const jogadorElements = document.querySelectorAll('.jogador-logado');
 
-      if (loggedInUser) {
-        
-        jogadorElements.forEach(jogador => {
-          jogador.setAttribute('data-codigo', loggedInUser);
-        });
-        $('[data-codigo]').each(function () {
-          const codigo = $(this).data('codigo');
-          const elemento = $(this);
-          window.dados.data.forEach(item => {
-            if (item.codigo === codigo) {
-              if (elemento.is('img')) {
-                elemento.attr('src', item.imagem);
-              }
-            }
-          });
-        });
-        $('.navbar-toggler').addClass('logado');
-      } else {
-        console.log('Usuário deslogado');
-      }
+        if (loggedInUser) {
 
-      // Add event listener for .navbar-toggler after header is loaded
-      document.querySelector('.navbar-toggler').addEventListener('click', function () {
-        if (!loggedInUser) {
-          // Redirect to /login if no user is logged in
-          window.location.href = '/login';
+            jogadorElements.forEach(jogador => {
+                jogador.setAttribute('data-codigo', loggedInUser);
+            });
+            $('[data-codigo]').each(function () {
+                const codigo = $(this).data('codigo');
+                const elemento = $(this);
+                window.dados.data.forEach(item => {
+                    if (item.codigo === codigo) {
+                        if (elemento.is('img')) {
+                            elemento.attr('src', item.imagem);
+                        }
+                    }
+                });
+            });
+            $('.navbar-toggler').addClass('logado');
         } else {
-          // Execute openOptions() if user is logged in
-          abrirOptions();
+            console.log('Usuário deslogado');
         }
-      });
+
+        // Add event listener for .navbar-toggler after header is loaded
+        document.querySelector('.navbar-toggler').addEventListener('click', function () {
+            if (!loggedInUser) {
+                // Redirect to /login if no user is logged in
+                window.location.href = '/login';
+            } else {
+                // Execute openOptions() if user is logged in
+                abrirOptions();
+            }
+        });
     });
 
     // atualizarElementosGlobais(window.dados);
 
-  });
+});
 
-  $("footer").load("components/footer.html");
-  $("#carregando").load("components/carregando.html");
+$("footer").load("components/footer.html");
+$("#carregando").load("components/carregando.html");
