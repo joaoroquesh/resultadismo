@@ -1401,6 +1401,32 @@ footer {
           color: $primary;
         }
 
+
+
+        @keyframes load {
+          0% {
+            rotate: 0deg;
+          }
+
+          100% {
+            rotate: 360deg;
+          }
+        }
+      }
+      &.enviando {
+        &::before {
+          border: 2px solid $primary;
+          border-top-color: transparent;
+          animation: load .5s linear infinite;
+        }
+
+        &::after {
+          content: 'enviando...';
+          color: $primary;
+        }
+
+        
+
         @keyframes load {
           0% {
             rotate: 0deg;

@@ -617,17 +617,31 @@ function removeUnloadGuard() {
 }
 
 
-/* contador de envios pendentes (timers + fetch) */
-function incPending() {
-  window.__palpitePendentes = (window.__palpitePendentes || 0) + 1;
-  if (window.__palpitePendentes === 1) addUnloadGuard();
-}
-function decPending() {
-  if (window.__palpitePendentes > 0) {
-    window.__palpitePendentes--;
-    if (window.__palpitePendentes === 0) removeUnloadGuard();
+/* ============================================================
+   Contador global de operações pendentes (timers + fetch)
+   ============================================================ */
+   function incPending() {
+    window.__palpitePendentes = (window.__palpitePendentes || 0) + 1;
+  
+    /* primeiro item pendente → liga o bloqueio e a classe */
+    if (window.__palpitePendentes === 1) {
+      addUnloadGuard();                               // ativa beforeunload
+      document.body.classList.add('salvando-palpite'); // mostra “loading”
+    }
   }
-}
+  
+  function decPending() {
+    if (window.__palpitePendentes > 0) {
+      window.__palpitePendentes--;
+  
+      /* último item acabou → libera a navegação e remove a classe */
+      if (window.__palpitePendentes === 0) {
+        removeUnloadGuard();                          // desativa beforeunload
+        document.body.classList.remove('salvando-palpite');
+      }
+    }
+  }
+  
 
 /* ============================================================
    1)  Liga todos os listeners (delegação -> serve para cards
@@ -698,16 +712,15 @@ function tratarFocusOut(e) {
       const card = form.closest('.card-game');
       card.classList.remove('erro', 'salvo');   // limpa estados anteriores
       card.classList.add('salvando');
-      document.body.classList.add('salvando-palpite');
 
       /* liga o guard */
-      addUnloadGuard();
       incPending();  
 
       /* agenda envio em 1,5 s */
       const id = setTimeout(() => {
         enviarPalpite(form, card);
         delete form.dataset.timerId;
+        card.classList.add('enviando');
       }, 1500);
 
       form.dataset.timerId = id;               // guarda para poder cancelar
@@ -735,7 +748,8 @@ async function enviarPalpite(form, card) {
     const json = await res.json();             // espera {ok:true}
 
     card.classList.remove('salvando');
-    document.body.classList.remove('salvando-palpite');
+    card.classList.remove('enviando');
+
 
     if (json.ok) {
       card.classList.add('salvo');
@@ -756,12 +770,37 @@ async function enviarPalpite(form, card) {
     }
   } catch (err) {
     card.classList.remove('salvando');
-    document.body.classList.remove('salvando-palpite');
+    card.classList.remove('enviando');
     card.classList.add('erro');
     console.error('Falha ao enviar palpite', err);
   } finally {
     /* desliga o guard – já temos resposta */
-    removeUnloadGuard();
     decPending();
   }
 }
+
+/* roda uma única vez depois que o DOM estiver pronto */
+document.addEventListener('keydown', e => {
+  /* só queremos tratar <Enter> dentro dos inputs dos palpites */
+  if (e.key !== 'Enter') return;
+
+  const el = e.target;
+  if (!el.matches('form.code-inputs input')) return;
+
+  e.preventDefault();                       // evita enviar o <form> ou quebrar linha
+
+  /* pega a lista linear de todos os inputs “vivos” de todos os forms */
+  const inputs = Array.from(
+    document.querySelectorAll('form.code-inputs input:not([disabled]):not([readonly])')
+  ).filter(i => i.offsetParent !== null);   // exclui elementos ocultos
+
+  const idx = inputs.indexOf(el);
+
+  if (idx > -1 && idx < inputs.length - 1) {
+    /* 👉 existe um próximo campo – foca nele */
+    inputs[idx + 1].focus();
+  } else {
+    /* 👉 era o último – simplesmente tira o foco para acionar tratarFocusOut */
+    el.blur();
+  }
+});
