@@ -532,56 +532,56 @@ function atualizarElementosGlobais(dados) {
 /* ============================================================
    Actualiza apenas o que mudou nos cards já existentes
    ============================================================ */
-   function atualizarJogosIncremental (novosDados) {
-    const logado = localStorage.getItem('logado');
-  
-    novosDados.forEach(jogo => {
-      if (!jogo.codigo || jogo.codigo === '#N/A') return;
-  
-      const $card = $(`#heading${jogo.codigo}`).closest('.card.game');
-  
-      /* 2.1 – se o card ainda não existe (jogo novo no dia) ---------- */
-      if (!$card.length) {
-        // ➜ opcional: se quiser acrescentar cards novos no dia aberto:
-        // listarJogos([jogo], diaActual, mesActual);  // append
-        return;
+function atualizarJogosIncremental(novosDados) {
+  const logado = localStorage.getItem('logado');
+
+  novosDados.forEach(jogo => {
+    if (!jogo.codigo || jogo.codigo === '#N/A') return;
+
+    const $card = $(`#heading${jogo.codigo}`).closest('.card.game');
+
+    /* 2.1 – se o card ainda não existe (jogo novo no dia) ---------- */
+    if (!$card.length) {
+      // ➜ opcional: se quiser acrescentar cards novos no dia aberto:
+      // listarJogos([jogo], diaActual, mesActual);  // append
+      return;
+    }
+
+    /* 2.2 – actualiza hora, resultado real e estado ---------------- */
+    $card.find('.card-game-label-hour').text(formatarHora(jogo.hora));
+
+    const [gm = '-', gv = '-'] = (jogo.resultado || '-').split('x').map(t => t.trim());
+    $card.find('.card-game-real-score .team-home').text(gm);
+    $card.find('.card-game-real-score .team-away').text(gv);
+
+    $card.removeClass('Finalizado EmAndamento Previsto')
+      .addClass(jogo.andamento || '');
+
+    /* 2.3 – palpite do utilizador logado --------------------------- */
+    if (logado) {
+      const palpite = jogo[logado] || '-';
+      const [pm = '-', pv = '-'] = palpite.includes('x') ? palpite.split('x') : ['', ''];
+      const $form = $(`#palpiteForm${jogo.codigo}`);
+      if ($form.length) {
+        $form.find('.code-input-home').val(pm);
+        $form.find('.code-input-away').val(pv);
       }
-  
-      /* 2.2 – actualiza hora, resultado real e estado ---------------- */
-      $card.find('.card-game-label-hour').text(formatarHora(jogo.hora));
-  
-      const [gm='-', gv='-'] = (jogo.resultado||'-').split('x').map(t=>t.trim());
-      $card.find('.card-game-real-score .team-home').text(gm);
-      $card.find('.card-game-real-score .team-away').text(gv);
-  
-      $card.removeClass('Finalizado EmAndamento Previsto')
-           .addClass(jogo.andamento || '');
-  
-      /* 2.3 – palpite do utilizador logado --------------------------- */
-      if (logado) {
-        const palpite = jogo[logado] || '-';
-        const [pm='-', pv='-'] = palpite.includes('x') ? palpite.split('x') : ['',''];
-        const $form = $(`#palpiteForm${jogo.codigo}`);
-        if ($form.length) {
-          $form.find('.code-input-home').val(pm);
-          $form.find('.code-input-away').val(pv);
-        }
-      }
-  
-      /* 2.4 – tabela de palpites da galera --------------------------- */
-      $card.find('tbody').html(listarPalpites(jogo));
-  
-      /* 2.5 – classe de pontuação do logado (cravada/saldo/acerto) --- */
-      $card.removeClass('cravada saldo acerto')
-           .addClass(calcClassePontuacao(jogo, logado)); // usa a mesma lógica
-    });
-  
-    /* 2.6 – recalcula os pontos do dia que está aberto -------------- */
-    const mesSel = $('#nav-tab .nav-link.active').attr('id').split('-')[1];
-    const diaSel = $('.tab-pane.show.active .nav-link.active').text().split(' ')[1];
-    calcularMostrarPontosDia(novosDados, diaSel, mesSel);
-  }
-  
+    }
+
+    /* 2.4 – tabela de palpites da galera --------------------------- */
+    $card.find('tbody').html(listarPalpites(jogo));
+
+    /* 2.5 – classe de pontuação do logado (cravada/saldo/acerto) --- */
+    $card.removeClass('cravada saldo acerto')
+      .addClass(calcClassePontuacao(jogo, logado)); // usa a mesma lógica
+  });
+
+  /* 2.6 – recalcula os pontos do dia que está aberto -------------- */
+  const mesSel = $('#nav-tab .nav-link.active').attr('id').split('-')[1];
+  const diaSel = $('.tab-pane.show.active .nav-link.active').text().split(' ')[1];
+  calcularMostrarPontosDia(novosDados, diaSel, mesSel);
+}
+
 
 /* ============================================================
    Atualiza o JSON de jogos em memória + localStorage
@@ -593,6 +593,39 @@ function atualizarPalpiteLocal({ email, codigo, palpite }) {
   if (jogo) {
     jogo[email] = palpite;                       // grava no objeto em memória
     localStorage.setItem('jogos', JSON.stringify(window.jogos)); // persiste
+  }
+}
+
+/* ============================================================
+   0)  Guard contra navegação enquanto há envio pendente
+   ============================================================ */
+function addUnloadGuard() {
+  if (!window.__palpiteGuard) {
+    window.__palpiteGuard = e => {
+      /* Chrome/Edge exigem returnValue != undefined para exibir o alerta */
+      e.preventDefault();
+      e.returnValue = '';          // mensagem padrão do navegador
+    };
+    window.addEventListener('beforeunload', window.__palpiteGuard);
+  }
+}
+function removeUnloadGuard() {
+  if (window.__palpiteGuard) {
+    window.removeEventListener('beforeunload', window.__palpiteGuard);
+    delete window.__palpiteGuard;
+  }
+}
+
+
+/* contador de envios pendentes (timers + fetch) */
+function incPending() {
+  window.__palpitePendentes = (window.__palpitePendentes || 0) + 1;
+  if (window.__palpitePendentes === 1) addUnloadGuard();
+}
+function decPending() {
+  if (window.__palpitePendentes > 0) {
+    window.__palpitePendentes--;
+    if (window.__palpitePendentes === 0) removeUnloadGuard();
   }
 }
 
@@ -657,6 +690,7 @@ function tratarFocusOut(e) {
     if (form.dataset.timerId) {
       clearTimeout(+form.dataset.timerId);
       delete form.dataset.timerId;
+      decPending(); 
     }
 
     /* só agenda se ambos preenchidos */
@@ -664,12 +698,17 @@ function tratarFocusOut(e) {
       const card = form.closest('.card-game');
       card.classList.remove('erro', 'salvo');   // limpa estados anteriores
       card.classList.add('salvando');
+      document.body.classList.add('salvando-palpite');
 
-      /* agenda envio em 3 s */
+      /* liga o guard */
+      addUnloadGuard();
+      incPending();  
+
+      /* agenda envio em 1,5 s */
       const id = setTimeout(() => {
         enviarPalpite(form, card);
         delete form.dataset.timerId;
-      }, 3000);
+      }, 1500);
 
       form.dataset.timerId = id;               // guarda para poder cancelar
     }
@@ -696,6 +735,7 @@ async function enviarPalpite(form, card) {
     const json = await res.json();             // espera {ok:true}
 
     card.classList.remove('salvando');
+    document.body.classList.remove('salvando-palpite');
 
     if (json.ok) {
       card.classList.add('salvo');
@@ -716,7 +756,12 @@ async function enviarPalpite(form, card) {
     }
   } catch (err) {
     card.classList.remove('salvando');
+    document.body.classList.remove('salvando-palpite');
     card.classList.add('erro');
     console.error('Falha ao enviar palpite', err);
+  } finally {
+    /* desliga o guard – já temos resposta */
+    removeUnloadGuard();
+    decPending();
   }
 }
