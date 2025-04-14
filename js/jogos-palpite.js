@@ -89,7 +89,7 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
 
     const codigo = jogo.codigo || '-';
     const data = jogo.data || '-';
-    const completo = jogo.completo || '-';
+    // const completo = jogo.completo || '-';
     const hora = formatarHora(jogo.hora) || '-';
     const andamento = jogo.andamento || '-';
     const mandante = jogo.mandante ? jogo.mandante.replace(/\s|\-|\|/g, '') : '-';

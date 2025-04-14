@@ -41,6 +41,21 @@
   <meta property="og:type" content="website" />
 
   <title>Resultadismo | Palpite</title>
+
+  <script>
+    (function () {
+      // Pega o valor salvo com a chave 'logado'
+      const loggedFlag = localStorage.getItem('logado');
+  
+      // Se não existir ou for string vazia, manda pra home
+      if (!loggedFlag || loggedFlag.trim() === '') {
+        // replace() não deixa a página atual no histórico
+        window.location.replace('https://www.resultadismo.com/');
+      }else{
+        window.location.replace('https://www.resultadismo.com/jogos');
+      }
+    })();
+  </script>
 </head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-P86V27WXK2"></script>

@@ -42,20 +42,6 @@
   <meta property="og:type" content="website" />
 
   <title>Resultadismo | Jogos</title>
-
-  <script>
-    (function () {
-      // Pega o valor salvo com a chave 'logado'
-      const loggedFlag = localStorage.getItem('logado');
-  
-      // Se não existir ou for string vazia, manda pra home
-      if (!loggedFlag || loggedFlag.trim() === '') {
-        // replace() não deixa a página atual no histórico
-        window.location.replace('https://www.resultadismo.com/');
-      }
-    })();
-  </script>
-  
 </head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-P86V27WXK2"></script>
@@ -173,16 +159,11 @@
         <div class="container">
           <div class="row">
             <div class="col d-flex flex-column justify-content-center align-items-center">
-              <div class="btns">
-                <div id="toggler" class="btn btn-outline-primary" data-toggle="collapse" data-target="#navegacao">
-                  Ver outras datas
-                  <svg id="arrow" viewBox="0 0 16 16" height="16px">
-                    <path class="st0" fill="#323232" d="M7.3,10.4l-3.8-3.9c-.3-.3-.3-.8,0-1.1s.8-.3,1.1,0l3.5,3.5,3.5-3.5c.3-.3.8-.3,1.1,0s.3.8,0,1.1l-4,4c-.1.1-.3.3-.6.3s-.6-.2-.8-.4Z"/>
-                  </svg>
-                </div>
-                <div class="btn btn-outline-primary" id="pontos-dia">
-                  0 pontos
-                </div>
+              <div id="toggler" class="btn btn-outline-primary" data-toggle="collapse" data-target="#navegacao">
+                Ver outras datas
+                <svg id="arrow" viewBox="0 0 16 16" height="16px">
+                  <path class="st0" fill="#323232" d="M7.3,10.4l-3.8-3.9c-.3-.3-.3-.8,0-1.1s.8-.3,1.1,0l3.5,3.5,3.5-3.5c.3-.3.8-.3,1.1,0s.3.8,0,1.1l-4,4c-.1.1-.3.3-.6.3s-.6-.2-.8-.4Z"/>
+                </svg>
               </div>
               <div class="accordion mt-3 d-flex flex-wrap justify-content-center w-100" id="accordionGames">
 
@@ -203,7 +184,6 @@
                           class="card-game-result-team-img team-home">
                         <span class="card-game-result-team-name team-home">Manchester City</span>
                       </div>
-                      <input type="text">
                       <div class="card-game-result-score">
                         <span class="team-home">0</span>
                         <span class="team-away">0</span>
@@ -347,156 +327,49 @@
                 </div>
 
                 <div class="card game skeleton p-0">
-                  <div class="card-game d-flex flex-column">
+                  <div class="card-game d-flex flex-column gap-3">
                     <div class="card-game-label d-flex gap-2 center-s">
                       <div class="card-game-label-hour">
-                        16h00
+                        ${hora}
                       </div>
                       <span>|</span>
-                      <div class="card-game-label-tournament">
-                        Champions
-                      </div>
+                      <div class="card-game-label-tournament" data-codigo="${campeonato.nome}"></div>
                     </div>
                     <div class="card-game-result">
                       <div class="card-game-result-team team-home">
-                        <img src="https://api.sofascore.app/api/v1/team/17/image" alt=""
-                          class="card-game-result-team-img team-home">
-                        <span class="card-game-result-team-name team-home">Manchester City</span>
+                        <img src="" data-codigo="${home.nome}" alt="" class="card-game-result-team-img team-home">
+                        <span class="card-game-result-team-name team-home" data-codigo="${home.nome}"></span>
                       </div>
-                      <input type="text">
                       <div class="card-game-result-score">
-                        <span class="team-home">0</span>
-                        <span class="team-away">0</span>
+                        <span class="team-home">${home.resultado}</span>
+                        <span class="team-away">${away.resultado}</span>
                       </div>
                       <div class="card-game-result-team team-away">
-                        <img src="https://api.sofascore.app/api/v1/team/2697/image" alt=""
-                          class="card-game-result-team-img team-away">
-                        <span class="card-game-result-team-name team-away">Inter</span>
+                        <img src="" data-codigo="${away.nome}" alt="" class="card-game-result-team-img team-away">
+                        <span class="card-game-result-team-name team-away" data-codigo="${away.nome}"></span>
                       </div>
                     </div>
                   </div>
-                  <div class="card-header" id="headingCod">
-                    <button class="btn text-center fs-sm collapsed" type="button" data-toggle="collapse"
-                      data-target="#collapseCod" aria-expanded="true" aria-controls="collapseCod">
-                      Palpites da galera
-                    </button>
+                  <div class="card-header" id="heading${codigo}">
+                    <h2 class="mb-0">
+                      <button class="btn text-center fs-sm collapsed" type="button" data-toggle="collapse"
+                        data-target="#collapse${codigo}" aria-expanded="true" aria-controls="collapse${codigo}">
+                        Palpites da galera
+                      </button>
+                    </h2>
                   </div>
 
-                  <div id="collapseCod" class="collapse" aria-labelledby="headingCod" data-parent="#accordionGames">
+                  <div id="collapse${codigo}" class="collapse" aria-labelledby="heading${codigo}"
+                    data-parent="#accordionGames">
                     <div class="card-body">
                       <table class="table">
                         <tbody>
                           <tr>
-                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
-                                alt="Escudo" width="32"></td>
-                            <td data-codigo="${nome}">Alan Gripp</td>
+                            <td><img src="" data-codigo="${nome}" alt="Escudo" width="32"></td>
+                            <td data-codigo="${nome}"></td>
                             <td>
                               <span class="">
-                                2x1
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
-                                alt="Escudo" width="32"></td>
-                            <td data-codigo="${nome}">Gabriel Morel</td>
-                            <td>
-                              <span class="">
-                                2x1
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
-                                alt="Escudo" width="32"></td>
-                            <td data-codigo="${nome}">Matheus Pessoa</td>
-                            <td>
-                              <span class="">
-                                2x1
-                              </span>
-                            </td>
-                          </tr>
-
-                          <tr>
-                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
-                                alt="Escudo" width="32"></td>
-                            <td data-codigo="${nome}">João Bruno</td>
-                            <td>
-                              <span class="">
-                                2x0
-                              </span>
-                            </td>
-                          </tr>
-
-                          <tr>
-                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
-                                alt="Escudo" width="32"></td>
-                            <td data-codigo="${nome}">Matheus Costa</td>
-                            <td>
-                              <span class="">
-                                2x0
-                              </span>
-                            </td>
-                          </tr>
-
-                          <tr>
-                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
-                                alt="Escudo" width="32"></td>
-                            <td data-codigo="${nome}">Emerson Silva</td>
-                            <td>
-                              <span class="">
-                                3x1
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
-                                alt="Escudo" width="32"></td>
-                            <td data-codigo="${nome}">Gustavo Sousa</td>
-                            <td>
-                              <span class="">
-                                3x1
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
-                                alt="Escudo" width="32"></td>
-                            <td data-codigo="${nome}">João Roque</td>
-                            <td>
-                              <span class="">
-                                3x1
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
-                                alt="Escudo" width="32"></td>
-                            <td data-codigo="${nome}">Luan Hatsuo</td>
-                            <td>
-                              <span class="">
-                                3x1
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
-                                alt="Escudo" width="32"></td>
-                            <td data-codigo="${nome}">Neto Bertoldo</td>
-                            <td>
-                              <span class="">
-                                3x0
-                              </span>
-                            </td>
-                          </tr>
-
-                          <tr>
-                            <td><img src="https://www.resultadismo.com/images/escudos/padrao.png" data-codigo="${nome}"
-                                alt="Escudo" width="32"></td>
-                            <td data-codigo="${nome}">Adauto Farias</td>
-                            <td>
-                              <span class="">
-                                4x1
+                                ${jogador.palpite}
                               </span>
                             </td>
                           </tr>
@@ -531,7 +404,7 @@
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script> -->
   <script src="js/main.js?v=07112024"></script>
-  <script src="js/jogos-palpite.js?v=07112024"></script>
+  <script src="js/jogos.js?v=07112024"></script>
   <script src="js/components.js"></script>
 
 
@@ -560,6 +433,10 @@
       });
   });
 </script>
+
+
+
+
 
 
 </body>

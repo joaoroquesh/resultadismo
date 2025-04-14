@@ -102,7 +102,6 @@ $(document).ready(function () {
         }
     }
 
-
     function mostrarErroCarregamento() {
         $('#carregando-text').html('Falhou, tentar novamente: <a class="navbar-toggler" href=""><img src="../images/icons/atualizar.svg" height="24px" alt="atualizar"></a>');
         $('#carregando').addClass('erro');
