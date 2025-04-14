@@ -2559,6 +2559,7 @@ footer a:hover {
   width: var(--team-size);
   max-width: var(--team-size);
   color: var(--star-dust-950);
+  background: transparent;
   border: 1px solid var(--turquoise-600);
   border-radius: var(--size-1);
   display: flex;
@@ -2575,6 +2576,14 @@ footer a:hover {
 #jogos .card-game-result-score input::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+#jogos .card-game-result-score input:-moz-placeholder-shown {
+  background: var(--star-dust-50);
+  border: 1px solid var(--star-dust-400);
+}
+#jogos .card-game-result-score input:placeholder-shown {
+  background: var(--star-dust-50);
+  border: 1px solid var(--star-dust-400);
 }
 #jogos .card.game .card {
   position: relative;

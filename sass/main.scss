@@ -1535,7 +1535,9 @@ footer {
             width: var(--team-size);
             max-width: var(--team-size);
             color: $dark;
-            border: 1px solid $primary;
+            background: transparent;
+              border: 1px solid $primary;
+            
             border-radius: $size-1;
             display: flex;
             justify-content: center;
@@ -1550,6 +1552,11 @@ footer {
               margin: 0;
             }
 
+          }
+
+          input:placeholder-shown {
+            background: $white;
+            border: 1px solid $darkgray;
           }
         }
       }
