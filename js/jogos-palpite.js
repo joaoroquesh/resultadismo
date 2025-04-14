@@ -76,15 +76,16 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
   const user = localStorage.getItem('logado');
 
   // 1. Ordenar os jogos pelo horário (jogo.hora convertido para Date)
-  const jogosOrdenados = jogosData
-    .filter(j => j.codigo && j.codigo !== '#N/A') // ignora inválidos
+  const jogosFiltrados = jogosData
+    .filter(j => j.codigo && j.codigo !== '#N/A')
+    .filter(j => {
+      if (!diaSelecionado || !mesSelecionado) return true;
+      const [dia, mes] = j.data.split('/');
+      return dia === diaSelecionado && mes === mesSelecionado;
+    })
     .sort((a, b) => new Date(a.hora) - new Date(b.hora));
 
-  jogosOrdenados.forEach(jogo => {
-    if (diaSelecionado && mesSelecionado) {
-      const [dia, mes] = jogo.data.split('/');
-      if (dia !== diaSelecionado || mes !== mesSelecionado) return;
-    }
+  jogosFiltrados.forEach(jogo => {
 
     const codigo = jogo.codigo || '-';
     const data = jogo.data || '-';
@@ -129,6 +130,7 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
         }
       }
     }
+    
 
     let cardHTML = `
       <div class="card game ${andamento} ${classePontuacao} p-0">
@@ -189,7 +191,7 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
     let totalPontosDia = 0;
     const user = localStorage.getItem('logado');
 
-    jogosOrdenados.forEach(jogo => {
+    jogosFiltrados.forEach(jogo => {
       if (diaSelecionado && mesSelecionado) {
         const [dia, mes] = jogo.data.split('/');
         if (dia !== diaSelecionado || mes !== mesSelecionado) return;
@@ -620,28 +622,28 @@ function removeUnloadGuard() {
 /* ============================================================
    Contador global de operações pendentes (timers + fetch)
    ============================================================ */
-   function incPending() {
-    window.__palpitePendentes = (window.__palpitePendentes || 0) + 1;
-  
-    /* primeiro item pendente → liga o bloqueio e a classe */
-    if (window.__palpitePendentes === 1) {
-      addUnloadGuard();                               // ativa beforeunload
-      document.body.classList.add('salvando-palpite'); // mostra “loading”
+function incPending() {
+  window.__palpitePendentes = (window.__palpitePendentes || 0) + 1;
+
+  /* primeiro item pendente → liga o bloqueio e a classe */
+  if (window.__palpitePendentes === 1) {
+    addUnloadGuard();                               // ativa beforeunload
+    document.body.classList.add('salvando-palpite'); // mostra “loading”
+  }
+}
+
+function decPending() {
+  if (window.__palpitePendentes > 0) {
+    window.__palpitePendentes--;
+
+    /* último item acabou → libera a navegação e remove a classe */
+    if (window.__palpitePendentes === 0) {
+      removeUnloadGuard();                          // desativa beforeunload
+      document.body.classList.remove('salvando-palpite');
     }
   }
-  
-  function decPending() {
-    if (window.__palpitePendentes > 0) {
-      window.__palpitePendentes--;
-  
-      /* último item acabou → libera a navegação e remove a classe */
-      if (window.__palpitePendentes === 0) {
-        removeUnloadGuard();                          // desativa beforeunload
-        document.body.classList.remove('salvando-palpite');
-      }
-    }
-  }
-  
+}
+
 
 /* ============================================================
    1)  Liga todos os listeners (delegação -> serve para cards
@@ -704,7 +706,7 @@ function tratarFocusOut(e) {
     if (form.dataset.timerId) {
       clearTimeout(+form.dataset.timerId);
       delete form.dataset.timerId;
-      decPending(); 
+      decPending();
     }
 
     /* só agenda se ambos preenchidos */
@@ -714,7 +716,7 @@ function tratarFocusOut(e) {
       card.classList.add('salvando');
 
       /* liga o guard */
-      incPending();  
+      incPending();
 
       /* agenda envio em 1,5 s */
       const id = setTimeout(() => {
