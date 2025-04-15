@@ -97,9 +97,9 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
     const campeonato = jogo.campeonato || '-';
     const resultado = jogo.resultado || '-';
     const info = jogo.info || '';
-    const infoVazio = "";
+    let infoVazio = "";  // Use 'let' instead of 'const' since we'll be modifying it
     if (info === '') {
-      const infoVazio = "d-none";
+      infoVazio = "d-none";  // This modifies the existing variable
     }
 
     // Gols reais
@@ -135,7 +135,7 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
         }
       }
     }
-    
+
 
     let cardHTML = `
       <div class="card game ${andamento} ${classePontuacao} p-0">
