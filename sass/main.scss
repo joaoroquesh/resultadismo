@@ -1369,10 +1369,11 @@ footer {
       &::after {
         scale: .9;
         background-size: contain;
-          background-position: center;
-          background-repeat: no-repeat;
+        background-position: center;
+        background-repeat: no-repeat;
       }
-      &:before{
+
+      &:before {
         content: '';
         position: absolute;
         top: $size-2;
@@ -1382,7 +1383,8 @@ footer {
         border-radius: 100px;
         // font-size: $font-size-xs;
       }
-      &:after{
+
+      &:after {
         position: absolute;
         top: $size-2;
         left: calc($size-3 + $size-2);
@@ -1413,6 +1415,7 @@ footer {
           }
         }
       }
+
       &.enviando {
         &::before {
           border: 2px solid $primary;
@@ -1425,7 +1428,7 @@ footer {
           color: $primary;
         }
 
-        
+
 
         @keyframes load {
           0% {
@@ -1463,6 +1466,14 @@ footer {
 
       &-label {
         font-size: var(--font-size-xs);
+
+        &-info {
+          color:$darkgray;
+          border: 1px solid $darkgray;
+          border-radius: 100px;
+          padding: var(--size-0) var(--size-1);
+          font-size: 10px;
+        }
       }
 
       &-result {
@@ -1536,8 +1547,8 @@ footer {
             max-width: var(--team-size);
             color: $dark;
             background: transparent;
-              border: 1px solid $primary;
-            
+            border: 1px solid $primary;
+
             border-radius: $size-1;
             display: flex;
             justify-content: center;
@@ -1825,12 +1836,13 @@ footer {
   }
 
 }
-.salvando-palpite{
-  .navegacao{
+
+.salvando-palpite {
+  .navegacao {
     position: relative;
     opacity: .25;
 
-    &:after{
+    &:after {
       content: '';
       position: absolute;
       top: 0;

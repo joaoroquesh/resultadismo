@@ -96,6 +96,11 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
     const visitante = jogo.visitante ? jogo.visitante.replace(/\s|\-|\|/g, '') : '-';
     const campeonato = jogo.campeonato || '-';
     const resultado = jogo.resultado || '-';
+    const info = jogo.info || '';
+    const infoVazio = "";
+    if (info === '') {
+      const infoVazio = "d-none";
+    }
 
     // Gols reais
     let mandanteGols = '-';
@@ -139,6 +144,7 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
             <div class="card-game-label-hour">${hora}</div>
             <span>|</span>
             <div class="card-game-label-tournament">${campeonato}</div>
+            <div class="card-game-label-info ${infoVazio}">${info}</div>
           </div>
           <div class="card-game-result">
             <div class="card-game-result-team team-home">
