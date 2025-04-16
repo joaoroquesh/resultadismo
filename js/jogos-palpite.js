@@ -636,6 +636,7 @@ function incPending() {
     addUnloadGuard();                               // ativa beforeunload
     document.body.classList.add('salvando-palpite'); // mostra “loading”
   }
+  console.log(`Palpites pendentes: ${window.__palpitePendentes}`);
 }
 
 function decPending() {
@@ -651,6 +652,7 @@ function decPending() {
 
     }
   }
+  console.log(`Palpites pendentes: ${window.__palpitePendentes}`);
 }
 
 
@@ -663,11 +665,19 @@ function inicializarEventosInputs() {
   document.addEventListener('keydown', tratarKeyDown, { capture: true });
   document.addEventListener('focusout', tratarFocusOut, true);
 
+  // Novo event listener para detectar cliques nos inputs code-input
   document.addEventListener('focus', function(e) {
     const inp = e.target;
     if (inp.classList.contains('code-input')) {
-      // Ativa o indicador de pendência assim que o usuário clicar/focar no input
-      incPending();
+      const form = inp.closest('form.code-inputs');
+      if (form && !form.dataset.pendingActive) {
+        // Marca o formulário como tendo uma operação pendente ativa
+        form.dataset.pendingActive = 'true';
+        incPending();
+        
+        // Guarda a referência ao formulário para limpar depois
+        window.__palpiteFormPendente = form;
+      }
     }
   }, true);
 }
