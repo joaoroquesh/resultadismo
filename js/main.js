@@ -57,9 +57,23 @@ $(document).ready(function () {
     const jaMontado = { dados: false, jogos: false };
     function carregarDados(url, key) {
         $.getJSON(url, function (data) {
-            /* salva/actualiza localStorage e memória ---------------------- */
-            localStorage.setItem(key, JSON.stringify(data));
-            window[key] = data;
+            try {
+                // Try to store the data
+                localStorage.setItem(key, JSON.stringify(data));
+                window[key] = data;
+            } catch (e) {
+                // Handle quota exceeded error
+                if (e.name === 'QuotaExceededError') {
+                    console.warn(`Storage quota exceeded for ${key}. Using in-memory only.`);
+                    // Still keep the data in memory
+                    window[key] = data;
+
+                    // You could also try to clear some space
+                    clearOldLocalStorageData();
+                } else {
+                    console.error('Error storing data:', e);
+                }
+            }
 
             /* dispara evento “pronto” p/ quem precisar ouvir -------------- */
             $(document).trigger(`${key}Pronto`);
@@ -90,6 +104,23 @@ $(document).ready(function () {
             verificarConclusao();
 
         });
+    }
+
+    // Helper function to clear space
+    function clearOldLocalStorageData() {
+        // Example: remove less critical items
+        try {
+            // Remove any temporary data
+            localStorage.removeItem('tempData');
+
+            // Or try to compress or reduce the 'jogos' data before storing
+            if (window.jogos) {
+                const compressedJogos = compressData(window.jogos);
+                localStorage.setItem('jogos', JSON.stringify(compressedJogos));
+            }
+        } catch (e) {
+            console.error('Failed to clear storage space:', e);
+        }
     }
 
     function verificarConclusao() {

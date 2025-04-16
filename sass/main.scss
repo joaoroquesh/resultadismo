@@ -1291,7 +1291,7 @@ footer {
       background: $medium;
 
       .card-game-result-score {
-        span {
+        span, input {
           border: $dark solid 1px;
           // color: $primary;
           // background: $darkgray;
@@ -1300,29 +1300,31 @@ footer {
     }
 
     &.vivo {
-      border: 1px solid $danger;
+      border: 1px solid $danger!important;
 
-      .card-header {
+      .card-game-label-hour {
         position: relative;
 
         &::before {
           content: "Ao vivo";
           position: absolute;
           top: 50%;
-          left: $size-2;
-          translate: 0 -50%;
+          left: calc(50% + 3px);
+          translate: -50% -50%;
           background: $danger;
           color: $light;
           padding: $size-0 $size-2;
           border-radius: $size-5;
           font-size: $font-size-xs;
+          text-wrap-mode: nowrap;
         }
       }
 
       .card-game-result-score {
-        span {
-          border: 1px solid $danger;
-          color: $danger;
+        span, input {
+          background: transparent;
+          border: 1px solid $dark;
+          color: $dark;
         }
       }
 
@@ -1337,14 +1339,6 @@ footer {
       td {
         &:last-child {
           display: none;
-        }
-      }
-
-      .logado {
-        td {
-          &:last-child {
-            display: table-cell;
-          }
         }
       }
 
@@ -1468,7 +1462,7 @@ footer {
         font-size: var(--font-size-xs);
 
         &-info {
-          color:$darkgray;
+          color: $darkgray;
           border: 1px solid $darkgray;
           border-radius: 100px;
           padding: var(--size-0) var(--size-1);
@@ -1572,6 +1566,12 @@ footer {
         }
       }
 
+    }
+
+    &-body {
+      .logado {
+        display: none;
+      }
     }
 
     &.game {
@@ -1725,7 +1725,7 @@ footer {
           position: absolute;
           top: 0;
           left: 0;
-          color: var(--star-dust-100);
+          color: $light;
           width: 29px;
           height: 29px;
           display: flex;
@@ -1737,18 +1737,16 @@ footer {
           font-weight: bold;
         }
 
-        &.vivo {
-          &:after {
-            display: none;
-          }
-        }
+
       }
 
       &.cravada {
         border: 1px solid $cravada;
 
         input {
+          background: $cravada;
           border: 1px solid $cravada;
+          color: $light;
         }
 
         &:after {
@@ -1762,6 +1760,7 @@ footer {
 
         input {
           border: 1px solid $saldo;
+          color: $saldo;
         }
 
         &:after {
@@ -1775,6 +1774,7 @@ footer {
 
         input {
           border: 1px solid $acerto;
+          color: $acerto;
         }
 
         &:after {
@@ -1782,6 +1782,17 @@ footer {
           background: $acerto;
           content: '+1';
         }
+      }
+
+      &.vivo {
+        &:after {
+          background: transparent;
+          border-right: 1px solid $danger;
+            border-bottom: 1px solid $danger;
+            color: $danger!important;
+        }
+
+
       }
     }
   }

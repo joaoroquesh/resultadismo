@@ -644,8 +644,11 @@ function decPending() {
 
     /* último item acabou → libera a navegação e remove a classe */
     if (window.__palpitePendentes === 0) {
-      removeUnloadGuard();                          // desativa beforeunload
-      document.body.classList.remove('salvando-palpite');
+      setTimeout(() => {
+        removeUnloadGuard();                          // desativa beforeunload
+        document.body.classList.remove('salvando-palpite');
+      }, 1500);
+
     }
   }
 }
@@ -659,6 +662,14 @@ function inicializarEventosInputs() {
   document.addEventListener('input', tratarDigitacao, { capture: true });
   document.addEventListener('keydown', tratarKeyDown, { capture: true });
   document.addEventListener('focusout', tratarFocusOut, true);
+
+  document.addEventListener('focus', function(e) {
+    const inp = e.target;
+    if (inp.classList.contains('code-input')) {
+      // Ativa o indicador de pendência assim que o usuário clicar/focar no input
+      incPending();
+    }
+  }, true);
 }
 
 /* ============================================================
@@ -721,15 +732,12 @@ function tratarFocusOut(e) {
       card.classList.remove('erro', 'salvo');   // limpa estados anteriores
       card.classList.add('salvando');
 
-      /* liga o guard */
-      incPending();
-
       /* agenda envio em 1,5 s */
       const id = setTimeout(() => {
         enviarPalpite(form, card);
         delete form.dataset.timerId;
         card.classList.add('enviando');
-      }, 1500);
+      }, 100);
 
       form.dataset.timerId = id;               // guarda para poder cancelar
     }

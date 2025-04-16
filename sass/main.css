@@ -2382,39 +2382,38 @@ footer a:hover {
 #jogos .card.Finalizado {
   background: var(--star-dust-200);
 }
-#jogos .card.Finalizado .card-game-result-score span {
+#jogos .card.Finalizado .card-game-result-score span, #jogos .card.Finalizado .card-game-result-score input {
   border: var(--star-dust-950) solid 1px;
 }
 #jogos .card.vivo {
-  border: 1px solid var(--punch-700);
+  border: 1px solid var(--punch-700) !important;
 }
-#jogos .card.vivo .card-header {
+#jogos .card.vivo .card-game-label-hour {
   position: relative;
 }
-#jogos .card.vivo .card-header::before {
+#jogos .card.vivo .card-game-label-hour::before {
   content: "Ao vivo";
   position: absolute;
   top: 50%;
-  left: var(--size-2);
-  translate: 0 -50%;
+  left: calc(50% + 3px);
+  translate: -50% -50%;
   background: var(--punch-700);
   color: var(--star-dust-100);
   padding: var(--size-0) var(--size-2);
   border-radius: var(--size-5);
   font-size: var(--font-size-xs);
+  text-wrap-mode: nowrap;
 }
-#jogos .card.vivo .card-game-result-score span {
-  border: 1px solid var(--punch-700);
-  color: var(--punch-700);
+#jogos .card.vivo .card-game-result-score span, #jogos .card.vivo .card-game-result-score input {
+  background: transparent;
+  border: 1px solid var(--star-dust-950);
+  color: var(--star-dust-950);
 }
 #jogos .card.vivo .card-game-real-score {
   color: var(--punch-700);
 }
 #jogos .card.breve td:last-child {
   display: none;
-}
-#jogos .card.breve .logado td:last-child {
-  display: table-cell;
 }
 #jogos .card.breve .card-game-real {
   display: none;
@@ -2592,6 +2591,9 @@ footer a:hover {
   background: var(--star-dust-50);
   border: 1px solid var(--star-dust-400);
 }
+#jogos .card-body .logado {
+  display: none;
+}
 #jogos .card.game .card {
   position: relative;
 }
@@ -2723,14 +2725,13 @@ footer a:hover {
   padding: 2px;
   font-weight: bold;
 }
-#jogos .card.game.cravada.vivo:after, #jogos .card.game.saldo.vivo:after, #jogos .card.game.acerto.vivo:after {
-  display: none;
-}
 #jogos .card.game.cravada {
   border: 1px solid var(--pizza-600);
 }
 #jogos .card.game.cravada input {
+  background: var(--pizza-600);
   border: 1px solid var(--pizza-600);
+  color: var(--star-dust-100);
 }
 #jogos .card.game.cravada:after {
   background: var(--pizza-600);
@@ -2741,6 +2742,7 @@ footer a:hover {
 }
 #jogos .card.game.saldo input {
   border: 1px solid var(--bilbao-700);
+  color: var(--bilbao-700);
 }
 #jogos .card.game.saldo:after {
   background: var(--bilbao-700);
@@ -2751,11 +2753,18 @@ footer a:hover {
 }
 #jogos .card.game.acerto input {
   border: 1px solid var(--blue-dianne-900);
+  color: var(--blue-dianne-900);
 }
 #jogos .card.game.acerto:after {
   font-weight: normal;
   background: var(--blue-dianne-900);
   content: "+1";
+}
+#jogos .card.game.vivo:after {
+  background: transparent;
+  border-right: 1px solid var(--punch-700);
+  border-bottom: 1px solid var(--punch-700);
+  color: var(--punch-700) !important;
 }
 #jogos #arrow {
   rotate: 180deg;
