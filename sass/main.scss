@@ -38,7 +38,7 @@ body {
 
   /* Handle */
   &::-webkit-scrollbar-thumb {
-    background: $darkgray;
+    background: $gray;
     border-radius: 10px;
   }
 }
@@ -150,7 +150,7 @@ tr.pago {
 
   /* Handle */
   &::-webkit-scrollbar-thumb {
-    background: $darkgray;
+    background: $gray;
     border-radius: 10px;
     transition: var(--transition-2);
 
@@ -289,7 +289,7 @@ footer {
   form.skeleton {
     position: relative;
     overflow: hidden !important;
-    border: 1px solid $darkgray !important;
+    border: 1px solid $gray !important;
     color: transparent !important;
     border-radius: $size-2 !important;
     // background-image: linear-gradient(120deg, transparent 25%, rgba(255, 255, 255, 0.6) 50%, transparent 75%);
@@ -1292,9 +1292,9 @@ footer {
 
       .card-game-result-score {
         span, input {
-          border: $dark solid 1px;
-          // color: $primary;
-          // background: $darkgray;
+          border: $gray solid 1px;
+          background: $gray;
+          color: $dark-gray;
         }
       }
     }
@@ -1323,8 +1323,8 @@ footer {
       .card-game-result-score {
         span, input {
           background: transparent;
-          border: 1px solid $dark;
-          color: $dark;
+          border: 1px solid $gray;
+          color: $gray;
         }
       }
 
@@ -1462,8 +1462,8 @@ footer {
         font-size: var(--font-size-xs);
 
         &-info {
-          color: $darkgray;
-          border: 1px solid $darkgray;
+          color: $gray;
+          border: 1px solid $gray;
           border-radius: 100px;
           padding: var(--size-0) var(--size-1);
           font-size: 10px;
@@ -1561,7 +1561,7 @@ footer {
 
           input:placeholder-shown {
             background: $white;
-            border: 1px solid $darkgray;
+            border: 1px solid $gray;
           }
         }
       }
@@ -1760,7 +1760,8 @@ footer {
 
         input {
           border: 1px solid $saldo;
-          color: $saldo;
+          background: $saldo;
+          color: $light;
         }
 
         &:after {
@@ -1774,7 +1775,8 @@ footer {
 
         input {
           border: 1px solid $acerto;
-          color: $acerto;
+          background: $acerto;
+          color: $light;
         }
 
         &:after {
@@ -1791,7 +1793,29 @@ footer {
             border-bottom: 1px solid $danger;
             color: $danger!important;
         }
-
+        &.cravada {
+          input {
+            border: 1px solid $cravada;
+            color: $cravada;
+            background: transparent;
+          }
+        }
+  
+        &.saldo {
+          input {
+            border: 1px solid $saldo;
+            color: $saldo;
+            background: transparent;
+          }
+        }
+  
+        &.acerto {
+          input {
+            border: 1px solid $acerto;
+            color: $acerto;
+            background: transparent;
+          }
+        }
 
       }
     }
