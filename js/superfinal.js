@@ -33,7 +33,7 @@ function atualizarVencedorTabs() {
 function calcularClassificacaoSuperFinal() {
     const jogadores = [
         { codigo: "jbrunocouto@gmail.com", nome: "João Bruno" },
-        { codigo: "wellingtondiasdigital@gmail.com", nome: "Wellington Dias" }
+        { codigo: "wellingtondiassh@gmail.com", nome: "Wellington Dias" }
     ];
 
     let classificacao = jogadores.map(jogador => {
