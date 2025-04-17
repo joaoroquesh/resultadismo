@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
 // Inicializar o Firebase
@@ -64,6 +64,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Erro ao deslogar:', error);
                 alert('Erro ao deslogar: ' + error.message);
             });
+    }
+
+    // Função de Login com Google
+    async function googleLogin() {
+        const provider = new GoogleAuthProvider();
+
+        try {
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+            console.log('Usuário logado com Google:', user);
+            updateUI(user);
+        } catch (error) {
+            console.error('Erro ao logar com Google:', error);
+            alert('Erro ao logar com Google: ' + error.message);
+        }
     }
 
     // Observar o estado de autenticação
@@ -136,6 +151,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const loginButton = document.getElementById('login-button');
     if (loginButton) {
         loginButton.addEventListener('click', login);
+    }
+
+    const googleLoginButton = document.getElementById('google-login-button');
+    if (googleLoginButton) {
+        googleLoginButton.addEventListener('click', googleLogin);
     }
 
     const logoutButton = document.getElementById('logout-button');
