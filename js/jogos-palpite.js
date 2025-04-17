@@ -69,6 +69,25 @@ function gerarNavegacao(jogosData) {
   });
 }
 
+function obterPalpiteUsuario(email, codigo) {
+  const chaveLocalStorage = 'palpitesUsuario';
+  let palpitesSalvos = JSON.parse(localStorage.getItem(chaveLocalStorage)) || {};
+
+  return palpitesSalvos[email] && palpitesSalvos[email][codigo] ? palpitesSalvos[email][codigo] : '-';
+}
+
+function normalizarTexto(texto) {
+  if (!texto) return '-';
+
+  return texto
+    .toLowerCase()
+    .normalize("NFD")                    // separa acentos das letras
+    .replace(/[\u0300-\u036f]/g, "")    // remove os acentos
+    .replace(/ç/g, "c")                 // substitui cedilha manualmente
+    .replace(/[^a-z0-9]/g, "");         // remove tudo que não for a-z ou 0-9
+}
+
+
 function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
   let accordionGames = $('#accordionGames');
   accordionGames.empty();
@@ -92,8 +111,8 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
     // const completo = jogo.completo || '-';
     const hora = formatarHora(jogo.hora) || '-';
     const andamento = jogo.andamento || '-';
-    const mandante = jogo.mandante ? jogo.mandante.replace(/\s|\-|\|/g, '') : '-';
-    const visitante = jogo.visitante ? jogo.visitante.replace(/\s|\-|\|/g, '') : '-';
+    const mandante = normalizarTexto(jogo.mandante);
+    const visitante = normalizarTexto(jogo.visitante);
     const campeonato = jogo.campeonato || '-';
     const resultado = jogo.resultado || '-';
     const info = jogo.info || '';
@@ -110,7 +129,7 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
     }
 
     // Palpite do usuário logado
-    const userPalpite = jogo[user] || '-';
+    const userPalpite = obterPalpiteUsuario(user, codigo);
     let userMandanteGols = '-';
     let userVisitanteGols = '-';
     if (userPalpite !== '-' && userPalpite.includes('x')) {
@@ -594,15 +613,26 @@ function atualizarJogosIncremental(novosDados) {
 /* ============================================================
    Atualiza o JSON de jogos em memória + localStorage
    ============================================================ */
-function atualizarPalpiteLocal({ email, codigo, palpite }) {
-  if (!window.jogos || !Array.isArray(window.jogos.data)) return;
-
-  const jogo = window.jogos.data.find(j => j.codigo === codigo);
-  if (jogo) {
-    jogo[email] = palpite;                       // grava no objeto em memória
-    localStorage.setItem('jogos', JSON.stringify(window.jogos)); // persiste
+   function atualizarPalpiteLocal({ email, codigo, palpite }) {
+    const chaveLocalStorage = 'palpitesUsuario';
+    let palpitesSalvos = JSON.parse(localStorage.getItem(chaveLocalStorage)) || {};
+  
+    if (!palpitesSalvos[email]) {
+      palpitesSalvos[email] = {};
+    }
+  
+    palpitesSalvos[email][codigo] = palpite;
+  
+    try {
+      localStorage.setItem(chaveLocalStorage, JSON.stringify(palpitesSalvos));
+    } catch(e) {
+      if (e.name === 'QuotaExceededError') {
+        alert('Espaço insuficiente no dispositivo. Por favor, limpe os dados antigos ou use outro dispositivo.');
+        console.error('QuotaExceededError:', e);
+      }
+    }
   }
-}
+  
 
 /* ============================================================
    0)  Guard contra navegação enquanto há envio pendente
