@@ -129,7 +129,7 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
     }
 
     // Palpite do usuário logado
-    const userPalpite = obterPalpiteUsuario(user, codigo);
+    const userPalpite = jogo[user] || '-';
     let userMandanteGols = '-';
     let userVisitanteGols = '-';
     if (userPalpite !== '-' && userPalpite.includes('x')) {
@@ -613,7 +613,7 @@ function atualizarJogosIncremental(novosDados) {
 /* ============================================================
    Atualiza o JSON de jogos em memória + localStorage
    ============================================================ */
-   function atualizarPalpiteLocal({ email, codigo, palpite }) {
+function atualizarPalpiteLocal({ email, codigo, palpite }) {
     const chaveLocalStorage = 'palpitesUsuario';
     let palpitesSalvos = JSON.parse(localStorage.getItem(chaveLocalStorage)) || {};
   
@@ -632,8 +632,6 @@ function atualizarJogosIncremental(novosDados) {
       }
     }
   }
-  
-
 /* ============================================================
    0)  Guard contra navegação enquanto há envio pendente
    ============================================================ */
@@ -696,7 +694,7 @@ function inicializarEventosInputs() {
   document.addEventListener('focusout', tratarFocusOut, true);
 
   // Novo event listener para detectar cliques nos inputs code-input
-  document.addEventListener('focus', function(e) {
+  document.addEventListener('focus', function (e) {
     const inp = e.target;
     if (inp.classList.contains('code-input')) {
       const form = inp.closest('form.code-inputs');
@@ -704,7 +702,7 @@ function inicializarEventosInputs() {
         // Marca o formulário como tendo uma operação pendente ativa
         form.dataset.pendingActive = 'true';
         incPending();
-        
+
         // Guarda a referência ao formulário para limpar depois
         window.__palpiteFormPendente = form;
       }
