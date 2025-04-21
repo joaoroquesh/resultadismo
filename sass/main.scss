@@ -289,9 +289,11 @@ footer {
   form.skeleton {
     position: relative;
     overflow: hidden !important;
-    border: 1px solid $gray !important;
+    // border: 1px solid $gray !important;
     color: transparent !important;
     border-radius: $size-2 !important;
+    padding: var(--size-1)!important;
+    width: 96px;
     // background-image: linear-gradient(120deg, transparent 25%, rgba(255, 255, 255, 0.6) 50%, transparent 75%);
 
     &.btn,
@@ -301,9 +303,9 @@ footer {
 
     &:before,
     &:after {
-      content: '';
+      content: ''!important;
       position: absolute;
-      display: block;
+      display: block!important;
       top: 50%;
       left: 50%;
       translate: -50% -50%;
@@ -316,6 +318,7 @@ footer {
     &:before {
       z-index: 1;
       background-color: $medium !important;
+      opacity: .75;
     }
 
     &:after {
