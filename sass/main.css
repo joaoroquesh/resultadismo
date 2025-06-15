@@ -2831,7 +2831,7 @@ footer a:hover {
 
 .navegacao nav .nav-link {
   background: transparent !important;
-  width: 32%;
+  flex: 1 0;
   border-bottom: 1px solid transparent;
   display: flex;
   justify-content: center;
