@@ -4,6 +4,7 @@ function executarFuncoesPagina() {
     atualizarElementosGlobais(window.dados);
     listarCampeonatos(window.jogos.data);
     listarMeses(window.jogos.data);
+    listarDias(window.jogos.data);
     construirClassificacao(window.jogos.data);
     ativarControleVisualizacao();
     
@@ -222,6 +223,67 @@ function listarMeses(jogosData) {
     }
 }
 
+function listarDias(jogosData) {
+    let dias = new Set();
+
+    // Processar cada jogo para coletar as datas
+    jogosData.forEach(jogo => {
+        if (jogo.data) {
+            // Extrair a data no formato DD/MM
+            let diaMes = jogo.data.slice(0, 5); // Pega DD/MM de DD/MM/YYYY
+            if (diaMes) {
+                dias.add(diaMes);
+            }
+        }
+    });
+
+    // Converter Set para Array, ordenar e formatar
+    // Ordenar as datas: converter DD/MM para MM/DD para ordenação correta e depois reverter
+    let datasOrdenadas = Array.from(dias).sort((a, b) => {
+        let [diaA, mesA] = a.split('/');
+        let [diaB, mesB] = b.split('/');
+        // Compara primeiro por mês, depois por dia
+        if (mesB !== mesA) {
+            return mesB.localeCompare(mesA);
+        }
+        return diaB.localeCompare(diaA);
+    });
+
+    // Construir o filtro de seleção de dias como botões
+    let filtroDia = $('#filtroDia');
+    filtroDia.empty(); // Limpar botões existentes (como o skeleton)
+    datasOrdenadas.forEach((diaMes, index) => {
+        let li = `
+            <li class="nav-item" role="presentation">
+                <button class="nav-link ${index === 0 ? 'active' : ''}" id="pills-dia-${diaMes.replace('/', '')}-tab" data-toggle="pill" type="button" role="tab" aria-selected="${index === 0}">${diaMes}</button>
+            </li>
+        `;
+        filtroDia.append(li);
+    });
+
+    // Adicionar evento de filtro para a classificação
+    filtroDia.on('click', '.nav-link', function () {
+        let diaMesSelecionado = $(this).text(); // Formato DD/MM
+        if (diaMesSelecionado) {
+            let jogosFiltrados = window.jogos.data.filter(jogo => jogo.data && jogo.data.startsWith(diaMesSelecionado));
+            construirClassificacao(jogosFiltrados);
+        } else {
+            // Se nada for selecionado (não deve acontecer com 'active' default), mostrar tudo ou o comportamento padrão.
+            construirClassificacao(window.jogos.data);
+        }
+    });
+
+    // Aplicar filtro inicial para o dia mais recente (se houver dias)
+    if (datasOrdenadas.length > 0) {
+        // O evento click no #filtroDia já lida com isso através do .active,
+        // mas para garantir a primeira carga correta se a aba Dia for a padrão:
+        // let diaInicial = datasOrdenadas[0];
+        // let jogosFiltradosIniciais = window.jogos.data.filter(jogo => jogo.data && jogo.data.startsWith(diaInicial));
+        // construirClassificacao(jogosFiltradosIniciais);
+        // No entanto, a lógica de qual filtro aplicar na carga inicial será gerenciada por `ativarControleVisualizacao` e `executarFuncoesPagina`
+    }
+}
+
 function ativarControleVisualizacao() {
     // Controlar a visualização com base nas abas selecionadas
     $('#nav-tab button').on('click', function () {
@@ -230,6 +292,8 @@ function ativarControleVisualizacao() {
             $('#filtroMes .nav-link.active').click();
         } else if (abaSelecionada === 'nav-campeonato-tab') {
             $('#filtroCampeonato .nav-link:first').click();
+        } else if (abaSelecionada === 'nav-dia-tab') { // Adicionado para filtro por dia
+            $('#filtroDia .nav-link.active').click();
         } else if (abaSelecionada === 'nav-geral-tab') {
             // Mostrar classificação geral sem filtro
             construirClassificacao(window.jogos.data);
