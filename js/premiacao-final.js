@@ -8,9 +8,11 @@ function executarFuncoesPagina() {
     construirClassificacao(window.jogos.data);
     ativarControleVisualizacao();
     
-    // Definir aba de visualização inicial como 'nav-geral-tab'
-    $('#nav-geral-tab').click();
-    $('#nav-geral-tab').trigger('click');
+    // Definir aba de visualização inicial como 'nav-dia-tab'
+    $('#nav-dia-tab').click();
+    // Consider if .trigger('click') is truly necessary after .click()
+    // For safety and to match existing pattern, keep it if it was there for nav-geral-tab
+    $('#nav-dia-tab').trigger('click');
 }
 
 function construirClassificacao(jogosData) {
@@ -224,64 +226,84 @@ function listarMeses(jogosData) {
 }
 
 function listarDias(jogosData) {
+    let hoje = new Date();
+    // Ajustar para meia-noite para evitar problemas de comparação de tempo
+    hoje.setHours(0, 0, 0, 0);
+
     let dias = new Set();
 
-    // Processar cada jogo para coletar as datas
+    // Processar cada jogo para coletar as datas válidas
     jogosData.forEach(jogo => {
         if (jogo.data) {
-            // Extrair a data no formato DD/MM
-            let diaMes = jogo.data.slice(0, 5); // Pega DD/MM de DD/MM/YYYY
-            if (diaMes) {
-                dias.add(diaMes);
+            let [dia, mes, ano] = jogo.data.split('/');
+            // JavaScript Date usa mês 0-indexado, então mes - 1
+            let dataJogo = new Date(ano, mes - 1, dia);
+            dataJogo.setHours(0,0,0,0); // Normalizar para comparação
+
+            if (dataJogo <= hoje) {
+                dias.add(jogo.data); // Adicionar no formato DD/MM/YYYY para ordenação
             }
         }
     });
 
-    // Converter Set para Array, ordenar e formatar
-    // Ordenar as datas: converter DD/MM para MM/DD para ordenação correta e depois reverter
+    // Converter Set para Array e ordenar em ordem decrescente (mais recente primeiro)
     let datasOrdenadas = Array.from(dias).sort((a, b) => {
-        let [diaA, mesA] = a.split('/');
-        let [diaB, mesB] = b.split('/');
-        // Compara primeiro por mês, depois por dia
-        if (mesB !== mesA) {
-            return mesB.localeCompare(mesA);
-        }
-        return diaB.localeCompare(diaA);
+        let [diaA, mesA, anoA] = a.split('/');
+        let [diaB, mesB, anoB] = b.split('/');
+        let dataObjA = new Date(anoA, mesA - 1, diaA);
+        let dataObjB = new Date(anoB, mesB - 1, diaB);
+        return dataObjB - dataObjA; // Decrescente
     });
 
     // Construir o filtro de seleção de dias como botões
     let filtroDia = $('#filtroDia');
-    filtroDia.empty(); // Limpar botões existentes (como o skeleton)
-    datasOrdenadas.forEach((diaMes, index) => {
-        let li = `
-            <li class="nav-item" role="presentation">
-                <button class="nav-link ${index === 0 ? 'active' : ''}" id="pills-dia-${diaMes.replace('/', '')}-tab" data-toggle="pill" type="button" role="tab" aria-selected="${index === 0}">${diaMes}</button>
-            </li>
-        `;
-        filtroDia.append(li);
-    });
+    filtroDia.empty(); // Limpar botões existentes
+
+    if (datasOrdenadas.length === 0) {
+        // Opcional: Adicionar uma mensagem se não houver dias para mostrar
+        // filtroDia.append('<li class="nav-item"><span class="nav-link text-muted">Nenhum dia anterior ou atual com jogos.</span></li>');
+        // Ou simplesmente deixar vazio como está
+    } else {
+        datasOrdenadas.forEach((dataCompleta, index) => {
+            let diaMesDisplay = dataCompleta.slice(0, 5); // Formato DD/MM para exibição
+            let li = `
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link ${index === 0 ? 'active' : ''}" id="pills-dia-${diaMesDisplay.replace('/', '')}-tab" data-date-full="${dataCompleta}" data-toggle="pill" type="button" role="tab" aria-selected="${index === 0}">${diaMesDisplay}</button>
+                </li>
+            `;
+            filtroDia.append(li);
+        });
+    }
+
 
     // Adicionar evento de filtro para a classificação
-    filtroDia.on('click', '.nav-link', function () {
-        let diaMesSelecionado = $(this).text(); // Formato DD/MM
+    // Certifique-se de que o event handler não está sendo duplicado se esta função for chamada múltiplas vezes.
+    // Idealmente, o handler é anexado uma vez. Se #filtroDia é estático e só os LIs mudam,
+    // usar delegação de evento no elemento pai (#filtroDia) é mais robusto.
+    // Ex: $('#filtroDia').off('click', '.nav-link').on('click', '.nav-link', function() { ... });
+    // Por enquanto, mantendo a estrutura original assumindo que #filtroDia é recriado ou o handler é gerenciado adequadamente.
+
+    $('#filtroDia').off('click', '.nav-link').on('click', '.nav-link', function () {
+        let diaMesSelecionado = $(this).text(); // Formato DD/MM para filtro
         if (diaMesSelecionado) {
-            let jogosFiltrados = window.jogos.data.filter(jogo => jogo.data && jogo.data.startsWith(diaMesSelecionado));
+            // window.jogos.data contém todas as datas, incluindo futuras se existirem no JSON.
+            // O filtro aqui deve ser consistente com o que foi mostrado.
+            // Os botões já são apenas de datas passadas/presentes.
+            // A lógica de filtro original `jogo.data.startsWith(diaMesSelecionado)` é correta.
+            let jogosFiltrados = window.jogos.data.filter(jogo => {
+                if (!jogo.data) return false;
+                // Verificar se a data do jogo (DD/MM) corresponde ao botão clicado
+                // E também que a data do jogo não é futura (já filtrado na criação dos botões, mas uma dupla checagem não faz mal)
+                let [dia, mes, ano] = jogo.data.split('/');
+                let dataJogo = new Date(ano, mes - 1, dia);
+                dataJogo.setHours(0,0,0,0);
+                return jogo.data.startsWith(diaMesSelecionado) && dataJogo <= hoje;
+            });
             construirClassificacao(jogosFiltrados);
         } else {
-            // Se nada for selecionado (não deve acontecer com 'active' default), mostrar tudo ou o comportamento padrão.
-            construirClassificacao(window.jogos.data);
+            construirClassificacao(window.jogos.data); // Fallback improvável
         }
     });
-
-    // Aplicar filtro inicial para o dia mais recente (se houver dias)
-    if (datasOrdenadas.length > 0) {
-        // O evento click no #filtroDia já lida com isso através do .active,
-        // mas para garantir a primeira carga correta se a aba Dia for a padrão:
-        // let diaInicial = datasOrdenadas[0];
-        // let jogosFiltradosIniciais = window.jogos.data.filter(jogo => jogo.data && jogo.data.startsWith(diaInicial));
-        // construirClassificacao(jogosFiltradosIniciais);
-        // No entanto, a lógica de qual filtro aplicar na carga inicial será gerenciada por `ativarControleVisualizacao` e `executarFuncoesPagina`
-    }
 }
 
 function ativarControleVisualizacao() {
