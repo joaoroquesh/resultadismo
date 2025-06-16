@@ -649,7 +649,12 @@ footer {
 #classificacao {
 
   #content-space {
-    height: 56px;
+    &.simple{
+      height: 56px;
+    }
+    &.double {
+      height: 86px;
+    }
   }
 
   .classificacao {
@@ -785,7 +790,7 @@ footer {
         }
 
         @media (max-width:567px) {
-          &:nth-child(n+4):nth-child(-n+7) {
+          &:nth-child(n+4):nth-child(-n+9) {
             color: transparent !important;
           }
         }
@@ -822,6 +827,24 @@ footer {
             &::after {
               content: "A";
               color: $acerto !important;
+            }
+          }
+        }
+
+        &:nth-child(8) {
+          @media (max-width:567px) {
+            &::after {
+              content: "% Ap";
+              color: $dark !important;
+            }
+          }
+        }
+
+        &:nth-child(9) {
+          @media (max-width:567px) {
+            &::after {
+              content: "% Ac";
+              color: $dark !important;
             }
           }
         }
@@ -938,9 +961,16 @@ footer {
           max-width: 46px;
           overflow: hidden;
         }
+      }
+      &:nth-child(n+8) {
+        width: var(--n-size);
+        max-width: var(--n-size);
+        // display: inline-flex;
+        // justify-content: center;
 
-        @media (max-width:410px) {
-          max-width: 40px;
+        @media (max-width:576px) {
+          max-width: 60px;
+          overflow: hidden;
         }
       }
 

@@ -71,8 +71,8 @@ function construirClassificacao(jogosData) {
 
     // Converter o objeto de classificação em um array e calcular aproveitamento e acertividade
     let classificacaoArray = Object.entries(classificacao).map(([codigo, stats]) => {
-        let aproveitamento = stats.jogos > 0 ? ((stats.pontuacao / (stats.jogos * 3)) * 100).toFixed(2) : 0;
-        let acertividade = stats.palpitesComPontos > 0 ? ((stats.palpitesComPontos / stats.jogos) * 100).toFixed(2) : 0;
+        let aproveitamento = stats.jogos > 0 ? ((stats.pontuacao / (stats.jogos * 3)) * 100).toFixed(1) : 0;
+        let acertividade = stats.palpitesComPontos > 0 ? ((stats.palpitesComPontos / stats.jogos) * 100).toFixed(1) : 0;
         return { codigo, ...stats, aproveitamento: parseFloat(aproveitamento), acertividade: parseFloat(acertividade) };
     });
 
