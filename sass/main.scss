@@ -1044,13 +1044,6 @@ footer {
             outline: 2px solid $primary;
             // background: $primary;
 
-            td {
-
-              &:nth-child(3),
-              &:nth-child(4) {
-                //  color: $light!important;
-              }
-            }
           }
         }
       }
@@ -1061,14 +1054,6 @@ footer {
             &:nth-child(1) {
               outline: 2px solid $cravada;
               // background: $cravada;
-
-              td {
-
-                &:nth-child(3),
-                &:nth-child(4) {
-                  //  color: $dark!important;
-                }
-              }
             }
           }
         }
@@ -2017,6 +2002,9 @@ footer {
 
       &:hover {
         border: 1px solid $primary;
+      }
+      &.future{
+        display: none;
       }
     }
   }
