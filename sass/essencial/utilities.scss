@@ -46,12 +46,12 @@
   &-primary {
     background-color: $primary;
     border: 1px solid $primary;
-    color: $white;
+    color: $white!important;;
 
     &:hover {
       background-color: $transparent;
       border: 2px solid $primary;
-      color: $primary;
+      color: $primary!important;;
     }
 
     &:active,
@@ -60,19 +60,19 @@
     .show>&.dropdown-toggle {
       background-color: $primary;
       border: 2px solid $primary;
-      color: $dark;
+      color: $dark!important;;
     }
   }
 
   &-outline-primary {
 
     border: 1px solid $primary;
-    color: $primary;
+    color: $primary!important;
 
     &:hover {
       background-color: $primary;
       border: 1px solid $primary;
-      color: $white;
+      color: $white!important;;
     }
 
     &:active,
@@ -81,19 +81,19 @@
     .show>&.dropdown-toggle {
       background-color: $primary;
       border: 1px solid $primary;
-      color: $dark;
+      color: $dark!important;;
     }
   }
 
   &-secondary {
     background-color: $secondary;
     border: 1px solid $secondary;
-    color: $white;
+    color: $white!important;;
 
     &:hover {
       background-color: $transparent;
       border: 2px solid $secondary;
-      color: $secondary;
+      color: $secondary!important;;
     }
 
     &:active,
@@ -102,19 +102,19 @@
     .show>&.dropdown-toggle {
       background-color: $secondary;
       border: 2px solid $secondary;
-      color: $dark;
+      color: $dark!important;;
     }
   }
 
   &-outline-secondary {
 
     border: 1px solid $secondary;
-    color: $secondary;
+    color: $secondary!important;;
 
     &:hover {
       background-color: $secondary;
       border: 1px solid $secondary;
-      color: $white;
+      color: $white!important;;
     }
 
     &:active,
@@ -123,7 +123,7 @@
     .show>&.dropdown-toggle {
       background-color: $secondary;
       border: 1px solid $secondary;
-      color: $dark;
+      color: $dark!important;;
     }
   }
 }

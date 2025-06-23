@@ -241,7 +241,7 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
 
     const pontosDiaEl = $('#pontos-dia');
     if (pontosDiaEl.length) {
-      const texto = totalPontosDia === 1 ? '1 ponto' : `${totalPontosDia} pontos`;
+      const texto = totalPontosDia === 1 ? '1 pt' : `${totalPontosDia} pts`;
       pontosDiaEl
         .text(texto)
         .removeClass('btn-primary btn-outline-primary')
