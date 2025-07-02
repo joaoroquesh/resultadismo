@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+  integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"> -->
+  <!-- <link rel="stylesheet" href="../css/owl.carousel.min.css">
+  <link rel="stylesheet" href="../css/owl.theme.default.css"> -->
+  <!-- <link rel="stylesheet" href="../css/aos.css"> -->
+  <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"> -->
+  <link rel="stylesheet" href="../../sass/main.css?v=07112024">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.0/css/all.css"
+    integrity="sha384-Mmxa0mLqhmOeaE8vgOSbKacftZcsNYDjQzuCOm6D02luYSzBG8vpaOykv9lFQ51Y" crossorigin="anonymous">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
+    rel="stylesheet">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="../favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../favicon/favicon-16x16.png">
+  <link rel="manifest" href="../favicon/site.webmanifest">
+
+  <meta property="og:site_name" content="Resultadismo">
+  <meta name="site_name" content="Resultadismo">
+  <meta property="og:title" content="Resultadismo | Classificação" />
+  <meta name="title" content="Resultadismo | Classificação" />
+  <meta property="og:description" content="Veja sua classificação no Resultadismo dos Clubistash">
+  <meta name="description" content="Veja sua classificação no Resultadismo dos Clubistash">
+  <meta property="og:url" content="https://www.resultadismo.com/" />
+  <meta name="url" content="https://www.resultadismo.com/" />
+  <meta property="og:image" itemprop="image" content="https://www.resultadismo.com/images/logo.jpg" />
+  <meta name="image" itemprop="image" content="https://www.resultadismo.com/images/logo.jpg" />
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="image:type" content="image/jpeg">
+  <meta property="og:image:width" content="300">
+  <meta property="og:image:height" content="300">
+  <meta property="og:type" content="website" />
+
+
+  <title>Resultadismo | Resultadão</title>
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P86V27WXK2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+
+  gtag('config', 'G-P86V27WXK2');
+</script>
+
+
+<body class="loading atualizando">
+
+  <div class="manutencao d-none">
+    <h2 class="m-0">
+      EM MANUTENÇÃO
+    </h2>
+  </div>
+
+  <section id="classificacao">
+
+    <section id="main">
+
+      <section id="headerX"></section>
+      <section id="menuX"></section>
+
+      <section id="content-fixed" class="fixed-top d-none">
+        <div class="container">
+          <div class="row">
+            <div class="col px-3 py-2 d-flex flex-column justify-content-center align-items-center">
+
+              <div id="navegacao" class="w-100 navegacao">
+                <nav>
+                  <div class="nav nav-tabs d-flex justify-content-around" id="nav-tab" role="tablist">
+                    <button class="nav-link px-2 active" id="nav-A-tab" data-toggle="tab" data-target="#nav-A" type="button"
+                      role="tab" aria-controls="nav-A" aria-selected="true">Resultadão</button>
+                    <button class="nav-link px-2" id="nav-B-tab" data-toggle="tab" data-target="#nav-B" type="button"
+                      role="tab" aria-controls="nav-B" aria-selected="false">Liga B</button>
+                    <!-- <button class="nav-link px-2" id="nav-C-tab" data-toggle="tab" data-target="#nav-C" type="button"
+                      role="tab" aria-controls="nav-C" aria-selected="false">Liga C</button> -->
+                  </div>
+                </nav>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <div id="content-space" class="simple"></div>
+
+      <section id="content" class="d-none">
+        <div class="container">
+          <div class="row">
+            <div class="col px-2 d-flex flex-column justify-content-center align-items-center">
+              <div class="tab-content" id="nav-tabContent">
+
+                <div class="tab-pane fade text-right show active" id="nav-A" role="tabpanel"
+                  aria-labelledby="nav-A-tab">
+                  <div class="w-100 classificacao classificacao-divisao">
+                    <div class="p-1">
+                      <table class="display table" id="classificacaoA">
+                        <thead class="">
+                          <tr>
+                            <th>&nbsp;</th>
+                            <th>&nbsp;</th>
+                            <th>Clubista</th>
+                            <th>Pontuação</th>
+                            <th>Cravadas</th>
+                            <th>Saldos</th>
+                            <th>Acertos</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+    
+                          <tr class="skeleton">
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                          </tr>
+    
+                          <tr class="skeleton">
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                          </tr>
+    
+                          <tr class="skeleton">
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                          </tr>
+    
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                
+                </div>
+
+                <div class="tab-pane fade text-center" id="nav-B" role="tabpanel"
+                  aria-labelledby="nav-B-tab">
+                  <div class="w-100 classificacao classificacao-divisao">
+                    <div class="p-1">
+                      <table class="display table" id="classificacaoB">
+                        <thead class="">
+                          <tr>
+                            <th>&nbsp;</th>
+                            <th>&nbsp;</th>
+                            <th>Clubista</th>
+                            <th>Pontuação</th>
+                            <th>Cravadas</th>
+                            <th>Saldos</th>
+                            <th>Acertos</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+    
+                          <tr class="skeleton">
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                          </tr>
+    
+                          <tr class="skeleton">
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                          </tr>
+    
+                          <tr class="skeleton">
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                            <td>
+                              &nbsp;
+                            </td>
+                          </tr>
+    
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                
+                </div>
+
+                <!-- <div class="tab-pane selecao fade text-center pt-3" id="nav-C" role="tabpanel"
+                  aria-labelledby="nav-C-tab">
+                
+                </div> -->
+
+              </div>
+              
+              
+              
+              <div class="center-s pt-5">
+                <a class="btn btn-outline-primary btn-click" href="https://docs.google.com/spreadsheets/d/1md7qlwt3Bg3KVm2TfbHbPL4MwULrsFZqzkYiY4uLRek/edit?gid=765676955#gid=765676955" target="_blank">
+                  Acesso ao histórico
+                </a>
+              </div>
+              <footer></footer>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <div id="carregando"></div>
+
+
+      <section id="csv">
+        <div class="container">
+          <div class="row">
+            <div class="col">
+              <div class="rodada w-fit-content">
+                <h2>
+                  Rodada <span id="rodada"></span>
+                </h2>
+                <h1>
+                  <span id="campeonato"></span>
+                </h1>
+                <h3>
+                  Data <span id="dataInicio"></span> a <span id="dataFim"></span>
+                </h3>
+                <h6>
+                  <span id="away1"></span> x <span id="home1"></span>
+                </h6>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+    </section>
+
+  </section>
+
+  <script src="../script/jquery.3.5.1.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+    crossorigin="anonymous"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script> -->
+  <!-- <script src="../js/classificacao.js?v=07112024"></script> -->
+  <!-- <script src="../js/main.js?v=07112024"></script> -->
+  <!-- <script src="../js/components.js"></script> -->
+  
+  <script>
+    document.querySelectorAll('.nav-pills').forEach(scrollablePills => {
+      let isDown = false;
+      let startX;
+      let scrollLeft;
+
+      scrollablePills.addEventListener('mousedown', (e) => {
+        isDown = true;
+        scrollablePills.classList.add('active');
+        startX = e.pageX - scrollablePills.offsetLeft;
+        scrollLeft = scrollablePills.scrollLeft;
+        scrollablePills.style.cursor = 'grabbing'; // Muda o cursor ao clicar
+      });
+
+      scrollablePills.addEventListener('mouseleave', () => {
+        isDown = false;
+        scrollablePills.style.cursor = 'grab'; // Reseta o cursor
+      });
+
+      scrollablePills.addEventListener('mouseup', () => {
+        isDown = false;
+        scrollablePills.style.cursor = 'grab'; // Reseta o cursor
+      });
+
+      scrollablePills.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - scrollablePills.offsetLeft;
+        const walk = (x - startX) * 2; // Multiplique por 2 para aumentar a sensibilidade ao arrastar
+        scrollablePills.scrollLeft = scrollLeft - walk;
+      });
+    });
+
+
+  </script>
+
+  <script>
+    $(document).ready(function() {
+      const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSJBCWjHmCmuTMSlfYgJMCQGpnReTX9W5lY-AQ9_N9lz44GuxSL0qzhWbKYMOvMS-g4bzkpEo7KYT2L/pub?output=csv';
+
+      fetch(csvUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Erro na resposta da rede: ' + response.statusText);
+          }
+          return response.text();
+        })
+        .then(csvText => {
+          // Divide o texto CSV em linhas e remove espaços extras
+          const rows = csvText.trim().split('\n');
+          if (rows.length < 2) {
+            console.error("O CSV não contém dados suficientes (cabeçalho + pelo menos uma linha de dados).");
+            return;
+          }
+
+          // Pega o cabeçalho e a primeira linha de dados
+          const header = rows[0].split(',');
+          const dataRow = rows[1].split(',');
+
+          // Cria um objeto para mapear o cabeçalho aos dados
+          const data = {};
+          header.forEach((key, index) => {
+            data[key.trim()] = dataRow[index] ? dataRow[index].trim() : '';
+          });
+
+          // Preenche os elementos HTML com os dados
+          $('#rodada').text(data.rodada);
+          $('#campeonato').text(data.campeonato);
+          $('#dataInicio').text(data.inicio);
+          $('#dataFim').text(data.fim);
+          $('#home1').text(data.home1);
+          $('#away1').text(data.away1);
+        })
+        .catch(error => {
+          console.error('Houve um problema com a operação de fetch:', error);
+          $('#csv').append('<p class="text-danger text-center">Não foi possível carregar os dados da rodada.</p>');
+        });
+    });
+  </script>
+
+
+
+</body>
+
+</html>
