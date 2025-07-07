@@ -192,60 +192,60 @@
 .btn-primary {
   background-color: var(--turquoise-600);
   border: 1px solid var(--turquoise-600);
-  color: var(--star-dust-50);
+  color: var(--star-dust-50) !important;
 }
 .btn-primary:hover {
   background-color: rgba(0, 0, 0, 0);
   border: 2px solid var(--turquoise-600);
-  color: var(--turquoise-600);
+  color: var(--turquoise-600) !important;
 }
 .btn-primary:active, .btn-primary:not(:disabled):not(.disabled).active, .btn-primary:not(:disabled):not(.disabled):active, .show > .btn-primary.dropdown-toggle {
   background-color: var(--turquoise-600);
   border: 2px solid var(--turquoise-600);
-  color: var(--star-dust-950);
+  color: var(--star-dust-950) !important;
 }
 .btn-outline-primary {
   border: 1px solid var(--turquoise-600);
-  color: var(--turquoise-600);
+  color: var(--turquoise-600) !important;
 }
 .btn-outline-primary:hover {
   background-color: var(--turquoise-600);
   border: 1px solid var(--turquoise-600);
-  color: var(--star-dust-50);
+  color: var(--star-dust-50) !important;
 }
 .btn-outline-primary:active, .btn-outline-primary:not(:disabled):not(.disabled).active, .btn-outline-primary:not(:disabled):not(.disabled):active, .show > .btn-outline-primary.dropdown-toggle {
   background-color: var(--turquoise-600);
   border: 1px solid var(--turquoise-600);
-  color: var(--star-dust-950);
+  color: var(--star-dust-950) !important;
 }
 .btn-secondary {
   background-color: var(--star-dust-950);
   border: 1px solid var(--star-dust-950);
-  color: var(--star-dust-50);
+  color: var(--star-dust-50) !important;
 }
 .btn-secondary:hover {
   background-color: rgba(0, 0, 0, 0);
   border: 2px solid var(--star-dust-950);
-  color: var(--star-dust-950);
+  color: var(--star-dust-950) !important;
 }
 .btn-secondary:active, .btn-secondary:not(:disabled):not(.disabled).active, .btn-secondary:not(:disabled):not(.disabled):active, .show > .btn-secondary.dropdown-toggle {
   background-color: var(--star-dust-950);
   border: 2px solid var(--star-dust-950);
-  color: var(--star-dust-950);
+  color: var(--star-dust-950) !important;
 }
 .btn-outline-secondary {
   border: 1px solid var(--star-dust-950);
-  color: var(--star-dust-950);
+  color: var(--star-dust-950) !important;
 }
 .btn-outline-secondary:hover {
   background-color: var(--star-dust-950);
   border: 1px solid var(--star-dust-950);
-  color: var(--star-dust-50);
+  color: var(--star-dust-50) !important;
 }
 .btn-outline-secondary:active, .btn-outline-secondary:not(:disabled):not(.disabled).active, .btn-outline-secondary:not(:disabled):not(.disabled):active, .show > .btn-outline-secondary.dropdown-toggle {
   background-color: var(--star-dust-950);
   border: 1px solid var(--star-dust-950);
-  color: var(--star-dust-950);
+  color: var(--star-dust-950) !important;
 }
 
 .bg-cravada {

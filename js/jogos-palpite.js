@@ -241,7 +241,7 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
 
     const pontosDiaEl = $('#pontos-dia');
     if (pontosDiaEl.length) {
-      const texto = totalPontosDia === 1 ? '1 ponto' : `${totalPontosDia} pontos`;
+      const texto = totalPontosDia === 1 ? '1 pt' : `${totalPontosDia} pts`;
       pontosDiaEl
         .text(texto)
         .removeClass('btn-primary btn-outline-primary')
@@ -255,16 +255,18 @@ function listarJogos(jogosData, diaSelecionado = null, mesSelecionado = null) {
 
 }
 
-function formatarHora(horaISO) {
-  if (!horaISO) return '-';
-
-  const data = new Date(horaISO);
-  const dataBrasilia = new Date(data.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
-
-  let horas = dataBrasilia.getHours();
-  let minutos = dataBrasilia.getMinutes();
-
-  return `${horas.toString().padStart(2, '0')}h${minutos.toString().padStart(2, '0')}`;
+function formatarHora(horaStr) {
+  if (!horaStr) return '-';
+    
+  try {
+    // Divide a string da hora em horas, minutos e segundos
+    const [horas, minutos] = horaStr.split(':');
+    // Formata a hora como HHhMM
+    return `${horas}h${minutos}`;
+  } catch (e) {
+    console.error('Erro ao formatar a hora:', e);
+    return '-';
+  }
 }
 
 function ativarControleVisualizacaoJogos() {

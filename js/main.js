@@ -1,7 +1,7 @@
 $(document).ready(function () {
     const apiUrls = {
-        dados: "https://script.google.com/macros/s/AKfycbz8G_SAowaGbTXSoL1Up7RnnDpEL5CGhzSc9VeLKpTm5bLqPAMWLtqS2zQBWw0NjdHCpg/exec",
-        jogos: "https://script.google.com/macros/s/AKfycby8KiefFil0gElim5WOmU6rxeaYGezA1qy-MCMhsSN8f33VN449grLj-q6rFhgO3_MC/exec",
+        dados: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2S6jbksVJ8TvsQuEn94oAuFuxH_1_7mR76umOJqosTU33xXxP2aq1iWMV7JfSR-sSNGBenAnIlG-V/pub?output=csv",
+        jogos: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV6e7cqAuMM_8TK0tVwr5LMi_mk5hJQ8dfts9fuSn3v9jHdxhY3zdMnVAZmPY4G96g72u-MX2Xua9w/pub?output=csv",
         // pontos: "https://script.google.com/macros/s/AKfycbwz50LSFr5lQP0TfWqzKKOmQQ5cT_ltXhZU-MbsHDFxuvoOXpU6CbDIqZ231oHTw-w/exec"
     };
 
@@ -10,7 +10,7 @@ $(document).ready(function () {
 
 
     const localDataKeys = Object.keys(apiUrls);
-
+    
     localDataKeys.forEach(key => {
         const localData = localStorage.getItem(key);
         if (localData) {
@@ -51,59 +51,89 @@ $(document).ready(function () {
     // Call the function to check login status
     checkLoginStatus();
 
+
+    /* ------------------------------------------------------------------
+       Helper function to parse CSV to JSON
+       ------------------------------------------------------------------ */
+    function parseCsvToJson(csvText) {
+        const lines = csvText.trim().split('\n');
+        if (lines.length < 2) {
+            return { data: [] }; // Return empty data structure if no data
+        }
+        // Get header, remove carriage returns (\r) and trim spaces
+        const header = lines[0].replace(/\r/g, '').split(',').map(h => h.trim());
+        const data = lines.slice(1).map(line => {
+            // Remove carriage returns and split by comma
+            const values = line.replace(/\r/g, '').split(',');
+            const obj = {};
+            // Map header keys to row values
+            header.forEach((key, index) => {
+                obj[key] = values[index] ? values[index].trim() : '';
+            });
+            return obj;
+        });
+        // Return in the expected format { data: [...] }
+        return { data };
+    }
+
+
     /* ------------------------------------------------------------------
    1)  Controla se é a 1.ª vez que cada recurso é carregado
    ------------------------------------------------------------------ */
     const jaMontado = { dados: false, jogos: false };
     function carregarDados(url, key) {
-        $.getJSON(url, function (data) {
-            try {
-                // Try to store the data
-                localStorage.setItem(key, JSON.stringify(data));
-                window[key] = data;
-            } catch (e) {
-                // Handle quota exceeded error
-                if (e.name === 'QuotaExceededError') {
-                    console.warn(`Storage quota exceeded for ${key}. Using in-memory only.`);
-                    // Still keep the data in memory
-                    window[key] = data;
-
-                    // You could also try to clear some space
-                    clearOldLocalStorageData();
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.text(); // Get response as text
+            })
+            .then(text => {
+                let data;
+                if (url.includes('output=csv')) {
+                    data = parseCsvToJson(text); // Parse CSV to JSON
                 } else {
-                    console.error('Error storing data:', e);
+                    data = JSON.parse(text); // Assume JSON for other URLs
                 }
-            }
 
-            /* dispara evento “pronto” p/ quem precisar ouvir -------------- */
-            $(document).trigger(`${key}Pronto`);
-
-            /* ----------------------------------------------------------------
-               PRIMEIRO carregamento → monta tudo normalmente
-               PRÓXIMOS carregamentos → apenas sincroniza o que mudou
-               ---------------------------------------------------------------- */
-            if (!jaMontado[key]) {
-                jaMontado[key] = true;                    // marca como já montado
-
-                /* quando ambos os JSON chegarem pela 1.ª vez */
-                if (jaMontado.dados && jaMontado.jogos) {
-                    executarFuncoesPagina();                // monta navegação + cards
-                    $('body').removeClass('loading');
+                try {
+                    localStorage.setItem(key, JSON.stringify(data));
+                    window[key] = data;
+                } catch (e) {
+                    if (e.name === 'QuotaExceededError') {
+                        console.warn(`Storage quota exceeded for ${key}. Using in-memory only.`);
+                        window[key] = data;
+                        clearOldLocalStorageData();
+                    } else {
+                        console.error('Error storing data:', e);
+                    }
                 }
-            } else {
-                /* já existe DOM → faz update incremental */
-                if (key === 'dados') atualizarElementosGlobais(data);     // já existe
-                if (key === 'jogos') atualizarJogosIncremental(data.data);
-            }
-        }).fail(function () {
-            erro = true;
-            mostrarErroCarregamento();
-            console.log("Deu erro");
-        }).always(function () {
-            carregados++;
-            verificarConclusao();
 
-        });
+                $(document).trigger(`${key}Pronto`);
+
+                if (!jaMontado[key]) {
+                    jaMontado[key] = true;
+                    if (jaMontado.dados && jaMontado.jogos) {
+                        executarFuncoesPagina();
+                        $('body').removeClass('loading');
+                    }
+                } else {
+                    if (key === 'dados') atualizarElementosGlobais(data);
+                }
+            })
+            .catch(error => {
+                erro = true;
+                mostrarErroCarregamento();
+                console.log("Deu erro", error);
+            })
+            .finally(() => {
+                carregados++;
+                verificarConclusao();
+                if (key === 'jogos' && window.jogos && window.jogos.data) {
+                    atualizarJogosIncremental(window.jogos.data);
+                }
+            });
     }
 
     // Helper function to clear space

@@ -192,60 +192,60 @@
 .btn-primary {
   background-color: var(--turquoise-600);
   border: 1px solid var(--turquoise-600);
-  color: var(--star-dust-50);
+  color: var(--star-dust-50) !important;
 }
 .btn-primary:hover {
   background-color: rgba(0, 0, 0, 0);
   border: 2px solid var(--turquoise-600);
-  color: var(--turquoise-600);
+  color: var(--turquoise-600) !important;
 }
 .btn-primary:active, .btn-primary:not(:disabled):not(.disabled).active, .btn-primary:not(:disabled):not(.disabled):active, .show > .btn-primary.dropdown-toggle {
   background-color: var(--turquoise-600);
   border: 2px solid var(--turquoise-600);
-  color: var(--star-dust-950);
+  color: var(--star-dust-950) !important;
 }
 .btn-outline-primary {
   border: 1px solid var(--turquoise-600);
-  color: var(--turquoise-600);
+  color: var(--turquoise-600) !important;
 }
 .btn-outline-primary:hover {
   background-color: var(--turquoise-600);
   border: 1px solid var(--turquoise-600);
-  color: var(--star-dust-50);
+  color: var(--star-dust-50) !important;
 }
 .btn-outline-primary:active, .btn-outline-primary:not(:disabled):not(.disabled).active, .btn-outline-primary:not(:disabled):not(.disabled):active, .show > .btn-outline-primary.dropdown-toggle {
   background-color: var(--turquoise-600);
   border: 1px solid var(--turquoise-600);
-  color: var(--star-dust-950);
+  color: var(--star-dust-950) !important;
 }
 .btn-secondary {
   background-color: var(--star-dust-950);
   border: 1px solid var(--star-dust-950);
-  color: var(--star-dust-50);
+  color: var(--star-dust-50) !important;
 }
 .btn-secondary:hover {
   background-color: rgba(0, 0, 0, 0);
   border: 2px solid var(--star-dust-950);
-  color: var(--star-dust-950);
+  color: var(--star-dust-950) !important;
 }
 .btn-secondary:active, .btn-secondary:not(:disabled):not(.disabled).active, .btn-secondary:not(:disabled):not(.disabled):active, .show > .btn-secondary.dropdown-toggle {
   background-color: var(--star-dust-950);
   border: 2px solid var(--star-dust-950);
-  color: var(--star-dust-950);
+  color: var(--star-dust-950) !important;
 }
 .btn-outline-secondary {
   border: 1px solid var(--star-dust-950);
-  color: var(--star-dust-950);
+  color: var(--star-dust-950) !important;
 }
 .btn-outline-secondary:hover {
   background-color: var(--star-dust-950);
   border: 1px solid var(--star-dust-950);
-  color: var(--star-dust-50);
+  color: var(--star-dust-50) !important;
 }
 .btn-outline-secondary:active, .btn-outline-secondary:not(:disabled):not(.disabled).active, .btn-outline-secondary:not(:disabled):not(.disabled):active, .show > .btn-outline-secondary.dropdown-toggle {
   background-color: var(--star-dust-950);
   border: 1px solid var(--star-dust-950);
-  color: var(--star-dust-950);
+  color: var(--star-dust-950) !important;
 }
 
 .bg-cravada {
@@ -1971,8 +1971,11 @@ footer a:hover {
   height: 104px;
 }
 
-#classificacao #content-space {
+#classificacao #content-space.simple {
   height: 56px;
+}
+#classificacao #content-space.double {
+  height: 86px;
 }
 #classificacao .classificacao {
   position: relative;
@@ -2054,7 +2057,7 @@ footer a:hover {
   justify-content: center;
 }
 @media (max-width: 567px) {
-  #classificacao .table thead th:nth-child(n+4):nth-child(-n+7) {
+  #classificacao .table thead th:nth-child(n+4):nth-child(-n+9) {
     color: transparent !important;
   }
 }
@@ -2080,6 +2083,18 @@ footer a:hover {
   #classificacao .table thead th:nth-child(7)::after {
     content: "A";
     color: var(--blue-dianne-900) !important;
+  }
+}
+@media (max-width: 567px) {
+  #classificacao .table thead th:nth-child(8)::after {
+    content: "% Ap";
+    color: var(--star-dust-950) !important;
+  }
+}
+@media (max-width: 567px) {
+  #classificacao .table thead th:nth-child(9)::after {
+    content: "% Ac";
+    color: var(--star-dust-950) !important;
   }
 }
 #classificacao .table tbody {
@@ -2163,10 +2178,16 @@ footer a:hover {
     overflow: hidden;
   }
 }
-@media (max-width: 410px) {
-  #classificacao .table th:nth-child(n+4):nth-child(-n+7),
-  #classificacao .table td:nth-child(n+4):nth-child(-n+7) {
-    max-width: 40px;
+#classificacao .table th:nth-child(n+8),
+#classificacao .table td:nth-child(n+8) {
+  width: var(--n-size);
+  max-width: var(--n-size);
+}
+@media (max-width: 576px) {
+  #classificacao .table th:nth-child(n+8),
+  #classificacao .table td:nth-child(n+8) {
+    max-width: 60px;
+    overflow: hidden;
   }
 }
 
@@ -2831,7 +2852,7 @@ footer a:hover {
 
 .navegacao nav .nav-link {
   background: transparent !important;
-  width: 32%;
+  flex: 1 0;
   border-bottom: 1px solid transparent;
   display: flex;
   justify-content: center;
@@ -2900,4 +2921,7 @@ footer a:hover {
 }
 .selecao .nav-pills .nav-link:hover {
   border: 1px solid var(--turquoise-600);
+}
+.selecao .nav-pills .nav-link.future {
+  display: none;
 }/*# sourceMappingURL=main.css.map */

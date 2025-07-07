@@ -28,10 +28,10 @@
 
   <meta property="og:site_name" content="Resultadismo">
   <meta name="site_name" content="Resultadismo">
-  <meta property="og:title" content="Resultadismo | Premiação" />
-  <meta name="title" content="Resultadismo | Premiação" />
-  <meta property="og:description" content="Veja sua Premiação no Resultadismo dos Clubistash">
-  <meta name="description" content="Veja sua Premiação no Resultadismo dos Clubistash">
+  <meta property="og:title" content="Resultadismo | Classificações" />
+  <meta name="title" content="Resultadismo | Classificações" />
+  <meta property="og:description" content="Veja sua Classificações no Resultadismo dos Clubistash">
+  <meta name="description" content="Veja sua Classificações no Resultadismo dos Clubistash">
   <meta property="og:url" content="https://www.resultadismo.com/" />
   <meta name="url" content="https://www.resultadismo.com/" />
   <meta property="og:image" itemprop="image" content="https://www.resultadismo.com/images/logo.jpg" />
@@ -43,7 +43,7 @@
   <meta property="og:type" content="website" />
 
 
-  <title>Resultadismo | Premiação</title>
+  <title>Resultadismo | Classificações</title>
 </head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-P86V27WXK2"></script>
@@ -75,7 +75,9 @@
               <div id="navegacao" class="w-100 navegacao">
                 <nav>
                   <div class="nav nav-tabs d-flex justify-content-around" id="nav-tab" role="tablist">
-                    <button class="nav-link active" id="nav-mes-tab" data-toggle="tab" data-target="#nav-mes"
+                    <button class="nav-link active" id="nav-dia-tab" data-toggle="tab" data-target="#nav-dia"
+                      type="button" role="tab" aria-controls="nav-dia" aria-selected="true">Dia</button>
+                    <button class="nav-link" id="nav-mes-tab" data-toggle="tab" data-target="#nav-mes"
                       type="button" role="tab" aria-controls="nav-mes" aria-selected="true">Mês</button>
                     <button class="nav-link" id="nav-campeonato-tab" data-toggle="tab" data-target="#nav-campeonato"
                       type="button" role="tab" aria-controls="nav-campeonato" aria-selected="false">Campeonato</button>
@@ -84,6 +86,17 @@
                   </div>
                 </nav>
                 <div class="tab-content" id="nav-tabContent">
+
+                  <div class="tab-pane selecao fade text-right pt-3 show active" id="nav-dia" role="tabpanel"
+                    aria-labelledby="nav-dia-tab">
+
+                    <ul class="nav nav-pills pr-5" id="filtroDia" role="tablist">
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link skeleton active" id="pills-hoje-tab" data-toggle="pill" type="button"
+                          role="tab" aria-selected="true">Hoje</button>
+                      </li>
+                    </ul>
+                  </div>
 
                   <div class="tab-pane selecao fade text-right pt-3" id="nav-mes" role="tabpanel"
                     aria-labelledby="nav-mes-tab">
@@ -107,7 +120,7 @@
                     </ul>
                   </div>
 
-                  <div class="tab-pane selecao fade text-center pt-3 show active" id="nav-geral" role="tabpanel"
+                  <div class="tab-pane selecao fade text-center pt-3" id="nav-geral" role="tabpanel"
                     aria-labelledby="nav-geral-tab">
                     <ul class="nav nav-pills" role="tablist">
                       <li class="nav-item w-100" role="presentation">
@@ -125,7 +138,7 @@
 
       </section>
 
-      <div id="content-space"></div>
+      <div id="content-space" class="double"></div>
 
       <section id="content">
         <div class="container">
@@ -143,6 +156,8 @@
                         <th>Cravadas</th>
                         <th>Saldos</th>
                         <th>Acertos</th>
+                        <th>Aproveitamento</th>
+                        <th>Acertividade</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -221,6 +236,16 @@
 
                     </tbody>
                   </table>
+                </div>
+                <div class="container">
+                  <div class="row">
+                    <div class="col">
+                      <p class="">
+                        <b>*Aproveitamento:</b> A porcentagem de pontos feitos em relação ao total de pontos possiveis, de acordo com os palpites feitos. <br>
+                        <b>*Acertividade:</b> A porcentagem de jogos em que pontuou, em relação ao total de palpites feitos.
+                      </p>
+                    </div>
+                  </div>
                 </div>
                 <footer></footer>
               </div>

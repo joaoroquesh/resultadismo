@@ -1,6 +1,18 @@
+// Função utilitária para calcular o caminho correto dos componentes
+function getComponentPath(component) {
+    // Conta quantos níveis acima está a página atual em relação à raiz
+    const pathDepth = window.location.pathname.split('/').filter(Boolean).length - 1;
+    // Se estiver na raiz, usa 'components/', senão usa '../components/' para cada nível acima
+    if (pathDepth === 0) {
+        return `components/${component}`;
+    } else {
+        return `${'../'.repeat(pathDepth)}components/${component}`;
+    }
+}
+
 $(document).ready(function () {
   // Carregar o menu e, em seguida, adicionar a classe 'active' ao link correspondente
-  $("#menu").load("components/menu-new.html", function () {
+  $("#menu").load(getComponentPath("menu-new.html"), function () {
     const currentPath = window.location.pathname;
     const menuItems = document.querySelectorAll('.nav-item .nav-link');
 
@@ -12,7 +24,7 @@ $(document).ready(function () {
     });
   });
 
-  $("#header").load("components/header.html", function () {
+  $("#header").load(getComponentPath("header.html"), function () {
     const loggedInUser = localStorage.getItem('logado');
     const jogadorElements = document.querySelectorAll('.jogador-logado');
 
@@ -51,5 +63,5 @@ $(document).ready(function () {
 
 });
 
-$("footer").load("components/footer.html");
-$("#carregando").load("components/carregando.html");
+$("footer").load(getComponentPath("footer.html"));
+$("#carregando").load(getComponentPath("carregando.html"));
