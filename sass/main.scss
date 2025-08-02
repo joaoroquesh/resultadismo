@@ -675,7 +675,24 @@ footer {
 
   #classificacaoA {
     tbody {
+
+      
       tr {
+
+        &:nth-child(-n+8) {
+          color: $saldo !important;
+
+          td {
+            &:nth-child(1) {
+              color: $light !important;
+
+              &:after {
+                background: $saldo !important;
+              }
+            }
+          }
+        }
+
         &:nth-child(1) {
 
           color: $cravada !important;
@@ -693,34 +710,23 @@ footer {
 
         }
 
-        &:nth-last-child(2) {
-          color: $danger-dark !important;
+        
 
-          td {
-            &:nth-child(1) {
-              color: $light !important;
+        // &:nth-last-child(2) {
+        //   color: $danger-dark !important;
 
-              &:after {
-                background: $danger-dark !important;
-              }
-            }
-          }
-        }
+        //   td {
+        //     &:nth-child(1) {
+        //       color: $light !important;
 
-        &:nth-last-child(1),
-        &:nth-child(n+8) {
-          color: $danger !important;
+        //       &:after {
+        //         background: $danger-dark !important;
+        //       }
+        //     }
+        //   }
+        // }
 
-          td {
-            &:nth-child(1) {
-              color: $light !important;
-
-              &:after {
-                background: $danger !important;
-              }
-            }
-          }
-        }
+        
       }
     }
   }
