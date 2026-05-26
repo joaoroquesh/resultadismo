@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/features/auth/AuthProvider";
@@ -90,4 +91,32 @@ export function useSavePrediction() {
       qc.invalidateQueries({ queryKey: ["my-predictions"] });
     },
   });
+}
+
+/** Assina mudanças de jogos (placar ao vivo) e revalida as queries afetadas. */
+export function useMatchesRealtime(competitionId: string | undefined) {
+  const qc = useQueryClient();
+  useEffect(() => {
+    if (!competitionId) return;
+    const channel = supabase
+      .channel(`matches-${competitionId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "matches",
+          filter: `competition_id=eq.${competitionId}`,
+        },
+        () => {
+          qc.invalidateQueries({ queryKey: ["matches", competitionId] });
+          qc.invalidateQueries({ queryKey: ["my-predictions", competitionId] });
+          qc.invalidateQueries({ queryKey: ["standings"] });
+        },
+      )
+      .subscribe();
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [competitionId, qc]);
 }

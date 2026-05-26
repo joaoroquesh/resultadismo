@@ -9,7 +9,7 @@ import { TeamCrest } from "@/components/TeamCrest";
 import { cn } from "@/lib/utils";
 import { dayjs, formatDayLabel } from "@/lib/format";
 import { MatchCard } from "./MatchCard";
-import { useCompetitions, useMatches, useMyPredictions } from "./api";
+import { useCompetitions, useMatches, useMyPredictions, useMatchesRealtime } from "./api";
 import type { MatchWithTeams } from "@/lib/types";
 
 type Tab = "abertos" | "resultados";
@@ -21,6 +21,7 @@ export function JogosPage() {
 
   const { data: matches, isLoading: loadingMatches } = useMatches(selectedId);
   const { data: predMap } = useMyPredictions(selectedId);
+  useMatchesRealtime(selectedId);
   const [tab, setTab] = useState<Tab>("abertos");
 
   const totalPoints = useMemo(() => {

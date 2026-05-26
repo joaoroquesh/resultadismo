@@ -83,9 +83,17 @@ export function LoginPage() {
             Continuar com Google
           </Button>
 
+          {!import.meta.env.DEV && (
+            <p className="mt-4 text-center text-xs text-ink-400">
+              Entre com sua conta Google para jogar.
+            </p>
+          )}
+
+          {import.meta.env.DEV && (
+            <>
           <div className="my-5 flex items-center gap-3 text-xs text-ink-400">
             <span className="h-px flex-1 bg-ink-200" />
-            ou com email
+            ou com email (dev)
             <span className="h-px flex-1 bg-ink-200" />
           </div>
 
@@ -134,6 +142,8 @@ export function LoginPage() {
               {mode === "login" ? "Crie agora" : "Entrar"}
             </button>
           </p>
+            </>
+          )}
         </div>
       </div>
     </div>
