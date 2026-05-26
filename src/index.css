@@ -1,0 +1,210 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ */
+/*  Resultadismo Design System — tokens                                */
+/*  Conceito visual herdado do jogo original, profissionalizado.       */
+/* ------------------------------------------------------------------ */
+@theme {
+  --font-sans: "Ubuntu", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* ---- Turquoise (marca / brand) ---- */
+  --color-brand-50: #effefa;
+  --color-brand-100: #c8fff0;
+  --color-brand-200: #91fee4;
+  --color-brand-300: #52f6d5;
+  --color-brand-400: #1ee3c0;
+  --color-brand-500: #06ddbb;
+  --color-brand-600: #1cb19c;
+  --color-brand-700: #067f70;
+  --color-brand-800: #0a655b;
+  --color-brand-900: #0e534c;
+  --color-brand-950: #003330;
+
+  /* ---- Star-dust (neutros) ---- */
+  --color-ink-50: #f6f6f6;
+  --color-ink-100: #e9e9e9;
+  --color-ink-200: #d1d1d1;
+  --color-ink-300: #b0b0b0;
+  --color-ink-400: #999999;
+  --color-ink-500: #6d6d6d;
+  --color-ink-600: #5d5d5d;
+  --color-ink-700: #4f4f4f;
+  --color-ink-800: #454545;
+  --color-ink-900: #3d3d3d;
+  --color-ink-950: #232323;
+
+  /* ---- Pizza (dourado = CRAVADA / +3) ---- */
+  --color-gold-50: #fefee8;
+  --color-gold-100: #ffffc2;
+  --color-gold-200: #fffb88;
+  --color-gold-300: #fff243;
+  --color-gold-400: #ffe110;
+  --color-gold-500: #efc703;
+  --color-gold-600: #bf9000;
+  --color-gold-700: #a46f04;
+  --color-gold-800: #87560c;
+  --color-gold-900: #734710;
+  --color-gold-950: #432505;
+
+  /* ---- Bilbao (verde = SALDO / +2) ---- */
+  --color-grass-50: #f1fbea;
+  --color-grass-100: #e0f6d1;
+  --color-grass-200: #c3efa7;
+  --color-grass-300: #9de274;
+  --color-grass-400: #7ad249;
+  --color-grass-500: #5bb72b;
+  --color-grass-600: #43921e;
+  --color-grass-700: #38761d;
+  --color-grass-800: #2e591b;
+  --color-grass-900: #284c1b;
+  --color-grass-950: #12290a;
+
+  /* ---- Blue-dianne (ciano = ACERTO / +1) ---- */
+  --color-aqua-50: #ecfffe;
+  --color-aqua-100: #cefffe;
+  --color-aqua-200: #a4fcfd;
+  --color-aqua-300: #65f8fb;
+  --color-aqua-400: #1feaf1;
+  --color-aqua-500: #03ccd7;
+  --color-aqua-600: #05a4b5;
+  --color-aqua-700: #0c8292;
+  --color-aqua-800: #136877;
+  --color-aqua-900: #134f5c;
+  --color-aqua-950: #073945;
+
+  /* ---- Punch (vermelho = perigo / ao vivo) ---- */
+  --color-flame-50: #fff1f1;
+  --color-flame-100: #ffe0e0;
+  --color-flame-200: #ffc7c7;
+  --color-flame-300: #ffa0a0;
+  --color-flame-400: #ff6969;
+  --color-flame-500: #f93a3a;
+  --color-flame-600: #e21818;
+  --color-flame-700: #c21313;
+  --color-flame-800: #a01414;
+  --color-flame-900: #851717;
+  --color-flame-950: #490606;
+
+  /* ---- Semânticos ---- */
+  --color-background: #ececed;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f6f6f6;
+  --color-border: #e2e2e3;
+
+  /* ---- Raios ---- */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-pill: 1000px;
+
+  /* ---- Sombras ---- */
+  --shadow-soft: 0 1px 3px rgb(35 35 35 / 0.06), 0 1px 2px rgb(35 35 35 / 0.04);
+  --shadow-card: 0 4px 16px rgb(35 35 35 / 0.08);
+  --shadow-pop: 0 12px 32px rgb(35 35 35 / 0.14);
+  --shadow-brand: 0 8px 24px rgb(28 177 156 / 0.28);
+
+  /* ---- Transições ---- */
+  --ease-bounce: cubic-bezier(0.6, -0.1, 0.4, 1.1);
+}
+
+/* Mapeamento semântico de pontuação (usado por componentes) */
+:root {
+  --score-cravada: var(--color-gold-500);
+  --score-cravada-ink: var(--color-gold-950);
+  --score-saldo: var(--color-grass-600);
+  --score-saldo-ink: #ffffff;
+  --score-acerto: var(--color-aqua-700);
+  --score-acerto-ink: #ffffff;
+  --score-erro: var(--color-ink-300);
+  --score-erro-ink: var(--color-ink-600);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-background);
+    color: var(--color-ink-950);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100dvh;
+  }
+
+  button {
+    font-family: inherit;
+  }
+
+  /* Esconde as setas dos inputs numéricos (placar) */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+}
+
+@layer utilities {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Animações */
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-pop-in {
+  animation: pop-in 0.28s var(--ease-bounce);
+}
+
+@keyframes pulse-live {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.animate-pulse-live {
+  animation: pulse-live 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
