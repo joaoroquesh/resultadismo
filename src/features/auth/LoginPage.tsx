@@ -29,7 +29,7 @@ function GoogleIcon() {
 }
 
 export function LoginPage() {
-  const { session, loading, signInWithGoogle } = useAuth();
+  const { session, loading, signInWithGoogle, signInWithPassword } = useAuth();
   const { toast } = useToast();
   const [busy, setBusy] = useState(false);
 
@@ -39,6 +39,15 @@ export function LoginPage() {
   async function handleGoogle() {
     setBusy(true);
     const { error } = await signInWithGoogle();
+    if (error) {
+      toast(error, "error");
+      setBusy(false);
+    }
+  }
+
+  async function handleDevLogin() {
+    setBusy(true);
+    const { error } = await signInWithPassword("joao.crf93@gmail.com", "resultadismo123");
     if (error) {
       toast(error, "error");
       setBusy(false);
@@ -62,6 +71,17 @@ export function LoginPage() {
           <p className="mt-4 text-center text-xs text-ink-400">
             Use sua conta Google para entrar e jogar.
           </p>
+
+          {import.meta.env.DEV && (
+            <button
+              type="button"
+              onClick={handleDevLogin}
+              disabled={busy}
+              className="mt-4 w-full rounded-md border border-dashed border-ink-200 py-2 text-xs font-medium text-ink-400 hover:bg-ink-50"
+            >
+              Entrar como João (dev)
+            </button>
+          )}
         </div>
 
         <p className="mt-6 text-center text-xs text-ink-400">
