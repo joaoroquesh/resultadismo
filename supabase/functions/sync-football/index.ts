@@ -183,6 +183,7 @@ Deno.serve(async (req) => {
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
   const footballDataToken = Deno.env.get("FOOTBALL_DATA_TOKEN") ?? "";
   const theSportsDbKey = Deno.env.get("THESPORTSDB_KEY") ?? "3";
 
@@ -190,10 +191,10 @@ Deno.serve(async (req) => {
     auth: { persistSession: false },
   });
 
-  // Autorização: cron (service key) ou usuário app_admin
+  // Autorização: cron (service key ou CRON_SECRET) ou usuário app_admin
   const authHeader = req.headers.get("Authorization") ?? "";
   const jwt = authHeader.replace("Bearer ", "");
-  let authorized = jwt === serviceKey;
+  let authorized = jwt === serviceKey || (!!cronSecret && jwt === cronSecret);
   if (!authorized && jwt) {
     const { data: userData } = await admin.auth.getUser(jwt);
     if (userData.user) {
