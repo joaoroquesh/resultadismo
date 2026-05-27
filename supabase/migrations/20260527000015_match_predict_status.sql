@@ -19,6 +19,7 @@ stable
 security definer
 set search_path = ''
 as $$
+#variable_conflict use_column
 declare
   v_comp uuid;
 begin
@@ -46,7 +47,7 @@ begin
     -- array_agg(...)[1] escolhe uma liga compartilhada (min(uuid) não existe no PG).
     select lm.user_id, (array_agg(lm.league_id))[1] as league_id
     from public.league_members lm
-    where lm.league_id in (select league_id from my_leagues)
+    where lm.league_id in (select ml.league_id from my_leagues ml)
       and lm.status = 'active'
     group by lm.user_id
   )
