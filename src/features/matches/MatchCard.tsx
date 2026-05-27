@@ -5,7 +5,7 @@ import { TeamCrest } from "@/components/TeamCrest";
 import { ScorePill } from "@/components/ScorePill";
 import { Avatar } from "@/components/ui/Avatar";
 import { cn } from "@/lib/utils";
-import { formatTime, isLocked } from "@/lib/format";
+import { formatTime, isLocked, formatDeadline } from "@/lib/format";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useSavePrediction, useSetJoker, useMatchPredictions } from "./api";
 import type { MatchWithTeams, Prediction, ScoreType } from "@/lib/types";
@@ -98,6 +98,15 @@ export function MatchCard({
             {match.group_name}
           </span>
         )}
+        {canEdit &&
+          (() => {
+            const d = formatDeadline(match.kickoff_at);
+            return d ? (
+              <span className={cn("font-semibold", d.urgent ? "text-flame-600" : "text-ink-400")}>
+                {d.text}
+              </span>
+            ) : null;
+          })()}
         {isJoker && (
           <span className="ml-auto flex items-center gap-0.5 rounded-pill bg-gold-500 px-1.5 py-0 text-[10px] font-bold text-gold-950">
             <Zap className="size-2.5 fill-gold-950" /> 2×

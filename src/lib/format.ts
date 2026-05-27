@@ -52,3 +52,15 @@ export function isLocked(iso: string | null): boolean {
   if (!iso) return false;
   return dayjs(iso).isBefore(dayjs());
 }
+
+/** "fecha em 2h" · "fecha em 45min" · "fecha já" — para o prazo do palpite. */
+export function formatDeadline(iso: string | null): { text: string; urgent: boolean } | null {
+  if (!iso) return null;
+  const diffMin = dayjs(iso).diff(dayjs(), "minute");
+  if (diffMin < 0) return null;
+  if (diffMin < 60) return { text: `fecha em ${diffMin}min`, urgent: true };
+  const h = Math.floor(diffMin / 60);
+  if (h < 24) return { text: `fecha em ${h}h`, urgent: h < 3 };
+  const d = Math.floor(h / 24);
+  return { text: `fecha em ${d}d`, urgent: false };
+}

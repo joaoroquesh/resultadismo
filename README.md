@@ -70,6 +70,7 @@ supabase/
    supabase link --project-ref SEU_REF
    supabase db push                 # aplica as migrations
    supabase functions deploy sync-football
+   supabase functions deploy send-push
    ```
 3. Em **Project Settings → API**, copie a *Project URL* e a *anon/publishable key*.
 
@@ -88,20 +89,36 @@ supabase/
    ```
 3. No app (logado como admin) → **Perfil → Admin → Comp.**, crie a competição com provider `football_data` e código (ex.: `WC` para Copa do Mundo, `BSA` para Brasileirão) e clique em **Sincronizar**.
 
-### 4. Sincronização automática (opcional, recomendado para jogos ao vivo)
-No SQL Editor do Supabase, rode uma vez (substitua os valores):
+### 4. Notificações Web Push (lembrete de prazo + cutucadas)
+1. Gere as chaves VAPID:
+   ```bash
+   npx web-push generate-vapid-keys
+   ```
+2. Configure os secrets da edge function:
+   ```bash
+   supabase secrets set VAPID_PUBLIC_KEY=...
+   supabase secrets set VAPID_PRIVATE_KEY=...
+   supabase secrets set VAPID_SUBJECT=mailto:seu@email.com
+   ```
+3. A **chave pública** também vai no frontend (Vercel) como `VITE_VAPID_PUBLIC_KEY`.
+
+### 5. Automação (sync de jogos + push)
+No SQL Editor do Supabase, rode uma vez (substitua os valores). Esta config alimenta
+o sync de jogos **e** o envio de push:
 ```sql
 insert into private.sync_config (id, functions_url, service_key)
 values (1, 'https://SEU_REF.supabase.co/functions/v1', 'SUA_SERVICE_ROLE_KEY')
 on conflict (id) do update set functions_url = excluded.functions_url, service_key = excluded.service_key;
 ```
-A função `run_football_sync()` já está agendada (pg_cron) a cada 15 minutos.
+Já estão agendados (pg_cron): `run_football_sync()` (jogos, 15min) e
+`create_deadline_reminders()` (lembretes de palpite, 15min).
 
-### 5. Vercel
+### 6. Vercel
 1. Importe o repositório GitHub em [vercel.com](https://vercel.com) (framework: **Vite**).
 2. Variáveis de ambiente:
    - `VITE_SUPABASE_URL` = Project URL do Supabase
    - `VITE_SUPABASE_ANON_KEY` = publishable/anon key
+   - `VITE_VAPID_PUBLIC_KEY` = chave pública VAPID (do passo 4)
 3. Deploy. O `vercel.json` já trata o roteamento de SPA.
 4. (Opcional) Aponte o domínio `resultadismo.com` para a Vercel.
 ```
