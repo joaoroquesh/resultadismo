@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { BottomNav } from "./BottomNav";
 import { Sidebar } from "./Sidebar";
+import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 
 export function AppShell() {
   return (
@@ -10,6 +11,7 @@ export function AppShell() {
         <Outlet />
       </div>
       <BottomNav />
+      <InstallPrompt />
     </div>
   );
 }
