@@ -138,6 +138,29 @@ export function useMatchPredictions(matchId: string, enabled: boolean) {
   });
 }
 
+export type MatchPredictStatus = {
+  user_id: string;
+  display_name: string;
+  avatar_url: string | null;
+  predicted: boolean;
+  league_id: string;
+};
+
+/** Antes do kickoff: membros da(s) liga(s) do usuário e quem já palpitou (sem o placar). */
+export function useMatchPredictStatus(matchId: string, enabled: boolean) {
+  return useQuery({
+    enabled,
+    queryKey: ["match-predict-status", matchId],
+    queryFn: async (): Promise<MatchPredictStatus[]> => {
+      const { data, error } = await supabase.rpc("get_match_predict_status", {
+        p_match_id: matchId,
+      });
+      if (error) throw error;
+      return (data ?? []) as MatchPredictStatus[];
+    },
+  });
+}
+
 /** Assina mudanças de jogos (placar ao vivo) e revalida as queries afetadas. */
 export function useMatchesRealtime(competitionId: string | undefined) {
   const qc = useQueryClient();

@@ -754,6 +754,16 @@ export type Database = {
         }
       }
       match_is_locked: { Args: { p_match_id: string }; Returns: boolean }
+      get_match_predict_status: {
+        Args: { p_match_id: string }
+        Returns: {
+          user_id: string
+          display_name: string
+          avatar_url: string | null
+          predicted: boolean
+          league_id: string
+        }[]
+      }
       nudge_member: {
         Args: { p_league_id: string; p_to_user: string }
         Returns: undefined

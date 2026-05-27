@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, Loader2, Lock, ChevronDown, Users, Zap } from "lucide-react";
+import { Check, Loader2, Lock, ChevronDown, Users, Zap, Hand } from "lucide-react";
 import { TeamCrest } from "@/components/TeamCrest";
 import { ScorePill } from "@/components/ScorePill";
 import { Avatar } from "@/components/ui/Avatar";
@@ -8,7 +8,8 @@ import { cn } from "@/lib/utils";
 import { formatTime, isLocked, formatDeadline } from "@/lib/format";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useToast } from "@/components/ui/Toast";
-import { useSavePrediction, useSetJoker, useMatchPredictions } from "./api";
+import { useSavePrediction, useSetJoker, useMatchPredictions, useMatchPredictStatus } from "./api";
+import { useNudge } from "@/features/notifications/api";
 import type { MatchWithTeams, Prediction, ScoreType } from "@/lib/types";
 
 type SaveState = "idle" | "saving" | "saved" | "error";
@@ -204,17 +205,22 @@ export function MatchCard({
         </div>
       ) : null}
 
-      {/* palpites da galera */}
-      {locked && (
+      {/* Após o início: placares da galera. Antes: só quem já palpitou (sem placar). */}
+      {(locked || !!session) && (
         <>
           <button
             onClick={() => setShowGalera((v) => !v)}
             className="flex w-full items-center justify-center gap-1.5 border-t border-border py-1.5 text-[11px] font-semibold text-ink-500 transition-colors hover:bg-ink-50"
           >
-            <Users className="size-3.5" /> Palpites da galera
+            <Users className="size-3.5" /> {locked ? "Palpites da galera" : "Quem já palpitou"}
             <ChevronDown className={cn("size-3.5 transition-transform", showGalera && "rotate-180")} />
           </button>
-          {showGalera && <Galera matchId={match.id} finished={finished} />}
+          {showGalera &&
+            (locked ? (
+              <Galera matchId={match.id} finished={finished} />
+            ) : (
+              <PredictStatus matchId={match.id} />
+            ))}
         </>
       )}
     </div>
@@ -319,5 +325,69 @@ function Galera({ matchId, finished }: { matchId: string; finished: boolean }) {
         </li>
       ))}
     </ul>
+  );
+}
+
+/** Antes do kickoff: membros da liga e quem já palpitou (sem revelar o placar). */
+function PredictStatus({ matchId }: { matchId: string }) {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const nudge = useNudge();
+  const { data, isLoading } = useMatchPredictStatus(matchId, true);
+
+  if (isLoading)
+    return <div className="px-3 py-3 text-center text-xs text-ink-400">carregando…</div>;
+  if (!data || data.length === 0)
+    return (
+      <div className="px-3 py-3 text-center text-xs text-ink-400">
+        Entre numa liga para ver quem já palpitou.
+      </div>
+    );
+
+  const done = data.filter((d) => d.predicted).length;
+
+  return (
+    <div className="bg-surface/60">
+      <p className="px-3 pt-2 text-center text-[11px] font-medium text-ink-500">
+        <span className="font-bold text-ink-700">
+          {done} de {data.length}
+        </span>{" "}
+        já palpitaram
+      </p>
+      <ul className="divide-y divide-border px-1 py-1">
+        {data.map((m) => (
+          <li key={m.user_id} className="flex items-center gap-2 px-2.5 py-1.5">
+            <Avatar src={m.avatar_url} name={m.display_name} size="xs" />
+            <span className="min-w-0 flex-1 truncate text-xs font-medium text-ink-800">
+              {m.display_name}
+              {m.user_id === user?.id && <span className="text-ink-400"> (você)</span>}
+            </span>
+            {m.predicted ? (
+              <span className="flex items-center gap-1 text-[11px] font-semibold text-grass-600">
+                <Check className="size-3.5" /> palpitou
+              </span>
+            ) : m.user_id === user?.id ? (
+              <span className="text-[11px] font-semibold text-gold-700">falta você!</span>
+            ) : (
+              <button
+                disabled={nudge.isPending}
+                onClick={() =>
+                  nudge.mutate(
+                    { leagueId: m.league_id, toUser: m.user_id },
+                    {
+                      onSuccess: () => toast("Cutucada enviada! 👉", "success"),
+                      onError: (e) => toast(e instanceof Error ? e.message : "Erro", "error"),
+                    },
+                  )
+                }
+                className="flex items-center gap-1 rounded-pill px-2 py-0.5 text-[11px] font-semibold text-gold-700 transition-colors hover:bg-gold-100 disabled:opacity-50"
+              >
+                <Hand className="size-3.5" /> cutucar
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
