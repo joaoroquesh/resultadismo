@@ -166,6 +166,18 @@ export function useMatchesRealtime(competitionId: string | undefined) {
   const qc = useQueryClient();
   useEffect(() => {
     if (!competitionId) return;
+    // Debounce: um sync atualiza vários jogos de uma vez; agrupamos a rajada
+    // numa única revalidação para não disparar uma tempestade de refetch
+    // (especialmente o de standings, que é o mais pesado).
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const invalidate = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        qc.invalidateQueries({ queryKey: ["matches", competitionId] });
+        qc.invalidateQueries({ queryKey: ["my-predictions", competitionId] });
+        qc.invalidateQueries({ queryKey: ["standings"] });
+      }, 1200);
+    };
     const channel = supabase
       .channel(`matches-${competitionId}-${Math.random().toString(36).slice(2)}`)
       .on(
@@ -176,14 +188,11 @@ export function useMatchesRealtime(competitionId: string | undefined) {
           table: "matches",
           filter: `competition_id=eq.${competitionId}`,
         },
-        () => {
-          qc.invalidateQueries({ queryKey: ["matches", competitionId] });
-          qc.invalidateQueries({ queryKey: ["my-predictions", competitionId] });
-          qc.invalidateQueries({ queryKey: ["standings"] });
-        },
+        invalidate,
       )
       .subscribe();
     return () => {
+      if (timer) clearTimeout(timer);
       void supabase.removeChannel(channel);
     };
   }, [competitionId, qc]);

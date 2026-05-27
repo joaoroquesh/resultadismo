@@ -63,15 +63,25 @@ export function useNotificationsRealtime() {
   const qc = useQueryClient();
   useEffect(() => {
     if (!user) return;
+    // Debounce: agrupa rajadas (ex.: vários lembretes) numa única revalidação.
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const invalidate = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(
+        () => qc.invalidateQueries({ queryKey: ["notifications", user.id] }),
+        800,
+      );
+    };
     const channel = supabase
       .channel(`notifications-${user.id}-${Math.random().toString(36).slice(2)}`)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
-        () => qc.invalidateQueries({ queryKey: ["notifications", user.id] }),
+        invalidate,
       )
       .subscribe();
     return () => {
+      if (timer) clearTimeout(timer);
       void supabase.removeChannel(channel);
     };
   }, [user, qc]);

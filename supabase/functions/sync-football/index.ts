@@ -137,64 +137,65 @@ async function syncFootballData(
     if (m.homeTeam?.id) teamsSeen.set(m.homeTeam.id, m.homeTeam);
     if (m.awayTeam?.id) teamsSeen.set(m.awayTeam.id, m.awayTeam);
   }
-  for (const [pid, t] of teamsSeen) {
+  // upsert de times em LOTE (1 ida ao banco em vez de N)
+  const teamRows = [...teamsSeen].map(([pid, t]) => {
     const pt = ptTeam(t);
-    const { data: up, error } = await supabase
+    return {
+      provider: "football_data" as const,
+      provider_ref: String(pid),
+      name: pt.name,
+      short_name: pt.short,
+      tla: t.tla ?? null,
+      crest_url: t.crest ?? null,
+    };
+  });
+  if (teamRows.length > 0) {
+    const { data: upTeams, error } = await supabase
       .from("teams")
-      .upsert(
-        {
-          provider: "football_data",
-          provider_ref: String(pid),
-          name: pt.name,
-          short_name: pt.short,
-          tla: t.tla ?? null,
-          crest_url: t.crest ?? null,
-        },
-        { onConflict: "provider,provider_ref" },
-      )
-      .select("id")
-      .single();
+      .upsert(teamRows, { onConflict: "provider,provider_ref" })
+      .select("id, provider_ref");
     if (error) throw error;
-    teamMap.set(pid, up!.id);
+    for (const r of upTeams ?? []) teamMap.set(Number(r.provider_ref), r.id);
   }
 
-  // upsert jogos
-  let count = 0;
-  for (const m of matches) {
+  // upsert de jogos em LOTE
+  const ts = new Date().toISOString();
+  const matchRows = matches.map((m) => {
     const status = mapFootballDataStatus(m.status);
     const ft = m.score?.fullTime ?? {};
     const pens = m.score?.penalties ?? {};
     const homeId = m.homeTeam?.id ? teamMap.get(m.homeTeam.id) : null;
     const awayId = m.awayTeam?.id ? teamMap.get(m.awayTeam.id) : null;
-
-    const { error } = await supabase.from("matches").upsert(
-      {
-        competition_id: comp.id,
-        provider: "football_data",
-        provider_ref: String(m.id),
-        stage: m.stage ?? null,
-        group_name: m.group ?? null,
-        round: m.matchday ? `Rodada ${m.matchday}` : (m.stage ?? null),
-        matchday: m.matchday ?? null,
-        home_team_id: homeId,
-        away_team_id: awayId,
-        home_team_name: m.homeTeam ? ptTeam(m.homeTeam).short : "A definir",
-        away_team_name: m.awayTeam ? ptTeam(m.awayTeam).short : "A definir",
-        kickoff_at: m.utcDate ?? null,
-        status,
-        home_score: status === "finished" ? (ft.home ?? null) : (status === "live" ? (ft.home ?? null) : null),
-        away_score: status === "finished" ? (ft.away ?? null) : (status === "live" ? (ft.away ?? null) : null),
-        home_pen: pens.home ?? null,
-        away_pen: pens.away ?? null,
-        last_synced_at: new Date().toISOString(),
-      },
-      { onConflict: "provider,provider_ref" },
-    );
+    const hasLiveScore = status === "finished" || status === "live";
+    return {
+      competition_id: comp.id,
+      provider: "football_data" as const,
+      provider_ref: String(m.id),
+      stage: m.stage ?? null,
+      group_name: m.group ?? null,
+      round: m.matchday ? `Rodada ${m.matchday}` : (m.stage ?? null),
+      matchday: m.matchday ?? null,
+      home_team_id: homeId ?? null,
+      away_team_id: awayId ?? null,
+      home_team_name: m.homeTeam ? ptTeam(m.homeTeam).short : "A definir",
+      away_team_name: m.awayTeam ? ptTeam(m.awayTeam).short : "A definir",
+      kickoff_at: m.utcDate ?? null,
+      status,
+      home_score: hasLiveScore ? (ft.home ?? null) : null,
+      away_score: hasLiveScore ? (ft.away ?? null) : null,
+      home_pen: pens.home ?? null,
+      away_pen: pens.away ?? null,
+      last_synced_at: ts,
+    };
+  });
+  if (matchRows.length > 0) {
+    const { error } = await supabase
+      .from("matches")
+      .upsert(matchRows, { onConflict: "provider,provider_ref" });
     if (error) throw error;
-    count++;
   }
 
-  return { teams: teamMap.size, matches: count };
+  return { teams: teamMap.size, matches: matchRows.length };
 }
 
 // ---------------------------------------------------------------------------
@@ -213,30 +214,31 @@ async function syncTheSportsDb(
   const data = await res.json();
   const events: any[] = data.events ?? [];
 
-  let count = 0;
-  for (const e of events) {
+  const ts = new Date().toISOString();
+  const rows = events.map((e) => {
     const finished = e.strStatus === "Match Finished" || e.strStatus === "FT";
     const kickoff = e.strTimestamp ?? (e.dateEvent && e.strTime ? `${e.dateEvent}T${e.strTime}Z` : null);
-    const { error } = await supabase.from("matches").upsert(
-      {
-        competition_id: comp.id,
-        provider: "thesportsdb",
-        provider_ref: String(e.idEvent),
-        round: e.intRound ? `Rodada ${e.intRound}` : null,
-        home_team_name: e.strHomeTeam ?? "A definir",
-        away_team_name: e.strAwayTeam ?? "A definir",
-        kickoff_at: kickoff,
-        status: finished ? "finished" : "scheduled",
-        home_score: finished ? Number(e.intHomeScore ?? null) : null,
-        away_score: finished ? Number(e.intAwayScore ?? null) : null,
-        last_synced_at: new Date().toISOString(),
-      },
-      { onConflict: "provider,provider_ref" },
-    );
+    return {
+      competition_id: comp.id,
+      provider: "thesportsdb" as const,
+      provider_ref: String(e.idEvent),
+      round: e.intRound ? `Rodada ${e.intRound}` : null,
+      home_team_name: e.strHomeTeam ?? "A definir",
+      away_team_name: e.strAwayTeam ?? "A definir",
+      kickoff_at: kickoff,
+      status: finished ? ("finished" as const) : ("scheduled" as const),
+      home_score: finished ? Number(e.intHomeScore ?? null) : null,
+      away_score: finished ? Number(e.intAwayScore ?? null) : null,
+      last_synced_at: ts,
+    };
+  });
+  if (rows.length > 0) {
+    const { error } = await supabase
+      .from("matches")
+      .upsert(rows, { onConflict: "provider,provider_ref" });
     if (error) throw error;
-    count++;
   }
-  return { teams: 0, matches: count };
+  return { teams: 0, matches: rows.length };
 }
 
 // ---------------------------------------------------------------------------

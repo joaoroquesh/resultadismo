@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import type { Competition, League, MatchStatus, Profile, DataProvider } from "@/lib/types";
+import type { Competition, League, MatchStatus, DataProvider } from "@/lib/types";
 
 export function usePendingLeagues() {
   return useQuery({
@@ -182,16 +182,24 @@ export function useCreateMatch() {
   });
 }
 
+export type AdminUser = {
+  id: string;
+  display_name: string;
+  avatar_url: string | null;
+  is_app_admin: boolean;
+  email: string | null;
+  created_at: string;
+};
+
 export function useAllProfiles() {
   return useQuery({
     queryKey: ["admin", "profiles"],
-    queryFn: async (): Promise<Profile[]> => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("created_at");
+    queryFn: async (): Promise<AdminUser[]> => {
+      // E-mail não fica mais em public.profiles (PII). A RPC lê de auth.users
+      // e só responde para app_admin.
+      const { data, error } = await supabase.rpc("admin_list_users");
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as AdminUser[];
     },
   });
 }

@@ -34,6 +34,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_control: {
+        Row: {
+          enabled: boolean
+          id: number
+          max_active: number
+          poll_seconds: number
+          session_ttl_seconds: number
+          updated_at: string
+        }
+        Insert: {
+          enabled?: boolean
+          id?: number
+          max_active?: number
+          poll_seconds?: number
+          session_ttl_seconds?: number
+          updated_at?: string
+        }
+        Update: {
+          enabled?: boolean
+          id?: number
+          max_active?: number
+          poll_seconds?: number
+          session_ttl_seconds?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      access_sessions: {
+        Row: {
+          admitted_at: string | null
+          enqueued_at: string
+          last_seen_at: string
+          priority: number
+          state: string
+          token: string
+          user_id: string | null
+        }
+        Insert: {
+          admitted_at?: string | null
+          enqueued_at?: string
+          last_seen_at?: string
+          priority?: number
+          state?: string
+          token?: string
+          user_id?: string | null
+        }
+        Update: {
+          admitted_at?: string | null
+          enqueued_at?: string
+          last_seen_at?: string
+          priority?: number
+          state?: string
+          token?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       competitions: {
         Row: {
           area: string | null
@@ -42,8 +99,8 @@ export type Database = {
           emblem_url: string | null
           id: string
           is_featured: boolean
-          last_synced_at: string | null
           jokers_per_week: number
+          last_synced_at: string | null
           max_jokers: number
           name: string
           provider: Database["public"]["Enums"]["data_provider"]
@@ -65,8 +122,8 @@ export type Database = {
           emblem_url?: string | null
           id?: string
           is_featured?: boolean
-          last_synced_at?: string | null
           jokers_per_week?: number
+          last_synced_at?: string | null
           max_jokers?: number
           name: string
           provider?: Database["public"]["Enums"]["data_provider"]
@@ -88,8 +145,8 @@ export type Database = {
           emblem_url?: string | null
           id?: string
           is_featured?: boolean
-          last_synced_at?: string | null
           jokers_per_week?: number
+          last_synced_at?: string | null
           max_jokers?: number
           name?: string
           provider?: Database["public"]["Enums"]["data_provider"]
@@ -554,7 +611,6 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           display_name: string
-          email: string | null
           favorite_team: string | null
           id: string
           is_app_admin: boolean
@@ -564,7 +620,6 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string
-          email?: string | null
           favorite_team?: string | null
           id: string
           is_app_admin?: boolean
@@ -574,7 +629,6 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string
-          email?: string | null
           favorite_team?: string | null
           id?: string
           is_app_admin?: boolean
@@ -667,6 +721,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_list_users: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          created_at: string
+          display_name: string
+          email: string
+          id: string
+          is_app_admin: boolean
+        }[]
+      }
       approve_league: {
         Args: { p_league_id: string }
         Returns: {
@@ -716,6 +781,17 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_match_predict_status: {
+        Args: { p_match_id: string }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          league_id: string
+          predicted: boolean
+          user_id: string
+        }[]
+      }
+      heartbeat_access: { Args: { p_token: string }; Returns: Json }
       is_app_admin: { Args: never; Returns: boolean }
       is_league_admin: { Args: { p_league_id: string }; Returns: boolean }
       is_league_member: { Args: { p_league_id: string }; Returns: boolean }
@@ -754,16 +830,6 @@ export type Database = {
         }
       }
       match_is_locked: { Args: { p_match_id: string }; Returns: boolean }
-      get_match_predict_status: {
-        Args: { p_match_id: string }
-        Returns: {
-          user_id: string
-          display_name: string
-          avatar_url: string | null
-          predicted: boolean
-          league_id: string
-        }[]
-      }
       nudge_member: {
         Args: { p_league_id: string; p_to_user: string }
         Returns: undefined
@@ -794,6 +860,8 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      release_access: { Args: { p_token: string }; Returns: undefined }
+      request_access: { Args: { p_token?: string }; Returns: Json }
       run_football_sync: { Args: never; Returns: undefined }
       score_points: {
         Args: { st: Database["public"]["Enums"]["score_type"] }
