@@ -9,6 +9,9 @@ import { cn } from "@/lib/utils";
 import { dayjs } from "@/lib/format";
 import { MatchCard } from "./MatchCard";
 import { useCompetitions, useMatches, useMyPredictions, useMatchesRealtime } from "./api";
+import { useAuth } from "@/features/auth/AuthProvider";
+import { useLoginModal } from "@/features/auth/LoginModalProvider";
+import { LandingSections } from "@/features/landing/LandingSections";
 
 const dayKey = (iso: string | null) => (iso ? dayjs(iso).format("YYYY-MM-DD") : "sem-data");
 
@@ -21,6 +24,8 @@ const weekKey = (iso: string | null) => {
 };
 
 export function JogosPage() {
+  const { session } = useAuth();
+  const { open: openLogin } = useLoginModal();
   const { data: competitions, isLoading: loadingComps } = useCompetitions();
   const [compId, setCompId] = useState<string | null>(null);
   const selectedId = compId ?? competitions?.[0]?.id;
@@ -193,6 +198,10 @@ export function JogosPage() {
           ))}
         </div>
       )}
+
+      {/* Landing híbrida: vende o jogo para visitantes deslogados ao rolar.
+          Para quem já entrou, a home fica 100% focada nos jogos. */}
+      {!session && <LandingSections onOpenLogin={openLogin} />}
     </Page>
   );
 }
