@@ -26,7 +26,14 @@ const FUTURE_BADGES = [
 ];
 
 export function PlayerProfilePage() {
-  const { id } = useParams();
+  const params = useParams();
+  // Robustez: se por algum motivo o useParams não entregar o :id, extrai da URL.
+  const id =
+    params.id ||
+    (typeof window !== "undefined"
+      ? decodeURIComponent(window.location.pathname.split("/jogador/")[1]?.split(/[/?#]/)[0] ?? "")
+      : "") ||
+    undefined;
   const navigate = useNavigate();
   const { data: player, isLoading } = usePlayerProfile(id);
 
