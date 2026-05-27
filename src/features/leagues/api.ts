@@ -25,7 +25,7 @@ export function useMyLeagues() {
         .eq("user_id", user!.id);
       if (error) throw error;
       return (data ?? [])
-        .filter((r) => r.league)
+        .filter((r) => r.league && !(r.league as { deleted_at?: string | null }).deleted_at)
         .map((r) => ({
           ...(r.league as unknown as League),
           my_role: r.role as MemberRole,
@@ -46,6 +46,8 @@ export function useLeague(slug: string | undefined) {
         .eq("slug", slug!)
         .maybeSingle();
       if (error) throw error;
+      // liga excluída (soft) não abre pra ninguém (admin restaura pela Lixeira)
+      if ((data as { deleted_at?: string | null } | null)?.deleted_at) return null;
       return data;
     },
   });

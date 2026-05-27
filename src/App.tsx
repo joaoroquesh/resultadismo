@@ -10,6 +10,7 @@ import { NovaLigaPage } from "@/features/leagues/NovaLigaPage";
 import { LigaDetailPage } from "@/features/leagues/LigaDetailPage";
 import { EditarPerfilPage } from "@/features/profile/EditarPerfilPage";
 import { AdminPage } from "@/features/admin/AdminPage";
+import { PlayerProfilePage } from "@/features/players/PlayerProfilePage";
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="/classificacao" element={<Navigate to="/ligas" replace />} />
           <Route path="/perfil" element={<PerfilPage />} />
           <Route path="/perfil/editar" element={<EditarPerfilPage />} />
+          <Route path="/jogador/:id" element={<PlayerProfilePage />} />
           <Route element={<RequireAdmin />}>
             <Route path="/admin" element={<AdminPage />} />
           </Route>
