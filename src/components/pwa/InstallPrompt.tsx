@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Download, Share, SquarePlus, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
@@ -10,9 +11,12 @@ const SEEN_KEY = "rsd:pwa-prompt-seen";
 export function InstallPrompt() {
   const state = useInstallState();
   const [show, setShow] = useState(false);
+  // No Perfil já existe o card "Instalar o app"; não duplicamos com o banner flutuante.
+  const onProfile = useLocation().pathname.startsWith("/perfil");
 
   // Auto-exibe uma vez, assim que dá pra instalar (Android) ou no iOS.
   useEffect(() => {
+    if (onProfile) return;
     if (state !== "installable" && state !== "ios") return;
     let seen = false;
     try {
@@ -30,14 +34,14 @@ export function InstallPrompt() {
       }
     }, 1000);
     return () => clearTimeout(t);
-  }, [state]);
+  }, [state, onProfile]);
 
   // Some se instalar enquanto estiver aberto.
   useEffect(() => {
     if (state === "installed") setShow(false);
   }, [state]);
 
-  if (!show || (state !== "installable" && state !== "ios")) return null;
+  if (!show || onProfile || (state !== "installable" && state !== "ios")) return null;
 
   const onInstall = async () => {
     await promptInstall();
