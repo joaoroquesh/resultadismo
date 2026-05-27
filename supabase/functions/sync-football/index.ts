@@ -243,7 +243,13 @@ Deno.serve(async (req) => {
         .eq("id", comp.id);
       results.push({ competition: comp.name, ok: true, ...r });
     } catch (e) {
-      results.push({ competition: comp.name, ok: false, error: String(e instanceof Error ? e.message : e) });
+      const msg =
+        e instanceof Error
+          ? e.message
+          : typeof e === "object"
+            ? JSON.stringify(e)
+            : String(e);
+      results.push({ competition: comp.name, ok: false, error: msg });
     }
   }
 
