@@ -42,8 +42,9 @@ begin
       and lc.competition_id = v_comp
   ),
   circle as (
-    -- união dos membros ativos dessas ligas (1 linha por pessoa)
-    select lm.user_id, min(lm.league_id) as league_id
+    -- união dos membros ativos dessas ligas (1 linha por pessoa).
+    -- array_agg(...)[1] escolhe uma liga compartilhada (min(uuid) não existe no PG).
+    select lm.user_id, (array_agg(lm.league_id))[1] as league_id
     from public.league_members lm
     where lm.league_id in (select league_id from my_leagues)
       and lm.status = 'active'
