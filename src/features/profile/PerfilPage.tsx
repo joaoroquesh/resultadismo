@@ -46,7 +46,7 @@ export function PerfilPage() {
   // --- Instalação do app (PWA) ---
   const installState = useInstallState();
   const [installBusy, setInstallBusy] = useState(false);
-  const [iosHelp, setIosHelp] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const onInstall = async () => {
     setInstallBusy(true);
@@ -176,47 +176,58 @@ export function PerfilPage() {
           <ThemeToggle />
         </Card>
 
-        {/* Instalar o app (PWA) */}
-        {installState !== "unsupported" && (
-          <Card className="p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <p className="font-medium text-ink-900">Instalar o app</p>
-                <p className="text-xs text-ink-500">
-                  {installState === "installed"
-                    ? "Instalado neste dispositivo."
-                    : installState === "ios"
-                      ? "Adicione à tela inicial pelo Safari."
-                      : "Abra num toque, direto da tela inicial."}
+        {/* Instalar o app (PWA) — sempre visível */}
+        <Card className="p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="font-medium text-ink-900">Instalar o app</p>
+              <p className="text-xs text-ink-500">
+                {installState === "installed"
+                  ? "Instalado neste dispositivo."
+                  : "Tenha o Resultadismo na tela inicial, abre num toque."}
+              </p>
+            </div>
+            {installState === "installed" ? (
+              <span className="flex shrink-0 items-center gap-1 text-sm font-semibold text-grass-600">
+                <Check className="size-4" /> Instalado
+              </span>
+            ) : installState === "installable" ? (
+              <Button size="sm" loading={installBusy} onClick={onInstall}>
+                <Download className="size-4" /> Instalar
+              </Button>
+            ) : (
+              <Button variant="outline" size="sm" onClick={() => setHelpOpen((v) => !v)}>
+                <Download className="size-4" /> Como instalar
+              </Button>
+            )}
+          </div>
+          {installState !== "installed" && installState !== "installable" && helpOpen && (
+            <div className="mt-3 border-t border-border pt-3 text-xs leading-relaxed text-ink-500">
+              {isIOS() ? (
+                <p>
+                  No Safari, toque em
+                  <Share
+                    className="mx-1 inline size-3.5 -translate-y-px text-brand-600"
+                    aria-label="Compartilhar"
+                  />
+                  <span className="font-semibold text-ink-700">Compartilhar</span> e depois em{" "}
+                  <span className="inline-flex translate-y-px items-center gap-0.5 font-semibold text-ink-700">
+                    <SquarePlus className="size-3.5" /> Adicionar à Tela de Início
+                  </span>
+                  .
                 </p>
-              </div>
-              {installState === "installed" ? (
-                <span className="flex shrink-0 items-center gap-1 text-sm font-semibold text-grass-600">
-                  <Check className="size-4" /> Instalado
-                </span>
-              ) : installState === "installable" ? (
-                <Button size="sm" loading={installBusy} onClick={onInstall}>
-                  <Download className="size-4" /> Instalar
-                </Button>
               ) : (
-                <Button variant="outline" size="sm" onClick={() => setIosHelp((v) => !v)}>
-                  Como instalar
-                </Button>
+                <p>
+                  <span className="font-semibold text-ink-700">No celular:</span> abra o menu do
+                  navegador (⋮) e toque em{" "}
+                  <span className="font-semibold text-ink-700">“Instalar app”</span> ou “Adicionar à
+                  tela inicial”. <span className="font-semibold text-ink-700">No computador:</span>{" "}
+                  clique no ícone de instalar na barra de endereço do Chrome ou Edge.
+                </p>
               )}
             </div>
-            {installState === "ios" && iosHelp && (
-              <p className="mt-3 border-t border-border pt-3 text-xs leading-relaxed text-ink-500">
-                No Safari, toque em
-                <Share className="mx-1 inline size-3.5 -translate-y-px text-brand-600" aria-label="Compartilhar" />
-                <span className="font-semibold text-ink-700">Compartilhar</span> e depois em{" "}
-                <span className="inline-flex translate-y-px items-center gap-0.5 font-semibold text-ink-700">
-                  <SquarePlus className="size-3.5" /> Adicionar à Tela de Início
-                </span>
-                .
-              </p>
-            )}
-          </Card>
-        )}
+          )}
+        </Card>
 
         {/* Notificações */}
         <Card className="flex items-center justify-between gap-3 p-4">

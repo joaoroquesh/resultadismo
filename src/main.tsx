@@ -8,6 +8,20 @@ import { ToastProvider } from "@/components/ui/Toast";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import "./index.css";
 
+// PWA: quando um novo service worker assume, recarrega 1x para aplicar a atualização
+// (sem isso, a página fica na versão antiga em cache mesmo após o SW trocar).
+if ("serviceWorker" in navigator) {
+  const hadController = !!navigator.serviceWorker.controller;
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (reloaded || !hadController) return; // não recarrega na 1ª instalação
+    reloaded = true;
+    window.location.reload();
+  });
+  // cutuca uma checagem de atualização logo ao abrir
+  navigator.serviceWorker.ready.then((reg) => reg.update().catch(() => {})).catch(() => {});
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
