@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.tsx";
 import { AuthProvider } from "@/features/auth/AuthProvider";
+import { LoginModalProvider } from "@/features/auth/LoginModalProvider";
 import { ToastProvider } from "@/components/ui/Toast";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import "./index.css";
@@ -39,7 +40,9 @@ createRoot(document.getElementById("root")!).render(
         <BrowserRouter>
           <ToastProvider>
             <AuthProvider>
-              <App />
+              <LoginModalProvider>
+                <App />
+              </LoginModalProvider>
             </AuthProvider>
           </ToastProvider>
         </BrowserRouter>
