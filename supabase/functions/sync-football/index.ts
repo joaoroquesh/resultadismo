@@ -51,6 +51,69 @@ function mapFootballDataStatus(s: string): MatchStatus {
   }
 }
 
+// Tradução PT-BR dos nomes das seleções (chaveado pela TLA, estável no provedor).
+// name = nome completo exibido; short = versão curta p/ os cards de jogo.
+const TEAM_PT: Record<string, { name: string; short?: string }> = {
+  ALG: { name: "Argélia" },
+  ARG: { name: "Argentina" },
+  AUS: { name: "Austrália" },
+  AUT: { name: "Áustria" },
+  BEL: { name: "Bélgica" },
+  BIH: { name: "Bósnia e Herzegovina", short: "Bósnia" },
+  BRA: { name: "Brasil" },
+  CAN: { name: "Canadá" },
+  CPV: { name: "Cabo Verde" },
+  COL: { name: "Colômbia" },
+  COD: { name: "Congo (RD)", short: "Congo RD" },
+  CRO: { name: "Croácia" },
+  CUW: { name: "Curaçao" },
+  CZE: { name: "Tchéquia" },
+  ECU: { name: "Equador" },
+  EGY: { name: "Egito" },
+  ENG: { name: "Inglaterra" },
+  FRA: { name: "França" },
+  GER: { name: "Alemanha" },
+  GHA: { name: "Gana" },
+  HAI: { name: "Haiti" },
+  IRN: { name: "Irã" },
+  IRQ: { name: "Iraque" },
+  CIV: { name: "Costa do Marfim", short: "C. Marfim" },
+  JPN: { name: "Japão" },
+  JOR: { name: "Jordânia" },
+  MEX: { name: "México" },
+  MAR: { name: "Marrocos" },
+  NED: { name: "Holanda" },
+  NZL: { name: "Nova Zelândia", short: "N. Zelândia" },
+  NOR: { name: "Noruega" },
+  PAN: { name: "Panamá" },
+  PAR: { name: "Paraguai" },
+  POR: { name: "Portugal" },
+  QAT: { name: "Catar" },
+  KSA: { name: "Arábia Saudita", short: "Arábia S." },
+  SCO: { name: "Escócia" },
+  SEN: { name: "Senegal" },
+  RSA: { name: "África do Sul" },
+  KOR: { name: "Coreia do Sul", short: "Coreia" },
+  ESP: { name: "Espanha" },
+  SWE: { name: "Suécia" },
+  SUI: { name: "Suíça" },
+  TUN: { name: "Tunísia" },
+  TUR: { name: "Turquia" },
+  USA: { name: "Estados Unidos", short: "EUA" },
+  URY: { name: "Uruguai" },
+  URU: { name: "Uruguai" },
+  UZB: { name: "Uzbequistão" },
+};
+
+function ptTeam(t: any): { name: string; short: string } {
+  const tla: string | undefined = t?.tla ?? undefined;
+  const pt = tla ? TEAM_PT[tla] : undefined;
+  if (pt) return { name: pt.name, short: pt.short ?? pt.name };
+  const name = t?.name ?? t?.shortName ?? "Time";
+  const short = t?.shortName ?? t?.tla ?? name;
+  return { name, short };
+}
+
 async function syncFootballData(
   supabase: SupabaseClient,
   comp: CompetitionRow,
@@ -75,14 +138,15 @@ async function syncFootballData(
     if (m.awayTeam?.id) teamsSeen.set(m.awayTeam.id, m.awayTeam);
   }
   for (const [pid, t] of teamsSeen) {
+    const pt = ptTeam(t);
     const { data: up, error } = await supabase
       .from("teams")
       .upsert(
         {
           provider: "football_data",
           provider_ref: String(pid),
-          name: t.name ?? t.shortName ?? "Time",
-          short_name: t.shortName ?? t.tla ?? t.name,
+          name: pt.name,
+          short_name: pt.short,
           tla: t.tla ?? null,
           crest_url: t.crest ?? null,
         },
@@ -114,8 +178,8 @@ async function syncFootballData(
         matchday: m.matchday ?? null,
         home_team_id: homeId,
         away_team_id: awayId,
-        home_team_name: m.homeTeam?.shortName ?? m.homeTeam?.name ?? "A definir",
-        away_team_name: m.awayTeam?.shortName ?? m.awayTeam?.name ?? "A definir",
+        home_team_name: m.homeTeam ? ptTeam(m.homeTeam).short : "A definir",
+        away_team_name: m.awayTeam ? ptTeam(m.awayTeam).short : "A definir",
         kickoff_at: m.utcDate ?? null,
         status,
         home_score: status === "finished" ? (ft.home ?? null) : (status === "live" ? (ft.home ?? null) : null),
