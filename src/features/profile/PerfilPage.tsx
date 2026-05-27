@@ -1,13 +1,30 @@
-import { useState } from "react";
+import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { LogOut, ShieldCheck, ChevronRight, Pencil, BellRing } from "lucide-react";
+import {
+  LogOut,
+  ShieldCheck,
+  ChevronRight,
+  Pencil,
+  BellRing,
+  BellOff,
+  Download,
+  Check,
+  Share,
+  SquarePlus,
+} from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { useToast } from "@/components/ui/Toast";
-import { subscribePush, pushConfigured } from "@/features/notifications/push";
+import {
+  subscribePush,
+  unsubscribePush,
+  getPushState,
+  type PushState,
+} from "@/features/notifications/push";
+import { useInstallState, promptInstall, isIOS } from "@/lib/pwa";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { usePlayerStats } from "./stats";
@@ -25,14 +42,80 @@ export function PerfilPage() {
   const { profile, user, isAppAdmin, signOut } = useAuth();
   const { data: stats } = usePlayerStats();
   const { toast } = useToast();
-  const [pushBusy, setPushBusy] = useState(false);
 
-  async function handlePush() {
+  // --- Instalação do app (PWA) ---
+  const installState = useInstallState();
+  const [installBusy, setInstallBusy] = useState(false);
+  const [iosHelp, setIosHelp] = useState(false);
+
+  const onInstall = async () => {
+    setInstallBusy(true);
+    const r = await promptInstall();
+    setInstallBusy(false);
+    if (r === "accepted") toast("App instalado! 🎉", "success");
+  };
+
+  // --- Notificações (Web Push) ---
+  const [push, setPush] = useState<PushState | null>(null);
+  const [pushBusy, setPushBusy] = useState(false);
+  const refreshPush = useCallback(async () => setPush(await getPushState()), []);
+  useEffect(() => {
+    void refreshPush();
+  }, [refreshPush]);
+
+  async function enablePush() {
     if (!user) return;
     setPushBusy(true);
     const { ok, error } = await subscribePush(user.id);
+    await refreshPush();
     setPushBusy(false);
     toast(ok ? "Notificações ativadas! 🔔" : error ?? "Não foi possível ativar.", ok ? "success" : "error");
+  }
+  async function disablePush() {
+    setPushBusy(true);
+    const { ok, error } = await unsubscribePush();
+    await refreshPush();
+    setPushBusy(false);
+    toast(ok ? "Notificações desativadas." : error ?? "Erro ao desativar.", ok ? "success" : "error");
+  }
+
+  let notifHelp = "Avisos de prazo e cutucadas dos amigos.";
+  let notifControl: ReactNode = (
+    <Button variant="outline" size="sm" disabled>
+      …
+    </Button>
+  );
+  if (push) {
+    if (!push.supported) {
+      notifHelp = isIOS()
+        ? "No iPhone, instale o app na tela inicial para ativar."
+        : "Seu navegador não suporta notificações.";
+      notifControl = (
+        <Button variant="outline" size="sm" disabled>
+          Indisponível
+        </Button>
+      );
+    } else if (push.permission === "denied") {
+      notifHelp = "Bloqueadas. Libere nas configurações do navegador.";
+      notifControl = (
+        <Button variant="outline" size="sm" disabled>
+          <BellOff className="size-4" /> Bloqueado
+        </Button>
+      );
+    } else if (push.subscribed) {
+      notifHelp = "Ativadas neste dispositivo.";
+      notifControl = (
+        <Button variant="outline" size="sm" loading={pushBusy} onClick={disablePush}>
+          <BellOff className="size-4" /> Desativar
+        </Button>
+      );
+    } else {
+      notifControl = (
+        <Button size="sm" loading={pushBusy} onClick={enablePush}>
+          <BellRing className="size-4" /> Ativar
+        </Button>
+      );
+    }
   }
 
   return (
@@ -76,10 +159,7 @@ export function PerfilPage() {
 
         <Card className="divide-y divide-border">
           {isAppAdmin && (
-            <Link
-              to="/admin"
-              className="flex items-center gap-3 p-4 transition hover:bg-ink-50"
-            >
+            <Link to="/admin" className="flex items-center gap-3 p-4 transition hover:bg-ink-50">
               <ShieldCheck className="size-5 text-brand-600" />
               <span className="flex-1 font-medium text-ink-900">Painel administrativo</span>
               <ChevronRight className="size-4 text-ink-400" />
@@ -96,20 +176,55 @@ export function PerfilPage() {
           <ThemeToggle />
         </Card>
 
+        {/* Instalar o app (PWA) */}
+        {installState !== "unsupported" && (
+          <Card className="p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="font-medium text-ink-900">Instalar o app</p>
+                <p className="text-xs text-ink-500">
+                  {installState === "installed"
+                    ? "Instalado neste dispositivo."
+                    : installState === "ios"
+                      ? "Adicione à tela inicial pelo Safari."
+                      : "Abra num toque, direto da tela inicial."}
+                </p>
+              </div>
+              {installState === "installed" ? (
+                <span className="flex shrink-0 items-center gap-1 text-sm font-semibold text-grass-600">
+                  <Check className="size-4" /> Instalado
+                </span>
+              ) : installState === "installable" ? (
+                <Button size="sm" loading={installBusy} onClick={onInstall}>
+                  <Download className="size-4" /> Instalar
+                </Button>
+              ) : (
+                <Button variant="outline" size="sm" onClick={() => setIosHelp((v) => !v)}>
+                  Como instalar
+                </Button>
+              )}
+            </div>
+            {installState === "ios" && iosHelp && (
+              <p className="mt-3 border-t border-border pt-3 text-xs leading-relaxed text-ink-500">
+                No Safari, toque em
+                <Share className="mx-1 inline size-3.5 -translate-y-px text-brand-600" aria-label="Compartilhar" />
+                <span className="font-semibold text-ink-700">Compartilhar</span> e depois em{" "}
+                <span className="inline-flex translate-y-px items-center gap-0.5 font-semibold text-ink-700">
+                  <SquarePlus className="size-3.5" /> Adicionar à Tela de Início
+                </span>
+                .
+              </p>
+            )}
+          </Card>
+        )}
+
+        {/* Notificações */}
         <Card className="flex items-center justify-between gap-3 p-4">
           <div className="min-w-0">
             <p className="font-medium text-ink-900">Notificações</p>
-            <p className="text-xs text-ink-500">Avisos de prazo e cutucadas dos amigos</p>
+            <p className="text-xs text-ink-500">{notifHelp}</p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            loading={pushBusy}
-            onClick={handlePush}
-            disabled={!pushConfigured()}
-          >
-            <BellRing className="size-4" /> {pushConfigured() ? "Ativar" : "Em breve"}
-          </Button>
+          {notifControl}
         </Card>
 
         <Button variant="outline" fullWidth onClick={signOut}>

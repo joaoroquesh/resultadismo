@@ -2,98 +2,46 @@ import { useEffect, useState } from "react";
 import { Download, Share, SquarePlus, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import { promptInstall, useInstallState } from "@/lib/pwa";
 
-// Evento não-padrão do Chromium (Android/desktop) para instalar PWA.
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
-}
-
-const DISMISS_KEY = "rsd:pwa-install";
-const SNOOZE_DAYS = 14;
-
-function isStandalone(): boolean {
-  return (
-    window.matchMedia?.("(display-mode: standalone)").matches ||
-    (window.navigator as Navigator & { standalone?: boolean }).standalone === true
-  );
-}
-
-function isIOS(): boolean {
-  const ua = window.navigator.userAgent;
-  const iDevice = /iphone|ipad|ipod/i.test(ua);
-  // iPadOS 13+ se apresenta como "Macintosh"; detecta pelo toque.
-  const iPadOS = /macintosh/i.test(ua) && "ontouchend" in document;
-  return iDevice || iPadOS;
-}
-
-function snoozed(): boolean {
-  try {
-    const v = localStorage.getItem(DISMISS_KEY);
-    if (!v) return false;
-    if (v === "installed") return true;
-    const ts = Number(v);
-    return !!ts && Date.now() - ts < SNOOZE_DAYS * 864e5;
-  } catch {
-    return false;
-  }
-}
-
-function remember(value: "installed" | "snooze") {
-  try {
-    localStorage.setItem(DISMISS_KEY, value === "installed" ? "installed" : String(Date.now()));
-  } catch {
-    /* localStorage indisponível (modo privado) — ignora */
-  }
-}
+// Aparece uma única vez por dispositivo. Depois, a instalação fica disponível no Perfil.
+const SEEN_KEY = "rsd:pwa-prompt-seen";
 
 export function InstallPrompt() {
-  const [mode, setMode] = useState<"android" | "ios" | null>(null);
-  const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
+  const state = useInstallState();
+  const [show, setShow] = useState(false);
 
+  // Auto-exibe uma vez, assim que dá pra instalar (Android) ou no iOS.
   useEffect(() => {
-    if (isStandalone() || snoozed()) return;
-
-    const onBeforeInstall = (e: Event) => {
-      e.preventDefault(); // impede o mini-infobar nativo; usamos o nosso banner
-      setDeferred(e as BeforeInstallPromptEvent);
-      setMode("android");
-    };
-    const onInstalled = () => {
-      remember("installed");
-      setDeferred(null);
-      setMode(null);
-    };
-    window.addEventListener("beforeinstallprompt", onBeforeInstall);
-    window.addEventListener("appinstalled", onInstalled);
-
-    // iOS/Safari não dispara beforeinstallprompt: mostramos instruções.
-    let timer: number | undefined;
-    if (isIOS()) {
-      timer = window.setTimeout(() => setMode((cur) => cur ?? "ios"), 1500);
+    if (state !== "installable" && state !== "ios") return;
+    let seen = false;
+    try {
+      seen = localStorage.getItem(SEEN_KEY) === "1";
+    } catch {
+      /* ignore */
     }
+    if (seen) return;
+    const t = window.setTimeout(() => {
+      setShow(true);
+      try {
+        localStorage.setItem(SEEN_KEY, "1");
+      } catch {
+        /* ignore */
+      }
+    }, 1000);
+    return () => clearTimeout(t);
+  }, [state]);
 
-    return () => {
-      window.removeEventListener("beforeinstallprompt", onBeforeInstall);
-      window.removeEventListener("appinstalled", onInstalled);
-      if (timer) clearTimeout(timer);
-    };
-  }, []);
+  // Some se instalar enquanto estiver aberto.
+  useEffect(() => {
+    if (state === "installed") setShow(false);
+  }, [state]);
 
-  if (!mode) return null;
+  if (!show || (state !== "installable" && state !== "ios")) return null;
 
-  const dismiss = () => {
-    remember("snooze");
-    setMode(null);
-  };
-
-  const install = async () => {
-    if (!deferred) return;
-    await deferred.prompt();
-    const { outcome } = await deferred.userChoice;
-    remember(outcome === "accepted" ? "installed" : "snooze");
-    setDeferred(null);
-    setMode(null);
+  const onInstall = async () => {
+    await promptInstall();
+    setShow(false);
   };
 
   return (
@@ -108,8 +56,8 @@ export function InstallPrompt() {
     >
       <button
         type="button"
-        onClick={dismiss}
-        aria-label="Agora não"
+        onClick={() => setShow(false)}
+        aria-label="Fechar"
         className="absolute right-2 top-2 grid size-7 place-items-center rounded-full text-ink-400 transition-colors hover:bg-ink-100 hover:text-ink-600"
       >
         <X className="size-4" />
@@ -121,7 +69,7 @@ export function InstallPrompt() {
         </div>
         <div className="min-w-0">
           <p className="text-sm font-bold text-ink-900">Tenha o Resultadismo na tela inicial</p>
-          {mode === "android" ? (
+          {state === "installable" ? (
             <p className="mt-0.5 text-xs text-ink-500">
               Instale o app pra abrir num toque e receber os lembretes dos seus palpites.
             </p>
@@ -139,12 +87,12 @@ export function InstallPrompt() {
         </div>
       </div>
 
-      {mode === "android" && (
+      {state === "installable" && (
         <div className="mt-3 flex items-center justify-end gap-2">
-          <Button variant="ghost" size="sm" onClick={dismiss}>
+          <Button variant="ghost" size="sm" onClick={() => setShow(false)}>
             Agora não
           </Button>
-          <Button size="sm" onClick={install}>
+          <Button size="sm" onClick={onInstall}>
             <Download className="size-4" /> Instalar app
           </Button>
         </div>

@@ -41,3 +41,40 @@ export async function subscribePush(userId: string): Promise<{ ok: boolean; erro
   if (error) return { ok: false, error: error.message };
   return { ok: true };
 }
+
+export type PushState = {
+  supported: boolean;
+  permission: NotificationPermission;
+  subscribed: boolean;
+};
+
+/** Estado atual das notificações neste navegador/dispositivo. */
+export async function getPushState(): Promise<PushState> {
+  const supported = pushConfigured() && "serviceWorker" in navigator && "Notification" in window;
+  if (!supported) return { supported: false, permission: "denied", subscribed: false };
+  let subscribed = false;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    subscribed = !!(await reg.pushManager.getSubscription());
+  } catch {
+    /* ignore */
+  }
+  return { supported: true, permission: Notification.permission, subscribed };
+}
+
+/** Cancela a inscrição neste dispositivo e remove do banco. */
+export async function unsubscribePush(): Promise<{ ok: boolean; error?: string }> {
+  try {
+    if (!("serviceWorker" in navigator)) return { ok: true };
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      const endpoint = sub.endpoint;
+      await sub.unsubscribe();
+      await supabase.from("push_subscriptions").delete().eq("endpoint", endpoint);
+    }
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Erro ao desativar." };
+  }
+}

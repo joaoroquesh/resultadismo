@@ -20,6 +20,14 @@
       rel="stylesheet"
     />
     <title>Resultadismo</title>
+    <script>
+      // Captura cedo o evento de instalação PWA (Android/Chromium), antes do bundle,
+      // para que a opção de instalar apareça já no primeiro carregamento.
+      window.addEventListener("beforeinstallprompt", function (e) {
+        e.preventDefault();
+        window.__bipEvent = e;
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>
