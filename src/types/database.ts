@@ -445,12 +445,54 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          data: Json
+          id: string
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          data?: Json
+          id?: string
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          data?: Json
+          id?: string
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       predictions: {
         Row: {
           away_pred: number
           created_at: string
           home_pred: number
           id: string
+          is_joker: boolean
           match_id: string
           points: number | null
           score_type: Database["public"]["Enums"]["score_type"] | null
@@ -463,6 +505,7 @@ export type Database = {
           created_at?: string
           home_pred: number
           id?: string
+          is_joker?: boolean
           match_id: string
           points?: number | null
           score_type?: Database["public"]["Enums"]["score_type"] | null
@@ -475,6 +518,7 @@ export type Database = {
           created_at?: string
           home_pred?: number
           id?: string
+          is_joker?: boolean
           match_id?: string
           points?: number | null
           score_type?: Database["public"]["Enums"]["score_type"] | null
@@ -531,6 +575,44 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       teams: {
         Row: {
@@ -665,6 +747,10 @@ export type Database = {
         }
       }
       match_is_locked: { Args: { p_match_id: string }; Returns: boolean }
+      nudge_member: {
+        Args: { p_league_id: string; p_to_user: string }
+        Returns: undefined
+      }
       reject_league: {
         Args: { p_league_id: string }
         Returns: {

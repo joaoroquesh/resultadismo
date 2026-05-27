@@ -17,16 +17,18 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
 
-      <Route element={<RequireAuth />}>
-        <Route element={<AppShell />}>
-          <Route path="/" element={<JogosPage />} />
+      <Route element={<AppShell />}>
+        {/* público: ver jogos sem login */}
+        <Route path="/" element={<JogosPage />} />
+
+        {/* exige login */}
+        <Route element={<RequireAuth />}>
           <Route path="/ligas" element={<LigasPage />} />
           <Route path="/ligas/nova" element={<NovaLigaPage />} />
           <Route path="/ligas/:slug" element={<LigaDetailPage />} />
           <Route path="/classificacao" element={<Navigate to="/ligas" replace />} />
           <Route path="/perfil" element={<PerfilPage />} />
           <Route path="/perfil/editar" element={<EditarPerfilPage />} />
-
           <Route element={<RequireAdmin />}>
             <Route path="/admin" element={<AdminPage />} />
           </Route>

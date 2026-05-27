@@ -1,18 +1,23 @@
 import { NavLink, Link } from "react-router-dom";
-import { Goal, Shield, User, ShieldCheck } from "lucide-react";
+import { Goal, Shield, User, ShieldCheck, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export function Sidebar() {
-  const { profile, user, isAppAdmin } = useAuth();
+  const { profile, user, isAppAdmin, session } = useAuth();
 
   const items = [
     { to: "/", label: "Jogos", icon: Goal, end: true },
-    { to: "/ligas", label: "Ligas", icon: Shield, end: false },
-    { to: "/perfil", label: "Perfil", icon: User, end: false },
-    ...(isAppAdmin ? [{ to: "/admin", label: "Admin", icon: ShieldCheck, end: false }] : []),
+    ...(session
+      ? [
+          { to: "/ligas", label: "Ligas", icon: Shield, end: false },
+          { to: "/perfil", label: "Perfil", icon: User, end: false },
+          ...(isAppAdmin ? [{ to: "/admin", label: "Admin", icon: ShieldCheck, end: false }] : []),
+        ]
+      : []),
   ];
 
   return (
@@ -45,18 +50,26 @@ export function Sidebar() {
 
       <div className="mt-4 space-y-4">
         <ThemeToggle />
-        <Link
-          to="/perfil"
-          className="flex items-center gap-3 rounded-md p-2 transition-colors hover:bg-ink-100"
-        >
-          <Avatar src={profile?.avatar_url} name={profile?.display_name} size="sm" />
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-ink-900">
-              {profile?.display_name ?? "Jogador"}
-            </p>
-            <p className="truncate text-xs text-ink-400">{user?.email}</p>
-          </div>
-        </Link>
+        {session ? (
+          <Link
+            to="/perfil"
+            className="flex items-center gap-3 rounded-md p-2 transition-colors hover:bg-ink-100"
+          >
+            <Avatar src={profile?.avatar_url} name={profile?.display_name} size="sm" />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-ink-900">
+                {profile?.display_name ?? "Jogador"}
+              </p>
+              <p className="truncate text-xs text-ink-400">{user?.email}</p>
+            </div>
+          </Link>
+        ) : (
+          <Link to="/login">
+            <Button fullWidth>
+              <LogIn className="size-4" /> Entrar
+            </Button>
+          </Link>
+        )}
       </div>
     </aside>
   );

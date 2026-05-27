@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import { Check, Loader2, Lock, ChevronDown, Users } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Check, Loader2, Lock, ChevronDown, Users, Zap } from "lucide-react";
 import { TeamCrest } from "@/components/TeamCrest";
 import { ScorePill } from "@/components/ScorePill";
 import { Avatar } from "@/components/ui/Avatar";
 import { cn } from "@/lib/utils";
 import { formatTime, isLocked } from "@/lib/format";
-import { useSavePrediction, useMatchPredictions } from "./api";
+import { useAuth } from "@/features/auth/AuthProvider";
+import { useSavePrediction, useSetJoker, useMatchPredictions } from "./api";
 import type { MatchWithTeams, Prediction, ScoreType } from "@/lib/types";
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 
-// estilo da caixa de placar conforme o estado
 const scoreBoxByType: Record<ScoreType, string> = {
   cravada: "bg-gold-500 text-gold-950 border-gold-500",
   saldo: "bg-grass-600 text-white border-grass-600",
@@ -25,14 +26,17 @@ export function MatchCard({
   match: MatchWithTeams;
   prediction: Prediction | null;
 }) {
+  const { session } = useAuth();
   const finished = match.status === "finished";
   const live = match.status === "live";
   const locked = match.status !== "scheduled" || isLocked(match.kickoff_at);
-  const open = !locked;
-  const pending = open && !prediction;
+  const canEdit = !locked && !!session;
+  const pending = canEdit && !prediction;
   const hasResult = match.home_score != null && match.away_score != null;
+  const isJoker = prediction?.is_joker ?? false;
 
   const save = useSavePrediction();
+  const joker = useSetJoker();
   const [home, setHome] = useState(prediction ? String(prediction.home_pred) : "");
   const [away, setAway] = useState(prediction ? String(prediction.away_pred) : "");
   const [saveState, setSaveState] = useState<SaveState>("idle");
@@ -40,7 +44,7 @@ export function MatchCard({
   const firstRender = useRef(true);
 
   useEffect(() => {
-    if (locked) return;
+    if (!canEdit) return;
     if (firstRender.current) {
       firstRender.current = false;
       return;
@@ -71,10 +75,11 @@ export function MatchCard({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-lg ring-1 transition",
+        "animate-rise overflow-hidden rounded-lg ring-1 transition-shadow",
         finished ? "bg-ink-100 ring-border" : "bg-surface ring-border shadow-[var(--shadow-soft)]",
         live && "ring-2 ring-flame-400",
         pending && "ring-2 ring-gold-300",
+        isJoker && !pending && "ring-2 ring-gold-400",
       )}
     >
       {/* label */}
@@ -89,8 +94,13 @@ export function MatchCard({
         <span className="text-ink-300">·</span>
         <span className="truncate">{match.competition?.name ?? match.round}</span>
         {match.group_name && (
-          <span className="rounded-pill border border-ink-200 px-1.5 py-0 text-[10px] text-ink-400">
+          <span className="rounded-pill border border-border px-1.5 py-0 text-[10px] text-ink-400">
             {match.group_name}
+          </span>
+        )}
+        {isJoker && (
+          <span className="ml-auto flex items-center gap-0.5 rounded-pill bg-gold-500 px-1.5 py-0 text-[10px] font-bold text-gold-950">
+            <Zap className="size-2.5 fill-gold-950" /> 2×
           </span>
         )}
       </div>
@@ -99,77 +109,84 @@ export function MatchCard({
       <div className="flex items-center justify-center gap-1.5 px-2 py-2.5">
         <TeamSide name={match.home_team?.short_name ?? match.home_team_name} team={match.home_team} align="right" />
         <div className="flex items-center gap-1.5">
-          <ScoreBox
-            value={home}
-            onChange={setHome}
-            editable={open}
-            scoreType={scoreType}
-            live={live}
-            locked={locked && !finished}
-          />
+          <ScoreBox value={home} onChange={setHome} editable={canEdit} scoreType={scoreType} live={live} />
           <span className="text-sm font-bold text-ink-300">×</span>
-          <ScoreBox
-            value={away}
-            onChange={setAway}
-            editable={open}
-            scoreType={scoreType}
-            live={live}
-            locked={locked && !finished}
-          />
+          <ScoreBox value={away} onChange={setAway} editable={canEdit} scoreType={scoreType} live={live} />
         </div>
         <TeamSide name={match.away_team?.short_name ?? match.away_team_name} team={match.away_team} align="left" />
       </div>
 
       {/* resultado real */}
       {(finished || (live && hasResult)) && (
-        <div className="flex items-center justify-center gap-2 border-t border-ink-200/60 py-1.5 text-xs">
+        <div className="flex items-center justify-center gap-2 border-t border-border py-1.5 text-xs">
           <span className="text-ink-400">Resultado</span>
           <span className={cn("font-extrabold tabular-nums", live ? "text-flame-600" : "text-ink-800")}>
             {match.home_score} × {match.away_score}
           </span>
-          {finished && scoreType && <ScorePill type={scoreType} withLabel />}
+          {finished && scoreType && <ScorePill type={scoreType} withLabel doubled={isJoker} />}
         </div>
       )}
 
-      {/* rodapé do palpite (aberto) */}
-      {open && (
-        <div className="flex h-7 items-center justify-center gap-1 border-t border-ink-100 text-[11px] font-medium">
-          {saveState === "saving" && (
-            <span className="flex items-center gap-1 text-ink-400">
-              <Loader2 className="size-3 animate-spin" /> salvando…
-            </span>
+      {/* footer: ações de palpite */}
+      {canEdit ? (
+        <div className="flex h-9 items-center justify-between gap-2 border-t border-border px-3 text-[11px] font-medium">
+          <span className="flex items-center gap-1">
+            {saveState === "saving" && (
+              <span className="flex items-center gap-1 text-ink-400">
+                <Loader2 className="size-3 animate-spin" /> salvando…
+              </span>
+            )}
+            {saveState === "saved" && (
+              <span className="flex items-center gap-1 text-grass-600">
+                <Check className="size-3" /> salvo
+              </span>
+            )}
+            {saveState === "error" && <span className="text-flame-600">erro</span>}
+            {saveState === "idle" &&
+              (pending ? (
+                <span className="text-gold-700">faça seu palpite</span>
+              ) : (
+                <span className="text-ink-400">palpite salvo</span>
+              ))}
+          </span>
+          {prediction && (
+            <button
+              onClick={() => joker.mutate({ matchId: match.id, value: !isJoker })}
+              className={cn(
+                "flex items-center gap-1 rounded-pill px-2 py-1 text-[11px] font-bold transition-colors",
+                isJoker
+                  ? "bg-gold-500 text-gold-950"
+                  : "text-ink-400 hover:bg-ink-100 hover:text-gold-700",
+              )}
+              aria-pressed={isJoker}
+              aria-label="Dobrar pontos (Joker 2x)"
+            >
+              <Zap className={cn("size-3.5", isJoker && "fill-gold-950")} /> 2×
+            </button>
           )}
-          {saveState === "saved" && (
-            <span className="flex items-center gap-1 text-gold-700">
-              <Check className="size-3" /> salvo
-            </span>
-          )}
-          {saveState === "error" && <span className="text-flame-600">erro ao salvar</span>}
-          {saveState === "idle" &&
-            (pending ? (
-              <span className="text-gold-700">faça seu palpite</span>
-            ) : (
-              <span className="text-ink-400">palpite salvo</span>
-            ))}
         </div>
-      )}
-
-      {/* sem palpite + travado */}
-      {locked && !prediction && (
-        <div className="flex h-7 items-center justify-center gap-1 border-t border-ink-200/60 text-[11px] text-ink-400">
+      ) : !session && !finished && !live ? (
+        <Link
+          to="/login"
+          className="flex h-9 items-center justify-center gap-1.5 border-t border-border text-[11px] font-semibold text-brand-600 transition-colors hover:bg-ink-50"
+        >
+          Entrar para palpitar
+        </Link>
+      ) : locked && session && !prediction ? (
+        <div className="flex h-8 items-center justify-center gap-1 border-t border-border text-[11px] text-ink-400">
           <Lock className="size-3" /> você não palpitou
         </div>
-      )}
+      ) : null}
 
-      {/* palpites da galera (após kickoff) */}
+      {/* palpites da galera */}
       {locked && (
         <>
           <button
             onClick={() => setShowGalera((v) => !v)}
-            className="flex w-full items-center justify-center gap-1.5 border-t border-ink-200/60 py-1.5 text-[11px] font-semibold text-ink-500 transition hover:bg-ink-50"
+            className="flex w-full items-center justify-center gap-1.5 border-t border-border py-1.5 text-[11px] font-semibold text-ink-500 transition-colors hover:bg-ink-50"
           >
             <Users className="size-3.5" /> Palpites da galera
-            <ChevronDown className={cn("size-3.5 transition", showGalera && "rotate-180")} />
+            <ChevronDown className={cn("size-3.5 transition-transform", showGalera && "rotate-180")} />
           </button>
           {showGalera && <Galera matchId={match.id} finished={finished} />}
         </>
@@ -194,8 +211,8 @@ function TeamSide({
         align === "right" ? "flex-row-reverse text-right" : "text-left",
       )}
     >
-      <TeamCrest team={team} name={name} size={26} />
-      <span className="line-clamp-2 text-[11px] font-semibold leading-tight text-ink-800">{name}</span>
+      <TeamCrest team={team} name={name} size={28} />
+      <span className="line-clamp-2 text-xs font-semibold leading-tight text-ink-800">{name}</span>
     </div>
   );
 }
@@ -206,17 +223,14 @@ function ScoreBox({
   editable,
   scoreType,
   live,
-  locked,
 }: {
   value: string;
   onChange: (v: string) => void;
   editable: boolean;
   scoreType: ScoreType | null;
   live: boolean;
-  locked: boolean;
 }) {
-  const base =
-    "relative flex size-9 items-center justify-center rounded-md border text-lg font-bold tabular-nums";
+  const base = "relative flex size-10 items-center justify-center rounded-md border text-xl font-bold tabular-nums";
 
   if (editable) {
     const empty = value === "";
@@ -232,14 +246,13 @@ function ScoreBox({
         placeholder="–"
         className={cn(
           base,
-          "outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20",
-          empty ? "border-ink-200 bg-surface text-ink-950" : "border-brand-500 bg-surface text-ink-950",
+          "bg-surface text-ink-950 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20",
+          empty ? "border-border" : "border-brand-500",
         )}
       />
     );
   }
 
-  // travado (mostra o palpite)
   const display = value === "" ? "–" : value;
   return (
     <span
@@ -249,22 +262,10 @@ function ScoreBox({
           ? scoreBoxByType[scoreType]
           : live
             ? "border-ink-300 bg-transparent text-ink-500"
-            : "border-ink-200 bg-ink-200/40 text-ink-500",
+            : "border-border bg-ink-200/40 text-ink-500",
       )}
     >
       {display}
-      {scoreType && scoreType !== "erro" && (
-        <span
-          className={cn(
-            "absolute -right-1.5 -top-1.5 rounded-full px-1 text-[9px] font-bold leading-tight",
-            scoreType === "cravada" && "bg-gold-600 text-white",
-            scoreType === "saldo" && "bg-grass-700 text-white",
-            scoreType === "acerto" && "bg-aqua-900 text-white",
-          )}
-        >
-          +{scoreType === "cravada" ? 3 : scoreType === "saldo" ? 2 : 1}
-        </span>
-      )}
     </span>
   );
 }
@@ -272,14 +273,12 @@ function ScoreBox({
 function Galera({ matchId, finished }: { matchId: string; finished: boolean }) {
   const { data, isLoading } = useMatchPredictions(matchId, true);
 
-  if (isLoading) {
-    return <div className="px-3 py-3 text-center text-xs text-ink-400">carregando…</div>;
-  }
-  if (!data || data.length === 0) {
+  if (isLoading) return <div className="px-3 py-3 text-center text-xs text-ink-400">carregando…</div>;
+  if (!data || data.length === 0)
     return <div className="px-3 py-3 text-center text-xs text-ink-400">ninguém palpitou ainda</div>;
-  }
+
   return (
-    <ul className="divide-y divide-ink-100 bg-surface/60 px-1 py-1">
+    <ul className="divide-y divide-border bg-surface/60 px-1 py-1">
       {data.map((p, i) => (
         <li key={p.user?.id ?? i} className="flex items-center gap-2 px-2.5 py-1.5">
           <Avatar src={p.user?.avatar_url} name={p.user?.display_name} size="xs" />

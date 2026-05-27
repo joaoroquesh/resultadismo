@@ -1,3 +1,4 @@
+import { Zap } from "lucide-react";
 import type { ScoreType } from "@/lib/types";
 import { SCORE_POINTS, SCORE_LABEL } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -9,17 +10,19 @@ const styles: Record<ScoreType, string> = {
   erro: "bg-ink-200 text-ink-500",
 };
 
-/** Selo +3/+2/+1 colorido pelo tipo de acerto. */
+/** Selo +3/+2/+1 colorido pelo tipo de acerto. `doubled` aplica o Joker (2×). */
 export function ScorePill({
   type,
   withLabel = false,
+  doubled = false,
   className,
 }: {
   type: ScoreType;
   withLabel?: boolean;
+  doubled?: boolean;
   className?: string;
 }) {
-  const pts = SCORE_POINTS[type];
+  const pts = SCORE_POINTS[type] * (doubled ? 2 : 1);
   return (
     <span
       className={cn(
@@ -30,6 +33,7 @@ export function ScorePill({
     >
       {type === "erro" ? "0" : `+${pts}`}
       {withLabel && <span className="font-semibold">{SCORE_LABEL[type]}</span>}
+      {doubled && type !== "erro" && <Zap className="size-3 fill-current" />}
     </span>
   );
 }

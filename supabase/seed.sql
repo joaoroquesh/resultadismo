@@ -123,5 +123,8 @@ begin
     (u_luan, m_a, 0, 2),
     (u_luan, m_b, 2, 2),
     (u_luan, m_c, 1, 0);
+
+  -- João usou o Joker (2x) na cravada de Brasil x Argentina → +6 em vez de +3
+  update public.predictions set is_joker = true where user_id = u_joao and match_id = m_a;
 end;
 $$;

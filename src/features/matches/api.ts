@@ -93,6 +93,22 @@ export function useSavePrediction() {
   });
 }
 
+export function useSetJoker() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { matchId: string; value: boolean }) => {
+      const { error } = await supabase
+        .from("predictions")
+        .update({ is_joker: input.value })
+        .eq("user_id", user!.id)
+        .eq("match_id", input.matchId);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-predictions"] }),
+  });
+}
+
 export type MatchPrediction = {
   home_pred: number;
   away_pred: number;

@@ -1,14 +1,22 @@
 import { NavLink } from "react-router-dom";
-import { Goal, Shield, User } from "lucide-react";
+import { Goal, Shield, User, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const items = [
-  { to: "/", label: "Jogos", icon: Goal, end: true },
-  { to: "/ligas", label: "Ligas", icon: Shield, end: false },
-  { to: "/perfil", label: "Perfil", icon: User, end: false },
-];
+import { useAuth } from "@/features/auth/AuthProvider";
 
 export function BottomNav() {
+  const { session } = useAuth();
+
+  const items = session
+    ? [
+        { to: "/", label: "Jogos", icon: Goal, end: true },
+        { to: "/ligas", label: "Ligas", icon: Shield, end: false },
+        { to: "/perfil", label: "Perfil", icon: User, end: false },
+      ]
+    : [
+        { to: "/", label: "Jogos", icon: Goal, end: true },
+        { to: "/login", label: "Entrar", icon: LogIn, end: false },
+      ];
+
   return (
     <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/90 backdrop-blur-md lg:hidden">
       <div className="mx-auto flex max-w-2xl items-stretch justify-around">
