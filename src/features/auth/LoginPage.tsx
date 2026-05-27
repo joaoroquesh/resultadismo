@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
 import { useToast } from "@/components/ui/Toast";
 import { Button } from "@/components/ui/Button";
@@ -84,8 +84,16 @@ export function LoginPage() {
           )}
         </div>
 
-        <p className="mt-6 text-center text-xs text-ink-400">
-          Ao continuar, você concorda com as regras da diversão. ⚽
+        <p className="mt-6 text-center text-xs leading-relaxed text-ink-400">
+          Ao continuar, você concorda com os{" "}
+          <Link to="/termos" className="font-medium text-brand-600 hover:text-brand-700">
+            Termos de Serviço
+          </Link>{" "}
+          e a{" "}
+          <Link to="/privacidade" className="font-medium text-brand-600 hover:text-brand-700">
+            Política de Privacidade
+          </Link>
+          .
         </p>
       </div>
     </div>

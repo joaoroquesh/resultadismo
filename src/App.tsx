@@ -13,6 +13,8 @@ import { AdminPage } from "@/features/admin/AdminPage";
 import { PlayerProfilePage } from "@/features/players/PlayerProfilePage";
 import { ComoFuncionaPage } from "@/features/help/ComoFuncionaPage";
 import { Onboarding } from "@/features/onboarding/Onboarding";
+import { PrivacidadePage } from "@/features/legal/PrivacidadePage";
+import { TermosPage } from "@/features/legal/TermosPage";
 
 export default function App() {
   return (
@@ -21,6 +23,10 @@ export default function App() {
       <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
+
+      {/* públicas e sempre acessíveis (Google exige links públicos) */}
+      <Route path="/privacidade" element={<PrivacidadePage />} />
+      <Route path="/termos" element={<TermosPage />} />
 
       <Route element={<AppShell />}>
         {/* público: ver jogos sem login */}
