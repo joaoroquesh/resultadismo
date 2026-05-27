@@ -5,6 +5,7 @@ import { useAuth } from "@/features/auth/AuthProvider";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { NotificationsBell } from "@/features/notifications/NotificationsBell";
 
 export function Sidebar() {
   const { profile, user, isAppAdmin, session } = useAuth();
@@ -22,10 +23,13 @@ export function Sidebar() {
 
   return (
     <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-border bg-surface-2 px-4 py-6 lg:flex">
-      <Link to="/" className="mb-8 flex items-center gap-2.5 px-2">
-        <img src="/brand/Resultadismo.svg" alt="" className="size-8" />
-        <span className="text-lg font-extrabold tracking-tight text-ink-950">Resultadismo</span>
-      </Link>
+      <div className="mb-8 flex items-center justify-between px-2">
+        <Link to="/" className="flex items-center gap-2.5">
+          <img src="/brand/Resultadismo.svg" alt="" className="size-8" />
+          <span className="text-lg font-extrabold tracking-tight text-ink-950">Resultadismo</span>
+        </Link>
+        {session && <NotificationsBell />}
+      </div>
 
       <nav className="flex flex-1 flex-col gap-1">
         {items.map(({ to, label, icon: Icon, end }) => (

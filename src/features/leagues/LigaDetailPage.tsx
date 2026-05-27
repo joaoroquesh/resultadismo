@@ -5,12 +5,13 @@ import {
   Copy,
   Clock,
   Check,
-  UserPlus,
+  Hand,
   Trash2,
   ShieldCheck,
   Plus,
   LogOut,
 } from "lucide-react";
+import { useNudge } from "@/features/notifications/api";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -220,6 +221,7 @@ function ClassificacaoTab({
 }
 
 function MembrosTab({
+  leagueId,
   members,
   isAdmin,
 }: {
@@ -229,8 +231,20 @@ function MembrosTab({
 }) {
   const update = useUpdateMember();
   const remove = useRemoveMember();
+  const nudge = useNudge();
+  const { user } = useAuth();
   const { toast } = useToast();
   const list = members ?? [];
+
+  function cutucar(toUser: string) {
+    nudge.mutate(
+      { leagueId, toUser },
+      {
+        onSuccess: () => toast("Cutucada enviada! 👉", "success"),
+        onError: (e) => toast(e instanceof Error ? e.message : "Erro", "error"),
+      },
+    );
+  }
 
   return (
     <ul className="space-y-2">
@@ -246,6 +260,16 @@ function MembrosTab({
               {m.status === "pending" && <Badge tone="gold">pendente</Badge>}
             </div>
           </div>
+          {m.status === "active" && m.profile?.id !== user?.id && (
+            <Button
+              size="icon"
+              variant="ghost"
+              aria-label="Cutucar"
+              onClick={() => cutucar(m.profile!.id)}
+            >
+              <Hand className="size-4 text-gold-600" />
+            </Button>
+          )}
           {isAdmin && m.role !== "owner" && (
             <div className="flex gap-1">
               {m.status === "pending" && (

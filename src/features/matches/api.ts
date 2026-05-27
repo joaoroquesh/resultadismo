@@ -142,7 +142,7 @@ export function useMatchesRealtime(competitionId: string | undefined) {
   useEffect(() => {
     if (!competitionId) return;
     const channel = supabase
-      .channel(`matches-${competitionId}`)
+      .channel(`matches-${competitionId}-${Math.random().toString(36).slice(2)}`)
       .on(
         "postgres_changes",
         {

@@ -1,0 +1,78 @@
+import { useEffect } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/features/auth/AuthProvider";
+
+export type Notification = {
+  id: string;
+  type: string;
+  title: string;
+  body: string | null;
+  data: Record<string, unknown>;
+  read_at: string | null;
+  created_at: string;
+};
+
+export function useNotifications() {
+  const { user } = useAuth();
+  return useQuery({
+    enabled: !!user,
+    queryKey: ["notifications", user?.id],
+    queryFn: async (): Promise<Notification[]> => {
+      const { data, error } = await supabase
+        .from("notifications")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(30);
+      if (error) throw error;
+      return (data ?? []) as unknown as Notification[];
+    },
+  });
+}
+
+export function useMarkAllRead() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("notifications")
+        .update({ read_at: new Date().toISOString() })
+        .is("read_at", null);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["notifications", user?.id] }),
+  });
+}
+
+export function useNudge() {
+  return useMutation({
+    mutationFn: async (input: { leagueId: string; toUser: string }) => {
+      const { error } = await supabase.rpc("nudge_member", {
+        p_league_id: input.leagueId,
+        p_to_user: input.toUser,
+      });
+      if (error) throw error;
+    },
+  });
+}
+
+/** Assina novas notificações em tempo real (cutucadas chegam na hora). */
+export function useNotificationsRealtime() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel(`notifications-${user.id}-${Math.random().toString(36).slice(2)}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+        () => qc.invalidateQueries({ queryKey: ["notifications", user.id] }),
+      )
+      .subscribe();
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [user, qc]);
+}

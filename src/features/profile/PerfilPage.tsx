@@ -7,9 +7,20 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { usePlayerStats } from "./stats";
+
+function Stat({ value, label, accent }: { value: string | number; label: string; accent?: string }) {
+  return (
+    <div className="rounded-md bg-surface-2 p-3 text-center">
+      <p className={`text-2xl font-extrabold tabular-nums ${accent ?? "text-ink-950"}`}>{value}</p>
+      <p className="mt-0.5 text-[11px] font-medium text-ink-500">{label}</p>
+    </div>
+  );
+}
 
 export function PerfilPage() {
   const { profile, user, isAppAdmin, signOut } = useAuth();
+  const { data: stats } = usePlayerStats();
 
   return (
     <Page title="Perfil">
@@ -34,7 +45,23 @@ export function PerfilPage() {
           </Link>
         </Card>
 
-        <Card className="divide-y divide-ink-100">
+        {stats && stats.jogos > 0 && (
+          <div>
+            <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wide text-ink-400">
+              Suas estatísticas
+            </h3>
+            <div className="grid grid-cols-3 gap-2">
+              <Stat value={stats.pontos} label="Pontos" accent="text-brand-600" />
+              <Stat value={stats.cravadas} label="Cravadas" accent="text-gold-600" />
+              <Stat value={`${stats.aproveitamento}%`} label="Aproveitamento" />
+              <Stat value={`${stats.acertividade}%`} label="Acertividade" />
+              <Stat value={stats.melhorSequencia} label="Sequência" accent="text-grass-600" />
+              <Stat value={stats.jogos} label="Jogos" />
+            </div>
+          </div>
+        )}
+
+        <Card className="divide-y divide-border">
           {isAppAdmin && (
             <Link
               to="/admin"
