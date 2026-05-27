@@ -1,10 +1,14 @@
 import { Outlet } from "react-router-dom";
 import { BottomNav } from "./BottomNav";
+import { Sidebar } from "./Sidebar";
 
 export function AppShell() {
   return (
-    <div className="relative mx-auto min-h-dvh max-w-md bg-background shadow-sm sm:my-0">
-      <Outlet />
+    <div className="min-h-dvh lg:flex">
+      <Sidebar />
+      <div className="min-w-0 flex-1">
+        <Outlet />
+      </div>
       <BottomNav />
     </div>
   );

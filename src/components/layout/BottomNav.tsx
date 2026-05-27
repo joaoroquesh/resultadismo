@@ -10,8 +10,8 @@ const items = [
 
 export function BottomNav() {
   return (
-    <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-ink-200/70 bg-surface/95 backdrop-blur">
-      <div className="mx-auto flex max-w-md items-stretch justify-around">
+    <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/90 backdrop-blur-md lg:hidden">
+      <div className="mx-auto flex max-w-2xl items-stretch justify-around">
         {items.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
