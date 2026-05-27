@@ -69,6 +69,8 @@ export function usePlayerStats() {
 
       const jogos = rows.length;
       const acertou = cravadas + saldos + acertos;
+      // Máximo possível conta o Joker: jogo com Joker vale até 6, não 3.
+      const maxPossivel = 3 * (jogos + jokers);
       return {
         jogos,
         pontos,
@@ -77,7 +79,7 @@ export function usePlayerStats() {
         acertos,
         erros,
         jokers,
-        aproveitamento: jogos ? Math.round((pontos / (3 * jogos)) * 1000) / 10 : 0,
+        aproveitamento: maxPossivel ? Math.round((pontos / maxPossivel) * 1000) / 10 : 0,
         acertividade: jogos ? Math.round((acertou / jogos) * 1000) / 10 : 0,
         melhorSequencia,
       };
