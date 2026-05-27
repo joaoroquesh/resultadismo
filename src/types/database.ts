@@ -43,6 +43,7 @@ export type Database = {
           id: string
           is_featured: boolean
           last_synced_at: string | null
+          jokers_per_week: number
           max_jokers: number
           name: string
           provider: Database["public"]["Enums"]["data_provider"]
@@ -65,6 +66,7 @@ export type Database = {
           id?: string
           is_featured?: boolean
           last_synced_at?: string | null
+          jokers_per_week?: number
           max_jokers?: number
           name: string
           provider?: Database["public"]["Enums"]["data_provider"]
@@ -87,6 +89,7 @@ export type Database = {
           id?: string
           is_featured?: boolean
           last_synced_at?: string | null
+          jokers_per_week?: number
           max_jokers?: number
           name?: string
           provider?: Database["public"]["Enums"]["data_provider"]

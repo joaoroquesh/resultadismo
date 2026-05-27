@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/features/auth/AuthProvider";
 import type { Competition, MatchWithTeams, Prediction } from "@/lib/types";
@@ -10,6 +10,8 @@ const MATCH_SELECT =
 export function useCompetitions() {
   return useQuery({
     queryKey: ["competitions"],
+    staleTime: 5 * 60_000,
+    placeholderData: keepPreviousData,
     queryFn: async (): Promise<Competition[]> => {
       const { data, error } = await supabase
         .from("competitions")
@@ -27,6 +29,8 @@ export function useMatches(competitionId: string | undefined) {
   return useQuery({
     enabled: !!competitionId,
     queryKey: ["matches", competitionId],
+    staleTime: 30_000,
+    placeholderData: keepPreviousData,
     queryFn: async (): Promise<MatchWithTeams[]> => {
       const { data, error } = await supabase
         .from("matches")
@@ -44,23 +48,21 @@ export function useMyPredictions(competitionId: string | undefined) {
   return useQuery({
     enabled: !!competitionId && !!user,
     queryKey: ["my-predictions", competitionId, user?.id],
+    staleTime: 30_000,
+    placeholderData: keepPreviousData,
     queryFn: async (): Promise<Map<string, Prediction>> => {
-      const { data: matchRows, error: mErr } = await supabase
-        .from("matches")
-        .select("id")
-        .eq("competition_id", competitionId!);
-      if (mErr) throw mErr;
-      const ids = (matchRows ?? []).map((m) => m.id);
-      if (ids.length === 0) return new Map();
-
+      // 1 ida ao banco: palpites do usuário cujo jogo é desta competição.
       const { data, error } = await supabase
         .from("predictions")
-        .select("*")
+        .select("*, matches!inner(competition_id)")
         .eq("user_id", user!.id)
-        .in("match_id", ids);
+        .eq("matches.competition_id", competitionId!);
       if (error) throw error;
       const map = new Map<string, Prediction>();
-      for (const p of data ?? []) map.set(p.match_id, p);
+      for (const row of data ?? []) {
+        const { matches: _m, ...pred } = row as Prediction & { matches: unknown };
+        map.set(pred.match_id, pred as Prediction);
+      }
       return map;
     },
   });

@@ -183,7 +183,7 @@ export function MatchCard({
               aria-label="Dobrar pontos (2x)"
               title={
                 !isJoker && jokersUsed >= maxJokers
-                  ? "Você já usou todos os dobros"
+                  ? "Você já usou seus dobros desta semana"
                   : "Dobrar os pontos deste jogo"
               }
             >

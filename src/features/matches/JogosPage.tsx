@@ -12,6 +12,14 @@ import { useCompetitions, useMatches, useMyPredictions, useMatchesRealtime } fro
 
 const dayKey = (iso: string | null) => (iso ? dayjs(iso).format("YYYY-MM-DD") : "sem-data");
 
+// segunda-feira (âncora da semana seg–dom) do dia, no formato YYYY-MM-DD
+const weekKey = (iso: string | null) => {
+  if (!iso) return "sem-data";
+  const d = dayjs(iso);
+  const dow = (d.day() + 6) % 7; // 0=seg … 6=dom
+  return d.subtract(dow, "day").format("YYYY-MM-DD");
+};
+
 export function JogosPage() {
   const { data: competitions, isLoading: loadingComps } = useCompetitions();
   const [compId, setCompId] = useState<string | null>(null);
@@ -71,14 +79,18 @@ export function JogosPage() {
     return sum;
   }, [predMap]);
 
-  const maxJokers = competitions?.find((c) => c.id === selectedId)?.max_jokers ?? 3;
-  const jokersUsed = useMemo(() => {
+  const maxJokers = competitions?.find((c) => c.id === selectedId)?.jokers_per_week ?? 2;
+  // dobros usados na semana (seg–dom) do dia selecionado
+  const jokersUsedThisWeek = useMemo(() => {
+    if (!matches || !day) return 0;
+    const wk = weekKey(day);
     let n = 0;
-    predMap?.forEach((p) => {
-      if (p.is_joker) n++;
-    });
+    for (const m of matches) {
+      if (weekKey(m.kickoff_at) !== wk) continue;
+      if (predMap?.get(m.id)?.is_joker) n++;
+    }
     return n;
-  }, [predMap]);
+  }, [matches, day, predMap]);
 
   return (
     <Page
@@ -151,7 +163,7 @@ export function JogosPage() {
             </span>
           )}
           <span className="inline-flex items-center gap-1 rounded-pill bg-gold-100 px-2 py-0.5 font-semibold text-gold-800">
-            <Zap className="size-3 fill-gold-700" /> {jokersUsed}/{maxJokers} dobros usados
+            <Zap className="size-3 fill-gold-700" /> {jokersUsedThisWeek}/{maxJokers} dobros nesta semana
           </span>
         </div>
       )}
@@ -175,7 +187,7 @@ export function JogosPage() {
               key={m.id}
               match={m}
               prediction={predMap?.get(m.id) ?? null}
-              jokersUsed={jokersUsed}
+              jokersUsed={jokersUsedThisWeek}
               maxJokers={maxJokers}
             />
           ))}
