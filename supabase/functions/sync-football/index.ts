@@ -66,7 +66,7 @@ const TEAM_PT: Record<string, { name: string; short?: string }> = {
   COL: { name: "Colômbia" },
   COD: { name: "Congo (RD)", short: "Congo RD" },
   CRO: { name: "Croácia" },
-  CUW: { name: "Curaçao" },
+  CUR: { name: "Curaçao" },
   CZE: { name: "Tchéquia" },
   ECU: { name: "Equador" },
   EGY: { name: "Egito" },
