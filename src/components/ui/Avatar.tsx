@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { cn, initials } from "@/lib/utils";
-import { parseGenAvatar, shapeStyle, avatarColorHex } from "@/lib/avatar";
+import { parseGenAvatar, shapeStyle, avatarBackground, avatarTextColor } from "@/lib/avatar";
 
 type Size = "xs" | "sm" | "md" | "lg" | "xl";
 
@@ -26,14 +26,19 @@ export function Avatar({
   const [errored, setErrored] = useState(false);
   const gen = parseGenAvatar(src);
 
-  // Avatar gerado (forma + cor + inicial)
+  // Avatar gerado (forma + cores + inicial)
   if (gen) {
-    const { bg, text } = avatarColorHex(gen.color);
+    const multi = gen.colors.length > 1;
     const initial = (name?.trim()?.[0] ?? "?").toUpperCase();
     return (
       <span
         className={cn("inline-flex shrink-0 items-center justify-center font-bold", sizes[size], className)}
-        style={{ background: bg, color: text, ...shapeStyle(gen.shape) }}
+        style={{
+          background: avatarBackground(gen.colors, gen.rotation),
+          color: avatarTextColor(gen.colors),
+          textShadow: multi ? "0 1px 2px rgba(0,0,0,0.35)" : undefined,
+          ...shapeStyle(gen.shape),
+        }}
       >
         {initial}
       </span>

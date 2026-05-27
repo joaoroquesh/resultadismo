@@ -7,6 +7,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { cn } from "@/lib/utils";
 import { formatTime, isLocked, formatDeadline } from "@/lib/format";
 import { useAuth } from "@/features/auth/AuthProvider";
+import { useToast } from "@/components/ui/Toast";
 import { useSavePrediction, useSetJoker, useMatchPredictions } from "./api";
 import type { MatchWithTeams, Prediction, ScoreType } from "@/lib/types";
 
@@ -22,11 +23,16 @@ const scoreBoxByType: Record<ScoreType, string> = {
 export function MatchCard({
   match,
   prediction,
+  jokersUsed = 0,
+  maxJokers = 99,
 }: {
   match: MatchWithTeams;
   prediction: Prediction | null;
+  jokersUsed?: number;
+  maxJokers?: number;
 }) {
   const { session } = useAuth();
+  const { toast } = useToast();
   const finished = match.status === "finished";
   const live = match.status === "live";
   const locked = match.status !== "scheduled" || isLocked(match.kickoff_at);
@@ -160,15 +166,26 @@ export function MatchCard({
           </span>
           {prediction && (
             <button
-              onClick={() => joker.mutate({ matchId: match.id, value: !isJoker })}
+              disabled={!isJoker && jokersUsed >= maxJokers}
+              onClick={() =>
+                joker.mutate(
+                  { matchId: match.id, value: !isJoker },
+                  { onError: (e) => toast(e instanceof Error ? e.message : "Erro no dobro", "error") },
+                )
+              }
               className={cn(
-                "flex items-center gap-1 rounded-pill px-2 py-1 text-[11px] font-bold transition-colors",
+                "flex items-center gap-1 rounded-pill px-2 py-1 text-[11px] font-bold transition-colors disabled:opacity-40",
                 isJoker
                   ? "bg-gold-500 text-gold-950"
                   : "text-ink-400 hover:bg-ink-100 hover:text-gold-700",
               )}
               aria-pressed={isJoker}
-              aria-label="Dobrar pontos (Joker 2x)"
+              aria-label="Dobrar pontos (2x)"
+              title={
+                !isJoker && jokersUsed >= maxJokers
+                  ? "Você já usou todos os dobros"
+                  : "Dobrar os pontos deste jogo"
+              }
             >
               <Zap className={cn("size-3.5", isJoker && "fill-gold-950")} /> 2×
             </button>
@@ -239,7 +256,8 @@ function ScoreBox({
   scoreType: ScoreType | null;
   live: boolean;
 }) {
-  const base = "relative flex size-10 items-center justify-center rounded-md border text-xl font-bold tabular-nums";
+  const base =
+    "relative flex size-10 items-center justify-center rounded-md border text-center text-xl font-bold leading-none tabular-nums";
 
   if (editable) {
     const empty = value === "";
@@ -255,7 +273,7 @@ function ScoreBox({
         placeholder="–"
         className={cn(
           base,
-          "bg-surface text-ink-950 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20",
+          "appearance-none bg-surface p-0 text-ink-950 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20",
           empty ? "border-border" : "border-brand-500",
         )}
       />

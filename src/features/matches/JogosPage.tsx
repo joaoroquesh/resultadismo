@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CalendarClock, Trophy } from "lucide-react";
+import { CalendarClock, Trophy, Zap } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -58,7 +58,7 @@ export function JogosPage() {
     let sum = 0;
     for (const m of dayMatches) {
       const p = predMap?.get(m.id);
-      if (p?.points != null) sum += p.points;
+      if (p?.points != null) sum += p.points * (p.is_joker ? 2 : 1);
     }
     return sum;
   }, [dayMatches, predMap]);
@@ -66,9 +66,18 @@ export function JogosPage() {
   const totalPoints = useMemo(() => {
     let sum = 0;
     predMap?.forEach((p) => {
-      if (p.points != null) sum += p.points;
+      if (p.points != null) sum += p.points * (p.is_joker ? 2 : 1);
     });
     return sum;
+  }, [predMap]);
+
+  const maxJokers = competitions?.find((c) => c.id === selectedId)?.max_jokers ?? 3;
+  const jokersUsed = useMemo(() => {
+    let n = 0;
+    predMap?.forEach((p) => {
+      if (p.is_joker) n++;
+    });
+    return n;
   }, [predMap]);
 
   return (
@@ -134,10 +143,17 @@ export function JogosPage() {
         </div>
       )}
 
-      {dayPoints > 0 && (
-        <p className="mb-3 text-center text-xs font-medium text-ink-500">
-          Você fez <span className="font-bold text-brand-700">{dayPoints} pts</span> neste dia
-        </p>
+      {predMap && (
+        <div className="mb-3 flex flex-wrap items-center justify-center gap-2 text-xs">
+          {dayPoints > 0 && (
+            <span className="font-medium text-ink-500">
+              Você fez <span className="font-bold text-brand-700">{dayPoints} pts</span> neste dia
+            </span>
+          )}
+          <span className="inline-flex items-center gap-1 rounded-pill bg-gold-100 px-2 py-0.5 font-semibold text-gold-800">
+            <Zap className="size-3 fill-gold-700" /> {jokersUsed}/{maxJokers} dobros usados
+          </span>
+        </div>
       )}
 
       {loadingMatches ? (
@@ -155,7 +171,13 @@ export function JogosPage() {
       ) : (
         <div className="space-y-3">
           {dayMatches.map((m) => (
-            <MatchCard key={m.id} match={m} prediction={predMap?.get(m.id) ?? null} />
+            <MatchCard
+              key={m.id}
+              match={m}
+              prediction={predMap?.get(m.id) ?? null}
+              jokersUsed={jokersUsed}
+              maxJokers={maxJokers}
+            />
           ))}
         </div>
       )}

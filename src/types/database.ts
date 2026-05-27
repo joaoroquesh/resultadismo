@@ -43,6 +43,7 @@ export type Database = {
           id: string
           is_featured: boolean
           last_synced_at: string | null
+          max_jokers: number
           name: string
           provider: Database["public"]["Enums"]["data_provider"]
           provider_code: string | null
@@ -64,6 +65,7 @@ export type Database = {
           id?: string
           is_featured?: boolean
           last_synced_at?: string | null
+          max_jokers?: number
           name: string
           provider?: Database["public"]["Enums"]["data_provider"]
           provider_code?: string | null
@@ -85,6 +87,7 @@ export type Database = {
           id?: string
           is_featured?: boolean
           last_synced_at?: string | null
+          max_jokers?: number
           name?: string
           provider?: Database["public"]["Enums"]["data_provider"]
           provider_code?: string | null
@@ -691,6 +694,7 @@ export type Database = {
         Args: { pa: number; ph: number; ra: number; rh: number }
         Returns: Database["public"]["Enums"]["score_type"]
       }
+      create_deadline_reminders: { Args: never; Returns: number }
       gen_join_code: { Args: never; Returns: string }
       get_league_standings: {
         Args: { p_lc_id: string }

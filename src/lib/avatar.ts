@@ -1,6 +1,5 @@
-// Avatar gerado: forma geométrica + cor + inicial do nome.
-// Codificado no campo avatar_url como "gen:<forma>:<cor>" — assim funciona em
-// qualquer lugar que já renderiza o avatar pela url, sem mudança de schema.
+// Avatar gerado: forma geométrica + 1 a 3 cores (com rotação da divisão) + inicial.
+// Codificado em avatar_url como "gen:<forma>:<cor1-cor2-cor3>:<rotacao>".
 import type { CSSProperties } from "react";
 
 export type AvatarShape = "circle" | "squircle" | "shield" | "hexagon" | "diamond";
@@ -24,6 +23,8 @@ export const AVATAR_COLORS: { key: string; hex: string; dark?: boolean }[] = [
   { key: "grafite", hex: "#3D3D3D" },
 ];
 
+export const AVATAR_ROTATIONS = [0, 45, 90, 135];
+
 export function shapeStyle(shape: AvatarShape): CSSProperties {
   switch (shape) {
     case "squircle":
@@ -40,19 +41,39 @@ export function shapeStyle(shape: AvatarShape): CSSProperties {
   }
 }
 
-export function buildGenAvatar(shape: AvatarShape, color: string): string {
-  return `gen:${shape}:${color}`;
+export type AvatarConfig = { shape: AvatarShape; colors: string[]; rotation: number };
+
+export function buildGenAvatar(shape: AvatarShape, colors: string[], rotation: number): string {
+  return `gen:${shape}:${colors.join("-")}:${rotation}`;
 }
 
-export function parseGenAvatar(
-  src: string | null | undefined,
-): { shape: AvatarShape; color: string } | null {
+export function parseGenAvatar(src: string | null | undefined): AvatarConfig | null {
   if (!src || !src.startsWith("gen:")) return null;
-  const [, shape, color] = src.split(":");
-  return { shape: (shape as AvatarShape) ?? "circle", color: color ?? "turquesa" };
+  const parts = src.split(":");
+  const shape = (parts[1] as AvatarShape) || "circle";
+  const colors = (parts[2] || "turquesa").split("-").filter(Boolean);
+  const rotation = Number.parseInt(parts[3] ?? "0", 10) || 0;
+  return { shape, colors: colors.length ? colors : ["turquesa"], rotation };
 }
 
-export function avatarColorHex(colorKey: string): { bg: string; text: string } {
-  const c = AVATAR_COLORS.find((x) => x.key === colorKey) ?? AVATAR_COLORS[0]!;
-  return { bg: c.hex, text: c.dark ? "#232323" : "#ffffff" };
+function hexOf(key: string): string {
+  return AVATAR_COLORS.find((c) => c.key === key)?.hex ?? AVATAR_COLORS[0]!.hex;
+}
+
+/** background (sólido ou gradiente de divisões) para a config de cores. */
+export function avatarBackground(colors: string[], rotation: number): string {
+  const c = colors.map(hexOf);
+  if (c.length <= 1) return c[0] ?? AVATAR_COLORS[0]!.hex;
+  if (c.length === 2) {
+    return `linear-gradient(${rotation}deg, ${c[0]} 0 50%, ${c[1]} 50% 100%)`;
+  }
+  return `linear-gradient(${rotation}deg, ${c[0]} 0 33.34%, ${c[1]} 33.34% 66.67%, ${c[2]} 66.67% 100%)`;
+}
+
+/** cor do texto: contraste para 1 cor; branco (com sombra) para multicolor. */
+export function avatarTextColor(colors: string[]): string {
+  if (colors.length === 1) {
+    return AVATAR_COLORS.find((x) => x.key === colors[0])?.dark ? "#232323" : "#ffffff";
+  }
+  return "#ffffff";
 }
