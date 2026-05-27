@@ -12,10 +12,13 @@ import { EditarPerfilPage } from "@/features/profile/EditarPerfilPage";
 import { AdminPage } from "@/features/admin/AdminPage";
 import { PlayerProfilePage } from "@/features/players/PlayerProfilePage";
 import { ComoFuncionaPage } from "@/features/help/ComoFuncionaPage";
+import { Onboarding } from "@/features/onboarding/Onboarding";
 
 export default function App() {
   return (
-    <Routes>
+    <>
+      <Onboarding />
+      <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
 
@@ -40,6 +43,7 @@ export default function App() {
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+      </Routes>
+    </>
   );
 }
