@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { useAuth } from "@/features/auth/AuthProvider";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export function PerfilPage() {
   const { profile, user, isAppAdmin, signOut } = useAuth();
@@ -48,6 +49,11 @@ export function PerfilPage() {
             <span className="flex-1 font-medium text-ink-900">Minhas ligas</span>
             <ChevronRight className="size-4 text-ink-400" />
           </Link>
+        </Card>
+
+        <Card className="flex items-center justify-between p-4">
+          <span className="font-medium text-ink-900">Aparência</span>
+          <ThemeToggle />
         </Card>
 
         <Button variant="outline" fullWidth onClick={signOut}>

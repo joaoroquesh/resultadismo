@@ -72,7 +72,7 @@ export function MatchCard({
     <div
       className={cn(
         "overflow-hidden rounded-lg ring-1 transition",
-        finished ? "bg-ink-100 ring-black/[0.04]" : "bg-surface ring-black/[0.04] shadow-[var(--shadow-soft)]",
+        finished ? "bg-ink-100 ring-border" : "bg-surface ring-border shadow-[var(--shadow-soft)]",
         live && "ring-2 ring-flame-400",
         pending && "ring-2 ring-gold-300",
       )}
@@ -233,7 +233,7 @@ function ScoreBox({
         className={cn(
           base,
           "outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20",
-          empty ? "border-ink-200 bg-white text-ink-950" : "border-brand-500 bg-white text-ink-950",
+          empty ? "border-ink-200 bg-surface text-ink-950" : "border-brand-500 bg-surface text-ink-950",
         )}
       />
     );

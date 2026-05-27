@@ -63,7 +63,7 @@ export function LoginPage() {
           <p className="mt-2 text-ink-500">Crave o placar, suba na classificação.</p>
         </div>
 
-        <div className="rounded-lg bg-surface p-6 shadow-[var(--shadow-card)] ring-1 ring-black/[0.04]">
+        <div className="rounded-lg bg-surface p-6 shadow-[var(--shadow-soft)] ring-1 ring-border">
           <Button variant="outline" fullWidth size="lg" onClick={handleGoogle} loading={busy}>
             {!busy && <GoogleIcon />}
             Continuar com Google

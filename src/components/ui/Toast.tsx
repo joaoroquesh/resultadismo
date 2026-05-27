@@ -51,7 +51,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div
             key={t.id}
             className={cn(
-              "animate-pop-in pointer-events-auto flex w-full max-w-sm items-center gap-3 rounded-md bg-surface p-3 shadow-[var(--shadow-pop)] ring-1 ring-black/[0.06]",
+              "animate-pop-in pointer-events-auto flex w-full max-w-sm items-center gap-3 rounded-md bg-surface p-3 shadow-[var(--shadow-pop)] ring-1 ring-border",
             )}
           >
             {icons[t.tone]}
