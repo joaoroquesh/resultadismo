@@ -11,6 +11,7 @@ import { LigaDetailPage } from "@/features/leagues/LigaDetailPage";
 import { EditarPerfilPage } from "@/features/profile/EditarPerfilPage";
 import { AdminPage } from "@/features/admin/AdminPage";
 import { PlayerProfilePage } from "@/features/players/PlayerProfilePage";
+import { ComoFuncionaPage } from "@/features/help/ComoFuncionaPage";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
       <Route element={<AppShell />}>
         {/* público: ver jogos sem login */}
         <Route path="/" element={<JogosPage />} />
+        <Route path="/como-funciona" element={<ComoFuncionaPage />} />
 
         {/* exige login */}
         <Route element={<RequireAuth />}>

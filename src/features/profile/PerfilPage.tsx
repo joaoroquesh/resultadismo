@@ -11,6 +11,7 @@ import {
   Check,
   Share,
   SquarePlus,
+  HelpCircle,
 } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
@@ -167,6 +168,14 @@ export function PerfilPage() {
           )}
           <Link to="/ligas" className="flex items-center gap-3 p-4 transition hover:bg-ink-50">
             <span className="flex-1 font-medium text-ink-900">Minhas ligas</span>
+            <ChevronRight className="size-4 text-ink-400" />
+          </Link>
+          <Link
+            to="/como-funciona"
+            className="flex items-center gap-3 p-4 transition hover:bg-ink-50"
+          >
+            <HelpCircle className="size-5 text-brand-600" />
+            <span className="flex-1 font-medium text-ink-900">Como funciona</span>
             <ChevronRight className="size-4 text-ink-400" />
           </Link>
         </Card>
