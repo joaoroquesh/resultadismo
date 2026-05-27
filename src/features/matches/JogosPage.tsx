@@ -4,6 +4,8 @@ import { Page } from "@/components/layout/Page";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
+import { Coachmark } from "@/components/ui/Coachmark";
+import { useAuth } from "@/features/auth/AuthProvider";
 import { TeamCrest } from "@/components/TeamCrest";
 import { cn } from "@/lib/utils";
 import { dayjs } from "@/lib/format";
@@ -21,6 +23,7 @@ const weekKey = (iso: string | null) => {
 };
 
 export function JogosPage() {
+  const { user } = useAuth();
   const { data: competitions, isLoading: loadingComps } = useCompetitions();
   const [compId, setCompId] = useState<string | null>(null);
   const selectedId = compId ?? competitions?.[0]?.id;
@@ -162,9 +165,24 @@ export function JogosPage() {
               Você fez <span className="font-bold text-brand-700">{dayPoints} pts</span> neste dia
             </span>
           )}
-          <span className="inline-flex items-center gap-1 rounded-pill bg-gold-100 px-2 py-0.5 font-semibold text-gold-800">
-            <Zap className="size-3 fill-gold-700" /> {jokersUsedThisWeek}/{maxJokers} dobros nesta semana
-          </span>
+          <Coachmark
+            storageKey="resultadismo-coach-dobro-v1"
+            title="Dobro de Pontos"
+            placement="bottom"
+            content={
+              <>
+                Ative o <span className="font-bold text-ink-50">2×</span> num palpite e ele vale o
+                dobro. Você tem {maxJokers} por semana — use nos jogos que tiver mais confiança.
+              </>
+            }
+            // só faz sentido para quem está logado e pode palpitar
+            defaultOpen={user ? undefined : false}
+          >
+            <span className="inline-flex items-center gap-1 rounded-pill bg-gold-100 px-2 py-0.5 font-semibold text-gold-800">
+              <Zap className="size-3 fill-gold-700" /> {jokersUsedThisWeek}/{maxJokers} dobros nesta
+              semana
+            </span>
+          </Coachmark>
         </div>
       )}
 

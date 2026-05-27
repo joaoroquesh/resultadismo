@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { Coachmark } from "@/components/ui/Coachmark";
 import { useToast } from "@/components/ui/Toast";
 import { useCompetitions } from "@/features/matches/api";
 import { useCreateLeague } from "./api";
@@ -75,34 +76,49 @@ export function NovaLigaPage() {
           </div>
         </Card>
 
-        <Card className="space-y-4 p-4">
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-ink-800">Visibilidade</label>
-            <SegmentedControl
-              value={visibility}
-              onChange={(v) => {
-                setVisibility(v);
-                setJoinPolicy(v === "public" ? "open" : "invite");
-              }}
-              options={[
-                { value: "private", label: "Privada" },
-                { value: "public", label: "Pública" },
-              ]}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-ink-800">Quem pode entrar</label>
-            <SegmentedControl
-              value={joinPolicy}
-              onChange={setJoinPolicy}
-              options={[
-                { value: "invite", label: "Convite" },
-                { value: "approval", label: "Aprovação" },
-                { value: "open", label: "Aberta" },
-              ]}
-            />
-          </div>
-        </Card>
+        <Coachmark
+          storageKey="resultadismo-coach-liga-acesso-v1"
+          title="Quem entra na liga"
+          placement="bottom"
+          content={
+            <>
+              <span className="font-bold text-ink-50">Privada</span> não aparece na busca;{" "}
+              <span className="font-bold text-ink-50">Pública</span> qualquer um acha. E o acesso pode
+              ser por <span className="font-bold text-ink-50">Convite</span> (só com link),{" "}
+              <span className="font-bold text-ink-50">Aprovação</span> (você libera cada pedido) ou{" "}
+              <span className="font-bold text-ink-50">Aberta</span> (entra direto).
+            </>
+          }
+        >
+          <Card className="space-y-4 p-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-ink-800">Visibilidade</label>
+              <SegmentedControl
+                value={visibility}
+                onChange={(v) => {
+                  setVisibility(v);
+                  setJoinPolicy(v === "public" ? "open" : "invite");
+                }}
+                options={[
+                  { value: "private", label: "Privada" },
+                  { value: "public", label: "Pública" },
+                ]}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-ink-800">Quem pode entrar</label>
+              <SegmentedControl
+                value={joinPolicy}
+                onChange={setJoinPolicy}
+                options={[
+                  { value: "invite", label: "Convite" },
+                  { value: "approval", label: "Aprovação" },
+                  { value: "open", label: "Aberta" },
+                ]}
+              />
+            </div>
+          </Card>
+        </Coachmark>
 
         <Card className="space-y-4 p-4">
           <div className="flex flex-col gap-1.5">
@@ -121,17 +137,31 @@ export function NovaLigaPage() {
             </select>
           </div>
           {competitionId && (
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-ink-800">Modo de disputa</label>
-              <SegmentedControl
-                value={mode}
-                onChange={setMode}
-                options={[
-                  { value: "table", label: "Tabela" },
-                  { value: "points", label: "Pontos" },
-                ]}
-              />
-            </div>
+            <Coachmark
+              storageKey="resultadismo-coach-liga-modo-v1"
+              title="Modo de disputa"
+              placement="top"
+              content={
+                <>
+                  <span className="font-bold text-ink-50">Tabela</span>: a liga acompanha um campeonato
+                  e quem somar mais pontos nos jogos lidera.{" "}
+                  <span className="font-bold text-ink-50">Pontos</span>: disputa corrida, valendo o
+                  total de pontos que cada um faz.
+                </>
+              }
+            >
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-ink-800">Modo de disputa</label>
+                <SegmentedControl
+                  value={mode}
+                  onChange={setMode}
+                  options={[
+                    { value: "table", label: "Tabela" },
+                    { value: "points", label: "Pontos" },
+                  ]}
+                />
+              </div>
+            </Coachmark>
           )}
         </Card>
 
