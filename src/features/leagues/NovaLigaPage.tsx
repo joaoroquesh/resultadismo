@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Info } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
@@ -89,6 +89,11 @@ export function NovaLigaPage() {
                 { value: "public", label: "Pública" },
               ]}
             />
+            <p className="text-xs leading-snug text-ink-500">
+              {visibility === "private"
+                ? "Só membros enxergam a liga — ninguém de fora encontra."
+                : "Qualquer pessoa pode encontrar e acompanhar a liga. A entrada fica liberada para todos."}
+            </p>
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium text-ink-800">Quem pode entrar</label>
@@ -101,6 +106,15 @@ export function NovaLigaPage() {
                 { value: "open", label: "Aberta" },
               ]}
             />
+            <p className="text-xs leading-snug text-ink-500">
+              {visibility === "public"
+                ? "Ligas públicas são sempre abertas: quem quiser entra na hora."
+                : joinPolicy === "invite"
+                  ? "Só entra quem recebe o código de convite da liga."
+                  : joinPolicy === "approval"
+                    ? "Qualquer um pode pedir para entrar, mas um admin precisa aprovar."
+                    : "Entrada livre: quem quiser participar entra sem convite nem aprovação."}
+            </p>
           </div>
         </Card>
 
@@ -131,6 +145,11 @@ export function NovaLigaPage() {
                   { value: "points", label: "Pontos" },
                 ]}
               />
+              <p className="text-xs leading-snug text-ink-500">
+                {mode === "table"
+                  ? "Vale o campeonato inteiro: os pontos somam rodada após rodada numa classificação única."
+                  : "Corrida por pontos: foco em acumular pontos nos jogos — quem somou mais, lidera."}
+              </p>
             </div>
           )}
         </Card>
@@ -139,7 +158,11 @@ export function NovaLigaPage() {
           <Info className="mt-0.5 size-4 shrink-0" />
           <p>
             Para evitar abusos, novas ligas passam por uma aprovação rápida de um administrador
-            antes de ficarem ativas.
+            antes de ficarem ativas. Em dúvida sobre as opções?{" "}
+            <Link to="/como-funciona" className="font-semibold underline">
+              Veja como funciona
+            </Link>
+            .
           </p>
         </div>
 
