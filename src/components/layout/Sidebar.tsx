@@ -1,7 +1,8 @@
 import { NavLink, Link } from "react-router-dom";
-import { Goal, Shield, User, ShieldCheck, LogIn } from "lucide-react";
+import { Goal, Shield, User, ShieldCheck, LogIn, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/AuthProvider";
+import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -9,6 +10,7 @@ import { NotificationsBell } from "@/features/notifications/NotificationsBell";
 
 export function Sidebar() {
   const { profile, user, isAppAdmin, session } = useAuth();
+  const { open: openLogin } = useLoginModal();
 
   const items = [
     { to: "/", label: "Jogos", icon: Goal, end: true },
@@ -19,6 +21,7 @@ export function Sidebar() {
           ...(isAppAdmin ? [{ to: "/admin", label: "Admin", icon: ShieldCheck, end: false }] : []),
         ]
       : []),
+    { to: "/como-funciona", label: "Como funciona", icon: HelpCircle, end: false },
   ];
 
   return (
@@ -68,11 +71,9 @@ export function Sidebar() {
             </div>
           </Link>
         ) : (
-          <Link to="/login">
-            <Button fullWidth>
-              <LogIn className="size-4" /> Entrar
-            </Button>
-          </Link>
+          <Button fullWidth onClick={openLogin}>
+            <LogIn className="size-4" /> Entrar
+          </Button>
         )}
       </div>
     </aside>

@@ -11,16 +11,21 @@ import { LigaDetailPage } from "@/features/leagues/LigaDetailPage";
 import { EditarPerfilPage } from "@/features/profile/EditarPerfilPage";
 import { AdminPage } from "@/features/admin/AdminPage";
 import { PlayerProfilePage } from "@/features/players/PlayerProfilePage";
+import { ComoFuncionaPage } from "@/features/help/ComoFuncionaPage";
+import { Onboarding } from "@/features/onboarding/Onboarding";
 
 export default function App() {
   return (
-    <Routes>
+    <>
+      <Onboarding />
+      <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
 
       <Route element={<AppShell />}>
         {/* público: ver jogos sem login */}
         <Route path="/" element={<JogosPage />} />
+        <Route path="/como-funciona" element={<ComoFuncionaPage />} />
 
         {/* exige login */}
         <Route element={<RequireAuth />}>
@@ -38,6 +43,7 @@ export default function App() {
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+      </Routes>
+    </>
   );
 }

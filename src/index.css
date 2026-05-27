@@ -220,6 +220,13 @@
   100% { transform: translateX(100%); }
 }
 
+/* Anel de destaque das dicas de primeiro acesso (coachmarks) */
+@keyframes coachmark-pulse {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(1.015); }
+}
+.animate-coachmark-pulse { animation: coachmark-pulse 1.8s var(--ease-out-quart) infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

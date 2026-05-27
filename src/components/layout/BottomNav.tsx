@@ -2,20 +2,21 @@ import { NavLink } from "react-router-dom";
 import { Goal, Shield, User, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/AuthProvider";
+import { useLoginModal } from "@/features/auth/LoginModalProvider";
 
 export function BottomNav() {
   const { session } = useAuth();
+  const { open: openLogin } = useLoginModal();
 
-  const items = session
-    ? [
-        { to: "/", label: "Jogos", icon: Goal, end: true },
-        { to: "/ligas", label: "Ligas", icon: Shield, end: false },
-        { to: "/perfil", label: "Perfil", icon: User, end: false },
-      ]
-    : [
-        { to: "/", label: "Jogos", icon: Goal, end: true },
-        { to: "/login", label: "Entrar", icon: LogIn, end: false },
-      ];
+  const items = [
+    { to: "/", label: "Jogos", icon: Goal, end: true },
+    ...(session
+      ? [
+          { to: "/ligas", label: "Ligas", icon: Shield, end: false },
+          { to: "/perfil", label: "Perfil", icon: User, end: false },
+        ]
+      : []),
+  ];
 
   return (
     <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/90 backdrop-blur-md lg:hidden">
@@ -40,6 +41,16 @@ export function BottomNav() {
             )}
           </NavLink>
         ))}
+        {!session && (
+          <button
+            type="button"
+            onClick={openLogin}
+            className="flex flex-1 flex-col items-center gap-1 py-2.5 text-[11px] font-medium text-ink-400 transition-colors hover:text-ink-600"
+          >
+            <LogIn className="size-6" strokeWidth={2.2} />
+            Entrar
+          </button>
+        )}
       </div>
     </nav>
   );
