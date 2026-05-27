@@ -1,11 +1,10 @@
 import { NavLink } from "react-router-dom";
-import { Goal, Shield, ListOrdered, User } from "lucide-react";
+import { Goal, Shield, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
   { to: "/", label: "Jogos", icon: Goal, end: true },
   { to: "/ligas", label: "Ligas", icon: Shield, end: false },
-  { to: "/classificacao", label: "Classificação", icon: ListOrdered, end: false },
   { to: "/perfil", label: "Perfil", icon: User, end: false },
 ];
 

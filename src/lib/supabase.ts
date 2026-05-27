@@ -18,3 +18,8 @@ export const supabase = createClient<Database>(url, key, {
     flowType: "pkce",
   },
 });
+
+// Em desenvolvimento, expõe o client para automação de testes (login só Google no UI).
+if (import.meta.env.DEV) {
+  (window as unknown as { supabase: typeof supabase }).supabase = supabase;
+}

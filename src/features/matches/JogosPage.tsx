@@ -1,18 +1,16 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CalendarClock, Trophy } from "lucide-react";
 import { Page } from "@/components/layout/Page";
-import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
 import { TeamCrest } from "@/components/TeamCrest";
 import { cn } from "@/lib/utils";
-import { dayjs, formatDayLabel } from "@/lib/format";
+import { dayjs } from "@/lib/format";
 import { MatchCard } from "./MatchCard";
 import { useCompetitions, useMatches, useMyPredictions, useMatchesRealtime } from "./api";
-import type { MatchWithTeams } from "@/lib/types";
 
-type Tab = "abertos" | "resultados";
+const dayKey = (iso: string | null) => (iso ? dayjs(iso).format("YYYY-MM-DD") : "sem-data");
 
 export function JogosPage() {
   const { data: competitions, isLoading: loadingComps } = useCompetitions();
@@ -22,7 +20,48 @@ export function JogosPage() {
   const { data: matches, isLoading: loadingMatches } = useMatches(selectedId);
   const { data: predMap } = useMyPredictions(selectedId);
   useMatchesRealtime(selectedId);
-  const [tab, setTab] = useState<Tab>("abertos");
+
+  const [day, setDay] = useState<string | null>(null);
+  const dayRowRef = useRef<HTMLDivElement>(null);
+
+  // dias únicos com jogos, ordenados
+  const days = useMemo(() => {
+    if (!matches) return [];
+    const set = new Set<string>();
+    for (const m of matches) set.add(dayKey(m.kickoff_at));
+    return Array.from(set).filter((d) => d !== "sem-data").sort();
+  }, [matches]);
+
+  // auto-seleciona hoje (ou próximo dia futuro, ou último)
+  useEffect(() => {
+    if (days.length === 0) {
+      setDay(null);
+      return;
+    }
+    setDay((cur) => {
+      if (cur && days.includes(cur)) return cur;
+      const today = dayjs().format("YYYY-MM-DD");
+      if (days.includes(today)) return today;
+      const future = days.find((d) => d >= today);
+      return future ?? days[days.length - 1]!;
+    });
+  }, [days]);
+
+  const dayMatches = useMemo(() => {
+    if (!matches || !day) return [];
+    return matches
+      .filter((m) => dayKey(m.kickoff_at) === day)
+      .sort((a, b) => dayjs(a.kickoff_at ?? 0).valueOf() - dayjs(b.kickoff_at ?? 0).valueOf());
+  }, [matches, day]);
+
+  const dayPoints = useMemo(() => {
+    let sum = 0;
+    for (const m of dayMatches) {
+      const p = predMap?.get(m.id);
+      if (p?.points != null) sum += p.points;
+    }
+    return sum;
+  }, [dayMatches, predMap]);
 
   const totalPoints = useMemo(() => {
     let sum = 0;
@@ -31,25 +70,6 @@ export function JogosPage() {
     });
     return sum;
   }, [predMap]);
-
-  const groups = useMemo(() => {
-    if (!matches) return [];
-    const filtered = matches.filter((m) =>
-      tab === "abertos" ? m.status !== "finished" : m.status === "finished",
-    );
-    filtered.sort((a, b) => {
-      const ta = a.kickoff_at ? dayjs(a.kickoff_at).valueOf() : 0;
-      const tb = b.kickoff_at ? dayjs(b.kickoff_at).valueOf() : 0;
-      return tab === "abertos" ? ta - tb : tb - ta;
-    });
-    const byDay = new Map<string, MatchWithTeams[]>();
-    for (const m of filtered) {
-      const key = m.kickoff_at ? dayjs(m.kickoff_at).format("YYYY-MM-DD") : "sem-data";
-      if (!byDay.has(key)) byDay.set(key, []);
-      byDay.get(key)!.push(m);
-    }
-    return Array.from(byDay.entries());
-  }, [matches, tab]);
 
   return (
     <Page
@@ -62,13 +82,13 @@ export function JogosPage() {
         ) : undefined
       }
     >
-      {/* seletor de competição */}
+      {/* competições */}
       {loadingComps ? (
-        <Skeleton className="mb-4 h-9 w-full" />
+        <Skeleton className="mb-3 h-9 w-full" />
       ) : (
         competitions &&
         competitions.length > 0 && (
-          <div className="no-scrollbar -mx-4 mb-4 flex gap-2 overflow-x-auto px-4">
+          <div className="no-scrollbar -mx-4 mb-3 flex gap-2 overflow-x-auto px-4">
             {competitions.map((c) => (
               <button
                 key={c.id}
@@ -88,15 +108,37 @@ export function JogosPage() {
         )
       )}
 
-      <SegmentedControl<Tab>
-        className="mb-4"
-        value={tab}
-        onChange={setTab}
-        options={[
-          { value: "abertos", label: "Jogos" },
-          { value: "resultados", label: "Resultados" },
-        ]}
-      />
+      {/* tabs de dia */}
+      {!loadingMatches && days.length > 0 && (
+        <div ref={dayRowRef} className="no-scrollbar -mx-4 mb-4 flex gap-2 overflow-x-auto px-4">
+          {days.map((d) => {
+            const isToday = d === dayjs().format("YYYY-MM-DD");
+            return (
+              <button
+                key={d}
+                onClick={() => setDay(d)}
+                className={cn(
+                  "flex shrink-0 flex-col items-center rounded-md border px-3 py-1.5 text-sm font-semibold leading-tight transition",
+                  day === d
+                    ? "border-brand-600 bg-brand-600 text-white"
+                    : "border-ink-200 bg-surface text-ink-600",
+                )}
+              >
+                <span className="text-[10px] font-medium uppercase opacity-80">
+                  {isToday ? "Hoje" : dayjs(d).format("ddd")}
+                </span>
+                <span>{dayjs(d).format("DD/MM")}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {dayPoints > 0 && (
+        <p className="mb-3 text-center text-xs font-medium text-ink-500">
+          Você fez <span className="font-bold text-brand-700">{dayPoints} pts</span> neste dia
+        </p>
+      )}
 
       {loadingMatches ? (
         <div className="space-y-3">
@@ -104,27 +146,16 @@ export function JogosPage() {
             <Skeleton key={i} className="h-28 w-full" />
           ))}
         </div>
-      ) : groups.length === 0 ? (
+      ) : dayMatches.length === 0 ? (
         <EmptyState
           icon={<CalendarClock className="size-7" />}
-          title={tab === "abertos" ? "Nenhum jogo aberto" : "Nenhum resultado ainda"}
-          description={
-            tab === "abertos"
-              ? "Quando houver jogos para palpitar, eles aparecem aqui."
-              : "Os jogos encerrados e seus pontos aparecem aqui."
-          }
+          title="Sem jogos"
+          description="Quando houver jogos nesta competição, eles aparecem aqui por dia."
         />
       ) : (
-        <div className="space-y-5">
-          {groups.map(([day, dayMatches]) => (
-            <section key={day} className="space-y-2.5">
-              <h2 className="px-1 text-xs font-bold uppercase tracking-wide text-ink-400">
-                {day === "sem-data" ? "A definir" : formatDayLabel(dayMatches[0]!.kickoff_at)}
-              </h2>
-              {dayMatches.map((m) => (
-                <MatchCard key={m.id} match={m} prediction={predMap?.get(m.id) ?? null} />
-              ))}
-            </section>
+        <div className="space-y-3">
+          {dayMatches.map((m) => (
+            <MatchCard key={m.id} match={m} prediction={predMap?.get(m.id) ?? null} />
           ))}
         </div>
       )}

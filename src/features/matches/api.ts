@@ -93,6 +93,33 @@ export function useSavePrediction() {
   });
 }
 
+export type MatchPrediction = {
+  home_pred: number;
+  away_pred: number;
+  score_type: import("@/lib/types").ScoreType | null;
+  points: number | null;
+  user: { id: string; display_name: string; avatar_url: string | null } | null;
+};
+
+/** Palpites de todos para um jogo (visível após o kickoff, por RLS). */
+export function useMatchPredictions(matchId: string, enabled: boolean) {
+  return useQuery({
+    enabled,
+    queryKey: ["match-predictions", matchId],
+    queryFn: async (): Promise<MatchPrediction[]> => {
+      const { data, error } = await supabase
+        .from("predictions")
+        .select(
+          "home_pred, away_pred, score_type, points, user:profiles!predictions_user_id_fkey(id, display_name, avatar_url)",
+        )
+        .eq("match_id", matchId)
+        .order("points", { ascending: false, nullsFirst: false });
+      if (error) throw error;
+      return (data ?? []) as unknown as MatchPrediction[];
+    },
+  });
+}
+
 /** Assina mudanças de jogos (placar ao vivo) e revalida as queries afetadas. */
 export function useMatchesRealtime(competitionId: string | undefined) {
   const qc = useQueryClient();

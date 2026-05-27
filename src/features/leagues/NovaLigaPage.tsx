@@ -129,7 +129,6 @@ export function NovaLigaPage() {
                 options={[
                   { value: "table", label: "Tabela" },
                   { value: "points", label: "Pontos" },
-                  { value: "cup", label: "Copa" },
                 ]}
               />
             </div>

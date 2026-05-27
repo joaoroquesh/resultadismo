@@ -8,7 +8,6 @@ import { PerfilPage } from "@/features/profile/PerfilPage";
 import { LigasPage } from "@/features/leagues/LigasPage";
 import { NovaLigaPage } from "@/features/leagues/NovaLigaPage";
 import { LigaDetailPage } from "@/features/leagues/LigaDetailPage";
-import { ClassificacaoPage } from "@/features/standings/ClassificacaoPage";
 import { EditarPerfilPage } from "@/features/profile/EditarPerfilPage";
 import { AdminPage } from "@/features/admin/AdminPage";
 
@@ -24,7 +23,7 @@ export default function App() {
           <Route path="/ligas" element={<LigasPage />} />
           <Route path="/ligas/nova" element={<NovaLigaPage />} />
           <Route path="/ligas/:slug" element={<LigaDetailPage />} />
-          <Route path="/classificacao" element={<ClassificacaoPage />} />
+          <Route path="/classificacao" element={<Navigate to="/ligas" replace />} />
           <Route path="/perfil" element={<PerfilPage />} />
           <Route path="/perfil/editar" element={<EditarPerfilPage />} />
 

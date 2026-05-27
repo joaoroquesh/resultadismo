@@ -1,10 +1,8 @@
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { Navigate } from "react-router-dom";
-import { Mail, Lock, User as UserIcon } from "lucide-react";
 import { useAuth } from "./AuthProvider";
 import { useToast } from "@/components/ui/Toast";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import { LoadingScreen } from "@/components/ui/Spinner";
 
 function GoogleIcon() {
@@ -31,31 +29,12 @@ function GoogleIcon() {
 }
 
 export function LoginPage() {
-  const { session, loading, signInWithGoogle, signInWithPassword, signUp } = useAuth();
+  const { session, loading, signInWithGoogle } = useAuth();
   const { toast } = useToast();
-  const [mode, setMode] = useState<"login" | "signup">("login");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
   if (loading) return <LoadingScreen />;
   if (session) return <Navigate to="/" replace />;
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    const { error } =
-      mode === "login"
-        ? await signInWithPassword(email, password)
-        : await signUp(email, password, name);
-    setBusy(false);
-    if (error) {
-      toast(traduzErro(error), "error");
-    } else if (mode === "signup") {
-      toast("Conta criada! Bem-vindo ao Resultadismo.", "success");
-    }
-  }
 
   async function handleGoogle() {
     setBusy(true);
@@ -70,89 +49,25 @@ export function LoginPage() {
     <div className="grid min-h-dvh place-items-center bg-background px-5 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center text-center">
-          <img src="/brand/Resultadismo.svg" alt="" className="size-16" />
-          <h1 className="mt-3 text-2xl font-bold tracking-tight text-ink-950">Resultadismo</h1>
-          <p className="mt-1 text-sm text-ink-500">
-            Crave o placar, suba na classificação.
-          </p>
+          <img src="/brand/Resultadismo.svg" alt="" className="size-20" />
+          <h1 className="mt-4 text-3xl font-bold tracking-tight text-ink-950">Resultadismo</h1>
+          <p className="mt-2 text-ink-500">Crave o placar, suba na classificação.</p>
         </div>
 
         <div className="rounded-lg bg-surface p-6 shadow-[var(--shadow-card)] ring-1 ring-black/[0.04]">
-          <Button variant="outline" fullWidth onClick={handleGoogle} disabled={busy}>
-            <GoogleIcon />
+          <Button variant="outline" fullWidth size="lg" onClick={handleGoogle} loading={busy}>
+            {!busy && <GoogleIcon />}
             Continuar com Google
           </Button>
-
-          {!import.meta.env.DEV && (
-            <p className="mt-4 text-center text-xs text-ink-400">
-              Entre com sua conta Google para jogar.
-            </p>
-          )}
-
-          {import.meta.env.DEV && (
-            <>
-          <div className="my-5 flex items-center gap-3 text-xs text-ink-400">
-            <span className="h-px flex-1 bg-ink-200" />
-            ou com email (dev)
-            <span className="h-px flex-1 bg-ink-200" />
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-3">
-            {mode === "signup" && (
-              <Input
-                label="Nome"
-                placeholder="Como quer ser chamado"
-                icon={<UserIcon className="size-4" />}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            )}
-            <Input
-              label="Email"
-              type="email"
-              placeholder="voce@email.com"
-              icon={<Mail className="size-4" />}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <Input
-              label="Senha"
-              type="password"
-              placeholder="••••••••"
-              icon={<Lock className="size-4" />}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              minLength={6}
-              required
-            />
-            <Button type="submit" fullWidth loading={busy}>
-              {mode === "login" ? "Entrar" : "Criar conta"}
-            </Button>
-          </form>
-
-          <p className="mt-5 text-center text-sm text-ink-500">
-            {mode === "login" ? "Ainda não tem conta?" : "Já tem conta?"}{" "}
-            <button
-              type="button"
-              onClick={() => setMode(mode === "login" ? "signup" : "login")}
-              className="font-semibold text-brand-600 hover:text-brand-700"
-            >
-              {mode === "login" ? "Crie agora" : "Entrar"}
-            </button>
+          <p className="mt-4 text-center text-xs text-ink-400">
+            Use sua conta Google para entrar e jogar.
           </p>
-            </>
-          )}
         </div>
+
+        <p className="mt-6 text-center text-xs text-ink-400">
+          Ao continuar, você concorda com as regras da diversão. ⚽
+        </p>
       </div>
     </div>
   );
-}
-
-function traduzErro(msg: string): string {
-  if (/invalid login credentials/i.test(msg)) return "Email ou senha incorretos.";
-  if (/already registered|already exists/i.test(msg)) return "Este email já está cadastrado.";
-  if (/password should be at least/i.test(msg)) return "A senha deve ter ao menos 6 caracteres.";
-  return msg;
 }

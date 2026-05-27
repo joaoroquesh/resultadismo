@@ -1,20 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { Check, Loader2, Lock } from "lucide-react";
+import { Check, Loader2, Lock, ChevronDown, Users } from "lucide-react";
 import { TeamCrest } from "@/components/TeamCrest";
 import { ScorePill } from "@/components/ScorePill";
-import { Card } from "@/components/ui/Card";
+import { Avatar } from "@/components/ui/Avatar";
 import { cn } from "@/lib/utils";
-import { formatKickoff, isLocked } from "@/lib/format";
-import { useSavePrediction } from "./api";
+import { formatTime, isLocked } from "@/lib/format";
+import { useSavePrediction, useMatchPredictions } from "./api";
 import type { MatchWithTeams, Prediction, ScoreType } from "@/lib/types";
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 
-const predBg: Record<ScoreType, string> = {
+// estilo da caixa de placar conforme o estado
+const scoreBoxByType: Record<ScoreType, string> = {
   cravada: "bg-gold-500 text-gold-950 border-gold-500",
   saldo: "bg-grass-600 text-white border-grass-600",
   acerto: "bg-aqua-700 text-white border-aqua-700",
-  erro: "bg-ink-100 text-ink-500 border-ink-200",
+  erro: "bg-ink-200 text-ink-400 border-ink-200",
 };
 
 export function MatchCard({
@@ -24,17 +25,20 @@ export function MatchCard({
   match: MatchWithTeams;
   prediction: Prediction | null;
 }) {
-  const locked = match.status !== "scheduled" || isLocked(match.kickoff_at);
   const finished = match.status === "finished";
   const live = match.status === "live";
+  const locked = match.status !== "scheduled" || isLocked(match.kickoff_at);
+  const open = !locked;
+  const pending = open && !prediction;
+  const hasResult = match.home_score != null && match.away_score != null;
 
   const save = useSavePrediction();
-  const [home, setHome] = useState<string>(prediction ? String(prediction.home_pred) : "");
-  const [away, setAway] = useState<string>(prediction ? String(prediction.away_pred) : "");
+  const [home, setHome] = useState(prediction ? String(prediction.home_pred) : "");
+  const [away, setAway] = useState(prediction ? String(prediction.away_pred) : "");
   const [saveState, setSaveState] = useState<SaveState>("idle");
+  const [showGalera, setShowGalera] = useState(false);
   const firstRender = useRef(true);
 
-  // Auto-save com debounce quando ambos os campos forem válidos.
   useEffect(() => {
     if (locked) return;
     if (firstRender.current) {
@@ -45,7 +49,6 @@ export function MatchCard({
     const a = parseInt(away, 10);
     if (Number.isNaN(h) || Number.isNaN(a)) return;
     if (prediction && prediction.home_pred === h && prediction.away_pred === a) return;
-
     setSaveState("saving");
     const t = setTimeout(() => {
       save.mutate(
@@ -53,7 +56,7 @@ export function MatchCard({
         {
           onSuccess: () => {
             setSaveState("saved");
-            setTimeout(() => setSaveState("idle"), 1800);
+            setTimeout(() => setSaveState("idle"), 1600);
           },
           onError: () => setSaveState("error"),
         },
@@ -63,185 +66,232 @@ export function MatchCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [home, away]);
 
-  return (
-    <Card className={cn("overflow-hidden", live && "ring-2 ring-flame-400")}>
-      {/* topo: contexto + horário/status */}
-      <div className="flex items-center justify-between border-b border-ink-100 px-3.5 py-2 text-xs">
-        <span className="truncate font-medium text-ink-500">
-          {[match.group_name, match.round].filter(Boolean).join(" · ") || match.stage || ""}
-        </span>
-        {live ? (
-          <span className="flex items-center gap-1.5 font-bold text-flame-600">
-            <span className="size-2 animate-pulse-live rounded-full bg-flame-500" />
-            AO VIVO
-          </span>
-        ) : finished ? (
-          <span className="font-semibold text-ink-400">Encerrado</span>
-        ) : (
-          <span className="font-semibold text-ink-600">{formatKickoff(match.kickoff_at)}</span>
-        )}
-      </div>
+  const scoreType = finished ? prediction?.score_type ?? null : null;
 
-      {/* corpo: times + placar */}
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 py-3.5">
-        {/* mandante */}
-        <div className="flex flex-col items-center gap-1.5 text-center">
-          <TeamCrest team={match.home_team} name={match.home_team_name} size={40} />
-          <span className="line-clamp-2 text-xs font-semibold text-ink-800">
-            {match.home_team?.short_name ?? match.home_team_name}
-          </span>
-        </div>
-
-        {/* centro: inputs (aberto) ou placar (travado) */}
-        <div className="flex min-w-[92px] flex-col items-center gap-1">
-          {locked ? (
-            <ResultCenter match={match} live={live} finished={finished} />
-          ) : (
-            <div className="flex items-center gap-1.5">
-              <ScoreInput value={home} onChange={setHome} ariaLabel="Placar mandante" />
-              <span className="text-lg font-bold text-ink-300">×</span>
-              <ScoreInput value={away} onChange={setAway} ariaLabel="Placar visitante" />
-            </div>
-          )}
-        </div>
-
-        {/* visitante */}
-        <div className="flex flex-col items-center gap-1.5 text-center">
-          <TeamCrest team={match.away_team} name={match.away_team_name} size={40} />
-          <span className="line-clamp-2 text-xs font-semibold text-ink-800">
-            {match.away_team?.short_name ?? match.away_team_name}
-          </span>
-        </div>
-      </div>
-
-      {/* rodapé: estado do palpite */}
-      <Footer
-        locked={locked}
-        finished={finished}
-        prediction={prediction}
-        saveState={saveState}
-        hasInput={home !== "" && away !== ""}
-      />
-    </Card>
-  );
-}
-
-function ScoreInput({
-  value,
-  onChange,
-  ariaLabel,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  ariaLabel: string;
-}) {
-  return (
-    <input
-      type="number"
-      inputMode="numeric"
-      min={0}
-      max={99}
-      aria-label={ariaLabel}
-      value={value}
-      onChange={(e) => {
-        const v = e.target.value.replace(/[^0-9]/g, "").slice(0, 2);
-        onChange(v);
-      }}
-      placeholder="–"
-      className="size-12 rounded-md border border-ink-200 bg-surface text-center text-xl font-bold text-ink-950 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
-    />
-  );
-}
-
-function ResultCenter({
-  match,
-  live,
-  finished,
-}: {
-  match: MatchWithTeams;
-  live: boolean;
-  finished: boolean;
-}) {
-  const hasScore = match.home_score != null && match.away_score != null;
-  if (!hasScore) {
-    return <span className="text-sm font-medium text-ink-400">aguardando</span>;
-  }
   return (
     <div
       className={cn(
-        "flex items-baseline gap-1.5 text-2xl font-extrabold tabular-nums",
-        live ? "text-flame-600" : "text-ink-950",
+        "overflow-hidden rounded-lg ring-1 transition",
+        finished ? "bg-ink-100 ring-black/[0.04]" : "bg-surface ring-black/[0.04] shadow-[var(--shadow-soft)]",
+        live && "ring-2 ring-flame-400",
+        pending && "ring-2 ring-gold-300",
       )}
     >
-      <span>{match.home_score}</span>
-      <span className="text-ink-300">×</span>
-      <span>{match.away_score}</span>
-      {match.home_pen != null && match.away_pen != null && (
-        <span className="ml-1 self-center text-xs font-semibold text-ink-400">
-          ({match.home_pen}-{match.away_pen} pên)
-        </span>
+      {/* label */}
+      <div className="flex items-center justify-center gap-2 px-3 pt-2.5 text-[11px] text-ink-500">
+        {live ? (
+          <span className="flex items-center gap-1 font-bold text-flame-600">
+            <span className="size-1.5 animate-pulse-live rounded-full bg-flame-500" /> AO VIVO
+          </span>
+        ) : (
+          <span className="font-semibold text-ink-600">{formatTime(match.kickoff_at)}</span>
+        )}
+        <span className="text-ink-300">·</span>
+        <span className="truncate">{match.competition?.name ?? match.round}</span>
+        {match.group_name && (
+          <span className="rounded-pill border border-ink-200 px-1.5 py-0 text-[10px] text-ink-400">
+            {match.group_name}
+          </span>
+        )}
+      </div>
+
+      {/* resultado: time + palpite + time */}
+      <div className="flex items-center justify-center gap-1.5 px-2 py-2.5">
+        <TeamSide name={match.home_team?.short_name ?? match.home_team_name} team={match.home_team} align="right" />
+        <div className="flex items-center gap-1.5">
+          <ScoreBox
+            value={home}
+            onChange={setHome}
+            editable={open}
+            scoreType={scoreType}
+            live={live}
+            locked={locked && !finished}
+          />
+          <span className="text-sm font-bold text-ink-300">×</span>
+          <ScoreBox
+            value={away}
+            onChange={setAway}
+            editable={open}
+            scoreType={scoreType}
+            live={live}
+            locked={locked && !finished}
+          />
+        </div>
+        <TeamSide name={match.away_team?.short_name ?? match.away_team_name} team={match.away_team} align="left" />
+      </div>
+
+      {/* resultado real */}
+      {(finished || (live && hasResult)) && (
+        <div className="flex items-center justify-center gap-2 border-t border-ink-200/60 py-1.5 text-xs">
+          <span className="text-ink-400">Resultado</span>
+          <span className={cn("font-extrabold tabular-nums", live ? "text-flame-600" : "text-ink-800")}>
+            {match.home_score} × {match.away_score}
+          </span>
+          {finished && scoreType && <ScorePill type={scoreType} withLabel />}
+        </div>
+      )}
+
+      {/* rodapé do palpite (aberto) */}
+      {open && (
+        <div className="flex h-7 items-center justify-center gap-1 border-t border-ink-100 text-[11px] font-medium">
+          {saveState === "saving" && (
+            <span className="flex items-center gap-1 text-ink-400">
+              <Loader2 className="size-3 animate-spin" /> salvando…
+            </span>
+          )}
+          {saveState === "saved" && (
+            <span className="flex items-center gap-1 text-gold-700">
+              <Check className="size-3" /> salvo
+            </span>
+          )}
+          {saveState === "error" && <span className="text-flame-600">erro ao salvar</span>}
+          {saveState === "idle" &&
+            (pending ? (
+              <span className="text-gold-700">faça seu palpite</span>
+            ) : (
+              <span className="text-ink-400">palpite salvo</span>
+            ))}
+        </div>
+      )}
+
+      {/* sem palpite + travado */}
+      {locked && !prediction && (
+        <div className="flex h-7 items-center justify-center gap-1 border-t border-ink-200/60 text-[11px] text-ink-400">
+          <Lock className="size-3" /> você não palpitou
+        </div>
+      )}
+
+      {/* palpites da galera (após kickoff) */}
+      {locked && (
+        <>
+          <button
+            onClick={() => setShowGalera((v) => !v)}
+            className="flex w-full items-center justify-center gap-1.5 border-t border-ink-200/60 py-1.5 text-[11px] font-semibold text-ink-500 transition hover:bg-ink-50"
+          >
+            <Users className="size-3.5" /> Palpites da galera
+            <ChevronDown className={cn("size-3.5 transition", showGalera && "rotate-180")} />
+          </button>
+          {showGalera && <Galera matchId={match.id} finished={finished} />}
+        </>
       )}
     </div>
   );
 }
 
-function Footer({
-  locked,
-  finished,
-  prediction,
-  saveState,
-  hasInput,
+function TeamSide({
+  name,
+  team,
+  align,
 }: {
-  locked: boolean;
-  finished: boolean;
-  prediction: Prediction | null;
-  saveState: SaveState;
-  hasInput: boolean;
+  name: string | null;
+  team: MatchWithTeams["home_team"];
+  align: "left" | "right";
 }) {
-  // Aberto para palpite
-  if (!locked) {
+  return (
+    <div
+      className={cn(
+        "flex min-w-0 flex-1 items-center gap-1.5",
+        align === "right" ? "flex-row-reverse text-right" : "text-left",
+      )}
+    >
+      <TeamCrest team={team} name={name} size={26} />
+      <span className="line-clamp-2 text-[11px] font-semibold leading-tight text-ink-800">{name}</span>
+    </div>
+  );
+}
+
+function ScoreBox({
+  value,
+  onChange,
+  editable,
+  scoreType,
+  live,
+  locked,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  editable: boolean;
+  scoreType: ScoreType | null;
+  live: boolean;
+  locked: boolean;
+}) {
+  const base =
+    "relative flex size-9 items-center justify-center rounded-md border text-lg font-bold tabular-nums";
+
+  if (editable) {
+    const empty = value === "";
     return (
-      <div className="flex h-8 items-center justify-center gap-1.5 border-t border-ink-100 text-xs font-medium">
-        {saveState === "saving" && (
-          <span className="flex items-center gap-1 text-ink-400">
-            <Loader2 className="size-3.5 animate-spin" /> salvando…
-          </span>
+      <input
+        type="number"
+        inputMode="numeric"
+        min={0}
+        max={99}
+        aria-label="Placar"
+        value={value}
+        onChange={(e) => onChange(e.target.value.replace(/[^0-9]/g, "").slice(0, 2))}
+        placeholder="–"
+        className={cn(
+          base,
+          "outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20",
+          empty ? "border-ink-200 bg-white text-ink-950" : "border-brand-500 bg-white text-ink-950",
         )}
-        {saveState === "saved" && (
-          <span className="flex items-center gap-1 text-grass-600">
-            <Check className="size-3.5" /> palpite salvo
-          </span>
-        )}
-        {saveState === "error" && <span className="text-flame-600">erro ao salvar</span>}
-        {saveState === "idle" &&
-          (prediction ? (
-            <span className="text-ink-400">
-              palpite: {prediction.home_pred} × {prediction.away_pred}
-            </span>
-          ) : (
-            <span className="text-ink-400">{hasInput ? "" : "faça seu palpite"}</span>
-          ))}
-      </div>
+      />
     );
   }
 
-  // Travado / finalizado
+  // travado (mostra o palpite)
+  const display = value === "" ? "–" : value;
   return (
-    <div className="flex h-9 items-center justify-center gap-2 border-t border-ink-100 px-3 text-xs">
-      {prediction ? (
-        <>
-          <span className="font-medium text-ink-500">
-            seu palpite: <span className="font-bold text-ink-800">
-              {prediction.home_pred} × {prediction.away_pred}
-            </span>
-          </span>
-          {finished && prediction.score_type && <ScorePill type={prediction.score_type} withLabel />}
-        </>
-      ) : (
-        <span className="flex items-center gap-1 text-ink-400">
-          <Lock className="size-3.5" /> você não palpitou
+    <span
+      className={cn(
+        base,
+        scoreType
+          ? scoreBoxByType[scoreType]
+          : live
+            ? "border-ink-300 bg-transparent text-ink-500"
+            : "border-ink-200 bg-ink-200/40 text-ink-500",
+      )}
+    >
+      {display}
+      {scoreType && scoreType !== "erro" && (
+        <span
+          className={cn(
+            "absolute -right-1.5 -top-1.5 rounded-full px-1 text-[9px] font-bold leading-tight",
+            scoreType === "cravada" && "bg-gold-600 text-white",
+            scoreType === "saldo" && "bg-grass-700 text-white",
+            scoreType === "acerto" && "bg-aqua-900 text-white",
+          )}
+        >
+          +{scoreType === "cravada" ? 3 : scoreType === "saldo" ? 2 : 1}
         </span>
       )}
-    </div>
+    </span>
+  );
+}
+
+function Galera({ matchId, finished }: { matchId: string; finished: boolean }) {
+  const { data, isLoading } = useMatchPredictions(matchId, true);
+
+  if (isLoading) {
+    return <div className="px-3 py-3 text-center text-xs text-ink-400">carregando…</div>;
+  }
+  if (!data || data.length === 0) {
+    return <div className="px-3 py-3 text-center text-xs text-ink-400">ninguém palpitou ainda</div>;
+  }
+  return (
+    <ul className="divide-y divide-ink-100 bg-surface/60 px-1 py-1">
+      {data.map((p, i) => (
+        <li key={p.user?.id ?? i} className="flex items-center gap-2 px-2.5 py-1.5">
+          <Avatar src={p.user?.avatar_url} name={p.user?.display_name} size="xs" />
+          <span className="min-w-0 flex-1 truncate text-xs font-medium text-ink-800">
+            {p.user?.display_name ?? "—"}
+          </span>
+          <span className="text-xs font-bold tabular-nums text-ink-600">
+            {p.home_pred} × {p.away_pred}
+          </span>
+          {finished && p.score_type && <ScorePill type={p.score_type} />}
+        </li>
+      ))}
+    </ul>
   );
 }

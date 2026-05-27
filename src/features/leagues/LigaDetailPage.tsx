@@ -363,7 +363,6 @@ function CompeticoesTab({
             options={[
               { value: "table", label: "Tabela" },
               { value: "points", label: "Pontos" },
-              { value: "cup", label: "Copa" },
             ]}
           />
           <div className="flex gap-2">
