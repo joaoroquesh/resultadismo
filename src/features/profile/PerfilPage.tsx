@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { LogOut, ShieldCheck, ChevronRight, Pencil } from "lucide-react";
+import { LogOut, ShieldCheck, ChevronRight, Pencil, BellRing } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
+import { useToast } from "@/components/ui/Toast";
+import { subscribePush, pushConfigured } from "@/features/notifications/push";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { usePlayerStats } from "./stats";
@@ -21,6 +24,16 @@ function Stat({ value, label, accent }: { value: string | number; label: string;
 export function PerfilPage() {
   const { profile, user, isAppAdmin, signOut } = useAuth();
   const { data: stats } = usePlayerStats();
+  const { toast } = useToast();
+  const [pushBusy, setPushBusy] = useState(false);
+
+  async function handlePush() {
+    if (!user) return;
+    setPushBusy(true);
+    const { ok, error } = await subscribePush(user.id);
+    setPushBusy(false);
+    toast(ok ? "Notificações ativadas! 🔔" : error ?? "Não foi possível ativar.", ok ? "success" : "error");
+  }
 
   return (
     <Page title="Perfil">
@@ -81,6 +94,22 @@ export function PerfilPage() {
         <Card className="flex items-center justify-between p-4">
           <span className="font-medium text-ink-900">Aparência</span>
           <ThemeToggle />
+        </Card>
+
+        <Card className="flex items-center justify-between gap-3 p-4">
+          <div className="min-w-0">
+            <p className="font-medium text-ink-900">Notificações</p>
+            <p className="text-xs text-ink-500">Avisos de prazo e cutucadas dos amigos</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            loading={pushBusy}
+            onClick={handlePush}
+            disabled={!pushConfigured()}
+          >
+            <BellRing className="size-4" /> {pushConfigured() ? "Ativar" : "Em breve"}
+          </Button>
         </Card>
 
         <Button variant="outline" fullWidth onClick={signOut}>
