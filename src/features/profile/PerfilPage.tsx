@@ -267,7 +267,15 @@ export function PerfilPage() {
           <LogOut className="size-4" /> Sair
         </Button>
 
-        <p className="pt-2 text-center text-xs text-ink-400">
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 pt-2 text-sm font-medium text-ink-500">
+          <Link to="/termos" className="transition-colors hover:text-ink-900">
+            Termos de uso
+          </Link>
+          <Link to="/privacidade" className="transition-colors hover:text-ink-900">
+            Privacidade
+          </Link>
+        </div>
+        <p className="text-center text-xs text-ink-400">
           Resultadismo © {new Date().getFullYear()}
         </p>
       </div>
