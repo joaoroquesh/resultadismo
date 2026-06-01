@@ -2,12 +2,23 @@
 // Codificado em avatar_url como "gen:<forma>:<cor1-cor2-cor3>:<rotacao>".
 import type { CSSProperties } from "react";
 
-export type AvatarShape = "circle" | "squircle" | "shield" | "hexagon" | "diamond";
+export type AvatarShape =
+  | "shield"
+  | "ogival"
+  | "banner"
+  | "circle"
+  | "squircle"
+  | "hexagon"
+  | "diamond";
 
 export const AVATAR_SHAPES: { key: AvatarShape; label: string }[] = [
+  // escudos de clube primeiro
+  { key: "shield", label: "Escudo" },
+  { key: "ogival", label: "Ogival" },
+  { key: "banner", label: "Bandeira" },
+  // formas geométricas
   { key: "circle", label: "Círculo" },
   { key: "squircle", label: "Quadrado" },
-  { key: "shield", label: "Escudo" },
   { key: "hexagon", label: "Hexágono" },
   { key: "diamond", label: "Losango" },
 ];
@@ -25,12 +36,23 @@ export const AVATAR_COLORS: { key: string; hex: string; dark?: boolean }[] = [
 
 export const AVATAR_ROTATIONS = [0, 45, 90, 135];
 
+// polígonos em % (escalam em qualquer tamanho). Crests com vértices suficientes
+// para um silhueta de escudo de futebol limpa.
+const SHIELD = "polygon(3% 0, 97% 0, 97% 46%, 88% 68%, 68% 88%, 50% 100%, 32% 88%, 12% 68%, 3% 46%)";
+const OGIVAL =
+  "polygon(50% 0, 73% 4%, 92% 17%, 100% 39%, 100% 51%, 90% 73%, 68% 92%, 50% 100%, 32% 92%, 10% 73%, 0 51%, 0 39%, 8% 17%, 27% 4%)";
+const BANNER = "polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%)";
+
 export function shapeStyle(shape: AvatarShape): CSSProperties {
   switch (shape) {
     case "squircle":
       return { borderRadius: "32%" };
     case "shield":
-      return { clipPath: "polygon(0% 0%, 100% 0%, 100% 62%, 50% 100%, 0% 62%)" };
+      return { clipPath: SHIELD };
+    case "ogival":
+      return { clipPath: OGIVAL };
+    case "banner":
+      return { clipPath: BANNER };
     case "hexagon":
       return { clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" };
     case "diamond":
