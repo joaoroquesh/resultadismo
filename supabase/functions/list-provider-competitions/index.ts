@@ -112,11 +112,41 @@ Deno.serve(async (req) => {
           emblem: l.strBadge ?? null,
           type: null,
           season: null, // TheSportsDB exige consulta de search_all_seasons; o admin preenche
-        }))
-        .sort((a: ProviderCompetition, b: ProviderCompetition) => {
-          const c = (a.country ?? "").localeCompare(b.country ?? "");
-          return c !== 0 ? c : a.name.localeCompare(b.name);
-        });
+        }));
+
+      // Curadoria: ligas que respondem fixtures/eventos com a key free mas
+      // não aparecem em all_leagues.php (verificado por consulta direta a
+      // eventsseason.php). Mescla sem duplicar por ID.
+      const CURATED: ProviderCompetition[] = [
+        {
+          provider: "thesportsdb",
+          code: "4351",
+          name: "Brazilian Serie A",
+          area: "Brazil",
+          country: "Brazil",
+          emblem: null,
+          type: null,
+          season: null,
+        },
+        {
+          provider: "thesportsdb",
+          code: "4562",
+          name: "International Friendlies",
+          area: "World",
+          country: "World",
+          emblem: null,
+          type: null,
+          season: null,
+        },
+      ];
+      for (const cur of CURATED) {
+        if (!competitions.some((c) => c.code === cur.code)) competitions.push(cur);
+      }
+
+      competitions.sort((a, b) => {
+        const c = (a.country ?? "").localeCompare(b.country ?? "");
+        return c !== 0 ? c : a.name.localeCompare(b.name);
+      });
       return json({ competitions });
     }
 
