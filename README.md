@@ -119,6 +119,21 @@ Já estão agendados (pg_cron): `run_football_sync()` (jogos, 15min) e
    - `VITE_SUPABASE_URL` = Project URL do Supabase
    - `VITE_SUPABASE_ANON_KEY` = publishable/anon key
    - `VITE_VAPID_PUBLIC_KEY` = chave pública VAPID (do passo 4)
+   - `VITE_LEAGUE_PRICE_CENTS` = preço da liga em centavos, só p/ exibição (ex.: `990`; deve bater com o `LEAGUE_PRICE_CENTS` da function)
 3. Deploy. O `vercel.json` já trata o roteamento de SPA.
 4. (Opcional) Aponte o domínio `resultadismo.com` para a Vercel.
+
+### 7. Pagamento de ligas (Mercado Pago)
+1. Crie uma aplicação em [mercadopago.com.br/developers](https://www.mercadopago.com.br/developers) e pegue o **Access Token** de produção.
+2. Configure os secrets das edge functions:
+   ```bash
+   supabase secrets set MERCADOPAGO_ACCESS_TOKEN=seu_token
+   supabase secrets set LEAGUE_PRICE_CENTS=990    # R$ 9,90
+   supabase secrets set APP_URL=https://resultadismo.com
+   # opcional (recomendado): valida a assinatura do webhook
+   supabase secrets set MP_WEBHOOK_SECRET=seu_segredo
+   ```
+3. No painel do Mercado Pago, cadastre o **webhook** apontando para
+   `https://SEU_REF.supabase.co/functions/v1/mercadopago-webhook` (evento: *payments*).
+4. Deploy das functions: `supabase functions deploy create-league-checkout mercadopago-webhook`.
 ```

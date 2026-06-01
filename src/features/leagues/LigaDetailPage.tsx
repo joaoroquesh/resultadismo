@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   Copy,
@@ -33,6 +34,7 @@ import {
   useRemoveMember,
   useLeaveLeague,
   useAddLeagueCompetition,
+  useLeagueCheckout,
 } from "./api";
 import type { LeagueMode } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -59,6 +61,32 @@ export function LigaDetailPage() {
   const { data: standings, isLoading: loadingStandings } = useStandings(activeLcId);
 
   const leave = useLeaveLeague();
+  const checkout = useLeagueCheckout();
+  const qc = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Enquanto o pagamento estiver pendente, atualiza a liga periodicamente
+  // (a webhook do Mercado Pago a ativa em segundos).
+  useEffect(() => {
+    if (league?.payment_status !== "pending") return;
+    const t = setInterval(() => {
+      qc.invalidateQueries({ queryKey: ["league", slug] });
+    }, 5000);
+    return () => clearInterval(t);
+  }, [league?.payment_status, slug, qc]);
+
+  // Mensagem ao voltar do checkout do Mercado Pago.
+  useEffect(() => {
+    const pag = searchParams.get("pagamento");
+    if (!pag) return;
+    if (pag === "sucesso") toast("Pagamento recebido! Ativando sua liga…", "success");
+    else if (pag === "processando")
+      toast("Pagamento em processamento. A liga será ativada em instantes.", "info");
+    else if (pag === "falhou")
+      toast("O pagamento não foi concluído. Você pode tentar de novo.", "error");
+    searchParams.delete("pagamento");
+    setSearchParams(searchParams, { replace: true });
+  }, [searchParams, setSearchParams, toast]);
 
   const tabs = useMemo(() => {
     const base: { value: Tab; label: string }[] = [
@@ -110,12 +138,32 @@ export function LigaDetailPage() {
         </Button>
       }
     >
-      {league.status === "pending" && (
+      {league.payment_status === "pending" ? (
+        <div className="mb-4 rounded-md bg-gold-100 p-3 text-sm text-gold-800">
+          <div className="flex items-start gap-2">
+            <Clock className="mt-0.5 size-4 shrink-0" />
+            <p>
+              Esta liga será ativada assim que o pagamento for confirmado. Acabou de pagar? Pode levar
+              alguns segundos.
+            </p>
+          </div>
+          {isOwner && (
+            <Button
+              size="sm"
+              className="mt-3"
+              loading={checkout.isPending}
+              onClick={() => checkout.mutate(league.id)}
+            >
+              Pagar agora
+            </Button>
+          )}
+        </div>
+      ) : league.status === "pending" ? (
         <div className="mb-4 flex items-start gap-2 rounded-md bg-gold-100 p-3 text-sm text-gold-800">
           <Clock className="mt-0.5 size-4 shrink-0" />
           <p>Esta liga aguarda aprovação de um administrador para ficar ativa.</p>
         </div>
-      )}
+      ) : null}
 
       {/* cabeçalho */}
       <Card className="mb-4 p-4">

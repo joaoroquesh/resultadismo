@@ -355,6 +355,7 @@ export type Database = {
           max_members: number | null
           name: string
           owner_id: string
+          payment_status: Database["public"]["Enums"]["payment_status"]
           slug: string
           status: Database["public"]["Enums"]["league_status"]
           updated_at: string
@@ -372,6 +373,7 @@ export type Database = {
           max_members?: number | null
           name: string
           owner_id: string
+          payment_status?: Database["public"]["Enums"]["payment_status"]
           slug: string
           status?: Database["public"]["Enums"]["league_status"]
           updated_at?: string
@@ -389,6 +391,7 @@ export type Database = {
           max_members?: number | null
           name?: string
           owner_id?: string
+          payment_status?: Database["public"]["Enums"]["payment_status"]
           slug?: string
           status?: Database["public"]["Enums"]["league_status"]
           updated_at?: string
@@ -890,6 +893,7 @@ export type Database = {
         | "cancelled"
       member_role: "owner" | "admin" | "member"
       member_status: "active" | "pending" | "banned"
+      payment_status: "none" | "pending" | "paid" | "failed" | "refunded"
       score_type: "cravada" | "saldo" | "acerto" | "erro"
     }
     CompositeTypes: {
@@ -1029,6 +1033,7 @@ export const Constants = {
       match_status: ["scheduled", "live", "finished", "postponed", "cancelled"],
       member_role: ["owner", "admin", "member"],
       member_status: ["active", "pending", "banned"],
+      payment_status: ["none", "pending", "paid", "failed", "refunded"],
       score_type: ["cravada", "saldo", "acerto", "erro"],
     },
   },

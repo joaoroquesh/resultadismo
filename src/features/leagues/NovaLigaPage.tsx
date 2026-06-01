@@ -9,7 +9,8 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Coachmark } from "@/components/ui/Coachmark";
 import { useToast } from "@/components/ui/Toast";
 import { useCompetitions } from "@/features/matches/api";
-import { useCreateLeague } from "./api";
+import { useCreateLeague, startLeagueCheckout } from "./api";
+import { LEAGUE_PRICE_BRL } from "@/lib/pricing";
 import type { LeagueMode } from "@/lib/types";
 
 export function NovaLigaPage() {
@@ -37,8 +38,20 @@ export function NovaLigaPage() {
         competitionId: competitionId || undefined,
         mode,
       });
-      toast("Liga criada! Aguarde a aprovação para começar.", "success");
-      navigate(`/ligas/${league.slug}`);
+      // Liga criada como "pendente": segue para o checkout do Mercado Pago p/ ativar.
+      try {
+        const url = await startLeagueCheckout(league.id);
+        window.location.href = url;
+        return;
+      } catch (payErr) {
+        toast(
+          payErr instanceof Error
+            ? `Liga criada, mas o pagamento não iniciou: ${payErr.message}`
+            : "Liga criada. Finalize o pagamento para ativá-la.",
+          "info",
+        );
+        navigate(`/ligas/${league.slug}`);
+      }
     } catch (err) {
       toast(err instanceof Error ? err.message : "Erro ao criar liga.", "error");
     }
@@ -187,8 +200,9 @@ export function NovaLigaPage() {
         <div className="flex items-start gap-2 rounded-md bg-brand-50 p-3 text-xs text-brand-800">
           <Info className="mt-0.5 size-4 shrink-0" />
           <p>
-            Para evitar abusos, novas ligas passam por uma aprovação rápida de um administrador
-            antes de ficarem ativas. Em dúvida sobre as opções?{" "}
+            Criar uma liga tem uma <strong>taxa única de {LEAGUE_PRICE_BRL}</strong>, paga via Pix ou
+            cartão no Mercado Pago. A liga é ativada automaticamente após a confirmação do pagamento.
+            Em dúvida sobre as opções?{" "}
             <Link to="/como-funciona" className="font-semibold underline">
               Veja como funciona
             </Link>
@@ -197,7 +211,7 @@ export function NovaLigaPage() {
         </div>
 
         <Button type="submit" fullWidth loading={create.isPending} disabled={!name.trim()}>
-          Criar liga
+          Criar liga • {LEAGUE_PRICE_BRL}
         </Button>
       </form>
     </Page>

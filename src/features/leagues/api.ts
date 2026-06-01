@@ -117,6 +117,17 @@ function slugify(name: string): string {
     .slice(0, 40);
 }
 
+/** Inicia o checkout de pagamento da liga e devolve a URL do Mercado Pago. */
+export async function startLeagueCheckout(leagueId: string): Promise<string> {
+  const { data, error } = await supabase.functions.invoke("create-league-checkout", {
+    body: { leagueId },
+  });
+  if (error) throw error;
+  const url = (data as { url?: string } | null)?.url;
+  if (!url) throw new Error("Não foi possível iniciar o pagamento.");
+  return url;
+}
+
 export function useCreateLeague() {
   const { user } = useAuth();
   const qc = useQueryClient();
@@ -157,6 +168,16 @@ export function useCreateLeague() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["my-leagues"] });
+    },
+  });
+}
+
+/** Reabre o checkout de uma liga pendente de pagamento (botão "Pagar agora"). */
+export function useLeagueCheckout() {
+  return useMutation({
+    mutationFn: async (leagueId: string) => {
+      const url = await startLeagueCheckout(leagueId);
+      window.location.href = url;
     },
   });
 }

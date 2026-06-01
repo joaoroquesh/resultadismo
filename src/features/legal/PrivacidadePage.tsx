@@ -1,16 +1,21 @@
 import { LegalLayout, LegalSection } from "./LegalLayout";
 
-const CONTATO = "contato@resultadismo.com";
+const CONTATO = "resultadismoapp@gmail.com";
 
 export function PrivacidadePage() {
   return (
-    <LegalLayout title="Política de Privacidade" updatedAt="27 de maio de 2026">
+    <LegalLayout title="Política de Privacidade" updatedAt="31 de maio de 2026">
       <p>
         Esta Política explica como o <strong>Resultadismo</strong> ("nós", "app") coleta, usa e
         protege seus dados quando você usa o site e o aplicativo em{" "}
         <strong>resultadismo.com</strong>. O Resultadismo é um jogo gratuito de palpites de futebol
         entre amigos, sem apostas e sem dinheiro real. Ao usar o app, você concorda com esta
         Política, em conformidade com a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018).
+      </p>
+      <p>
+        <strong>Controlador dos dados:</strong> o Resultadismo, projeto independente mantido de forma
+        pessoal. <strong>Encarregado (DPO):</strong> os pedidos sobre dados e privacidade são tratados
+        diretamente pelo responsável pelo app, pelo e-mail <strong>{CONTATO}</strong> (LGPD, art. 41).
       </p>
 
       <LegalSection title="1. Dados que coletamos">
@@ -34,8 +39,14 @@ export function PrivacidadePage() {
             do seu navegador para enviar avisos de prazo e cutucadas.
           </li>
           <li>
-            <strong>Dados técnicos:</strong> informações mínimas de funcionamento (ex.: identificador
-            de sessão de acesso e horário), usadas para manter o serviço estável em horários de pico.
+            <strong>Dados técnicos:</strong> registros mínimos de funcionamento e segurança gerados pelo
+            nosso provedor de backend (ex.: data e hora de acesso e endereço IP), usados para autenticar,
+            manter o serviço estável e prevenir abusos.
+          </li>
+          <li>
+            <strong>Pagamentos (ao criar liga paga):</strong> ao pagar a taxa de criação de liga, o
+            pagamento é processado pelo Mercado Pago. Guardamos apenas o status e um identificador da
+            transação; os dados do seu cartão ficam com o Mercado Pago, nunca conosco.
           </li>
         </ul>
         <p>
@@ -82,6 +93,10 @@ export function PrivacidadePage() {
             <strong>Serviços de push do navegador</strong> (Google, Apple, Mozilla) — apenas se você
             ativar notificações, para entregá-las ao seu dispositivo.
           </li>
+          <li>
+            <strong>Mercado Pago</strong> — processamento de pagamentos, apenas se você criar uma liga
+            paga.
+          </li>
         </ul>
         <p>
           Dentro de uma liga, seu nome, avatar e estatísticas ficam visíveis aos demais participantes,
@@ -116,21 +131,30 @@ export function PrivacidadePage() {
           conexões criptografadas (HTTPS) e controles de acesso por linha (RLS) no banco. Nenhum sistema
           é 100% seguro, mas trabalhamos para reduzir riscos.
         </p>
+        <p>
+          Em caso de incidente de segurança que possa gerar risco relevante aos seus dados, tomaremos as
+          medidas cabíveis e comunicaremos você e a Autoridade Nacional de Proteção de Dados (ANPD)
+          quando exigido pela LGPD.
+        </p>
       </LegalSection>
 
       <LegalSection title="8. Retenção e exclusão">
         <p>
-          Mantemos seus dados enquanto sua conta existir. Você pode solicitar a exclusão da sua conta e
-          dos dados associados a qualquer momento pelo contato abaixo; atenderemos no prazo legal.
-          Alguns registros podem ser mantidos quando exigido por lei.
+          Mantemos seus dados enquanto sua conta existir. Você pode solicitar a exclusão da sua conta a
+          qualquer momento pelo contato abaixo; após a solicitação, removemos seus dados pessoais em até{" "}
+          <strong>30 dias</strong>. Registros técnicos de acesso e segurança podem ser mantidos por até{" "}
+          <strong>6 meses</strong> e alguns dados podem ser conservados por mais tempo quando exigido por
+          lei.
         </p>
       </LegalSection>
 
       <LegalSection title="9. Seus direitos">
         <p>
-          Conforme a LGPD, você pode solicitar: confirmação e acesso aos seus dados; correção; anonimização
-          ou exclusão; portabilidade; informação sobre compartilhamentos; e revogação de consentimento.
-          Para exercer, escreva para <strong>{CONTATO}</strong>.
+          Conforme a LGPD (art. 18), você pode solicitar: confirmação e acesso aos seus dados; correção;
+          anonimização ou exclusão; portabilidade; informação sobre compartilhamentos; e revogação de
+          consentimento. Para exercer, escreva para <strong>{CONTATO}</strong>. Você também pode
+          apresentar uma reclamação à Autoridade Nacional de Proteção de Dados (ANPD) em{" "}
+          <strong>gov.br/anpd</strong>.
         </p>
       </LegalSection>
 

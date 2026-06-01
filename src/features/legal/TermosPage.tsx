@@ -1,22 +1,27 @@
 import { LegalLayout, LegalSection } from "./LegalLayout";
 
-const CONTATO = "contato@resultadismo.com";
+const CONTATO = "resultadismoapp@gmail.com";
 
 export function TermosPage() {
   return (
-    <LegalLayout title="Termos de Serviço" updatedAt="27 de maio de 2026">
+    <LegalLayout title="Termos de Serviço" updatedAt="31 de maio de 2026">
       <p>
         Bem-vindo ao <strong>Resultadismo</strong>. Estes Termos regem o uso do site e do aplicativo em{" "}
         <strong>resultadismo.com</strong>. Ao acessar ou usar o app, você concorda com estes Termos. Se
         não concordar, não use o serviço.
       </p>
+      <p>
+        O Resultadismo é um projeto independente, mantido de forma pessoal. Para qualquer assunto legal,
+        de privacidade ou de proteção de dados, fale com <strong>{CONTATO}</strong>.
+      </p>
 
       <LegalSection title="1. O que é o Resultadismo">
         <p>
-          O Resultadismo é um jogo <strong>gratuito</strong> e de <strong>entretenimento</strong>: você
-          palpita os placares de jogos reais de futebol, ganha pontos por acerto e disputa com amigos em
-          ligas. <strong>Não é uma casa de apostas.</strong> Não há aposta de dinheiro, não há prêmios em
-          dinheiro e não há qualquer pagamento para jogar ou ganhar.
+          O Resultadismo é um jogo de <strong>entretenimento</strong>: você palpita os placares de jogos
+          reais de futebol, ganha pontos por acerto e disputa com amigos em ligas.{" "}
+          <strong>Não é uma casa de apostas.</strong> Não há aposta de dinheiro nem prêmios em dinheiro.
+          Jogar e participar de ligas é <strong>gratuito</strong>; criar uma liga própria pode ter uma
+          taxa única de serviço (ver seção 12).
         </p>
       </LegalSection>
 
@@ -53,6 +58,11 @@ export function TermosPage() {
           fazem parte do funcionamento do app e podem ser ajustados para melhorar a experiência. A
           pontuação é calculada com base nos resultados oficiais dos jogos.
         </p>
+        <p>
+          Notou um erro de placar ou de pontuação? Avise em até <strong>7 dias</strong> pelo contato no
+          fim desta página. Corrigimos quando o erro for confirmado; a decisão final sobre a pontuação
+          cabe à administração do Resultadismo.
+        </p>
       </LegalSection>
 
       <LegalSection title="6. Dados de futebol de terceiros">
@@ -78,6 +88,10 @@ export function TermosPage() {
           times e competições pertencem aos seus respectivos titulares e são usados apenas para fins
           informativos do jogo.
         </p>
+        <p>
+          Ao criar ligas, escolher nomes ou enviar um avatar, você nos concede uma licença limitada e
+          gratuita para exibir esse conteúdo dentro do app, apenas com a finalidade de operar o jogo.
+        </p>
       </LegalSection>
 
       <LegalSection title="9. Limitação de responsabilidade">
@@ -99,18 +113,38 @@ export function TermosPage() {
       <LegalSection title="11. Alterações nos Termos">
         <p>
           Podemos atualizar estes Termos. Mudanças relevantes serão indicadas pela data de "última
-          atualização" no topo. O uso contínuo após alterações significa concordância com a versão vigente.
+          atualização" no topo e, quando significativas, avisadas dentro do app com antecedência razoável
+          antes de entrarem em vigor. O uso contínuo após alterações significa concordância com a versão
+          vigente.
         </p>
       </LegalSection>
 
-      <LegalSection title="12. Lei aplicável e foro">
+      <LegalSection title="12. Pagamentos e reembolso (criação de ligas)">
         <p>
-          Estes Termos são regidos pelas leis do Brasil. Fica eleito o foro do domicílio do usuário para
-          dirimir eventuais controvérsias, salvo disposição legal em contrário.
+          Jogar e participar de ligas é gratuito. <strong>Criar uma liga própria</strong> pode ter uma{" "}
+          <strong>taxa única de serviço</strong>, exibida antes da confirmação. O pagamento é processado
+          pelo <strong>Mercado Pago</strong> (Pix ou cartão); não recebemos nem armazenamos os dados do
+          seu cartão. A liga é ativada automaticamente após a confirmação do pagamento.
+        </p>
+        <p>
+          É uma cobrança avulsa, <strong>sem renovação automática</strong> e sem mensalidade — uma taxa
+          de serviço para criar a liga, que não é aposta nem compra de prêmio. Conforme o Código de
+          Defesa do Consumidor, você pode pedir <strong>reembolso em até 7 dias</strong> da compra,
+          desde que a liga ainda não tenha sido usada (sem palpites lançados). Para isso, escreva para{" "}
+          <strong>{CONTATO}</strong>.
         </p>
       </LegalSection>
 
-      <LegalSection title="13. Contato">
+      <LegalSection title="13. Lei aplicável e foro">
+        <p>
+          Estes Termos são regidos pelas leis brasileiras, incluindo o Código de Defesa do Consumidor
+          (CDC), o Marco Civil da Internet (Lei nº 12.965/2014) e a Lei Geral de Proteção de Dados (LGPD,
+          Lei nº 13.709/2018). Fica eleito o foro do domicílio do usuário para dirimir eventuais
+          controvérsias, salvo disposição legal em contrário.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="14. Contato">
         <p>
           Dúvidas sobre estes Termos? Fale com a gente em <strong>{CONTATO}</strong>.
         </p>
