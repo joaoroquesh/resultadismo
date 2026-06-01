@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Check, X, RefreshCw, Plus, ShieldCheck, Trash2, RotateCcw, Settings, Clock } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { dayjs } from "@/lib/format";
 import { useDeletedLeagues, useSoftDeleteLeague, useRestoreLeague } from "./moderation";
+import { useProviderCompetitions, type ProviderCompetition, type ProviderName } from "./providers";
+import { cn } from "@/lib/utils";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -217,11 +219,31 @@ function CompeticoesAdmin() {
   const create = useCreateCompetition();
   const sync = useSyncFootball();
   const { toast } = useToast();
-  const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [provider, setProvider] = useState<DataProvider>("football_data");
-  const [code, setCode] = useState("");
-  const [season, setSeason] = useState("");
+  const [provider, setProvider] = useState<ProviderName>("football_data");
+  const [filter, setFilter] = useState("");
+  const { data: catalog, isLoading: loadingCatalog, error: catalogError } =
+    useProviderCompetitions(provider);
+
+  // (provider, provider_code) -> já no app, p/ marcar "adicionada"
+  const addedKeys = useMemo(() => {
+    const s = new Set<string>();
+    (comps ?? []).forEach((c) => {
+      if (c.provider_code) s.add(`${c.provider}:${c.provider_code}`);
+    });
+    return s;
+  }, [comps]);
+
+  const filtered = useMemo(() => {
+    const q = filter.trim().toLowerCase();
+    const list = catalog ?? [];
+    if (!q) return list;
+    return list.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        (c.country ?? "").toLowerCase().includes(q) ||
+        c.code.toLowerCase().includes(q),
+    );
+  }, [catalog, filter]);
 
   async function handleSync(id?: string) {
     try {
@@ -234,22 +256,17 @@ function CompeticoesAdmin() {
     }
   }
 
-  async function handleCreate() {
-    if (!name.trim()) return;
+  async function handleAdd(c: ProviderCompetition) {
     try {
       await create.mutateAsync({
-        name: name.trim(),
-        provider,
-        providerCode: code.trim() || undefined,
-        providerSeason: season.trim() || undefined,
-        type: "LEAGUE",
+        name: c.name,
+        provider: c.provider as DataProvider,
+        providerCode: c.code,
+        providerSeason: c.season ?? undefined,
+        type: c.type === "CUP" ? "CUP" : "LEAGUE",
         isFeatured: false,
       });
-      toast("Competição criada!", "success");
-      setOpen(false);
-      setName("");
-      setCode("");
-      setSeason("");
+      toast(`${c.name} adicionada!`, "success");
     } catch (e) {
       toast(e instanceof Error ? e.message : "Erro.", "error");
     }
@@ -263,7 +280,8 @@ function CompeticoesAdmin() {
         <RefreshCw className="size-4" /> Sincronizar todas
       </Button>
 
-      {comps?.map((c) => (
+      {/* já no app */}
+      {(comps ?? []).map((c) => (
         <Card key={c.id} className="p-3.5">
           <div className="flex items-center justify-between">
             <div className="min-w-0">
@@ -283,53 +301,93 @@ function CompeticoesAdmin() {
         </Card>
       ))}
 
-      {open ? (
-        <Card className="space-y-3 p-4">
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Nome (ex.: Brasileirão Série A)"
-            className="h-11 w-full rounded-md border border-ink-200 px-3.5 outline-none focus:border-brand-500"
-          />
-          <select
-            value={provider}
-            onChange={(e) => setProvider(e.target.value as DataProvider)}
-            className="h-11 w-full rounded-md border border-ink-200 bg-surface px-3 outline-none focus:border-brand-500"
-          >
-            <option value="football_data">football-data.org</option>
-            <option value="thesportsdb">TheSportsDB</option>
-            <option value="manual">Manual</option>
-          </select>
-          {provider !== "manual" && (
-            <div className="flex gap-2">
-              <input
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder="Código (ex.: WC, BSA)"
-                className="h-11 w-full rounded-md border border-ink-200 px-3.5 outline-none focus:border-brand-500"
-              />
-              <input
-                value={season}
-                onChange={(e) => setSeason(e.target.value)}
-                placeholder="Temporada (ex.: 2026)"
-                className="h-11 w-full rounded-md border border-ink-200 px-3.5 outline-none focus:border-brand-500"
-              />
-            </div>
-          )}
-          <div className="flex gap-2">
-            <Button variant="ghost" fullWidth onClick={() => setOpen(false)}>
-              Cancelar
-            </Button>
-            <Button fullWidth loading={create.isPending} onClick={handleCreate}>
-              Criar
-            </Button>
-          </div>
-        </Card>
-      ) : (
-        <Button variant="ghost" fullWidth onClick={() => setOpen(true)}>
-          <Plus className="size-4" /> Nova competição
-        </Button>
-      )}
+      {/* catálogo das APIs grátis */}
+      <Card className="space-y-3 p-4">
+        <div>
+          <p className="text-sm font-semibold text-ink-900">Adicionar do catálogo</p>
+          <p className="text-xs text-ink-500">
+            Competições liberadas no plano da sua chave em cada provedor.
+          </p>
+        </div>
+        <div className="flex gap-1 rounded-pill bg-ink-100 p-1">
+          {(["football_data", "thesportsdb"] as ProviderName[]).map((p) => (
+            <button
+              key={p}
+              type="button"
+              onClick={() => setProvider(p)}
+              className={cn(
+                "flex-1 rounded-pill px-3 py-1.5 text-sm font-semibold transition-all",
+                provider === p
+                  ? "bg-surface text-ink-950 shadow-[var(--shadow-soft)]"
+                  : "text-ink-500 hover:text-ink-700",
+              )}
+            >
+              {p === "football_data" ? "football-data.org" : "TheSportsDB"}
+            </button>
+          ))}
+        </div>
+        <input
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          placeholder="Buscar por nome, país ou código…"
+          className="h-11 w-full rounded-md border border-ink-200 bg-surface px-3.5 outline-none focus:border-brand-500"
+        />
+        {loadingCatalog ? (
+          <Skeleton className="h-40 w-full" />
+        ) : catalogError ? (
+          <p className="text-sm text-flame-600">
+            Erro ao buscar catálogo: {(catalogError as Error).message}
+          </p>
+        ) : (
+          <ul className="max-h-80 divide-y divide-border overflow-y-auto rounded-md border border-border">
+            {filtered.length === 0 ? (
+              <li className="p-4 text-center text-sm text-ink-400">
+                Nenhuma competição encontrada.
+              </li>
+            ) : (
+              filtered.map((c) => {
+                const added = addedKeys.has(`${c.provider}:${c.code}`);
+                return (
+                  <li
+                    key={`${c.provider}:${c.code}`}
+                    className="flex items-center gap-3 p-2.5"
+                  >
+                    {c.emblem ? (
+                      <img src={c.emblem} alt="" className="size-7 shrink-0 rounded" />
+                    ) : (
+                      <div className="size-7 shrink-0 rounded bg-ink-100" />
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-ink-900">{c.name}</p>
+                      <p className="truncate text-[11px] text-ink-500">
+                        {c.country ?? "—"} · {c.code}
+                        {c.season ? ` · temp. ${c.season}` : ""}
+                      </p>
+                    </div>
+                    {added ? (
+                      <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-grass-600">
+                        <Check className="size-3.5" /> adicionada
+                      </span>
+                    ) : (
+                      <Button
+                        size="sm"
+                        loading={create.isPending}
+                        onClick={() => handleAdd(c)}
+                      >
+                        <Plus className="size-4" /> Adicionar
+                      </Button>
+                    )}
+                  </li>
+                );
+              })
+            )}
+          </ul>
+        )}
+        <p className="text-[11px] text-ink-400">
+          {filtered.length} de {catalog?.length ?? 0} ·{" "}
+          {provider === "football_data" ? "football-data.org" : "TheSportsDB"}
+        </p>
+      </Card>
     </div>
   );
 }
