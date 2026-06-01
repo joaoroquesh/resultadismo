@@ -26,6 +26,7 @@ import { useAuth } from "@/features/auth/AuthProvider";
 import { useCompetitions } from "@/features/matches/api";
 import { useStandings } from "./api";
 import { StandingsTable } from "@/features/standings/StandingsTable";
+import { ConfrontoView } from "@/features/confronto/ConfrontoView";
 import {
   useLeague,
   useLeagueMembers,
@@ -247,6 +248,8 @@ export function LigaDetailPage() {
           standings={standings}
           loading={loadingStandings}
           currentUserId={user?.id}
+          isAdmin={isAdmin}
+          leagueId={league.id}
         />
       )}
 
@@ -274,13 +277,17 @@ function ClassificacaoTab({
   standings,
   loading,
   currentUserId,
+  isAdmin,
+  leagueId,
 }: {
-  comps: { id: string; name: string }[];
+  comps: { id: string; name: string; mode: string; competition_id: string }[];
   activeLcId?: string;
   onSelect: (id: string) => void;
   standings: ReturnType<typeof useStandings>["data"];
   loading: boolean;
   currentUserId?: string;
+  isAdmin: boolean;
+  leagueId: string;
 }) {
   if (comps.length === 0) {
     return (
@@ -290,6 +297,7 @@ function ClassificacaoTab({
       />
     );
   }
+  const active = comps.find((c) => c.id === activeLcId);
   return (
     <div className="space-y-3">
       {comps.length > 1 && (
@@ -310,7 +318,15 @@ function ClassificacaoTab({
           ))}
         </div>
       )}
-      {loading ? (
+      {active?.mode === "liga" && activeLcId ? (
+        <ConfrontoView
+          lcId={activeLcId}
+          leagueId={leagueId}
+          competitionId={active.competition_id}
+          isAdmin={isAdmin}
+          currentUserId={currentUserId}
+        />
+      ) : loading ? (
         <Skeleton className="h-64 w-full" />
       ) : standings && standings.length > 0 ? (
         <StandingsTable rows={standings} currentUserId={currentUserId} />
@@ -436,7 +452,7 @@ function CompeticoesTab({
   const [open, setOpen] = useState(false);
   const [competitionId, setCompetitionId] = useState("");
   const [name, setName] = useState("");
-  const [mode, setMode] = useState<LeagueMode>("table");
+  const [mode, setMode] = useState<LeagueMode>("points");
 
   async function handleAdd() {
     if (!competitionId || !name.trim()) return;
@@ -457,7 +473,13 @@ function CompeticoesTab({
         <Card key={c.id} className="flex items-center justify-between p-3.5">
           <span className="font-semibold text-ink-900">{c.name}</span>
           <Badge tone="neutral">
-            {c.mode === "table" ? "Tabela" : c.mode === "cup" ? "Copa" : "Pontos"}
+            {c.mode === "liga"
+              ? "Liga"
+              : c.mode === "cup"
+                ? "Copa"
+                : c.mode === "table"
+                  ? "Tabela"
+                  : "Pontos"}
           </Badge>
         </Card>
       ))}
@@ -486,10 +508,15 @@ function CompeticoesTab({
             value={mode}
             onChange={setMode}
             options={[
-              { value: "table", label: "Tabela" },
               { value: "points", label: "Pontos" },
+              { value: "liga", label: "Liga" },
             ]}
           />
+          <p className="text-xs leading-snug text-ink-500">
+            {mode === "liga"
+              ? "Confronto direto: cada rodada você enfrenta um adversário; quem fizer mais pontos vence (3/1/0)."
+              : "Corrida de pontos: soma tudo numa classificação única."}
+          </p>
           <div className="flex gap-2">
             <Button variant="ghost" fullWidth onClick={() => setOpen(false)}>
               Cancelar

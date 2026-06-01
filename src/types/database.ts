@@ -168,6 +168,7 @@ export type Database = {
           created_at: string
           id: string
           league_competition_id: string
+          matchday: number | null
           member_a: string | null
           member_b: string | null
           points_a: number
@@ -185,6 +186,7 @@ export type Database = {
           created_at?: string
           id?: string
           league_competition_id: string
+          matchday?: number | null
           member_a?: string | null
           member_b?: string | null
           points_a?: number
@@ -202,6 +204,7 @@ export type Database = {
           created_at?: string
           id?: string
           league_competition_id?: string
+          matchday?: number | null
           member_a?: string | null
           member_b?: string | null
           points_a?: number
@@ -784,6 +787,22 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_confronto_standings: {
+        Args: { p_lc_id: string }
+        Returns: {
+          avatar_url: string
+          derrotas: number
+          display_name: string
+          empates: number
+          gols_contra: number
+          gols_pro: number
+          jogos: number
+          pontos: number
+          rank: number
+          user_id: string
+          vitorias: number
+        }[]
+      }
       get_match_predict_status: {
         Args: { p_match_id: string }
         Returns: {
@@ -882,7 +901,7 @@ export type Database = {
     Enums: {
       data_provider: "manual" | "football_data" | "thesportsdb"
       join_policy: "open" | "approval" | "invite"
-      league_mode: "table" | "cup" | "points"
+      league_mode: "table" | "cup" | "points" | "liga"
       league_status: "pending" | "active" | "rejected" | "archived"
       league_visibility: "public" | "private"
       match_status:
@@ -1027,7 +1046,7 @@ export const Constants = {
     Enums: {
       data_provider: ["manual", "football_data", "thesportsdb"],
       join_policy: ["open", "approval", "invite"],
-      league_mode: ["table", "cup", "points"],
+      league_mode: ["table", "cup", "points", "liga"],
       league_status: ["pending", "active", "rejected", "archived"],
       league_visibility: ["public", "private"],
       match_status: ["scheduled", "live", "finished", "postponed", "cancelled"],
