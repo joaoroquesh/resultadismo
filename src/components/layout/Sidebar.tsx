@@ -16,7 +16,7 @@ export function Sidebar() {
     { to: "/", label: "Jogos", icon: Goal, end: true },
     ...(session
       ? [
-          { to: "/ligas", label: "Ligas", icon: Shield, end: false },
+          { to: "/federacoes", label: "Federações", icon: Shield, end: false },
           { to: "/perfil", label: "Perfil", icon: User, end: false },
           ...(isAppAdmin ? [{ to: "/admin", label: "Admin", icon: ShieldCheck, end: false }] : []),
         ]

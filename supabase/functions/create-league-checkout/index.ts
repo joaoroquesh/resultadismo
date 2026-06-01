@@ -1,14 +1,12 @@
 // Resultadismo · Edge Function · create-league-checkout
-// Cria a preferência de checkout no Mercado Pago para a taxa única de criação de
-// uma liga. Não cria a liga (o frontend já criou em 'pending') — apenas valida o
-// dono/estado e devolve a URL de pagamento (Pix/cartão).
+// Caminho de pagamento REAL (modo 'live'): cria a preferência no Mercado Pago.
+// Preço e modo vêm do banco (app_settings). Aplica código de desconto se houver.
+// Em modo 'test'/'disabled' o frontend NÃO chama isto (usa simulate_league_payment).
 //
-// Chamada (app, autenticado): supabase.functions.invoke("create-league-checkout", { body: { leagueId } })
+// Chamada (app, autenticado):
+//   supabase.functions.invoke("create-league-checkout", { body: { leagueId, discountCode? } })
 //
-// Secrets necessários:
-//   MERCADOPAGO_ACCESS_TOKEN  — Access Token do Mercado Pago
-//   LEAGUE_PRICE_CENTS        — preço em centavos de BRL (default 990 = R$ 9,90)
-//   APP_URL                   — URL pública do app (back_urls do checkout)
+// Secrets: MERCADOPAGO_ACCESS_TOKEN, APP_URL
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 
@@ -31,17 +29,8 @@ Deno.serve(async (req) => {
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const mpToken = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN") ?? "";
-  const priceCents = Math.round(Number(Deno.env.get("LEAGUE_PRICE_CENTS") ?? "990"));
   const appUrl = (Deno.env.get("APP_URL") ?? "https://resultadismo.com").replace(/\/+$/, "");
 
-  if (!mpToken) {
-    return json({ error: "Pagamento indisponível: token do Mercado Pago não configurado." }, 503);
-  }
-  if (!Number.isFinite(priceCents) || priceCents <= 0) {
-    return json({ error: "Preço da liga inválido." }, 500);
-  }
-
-  // Usuário autenticado (JWT do app)
   const authHeader = req.headers.get("Authorization") ?? "";
   const jwt = authHeader.replace("Bearer ", "");
   if (!jwt) return json({ error: "Não autorizado" }, 401);
@@ -51,7 +40,7 @@ Deno.serve(async (req) => {
   const user = userData.user;
   if (!user) return json({ error: "Não autorizado" }, 401);
 
-  let body: { leagueId?: string } = {};
+  let body: { leagueId?: string; discountCode?: string } = {};
   try {
     body = await req.json();
   } catch {
@@ -59,39 +48,87 @@ Deno.serve(async (req) => {
   }
   if (!body.leagueId) return json({ error: "leagueId é obrigatório" }, 400);
 
+  // Configurações de pagamento (modo + preço)
+  const { data: settings } = await admin
+    .from("app_settings")
+    .select("payment_mode, league_price_cents")
+    .eq("id", 1)
+    .maybeSingle();
+  const mode = settings?.payment_mode ?? "disabled";
+  const priceCents = Number(settings?.league_price_cents ?? 990);
+
+  if (mode !== "live") {
+    return json({ error: "Pagamento não está no modo Mercado Pago." }, 409);
+  }
+  if (!mpToken) {
+    return json({ error: "Pagamento indisponível: token do Mercado Pago não configurado." }, 503);
+  }
+
+  // Federação (tabela leagues por baixo)
   const { data: league, error } = await admin
     .from("leagues")
     .select("id, name, slug, owner_id, status, payment_status")
     .eq("id", body.leagueId)
     .maybeSingle();
   if (error) return json({ error: error.message }, 500);
-  if (!league) return json({ error: "Liga não encontrada" }, 404);
-  if (league.owner_id !== user.id) return json({ error: "Você não é o dono desta liga" }, 403);
+  if (!league) return json({ error: "Federação não encontrada" }, 404);
+  if (league.owner_id !== user.id) return json({ error: "Você não é o dono desta federação" }, 403);
   if (league.payment_status === "paid" || league.status === "active") {
-    return json({ error: "Esta liga já está ativa." }, 409);
+    return json({ error: "Esta federação já está ativa." }, 409);
   }
 
-  const unitPrice = priceCents / 100;
+  // Desconto (opcional)
+  let finalCents = priceCents;
+  let discountCode: string | null = null;
+  if (body.discountCode && body.discountCode.trim()) {
+    const { data: disc } = await admin.rpc("validate_discount_code", { p_code: body.discountCode });
+    if (disc?.valid) {
+      discountCode = disc.code;
+      if (disc.percent_off) finalCents = Math.round(priceCents * (1 - disc.percent_off / 100));
+      else if (disc.amount_off_cents) finalCents = priceCents - disc.amount_off_cents;
+      finalCents = Math.max(0, finalCents);
+    }
+  }
+
+  // Desconto de 100% → ativa de graça (sem MP)
+  if (finalCents <= 0) {
+    await admin.from("league_payments").insert({
+      league_id: league.id,
+      user_id: user.id,
+      provider: "discount-free",
+      payment_id: `free-${league.id}`,
+      status: "paid",
+      amount_cents: 0,
+      discount_code: discountCode,
+    });
+    await admin
+      .from("leagues")
+      .update({ payment_status: "paid", status: "active", approved_at: new Date().toISOString() })
+      .eq("id", league.id);
+    return json({ free: true });
+  }
+
+  const unitPrice = finalCents / 100;
   const notificationUrl = `${supabaseUrl}/functions/v1/mercadopago-webhook`;
 
   const preference = {
     items: [
       {
         id: league.id,
-        title: `Criação de liga: ${league.name}`,
-        description: "Resultadismo — taxa única de criação de liga",
+        title: `Criação de federação: ${league.name}`,
+        description: "Resultadismo — taxa única de criação de federação",
         quantity: 1,
         currency_id: "BRL",
         unit_price: unitPrice,
       },
     ],
     external_reference: league.id,
-    metadata: { league_id: league.id, user_id: user.id },
+    metadata: { league_id: league.id, user_id: user.id, discount_code: discountCode },
     payment_methods: { installments: 1 },
     back_urls: {
-      success: `${appUrl}/ligas/${league.slug}?pagamento=sucesso`,
-      pending: `${appUrl}/ligas/${league.slug}?pagamento=processando`,
-      failure: `${appUrl}/ligas/${league.slug}?pagamento=falhou`,
+      success: `${appUrl}/federacoes/${league.slug}?pagamento=sucesso`,
+      pending: `${appUrl}/federacoes/${league.slug}?pagamento=processando`,
+      failure: `${appUrl}/federacoes/${league.slug}?pagamento=falhou`,
     },
     auto_return: "approved",
     notification_url: notificationUrl,
@@ -100,15 +137,10 @@ Deno.serve(async (req) => {
 
   const res = await fetch("https://api.mercadopago.com/checkout/preferences", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${mpToken}`,
-      "Content-Type": "application/json",
-    },
+    headers: { Authorization: `Bearer ${mpToken}`, "Content-Type": "application/json" },
     body: JSON.stringify(preference),
   });
-  if (!res.ok) {
-    return json({ error: `Mercado Pago ${res.status}: ${await res.text()}` }, 502);
-  }
+  if (!res.ok) return json({ error: `Mercado Pago ${res.status}: ${await res.text()}` }, 502);
   const pref = await res.json();
   const url = pref.init_point ?? pref.sandbox_init_point;
   if (!url) return json({ error: "Mercado Pago não retornou a URL de pagamento." }, 502);

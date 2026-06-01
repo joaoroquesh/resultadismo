@@ -31,7 +31,7 @@ export function PrivacidadePage() {
             você escolher).
           </li>
           <li>
-            <strong>Atividade no jogo:</strong> seus palpites de placar, as ligas que você cria ou
+            <strong>Atividade no jogo:</strong> seus palpites de placar, as federações que você cria ou
             participa, e a pontuação resultante.
           </li>
           <li>
@@ -44,7 +44,7 @@ export function PrivacidadePage() {
             manter o serviço estável e prevenir abusos.
           </li>
           <li>
-            <strong>Pagamentos (ao criar liga paga):</strong> ao pagar a taxa de criação de liga, o
+            <strong>Pagamentos (ao criar federação paga):</strong> ao pagar a taxa de criação de federação, o
             pagamento é processado pelo Mercado Pago. Guardamos apenas o status e um identificador da
             transação; os dados do seu cartão ficam com o Mercado Pago, nunca conosco.
           </li>
@@ -58,7 +58,7 @@ export function PrivacidadePage() {
       <LegalSection title="2. Como usamos seus dados">
         <ul className="list-disc space-y-1 pl-5">
           <li>Autenticar seu acesso e manter sua sessão.</li>
-          <li>Registrar palpites, calcular a pontuação e montar as classificações das ligas.</li>
+          <li>Registrar palpites, calcular a pontuação e montar as classificações das federações.</li>
           <li>Mostrar seu perfil público (nome, avatar e estatísticas) a outros jogadores.</li>
           <li>Enviar notificações que você ativou (lembretes de palpite e cutucadas).</li>
           <li>Manter a segurança, prevenir abusos e operar o serviço.</li>
@@ -94,12 +94,12 @@ export function PrivacidadePage() {
             ativar notificações, para entregá-las ao seu dispositivo.
           </li>
           <li>
-            <strong>Mercado Pago</strong> — processamento de pagamentos, apenas se você criar uma liga
+            <strong>Mercado Pago</strong> — processamento de pagamentos, apenas se você criar uma federação
             paga.
           </li>
         </ul>
         <p>
-          Dentro de uma liga, seu nome, avatar e estatísticas ficam visíveis aos demais participantes,
+          Dentro de uma federação, seu nome, avatar e estatísticas ficam visíveis aos demais participantes,
           e seus palpites tornam-se visíveis após o início de cada jogo. Seu e-mail nunca é exposto a
           outros jogadores.
         </p>

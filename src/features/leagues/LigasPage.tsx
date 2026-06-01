@@ -22,7 +22,7 @@ export function LigasPage() {
     if (!code.trim()) return;
     try {
       await join.mutateAsync(code.trim());
-      toast("Você entrou na liga!", "success");
+      toast("Você entrou na federação!", "success");
       setCode("");
     } catch (err) {
       toast(err instanceof Error ? err.message : "Não foi possível entrar.", "error");
@@ -31,9 +31,9 @@ export function LigasPage() {
 
   return (
     <Page
-      title="Ligas"
+      title="Federações"
       action={
-        <Link to="/ligas/nova">
+        <Link to="/federacoes/nova">
           <Button size="sm">
             <Plus className="size-4" /> Criar
           </Button>
@@ -62,12 +62,12 @@ export function LigasPage() {
       ) : !leagues || leagues.length === 0 ? (
         <EmptyState
           icon={<Shield className="size-7" />}
-          title="Nenhuma liga ainda"
-          description="Crie sua liga e convide os amigos, ou entre numa liga existente com um código."
+          title="Nenhuma federação ainda"
+          description="Crie sua federação e convide os amigos, ou entre numa federação existente com um código."
           action={
-            <Link to="/ligas/nova">
+            <Link to="/federacoes/nova">
               <Button>
-                <Plus className="size-4" /> Criar liga
+                <Plus className="size-4" /> Criar federação
               </Button>
             </Link>
           }
@@ -75,7 +75,7 @@ export function LigasPage() {
       ) : (
         <div className="space-y-3">
           {leagues.map((l) => (
-            <Link key={l.id} to={`/ligas/${l.slug}`}>
+            <Link key={l.id} to={`/federacoes/${l.slug}`}>
               <Card className="flex items-center gap-3 p-4 transition active:scale-[0.99]">
                 <div className="flex size-11 items-center justify-center rounded-md bg-brand-100 text-brand-700">
                   <Shield className="size-6" />

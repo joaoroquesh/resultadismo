@@ -46,7 +46,7 @@ export function useLeague(slug: string | undefined) {
         .eq("slug", slug!)
         .maybeSingle();
       if (error) throw error;
-      // liga excluída (soft) não abre pra ninguém (admin restaura pela Lixeira)
+      // federação excluída (soft) não abre pra ninguém (admin restaura pela Lixeira)
       if ((data as { deleted_at?: string | null } | null)?.deleted_at) return null;
       return data;
     },
@@ -117,15 +117,18 @@ function slugify(name: string): string {
     .slice(0, 40);
 }
 
-/** Inicia o checkout de pagamento da liga e devolve a URL do Mercado Pago. */
-export async function startLeagueCheckout(leagueId: string): Promise<string> {
+/** Inicia o checkout (modo Mercado Pago). Devolve {url} ou {free:true} (100% de desconto). */
+export async function startLeagueCheckout(
+  leagueId: string,
+  discountCode?: string,
+): Promise<{ url?: string; free?: boolean }> {
   const { data, error } = await supabase.functions.invoke("create-league-checkout", {
-    body: { leagueId },
+    body: { leagueId, discountCode: discountCode || undefined },
   });
   if (error) throw error;
-  const url = (data as { url?: string } | null)?.url;
-  if (!url) throw new Error("Não foi possível iniciar o pagamento.");
-  return url;
+  const res = (data as { url?: string; free?: boolean } | null) ?? {};
+  if (!res.url && !res.free) throw new Error("Não foi possível iniciar o pagamento.");
+  return res;
 }
 
 export function useCreateLeague() {
@@ -172,12 +175,20 @@ export function useCreateLeague() {
   });
 }
 
-/** Reabre o checkout de uma liga pendente de pagamento (botão "Pagar agora"). */
+/** Reabre o checkout de uma federação pendente (botão "Pagar agora", modo Mercado Pago). */
 export function useLeagueCheckout() {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: async (leagueId: string) => {
-      const url = await startLeagueCheckout(leagueId);
-      window.location.href = url;
+      const res = await startLeagueCheckout(leagueId);
+      if (res.url) window.location.href = res.url;
+      return res;
+    },
+    onSuccess: (res) => {
+      if (res.free) {
+        qc.invalidateQueries({ queryKey: ["league"] });
+        qc.invalidateQueries({ queryKey: ["my-leagues"] });
+      }
     },
   });
 }

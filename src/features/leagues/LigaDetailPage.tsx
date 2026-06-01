@@ -36,6 +36,7 @@ import {
   useAddLeagueCompetition,
   useLeagueCheckout,
 } from "./api";
+import { usePaymentSettings, useSimulatePayment, useCompLeague } from "@/features/payments/api";
 import type { LeagueMode } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -62,10 +63,14 @@ export function LigaDetailPage() {
 
   const leave = useLeaveLeague();
   const checkout = useLeagueCheckout();
+  const simulate = useSimulatePayment();
+  const comp = useCompLeague();
+  const { data: paySettings } = usePaymentSettings();
+  const payMode = paySettings?.payment_mode ?? "disabled";
   const qc = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Enquanto o pagamento estiver pendente, atualiza a liga periodicamente
+  // Enquanto o pagamento estiver pendente, atualiza a federação periodicamente
   // (a webhook do Mercado Pago a ativa em segundos).
   useEffect(() => {
     if (league?.payment_status !== "pending") return;
@@ -79,9 +84,9 @@ export function LigaDetailPage() {
   useEffect(() => {
     const pag = searchParams.get("pagamento");
     if (!pag) return;
-    if (pag === "sucesso") toast("Pagamento recebido! Ativando sua liga…", "success");
+    if (pag === "sucesso") toast("Pagamento recebido! Ativando sua federação…", "success");
     else if (pag === "processando")
-      toast("Pagamento em processamento. A liga será ativada em instantes.", "info");
+      toast("Pagamento em processamento. A federação será ativada em instantes.", "info");
     else if (pag === "falhou")
       toast("O pagamento não foi concluído. Você pode tentar de novo.", "error");
     searchParams.delete("pagamento");
@@ -99,15 +104,15 @@ export function LigaDetailPage() {
 
   if (isLoading) {
     return (
-      <Page title="Liga">
+      <Page title="Federação">
         <Skeleton className="h-40 w-full" />
       </Page>
     );
   }
   if (!league) {
     return (
-      <Page title="Liga">
-        <EmptyState title="Liga não encontrada" description="Verifique o link ou o código." />
+      <Page title="Federação">
+        <EmptyState title="Federação não encontrada" description="Verifique o link ou o código." />
       </Page>
     );
   }
@@ -122,8 +127,8 @@ export function LigaDetailPage() {
     if (!league) return;
     try {
       await leave.mutateAsync(league.id);
-      toast("Você saiu da liga.", "info");
-      navigate("/ligas");
+      toast("Você saiu da federação.", "info");
+      navigate("/federacoes");
     } catch (err) {
       toast(err instanceof Error ? err.message : "Erro ao sair.", "error");
     }
@@ -133,7 +138,7 @@ export function LigaDetailPage() {
     <Page
       title={league.name}
       action={
-        <Button variant="ghost" size="icon" onClick={() => navigate("/ligas")} aria-label="Voltar">
+        <Button variant="ghost" size="icon" onClick={() => navigate("/federacoes")} aria-label="Voltar">
           <ArrowLeft className="size-5" />
         </Button>
       }
@@ -143,25 +148,73 @@ export function LigaDetailPage() {
           <div className="flex items-start gap-2">
             <Clock className="mt-0.5 size-4 shrink-0" />
             <p>
-              Esta liga será ativada assim que o pagamento for confirmado. Acabou de pagar? Pode levar
-              alguns segundos.
+              {payMode === "test"
+                ? "Modo de teste: conclua o pagamento simulado para ativar esta federação."
+                : "Esta federação será ativada assim que o pagamento for confirmado. Acabou de pagar? Pode levar alguns segundos."}
             </p>
           </div>
-          {isOwner && (
-            <Button
-              size="sm"
-              className="mt-3"
-              loading={checkout.isPending}
-              onClick={() => checkout.mutate(league.id)}
-            >
-              Pagar agora
-            </Button>
-          )}
+          <div className="mt-3 flex flex-wrap gap-2">
+            {isOwner && payMode === "test" && (
+              <Button
+                size="sm"
+                loading={simulate.isPending}
+                onClick={() =>
+                  simulate.mutate(
+                    { leagueId: league.id },
+                    {
+                      onSuccess: () => toast("Pagamento simulado — federação ativa!", "success"),
+                      onError: (e) => toast(e instanceof Error ? e.message : "Erro ao simular.", "error"),
+                    },
+                  )
+                }
+              >
+                Simular pagamento
+              </Button>
+            )}
+            {isOwner && payMode === "live" && (
+              <Button size="sm" loading={checkout.isPending} onClick={() => checkout.mutate(league.id)}>
+                Pagar agora
+              </Button>
+            )}
+            {isAppAdmin && (
+              <Button
+                size="sm"
+                variant="outline"
+                loading={comp.isPending}
+                onClick={() =>
+                  comp.mutate(league.id, {
+                    onSuccess: () => toast("Federação liberada sem pagamento.", "success"),
+                    onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
+                  })
+                }
+              >
+                Liberar sem pagamento
+              </Button>
+            )}
+          </div>
         </div>
       ) : league.status === "pending" ? (
-        <div className="mb-4 flex items-start gap-2 rounded-md bg-gold-100 p-3 text-sm text-gold-800">
-          <Clock className="mt-0.5 size-4 shrink-0" />
-          <p>Esta liga aguarda aprovação de um administrador para ficar ativa.</p>
+        <div className="mb-4 rounded-md bg-gold-100 p-3 text-sm text-gold-800">
+          <div className="flex items-start gap-2">
+            <Clock className="mt-0.5 size-4 shrink-0" />
+            <p>Esta federação aguarda aprovação de um administrador para ficar ativa.</p>
+          </div>
+          {isAppAdmin && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="mt-3"
+              loading={comp.isPending}
+              onClick={() =>
+                comp.mutate(league.id, {
+                  onSuccess: () => toast("Federação liberada.", "success"),
+                  onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
+                })
+              }
+            >
+              Liberar sem pagamento
+            </Button>
+          )}
         </div>
       ) : null}
 
@@ -207,7 +260,7 @@ export function LigaDetailPage() {
 
       {myMember && !isOwner && (
         <Button variant="ghost" fullWidth className="mt-6 text-flame-600" onClick={handleLeave}>
-          <LogOut className="size-4" /> Sair da liga
+          <LogOut className="size-4" /> Sair da federação
         </Button>
       )}
     </Page>
@@ -233,7 +286,7 @@ function ClassificacaoTab({
     return (
       <EmptyState
         title="Sem competições"
-        description="Um administrador precisa vincular uma competição a esta liga."
+        description="Um administrador precisa vincular uma competição a esta federação."
       />
     );
   }

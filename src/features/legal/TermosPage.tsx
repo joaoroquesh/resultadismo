@@ -18,9 +18,9 @@ export function TermosPage() {
       <LegalSection title="1. O que é o Resultadismo">
         <p>
           O Resultadismo é um jogo de <strong>entretenimento</strong>: você palpita os placares de jogos
-          reais de futebol, ganha pontos por acerto e disputa com amigos em ligas.{" "}
+          reais de futebol, ganha pontos por acerto e disputa com amigos em federações.{" "}
           <strong>Não é uma casa de apostas.</strong> Não há aposta de dinheiro nem prêmios em dinheiro.
-          Jogar e participar de ligas é <strong>gratuito</strong>; criar uma liga própria pode ter uma
+          Jogar e participar de federações é <strong>gratuito</strong>; criar uma federação própria pode ter uma
           taxa única de serviço (ver seção 12).
         </p>
       </LegalSection>
@@ -37,17 +37,17 @@ export function TermosPage() {
         <p>Para manter a brincadeira justa e saudável, você concorda em não:</p>
         <ul className="list-disc space-y-1 pl-5">
           <li>Trapacear, usar bots, automações ou explorar falhas para obter vantagem.</li>
-          <li>Usar nomes de liga, perfil ou textos ofensivos, ilegais ou que violem direitos de terceiros.</li>
+          <li>Usar nomes de federação, perfil ou textos ofensivos, ilegais ou que violem direitos de terceiros.</li>
           <li>Abusar de recursos sociais (ex.: cutucadas) para incomodar outros jogadores.</li>
           <li>Tentar acessar dados de outras pessoas ou prejudicar o funcionamento do serviço.</li>
         </ul>
       </LegalSection>
 
-      <LegalSection title="4. Ligas e moderação">
+      <LegalSection title="4. Federações e moderação">
         <p>
-          Você pode criar e administrar ligas. A criação de ligas pode passar por aprovação. O
-          administrador da liga gere seus membros e competições. O administrador geral do Resultadismo
-          pode <strong>moderar, aprovar, recusar ou excluir</strong> ligas e conteúdos que violem estes
+          Você pode criar e administrar federações. A criação de federações pode passar por aprovação. O
+          administrador da federação gere seus membros e competições. O administrador geral do Resultadismo
+          pode <strong>moderar, aprovar, recusar ou excluir</strong> federações e conteúdos que violem estes
           Termos, a fim de manter a integridade do jogo.
         </p>
       </LegalSection>
@@ -89,7 +89,7 @@ export function TermosPage() {
           informativos do jogo.
         </p>
         <p>
-          Ao criar ligas, escolher nomes ou enviar um avatar, você nos concede uma licença limitada e
+          Ao criar federações, escolher nomes ou enviar um avatar, você nos concede uma licença limitada e
           gratuita para exibir esse conteúdo dentro do app, apenas com a finalidade de operar o jogo.
         </p>
       </LegalSection>
@@ -119,18 +119,18 @@ export function TermosPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="12. Pagamentos e reembolso (criação de ligas)">
+      <LegalSection title="12. Pagamentos e reembolso (criação de federações)">
         <p>
-          Jogar e participar de ligas é gratuito. <strong>Criar uma liga própria</strong> pode ter uma{" "}
+          Jogar e participar de federações é gratuito. <strong>Criar uma federação própria</strong> pode ter uma{" "}
           <strong>taxa única de serviço</strong>, exibida antes da confirmação. O pagamento é processado
           pelo <strong>Mercado Pago</strong> (Pix ou cartão); não recebemos nem armazenamos os dados do
-          seu cartão. A liga é ativada automaticamente após a confirmação do pagamento.
+          seu cartão. A federação é ativada automaticamente após a confirmação do pagamento.
         </p>
         <p>
           É uma cobrança avulsa, <strong>sem renovação automática</strong> e sem mensalidade — uma taxa
-          de serviço para criar a liga, que não é aposta nem compra de prêmio. Conforme o Código de
+          de serviço para criar a federação, que não é aposta nem compra de prêmio. Conforme o Código de
           Defesa do Consumidor, você pode pedir <strong>reembolso em até 7 dias</strong> da compra,
-          desde que a liga ainda não tenha sido usada (sem palpites lançados). Para isso, escreva para{" "}
+          desde que a federação ainda não tenha sido usada (sem palpites lançados). Para isso, escreva para{" "}
           <strong>{CONTATO}</strong>.
         </p>
       </LegalSection>

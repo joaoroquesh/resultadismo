@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useParams } from "react-router-dom";
 import { RequireAuth, RequireAdmin } from "@/features/auth/guards";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { AuthCallback } from "@/features/auth/AuthCallback";
@@ -16,6 +16,12 @@ import { Onboarding } from "@/features/onboarding/Onboarding";
 import { PrivacidadePage } from "@/features/legal/PrivacidadePage";
 import { TermosPage } from "@/features/legal/TermosPage";
 
+// Redireciona links antigos /ligas/:slug para /federacoes/:slug (rename Liga -> Federação)
+function FederacaoSlugRedirect() {
+  const { slug } = useParams();
+  return <Navigate to={`/federacoes/${slug ?? ""}`} replace />;
+}
+
 export default function App() {
   return (
     <>
@@ -28,6 +34,11 @@ export default function App() {
       <Route path="/privacidade" element={<PrivacidadePage />} />
       <Route path="/termos" element={<TermosPage />} />
 
+      {/* compat: links antigos de "liga" agora apontam para "federação" */}
+      <Route path="/ligas" element={<Navigate to="/federacoes" replace />} />
+      <Route path="/ligas/nova" element={<Navigate to="/federacoes/nova" replace />} />
+      <Route path="/ligas/:slug" element={<FederacaoSlugRedirect />} />
+
       <Route element={<AppShell />}>
         {/* público: ver jogos sem login */}
         <Route path="/" element={<JogosPage />} />
@@ -35,10 +46,10 @@ export default function App() {
 
         {/* exige login */}
         <Route element={<RequireAuth />}>
-          <Route path="/ligas" element={<LigasPage />} />
-          <Route path="/ligas/nova" element={<NovaLigaPage />} />
-          <Route path="/ligas/:slug" element={<LigaDetailPage />} />
-          <Route path="/classificacao" element={<Navigate to="/ligas" replace />} />
+          <Route path="/federacoes" element={<LigasPage />} />
+          <Route path="/federacoes/nova" element={<NovaLigaPage />} />
+          <Route path="/federacoes/:slug" element={<LigaDetailPage />} />
+          <Route path="/classificacao" element={<Navigate to="/federacoes" replace />} />
           <Route path="/perfil" element={<PerfilPage />} />
           <Route path="/perfil/editar" element={<EditarPerfilPage />} />
           <Route path="/jogador/:id" element={<PlayerProfilePage />} />

@@ -19,7 +19,7 @@ export type PlayerProfile = {
   leagues: { id: string; name: string; slug: string }[];
 };
 
-/** Perfil público de um jogador (stats globais + ligas visíveis ao solicitante). */
+/** Perfil público de um jogador (stats globais + federações visíveis ao solicitante). */
 export function usePlayerProfile(userId: string | undefined) {
   return useQuery({
     enabled: !!userId,

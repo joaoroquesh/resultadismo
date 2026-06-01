@@ -331,7 +331,7 @@ function Galera({ matchId, finished }: { matchId: string; finished: boolean }) {
   );
 }
 
-/** Antes do kickoff: membros da liga e quem já palpitou (sem revelar o placar). */
+/** Antes do kickoff: membros da federação e quem já palpitou (sem revelar o placar). */
 function PredictStatus({ matchId }: { matchId: string }) {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -343,7 +343,7 @@ function PredictStatus({ matchId }: { matchId: string }) {
   if (!data || data.length === 0)
     return (
       <div className="px-3 py-3 text-center text-xs text-ink-400">
-        Entre numa liga para ver quem já palpitou.
+        Entre numa federação para ver quem já palpitou.
       </div>
     );
 

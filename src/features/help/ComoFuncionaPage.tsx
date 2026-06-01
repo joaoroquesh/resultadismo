@@ -119,7 +119,7 @@ export function ComoFuncionaPage() {
           <p className="text-sm leading-relaxed text-ink-700">
             No <span className="font-bold text-brand-700">Resultadismo</span> você crava o placar dos
             jogos antes da bola rolar. Quanto mais perto do resultado real, mais pontos você ganha — e
-            sobe na classificação das suas ligas. Aqui vão as regras, sem complicação.
+            sobe na classificação das suas federações. Aqui vão as regras, sem complicação.
           </p>
         </div>
 
@@ -198,7 +198,7 @@ export function ComoFuncionaPage() {
           title="Como a disputa funciona"
         >
           <p className="-mt-1 text-sm leading-relaxed text-ink-600">
-            Toda liga acompanha uma competição (um campeonato de futebol). Ao criar a liga, você
+            Toda federação acompanha uma competição (um campeonato de futebol). Ao criar a federação, você
             escolhe <span className="font-semibold text-ink-900">como os pontos são contados</span>:
           </p>
           <div className="space-y-2">
@@ -244,28 +244,28 @@ export function ComoFuncionaPage() {
           </Card>
         </Section>
 
-        {/* Ligas */}
-        <Section icon={<ShieldCheck className="size-4" strokeWidth={2.4} />} title="Ligas">
+        {/* Federações */}
+        <Section icon={<ShieldCheck className="size-4" strokeWidth={2.4} />} title="Federações">
           <p className="-mt-1 text-sm leading-relaxed text-ink-600">
-            Liga é o seu grupo de disputa. Ao criar uma, você define duas coisas: quem pode{" "}
-            <span className="font-semibold text-ink-900">ver</span> a liga e quem pode{" "}
+            Federação é o seu grupo de disputa. Ao criar uma, você define duas coisas: quem pode{" "}
+            <span className="font-semibold text-ink-900">ver</span> a federação e quem pode{" "}
             <span className="font-semibold text-ink-900">entrar</span> nela.
           </p>
 
           <div>
             <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wide text-ink-400">
-              Visibilidade — quem enxerga a liga
+              Visibilidade — quem enxerga a federação
             </h3>
             <Card className="divide-y divide-border">
               <OptionRow
                 icon={<EyeOff className="size-4" strokeWidth={2.2} />}
                 title="Privada"
-                desc="Só aparece para quem é membro. Ninguém de fora encontra a liga — ideal para a turma fechada de amigos."
+                desc="Só aparece para quem é membro. Ninguém de fora encontra a federação — ideal para a turma fechada de amigos."
               />
               <OptionRow
                 icon={<Eye className="size-4" strokeWidth={2.2} />}
                 title="Pública"
-                desc="Qualquer pessoa pode encontrar e acompanhar a liga. Como é aberta a todos, a entrada fica liberada automaticamente."
+                desc="Qualquer pessoa pode encontrar e acompanhar a federação. Como é aberta a todos, a entrada fica liberada automaticamente."
               />
             </Card>
           </div>
@@ -278,17 +278,17 @@ export function ComoFuncionaPage() {
               <OptionRow
                 icon={<Mail className="size-4" strokeWidth={2.2} />}
                 title="Convite"
-                desc="Só entra quem recebe o código de convite da liga. O controle é todo seu."
+                desc="Só entra quem recebe o código de convite da federação. O controle é todo seu."
               />
               <OptionRow
                 icon={<UserCheck className="size-4" strokeWidth={2.2} />}
                 title="Aprovação"
-                desc="Qualquer um pode pedir para entrar, mas um administrador da liga precisa aprovar antes."
+                desc="Qualquer um pode pedir para entrar, mas um administrador da federação precisa aprovar antes."
               />
               <OptionRow
                 icon={<DoorOpen className="size-4" strokeWidth={2.2} />}
                 title="Aberta"
-                desc="Entrada livre: quem quiser participar entra na hora, sem convite nem aprovação. (Ligas públicas usam sempre esta opção.)"
+                desc="Entrada livre: quem quiser participar entra na hora, sem convite nem aprovação. (Federações públicas usam sempre esta opção.)"
               />
             </Card>
           </div>
@@ -296,7 +296,7 @@ export function ComoFuncionaPage() {
           <div className="flex items-start gap-2 rounded-md bg-brand-500/10 p-3 text-xs leading-relaxed text-brand-800">
             <ShieldCheck className="mt-0.5 size-4 shrink-0" />
             <p>
-              Para evitar abusos, toda liga nova passa por uma{" "}
+              Para evitar abusos, toda federação nova passa por uma{" "}
               <span className="font-semibold">aprovação rápida</span> de um administrador do
               Resultadismo antes de ficar ativa. É coisa de pouco tempo.
             </p>
@@ -313,9 +313,9 @@ export function ComoFuncionaPage() {
               </Button>
             </Link>
             {session ? (
-              <Link to="/ligas/nova" className="sm:w-auto">
+              <Link to="/federacoes/nova" className="sm:w-auto">
                 <Button fullWidth>
-                  <Trophy className="size-4" /> Criar uma liga
+                  <Trophy className="size-4" /> Criar uma federação
                 </Button>
               </Link>
             ) : (

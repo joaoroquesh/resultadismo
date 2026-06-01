@@ -12,7 +12,7 @@ export type DeletedLeague = {
   owner_name: string | null;
 };
 
-/** Ligas na "lixeira" (soft-deleted, ainda restauráveis por ~10 min). */
+/** Federações na "lixeira" (soft-deleted, ainda restauráveis por ~10 min). */
 export function useDeletedLeagues() {
   return useQuery({
     queryKey: ["admin", "deleted-leagues"],
@@ -33,7 +33,7 @@ function useInvalidateLeagues() {
   };
 }
 
-/** Exclui (soft) uma liga — reversível por ~10 min na lixeira. */
+/** Exclui (soft) uma federação — reversível por ~10 min na lixeira. */
 export function useSoftDeleteLeague() {
   const invalidate = useInvalidateLeagues();
   return useMutation({
@@ -45,7 +45,7 @@ export function useSoftDeleteLeague() {
   });
 }
 
-/** Restaura uma liga da lixeira. */
+/** Restaura uma federação da lixeira. */
 export function useRestoreLeague() {
   const invalidate = useInvalidateLeagues();
   return useMutation({

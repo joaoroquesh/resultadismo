@@ -5,6 +5,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { dayjs } from "@/lib/format";
 import { useDeletedLeagues, useSoftDeleteLeague, useRestoreLeague } from "./moderation";
 import { useProviderCompetitions, type ProviderCompetition, type ProviderName } from "./providers";
+import { PaymentAdmin } from "./PaymentAdmin";
 import { cn } from "@/lib/utils";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
@@ -30,11 +31,11 @@ import {
 } from "./api";
 import type { DataProvider, MatchStatus } from "@/lib/types";
 
-type Tab = "ligas" | "competicoes" | "jogos" | "usuarios";
+type Tab = "federações" | "competicoes" | "jogos" | "usuarios" | "pagamento";
 
 export function AdminPage() {
   const navigate = useNavigate();
-  const [tab, setTab] = useState<Tab>("ligas");
+  const [tab, setTab] = useState<Tab>("federações");
 
   return (
     <Page
@@ -50,16 +51,18 @@ export function AdminPage() {
         value={tab}
         onChange={setTab}
         options={[
-          { value: "ligas", label: "Ligas" },
+          { value: "federações", label: "Federações" },
           { value: "competicoes", label: "Comp." },
           { value: "jogos", label: "Jogos" },
           { value: "usuarios", label: "Users" },
+          { value: "pagamento", label: "Pgto" },
         ]}
       />
-      {tab === "ligas" && <LigasAdmin />}
+      {tab === "federações" && <LigasAdmin />}
       {tab === "competicoes" && <CompeticoesAdmin />}
       {tab === "jogos" && <JogosAdmin />}
       {tab === "usuarios" && <UsuariosAdmin />}
+      {tab === "pagamento" && <PaymentAdmin />}
     </Page>
   );
 }
@@ -76,7 +79,7 @@ function LigasAdmin() {
 
   if (isLoading) return <Skeleton className="h-40 w-full" />;
 
-  // ligas já excluídas (soft) saem das listas normais e vão pra Lixeira
+  // federações já excluídas (soft) saem das listas normais e vão pra Lixeira
   const live = (leagues ?? []).filter((l) => !(l as { deleted_at?: string | null }).deleted_at);
   const pending = live.filter((l) => l.status === "pending");
   const others = live.filter((l) => l.status !== "pending");
@@ -85,7 +88,7 @@ function LigasAdmin() {
     if (!toDelete) return;
     softDelete.mutate(toDelete.id, {
       onSuccess: () => {
-        toast("Liga excluída. Você tem 10 min para desfazer na Lixeira.", "success");
+        toast("Federação excluída. Você tem 10 min para desfazer na Lixeira.", "success");
         setToDelete(null);
       },
       onError: (e) => toast(e instanceof Error ? e.message : "Erro ao excluir.", "error"),
@@ -97,7 +100,7 @@ function LigasAdmin() {
       <section className="space-y-2">
         <h2 className="text-xs font-bold uppercase tracking-wide text-ink-400">Aguardando aprovação</h2>
         {pending.length === 0 ? (
-          <EmptyState title="Nada pendente" description="Novas ligas aparecerão aqui para aprovação." />
+          <EmptyState title="Nada pendente" description="Novas federações aparecerão aqui para aprovação." />
         ) : (
           pending.map((l) => (
             <Card key={l.id} className="p-4">
@@ -114,7 +117,7 @@ function LigasAdmin() {
                   fullWidth
                   loading={approve.isPending}
                   onClick={() =>
-                    approve.mutate(l.id, { onSuccess: () => toast("Liga aprovada!", "success") })
+                    approve.mutate(l.id, { onSuccess: () => toast("Federação aprovada!", "success") })
                   }
                 >
                   <Check className="size-4" /> Aprovar
@@ -124,7 +127,7 @@ function LigasAdmin() {
                   variant="outline"
                   fullWidth
                   onClick={() =>
-                    reject.mutate(l.id, { onSuccess: () => toast("Liga rejeitada.", "info") })
+                    reject.mutate(l.id, { onSuccess: () => toast("Federação rejeitada.", "info") })
                   }
                 >
                   <X className="size-4" /> Rejeitar
@@ -137,7 +140,7 @@ function LigasAdmin() {
 
       {others.length > 0 && (
         <section className="space-y-2">
-          <h2 className="text-xs font-bold uppercase tracking-wide text-ink-400">Todas as ligas</h2>
+          <h2 className="text-xs font-bold uppercase tracking-wide text-ink-400">Todas as federações</h2>
           {others.map((l) => (
             <Card key={l.id} className="flex items-center gap-2 p-3.5">
               <div className="min-w-0 flex-1">
@@ -147,7 +150,7 @@ function LigasAdmin() {
               <Badge tone={l.status === "active" ? "grass" : l.status === "rejected" ? "flame" : "neutral"}>
                 {l.status}
               </Badge>
-              <Link to={`/ligas/${l.slug}`} aria-label="Gerir liga">
+              <Link to={`/federacoes/${l.slug}`} aria-label="Gerir federação">
                 <Button size="icon" variant="ghost">
                   <Settings className="size-4" />
                 </Button>
@@ -155,7 +158,7 @@ function LigasAdmin() {
               <Button
                 size="icon"
                 variant="ghost"
-                aria-label="Excluir liga"
+                aria-label="Excluir federação"
                 onClick={() => setToDelete({ id: l.id, name: l.name })}
               >
                 <Trash2 className="size-4 text-flame-500" />
@@ -187,7 +190,7 @@ function LigasAdmin() {
                   loading={restore.isPending}
                   onClick={() =>
                     restore.mutate(d.id, {
-                      onSuccess: () => toast("Liga restaurada!", "success"),
+                      onSuccess: () => toast("Federação restaurada!", "success"),
                       onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
                     })
                   }
@@ -202,10 +205,10 @@ function LigasAdmin() {
 
       <ConfirmDialog
         open={!!toDelete}
-        title="Excluir liga"
+        title="Excluir federação"
         message={`Excluir "${toDelete?.name ?? ""}"? Ela some para os membros, mas dá pra desfazer por 10 min na Lixeira.`}
-        step2Message="Confirmação final: excluir esta liga agora?"
-        confirmLabel="Excluir liga"
+        step2Message="Confirmação final: excluir esta federação agora?"
+        confirmLabel="Excluir federação"
         loading={softDelete.isPending}
         onConfirm={confirmDelete}
         onCancel={() => setToDelete(null)}

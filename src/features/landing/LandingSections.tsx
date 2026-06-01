@@ -249,8 +249,8 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
             </FeatureRow>
           </Reveal>
           <Reveal delay={60}>
-            <FeatureRow icon={Users} title="Criar ou entrar em ligas">
-              Monte uma liga privada e chame a galera com um link. Trabalho, família, panela de
+            <FeatureRow icon={Users} title="Criar ou entrar em federações">
+              Monte uma federação privada e chame a galera com um link. Trabalho, família, panela de
               amigos — você decide quem entra.
             </FeatureRow>
           </Reveal>

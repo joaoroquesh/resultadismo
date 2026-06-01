@@ -146,7 +146,7 @@ export type MatchPredictStatus = {
   league_id: string;
 };
 
-/** Antes do kickoff: membros da(s) liga(s) do usuário e quem já palpitou (sem o placar). */
+/** Antes do kickoff: membros da(s) federação(s) do usuário e quem já palpitou (sem o placar). */
 export function useMatchPredictStatus(matchId: string, enabled: boolean) {
   return useQuery({
     enabled,

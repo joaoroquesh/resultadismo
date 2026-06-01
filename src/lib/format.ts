@@ -58,7 +58,7 @@ export function isLocked(iso: string | null): boolean {
 /* ------------------------------------------------------------------ */
 const STAGE_LABELS_PT: Record<string, string> = {
   GROUP_STAGE: "Fase de grupos",
-  LEAGUE_STAGE: "Fase de liga",
+  LEAGUE_STAGE: "Fase de federação",
   REGULAR_SEASON: "Temporada regular",
   PRELIMINARY_ROUND: "Preliminares",
   QUALIFICATION: "Eliminatórias",

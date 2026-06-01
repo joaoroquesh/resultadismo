@@ -103,7 +103,7 @@ Deno.serve(async (req) => {
   if (!payRes.ok) return json({ error: `MP ${payRes.status}` }, 502);
   const pay = await payRes.json();
 
-  const meta = (pay.metadata ?? {}) as { league_id?: string };
+  const meta = (pay.metadata ?? {}) as { league_id?: string; discount_code?: string };
   const leagueId: string | undefined = pay.external_reference ?? meta.league_id;
   if (!leagueId) return json({ ok: true, ignored: "sem external_reference" });
 
@@ -121,6 +121,14 @@ Deno.serve(async (req) => {
     p_raw: pay,
   });
   if (error) return json({ error: error.message }, 500);
+
+  // Registra o cupom usado (dispara a contagem de uso) — só quando aprovado.
+  if (meta.discount_code && status === "paid") {
+    await admin
+      .from("league_payments")
+      .update({ discount_code: meta.discount_code })
+      .eq("payment_id", String(pay.id));
+  }
 
   return json({ ok: true, leagueId, status });
 });
