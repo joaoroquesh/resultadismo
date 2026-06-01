@@ -15,6 +15,7 @@ import { ComoFuncionaPage } from "@/features/help/ComoFuncionaPage";
 import { Onboarding } from "@/features/onboarding/Onboarding";
 import { PrivacidadePage } from "@/features/legal/PrivacidadePage";
 import { TermosPage } from "@/features/legal/TermosPage";
+import { SimuladorPage } from "@/features/confronto/SimuladorPage";
 
 // Redireciona links antigos /ligas/:slug para /federacoes/:slug (rename Liga -> Federação)
 function FederacaoSlugRedirect() {
@@ -52,6 +53,7 @@ export default function App() {
           <Route path="/classificacao" element={<Navigate to="/federacoes" replace />} />
           <Route path="/perfil" element={<PerfilPage />} />
           <Route path="/perfil/editar" element={<EditarPerfilPage />} />
+          <Route path="/simulador" element={<SimuladorPage />} />
           <Route path="/jogador/:id" element={<PlayerProfilePage />} />
           <Route element={<RequireAdmin />}>
             <Route path="/admin" element={<AdminPage />} />

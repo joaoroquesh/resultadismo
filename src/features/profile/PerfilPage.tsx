@@ -13,6 +13,7 @@ import {
   SquarePlus,
   HelpCircle,
   Sparkles,
+  Swords,
 } from "lucide-react";
 import { replayOnboarding } from "@/features/onboarding/Onboarding";
 import { Page } from "@/components/layout/Page";
@@ -181,6 +182,13 @@ export function PerfilPage() {
               <span className="flex-1 font-medium text-ink-900">Rever tour de boas-vindas</span>
               <ChevronRight className="size-4 text-ink-400" />
             </button>
+          )}
+          {isAppAdmin && (
+            <Link to="/simulador" className="flex items-center gap-3 p-4 transition hover:bg-ink-50">
+              <Swords className="size-5 text-brand-600" />
+              <span className="flex-1 font-medium text-ink-900">Simulador de confrontos</span>
+              <ChevronRight className="size-4 text-ink-400" />
+            </Link>
           )}
           <Link to="/federacoes" className="flex items-center gap-3 p-4 transition hover:bg-ink-50">
             <span className="flex-1 font-medium text-ink-900">Minhas federações</span>
