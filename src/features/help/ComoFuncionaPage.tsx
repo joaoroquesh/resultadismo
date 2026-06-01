@@ -141,7 +141,7 @@ export function ComoFuncionaPage() {
             <ScoreRow
               pts="+2"
               title="Saldo"
-              desc="Acertou a diferença de gols e quem venceu (ex.: você palpitou 2×0 e o jogo terminou 3×1)."
+              desc="Errou o placar exato, mas acertou a diferença de gols (ex.: palpitou 2×0, deu 3×1). Cravar o empate também conta aqui (ex.: palpitou 1×1, deu 2×2)."
               pill="bg-grass-600"
               text="text-white"
               icon={<Scale className="size-4 text-grass-600" strokeWidth={2.4} />}
@@ -149,7 +149,7 @@ export function ComoFuncionaPage() {
             <ScoreRow
               pts="+1"
               title="Acerto"
-              desc="Acertou só quem venceu (ou que foi empate), mas errou o saldo de gols."
+              desc="Acertou só quem venceu, mas errou o saldo de gols (ex.: palpitou 2×0, deu 1×0)."
               pill="bg-aqua-700"
               text="text-white"
               icon={<CheckCircle2 className="size-4 text-aqua-700" strokeWidth={2.4} />}

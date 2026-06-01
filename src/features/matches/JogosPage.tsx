@@ -100,7 +100,8 @@ export function JogosPage() {
 
   return (
     <Page
-      title="Jogos"
+      // deslogado: sem título "Jogos" — o Header mostra a marca (landing pública)
+      title={session ? "Jogos" : undefined}
       action={
         totalPoints > 0 ? (
           <Badge tone="brand" className="gap-1">

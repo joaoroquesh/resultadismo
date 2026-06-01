@@ -5,7 +5,7 @@ import { TeamCrest } from "@/components/TeamCrest";
 import { ScorePill } from "@/components/ScorePill";
 import { Avatar } from "@/components/ui/Avatar";
 import { cn } from "@/lib/utils";
-import { formatTime, isLocked, formatDeadline } from "@/lib/format";
+import { formatTime, isLocked, formatDeadline, matchPhaseLabel } from "@/lib/format";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useToast } from "@/components/ui/Toast";
 import { useSavePrediction, useSetJoker, useMatchPredictions, useMatchPredictStatus } from "./api";
@@ -100,11 +100,14 @@ export function MatchCard({
         )}
         <span className="text-ink-300">·</span>
         <span className="truncate">{match.competition?.name ?? match.round}</span>
-        {match.group_name && (
-          <span className="rounded-pill border border-border px-1.5 py-0 text-[10px] text-ink-400">
-            {match.group_name}
-          </span>
-        )}
+        {(() => {
+          const phase = matchPhaseLabel(match);
+          return phase ? (
+            <span className="shrink-0 rounded-pill border border-border px-1.5 py-0 text-[10px] text-ink-400">
+              {phase}
+            </span>
+          ) : null;
+        })()}
         {canEdit &&
           (() => {
             const d = formatDeadline(match.kickoff_at);

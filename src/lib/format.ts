@@ -53,6 +53,53 @@ export function isLocked(iso: string | null): boolean {
   return dayjs(iso).isBefore(dayjs());
 }
 
+/* ------------------------------------------------------------------ */
+/*  Rótulos de fase/grupo (vêm crus da API: "GROUP_A", "LAST_16"...)   */
+/* ------------------------------------------------------------------ */
+const STAGE_LABELS_PT: Record<string, string> = {
+  GROUP_STAGE: "Fase de grupos",
+  LEAGUE_STAGE: "Fase de liga",
+  REGULAR_SEASON: "Temporada regular",
+  PRELIMINARY_ROUND: "Preliminares",
+  QUALIFICATION: "Eliminatórias",
+  QUALIFICATION_ROUND_1: "Eliminatórias",
+  PLAYOFFS: "Repescagem",
+  PLAYOFF_ROUND: "Repescagem",
+  LAST_64: "32 avos de final",
+  LAST_32: "16 avos de final",
+  LAST_16: "Oitavas de final",
+  QUARTER_FINAL: "Quartas de final",
+  QUARTER_FINALS: "Quartas de final",
+  SEMI_FINAL: "Semifinal",
+  SEMI_FINALS: "Semifinal",
+  THIRD_PLACE: "Disputa de 3º lugar",
+  FINAL: "Final",
+};
+
+/** "GROUP_A" → "Grupo A". null se não houver grupo. */
+export function formatGroup(group: string | null | undefined): string | null {
+  if (!group) return null;
+  const tail = group.match(/([A-Za-z0-9]+)\s*$/);
+  return `Grupo ${(tail ? tail[1] : group).toUpperCase()}`;
+}
+
+/** "LAST_16" → "Oitavas de final". Fallback legível para valores desconhecidos. */
+export function formatStage(stage: string | null | undefined): string | null {
+  if (!stage) return null;
+  const key = stage.trim().toUpperCase().replace(/\s+/g, "_");
+  if (STAGE_LABELS_PT[key]) return STAGE_LABELS_PT[key];
+  const pretty = stage.replace(/_/g, " ").toLowerCase().trim();
+  return pretty ? pretty.charAt(0).toUpperCase() + pretty.slice(1) : null;
+}
+
+/** Rótulo de fase para o card: grupo tem prioridade; senão a fase do mata-mata. */
+export function matchPhaseLabel(m: {
+  group_name?: string | null;
+  stage?: string | null;
+}): string | null {
+  return formatGroup(m.group_name) ?? formatStage(m.stage);
+}
+
 /** "fecha em 2h" · "fecha em 45min" · "fecha já" — para o prazo do palpite. */
 export function formatDeadline(iso: string | null): { text: string; urgent: boolean } | null {
   if (!iso) return null;

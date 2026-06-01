@@ -7,6 +7,7 @@ import {
   Sparkles,
   Gift,
   ChevronDown,
+  ArrowRight,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -96,17 +97,21 @@ function FeatureRow({
   );
 }
 
-/** Linha de pontuação — cor semântica vívida (dourado/verde/ciano). */
+/** Linha de pontuação — cor semântica vívida (dourado/verde/ciano) + exemplo real. */
 function ScoreRow({
   pts,
   label,
   desc,
   tone,
+  palpite,
+  resultado,
 }: {
   pts: number;
   label: string;
   desc: string;
   tone: "gold" | "grass" | "aqua";
+  palpite: string;
+  resultado: string;
 }) {
   const styles = {
     gold: {
@@ -124,22 +129,36 @@ function ScoreRow({
   }[tone];
 
   return (
-    <div className="flex items-center gap-3 rounded-lg bg-surface p-3.5 shadow-[var(--shadow-soft)] ring-1 ring-border">
-      <span
-        className={cn(
-          "grid size-12 shrink-0 place-items-center rounded-md text-2xl font-extrabold tabular-nums ring-1 ring-inset",
-          styles.chip,
-        )}
-      >
-        +{pts}
-      </span>
-      <div className="min-w-0">
-        <p className="font-bold text-ink-950">{label}</p>
-        <p className="text-sm text-ink-500">{desc}</p>
+    <div className="rounded-lg bg-surface p-3.5 shadow-[var(--shadow-soft)] ring-1 ring-border">
+      <div className="flex items-center gap-3">
+        <span
+          className={cn(
+            "grid size-12 shrink-0 place-items-center rounded-md text-2xl font-extrabold tabular-nums ring-1 ring-inset",
+            styles.chip,
+          )}
+        >
+          +{pts}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-bold text-ink-950">{label}</p>
+          <p className="text-sm text-ink-500">{desc}</p>
+        </div>
+        <span className={cn("shrink-0 text-sm font-bold tabular-nums", styles.pts)}>
+          {pts} {pts === 1 ? "ponto" : "pontos"}
+        </span>
       </div>
-      <span className={cn("ml-auto text-sm font-bold tabular-nums", styles.pts)}>
-        {pts} {pts === 1 ? "ponto" : "pontos"}
-      </span>
+      {/* exemplo concreto: palpite → resultado */}
+      <div className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-md bg-ink-100/70 px-3 py-2 text-xs">
+        <span className="font-medium text-ink-400">Você palpita</span>
+        <span className="rounded bg-surface px-1.5 py-0.5 font-bold tabular-nums text-ink-800 ring-1 ring-border">
+          {palpite}
+        </span>
+        <ArrowRight className="size-3.5 text-ink-300" />
+        <span className="font-medium text-ink-400">e o jogo termina</span>
+        <span className="rounded bg-surface px-1.5 py-0.5 font-bold tabular-nums text-ink-800 ring-1 ring-border">
+          {resultado}
+        </span>
+      </div>
     </div>
   );
 }
@@ -225,7 +244,8 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
         <div className="space-y-3">
           <Reveal>
             <FeatureRow icon={Target} title="Palpitar nos jogos">
-              Cravou o placar antes da bola rolar? Boa. Cada rodada é uma chance nova de pontuar.
+              Para cada jogo, você dá um palpite de placar, tipo 2×1. Quanto mais perto do resultado
+              real, mais pontos você leva.
             </FeatureRow>
           </Reveal>
           <Reveal delay={60}>
@@ -251,19 +271,25 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
               tone="gold"
               pts={3}
               label="Cravou o placar"
-              desc="Acertou em cheio: gols do mandante e do visitante."
+              desc="Acertou em cheio: os gols dos dois times."
+              palpite="2×1"
+              resultado="2×1"
             />
             <ScoreRow
               tone="grass"
               pts={2}
               label="Acertou o saldo de gols"
-              desc="Errou o placar, mas pegou a diferença de gols."
+              desc="Errou o placar, mas pegou a diferença. Cravar o empate também conta aqui."
+              palpite="1×1"
+              resultado="2×2"
             />
             <ScoreRow
               tone="aqua"
               pts={1}
               label="Acertou só quem venceu"
-              desc="Cravou o vencedor (ou o empate) e nada mais."
+              desc="Foi no time certo, mas errou o saldo de gols."
+              palpite="2×0"
+              resultado="1×0"
             />
           </div>
           <p className="mt-3 text-center text-xs text-ink-400">
