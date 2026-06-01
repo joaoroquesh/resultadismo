@@ -28,8 +28,16 @@ export function EditarPerfilPage() {
   const { profile, user, refreshProfile } = useAuth();
 
   const initial = parseGenAvatar(profile?.avatar_url);
+  // A foto do Google vem da identidade OAuth (user_metadata), não do avatar salvo —
+  // assim a opção continua disponível mesmo depois de salvar um escudo.
+  const metaPhoto =
+    (user?.user_metadata?.avatar_url as string | undefined) ||
+    (user?.user_metadata?.picture as string | undefined) ||
+    null;
+  // fallback: perfis antigos que guardaram a foto direto em avatar_url
   const googlePhoto =
-    profile?.avatar_url && !profile.avatar_url.startsWith("gen:") ? profile.avatar_url : null;
+    metaPhoto ||
+    (profile?.avatar_url && !profile.avatar_url.startsWith("gen:") ? profile.avatar_url : null);
 
   const [name, setName] = useState(profile?.display_name ?? "");
   const [favoriteTeam, setFavoriteTeam] = useState(profile?.favorite_team ?? "");
