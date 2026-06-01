@@ -118,8 +118,8 @@ export function MatchCard({
             ) : null;
           })()}
         {isJoker && (
-          <span className="ml-auto flex items-center gap-0.5 rounded-pill bg-gold-500 px-1.5 py-0 text-[10px] font-bold text-gold-950">
-            <Zap className="size-2.5 fill-gold-950" /> 2×
+          <span className="ml-auto flex items-center gap-0.5 rounded-pill bg-brand-600 px-1.5 py-0 text-[10px] font-bold text-white">
+            <Zap className="size-2.5 fill-white" /> 2×
           </span>
         )}
       </div>
@@ -180,8 +180,8 @@ export function MatchCard({
               className={cn(
                 "flex items-center gap-1 rounded-pill px-2 py-1 text-[11px] font-bold transition-colors disabled:opacity-40",
                 isJoker
-                  ? "bg-gold-500 text-gold-950"
-                  : "text-ink-400 hover:bg-ink-100 hover:text-gold-700",
+                  ? "bg-brand-600 text-white"
+                  : "text-ink-400 hover:bg-ink-100 hover:text-brand-700",
               )}
               aria-pressed={isJoker}
               aria-label="Dobrar pontos (2x)"
@@ -191,7 +191,7 @@ export function MatchCard({
                   : "Dobrar os pontos deste jogo"
               }
             >
-              <Zap className={cn("size-3.5", isJoker && "fill-gold-950")} /> 2×
+              <Zap className={cn("size-3.5", isJoker && "fill-white")} /> 2×
             </button>
           )}
         </div>

@@ -182,8 +182,8 @@ export function JogosPage() {
             // só faz sentido para quem está logado e pode palpitar
             defaultOpen={user ? undefined : false}
           >
-            <span className="inline-flex items-center gap-1 rounded-pill bg-gold-100 px-2 py-0.5 font-semibold text-gold-800">
-              <Zap className="size-3 fill-gold-700" /> {jokersUsedThisWeek}/{maxJokers} dobros nesta
+            <span className="inline-flex items-center gap-1 rounded-pill bg-brand-500/15 px-2 py-0.5 font-semibold text-brand-700">
+              <Zap className="size-3 fill-brand-600" /> {jokersUsedThisWeek}/{maxJokers} dobros nesta
               semana
             </span>
           </Coachmark>

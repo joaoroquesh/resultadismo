@@ -6,6 +6,12 @@ import { useFirstSeen } from "@/lib/useFirstSeen";
 
 export const ONBOARDING_KEY = "resultadismo-onboarding-v1";
 
+/** Evento p/ reabrir o tour manualmente (ex.: admin testando). */
+const REPLAY_EVENT = "resultadismo:replay-onboarding";
+export function replayOnboarding() {
+  window.dispatchEvent(new Event(REPLAY_EVENT));
+}
+
 interface Slide {
   icon: ReactNode;
   iconWrap: string;
@@ -92,13 +98,13 @@ const SLIDES: Slide[] = [
   },
   {
     icon: <Zap className="size-9 fill-current" />,
-    iconWrap: "bg-gold-500/15 text-gold-700",
+    iconWrap: "bg-brand-500/15 text-brand-600",
     title: "Dobro de Pontos",
     body: (
       <p className="text-sm leading-relaxed text-ink-600">
         Confiante num jogo? Ative o{" "}
-        <span className="inline-flex items-center gap-0.5 rounded-pill bg-gold-500 px-1.5 align-middle text-[11px] font-bold text-gold-950">
-          <Zap className="size-2.5 fill-gold-950" /> 2×
+        <span className="inline-flex items-center gap-0.5 rounded-pill bg-brand-600 px-1.5 align-middle text-[11px] font-bold text-white">
+          <Zap className="size-2.5 fill-white" /> 2×
         </span>{" "}
         no palpite e ele vale <span className="font-bold text-ink-900">o dobro</span>. Mas calma: são
         poucos por semana, então guarde para os palpites mais certeiros.
@@ -126,9 +132,22 @@ export function Onboarding() {
   const { user, loading } = useAuth();
   const [pending, markSeen] = useFirstSeen(ONBOARDING_KEY);
   const [index, setIndex] = useState(0);
+  const [forced, setForced] = useState(false);
+
+  // Reabrir manualmente (admin testando): mostra mesmo já tendo visto.
+  useEffect(() => {
+    const onReplay = () => {
+      setIndex(0);
+      setForced(true);
+    };
+    window.addEventListener(REPLAY_EVENT, onReplay);
+    return () => window.removeEventListener(REPLAY_EVENT, onReplay);
+  }, []);
+
+  // Aparece no 1º acesso (pending) ou quando reaberto manualmente (forced).
+  const visible = !loading && !!user && (pending || forced);
 
   // Trava o scroll do body enquanto o overlay está visível.
-  const visible = !loading && !!user && pending;
   useEffect(() => {
     if (!visible) return;
     const prev = document.body.style.overflow;
@@ -143,7 +162,11 @@ export function Onboarding() {
   const isLast = index === SLIDES.length - 1;
   const slide = SLIDES[index]!;
 
-  const next = () => (isLast ? markSeen() : setIndex((i) => i + 1));
+  const close = () => {
+    markSeen();
+    setForced(false);
+  };
+  const next = () => (isLast ? close() : setIndex((i) => i + 1));
   const back = () => setIndex((i) => Math.max(0, i - 1));
 
   return (
@@ -161,7 +184,7 @@ export function Onboarding() {
           </span>
           <button
             type="button"
-            onClick={markSeen}
+            onClick={close}
             className="rounded-pill px-2 py-1 text-xs font-semibold text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-700"
           >
             Pular
@@ -199,8 +222,8 @@ export function Onboarding() {
           ))}
         </div>
 
-        {/* navegação */}
-        <div className="flex items-center gap-2 border-t border-border p-4 safe-bottom">
+        {/* navegação (pb garante respiro mesmo sem safe-area no desktop) */}
+        <div className="flex items-center gap-2 border-t border-border px-4 pt-4 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
           {index > 0 ? (
             <button
               type="button"

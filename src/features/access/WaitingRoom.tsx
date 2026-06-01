@@ -15,13 +15,16 @@ function Frame({ children }: { children: ReactNode }) {
   );
 }
 
-/** Splash curtíssimo enquanto o portão decide (admitido vs. fila). */
+/**
+ * Loading sutil enquanto o portão decide (quase sempre instantâneo).
+ * NÃO usa a tela de fila — só o logo animado no fundo normal do app, para não
+ * dar a impressão de "fila cheia" num carregamento comum.
+ */
 export function AccessSplash() {
   return (
-    <Frame>
-      <img src="/brand/Resultadismo.svg" alt="Resultadismo" className="mx-auto mb-4 size-14" />
-      <Spinner className="mx-auto size-7" />
-    </Frame>
+    <div className="flex min-h-dvh items-center justify-center bg-background">
+      <img src="/brand/Resultadismo-anime.svg" alt="Carregando" className="size-20" />
+    </div>
   );
 }
 

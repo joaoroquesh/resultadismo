@@ -7,7 +7,17 @@ import { AccessGate } from "@/features/access/AccessGate";
 import { useAuth } from "@/features/auth/AuthProvider";
 
 export function AppShell() {
-  const { session } = useAuth();
+  const { session, loading } = useAuth();
+
+  // Auth ainda resolvendo: loading sutil (não decide entre landing e app ainda,
+  // evitando flash da landing para quem está logado).
+  if (loading) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-background">
+        <img src="/brand/Resultadismo-anime.svg" alt="Carregando" className="size-20" />
+      </div>
+    );
+  }
 
   // Visitante deslogado: landing page pública (sem sidebar, sem fila de acesso).
   if (!session) {

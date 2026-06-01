@@ -169,13 +169,13 @@ export function ComoFuncionaPage() {
         <Section icon={<Zap className="size-4" strokeWidth={2.4} />} title="Dobro de pontos (2×)">
           <Card className="space-y-3 p-4">
             <div className="flex items-start gap-3">
-              <span className="grid size-10 shrink-0 place-items-center rounded-md bg-gold-500 text-gold-950">
-                <Zap className="size-5 fill-gold-950" />
+              <span className="grid size-10 shrink-0 place-items-center rounded-md bg-brand-600 text-white">
+                <Zap className="size-5 fill-white" />
               </span>
               <p className="text-sm leading-relaxed text-ink-600">
                 Confiante em um jogo? Toque no{" "}
-                <span className="inline-flex items-center gap-0.5 rounded-pill bg-gold-500 px-1.5 align-middle text-[11px] font-bold text-gold-950">
-                  <Zap className="size-2.5 fill-gold-950" /> 2×
+                <span className="inline-flex items-center gap-0.5 rounded-pill bg-brand-600 px-1.5 align-middle text-[11px] font-bold text-white">
+                  <Zap className="size-2.5 fill-white" /> 2×
                 </span>{" "}
                 ao palpitar para <span className="font-bold text-ink-900">dobrar os pontos</span>{" "}
                 daquele palpite. Uma cravada vira <span className="font-bold text-gold-700">+6</span>,
@@ -183,7 +183,7 @@ export function ComoFuncionaPage() {
                 <span className="font-bold text-aqua-700">+2</span>.
               </p>
             </div>
-            <p className="rounded-md bg-gold-100 px-3 py-2 text-xs font-medium text-gold-800">
+            <p className="rounded-md bg-brand-500/10 px-3 py-2 text-xs font-medium text-brand-700">
               Atenção: você tem no máximo{" "}
               <span className="font-bold">2 dobros por semana</span> (de segunda a domingo). Use com
               estratégia — e cuidado, se errar o jogo dobrado você não perde pontos, mas perde a
