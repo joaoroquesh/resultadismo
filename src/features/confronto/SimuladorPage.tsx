@@ -97,14 +97,14 @@ export function SimuladorPage() {
               value={gran}
               onChange={setGran}
               options={[
-                { value: "diario", label: GRANULARIDADE_LABEL.diario },
                 { value: "bloco", label: "Por fase" },
                 { value: "semanal", label: GRANULARIDADE_LABEL.semanal },
               ]}
             />
             <p className="text-xs leading-snug text-ink-500">
-              Cada rodada de confronto tem {JOGOS_POR_RODADA[gran]}. Mais jogos por rodada = duelo
-              mais justo; menos jogos = mais rodadas.
+              Na Copa, cada confronto vale por uma <span className="font-medium text-ink-700">fase</span> (rodada
+              de grupos ou fase do mata-mata): {JOGOS_POR_RODADA[gran]} por rodada. Mais jogos por
+              rodada = duelo mais justo.
             </p>
           </div>
         </Card>

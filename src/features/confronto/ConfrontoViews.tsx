@@ -258,7 +258,7 @@ export function MyConfrontoCard({
       </div>
       {bye ? (
         <p className="text-center text-sm font-medium">
-          Sem adversário nesta fase — você avança direto.
+          Sem adversário nesta fase. Você avança direto.
         </p>
       ) : (
         <div className="flex items-center justify-between gap-2">
