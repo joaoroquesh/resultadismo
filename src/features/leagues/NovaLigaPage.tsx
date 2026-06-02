@@ -37,6 +37,7 @@ export function NovaLigaPage() {
   const [discountCode, setDiscountCode] = useState("");
   const [discount, setDiscount] = useState<DiscountInfo | null>(null);
   const [checkingDiscount, setCheckingDiscount] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   const payMode = settings?.payment_mode ?? "disabled";
   const priceCents = settings?.league_price_cents ?? 990;
@@ -60,7 +61,9 @@ export function NovaLigaPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!name.trim()) return;
+    // Clique único: ignora cliques repetidos enquanto cria/abre o pagamento.
+    if (!name.trim() || redirecting) return;
+    setRedirecting(true);
     try {
       const league = await create.mutateAsync({
         name: name.trim(),
@@ -114,6 +117,7 @@ export function NovaLigaPage() {
       }
     } catch (err) {
       toast(err instanceof Error ? err.message : "Erro ao criar federação.", "error");
+      setRedirecting(false); // deu erro ao criar: libera o botão de novo
     }
   }
 
@@ -320,8 +324,26 @@ export function NovaLigaPage() {
           </p>
         </div>
 
-        <Button type="submit" fullWidth loading={submitting} disabled={!name.trim()}>
-          {isPaid ? `Criar federação • ${formatBRL(effectiveCents)}` : "Criar federação"}
+        <div className="rounded-md border border-border bg-surface p-3 text-xs leading-relaxed text-ink-500">
+          <strong className="text-ink-700">O que é uma federação?</strong> É o espaço onde você e seus
+          amigos jogam. Hoje ela roda o <strong>bolão da Copa</strong> (modo Tabela — quem soma mais
+          pontos lidera). Depois da Copa, dará para adicionar ligas de vários campeonatos: Brasileirão,
+          top 5 da Europa, Série B, Libertadores e Copa do Brasil.
+        </div>
+
+        <Button
+          type="submit"
+          fullWidth
+          loading={submitting || redirecting}
+          disabled={!name.trim() || redirecting}
+        >
+          {redirecting
+            ? payMode === "live"
+              ? "Abrindo o Mercado Pago…"
+              : "Processando…"
+            : isPaid
+              ? `Criar federação • ${formatBRL(effectiveCents)}`
+              : "Criar federação"}
         </Button>
       </form>
     </Page>

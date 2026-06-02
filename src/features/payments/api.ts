@@ -123,6 +123,40 @@ export function useCompLeague() {
 }
 
 // ---------------------------------------------------------------------------
+// Admin · moderação do NOME (pago ativa na hora; só o nome fica em revisão)
+// ---------------------------------------------------------------------------
+export function useApproveName() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (leagueId: string) => {
+      const { error } = await db.rpc("admin_approve_league_name", { p_league_id: leagueId });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["league"] });
+      qc.invalidateQueries({ queryKey: ["name-review"] });
+    },
+  });
+}
+
+export function useNameReviewLeagues(enabled = true) {
+  return useQuery({
+    enabled,
+    queryKey: ["name-review"],
+    queryFn: async (): Promise<{ id: string; name: string; slug: string }[]> => {
+      const { data, error } = await db
+        .from("leagues")
+        .select("id, name, slug")
+        .eq("name_approved", false)
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data as { id: string; name: string; slug: string }[]) ?? [];
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Admin · códigos de desconto
 // ---------------------------------------------------------------------------
 export function useDiscountCodes(enabled = true) {

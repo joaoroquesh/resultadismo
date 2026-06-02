@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Ticket } from "lucide-react";
+import { Plus, Trash2, Ticket, ShieldCheck } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -15,6 +15,8 @@ import {
   useCreateDiscount,
   useToggleDiscount,
   useDeleteDiscount,
+  useNameReviewLeagues,
+  useApproveName,
   type PaymentMode,
   type DiscountCode,
 } from "@/features/payments/api";
@@ -22,9 +24,50 @@ import {
 export function PaymentAdmin() {
   return (
     <div className="space-y-4">
+      <NameReviewCard />
       <PaymentSettingsCard />
       <DiscountCodesCard />
     </div>
+  );
+}
+
+function NameReviewCard() {
+  const { data: leagues, isLoading } = useNameReviewLeagues();
+  const approve = useApproveName();
+  const { toast } = useToast();
+  const list = leagues ?? [];
+
+  // Só aparece quando há nomes pendentes de revisão.
+  if (isLoading || list.length === 0) return null;
+
+  return (
+    <Card className="space-y-3 p-4">
+      <div className="flex items-center gap-2 text-sm font-bold text-ink-900">
+        <ShieldCheck className="size-4 text-brand-600" /> Nomes a revisar ({list.length})
+      </div>
+      <p className="text-xs text-ink-500">
+        Federações pagas já entram ativas; aprove o nome (ou exclua na aba Federações se for impróprio).
+      </p>
+      <ul className="space-y-2">
+        {list.map((l) => (
+          <li key={l.id} className="flex items-center gap-2 rounded-md border border-border p-2.5">
+            <span className="min-w-0 flex-1 truncate font-semibold text-ink-900">{l.name}</span>
+            <Button
+              size="sm"
+              loading={approve.isPending}
+              onClick={() =>
+                approve.mutate(l.id, {
+                  onSuccess: () => toast("Nome aprovado!", "success"),
+                  onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
+                })
+              }
+            >
+              Aprovar nome
+            </Button>
+          </li>
+        ))}
+      </ul>
+    </Card>
   );
 }
 

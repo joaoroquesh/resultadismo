@@ -103,7 +103,12 @@ Deno.serve(async (req) => {
     });
     await admin
       .from("leagues")
-      .update({ payment_status: "paid", status: "active", approved_at: new Date().toISOString() })
+      .update({
+        payment_status: "paid",
+        status: "active",
+        approved_at: new Date().toISOString(),
+        name_approved: false,
+      })
       .eq("id", league.id);
     return json({ free: true });
   }
@@ -124,7 +129,8 @@ Deno.serve(async (req) => {
     ],
     external_reference: league.id,
     metadata: { league_id: league.id, user_id: user.id, discount_code: discountCode },
-    payment_methods: { installments: 1 },
+    // Sem boleto (R$ 3,49 fixo não faz sentido p/ R$ 9,90) — Pix/cartão/débito.
+    payment_methods: { installments: 1, excluded_payment_types: [{ id: "ticket" }] },
     back_urls: {
       success: `${appUrl}/federacoes/${league.slug}?pagamento=sucesso`,
       pending: `${appUrl}/federacoes/${league.slug}?pagamento=processando`,

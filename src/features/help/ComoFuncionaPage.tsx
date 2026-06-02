@@ -230,15 +230,33 @@ export function ComoFuncionaPage() {
             <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-md bg-brand-500/10 text-brand-600">
               <Trophy className="size-4" strokeWidth={2.4} />
             </span>
-            <div className="space-y-1">
-              <p className="font-semibold text-ink-900">Quem está ganhando?</p>
+            <div className="space-y-2">
+              <p className="font-semibold text-ink-900">Quem está ganhando? E o desempate</p>
               <p className="text-sm leading-relaxed text-ink-600">
-                Em qualquer modo, a classificação ordena os jogadores pelo total de pontos — quem tem
-                mais fica no topo. Você também vê o número de{" "}
-                <span className="font-semibold text-gold-700">cravadas</span> e o{" "}
-                <span className="font-semibold text-ink-900">aproveitamento</span> de cada um (a
-                porcentagem dos pontos possíveis que a pessoa conquistou), bons critérios de desempate
-                e de pura zoeira no grupo.
+                A classificação ordena pelo{" "}
+                <span className="font-semibold text-ink-900">total de pontos</span>. Deu empate? O
+                desempate segue nesta ordem:
+              </p>
+              <ol className="ml-1 space-y-1 text-sm text-ink-600">
+                <li>
+                  1. Mais <span className="font-semibold text-gold-700">cravadas</span> (placar exato)
+                </li>
+                <li>
+                  2. Mais <span className="font-semibold text-grass-700">saldos</span> (diferença de
+                  gols)
+                </li>
+                <li>
+                  3. Maior <span className="font-semibold text-ink-900">aproveitamento</span> (pontos
+                  feitos ÷ pontos possíveis)
+                </li>
+                <li>
+                  4. <span className="font-semibold text-ink-900">Usuário mais antigo</span> (quem está
+                  no Resultadismo há mais tempo)
+                </li>
+              </ol>
+              <p className="text-xs leading-relaxed text-ink-500">
+                Também mostramos a <span className="font-semibold">acertividade</span> (em quantos
+                palpites você pontuou) — ótima pra estatística e pra zoeira no grupo.
               </p>
             </div>
           </Card>
@@ -247,9 +265,21 @@ export function ComoFuncionaPage() {
         {/* Federações */}
         <Section icon={<ShieldCheck className="size-4" strokeWidth={2.4} />} title="Federações">
           <p className="-mt-1 text-sm leading-relaxed text-ink-600">
-            Federação é o seu grupo de disputa. Ao criar uma, você define duas coisas: quem pode{" "}
-            <span className="font-semibold text-ink-900">ver</span> a federação e quem pode{" "}
-            <span className="font-semibold text-ink-900">entrar</span> nela.
+            A <span className="font-semibold text-ink-900">federação</span> é o espaço onde você e seus
+            amigos jogam. Dentro dela rolam as{" "}
+            <span className="font-semibold text-ink-900">disputas</span>: hoje, o{" "}
+            <span className="font-semibold text-ink-900">bolão da Copa do Mundo</span> (modo Tabela).
+            Depois da Copa, dará para adicionar ligas de vários campeonatos — Brasileirão, top 5 da
+            Europa (Inglaterra, Espanha, Itália, França e Alemanha), Brasileirão Série B, Libertadores e
+            Copa do Brasil.
+          </p>
+          <p className="text-sm leading-relaxed text-ink-600">
+            Jogar e participar é <span className="font-semibold text-ink-900">de graça</span>.{" "}
+            <span className="font-semibold text-ink-900">Criar</span> uma federação própria tem uma{" "}
+            <span className="font-semibold text-ink-900">taxa única</span> (Pix ou cartão) — é o que
+            mantém o app no ar, sem anúncios. Ao criar, você define quem pode{" "}
+            <span className="font-semibold text-ink-900">ver</span> e quem pode{" "}
+            <span className="font-semibold text-ink-900">entrar</span> na federação.
           </p>
 
           <div>
@@ -296,9 +326,10 @@ export function ComoFuncionaPage() {
           <div className="flex items-start gap-2 rounded-md bg-brand-500/10 p-3 text-xs leading-relaxed text-brand-800">
             <ShieldCheck className="mt-0.5 size-4 shrink-0" />
             <p>
-              Para evitar abusos, toda federação nova passa por uma{" "}
-              <span className="font-semibold">aprovação rápida</span> de um administrador do
-              Resultadismo antes de ficar ativa. É coisa de pouco tempo.
+              Assim que o pagamento é confirmado, sua federação fica{" "}
+              <span className="font-semibold">ativa na hora</span>. Só o{" "}
+              <span className="font-semibold">nome</span> passa por uma revisão rápida da moderação (pra
+              evitar nomes ofensivos) — e você já joga normalmente enquanto isso.
             </p>
           </div>
         </Section>

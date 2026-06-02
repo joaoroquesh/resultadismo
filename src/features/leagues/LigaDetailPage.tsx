@@ -144,6 +144,17 @@ export function LigaDetailPage() {
         </Button>
       }
     >
+      {league.status === "active" &&
+        (league as { name_approved?: boolean }).name_approved === false && (
+          <div className="mb-4 flex items-start gap-2 rounded-md bg-brand-50 p-3 text-sm text-brand-800">
+            <Clock className="mt-0.5 size-4 shrink-0" />
+            <p>
+              Sua federação está <strong>ativa</strong> e já dá pra jogar! Só o <strong>nome</strong>{" "}
+              está em análise rápida da moderação — se precisar de ajuste, a gente te avisa.
+            </p>
+          </div>
+        )}
+
       {league.payment_status === "pending" ? (
         <div className="mb-4 rounded-md bg-gold-100 p-3 text-sm text-gold-800">
           <div className="flex items-start gap-2">
