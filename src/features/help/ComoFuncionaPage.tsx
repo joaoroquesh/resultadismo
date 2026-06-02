@@ -8,6 +8,7 @@ import {
   Zap,
   Trophy,
   ListOrdered,
+  Swords,
   Eye,
   EyeOff,
   Mail,
@@ -198,32 +199,43 @@ export function ComoFuncionaPage() {
           title="Como a disputa funciona"
         >
           <p className="-mt-1 text-sm leading-relaxed text-ink-600">
-            Toda federação acompanha uma competição (um campeonato de futebol). Ao criar a federação, você
-            escolhe <span className="font-semibold text-ink-900">como os pontos são contados</span>:
+            Cada disputa dentro de uma federação tem um{" "}
+            <span className="font-semibold text-ink-900">modo</span>. São dois jeitos de jogar:
           </p>
           <div className="space-y-2">
             <Card className="space-y-1.5 p-4">
               <p className="flex items-center gap-2 font-bold text-ink-900">
                 <ListOrdered className="size-4 text-brand-600" strokeWidth={2.4} />
-                Modo Tabela
+                Pontos
               </p>
               <p className="text-sm leading-relaxed text-ink-600">
-                Vale o campeonato <span className="font-semibold text-ink-900">inteiro</span>: cada
-                jogo que tem na competição conta, do começo ao fim. Os pontos vão somando rodada após
-                rodada e formam uma classificação única — ótimo para uma disputa longa entre os
-                amigos.
+                Corrida de pontos: todo mundo acumula os pontos dos palpites e quem somou mais lidera.
+                É aberto, você entra quando quiser.
               </p>
             </Card>
-            <Card className="space-y-1.5 p-4">
+            <Card className="space-y-2.5 p-4">
               <p className="flex items-center gap-2 font-bold text-ink-900">
-                <Zap className="size-4 text-brand-600" strokeWidth={2.4} />
-                Modo Pontos
+                <Swords className="size-4 text-brand-600" strokeWidth={2.4} />
+                Confronto
               </p>
               <p className="text-sm leading-relaxed text-ink-600">
-                Foco em <span className="font-semibold text-ink-900">acumular pontos</span> nos jogos
-                da competição, com a corrida sempre baseada em quem somou mais. A leitura é direta:
-                quem pontuou mais, lidera.
+                Mano a mano: a cada rodada você enfrenta um adversário e quem fizer mais pontos no
+                período vence o confronto. O admin{" "}
+                <span className="font-semibold text-ink-900">sorteia</span> os confrontos, e isso{" "}
+                <span className="font-semibold text-ink-900">trava os participantes</span> (quem entra
+                depois não joga aquela disputa). Tem dois formatos:
               </p>
+              <div className="space-y-1.5 rounded-md bg-surface-2 p-3 text-sm leading-relaxed text-ink-600">
+                <p>
+                  <span className="font-semibold text-ink-900">Liga</span>: todos contra todos. Cada
+                  confronto vale <span className="font-semibold">3 (vitória), 1 (empate), 0 (derrota)</span>{" "}
+                  e forma uma tabela.
+                </p>
+                <p>
+                  <span className="font-semibold text-ink-900">Copa</span>: mata-mata. Quem perde o
+                  confronto está fora, até sobrar o campeão.
+                </p>
+              </div>
             </Card>
           </div>
           <Card className="flex items-start gap-3 p-4">
@@ -233,12 +245,12 @@ export function ComoFuncionaPage() {
             <div className="space-y-1">
               <p className="font-semibold text-ink-900">Quem está ganhando?</p>
               <p className="text-sm leading-relaxed text-ink-600">
-                Em qualquer modo, a classificação ordena os jogadores pelo total de pontos — quem tem
-                mais fica no topo. Você também vê o número de{" "}
-                <span className="font-semibold text-gold-700">cravadas</span> e o{" "}
-                <span className="font-semibold text-ink-900">aproveitamento</span> de cada um (a
-                porcentagem dos pontos possíveis que a pessoa conquistou), bons critérios de desempate
-                e de pura zoeira no grupo.
+                No <span className="font-semibold text-ink-900">Pontos</span>, lidera quem tem mais
+                pontos no total. No <span className="font-semibold text-ink-900">Confronto</span>, valem
+                os duelos: na Liga, a tabela por 3/1/0; na Copa, quem vai avançando no chaveamento. Em
+                todos, você vê suas <span className="font-semibold text-gold-700">cravadas</span> e o{" "}
+                <span className="font-semibold text-ink-900">aproveitamento</span> pra contar vantagem
+                no grupo.
               </p>
             </div>
           </Card>

@@ -33,7 +33,9 @@ export function NovaLigaPage() {
   const [visibility, setVisibility] = useState<"private" | "public">("private");
   const [joinPolicy, setJoinPolicy] = useState<"invite" | "approval" | "open">("invite");
   const [competitionId, setCompetitionId] = useState<string>("");
-  const [mode, setMode] = useState<LeagueMode>("table");
+  const [tipo, setTipo] = useState<"pontos" | "confronto">("pontos");
+  const [formato, setFormato] = useState<"liga" | "cup">("liga");
+  const mode: LeagueMode = tipo === "pontos" ? "points" : formato;
   const [discountCode, setDiscountCode] = useState("");
   const [discount, setDiscount] = useState<DiscountInfo | null>(null);
   const [checkingDiscount, setCheckingDiscount] = useState(false);
@@ -226,36 +228,40 @@ export function NovaLigaPage() {
             </select>
           </div>
           {competitionId && (
-            <Coachmark
-              storageKey="resultadismo-coach-liga-modo-v1"
-              title="Modo de disputa"
-              placement="top"
-              content={
-                <>
-                  <span className="font-bold text-ink-50">Tabela</span>: a federação acompanha um
-                  campeonato e quem somar mais pontos nos jogos lidera.{" "}
-                  <span className="font-bold text-ink-50">Pontos</span>: disputa corrida, valendo o
-                  total de pontos que cada um faz.
-                </>
-              }
-            >
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-ink-800">Modo de disputa</label>
-                <SegmentedControl
-                  value={mode}
-                  onChange={setMode}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-ink-800">Modo de disputa</label>
+              <SegmentedControl<"pontos" | "confronto">
+                value={tipo}
+                onChange={setTipo}
+                options={[
+                  { value: "pontos", label: "Pontos" },
+                  { value: "confronto", label: "Confronto" },
+                ]}
+              />
+              {tipo === "confronto" && (
+                <SegmentedControl<"liga" | "cup">
+                  value={formato}
+                  onChange={setFormato}
                   options={[
-                    { value: "table", label: "Tabela" },
-                    { value: "points", label: "Pontos" },
+                    { value: "liga", label: "Liga" },
+                    { value: "cup", label: "Copa" },
                   ]}
                 />
-                <p className="text-xs leading-snug text-ink-500">
-                  {mode === "table"
-                    ? "Vale o campeonato inteiro: os pontos somam rodada após rodada numa classificação única."
-                    : "Corrida por pontos: foco em acumular pontos nos jogos — quem somou mais, lidera."}
+              )}
+              <p className="text-xs leading-snug text-ink-500">
+                {tipo === "pontos"
+                  ? "Pontos: todo mundo acumula pontos e quem somou mais lidera. Entra quando quiser."
+                  : formato === "liga"
+                    ? "Liga: todos contra todos; cada rodada vale 3/1/0 e forma uma tabela."
+                    : "Copa: mata-mata; quem perde o confronto está fora, até sobrar o campeão."}
+              </p>
+              {tipo === "confronto" && (
+                <p className="rounded-md bg-brand-500/10 px-3 py-2 text-[11px] leading-relaxed text-brand-700">
+                  No confronto você <span className="font-semibold">sorteia</span> depois de criar —
+                  isso trava os participantes. Quem entrar na federação depois não joga esta disputa.
                 </p>
-              </div>
-            </Coachmark>
+              )}
+            </div>
           )}
         </Card>
 
