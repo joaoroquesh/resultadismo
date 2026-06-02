@@ -91,6 +91,27 @@ export type Database = {
         }
         Relationships: []
       }
+      app_settings: {
+        Row: {
+          id: number
+          league_price_cents: number
+          payment_mode: Database["public"]["Enums"]["payment_mode"]
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          league_price_cents?: number
+          payment_mode?: Database["public"]["Enums"]["payment_mode"]
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          league_price_cents?: number
+          payment_mode?: Database["public"]["Enums"]["payment_mode"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       competitions: {
         Row: {
           area: string | null
@@ -162,6 +183,45 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      confronto_participants: {
+        Row: {
+          created_at: string
+          id: string
+          league_competition_id: string
+          seed: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          league_competition_id: string
+          seed?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          league_competition_id?: string
+          seed?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "confronto_participants_league_competition_id_fkey"
+            columns: ["league_competition_id"]
+            isOneToOne: false
+            referencedRelation: "league_competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "confronto_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cup_ties: {
         Row: {
@@ -249,14 +309,64 @@ export type Database = {
           },
         ]
       }
+      discount_codes: {
+        Row: {
+          active: boolean
+          amount_off_cents: number | null
+          code: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          max_uses: number | null
+          percent_off: number | null
+          used_count: number
+        }
+        Insert: {
+          active?: boolean
+          amount_off_cents?: number | null
+          code: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          percent_off?: number | null
+          used_count?: number
+        }
+        Update: {
+          active?: boolean
+          amount_off_cents?: number | null
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          percent_off?: number | null
+          used_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discount_codes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       league_competitions: {
         Row: {
           competition_id: string
+          confronto_state: string
           created_at: string
+          drawn_at: string | null
           id: string
           league_id: string
           mode: Database["public"]["Enums"]["league_mode"]
           name: string
+          period_kind: string
           settings: Json
           starts_on: string | null
           status: string
@@ -264,11 +374,14 @@ export type Database = {
         }
         Insert: {
           competition_id: string
+          confronto_state?: string
           created_at?: string
+          drawn_at?: string | null
           id?: string
           league_id: string
           mode?: Database["public"]["Enums"]["league_mode"]
           name: string
+          period_kind?: string
           settings?: Json
           starts_on?: string | null
           status?: string
@@ -276,11 +389,14 @@ export type Database = {
         }
         Update: {
           competition_id?: string
+          confronto_state?: string
           created_at?: string
+          drawn_at?: string | null
           id?: string
           league_id?: string
           mode?: Database["public"]["Enums"]["league_mode"]
           name?: string
+          period_kind?: string
           settings?: Json
           starts_on?: string | null
           status?: string
@@ -345,11 +461,82 @@ export type Database = {
           },
         ]
       }
+      league_payments: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          currency: string
+          discount_code: string | null
+          discount_counted: boolean
+          external_reference: string | null
+          id: string
+          league_id: string
+          payment_id: string | null
+          preference_id: string | null
+          provider: string
+          raw: Json | null
+          status: Database["public"]["Enums"]["payment_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          discount_code?: string | null
+          discount_counted?: boolean
+          external_reference?: string | null
+          id?: string
+          league_id: string
+          payment_id?: string | null
+          preference_id?: string | null
+          provider?: string
+          raw?: Json | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          discount_code?: string | null
+          discount_counted?: boolean
+          external_reference?: string | null
+          id?: string
+          league_id?: string
+          payment_id?: string | null
+          preference_id?: string | null
+          provider?: string
+          raw?: Json | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "league_payments_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "leagues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "league_payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leagues: {
         Row: {
           approved_at: string | null
           approved_by: string | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           description: string | null
           id: string
           join_code: string | null
@@ -368,6 +555,8 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           id?: string
           join_code?: string | null
@@ -386,6 +575,8 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           id?: string
           join_code?: string | null
@@ -404,6 +595,13 @@ export type Database = {
           {
             foreignKeyName: "leagues_approved_by_fkey"
             columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leagues_deleted_by_fkey"
+            columns: ["deleted_by"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -727,23 +925,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      admin_list_users: {
-        Args: never
-        Returns: {
-          avatar_url: string
-          created_at: string
-          display_name: string
-          email: string
-          id: string
-          is_app_admin: boolean
-        }[]
-      }
-      approve_league: {
+      admin_comp_league: {
         Args: { p_league_id: string }
         Returns: {
           approved_at: string | null
           approved_by: string | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           description: string | null
           id: string
           join_code: string | null
@@ -752,6 +941,7 @@ export type Database = {
           max_members: number | null
           name: string
           owner_id: string
+          payment_status: Database["public"]["Enums"]["payment_status"]
           slug: string
           status: Database["public"]["Enums"]["league_status"]
           updated_at: string
@@ -764,12 +954,140 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_list_deleted_leagues: {
+        Args: never
+        Returns: {
+          deleted_at: string
+          id: string
+          name: string
+          owner_name: string
+          slug: string
+        }[]
+      }
+      admin_list_users: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          created_at: string
+          display_name: string
+          email: string
+          id: string
+          is_app_admin: boolean
+        }[]
+      }
+      admin_restore_league: {
+        Args: { p_league_id: string }
+        Returns: undefined
+      }
+      admin_soft_delete_league: {
+        Args: { p_league_id: string }
+        Returns: undefined
+      }
+      admin_update_payment_settings: {
+        Args: {
+          p_mode: Database["public"]["Enums"]["payment_mode"]
+          p_price_cents: number
+        }
+        Returns: {
+          id: number
+          league_price_cents: number
+          payment_mode: Database["public"]["Enums"]["payment_mode"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "app_settings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      approve_league: {
+        Args: { p_league_id: string }
+        Returns: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          description: string | null
+          id: string
+          join_code: string | null
+          join_policy: Database["public"]["Enums"]["join_policy"]
+          logo_url: string | null
+          max_members: number | null
+          name: string
+          owner_id: string
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          slug: string
+          status: Database["public"]["Enums"]["league_status"]
+          updated_at: string
+          visibility: Database["public"]["Enums"]["league_visibility"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "leagues"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      can_settle_leagues: { Args: never; Returns: boolean }
       compute_score_type: {
         Args: { pa: number; ph: number; ra: number; rh: number }
         Returns: Database["public"]["Enums"]["score_type"]
       }
+      confirm_league_payment: {
+        Args: {
+          p_amount_cents?: number
+          p_league_id: string
+          p_payment_id: string
+          p_preference_id?: string
+          p_raw?: Json
+          p_status: Database["public"]["Enums"]["payment_status"]
+        }
+        Returns: undefined
+      }
       create_deadline_reminders: { Args: never; Returns: number }
+      draw_confronto: {
+        Args: { p_lc_id: string; p_participants: Json; p_ties: Json }
+        Returns: undefined
+      }
       gen_join_code: { Args: never; Returns: string }
+      get_confronto_standings: {
+        Args: { p_lc_id: string }
+        Returns: {
+          avatar_url: string
+          derrotas: number
+          display_name: string
+          empates: number
+          gols_contra: number
+          gols_pro: number
+          jogos: number
+          pontos: number
+          rank: number
+          user_id: string
+          vitorias: number
+        }[]
+      }
+      get_confronto_ties: {
+        Args: { p_lc_id: string }
+        Returns: {
+          avatar_a: string
+          avatar_b: string
+          id: string
+          matchday: number
+          member_a: string
+          member_b: string
+          name_a: string
+          name_b: string
+          pa: number
+          pb: number
+          resolved: boolean
+          round_label: string
+          round_order: number
+          slot: number
+          winner: string
+        }[]
+      }
       get_league_standings: {
         Args: { p_lc_id: string }
         Returns: {
@@ -787,22 +1105,6 @@ export type Database = {
           user_id: string
         }[]
       }
-      get_confronto_standings: {
-        Args: { p_lc_id: string }
-        Returns: {
-          avatar_url: string
-          derrotas: number
-          display_name: string
-          empates: number
-          gols_contra: number
-          gols_pro: number
-          jogos: number
-          pontos: number
-          rank: number
-          user_id: string
-          vitorias: number
-        }[]
-      }
       get_match_predict_status: {
         Args: { p_match_id: string }
         Returns: {
@@ -811,6 +1113,27 @@ export type Database = {
           league_id: string
           predicted: boolean
           user_id: string
+        }[]
+      }
+      get_player_profile: { Args: { p_user_id: string }; Returns: Json }
+      get_tie_detail: {
+        Args: { p_tie_id: string }
+        Returns: {
+          a_away: number
+          a_home: number
+          a_joker: boolean
+          a_pts: number
+          away_name: string
+          away_score: number
+          b_away: number
+          b_home: number
+          b_joker: boolean
+          b_pts: number
+          home_name: string
+          home_score: number
+          kickoff_at: string
+          match_id: string
+          status: Database["public"]["Enums"]["match_status"]
         }[]
       }
       heartbeat_access: { Args: { p_token: string }; Returns: Json }
@@ -862,6 +1185,8 @@ export type Database = {
           approved_at: string | null
           approved_by: string | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           description: string | null
           id: string
           join_code: string | null
@@ -870,6 +1195,7 @@ export type Database = {
           max_members: number | null
           name: string
           owner_id: string
+          payment_status: Database["public"]["Enums"]["payment_status"]
           slug: string
           status: Database["public"]["Enums"]["league_status"]
           updated_at: string
@@ -897,6 +1223,37 @@ export type Database = {
         Args: { p_user_id: string; p_value: boolean }
         Returns: undefined
       }
+      simulate_league_payment: {
+        Args: { p_discount_code?: string; p_league_id: string }
+        Returns: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          description: string | null
+          id: string
+          join_code: string | null
+          join_policy: Database["public"]["Enums"]["join_policy"]
+          logo_url: string | null
+          max_members: number | null
+          name: string
+          owner_id: string
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          slug: string
+          status: Database["public"]["Enums"]["league_status"]
+          updated_at: string
+          visibility: Database["public"]["Enums"]["league_visibility"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "leagues"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      undo_confronto_draw: { Args: { p_lc_id: string }; Returns: undefined }
+      validate_discount_code: { Args: { p_code: string }; Returns: Json }
     }
     Enums: {
       data_provider: "manual" | "football_data" | "thesportsdb"
@@ -912,6 +1269,7 @@ export type Database = {
         | "cancelled"
       member_role: "owner" | "admin" | "member"
       member_status: "active" | "pending" | "banned"
+      payment_mode: "disabled" | "test" | "live"
       payment_status: "none" | "pending" | "paid" | "failed" | "refunded"
       score_type: "cravada" | "saldo" | "acerto" | "erro"
     }
@@ -1052,6 +1410,7 @@ export const Constants = {
       match_status: ["scheduled", "live", "finished", "postponed", "cancelled"],
       member_role: ["owner", "admin", "member"],
       member_status: ["active", "pending", "banned"],
+      payment_mode: ["disabled", "test", "live"],
       payment_status: ["none", "pending", "paid", "failed", "refunded"],
       score_type: ["cravada", "saldo", "acerto", "erro"],
     },

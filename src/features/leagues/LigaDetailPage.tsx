@@ -26,7 +26,7 @@ import { useAuth } from "@/features/auth/AuthProvider";
 import { useCompetitions } from "@/features/matches/api";
 import { useStandings } from "./api";
 import { StandingsTable } from "@/features/standings/StandingsTable";
-import { ConfrontoView } from "@/features/confronto/ConfrontoView";
+import { ConfrontoSection } from "@/features/confronto/ConfrontoSection";
 import {
   useLeague,
   useLeagueMembers,
@@ -250,6 +250,7 @@ export function LigaDetailPage() {
           currentUserId={user?.id}
           isAdmin={isAdmin}
           leagueId={league.id}
+          memberCount={(members ?? []).filter((m) => m.status === "active").length}
         />
       )}
 
@@ -279,8 +280,9 @@ function ClassificacaoTab({
   currentUserId,
   isAdmin,
   leagueId,
+  memberCount,
 }: {
-  comps: { id: string; name: string; mode: string; competition_id: string }[];
+  comps: { id: string; name: string; mode: string; competition_id: string; confronto_state?: string }[];
   activeLcId?: string;
   onSelect: (id: string) => void;
   standings: ReturnType<typeof useStandings>["data"];
@@ -288,6 +290,7 @@ function ClassificacaoTab({
   currentUserId?: string;
   isAdmin: boolean;
   leagueId: string;
+  memberCount: number;
 }) {
   if (comps.length === 0) {
     return (
@@ -318,11 +321,14 @@ function ClassificacaoTab({
           ))}
         </div>
       )}
-      {active?.mode === "liga" && activeLcId ? (
-        <ConfrontoView
+      {active && activeLcId && (active.mode === "liga" || active.mode === "cup") ? (
+        <ConfrontoSection
           lcId={activeLcId}
           leagueId={leagueId}
           competitionId={active.competition_id}
+          mode={active.mode}
+          state={active.confronto_state ?? "draft"}
+          memberCount={memberCount}
           isAdmin={isAdmin}
           currentUserId={currentUserId}
         />
@@ -452,7 +458,9 @@ function CompeticoesTab({
   const [open, setOpen] = useState(false);
   const [competitionId, setCompetitionId] = useState("");
   const [name, setName] = useState("");
-  const [mode, setMode] = useState<LeagueMode>("points");
+  const [tipo, setTipo] = useState<"pontos" | "confronto">("pontos");
+  const [formato, setFormato] = useState<"liga" | "cup">("liga");
+  const mode: LeagueMode = tipo === "pontos" ? "points" : formato;
 
   async function handleAdd() {
     if (!competitionId || !name.trim()) return;
@@ -504,19 +512,40 @@ function CompeticoesTab({
             placeholder="Nome do bolão"
             className="h-11 w-full rounded-md border border-ink-200 bg-surface px-3.5 outline-none focus:border-brand-500"
           />
-          <SegmentedControl
-            value={mode}
-            onChange={setMode}
-            options={[
-              { value: "points", label: "Pontos" },
-              { value: "liga", label: "Liga" },
-            ]}
-          />
-          <p className="text-xs leading-snug text-ink-500">
-            {mode === "liga"
-              ? "Confronto direto: cada rodada você enfrenta um adversário; quem fizer mais pontos vence (3/1/0)."
-              : "Corrida de pontos: soma tudo numa classificação única."}
-          </p>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-ink-800">Tipo de disputa</label>
+            <SegmentedControl<"pontos" | "confronto">
+              value={tipo}
+              onChange={setTipo}
+              options={[
+                { value: "pontos", label: "Pontos" },
+                { value: "confronto", label: "Confronto" },
+              ]}
+            />
+            {tipo === "confronto" && (
+              <SegmentedControl<"liga" | "cup">
+                value={formato}
+                onChange={setFormato}
+                options={[
+                  { value: "liga", label: "Liga" },
+                  { value: "cup", label: "Copa" },
+                ]}
+              />
+            )}
+            <p className="text-xs leading-snug text-ink-500">
+              {tipo === "pontos"
+                ? "Corrida de pontos: todo mundo acumula, quem somou mais lidera."
+                : formato === "liga"
+                  ? "Liga: todos contra todos; cada rodada vale 3/1/0 e forma uma tabela."
+                  : "Copa: mata-mata; quem perde o confronto está fora."}
+            </p>
+            {tipo === "confronto" && (
+              <p className="rounded-md bg-brand-500/10 px-3 py-2 text-[11px] leading-relaxed text-brand-700">
+                Depois de criar, você <span className="font-semibold">sorteia os confrontos</span> —
+                isso trava os participantes. Quem entrar depois não joga esta disputa.
+              </p>
+            )}
+          </div>
           <div className="flex gap-2">
             <Button variant="ghost" fullWidth onClick={() => setOpen(false)}>
               Cancelar
