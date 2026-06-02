@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Info, Ticket } from "lucide-react";
 import { Page } from "@/components/layout/Page";
@@ -37,6 +37,23 @@ export function NovaLigaPage() {
   const [discountCode, setDiscountCode] = useState("");
   const [discount, setDiscount] = useState<DiscountInfo | null>(null);
   const [checkingDiscount, setCheckingDiscount] = useState(false);
+
+  // Pré-seleção da Copa do Mundo (default) — assim que o catálogo chega.
+  // Procura por provider_code "WC" (football-data) ou nome com "copa do mundo" / "world cup".
+  useEffect(() => {
+    if (competitionId || !competitions?.length) return;
+    const wc = competitions.find((c) => {
+      const code = (c.provider_code ?? "").toUpperCase();
+      const name = `${(c as { display_name?: string | null }).display_name ?? ""} ${c.name}`.toLowerCase();
+      return (
+        code === "WC" ||
+        code === "4429" || // TheSportsDB FIFA World Cup
+        name.includes("copa do mundo") ||
+        name.includes("world cup")
+      );
+    });
+    if (wc) setCompetitionId(wc.id);
+  }, [competitions, competitionId]);
 
   const payMode = settings?.payment_mode ?? "disabled";
   const priceCents = settings?.league_price_cents ?? 990;

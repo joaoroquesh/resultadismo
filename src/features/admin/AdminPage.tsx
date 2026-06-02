@@ -1,10 +1,15 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, X, RefreshCw, Plus, ShieldCheck, Trash2, RotateCcw, Settings, Clock } from "lucide-react";
+import { ArrowLeft, Check, X, RefreshCw, Plus, ShieldCheck, Trash2, RotateCcw, Settings, Clock, Eye, EyeOff, Pencil, AlertTriangle } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { dayjs } from "@/lib/format";
 import { useDeletedLeagues, useSoftDeleteLeague, useRestoreLeague } from "./moderation";
 import { useProviderCompetitions, type ProviderCompetition, type ProviderName } from "./providers";
+import {
+  useDeleteCompetition,
+  useSetCompetitionPublished,
+  useRenameCompetition,
+} from "./competitions";
 import { PaymentAdmin } from "./PaymentAdmin";
 import { cn } from "@/lib/utils";
 import { Page } from "@/components/layout/Page";
@@ -217,15 +222,33 @@ function LigasAdmin() {
   );
 }
 
+function normalizeName(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/\b(spanish|english|italian|german|french|brazilian|primera|premier|league|liga|serie|division|campeonato)\b/g, "")
+    .replace(/[^a-z0-9]+/g, "")
+    .trim();
+}
+
 function CompeticoesAdmin() {
   const { data: comps, isLoading } = useAdminCompetitions();
   const create = useCreateCompetition();
   const sync = useSyncFootball();
+  const del = useDeleteCompetition();
+  const setPub = useSetCompetitionPublished();
+  const rename = useRenameCompetition();
   const { toast } = useToast();
   const [provider, setProvider] = useState<ProviderName>("football_data");
   const [filter, setFilter] = useState("");
   const { data: catalog, isLoading: loadingCatalog, error: catalogError } =
     useProviderCompetitions(provider);
+
+  // estado da UI de gestão
+  const [toDelete, setToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState("");
 
   // (provider, provider_code) -> já no app, p/ marcar "adicionada"
   const addedKeys = useMemo(() => {
@@ -234,6 +257,23 @@ function CompeticoesAdmin() {
       if (c.provider_code) s.add(`${c.provider}:${c.provider_code}`);
     });
     return s;
+  }, [comps]);
+
+  // duplicatas: agrupa competições já adicionadas por nome normalizado
+  const dupGroups = useMemo(() => {
+    const m = new Map<string, string[]>();
+    for (const c of comps ?? []) {
+      const k = normalizeName((c as { display_name?: string }).display_name || c.name);
+      if (!k) continue;
+      const arr = m.get(k) ?? [];
+      arr.push(c.id);
+      m.set(k, arr);
+    }
+    const dupIds = new Set<string>();
+    for (const ids of m.values()) {
+      if (ids.length > 1) ids.forEach((id) => dupIds.add(id));
+    }
+    return dupIds;
   }, [comps]);
 
   const filtered = useMemo(() => {
@@ -269,9 +309,45 @@ function CompeticoesAdmin() {
         type: c.type === "CUP" ? "CUP" : "LEAGUE",
         isFeatured: false,
       });
-      toast(`${c.name} adicionada!`, "success");
+      toast(`${c.name} adicionada como rascunho. Veja os jogos e publique.`, "success");
     } catch (e) {
       toast(e instanceof Error ? e.message : "Erro.", "error");
+    }
+  }
+
+  function startEdit(id: string, current: string) {
+    setEditingId(id);
+    setEditingName(current);
+  }
+  function cancelEdit() {
+    setEditingId(null);
+    setEditingName("");
+  }
+  async function saveEdit(id: string) {
+    try {
+      await rename.mutateAsync({ id, displayName: editingName });
+      toast("Nome atualizado.", "success");
+      cancelEdit();
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Erro.", "error");
+    }
+  }
+  async function togglePublish(id: string, value: boolean) {
+    try {
+      await setPub.mutateAsync({ id, value });
+      toast(value ? "Competição publicada!" : "Voltou para rascunho.", "success");
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Erro.", "error");
+    }
+  }
+  async function confirmDelete() {
+    if (!toDelete) return;
+    try {
+      await del.mutateAsync(toDelete.id);
+      toast(`${toDelete.name} excluída.`, "success");
+      setToDelete(null);
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Erro ao excluir.", "error");
     }
   }
 
@@ -283,26 +359,93 @@ function CompeticoesAdmin() {
         <RefreshCw className="size-4" /> Sincronizar todas
       </Button>
 
-      {/* já no app */}
-      {(comps ?? []).map((c) => (
-        <Card key={c.id} className="p-3.5">
-          <div className="flex items-center justify-between">
-            <div className="min-w-0">
-              <p className="truncate font-semibold text-ink-900">{c.name}</p>
-              <p className="text-xs text-ink-500">
-                {c.provider}
-                {c.provider_code ? ` · ${c.provider_code}` : ""}
-                {c.is_featured ? " · destaque" : ""}
-              </p>
-            </div>
-            {c.provider !== "manual" && (
-              <Button size="sm" variant="ghost" onClick={() => handleSync(c.id)}>
-                <RefreshCw className="size-4" />
-              </Button>
+      {/* já no app — com gestão completa */}
+      {(comps ?? []).map((c) => {
+        const cc = c as typeof c & {
+          display_name?: string | null;
+          is_published?: boolean;
+        };
+        const shown = cc.display_name || c.name;
+        const isDup = dupGroups.has(c.id);
+        const published = cc.is_published !== false;
+        const isEditing = editingId === c.id;
+        return (
+          <Card key={c.id} className="p-3.5">
+            {isEditing ? (
+              <div className="flex items-center gap-2">
+                <input
+                  value={editingName}
+                  onChange={(e) => setEditingName(e.target.value)}
+                  placeholder="Nome em português"
+                  autoFocus
+                  className="h-10 flex-1 rounded-md border border-ink-200 bg-surface px-3 outline-none focus:border-brand-500"
+                />
+                <Button size="sm" loading={rename.isPending} onClick={() => saveEdit(c.id)}>
+                  Salvar
+                </Button>
+                <Button size="sm" variant="ghost" onClick={cancelEdit}>
+                  <X className="size-4" />
+                </Button>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="truncate font-semibold text-ink-900">{shown}</p>
+                      {!published && <Badge tone="gold">rascunho</Badge>}
+                      {isDup && (
+                        <Badge tone="flame" className="gap-1">
+                          <AlertTriangle className="size-3" /> duplicata
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="truncate text-xs text-ink-500">
+                      {c.provider}
+                      {c.provider_code ? ` · ${c.provider_code}` : ""}
+                      {cc.display_name ? ` · original: ${c.name}` : ""}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => togglePublish(c.id, !published)}
+                    loading={setPub.isPending}
+                  >
+                    {published ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                    {published ? "Despublicar" : "Publicar"}
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => startEdit(c.id, shown)}>
+                    <Pencil className="size-4" /> Renomear
+                  </Button>
+                  <Link
+                    to={`/?comp=${c.id}`}
+                    className="inline-flex items-center gap-1 rounded-pill px-2 py-1 text-xs font-semibold text-brand-600 hover:bg-brand-500/10"
+                    title="Pré-visualizar os jogos antes de publicar"
+                  >
+                    <Eye className="size-3.5" /> Ver jogos
+                  </Link>
+                  {c.provider !== "manual" && (
+                    <Button size="sm" variant="ghost" onClick={() => handleSync(c.id)}>
+                      <RefreshCw className="size-4" /> Sincronizar
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setToDelete({ id: c.id, name: shown })}
+                    aria-label="Excluir competição"
+                  >
+                    <Trash2 className="size-4 text-flame-500" />
+                  </Button>
+                </div>
+              </>
             )}
-          </div>
-        </Card>
-      ))}
+          </Card>
+        );
+      })}
 
       {/* catálogo das APIs grátis */}
       <Card className="space-y-3 p-4">
@@ -391,6 +534,17 @@ function CompeticoesAdmin() {
           {provider === "football_data" ? "football-data.org" : "TheSportsDB"}
         </p>
       </Card>
+
+      <ConfirmDialog
+        open={!!toDelete}
+        title="Excluir competição"
+        message={`Excluir "${toDelete?.name ?? ""}"? Os jogos, times e palpites desta competição também somem. Não dá pra desfazer.`}
+        step2Message="Confirmação final: excluir essa competição e tudo dentro dela?"
+        confirmLabel="Excluir competição"
+        loading={del.isPending}
+        onConfirm={confirmDelete}
+        onCancel={() => setToDelete(null)}
+      />
     </div>
   );
 }
