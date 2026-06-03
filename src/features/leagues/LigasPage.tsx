@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { Plus, Shield, Users, ChevronRight, Ticket, Clock } from "lucide-react";
+import { Escudo } from "@/components/ui/Escudo";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -77,9 +78,7 @@ export function LigasPage() {
           {leagues.map((l) => (
             <Link key={l.id} to={`/federacoes/${l.slug}`}>
               <Card className="flex items-center gap-3 p-4 transition active:scale-[0.99]">
-                <div className="flex size-11 items-center justify-center rounded-md bg-brand-100 text-brand-700">
-                  <Shield className="size-6" />
-                </div>
+                <Escudo src={l.logo_url} name={l.name} size="md" />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <h3 className="truncate font-bold text-ink-900">{l.name}</h3>
