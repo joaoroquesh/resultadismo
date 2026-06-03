@@ -145,9 +145,15 @@ export function crestBackground(cfg: CrestConfig): string {
         return `linear-gradient(${rot}deg, ${c[0]} 0 50%, ${c[1]} 50% 100%)`;
       return `linear-gradient(${rot}deg, ${c[0]} 0 33.34%, ${c[1]} 33.34% 66.67%, ${c[2]} 66.67% 100%)`;
     case "grid": {
-      // 2x2: quatro quadrantes via conic-gradient (limites na vertical/horizontal).
-      const q = [c[0], c[1] ?? c[0], c[2] ?? c[0], c[3] ?? c[1] ?? c[0]];
-      return `conic-gradient(from ${rot}deg at 50% 50%, ${q[0]} 0 90deg, ${q[1]} 90deg 180deg, ${q[2]} 180deg 270deg, ${q[3]} 270deg 360deg)`;
+      // 2x2 via conic-gradient. Ordem das cores em leitura natural:
+      // [0]=sup-esq, [1]=sup-dir, [2]=inf-esq, [3]=inf-dir.
+      // Setores do conic (from 0deg): 0–90=sup-dir, 90–180=inf-dir,
+      // 180–270=inf-esq, 270–360=sup-esq.
+      const tl = c[0];
+      const tr = c[1] ?? c[0];
+      const bl = c[2] ?? c[0];
+      const br = c[3] ?? c[1] ?? c[0];
+      return `conic-gradient(from ${rot}deg at 50% 50%, ${tr} 0 90deg, ${br} 90deg 180deg, ${bl} 180deg 270deg, ${tl} 270deg 360deg)`;
     }
     case "ball": {
       // fundo + bola central (flâmula). cor2 = bola, cor1 = fundo.
