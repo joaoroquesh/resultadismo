@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Trophy,
   ListOrdered,
@@ -11,14 +11,16 @@ import {
   Plus,
   Users,
   ChevronDown,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/lib/utils";
+import { useLeagueMembers } from "@/features/leagues/api";
 import { MAX_JOGADORES } from "./simulator";
-import { roundsNeeded } from "./build";
+import { roundsNeeded, buildLigaFixtures, buildCopaFixtures, type Period, type DrawTie } from "./build";
 import {
   useConfrontoTies,
   useConfrontoPeriods,
@@ -127,6 +129,33 @@ function SorteioPanel({
   // Preview de teste (hipotético — só simulação, não altera o sorteio real).
   const testRounds = roundsNeeded(isLiga ? "liga" : "cup", testN);
   const testViavel = P > 0 && (isLiga ? Math.min(testRounds, P) : testRounds) <= P;
+
+  // Prévia REAL do sorteio: mesmos participantes/ordem que o sorteio usa (seed = entrada).
+  const { data: members } = useLeagueMembers(leagueId);
+  const players = useMemo(() => {
+    const active = (members ?? []).filter((m) => m.status === "active");
+    active.sort((a, b) => (a.joined_at ?? "").localeCompare(b.joined_at ?? ""));
+    return active
+      .map((m) => ({ id: m.profile?.id as string, name: m.profile?.display_name ?? "—" }))
+      .filter((p) => p.id);
+  }, [members]);
+  const nameOf = (id: string | null) =>
+    id ? (players.find((p) => p.id === id)?.name ?? "—") : "—";
+  const periodList: Period[] = useMemo(
+    () => (periods ?? []).map((p) => ({ kind: p.kind, value: p.value, label: p.label, games: p.games })),
+    [periods],
+  );
+  const previewTies = useMemo<DrawTie[]>(() => {
+    const ids = players.map((p) => p.id);
+    if (ids.length < 2 || periodList.length === 0) return [];
+    return isLiga ? buildLigaFixtures(ids, periodList, rounds) : buildCopaFixtures(ids, periodList);
+  }, [players, periodList, rounds, isLiga]);
+  const previewRound1 = previewTies.filter((t) => t.round_order === 1);
+  const previewByes = previewRound1.filter((t) => t.member_b === null).length;
+  const previewRoundsCount = previewTies.length
+    ? Math.max(...previewTies.map((t) => t.round_order))
+    : 0;
+  const bracketFases = [...new Set(previewTies.map((t) => t.round_label))];
 
   const doDraw = () =>
     draw.mutate(
@@ -267,6 +296,66 @@ function SorteioPanel({
           </p>
         )}
       </div>
+
+      {/* Prévia do sorteio — exatamente o que será criado */}
+      {previewRound1.length > 0 && (
+        <div className="rounded-lg bg-surface p-4 shadow-[var(--shadow-soft)] ring-1 ring-border">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <p className="text-sm font-semibold text-ink-800">Prévia do sorteio</p>
+            <span className="text-xs text-ink-400">
+              {isLiga
+                ? `${previewRoundsCount} ${previewRoundsCount === 1 ? "rodada" : "rodadas"}`
+                : `chave de ${1 << previewRoundsCount}${previewByes ? ` · ${previewByes} bye${previewByes > 1 ? "s" : ""}` : ""}`}
+            </span>
+          </div>
+
+          <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-brand-600">
+            {isLiga ? "Rodada 1" : (previewRound1[0]?.round_label ?? "1ª fase")}
+          </p>
+          <ul className="space-y-1">
+            {previewRound1.map((t, i) => (
+              <li
+                key={i}
+                className="flex items-center gap-2 rounded-md bg-surface-2 px-2.5 py-1.5 text-sm"
+              >
+                <span className="min-w-0 flex-1 truncate text-right font-semibold text-ink-900">
+                  {nameOf(t.member_a)}
+                </span>
+                {t.member_b === null ? (
+                  <span className="shrink-0 rounded-pill bg-ink-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-ink-400">
+                    passa (bye)
+                  </span>
+                ) : (
+                  <span className="shrink-0 text-xs font-bold text-ink-300">×</span>
+                )}
+                <span className="min-w-0 flex-1 truncate font-semibold text-ink-900">
+                  {t.member_b === null ? "" : nameOf(t.member_b)}
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          {isLiga && previewRoundsCount > 1 && (
+            <p className="mt-2 text-xs text-ink-400">
+              + {previewRoundsCount - 1} {previewRoundsCount - 1 === 1 ? "rodada" : "rodadas"} com
+              outros adversários (cada um joga {previewRoundsCount} confrontos).
+            </p>
+          )}
+          {!isLiga && bracketFases.length > 1 && (
+            <p className="mt-2 flex flex-wrap items-center gap-1 text-xs text-ink-400">
+              {bracketFases.map((f, i) => (
+                <span key={f} className="inline-flex items-center gap-1">
+                  {i > 0 && <ArrowRight className="size-3 text-ink-300" />}
+                  {f}
+                </span>
+              ))}
+            </p>
+          )}
+          <p className="mt-2 text-[11px] leading-relaxed text-ink-400">
+            A ordem segue a entrada na federação. É exatamente o confronto que será criado.
+          </p>
+        </div>
+      )}
 
       {/* Testar com mais jogadores (só simulação) */}
       <div className="overflow-hidden rounded-lg bg-surface shadow-[var(--shadow-soft)] ring-1 ring-border">
