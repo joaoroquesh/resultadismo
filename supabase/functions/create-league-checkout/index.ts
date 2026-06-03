@@ -73,8 +73,10 @@ Deno.serve(async (req) => {
   if (error) return json({ error: error.message }, 500);
   if (!league) return json({ error: "Federação não encontrada" }, 404);
   if (league.owner_id !== user.id) return json({ error: "Você não é o dono desta federação" }, 403);
-  if (league.payment_status === "paid" || league.status === "active") {
-    return json({ error: "Esta federação já está ativa." }, 409);
+  // Só bloqueia se já estiver PAGA. status 'active' sozinho pode ser aprovação do admin
+  // sem pagamento (estado em que ainda faz sentido pagar).
+  if (league.payment_status === "paid") {
+    return json({ error: "Esta federação já está paga." }, 409);
   }
 
   // Desconto (opcional)

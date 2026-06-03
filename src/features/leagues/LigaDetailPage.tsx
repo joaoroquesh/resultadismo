@@ -170,7 +170,7 @@ export function LigaDetailPage() {
           </div>
         )}
 
-      {league.payment_status === "pending" ? (
+      {league.payment_status === "pending" && league.status !== "active" ? (
         <div className="mb-4 rounded-md bg-gold-100 p-3 text-sm text-gold-800">
           <div className="flex items-start gap-2">
             <Clock className="mt-0.5 size-4 shrink-0" />
@@ -199,7 +199,19 @@ export function LigaDetailPage() {
               </Button>
             )}
             {isOwner && payMode === "live" && (
-              <Button size="sm" loading={checkout.isPending} onClick={() => checkout.mutate(league.id)}>
+              <Button
+                size="sm"
+                loading={checkout.isPending}
+                onClick={() =>
+                  checkout.mutate(league.id, {
+                    onError: (e) =>
+                      toast(
+                        e instanceof Error ? e.message : "Não foi possível abrir o pagamento. Tente recarregar a página.",
+                        "error",
+                      ),
+                  })
+                }
+              >
                 Pagar agora
               </Button>
             )}
