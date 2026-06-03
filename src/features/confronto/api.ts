@@ -97,6 +97,24 @@ export function useTieDetail(tieId: string | undefined, enabled = true) {
   });
 }
 
+/** Períodos (matchdays) disponíveis da competição — limita o nº de rodadas no sorteio. */
+export function useConfrontoPeriods(competitionId: string | undefined) {
+  return useQuery({
+    enabled: !!competitionId,
+    queryKey: ["confronto-periods", competitionId],
+    queryFn: async (): Promise<number[]> => {
+      const { data, error } = await supabase
+        .from("matches")
+        .select("matchday")
+        .eq("competition_id", competitionId!)
+        .not("matchday", "is", null)
+        .order("matchday", { ascending: true });
+      if (error) throw error;
+      return [...new Set((data ?? []).map((r) => r.matchday as number))];
+    },
+  });
+}
+
 /** Participantes travados no sorteio. */
 export function useConfrontoParticipants(lcId: string | undefined, enabled = true) {
   return useQuery({
@@ -133,6 +151,8 @@ export function useDrawConfronto() {
       leagueId: string;
       competitionId: string;
       formato: ConfrontoFormato;
+      /** Nº de rodadas escolhido no simulador (Liga). Copa ignora (definido pelo chaveamento). */
+      rounds?: number;
     }) => {
       const { data: mem, error: memErr } = await supabase
         .from("league_members")
@@ -155,7 +175,9 @@ export function useDrawConfronto() {
       if (periods.length === 0) throw new Error("A competição ainda não tem rodadas para o sorteio.");
 
       const ties =
-        input.formato === "cup" ? buildCopaFixtures(ids, periods) : buildLigaFixtures(ids, periods);
+        input.formato === "cup"
+          ? buildCopaFixtures(ids, periods)
+          : buildLigaFixtures(ids, periods, input.rounds);
       const participants = buildParticipants(ids);
 
       const { error } = await supabase.rpc("draw_confronto", {

@@ -52,9 +52,24 @@ export function buildParticipants(ids: string[]): DrawParticipant[] {
   return ids.map((user_id, i) => ({ user_id, seed: i + 1 }));
 }
 
-/** Liga: round-robin; cada rodada → um período (matchday). */
-export function buildLigaFixtures(ids: string[], periods: number[]): DrawTie[] {
-  const schedule = roundRobin(ids.length).slice(0, periods.length);
+/**
+ * Liga: round-robin; cada rodada → um período (matchday).
+ * `targetRounds` (opcional) define quantas rodadas gerar — o admin escolhe no
+ * simulador. Acima de n-1 vira turno e returno (returno inverte o mando).
+ * Sem `targetRounds`, usa o turno completo que couber nos períodos disponíveis.
+ */
+export function buildLigaFixtures(
+  ids: string[],
+  periods: number[],
+  targetRounds?: number,
+): DrawTie[] {
+  const rr = roundRobin(ids.length); // turno completo: n-1 (ou n com folga p/ ímpar)
+  const total = Math.max(1, Math.min(targetRounds ?? Math.min(rr.length, periods.length), periods.length));
+  const schedule = Array.from({ length: total }, (_, r) => {
+    const base = rr[r % rr.length]!;
+    const returno = Math.floor(r / rr.length) % 2 === 1; // voltas alternam o mando
+    return returno ? base.map((p) => (p.b !== null ? { a: p.b, b: p.a } : p)) : base;
+  });
   return schedule.flatMap((pairings, r) =>
     pairings
       .filter((p) => p.b !== null)
@@ -64,7 +79,7 @@ export function buildLigaFixtures(ids: string[], periods: number[]): DrawTie[] {
         slot: slot + 1,
         member_a: ids[p.a]!,
         member_b: ids[p.b as number]!,
-        matchday: periods[r] ?? null,
+        matchday: periods[r] ?? periods[periods.length - 1] ?? null,
       })),
   );
 }
