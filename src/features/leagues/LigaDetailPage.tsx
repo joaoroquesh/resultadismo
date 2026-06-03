@@ -12,8 +12,6 @@ import {
   Plus,
   LogOut,
   Palette,
-  RotateCw,
-  Sparkles,
 } from "lucide-react";
 import { useNudge } from "@/features/notifications/api";
 import { Page } from "@/components/layout/Page";
@@ -25,14 +23,9 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { Escudo, ESCUDO_SHAPES, defaultEscudoFromName } from "@/components/ui/Escudo";
-import {
-  AVATAR_COLORS,
-  AVATAR_ROTATIONS,
-  buildGenAvatar,
-  parseGenAvatar,
-  type AvatarShape,
-} from "@/lib/avatar";
+import { Escudo } from "@/components/ui/Escudo";
+import { CrestEditor } from "@/components/ui/CrestEditor";
+import { FLAMULA_SHAPES } from "@/lib/crest";
 import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useCompetitions, findWorldCupCompetition } from "@/features/matches/api";
@@ -679,10 +672,9 @@ function CompeticoesTab({
 }
 
 /**
- * Editor de identidade visual da federação: forma (clássico/ogival/bandeira),
- * 1–3 cores e rotação da divisão. Tudo armazenado em `leagues.logo_url` no
- * mesmo formato `gen:` usado pelo avatar — então o mesmo renderer (`Escudo`)
- * pinta em qualquer lugar do app sem branch extra.
+ * Editor da flâmula da federação: forma (3 flâmulas) + cores (sólido/listras/
+ * grade/bola) e rotação. Salvo como `crest:flamula:...` em `leagues.logo_url`,
+ * então o mesmo renderer (`Escudo`) pinta em qualquer lugar do app.
  */
 function EscudoStudio({
   leagueId,
@@ -697,53 +689,22 @@ function EscudoStudio({
 }) {
   const update = useUpdateLeagueLogo();
   const { toast } = useToast();
-  const initial = parseGenAvatar(currentLogo) ?? parseGenAvatar(defaultEscudoFromName(leagueName));
-
-  const [shape, setShape] = useState<AvatarShape>(initial?.shape ?? "shield");
-  const [colorCount, setColorCount] = useState<number>(initial?.colors.length ?? 2);
-  const [colors, setColors] = useState<string[]>([
-    initial?.colors[0] ?? "verde",
-    initial?.colors[1] ?? "dourado",
-    initial?.colors[2] ?? "vermelho",
-  ]);
-  const [rotation, setRotation] = useState<number>(initial?.rotation ?? 0);
-
-  const activeColors = colors.slice(0, colorCount);
-  const previewUrl = buildGenAvatar(shape, activeColors, rotation);
-
-  function setColorAt(i: number, key: string) {
-    setColors((prev) => prev.map((c, idx) => (idx === i ? key : c)));
-  }
-
-  function randomize() {
-    const sh = ESCUDO_SHAPES[Math.floor(Math.random() * ESCUDO_SHAPES.length)]!.key;
-    const n = (Math.floor(Math.random() * 3) + 1) as 1 | 2 | 3;
-    const pool = [...AVATAR_COLORS].sort(() => Math.random() - 0.5).slice(0, n);
-    const rot = AVATAR_ROTATIONS[Math.floor(Math.random() * AVATAR_ROTATIONS.length)]!;
-    setShape(sh);
-    setColorCount(n);
-    setColors([
-      pool[0]!.key,
-      pool[1]?.key ?? colors[1]!,
-      pool[2]?.key ?? colors[2]!,
-    ]);
-    setRotation(rot);
-  }
+  const [crest, setCrest] = useState<string>(currentLogo ?? "");
 
   async function handleSave() {
     try {
-      await update.mutateAsync({ leagueId, logoUrl: previewUrl });
-      toast("Escudo salvo!", "success");
+      await update.mutateAsync({ leagueId, logoUrl: crest || null });
+      toast("Flâmula salva!", "success");
       onClose();
     } catch (e) {
-      toast(e instanceof Error ? e.message : "Erro ao salvar escudo.", "error");
+      toast(e instanceof Error ? e.message : "Erro ao salvar flâmula.", "error");
     }
   }
 
   async function handleReset() {
     try {
       await update.mutateAsync({ leagueId, logoUrl: null });
-      toast("Escudo voltou para o automático.", "info");
+      toast("Flâmula voltou para o automático.", "info");
       onClose();
     } catch (e) {
       toast(e instanceof Error ? e.message : "Erro ao resetar.", "error");
@@ -752,110 +713,31 @@ function EscudoStudio({
 
   return (
     <Card className="mb-4 space-y-4 p-4">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-sm font-semibold text-ink-800">Identidade da federação</p>
-        <Button size="sm" variant="ghost" onClick={randomize} title="Sortear estilo">
-          <Sparkles className="size-4" /> Sortear
-        </Button>
-      </div>
+      <p className="text-sm font-semibold text-ink-800">Flâmula da federação</p>
 
       {/* Preview ao vivo */}
       <div className="flex items-center gap-4 rounded-md bg-ink-50 p-3">
-        <Escudo src={previewUrl} name={leagueName} size="xl" />
+        <Escudo src={crest || null} name={leagueName} size="xl" />
         <div className="min-w-0">
           <p className="truncate font-bold text-ink-900">{leagueName}</p>
           <p className="text-xs text-ink-500">
-            Pré-visualização — o escudo aparece na federação e na classificação.
+            Pré-visualização — a flâmula aparece na federação e na classificação.
           </p>
         </div>
       </div>
 
-      {/* Forma */}
-      <div className="space-y-1.5">
-        <p className="text-xs font-medium text-ink-500">Formato</p>
-        <div className="flex flex-wrap gap-2.5">
-          {ESCUDO_SHAPES.map((s) => {
-            const active = shape === s.key;
-            return (
-              <button
-                key={s.key}
-                type="button"
-                aria-label={s.label}
-                onClick={() => setShape(s.key)}
-                className={cn(
-                  "flex flex-col items-center gap-1 rounded-md p-1.5 ring-2 transition",
-                  active ? "ring-brand-600" : "ring-transparent hover:bg-ink-100",
-                )}
-              >
-                <Escudo
-                  src={buildGenAvatar(s.key, activeColors, rotation)}
-                  name={leagueName}
-                  size="md"
-                />
-                <span className="text-[10px] font-semibold uppercase tracking-wide text-ink-500">
-                  {s.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Quantas cores */}
-      <div className="space-y-2">
-        <p className="text-xs font-medium text-ink-500">Cores</p>
-        <SegmentedControl<string>
-          value={String(colorCount)}
-          onChange={(v) => setColorCount(Number(v))}
-          options={[
-            { value: "1", label: "1" },
-            { value: "2", label: "2" },
-            { value: "3", label: "3" },
-          ]}
-        />
-      </div>
-
-      {/* Picker por divisão */}
-      <div className="space-y-2.5">
-        {Array.from({ length: colorCount }).map((_, i) => (
-          <div key={i} className="flex flex-wrap items-center gap-2">
-            {colorCount > 1 && (
-              <span className="w-12 text-xs font-medium text-ink-400">Div {i + 1}</span>
-            )}
-            {AVATAR_COLORS.map((c) => (
-              <button
-                key={c.key}
-                type="button"
-                aria-label={c.key}
-                onClick={() => setColorAt(i, c.key)}
-                className={cn(
-                  "size-8 rounded-full ring-2 ring-offset-2 ring-offset-surface transition",
-                  colors[i] === c.key ? "ring-ink-900" : "ring-transparent",
-                )}
-                style={{ background: c.hex }}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-
-      {colorCount > 1 && (
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            const idx = AVATAR_ROTATIONS.indexOf(rotation);
-            setRotation(AVATAR_ROTATIONS[(idx + 1) % AVATAR_ROTATIONS.length]!);
-          }}
-        >
-          <RotateCw className="size-4" /> Girar divisão ({rotation}°)
-        </Button>
-      )}
+      <CrestEditor
+        kind="flamula"
+        name={leagueName}
+        initial={currentLogo}
+        shapes={FLAMULA_SHAPES}
+        allowBall
+        onChange={setCrest}
+      />
 
       <div className="flex flex-wrap gap-2 pt-2">
         <Button fullWidth loading={update.isPending} onClick={handleSave}>
-          Salvar escudo
+          Salvar flâmula
         </Button>
         <Button variant="ghost" onClick={handleReset} loading={update.isPending}>
           Voltar ao automático
