@@ -88,7 +88,9 @@ export function useCreateCompetition() {
         })
         .select()
         .single();
-      if (error) throw error;
+      // surfaceia a mensagem real (PostgrestError não é Error → o toast mostrava
+      // só "Erro."). Ex.: 'invalid input value for enum data_provider: "espn"'.
+      if (error) throw new Error(error.message);
       return data;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "competitions"] }),
