@@ -15,6 +15,8 @@ import {
   useSimulatePayment,
   validateDiscount,
   applyDiscount,
+  isPromoActive,
+  effectivePriceCents,
   type DiscountInfo,
 } from "@/features/payments/api";
 import { formatBRL } from "@/lib/pricing";
@@ -53,9 +55,11 @@ export function NovaLigaPage() {
   const isWorldCup = !!selectedComp && selectedComp === findWorldCupCompetition(competitions);
 
   const payMode = settings?.payment_mode ?? "disabled";
-  const priceCents = settings?.league_price_cents ?? 990;
+  const baseCents = settings?.league_price_cents ?? 990;
+  const promoActive = isPromoActive(settings);
+  const currentCents = effectivePriceCents(settings); // promo se valendo, senão base
   const isPaid = payMode !== "disabled";
-  const effectiveCents = applyDiscount(priceCents, discount);
+  const effectiveCents = applyDiscount(currentCents, discount); // cupom sobre o preço vigente
   const appliedCode = discount?.valid ? discount.code : undefined;
 
   async function handleApplyDiscount() {
@@ -341,8 +345,16 @@ export function NovaLigaPage() {
               </>
             ) : (
               <>
-                Criar uma federação tem uma <strong>taxa única de {formatBRL(priceCents)}</strong>, paga
-                via Pix ou cartão no Mercado Pago. Ativa automaticamente após a confirmação.
+                Criar uma federação tem uma{" "}
+                <strong>taxa única de {formatBRL(currentCents)}</strong>
+                {promoActive && (
+                  <>
+                    {" "}
+                    <span className="text-brand-700/70 line-through">{formatBRL(baseCents)}</span> —
+                    promoção da Copa
+                  </>
+                )}
+                , paga via Pix ou cartão no Mercado Pago. Ativa automaticamente após a confirmação.
               </>
             )}{" "}
             Em dúvida?{" "}

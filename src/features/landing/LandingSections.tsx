@@ -330,7 +330,9 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
             <span className="font-semibold text-ink-700">criar a própria federação</span> — o espaço
             onde a sua turma joga — paga uma{" "}
             <span className="font-semibold text-ink-700">taxa única</span> (Pix ou cartão). É o que
-            mantém o app no ar e sem anúncios.
+            mantém o app no ar e sem anúncios.{" "}
+            <span className="font-semibold text-grass-700">Na Copa, sai por R$ 9,90</span> (depois
+            R$ 19,90).
           </p>
           <div className="mt-6">
             <Button size="lg" onClick={onOpenLogin}>

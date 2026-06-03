@@ -48,14 +48,20 @@ Deno.serve(async (req) => {
   }
   if (!body.leagueId) return json({ error: "leagueId é obrigatório" }, 400);
 
-  // Configurações de pagamento (modo + preço)
+  // Configurações de pagamento (modo + preço base + promoção opcional)
   const { data: settings } = await admin
     .from("app_settings")
-    .select("payment_mode, league_price_cents")
+    .select("payment_mode, league_price_cents, promo_price_cents, promo_until")
     .eq("id", 1)
     .maybeSingle();
   const mode = settings?.payment_mode ?? "disabled";
-  const priceCents = Number(settings?.league_price_cents ?? 990);
+  const baseCents = Number(settings?.league_price_cents ?? 990);
+  // Preço promocional vale enquanto now() < promo_until (autoritativo no servidor).
+  const promoCents = settings?.promo_price_cents;
+  const promoUntil = settings?.promo_until;
+  const promoActive =
+    promoCents != null && promoUntil != null && new Date(promoUntil).getTime() > Date.now();
+  const priceCents = promoActive ? Number(promoCents) : baseCents;
 
   if (mode !== "live") {
     return json({ error: "Pagamento não está no modo Mercado Pago." }, 409);

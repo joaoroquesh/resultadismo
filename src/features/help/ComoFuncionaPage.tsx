@@ -276,8 +276,9 @@ export function ComoFuncionaPage() {
           <p className="text-sm leading-relaxed text-ink-600">
             Jogar e participar é <span className="font-semibold text-ink-900">de graça</span>.{" "}
             <span className="font-semibold text-ink-900">Criar</span> uma federação própria tem uma{" "}
-            <span className="font-semibold text-ink-900">taxa única</span> (Pix ou cartão) — é o que
-            mantém o app no ar, sem anúncios. Ao criar, você define quem pode{" "}
+            <span className="font-semibold text-ink-900">taxa única de R$ 19,90</span> —{" "}
+            <span className="font-semibold text-grass-700">R$ 9,90 na promoção da Copa</span> (Pix ou
+            cartão), o que mantém o app no ar, sem anúncios. Ao criar, você define quem pode{" "}
             <span className="font-semibold text-ink-900">ver</span> e quem pode{" "}
             <span className="font-semibold text-ink-900">entrar</span> na federação.
           </p>
