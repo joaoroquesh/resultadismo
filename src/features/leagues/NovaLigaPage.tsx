@@ -1,6 +1,6 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Info, Ticket } from "lucide-react";
+import { ArrowLeft, Info, Ticket, Trophy } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Coachmark } from "@/components/ui/Coachmark";
 import { useToast } from "@/components/ui/Toast";
-import { useCompetitions } from "@/features/matches/api";
+import { useCompetitions, findWorldCupCompetition } from "@/features/matches/api";
 import { useCreateLeague, startLeagueCheckout } from "./api";
 import {
   usePaymentSettings,
@@ -33,10 +33,23 @@ export function NovaLigaPage() {
   const [visibility, setVisibility] = useState<"private" | "public">("private");
   const [joinPolicy, setJoinPolicy] = useState<"invite" | "approval" | "open">("invite");
   const [competitionId, setCompetitionId] = useState<string>("");
-  const [mode, setMode] = useState<LeagueMode>("table");
+  // Pontos é o default da temporada de Copa: corrida individual por palpite.
+  // Tabela continua disponível (campeonatos por pontos corridos).
+  const [mode, setMode] = useState<LeagueMode>("points");
   const [discountCode, setDiscountCode] = useState("");
   const [discount, setDiscount] = useState<DiscountInfo | null>(null);
   const [checkingDiscount, setCheckingDiscount] = useState(false);
+
+  // Pré-seleção da Copa do Mundo (default da temporada) — assim que o catálogo chega.
+  useEffect(() => {
+    if (competitionId || !competitions?.length) return;
+    const wc = findWorldCupCompetition(competitions);
+    if (wc) setCompetitionId(wc.id);
+  }, [competitions, competitionId]);
+
+  // Detecta se a competição escolhida é a Copa do Mundo (pra ajustar o copy/UI).
+  const selectedComp = competitions?.find((c) => c.id === competitionId);
+  const isWorldCup = !!selectedComp && selectedComp === findWorldCupCompetition(competitions);
 
   const payMode = settings?.payment_mode ?? "disabled";
   const priceCents = settings?.league_price_cents ?? 990;
@@ -62,13 +75,18 @@ export function NovaLigaPage() {
     e.preventDefault();
     if (!name.trim()) return;
     try {
+      // Fallback robusto: se o catálogo chegou tarde e o useEffect não pré-selecionou
+      // a Copa, ainda assim cravamos ela no submit. Toda federação nasce com competição.
+      const finalCompId = competitionId || findWorldCupCompetition(competitions)?.id;
+      const finalMode: LeagueMode =
+        finalCompId && finalCompId === findWorldCupCompetition(competitions)?.id ? "points" : mode;
       const league = await create.mutateAsync({
         name: name.trim(),
         description: description.trim() || undefined,
         visibility,
         joinPolicy,
-        competitionId: competitionId || undefined,
-        mode,
+        competitionId: finalCompId || undefined,
+        mode: finalMode,
       });
       const slug = league.slug;
 
@@ -217,45 +235,56 @@ export function NovaLigaPage() {
               onChange={(e) => setCompetitionId(e.target.value)}
               className="h-11 rounded-md border border-ink-200 bg-surface px-3 text-ink-950 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
             >
-              <option value="">Escolher depois</option>
               {competitions?.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.name}
+                  {(c as { display_name?: string | null }).display_name ?? c.name}
                 </option>
               ))}
             </select>
           </div>
-          {competitionId && (
-            <Coachmark
-              storageKey="resultadismo-coach-liga-modo-v1"
-              title="Modo de disputa"
-              placement="top"
-              content={
-                <>
-                  <span className="font-bold text-ink-50">Tabela</span>: a federação acompanha um
-                  campeonato e quem somar mais pontos nos jogos lidera.{" "}
-                  <span className="font-bold text-ink-50">Pontos</span>: disputa corrida, valendo o
-                  total de pontos que cada um faz.
-                </>
-              }
-            >
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-ink-800">Modo de disputa</label>
-                <SegmentedControl
-                  value={mode}
-                  onChange={setMode}
-                  options={[
-                    { value: "table", label: "Tabela" },
-                    { value: "points", label: "Pontos" },
-                  ]}
-                />
-                <p className="text-xs leading-snug text-ink-500">
-                  {mode === "table"
-                    ? "Vale o campeonato inteiro: os pontos somam rodada após rodada numa classificação única."
-                    : "Corrida por pontos: foco em acumular pontos nos jogos — quem somou mais, lidera."}
-                </p>
-              </div>
-            </Coachmark>
+
+          {isWorldCup ? (
+            <div className="flex items-start gap-2 rounded-md bg-grass-50 p-3 text-xs text-grass-800 ring-1 ring-grass-200/60">
+              <Trophy className="mt-0.5 size-4 shrink-0" />
+              <p>
+                <strong>Copa do Mundo 2026 — modo Pontos</strong> vem ativa por padrão. É a
+                disputa da temporada: cada palpite vale pontos e quem somar mais lidera.
+                Você pode trocar a competição depois, lá na página da federação.
+              </p>
+            </div>
+          ) : (
+            competitionId && (
+              <Coachmark
+                storageKey="resultadismo-coach-liga-modo-v1"
+                title="Modo de disputa"
+                placement="top"
+                content={
+                  <>
+                    <span className="font-bold text-ink-50">Tabela</span>: a federação acompanha
+                    um campeonato e quem somar mais pontos nos jogos lidera.{" "}
+                    <span className="font-bold text-ink-50">Pontos</span>: disputa corrida,
+                    valendo o total de pontos que cada um faz.
+                  </>
+                }
+              >
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-ink-800">Modo de disputa</label>
+                  <SegmentedControl
+                    value={mode}
+                    onChange={setMode}
+                    options={[
+                      { value: "points", label: "Pontos" },
+                      { value: "table", label: "Tabela" },
+                    ]}
+                  />
+                  <p className="text-xs leading-snug text-ink-500">
+                    {mode === "table"
+                      ? "Vale o campeonato inteiro: os pontos somam rodada após rodada numa classificação única."
+                      : "Corrida por pontos: foco em acumular pontos nos jogos — quem somou mais, lidera."}
+                  </p>
+                </div>
+              </Coachmark>
+            )
           )}
         </Card>
 

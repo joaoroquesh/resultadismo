@@ -85,7 +85,7 @@ const SLIDES: Slide[] = [
           tone="grass"
           points={2}
           label="Acertou o saldo de gols"
-          desc="Errou o placar, mas pegou a diferença. Cravar o empate conta aqui."
+          desc="Errou o placar, mas pegou a diferença."
         />
         <PointRow
           tone="aqua"

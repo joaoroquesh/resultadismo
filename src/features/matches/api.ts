@@ -7,16 +7,42 @@ import type { Competition, MatchWithTeams, Prediction } from "@/lib/types";
 const MATCH_SELECT =
   "*, home_team:teams!matches_home_team_id_fkey(*), away_team:teams!matches_away_team_id_fkey(*), competition:competitions(id,name,slug,emblem_url)";
 
+/**
+ * Acha a Copa do Mundo no catálogo da liga. Default sazonal da temporada
+ * (Copa do Mundo 2026) — reaproveitado pelo NovaLigaPage e pela aba de
+ * Competições da federação. Quando a Copa sair do calendário a gente
+ * troca aqui só uma vez.
+ */
+export function findWorldCupCompetition(
+  comps: Competition[] | undefined,
+): Competition | undefined {
+  if (!comps?.length) return undefined;
+  return comps.find((c) => {
+    const code = (c.provider_code ?? "").toUpperCase();
+    const name = `${(c as { display_name?: string | null }).display_name ?? ""} ${c.name}`.toLowerCase();
+    return (
+      code === "WC" ||
+      code === "4429" || // TheSportsDB FIFA World Cup
+      name.includes("copa do mundo") ||
+      name.includes("world cup")
+    );
+  });
+}
+
 export function useCompetitions() {
+  const { isAppAdmin } = useAuth();
   return useQuery({
-    queryKey: ["competitions"],
+    // cache separado p/ admin (vê rascunhos) e público (só publicadas)
+    queryKey: ["competitions", isAppAdmin ? "admin" : "public"],
     staleTime: 5 * 60_000,
     placeholderData: keepPreviousData,
     queryFn: async (): Promise<Competition[]> => {
-      const { data, error } = await supabase
-        .from("competitions")
-        .select("*")
-        .eq("status", "active")
+      // colunas `is_published` e `display_name` foram adicionadas via migração
+      // depois dos types gerados — cast para `any` evita ter que rerodar `supabase gen types`.
+      let q = supabase.from("competitions").select("*").eq("status", "active");
+      // público só vê publicadas; admin enxerga tudo (incl. rascunhos)
+      if (!isAppAdmin) q = (q as unknown as { eq: (c: string, v: unknown) => typeof q }).eq("is_published", true);
+      const { data, error } = await q
         .order("is_featured", { ascending: false })
         .order("name");
       if (error) throw error;
@@ -32,11 +58,23 @@ export function useMatches(competitionId: string | undefined) {
     staleTime: 30_000,
     placeholderData: keepPreviousData,
     queryFn: async (): Promise<MatchWithTeams[]> => {
-      const { data, error } = await supabase
+      // Filtra jogos anteriores à data em que a competição foi adicionada no app.
+      // Jogos retroativos não interessam para os palpites e poluem a tela.
+      const { data: comp, error: compErr } = await supabase
+        .from("competitions")
+        .select("created_at")
+        .eq("id", competitionId!)
+        .maybeSingle();
+      if (compErr) throw compErr;
+      const since = comp?.created_at ?? null;
+
+      let q = supabase
         .from("matches")
         .select(MATCH_SELECT)
         .eq("competition_id", competitionId!)
         .order("kickoff_at", { ascending: true });
+      if (since) q = q.gte("kickoff_at", since);
+      const { data, error } = await q;
       if (error) throw error;
       return (data ?? []) as unknown as MatchWithTeams[];
     },

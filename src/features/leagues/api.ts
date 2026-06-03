@@ -232,6 +232,45 @@ export function useAddLeagueCompetition() {
   });
 }
 
+export function useUpdateLeagueLogo() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { leagueId: string; logoUrl: string | null }) => {
+      // Escudo gerado vai como "gen:shield:cor1-cor2:rotação" em leagues.logo_url.
+      // RLS já garante: só dono/admin da federação consegue gravar.
+      const { error } = await supabase
+        .from("leagues")
+        .update({ logo_url: input.logoUrl })
+        .eq("id", input.leagueId);
+      if (error) throw error;
+    },
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: ["league"] });
+      qc.invalidateQueries({ queryKey: ["my-leagues"] });
+      qc.invalidateQueries({ queryKey: ["league-members", v.leagueId] });
+    },
+  });
+}
+
+export function useDeleteLeagueCompetition() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { leagueId: string; lcId: string }) => {
+      // RLS já enforça: só admin da federação (ou app_admin) consegue deletar.
+      // cascade nos predictions/cup_ties/etc. cuida do resto.
+      const { error } = await supabase
+        .from("league_competitions")
+        .delete()
+        .eq("id", input.lcId);
+      if (error) throw error;
+    },
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: ["league-competitions", v.leagueId] });
+      qc.invalidateQueries({ queryKey: ["standings"] });
+    },
+  });
+}
+
 export function useUpdateMember() {
   const qc = useQueryClient();
   return useMutation({
