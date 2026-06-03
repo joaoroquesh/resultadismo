@@ -205,6 +205,10 @@ export function useDrawConfronto() {
       kind?: PeriodKind;
       /** Participantes escolhidos (ordem = seed). Se omitido, usa todos os membros ativos. */
       memberIds?: string[];
+      /** Formato da Liga: 'partial' (turno/returno) ou 'swiss'. */
+      ligaFormat?: "partial" | "swiss";
+      /** Se setado (futuro), o sorteio fica agendado e é revelado nesse horário. */
+      scheduledDrawAt?: string | null;
     }) => {
       let ids = input.memberIds ?? [];
       if (ids.length === 0) {
@@ -242,9 +246,12 @@ export function useDrawConfronto() {
         p_lc_id: input.lcId,
         p_participants: participants as unknown as Json,
         p_ties: ties as unknown as Json,
+        p_liga_format: input.ligaFormat ?? undefined,
+        p_period_kind: input.kind ?? "phase",
+        p_scheduled_draw_at: input.scheduledDrawAt ?? undefined,
       });
       if (error) throw error;
-      return { ties: ties.length, participants: ids.length };
+      return { ties: ties.length, participants: ids.length, scheduled: !!input.scheduledDrawAt };
     },
     onSuccess: (_r, v) => invalidateConfronto(qc, v.lcId, v.leagueId),
   });

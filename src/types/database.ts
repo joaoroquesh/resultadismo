@@ -435,6 +435,7 @@ export type Database = {
           name: string
           participant_mode: string
           period_kind: string
+          scheduled_draw_at: string | null
           settings: Json
           starts_on: string | null
           status: string
@@ -452,6 +453,7 @@ export type Database = {
           name: string
           participant_mode?: string
           period_kind?: string
+          scheduled_draw_at?: string | null
           settings?: Json
           starts_on?: string | null
           status?: string
@@ -469,6 +471,7 @@ export type Database = {
           name?: string
           participant_mode?: string
           period_kind?: string
+          scheduled_draw_at?: string | null
           settings?: Json
           starts_on?: string | null
           status?: string
@@ -1183,7 +1186,14 @@ export type Database = {
       }
       create_deadline_reminders: { Args: never; Returns: number }
       draw_confronto: {
-        Args: { p_lc_id: string; p_participants: Json; p_ties: Json }
+        Args: {
+          p_lc_id: string
+          p_liga_format?: string
+          p_participants: Json
+          p_period_kind?: string
+          p_scheduled_draw_at?: string
+          p_ties: Json
+        }
         Returns: undefined
       }
       gen_join_code: { Args: never; Returns: string }
@@ -1373,6 +1383,8 @@ export type Database = {
         }
       }
       release_access: { Args: { p_token: string }; Returns: undefined }
+      release_confronto_if_due: { Args: { p_lc_id: string }; Returns: boolean }
+      release_scheduled_confrontos: { Args: never; Returns: number }
       request_access: { Args: { p_token?: string }; Returns: Json }
       run_football_sync: { Args: never; Returns: undefined }
       score_points: {

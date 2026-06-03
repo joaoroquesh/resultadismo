@@ -45,12 +45,7 @@ import {
   useLeagueCheckout,
 } from "./api";
 import { usePaymentSettings, useSimulatePayment, useCompLeague } from "@/features/payments/api";
-import {
-  useNamePrefixes,
-  competitionNameError,
-  requiredPrefix,
-  NAME_PREFIX_DEFAULTS,
-} from "./naming";
+import { useNamePrefixes, requiredPrefix, NAME_PREFIX_DEFAULTS } from "./naming";
 import { RefundFederationButton } from "./RefundFederationButton";
 import type { LeagueMode } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -441,6 +436,7 @@ function ClassificacaoTab({
     confronto_state?: string;
     participant_mode?: string;
     liga_format?: string;
+    scheduled_draw_at?: string | null;
   }[];
   activeLcId?: string;
   onSelect: (id: string) => void;
@@ -454,7 +450,10 @@ function ClassificacaoTab({
   // Separa as disputas por tipo: Pontos (corrida por campeonato) e Confronto (Liga/Copa).
   const isConfronto = (m: string) => m === "liga" || m === "cup";
   const pontos = comps.filter((c) => !isConfronto(c.mode));
-  const confronto = comps.filter((c) => isConfronto(c.mode));
+  // Rascunho (em configuração) só aparece pro admin; pros demais, só quando liberado.
+  const confronto = comps.filter(
+    (c) => isConfronto(c.mode) && (isAdmin || c.confronto_state !== "draft"),
+  );
   const hasBoth = pontos.length > 0 && confronto.length > 0;
   const activeComp = comps.find((c) => c.id === activeLcId);
   const [view, setView] = useState<"pontos" | "confronto">(
@@ -543,6 +542,7 @@ function ClassificacaoTab({
           currentUserId={currentUserId}
           participantMode={active.participant_mode ?? "admin"}
           ligaFormat={active.liga_format ?? "partial"}
+          scheduledDrawAt={active.scheduled_draw_at ?? null}
         />
       ) : loading ? (
         <Skeleton className="h-64 w-full" />
@@ -662,21 +662,21 @@ function CompeticoesTab({
   const [tipo, setTipo] = useState<"pontos" | "confronto">("pontos");
   const [formato, setFormato] = useState<"liga" | "cup">("liga");
   const [participantMode, setParticipantMode] = useState<"admin" | "optin">("admin");
-  const [ligaFormat, setLigaFormat] = useState<"partial" | "swiss">("partial");
   const mode: LeagueMode = !confrontoEnabled || tipo === "pontos" ? "points" : formato;
+  const isConfrontoNew = mode === "liga" || mode === "cup";
 
-  // Regra de nome por tipo (Copa.../Liga.../Bolão...), configurável no admin.
+  // Prefixo do tipo (Bolão/Liga/Copa) entra como badge fixa — a pessoa digita só o resto.
   const { data: prefixesData } = useNamePrefixes();
   const prefixes = prefixesData ?? NAME_PREFIX_DEFAULTS;
-  const nameErr = competitionNameError(name, mode, prefixes);
+  const prefix = requiredPrefix(mode, prefixes);
 
-  // Pré-seleciona Copa do Mundo no formulário ao abrir, se ainda não escolheu.
+  // Pré-preenche um complemento sugerido ao abrir (o prefixo é a badge).
   useEffect(() => {
     if (!open || competitionId || !competitions?.length) return;
     const wc = findWorldCupCompetition(competitions);
     if (wc) {
       setCompetitionId(wc.id);
-      setName((cur) => cur || `${NAME_PREFIX_DEFAULTS.points} da Copa do Mundo 2026`);
+      setName((cur) => cur || "da Copa do Mundo 2026");
     }
   }, [open, competitions, competitionId]);
 
@@ -685,20 +685,20 @@ function CompeticoesTab({
 
   async function handleAdd() {
     if (!competitionId || !name.trim()) return;
-    if (nameErr) {
-      toast(nameErr, "error");
-      return;
-    }
     try {
       await add.mutateAsync({
         leagueId,
         competitionId,
-        name: name.trim(),
+        name: `${prefix} ${name.trim()}`.trim(),
         mode,
-        participantMode: mode === "liga" || mode === "cup" ? participantMode : undefined,
-        ligaFormat: mode === "liga" ? ligaFormat : undefined,
+        participantMode: isConfrontoNew ? participantMode : undefined,
       });
-      toast("Competição adicionada!", "success");
+      toast(
+        isConfrontoNew
+          ? "Disputa criada! Agora configure e libere o sorteio."
+          : "Competição adicionada!",
+        "success",
+      );
       setOpen(false);
       setName("");
       setCompetitionId("");
@@ -762,20 +762,21 @@ function CompeticoesTab({
               </option>
             ))}
           </select>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder={`${requiredPrefix(mode, prefixes)} dos amigos`}
-            className="h-11 w-full rounded-md border border-ink-200 bg-surface px-3.5 outline-none focus:border-brand-500"
-          />
-          {name.trim() && nameErr ? (
-            <p className="-mt-1.5 text-xs font-medium text-flame-600">{nameErr}</p>
-          ) : (
-            <p className="-mt-1.5 text-xs text-ink-400">
-              Comece o nome com{" "}
-              <span className="font-semibold text-ink-600">"{requiredPrefix(mode, prefixes)}"</span>.
-            </p>
-          )}
+          <div className="flex items-stretch overflow-hidden rounded-md border border-ink-200 bg-surface focus-within:border-brand-500">
+            <span className="flex shrink-0 items-center bg-ink-100 px-3 text-sm font-bold text-ink-600">
+              {prefix}
+            </span>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="dos amigos"
+              className="h-11 min-w-0 flex-1 bg-transparent px-3 outline-none"
+            />
+          </div>
+          <p className="-mt-1.5 text-xs text-ink-400">
+            O tipo (<span className="font-semibold text-ink-600">{prefix}</span>) já entra no nome — é
+            só completar.
+          </p>
           {confrontoEnabled ? (
             <div className="space-y-2">
               <label className="text-sm font-medium text-ink-800">Tipo de disputa</label>
@@ -804,24 +805,6 @@ function CompeticoesTab({
                     ? "Liga: todos contra todos; cada rodada vale 3/1/0 e forma uma tabela."
                     : "Copa: mata-mata; quem perde o confronto está fora."}
               </p>
-              {tipo === "confronto" && formato === "liga" && (
-                <div className="space-y-1 pt-1">
-                  <label className="text-sm font-medium text-ink-800">Formato da Liga</label>
-                  <SegmentedControl<"partial" | "swiss">
-                    value={ligaFormat}
-                    onChange={setLigaFormat}
-                    options={[
-                      { value: "partial", label: "Turno" },
-                      { value: "swiss", label: "Suíço" },
-                    ]}
-                  />
-                  <p className="text-xs leading-snug text-ink-500">
-                    {ligaFormat === "partial"
-                      ? "Turno: os confrontos já saem definidos no sorteio (todos contra todos até onde couber)."
-                      : "Suíço: cada rodada é gerada por classificação — quem vai bem pega quem vai bem, sem revanche."}
-                  </p>
-                </div>
-              )}
               {tipo === "confronto" && (
                 <div className="space-y-1 pt-1">
                   <label className="text-sm font-medium text-ink-800">Quem entra</label>
@@ -886,7 +869,7 @@ function CompeticoesTab({
               Cancelar
             </Button>
             <Button fullWidth loading={add.isPending} onClick={handleAdd}>
-              Adicionar
+              {isConfrontoNew ? "Criar e configurar" : "Adicionar"}
             </Button>
           </div>
         </Card>

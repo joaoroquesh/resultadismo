@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Trophy,
   ListOrdered,
@@ -7,8 +8,6 @@ import {
   Check,
   TriangleAlert,
   Clock,
-  Minus,
-  Plus,
   Users,
   ChevronDown,
   ArrowRight,
@@ -18,6 +17,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
 import { useLeagueMembers } from "@/features/leagues/api";
 import { MAX_JOGADORES } from "./simulator";
 import { roundsNeeded, buildLigaFixtures, buildCopaFixtures, type Period, type DrawTie } from "./build";
@@ -46,20 +46,33 @@ export function ConfrontoSection({
   currentUserId,
   participantMode = "admin",
   ligaFormat = "partial",
+  scheduledDrawAt = null,
 }: {
   lcId: string;
   leagueId: string;
   competitionId: string;
   mode: string; // 'liga' | 'cup'
-  state: string; // 'draft' | 'drawn' | 'finished'
+  state: string; // 'draft' | 'scheduled' | 'drawn' | 'finished'
   memberCount: number;
   isAdmin: boolean;
   currentUserId?: string;
   participantMode?: string; // 'admin' | 'optin'
   ligaFormat?: string; // 'partial' | 'swiss'
+  scheduledDrawAt?: string | null;
 }) {
   const formato: ConfrontoFormato = mode === "cup" ? "cup" : "liga";
 
+  if (state === "scheduled") {
+    return (
+      <ScheduledView
+        lcId={lcId}
+        leagueId={leagueId}
+        scheduledDrawAt={scheduledDrawAt}
+        formato={formato}
+        isAdmin={isAdmin}
+      />
+    );
+  }
   if (state !== "drawn" && state !== "finished") {
     return (
       <SorteioPanel
@@ -70,7 +83,6 @@ export function ConfrontoSection({
         memberCount={memberCount}
         isAdmin={isAdmin}
         participantMode={participantMode}
-        ligaFormat={ligaFormat}
         currentUserId={currentUserId}
       />
     );
@@ -88,13 +100,77 @@ export function ConfrontoSection({
   );
 }
 
-/* -------------------- Rascunho: simular, configurar e sortear -------------------- */
-function ligaRoundLabel(rounds: number, fullTurno: number): string {
-  if (rounds < fullTurno) return "turno parcial — nem todos se enfrentam";
-  if (rounds === fullTurno) return "turno completo — todos contra todos";
-  return "turno e returno — todos se enfrentam mais de uma vez";
+/* -------------------- Agendado: revela no horário -------------------- */
+function ScheduledView({
+  lcId,
+  leagueId,
+  scheduledDrawAt,
+  formato,
+  isAdmin,
+}: {
+  lcId: string;
+  leagueId: string;
+  scheduledDrawAt: string | null;
+  formato: ConfrontoFormato;
+  isAdmin: boolean;
+}) {
+  const { toast } = useToast();
+  const undo = useUndoDraw();
+  const qc = useQueryClient();
+  const when = scheduledDrawAt ? new Date(scheduledDrawAt) : null;
+
+  // Gatilho lazy: se o horário já passou, revela ao abrir (o cron é o backstop).
+  useEffect(() => {
+    if (!when || when > new Date()) return;
+    supabase.rpc("release_confronto_if_due", { p_lc_id: lcId }).then(({ data }) => {
+      if (data) {
+        qc.invalidateQueries({ queryKey: ["confronto-ties", lcId] });
+        qc.invalidateQueries({ queryKey: ["league-competitions", leagueId] });
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lcId, scheduledDrawAt]);
+
+  return (
+    <div className="rounded-lg bg-surface p-5 text-center shadow-[var(--shadow-soft)] ring-1 ring-border">
+      <span className="mx-auto mb-3 grid size-12 place-items-center rounded-full bg-brand-500/10 text-brand-600">
+        <Clock className="size-6" />
+      </span>
+      <p className="font-bold text-ink-950">Sorteio agendado</p>
+      <p className="mx-auto mt-1 max-w-xs text-sm leading-relaxed text-ink-500">
+        Os confrontos da {formato === "cup" ? "Copa" : "Liga"} serão revelados{" "}
+        {when ? (
+          <span className="font-semibold text-ink-700">
+            {when.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}
+          </span>
+        ) : (
+          "em breve"
+        )}
+        . Os participantes já estão travados.
+      </p>
+      {isAdmin && (
+        <button
+          type="button"
+          onClick={() =>
+            undo.mutate(
+              { lcId, leagueId },
+              {
+                onSuccess: () => toast("Agendamento desfeito. Você pode reconfigurar.", "info"),
+                onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
+              },
+            )
+          }
+          disabled={undo.isPending}
+          className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-ink-400 transition-colors hover:text-flame-600 disabled:opacity-50"
+        >
+          <RotateCcw className="size-3.5" /> Desfazer agendamento
+        </button>
+      )}
+    </div>
+  );
 }
 
+/* -------------------- Rascunho: simular, configurar e sortear -------------------- */
 function SorteioPanel({
   lcId,
   leagueId,
@@ -103,7 +179,6 @@ function SorteioPanel({
   memberCount,
   isAdmin,
   participantMode = "admin",
-  ligaFormat = "partial",
   currentUserId,
 }: {
   lcId: string;
@@ -113,7 +188,6 @@ function SorteioPanel({
   memberCount: number;
   isAdmin: boolean;
   participantMode?: string;
-  ligaFormat?: string;
   currentUserId?: string;
 }) {
   const { toast } = useToast();
@@ -126,9 +200,10 @@ function SorteioPanel({
   const [confirm, setConfirm] = useState(false);
   const [testOpen, setTestOpen] = useState(false);
   const [testN, setTestN] = useState(Math.max(2, memberCount));
+  const [drawWhen, setDrawWhen] = useState<"now" | "datetime" | "first">("now");
+  const [drawAt, setDrawAt] = useState("");
 
   const isLiga = formato === "liga";
-  const isSwiss = isLiga && ligaFormat === "swiss";
   const Icon = formato === "cup" ? Trophy : ListOrdered;
 
   // Membros ativos na ordem de entrada (= seed do sorteio).
@@ -160,18 +235,29 @@ function SorteioPanel({
   const n = Math.max(2, players.length);
   const P = periods?.length ?? 0;
   const fullTurno = Math.max(1, n - 1);
-  const defaultRounds = Math.min(fullTurno, P || fullTurno);
-  const [rounds, setRounds] = useState(defaultRounds);
 
-  // Mantém o nº de rodadas dentro de [1, P] quando períodos/participantes mudam.
-  useEffect(() => {
-    if (!P) return;
-    setRounds((r) => Math.min(Math.max(1, r || defaultRounds), P));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [P, fullTurno]);
-
+  // Formato da Liga, escolhido aqui no simulador (mesmo cabendo turno, pode optar suíço).
+  const [ligaFmt, setLigaFmt] = useState<"turno" | "returno" | "swiss">("turno");
+  const isSwiss = isLiga && ligaFmt === "swiss";
+  // turno = n-1 rodadas; returno = 2(n-1); ambos limitados pelos períodos. Suíço = progressivo.
+  const rounds = isSwiss
+    ? 1
+    : ligaFmt === "returno"
+      ? Math.min(2 * fullTurno, P || 2 * fullTurno)
+      : Math.min(fullTurno, P || fullTurno);
+  const turnoCabe = fullTurno <= P;
+  const returnoCabe = 2 * fullTurno <= P;
   const realRounds = isLiga ? (isSwiss ? Math.min(P, fullTurno) : rounds) : roundsNeeded("cup", n);
-  const viavel = P > 0 && (isSwiss ? true : realRounds <= P) && players.length >= 2;
+  const viavel =
+    P > 0 &&
+    players.length >= 2 &&
+    (isLiga
+      ? isSwiss
+        ? true
+        : ligaFmt === "returno"
+          ? returnoCabe
+          : turnoCabe
+      : realRounds <= P);
   const confrontosPorRodada = Math.floor(n / 2);
 
   // Preview de teste (hipotético — só simulação, não altera o sorteio real).
@@ -195,7 +281,21 @@ function SorteioPanel({
     : 0;
   const bracketFases = [...new Set(previewTies.map((t) => t.round_label))];
 
-  const doDraw = () =>
+  const doDraw = async () => {
+    let scheduledDrawAt: string | null = null;
+    if (drawWhen === "datetime" && drawAt) {
+      scheduledDrawAt = new Date(drawAt).toISOString();
+    } else if (drawWhen === "first") {
+      const { data } = await supabase
+        .from("matches")
+        .select("kickoff_at")
+        .eq("competition_id", competitionId)
+        .not("kickoff_at", "is", null)
+        .order("kickoff_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      scheduledDrawAt = (data?.kickoff_at as string | undefined) ?? null;
+    }
     draw.mutate(
       {
         lcId,
@@ -205,15 +305,23 @@ function SorteioPanel({
         kind,
         rounds: isLiga ? (isSwiss ? 1 : rounds) : undefined,
         memberIds: players.map((p) => p.id),
+        ligaFormat: isSwiss ? "swiss" : "partial",
+        scheduledDrawAt,
       },
       {
         onSuccess: (r) => {
-          toast(`Sorteado! ${r.ties} confrontos entre ${r.participants} jogadores.`, "success");
+          toast(
+            r.scheduled
+              ? "Sorteio agendado! A disputa será revelada no horário."
+              : `Sorteado! ${r.ties} confrontos entre ${r.participants} jogadores.`,
+            "success",
+          );
           setConfirm(false);
         },
         onError: (e) => toast(e instanceof Error ? e.message : "Erro ao sortear.", "error"),
       },
     );
+  };
 
   return (
     <div className="space-y-3">
@@ -394,41 +502,44 @@ function SorteioPanel({
           </span>
         </div>
 
-        {/* Configurar rodadas (só Liga turno; suíço é progressivo) */}
-        {isLiga && !isSwiss && P > 0 && (
+        {/* Formato da Liga: Turno / Turno e Returno / Suíço (escolhido aqui) */}
+        {isLiga && P > 0 && (
           <div className="mt-4 border-t border-ink-100 pt-3">
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-ink-800">Rodadas</p>
-                <p className="text-xs text-ink-500">{ligaRoundLabel(rounds, fullTurno)}</p>
-              </div>
-              <div className="flex items-center gap-2">
+            <p className="mb-2 text-sm font-semibold text-ink-800">Formato da Liga</p>
+            <div className="flex gap-1 rounded-pill bg-ink-100 p-1">
+              {(
+                [
+                  { v: "turno", label: "Turno", ok: turnoCabe },
+                  { v: "returno", label: "Ida e volta", ok: returnoCabe },
+                  { v: "swiss", label: "Suíço", ok: true },
+                ] as const
+              ).map((o) => (
                 <button
+                  key={o.v}
                   type="button"
-                  aria-label="Menos rodadas"
-                  onClick={() => setRounds((r) => Math.max(1, r - 1))}
-                  disabled={rounds <= 1}
-                  className="grid size-8 place-items-center rounded-md text-ink-600 ring-1 ring-border transition-colors hover:bg-ink-100 disabled:opacity-40"
+                  onClick={() => setLigaFmt(o.v)}
+                  title={!o.ok ? "Não cabe nos períodos da competição" : undefined}
+                  className={cn(
+                    "flex-1 rounded-pill px-2 py-1.5 text-xs font-semibold transition-colors",
+                    ligaFmt === o.v
+                      ? "bg-surface text-brand-700 shadow-[var(--shadow-soft)]"
+                      : o.ok
+                        ? "text-ink-500"
+                        : "text-ink-400",
+                  )}
                 >
-                  <Minus className="size-4" />
+                  {o.label}
+                  {!o.ok && <TriangleAlert className="ml-1 inline size-3 text-flame-500" />}
                 </button>
-                <span className="w-7 text-center text-lg font-extrabold tabular-nums text-ink-950">
-                  {rounds}
-                </span>
-                <button
-                  type="button"
-                  aria-label="Mais rodadas"
-                  onClick={() => setRounds((r) => Math.min(P, r + 1))}
-                  disabled={rounds >= P}
-                  className="grid size-8 place-items-center rounded-md text-ink-600 ring-1 ring-border transition-colors hover:bg-ink-100 disabled:opacity-40"
-                >
-                  <Plus className="size-4" />
-                </button>
-              </div>
+              ))}
             </div>
-            <p className="mt-2 text-xs text-ink-400">
-              {confrontosPorRodada} {confrontosPorRodada === 1 ? "confronto" : "confrontos"} por rodada
-              {" · "}máx. {P} {P === 1 ? "rodada" : "rodadas"} (períodos da competição)
+            <p className="mt-2 text-xs leading-relaxed text-ink-500">
+              {ligaFmt === "turno"
+                ? `Todos contra todos uma vez (${fullTurno} ${fullTurno === 1 ? "rodada" : "rodadas"}).`
+                : ligaFmt === "returno"
+                  ? `Todos contra todos, ida e volta (${2 * fullTurno} rodadas).`
+                  : `Cada rodada sai por classificação a cada fase, sem revanche (até ${Math.min(P, fullTurno)} rodadas).`}{" "}
+              {confrontosPorRodada} por rodada · {P} {P === 1 ? "período" : "períodos"} disponíveis.
             </p>
           </div>
         )}
@@ -596,8 +707,8 @@ function SorteioPanel({
             Sortear confrontos?
           </h2>
           <p className="text-sm leading-relaxed text-ink-600">
-            Vou travar os <span className="font-bold text-ink-900">{memberCount} participantes</span>{" "}
-            atuais e montar{" "}
+            Vou travar os <span className="font-bold text-ink-900">{players.length} participantes</span>{" "}
+            e montar{" "}
             {isLiga ? (
               <>
                 <span className="font-bold text-ink-900">{rounds} rodadas</span> de Liga
@@ -608,16 +719,57 @@ function SorteioPanel({
             . Quem entrar na federação depois <span className="font-semibold">não joga</span> esta{" "}
             {isLiga ? "Liga" : "Copa"}.
           </p>
-          <p className="rounded-md bg-brand-500/10 px-3 py-2 text-xs text-brand-700">
-            Tranquilo: dá pra <span className="font-semibold">refazer ou desfazer</span> o sorteio
-            enquanto nenhuma rodada começar.
-          </p>
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-ink-800">Quando sortear?</p>
+            <div className="flex flex-col gap-1">
+              {(
+                [
+                  { v: "now", label: "Agora (instantâneo)" },
+                  { v: "first", label: "No 1º jogo do campeonato" },
+                  { v: "datetime", label: "Agendar data e hora" },
+                ] as const
+              ).map((o) => (
+                <label
+                  key={o.v}
+                  className="flex cursor-pointer items-center gap-2 rounded-md px-1 py-1 text-sm text-ink-700"
+                >
+                  <input
+                    type="radio"
+                    name="drawWhen"
+                    checked={drawWhen === o.v}
+                    onChange={() => setDrawWhen(o.v)}
+                    className="size-4 accent-brand-600"
+                  />
+                  {o.label}
+                </label>
+              ))}
+            </div>
+            {drawWhen === "datetime" && (
+              <input
+                type="datetime-local"
+                value={drawAt}
+                onChange={(e) => setDrawAt(e.target.value)}
+                className="h-10 w-full rounded-md border border-ink-200 bg-surface px-3 text-sm outline-none focus:border-brand-500"
+              />
+            )}
+            {drawWhen !== "now" && (
+              <p className="rounded-md bg-brand-500/10 px-3 py-2 text-xs text-brand-700">
+                A disputa aparece como <span className="font-semibold">"sorteio agendado"</span> e é
+                revelada automaticamente no horário.
+              </p>
+            )}
+          </div>
           <div className="flex gap-2">
             <Button variant="ghost" fullWidth onClick={() => setConfirm(false)}>
               Cancelar
             </Button>
-            <Button fullWidth loading={draw.isPending} onClick={doDraw}>
-              <Dices className="size-4" /> Sortear
+            <Button
+              fullWidth
+              loading={draw.isPending}
+              disabled={drawWhen === "datetime" && !drawAt}
+              onClick={doDraw}
+            >
+              <Dices className="size-4" /> {drawWhen === "now" ? "Sortear" : "Agendar sorteio"}
             </Button>
           </div>
         </div>
