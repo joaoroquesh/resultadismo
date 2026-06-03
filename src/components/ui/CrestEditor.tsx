@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { RotateCw, Sparkles } from "lucide-react";
+import { RotateCw, Sparkles, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "./Button";
+import { SegmentedControl } from "./SegmentedControl";
 import { CrestMask } from "./CrestMask";
 import {
   CREST_COLORS,
@@ -39,6 +40,20 @@ function colorCount(fill: CrestFill, stripeCount: number): number {
   }
 }
 
+function hexOf(key: string): string {
+  return CREST_COLORS.find((c) => c.key === key)?.hex ?? CREST_COLORS[0]!.hex;
+}
+function isDarkKey(key: string): boolean {
+  return !!CREST_COLORS.find((c) => c.key === key)?.dark;
+}
+
+// Rótulo da divisão por estilo: posicional (sem jargão "Div N").
+function divLabel(fill: CrestFill, i: number): string {
+  if (fill === "ball") return i === 0 ? "Fundo" : "Bola";
+  if (fill === "grid") return ["↖", "↗", "↙", "↘"][i] ?? String(i + 1);
+  return String(i + 1); // listras: 1, 2, 3 (de cima p/ baixo)
+}
+
 export type CrestEditorProps = {
   kind: CrestKind;
   name?: string | null;
@@ -51,8 +66,6 @@ export type CrestEditorProps = {
   photoUrl?: string | null;
   /** federação: permite o padrão "bola no centro" */
   allowBall?: boolean;
-  /** preview/thumbs mostram a inicial (perfil sim, federação não) */
-  withLetter?: boolean;
   onChange: (crest: string) => void;
 };
 
@@ -64,7 +77,6 @@ export function CrestEditor({
   allowPhoto = false,
   photoUrl = null,
   allowBall = false,
-  withLetter = false,
   onChange,
 }: CrestEditorProps) {
   const init = parseCrest(initial) ?? defaultCrestFromName(name, kind);
@@ -75,6 +87,7 @@ export function CrestEditor({
     init.fill === "stripes" ? Math.min(3, Math.max(2, init.colors.length)) : 2,
   );
   const [rotation, setRotation] = useState(init.rotation);
+  const [activeDiv, setActiveDiv] = useState(0);
   // buffer de até 4 cores (preserva escolhas ao trocar de padrão)
   const [colors, setColors] = useState<string[]>([
     init.colors[0] ?? "verde",
@@ -94,6 +107,12 @@ export function CrestEditor({
   const n = colorCount(fill, stripeCount);
   const activeColors = n > 0 ? colors.slice(0, n) : colors.slice(0, 1);
   const canRotate = fill === "stripes" || fill === "grid";
+  const showColors = fill !== "photo";
+
+  // ao trocar de estilo/nº de faixas, a divisão ativa volta pra primeira
+  useEffect(() => {
+    setActiveDiv(0);
+  }, [fill, stripeCount]);
 
   // monta a config atual e emite
   const current = buildCrest({
@@ -129,35 +148,23 @@ export function CrestEditor({
   const photoMissing = fill === "photo" && !photoUrl;
 
   return (
-    <div className="space-y-4">
-      {/* Padrão (fill) + sortear */}
-      <div className="space-y-1.5">
+    <div className="space-y-5">
+      {/* Estilo (fill) + sortear */}
+      <div className="space-y-2">
         <div className="flex items-center justify-between">
           <p className="text-xs font-medium text-ink-500">Estilo</p>
           <Button size="sm" variant="ghost" onClick={randomize} title="Sortear">
             <Sparkles className="size-4" /> Sortear
           </Button>
         </div>
-        <div className="flex flex-wrap gap-1 rounded-pill bg-ink-100 p-1">
-          {fills.map((f) => (
-            <button
-              key={f}
-              type="button"
-              onClick={() => setFill(f)}
-              className={cn(
-                "flex-1 rounded-pill px-3 py-1.5 text-sm font-semibold transition-all",
-                fill === f
-                  ? "bg-surface text-ink-950 shadow-[var(--shadow-soft)]"
-                  : "text-ink-500 hover:text-ink-700",
-              )}
-            >
-              {FILL_LABEL[f]}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl<CrestFill>
+          value={fill}
+          onChange={setFill}
+          options={fills.map((f) => ({ value: f, label: FILL_LABEL[f] }))}
+        />
         {photoMissing && (
           <p className="text-xs leading-snug text-ink-500">
-            Você ainda não tem foto do Google conectada — vamos usar a inicial do seu nome
+            Você ainda não tem foto do Google conectada. Vamos usar a inicial do seu nome,
             recortada no escudo.
           </p>
         )}
@@ -165,27 +172,18 @@ export function CrestEditor({
 
       {/* nº de listras */}
       {fill === "stripes" && (
-        <div className="flex flex-wrap gap-1 rounded-pill bg-ink-100 p-1">
-          {[2, 3].map((c) => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => setStripeCount(c)}
-              className={cn(
-                "flex-1 rounded-pill px-3 py-1.5 text-sm font-semibold transition-all",
-                stripeCount === c
-                  ? "bg-surface text-ink-950 shadow-[var(--shadow-soft)]"
-                  : "text-ink-500 hover:text-ink-700",
-              )}
-            >
-              {c} listras
-            </button>
-          ))}
-        </div>
+        <SegmentedControl<string>
+          value={String(stripeCount)}
+          onChange={(v) => setStripeCount(Number(v))}
+          options={[
+            { value: "2", label: "2 faixas" },
+            { value: "3", label: "3 faixas" },
+          ]}
+        />
       )}
 
       {/* Forma */}
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         <p className="text-xs font-medium text-ink-500">Formato</p>
         <div className="grid grid-cols-6 gap-2 sm:grid-cols-8">
           {shapes.map((sh) => {
@@ -202,10 +200,12 @@ export function CrestEditor({
               <button
                 key={sh}
                 type="button"
+                aria-label={`Forma ${sh}`}
+                aria-pressed={active}
                 onClick={() => setShape(sh)}
                 className={cn(
                   "flex items-center justify-center rounded-md p-1.5 ring-2 transition",
-                  active ? "ring-brand-600" : "ring-transparent hover:bg-ink-100",
+                  active ? "bg-brand-500/10 ring-brand-600" : "ring-transparent hover:bg-ink-100",
                 )}
               >
                 <CrestMask src={thumb} name={name} px={36} defaultKind={kind} />
@@ -215,34 +215,72 @@ export function CrestEditor({
         </div>
       </div>
 
-      {/* Cores por divisão (oculto no modo foto com foto) */}
-      {!(fill === "photo" && photoUrl) && (
+      {/* Cores: escolhe a divisão (quando há +1) e depois a cor */}
+      {showColors && (
         <div className="space-y-2.5">
           <p className="text-xs font-medium text-ink-500">
             {fill === "ball" ? "Cores (fundo e bola)" : "Cores"}
           </p>
-          {Array.from({ length: Math.max(1, n) }).map((_, i) => (
-            <div key={i} className="flex flex-wrap items-center gap-2">
-              {Math.max(1, n) > 1 && (
-                <span className="w-14 text-xs font-medium text-ink-400">
-                  {fill === "ball" ? (i === 0 ? "Fundo" : "Bola") : `Div ${i + 1}`}
-                </span>
-              )}
-              {CREST_COLORS.map((c) => (
+
+          {n > 1 && (
+            <div className="flex flex-wrap gap-2.5">
+              {Array.from({ length: n }).map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setActiveDiv(i)}
+                  aria-label={`Editar ${divLabel(fill, i)}`}
+                  aria-pressed={activeDiv === i}
+                  className="flex flex-col items-center gap-1"
+                >
+                  <span
+                    className={cn(
+                      "size-9 rounded-md ring-2 ring-offset-2 ring-offset-surface transition",
+                      activeDiv === i ? "ring-brand-600" : "ring-border",
+                    )}
+                    style={{ background: hexOf(colors[i]!) }}
+                  />
+                  <span
+                    className={cn(
+                      "text-[11px] font-bold leading-none",
+                      activeDiv === i ? "text-ink-800" : "text-ink-400",
+                    )}
+                  >
+                    {divLabel(fill, i)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* paleta única — pinta a divisão ativa */}
+          <div className="flex flex-wrap gap-2.5">
+            {CREST_COLORS.map((c) => {
+              const selected = colors[activeDiv] === c.key;
+              return (
                 <button
                   key={c.key}
                   type="button"
                   aria-label={c.key}
-                  onClick={() => setColorAt(i, c.key)}
+                  aria-pressed={selected}
+                  onClick={() => setColorAt(activeDiv, c.key)}
                   className={cn(
-                    "size-8 rounded-full ring-2 ring-offset-2 ring-offset-surface transition",
-                    colors[i] === c.key ? "ring-ink-900" : "ring-transparent",
+                    "grid size-9 place-items-center rounded-full ring-2 ring-offset-2 ring-offset-surface transition",
+                    selected ? "ring-brand-600" : "ring-transparent hover:ring-border",
                   )}
                   style={{ background: c.hex }}
-                />
-              ))}
-            </div>
-          ))}
+                >
+                  {selected && (
+                    <Check
+                      className="size-4"
+                      strokeWidth={3}
+                      style={{ color: isDarkKey(c.key) ? "#232323" : "#ffffff" }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 

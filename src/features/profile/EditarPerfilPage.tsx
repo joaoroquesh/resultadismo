@@ -35,6 +35,14 @@ export function EditarPerfilPage() {
   const [favoriteTeam, setFavoriteTeam] = useState(profile?.favorite_team ?? "");
   const [crest, setCrest] = useState<string>(initialCrest ?? "");
   const [busy, setBusy] = useState(false);
+  // "Voltar ao automático" remonta o editor a partir do default (sem escolha salva).
+  const [editorInitial, setEditorInitial] = useState<string | null>(initialCrest);
+  const [editorKey, setEditorKey] = useState(0);
+
+  function resetToDefault() {
+    setEditorInitial(null);
+    setEditorKey((k) => k + 1);
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -79,15 +87,22 @@ export function EditarPerfilPage() {
             </p>
           </div>
           <CrestEditor
+            key={editorKey}
             kind="escudo"
             name={name}
-            initial={initialCrest}
+            initial={editorInitial}
             shapes={ESCUDO_SHAPES}
             allowPhoto
             photoUrl={googlePhoto}
-            withLetter
             onChange={setCrest}
           />
+          <button
+            type="button"
+            onClick={resetToDefault}
+            className="text-xs font-semibold text-ink-400 transition hover:text-ink-600"
+          >
+            Voltar ao escudo automático
+          </button>
         </Card>
 
         <Card className="space-y-4 p-4">
