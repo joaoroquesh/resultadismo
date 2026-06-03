@@ -155,6 +155,30 @@ export function useCompLeague() {
   });
 }
 
+/**
+ * Reembolso self-service (direito de arrependimento — 7 dias). Chama a Edge
+ * Function `cancel-league-refund`, que estorna no Mercado Pago e arquiva a
+ * federação. A function responde sempre 200 com { ok, error? }.
+ */
+export function useRefundLeague() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (leagueId: string) => {
+      const { data, error } = await supabase.functions.invoke("cancel-league-refund", {
+        body: { leagueId },
+      });
+      if (error) throw new Error(error.message ?? "Falha ao processar o reembolso.");
+      const res = (data as { ok?: boolean; error?: string } | null) ?? {};
+      if (!res.ok) throw new Error(res.error ?? "Não foi possível processar o reembolso.");
+      return res;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["league"] });
+      qc.invalidateQueries({ queryKey: ["my-leagues"] });
+    },
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Admin · moderação do NOME (pago ativa na hora; só o nome fica em revisão)
 // ---------------------------------------------------------------------------
