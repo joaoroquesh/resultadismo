@@ -10,7 +10,7 @@
 //      crest:escudo:3:photo:grafite::https%3A%2F%2F...
 //
 // A foto é encodeURIComponent — então nunca contém ":" e não quebra o split.
-import { AVATAR_COLORS } from "./avatar";
+import { AVATAR_COLORS, parseGenAvatar } from "./avatar";
 
 export type CrestKind = "escudo" | "flamula";
 export type CrestFill = "solid" | "stripes" | "grid" | "ball" | "photo";
@@ -172,6 +172,39 @@ export function defaultCrestFromName(
     };
   }
   return { kind, shape: DEFAULT_ESCUDO_SHAPE, fill: "solid", colors: [color], rotation: 0 };
+}
+
+/**
+ * Normaliza QUALQUER avatar_url antigo para um crest de escudo — ninguém fica
+ * sem escudo:
+ *  - crest:...      → passa direto
+ *  - gen:...        → escudo com as cores do avatar antigo
+ *  - foto crua (URL)→ escudo recortando a foto
+ *  - null/vazio     → null (o render usa o default determinístico do nome)
+ */
+export function legacyToCrest(src: string | null | undefined): string | null {
+  if (!src) return null;
+  if (isCrest(src)) return src;
+  if (src.startsWith("gen:")) {
+    const g = parseGenAvatar(src);
+    const colors = g?.colors?.length ? g.colors : ["turquesa"];
+    return buildCrest({
+      kind: "escudo",
+      shape: DEFAULT_ESCUDO_SHAPE,
+      fill: colors.length > 1 ? "stripes" : "solid",
+      colors,
+      rotation: g?.rotation ?? 0,
+    });
+  }
+  // sobra: foto crua (URL do Google salva direto) → recorta no escudo padrão
+  return buildCrest({
+    kind: "escudo",
+    shape: DEFAULT_ESCUDO_SHAPE,
+    fill: "photo",
+    colors: ["turquesa"],
+    rotation: 0,
+    photo: src,
+  });
 }
 
 // ---------------------------------------------------------------------------
