@@ -215,6 +215,8 @@ export function useAddLeagueCompetition() {
       mode: LeagueMode;
       /** Confronto: como os participantes entram ('admin' seleciona | 'optin' cada um aceita). */
       participantMode?: "admin" | "optin";
+      /** Liga: 'partial' (turno) ou 'swiss' (progressivo). */
+      ligaFormat?: "partial" | "swiss";
     }) => {
       const { data, error } = await supabase
         .from("league_competitions")
@@ -224,6 +226,7 @@ export function useAddLeagueCompetition() {
           name: input.name,
           mode: input.mode,
           ...(input.participantMode ? { participant_mode: input.participantMode } : {}),
+          ...(input.ligaFormat ? { liga_format: input.ligaFormat } : {}),
         })
         .select()
         .single();

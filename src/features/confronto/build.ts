@@ -153,6 +153,56 @@ export function buildCopaFixtures(ids: string[], periods: Period[]): DrawTie[] {
   return ties;
 }
 
+/** Chave canônica de um par (independe da ordem). */
+export function pairKey(a: string, b: string): string {
+  return a < b ? `${a}|${b}` : `${b}|${a}`;
+}
+
+/**
+ * Suíço: monta a PRÓXIMA rodada pareando por classificação (`order`, melhor
+ * primeiro) e evitando revanches (`played`). Ímpar → último ganha folga (bye).
+ */
+export function buildSwissNextRound(
+  order: string[],
+  played: Set<string>,
+  period: Period,
+  roundOrder: number,
+): DrawTie[] {
+  const remaining = [...order];
+  const ties: DrawTie[] = [];
+  const md = periodMatchday(period);
+  let slot = 1;
+  while (remaining.length > 1) {
+    const a = remaining.shift()!;
+    let idx = remaining.findIndex((b) => !played.has(pairKey(a, b)));
+    if (idx === -1) idx = 0; // todos já se enfrentaram → revanche inevitável
+    const b = remaining.splice(idx, 1)[0]!;
+    ties.push({
+      round_order: roundOrder,
+      round_label: period.label,
+      slot: slot++,
+      member_a: a,
+      member_b: b,
+      matchday: md,
+      period_kind: period.kind,
+      period_value: period.value,
+    });
+  }
+  if (remaining.length === 1) {
+    ties.push({
+      round_order: roundOrder,
+      round_label: period.label,
+      slot,
+      member_a: remaining[0]!,
+      member_b: null,
+      matchday: md,
+      period_kind: period.kind,
+      period_value: period.value,
+    });
+  }
+  return ties;
+}
+
 /** Nº de rodadas necessárias por formato (p/ checar viabilidade no sorteio). */
 export function roundsNeeded(formato: "liga" | "cup", n: number): number {
   if (formato === "cup") return Math.max(1, Math.round(Math.log2(nextPow2(Math.max(2, n)))));

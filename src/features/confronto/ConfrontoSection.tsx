@@ -28,6 +28,7 @@ import {
   useToggleOptin,
   useDrawConfronto,
   useUndoDraw,
+  useAdvanceSwiss,
   type ConfrontoFormato,
   type ConfrontoTie,
   type PeriodKind,
@@ -44,6 +45,7 @@ export function ConfrontoSection({
   isAdmin,
   currentUserId,
   participantMode = "admin",
+  ligaFormat = "partial",
 }: {
   lcId: string;
   leagueId: string;
@@ -54,6 +56,7 @@ export function ConfrontoSection({
   isAdmin: boolean;
   currentUserId?: string;
   participantMode?: string; // 'admin' | 'optin'
+  ligaFormat?: string; // 'partial' | 'swiss'
 }) {
   const formato: ConfrontoFormato = mode === "cup" ? "cup" : "liga";
 
@@ -67,6 +70,7 @@ export function ConfrontoSection({
         memberCount={memberCount}
         isAdmin={isAdmin}
         participantMode={participantMode}
+        ligaFormat={ligaFormat}
         currentUserId={currentUserId}
       />
     );
@@ -75,7 +79,9 @@ export function ConfrontoSection({
     <DrawnView
       lcId={lcId}
       leagueId={leagueId}
+      competitionId={competitionId}
       formato={formato}
+      ligaFormat={ligaFormat}
       isAdmin={isAdmin}
       currentUserId={currentUserId}
     />
@@ -97,6 +103,7 @@ function SorteioPanel({
   memberCount,
   isAdmin,
   participantMode = "admin",
+  ligaFormat = "partial",
   currentUserId,
 }: {
   lcId: string;
@@ -106,6 +113,7 @@ function SorteioPanel({
   memberCount: number;
   isAdmin: boolean;
   participantMode?: string;
+  ligaFormat?: string;
   currentUserId?: string;
 }) {
   const { toast } = useToast();
@@ -120,6 +128,7 @@ function SorteioPanel({
   const [testN, setTestN] = useState(Math.max(2, memberCount));
 
   const isLiga = formato === "liga";
+  const isSwiss = isLiga && ligaFormat === "swiss";
   const Icon = formato === "cup" ? Trophy : ListOrdered;
 
   // Membros ativos na ordem de entrada (= seed do sorteio).
@@ -161,8 +170,8 @@ function SorteioPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [P, fullTurno]);
 
-  const realRounds = isLiga ? rounds : roundsNeeded("cup", n);
-  const viavel = P > 0 && realRounds <= P && players.length >= 2;
+  const realRounds = isLiga ? (isSwiss ? Math.min(P, fullTurno) : rounds) : roundsNeeded("cup", n);
+  const viavel = P > 0 && (isSwiss ? true : realRounds <= P) && players.length >= 2;
   const confrontosPorRodada = Math.floor(n / 2);
 
   // Preview de teste (hipotético — só simulação, não altera o sorteio real).
@@ -175,8 +184,10 @@ function SorteioPanel({
   const previewTies = useMemo<DrawTie[]>(() => {
     const ids = players.map((p) => p.id);
     if (ids.length < 2 || periodList.length === 0) return [];
-    return isLiga ? buildLigaFixtures(ids, periodList, rounds) : buildCopaFixtures(ids, periodList);
-  }, [players, periodList, rounds, isLiga]);
+    return isLiga
+      ? buildLigaFixtures(ids, periodList, isSwiss ? 1 : rounds)
+      : buildCopaFixtures(ids, periodList);
+  }, [players, periodList, rounds, isLiga, isSwiss]);
   const previewRound1 = previewTies.filter((t) => t.round_order === 1);
   const previewByes = previewRound1.filter((t) => t.member_b === null).length;
   const previewRoundsCount = previewTies.length
@@ -192,7 +203,7 @@ function SorteioPanel({
         competitionId,
         formato,
         kind,
-        rounds: isLiga ? rounds : undefined,
+        rounds: isLiga ? (isSwiss ? 1 : rounds) : undefined,
         memberIds: players.map((p) => p.id),
       },
       {
@@ -383,8 +394,8 @@ function SorteioPanel({
           </span>
         </div>
 
-        {/* Configurar rodadas (só Liga) */}
-        {isLiga && P > 0 && (
+        {/* Configurar rodadas (só Liga turno; suíço é progressivo) */}
+        {isLiga && !isSwiss && P > 0 && (
           <div className="mt-4 border-t border-ink-100 pt-3">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
@@ -474,7 +485,13 @@ function SorteioPanel({
             ))}
           </ul>
 
-          {isLiga && previewRoundsCount > 1 && (
+          {isSwiss && (
+            <p className="mt-2 text-xs text-ink-400">
+              Suíço: sorteamos só a 1ª rodada. As próximas saem por classificação a cada fase
+              (até {Math.min(P, fullTurno)} rodadas), sem revanche.
+            </p>
+          )}
+          {isLiga && !isSwiss && previewRoundsCount > 1 && (
             <p className="mt-2 text-xs text-ink-400">
               + {previewRoundsCount - 1} {previewRoundsCount - 1 === 1 ? "rodada" : "rodadas"} com
               outros adversários (cada um joga {previewRoundsCount} confrontos).
@@ -613,29 +630,64 @@ function SorteioPanel({
 function DrawnView({
   lcId,
   leagueId,
+  competitionId,
   formato,
+  ligaFormat = "partial",
   isAdmin,
   currentUserId,
 }: {
   lcId: string;
   leagueId: string;
+  competitionId: string;
   formato: ConfrontoFormato;
+  ligaFormat?: string;
   isAdmin: boolean;
   currentUserId?: string;
 }) {
   const { toast } = useToast();
   const { data: ties, isLoading } = useConfrontoTies(lcId);
   const undo = useUndoDraw();
+  const advance = useAdvanceSwiss();
   const [openTie, setOpenTie] = useState<ConfrontoTie | null>(null);
   const [tab, setTab] = useState<"tabela" | "rodadas">("tabela");
 
   if (isLoading) return <Skeleton className="h-64 w-full" />;
   const list = ties ?? [];
   const started = list.some((t) => t.resolved);
+  const isSwiss = formato === "liga" && ligaFormat === "swiss";
+  const maxRound = list.length ? Math.max(...list.map((t) => t.round_order)) : 0;
+  const latestResolved =
+    maxRound > 0 && list.filter((t) => t.round_order === maxRound).every((t) => t.resolved);
+  const canAdvance = isSwiss && isAdmin && latestResolved;
 
   return (
     <div className="space-y-4">
       <MyConfrontoCard ties={list} currentUserId={currentUserId} onOpen={setOpenTie} />
+
+      {canAdvance && (
+        <Button
+          variant="outline"
+          fullWidth
+          loading={advance.isPending}
+          onClick={() =>
+            advance.mutate(
+              { lcId, competitionId },
+              {
+                onSuccess: (r) =>
+                  toast(
+                    r.created > 0
+                      ? `Rodada ${r.round} gerada por classificação!`
+                      : "Sem próxima rodada agora (suíço completo ou rodada em andamento).",
+                    r.created > 0 ? "success" : "info",
+                  ),
+                onError: (e) => toast(e instanceof Error ? e.message : "Erro ao gerar rodada.", "error"),
+              },
+            )
+          }
+        >
+          <Dices className="size-4" /> Gerar próxima rodada (suíço)
+        </Button>
+      )}
 
       {formato === "cup" ? (
         <div>

@@ -430,6 +430,7 @@ export type Database = {
           drawn_at: string | null
           id: string
           league_id: string
+          liga_format: string
           mode: Database["public"]["Enums"]["league_mode"]
           name: string
           participant_mode: string
@@ -446,6 +447,7 @@ export type Database = {
           drawn_at?: string | null
           id?: string
           league_id: string
+          liga_format?: string
           mode?: Database["public"]["Enums"]["league_mode"]
           name: string
           participant_mode?: string
@@ -462,6 +464,7 @@ export type Database = {
           drawn_at?: string | null
           id?: string
           league_id?: string
+          liga_format?: string
           mode?: Database["public"]["Enums"]["league_mode"]
           name?: string
           participant_mode?: string
@@ -1126,6 +1129,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      append_confronto_ties: {
+        Args: { p_lc_id: string; p_ties: Json }
+        Returns: number
       }
       approve_league: {
         Args: { p_league_id: string }

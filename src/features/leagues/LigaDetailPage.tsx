@@ -431,6 +431,7 @@ function ClassificacaoTab({
     competition_id: string;
     confronto_state?: string;
     participant_mode?: string;
+    liga_format?: string;
   }[];
   activeLcId?: string;
   onSelect: (id: string) => void;
@@ -532,6 +533,7 @@ function ClassificacaoTab({
           isAdmin={isAdmin}
           currentUserId={currentUserId}
           participantMode={active.participant_mode ?? "admin"}
+          ligaFormat={active.liga_format ?? "partial"}
         />
       ) : loading ? (
         <Skeleton className="h-64 w-full" />
@@ -651,6 +653,7 @@ function CompeticoesTab({
   const [tipo, setTipo] = useState<"pontos" | "confronto">("pontos");
   const [formato, setFormato] = useState<"liga" | "cup">("liga");
   const [participantMode, setParticipantMode] = useState<"admin" | "optin">("admin");
+  const [ligaFormat, setLigaFormat] = useState<"partial" | "swiss">("partial");
   const mode: LeagueMode = !confrontoEnabled || tipo === "pontos" ? "points" : formato;
 
   // Regra de nome por tipo (Copa.../Liga.../Bolão...), configurável no admin.
@@ -684,6 +687,7 @@ function CompeticoesTab({
         name: name.trim(),
         mode,
         participantMode: mode === "liga" || mode === "cup" ? participantMode : undefined,
+        ligaFormat: mode === "liga" ? ligaFormat : undefined,
       });
       toast("Competição adicionada!", "success");
       setOpen(false);
@@ -791,6 +795,24 @@ function CompeticoesTab({
                     ? "Liga: todos contra todos; cada rodada vale 3/1/0 e forma uma tabela."
                     : "Copa: mata-mata; quem perde o confronto está fora."}
               </p>
+              {tipo === "confronto" && formato === "liga" && (
+                <div className="space-y-1 pt-1">
+                  <label className="text-sm font-medium text-ink-800">Formato da Liga</label>
+                  <SegmentedControl<"partial" | "swiss">
+                    value={ligaFormat}
+                    onChange={setLigaFormat}
+                    options={[
+                      { value: "partial", label: "Turno" },
+                      { value: "swiss", label: "Suíço" },
+                    ]}
+                  />
+                  <p className="text-xs leading-snug text-ink-500">
+                    {ligaFormat === "partial"
+                      ? "Turno: os confrontos já saem definidos no sorteio (todos contra todos até onde couber)."
+                      : "Suíço: cada rodada é gerada por classificação — quem vai bem pega quem vai bem, sem revanche."}
+                  </p>
+                </div>
+              )}
               {tipo === "confronto" && (
                 <div className="space-y-1 pt-1">
                   <label className="text-sm font-medium text-ink-800">Quem entra</label>

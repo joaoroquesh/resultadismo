@@ -1,7 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import type { Json } from "@/types/database";
-import { buildLigaFixtures, buildCopaFixtures, buildParticipants, type Period } from "./build";
+import {
+  buildLigaFixtures,
+  buildCopaFixtures,
+  buildParticipants,
+  buildSwissNextRound,
+  pairKey,
+  type Period,
+} from "./build";
 
 export type PeriodKind = "phase" | "week";
 
@@ -252,5 +259,78 @@ export function useUndoDraw() {
       if (error) throw error;
     },
     onSuccess: (_r, v) => invalidateConfronto(qc, v.lcId, v.leagueId),
+  });
+}
+
+/**
+ * Suíço progressivo: gera a próxima rodada (se a atual já resolveu e há período
+ * seguinte), pareando por classificação e evitando revanches. Idempotente: só
+ * cria se ainda não existe a próxima rodada.
+ */
+export function useAdvanceSwiss() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { lcId: string; competitionId: string }) => {
+      const { data: tiesData, error: tErr } = await supabase.rpc("get_confronto_ties", {
+        p_lc_id: input.lcId,
+      });
+      if (tErr) throw tErr;
+      const ties = (tiesData ?? []) as ConfrontoTie[];
+      if (ties.length === 0) return { lcId: input.lcId, created: 0 };
+      const maxRound = Math.max(...ties.map((t) => t.round_order));
+      const cur = ties.filter((t) => t.round_order === maxRound);
+      if (!cur.every((t) => t.resolved)) return { lcId: input.lcId, created: 0 };
+
+      // Período da rodada atual (kind/value) — direto da tabela.
+      const { data: rawTies } = await supabase
+        .from("cup_ties")
+        .select("round_order, period_kind, period_value")
+        .eq("league_competition_id", input.lcId);
+      const curRaw = (rawTies ?? []).filter((t) => t.round_order === maxRound);
+      const curKind = (curRaw[0]?.period_kind as string | null) ?? "matchday";
+      const curValue = (curRaw[0]?.period_value as string | null) ?? null;
+      const periodKind = curKind === "week" ? "week" : "phase";
+
+      const { data: periodsData, error: pErr } = await supabase.rpc("get_competition_periods", {
+        p_competition_id: input.competitionId,
+        p_kind: periodKind,
+      });
+      if (pErr) throw pErr;
+      const periods = (periodsData ?? []) as ConfrontoPeriod[];
+      const curIdx = periods.findIndex((p) => p.value === curValue && p.kind === curKind);
+      const next = curIdx >= 0 ? periods[curIdx + 1] : undefined;
+      if (!next) return { lcId: input.lcId, created: 0 }; // suíço completo
+
+      const { data: standData } = await supabase.rpc("get_confronto_standings", { p_lc_id: input.lcId });
+      const rank = new Map<string, number>(
+        ((standData ?? []) as ConfrontoStanding[]).map((s, i) => [s.user_id, s.rank ?? i + 1]),
+      );
+      const { data: partData } = await supabase
+        .from("confronto_participants")
+        .select("user_id, seed")
+        .eq("league_competition_id", input.lcId)
+        .order("seed");
+      const partIds = (partData ?? []).map((p) => p.user_id as string);
+      const order = [...partIds].sort((a, b) => (rank.get(a) ?? 999) - (rank.get(b) ?? 999));
+
+      const played = new Set<string>();
+      for (const t of ties) if (t.member_a && t.member_b) played.add(pairKey(t.member_a, t.member_b));
+
+      const newTies = buildSwissNextRound(
+        order,
+        played,
+        { kind: next.kind, value: next.value, label: next.label },
+        maxRound + 1,
+      );
+      if (newTies.length === 0) return { lcId: input.lcId, created: 0 };
+
+      const { error: aErr } = await supabase.rpc("append_confronto_ties", {
+        p_lc_id: input.lcId,
+        p_ties: newTies as unknown as Json,
+      });
+      if (aErr) throw new Error(aErr.message);
+      return { lcId: input.lcId, created: newTies.length, round: maxRound + 1 };
+    },
+    onSuccess: (r) => invalidateConfronto(qc, r.lcId),
   });
 }
