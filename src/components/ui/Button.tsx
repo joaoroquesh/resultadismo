@@ -28,12 +28,26 @@ const sizes: Record<Size, string> = {
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { className, variant = "primary", size = "md", loading, fullWidth, disabled, children, ...props },
+  {
+    className,
+    variant = "primary",
+    size = "md",
+    loading,
+    fullWidth,
+    disabled,
+    // Default seguro: type="button". Sem isso, um <button> dentro de um <form>
+    // vira submit e dispara o envio do formulário (ex.: "Sortear" salvava o
+    // perfil). Quem quer enviar passa type="submit" explicitamente.
+    type = "button",
+    children,
+    ...props
+  },
   ref,
 ) {
   return (
     <button
       ref={ref}
+      type={type}
       disabled={disabled || loading}
       className={cn(
         "inline-flex select-none items-center justify-center gap-2 rounded-pill font-semibold transition-all",

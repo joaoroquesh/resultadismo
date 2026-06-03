@@ -10,7 +10,7 @@ import { CrestEditor } from "@/components/ui/CrestEditor";
 import { useToast } from "@/components/ui/Toast";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/features/auth/AuthProvider";
-import { ESCUDO_SHAPES } from "@/lib/crest";
+import { ESCUDO_SHAPES, legacyToCrest } from "@/lib/crest";
 
 export function EditarPerfilPage() {
   const navigate = useNavigate();
@@ -29,7 +29,9 @@ export function EditarPerfilPage() {
     metaPhoto ||
     (saved && !saved.startsWith("gen:") && !saved.startsWith("crest:") ? saved : null);
 
-  const initialCrest = saved?.startsWith("crest:") ? saved : null;
+  // Abre o editor já refletindo o avatar atual convertido em escudo
+  // (foto antiga/gen viram escudo). Assim ninguém edita "do zero" sem querer.
+  const initialCrest = legacyToCrest(saved);
 
   const [name, setName] = useState(profile?.display_name ?? "");
   const [favoriteTeam, setFavoriteTeam] = useState(profile?.favorite_team ?? "");

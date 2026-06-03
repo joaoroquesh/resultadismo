@@ -6,7 +6,6 @@ import {
   Copy,
   Clock,
   Check,
-  Hand,
   Trash2,
   ShieldCheck,
   Plus,
@@ -14,7 +13,6 @@ import {
   Palette,
   Sparkles,
 } from "lucide-react";
-import { useNudge } from "@/features/notifications/api";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -364,7 +362,7 @@ export function LigaDetailPage() {
       )}
 
       {tab === "membros" && (
-        <MembrosTab leagueId={league.id} members={members ?? []} isAdmin={isAdmin} />
+        <MembrosTab members={members ?? []} isAdmin={isAdmin} />
       )}
 
       {tab === "competicoes" && isAdmin && (
@@ -457,30 +455,16 @@ function ClassificacaoTab({
 }
 
 function MembrosTab({
-  leagueId,
   members,
   isAdmin,
 }: {
-  leagueId: string;
   members: ReturnType<typeof useLeagueMembers>["data"] & object;
   isAdmin: boolean;
 }) {
   const update = useUpdateMember();
   const remove = useRemoveMember();
-  const nudge = useNudge();
-  const { user } = useAuth();
   const { toast } = useToast();
   const list = members ?? [];
-
-  function cutucar(toUser: string) {
-    nudge.mutate(
-      { leagueId, toUser },
-      {
-        onSuccess: () => toast("Cutucada enviada! 👉", "success"),
-        onError: (e) => toast(e instanceof Error ? e.message : "Erro", "error"),
-      },
-    );
-  }
 
   return (
     <ul className="space-y-2">
@@ -496,16 +480,6 @@ function MembrosTab({
               {m.status === "pending" && <Badge tone="gold">pendente</Badge>}
             </div>
           </div>
-          {m.status === "active" && m.profile?.id !== user?.id && (
-            <Button
-              size="icon"
-              variant="ghost"
-              aria-label="Cutucar"
-              onClick={() => cutucar(m.profile!.id)}
-            >
-              <Hand className="size-4 text-gold-600" />
-            </Button>
-          )}
           {isAdmin && m.role !== "owner" && (
             <div className="flex gap-1">
               {m.status === "pending" && (
