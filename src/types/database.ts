@@ -252,6 +252,8 @@ export type Database = {
           matchday: number | null
           member_a: string | null
           member_b: string | null
+          period_kind: string | null
+          period_value: string | null
           points_a: number
           points_b: number
           round_label: string
@@ -271,6 +273,8 @@ export type Database = {
           matchday?: number | null
           member_a?: string | null
           member_b?: string | null
+          period_kind?: string | null
+          period_value?: string | null
           points_a?: number
           points_b?: number
           round_label: string
@@ -290,6 +294,8 @@ export type Database = {
           matchday?: number | null
           member_a?: string | null
           member_b?: string | null
+          period_kind?: string | null
+          period_value?: string | null
           points_a?: number
           points_b?: number
           round_label?: string
@@ -1135,6 +1141,18 @@ export type Database = {
         Returns: undefined
       }
       gen_join_code: { Args: never; Returns: string }
+      get_competition_periods: {
+        Args: { p_competition_id: string; p_kind: string }
+        Returns: {
+          ends_on: string
+          games: number
+          kind: string
+          label: string
+          period_index: number
+          starts_on: string
+          value: string
+        }[]
+      }
       get_confronto_standings: {
         Args: { p_lc_id: string }
         Returns: {
@@ -1261,6 +1279,17 @@ export type Database = {
         }
       }
       leave_league: { Args: { p_league_id: string }; Returns: undefined }
+      match_in_period: {
+        Args: {
+          m_kickoff: string
+          m_matchday: number
+          m_stage: string
+          p_fallback_matchday: number
+          p_kind: string
+          p_value: string
+        }
+        Returns: boolean
+      }
       match_is_locked: { Args: { p_match_id: string }; Returns: boolean }
       nudge_for_match: {
         Args: { p_match_id: string; p_to_user: string }

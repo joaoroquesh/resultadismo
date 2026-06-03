@@ -8,6 +8,14 @@ export interface DrawParticipant {
   seed: number;
 }
 
+/** Período da competição (fase ou semana) onde um confronto é decidido. */
+export interface Period {
+  kind: string; // 'matchday' | 'stage' | 'week'
+  value: string; // '1'.. | 'LAST_16'.. | '2026-25'
+  label: string;
+  games?: number;
+}
+
 export interface DrawTie {
   round_order: number;
   round_label: string;
@@ -15,6 +23,13 @@ export interface DrawTie {
   member_a: string | null;
   member_b: string | null;
   matchday: number | null;
+  period_kind: string | null;
+  period_value: string | null;
+}
+
+/** matchday (compat) quando o período é de grupo; senão null. */
+function periodMatchday(p: Period | undefined): number | null {
+  return p && p.kind === "matchday" ? Number(p.value) : null;
 }
 
 function nextPow2(n: number): number {
@@ -60,7 +75,7 @@ export function buildParticipants(ids: string[]): DrawParticipant[] {
  */
 export function buildLigaFixtures(
   ids: string[],
-  periods: number[],
+  periods: Period[],
   targetRounds?: number,
 ): DrawTie[] {
   const rr = roundRobin(ids.length); // turno completo: n-1 (ou n com folga p/ ímpar)
@@ -70,30 +85,34 @@ export function buildLigaFixtures(
     const returno = Math.floor(r / rr.length) % 2 === 1; // voltas alternam o mando
     return returno ? base.map((p) => (p.b !== null ? { a: p.b, b: p.a } : p)) : base;
   });
-  return schedule.flatMap((pairings, r) =>
-    pairings
+  return schedule.flatMap((pairings, r) => {
+    const per = periods[r];
+    return pairings
       .filter((p) => p.b !== null)
       .map((p, slot) => ({
         round_order: r + 1,
-        round_label: `Rodada ${r + 1}`,
+        round_label: per?.label ?? `Rodada ${r + 1}`,
         slot: slot + 1,
         member_a: ids[p.a]!,
         member_b: ids[p.b as number]!,
-        matchday: periods[r] ?? periods[periods.length - 1] ?? null,
-      })),
-  );
+        matchday: periodMatchday(per),
+        period_kind: per?.kind ?? null,
+        period_value: per?.value ?? null,
+      }));
+  });
 }
 
 /**
  * Copa: chaveamento. ids já vêm na ordem de força (seed 1 = mais forte).
  * Gera a 1ª rodada com pares e byes; rodadas seguintes como vagas (a preencher
- * conforme os vencedores avançam). Cada rodada → um período (matchday).
+ * conforme os vencedores avançam). Cada fase do chaveamento → um período da Copa.
  */
-export function buildCopaFixtures(ids: string[], periods: number[]): DrawTie[] {
+export function buildCopaFixtures(ids: string[], periods: Period[]): DrawTie[] {
   const n = ids.length;
   const size = nextPow2(Math.max(2, n));
   const order = seedOrder(size); // seeds (1-based) em ordem de posição
   const ties: DrawTie[] = [];
+  const per = (round: number): Period | undefined => periods[round - 1];
 
   // 1ª rodada
   const firstSlots = size / 2;
@@ -108,7 +127,9 @@ export function buildCopaFixtures(ids: string[], periods: number[]): DrawTie[] {
       slot: i + 1,
       member_a: a ?? b, // se um for bye, o real vai em member_a
       member_b: a && b ? b : null, // member_b null = bye (member_a avança)
-      matchday: periods[0] ?? null,
+      matchday: periodMatchday(per(1)),
+      period_kind: per(1)?.kind ?? null,
+      period_value: per(1)?.value ?? null,
     });
   }
 
@@ -122,7 +143,9 @@ export function buildCopaFixtures(ids: string[], periods: number[]): DrawTie[] {
         slot: i + 1,
         member_a: null,
         member_b: null,
-        matchday: periods[round - 1] ?? null,
+        matchday: periodMatchday(per(round)),
+        period_kind: per(round)?.kind ?? null,
+        period_value: per(round)?.value ?? null,
       });
     }
     round++;

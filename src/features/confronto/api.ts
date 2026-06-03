@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import type { Json } from "@/types/database";
-import { buildLigaFixtures, buildCopaFixtures, buildParticipants } from "./build";
+import { buildLigaFixtures, buildCopaFixtures, buildParticipants, type Period } from "./build";
+
+export type PeriodKind = "phase" | "week";
 
 export type ConfrontoFormato = "liga" | "cup";
 
@@ -99,20 +101,28 @@ export function useTieDetail(tieId: string | undefined, enabled = true) {
   });
 }
 
-/** Períodos (matchdays) disponíveis da competição — limita o nº de rodadas no sorteio. */
-export function useConfrontoPeriods(competitionId: string | undefined) {
+export interface ConfrontoPeriod {
+  period_index: number;
+  kind: string; // 'matchday' | 'stage' | 'week'
+  value: string;
+  label: string;
+  games: number;
+  starts_on: string;
+  ends_on: string;
+}
+
+/** Períodos da competição (fase ou semana), com nº de jogos — limita as rodadas no sorteio. */
+export function useConfrontoPeriods(competitionId: string | undefined, kind: PeriodKind = "phase") {
   return useQuery({
     enabled: !!competitionId,
-    queryKey: ["confronto-periods", competitionId],
-    queryFn: async (): Promise<number[]> => {
-      const { data, error } = await supabase
-        .from("matches")
-        .select("matchday")
-        .eq("competition_id", competitionId!)
-        .not("matchday", "is", null)
-        .order("matchday", { ascending: true });
+    queryKey: ["confronto-periods", competitionId, kind],
+    queryFn: async (): Promise<ConfrontoPeriod[]> => {
+      const { data, error } = await supabase.rpc("get_competition_periods", {
+        p_competition_id: competitionId!,
+        p_kind: kind,
+      });
       if (error) throw error;
-      return [...new Set((data ?? []).map((r) => r.matchday as number))];
+      return (data ?? []) as ConfrontoPeriod[];
     },
   });
 }
@@ -155,6 +165,8 @@ export function useDrawConfronto() {
       formato: ConfrontoFormato;
       /** Nº de rodadas escolhido no simulador (Liga). Copa ignora (definido pelo chaveamento). */
       rounds?: number;
+      /** Forma das rodadas: por fase (grupos+mata-mata) ou por semana. */
+      kind?: PeriodKind;
     }) => {
       const { data: mem, error: memErr } = await supabase
         .from("league_members")
@@ -166,14 +178,17 @@ export function useDrawConfronto() {
       const ids = (mem ?? []).map((m) => m.user_id as string);
       if (ids.length < 2) throw new Error("Precisa de pelo menos 2 participantes ativos.");
 
-      const { data: md, error: mdErr } = await supabase
-        .from("matches")
-        .select("matchday")
-        .eq("competition_id", input.competitionId)
-        .not("matchday", "is", null)
-        .order("matchday", { ascending: true });
-      if (mdErr) throw mdErr;
-      const periods = [...new Set((md ?? []).map((r) => r.matchday as number))];
+      const { data: pdata, error: perr } = await supabase.rpc("get_competition_periods", {
+        p_competition_id: input.competitionId,
+        p_kind: input.kind ?? "phase",
+      });
+      if (perr) throw perr;
+      const periods: Period[] = (pdata ?? []).map((p) => ({
+        kind: p.kind,
+        value: p.value,
+        label: p.label,
+        games: p.games,
+      }));
       if (periods.length === 0) throw new Error("A competição ainda não tem rodadas para o sorteio.");
 
       const ties =
