@@ -318,3 +318,24 @@ export function useLeaveLeague() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["my-leagues"] }),
   });
 }
+
+/**
+ * Liga/desliga o modo Confronto (Liga/Copa + sorteio) de uma federação.
+ * Só o app admin executa — a RPC `admin_set_confronto_enabled` enforça no servidor.
+ */
+export function useSetConfrontoEnabled() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { leagueId: string; value: boolean }) => {
+      const { error } = await supabase.rpc("admin_set_confronto_enabled", {
+        p_league_id: input.leagueId,
+        p_value: input.value,
+      });
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["league"] });
+      qc.invalidateQueries({ queryKey: ["my-leagues"] });
+    },
+  });
+}

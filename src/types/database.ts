@@ -96,18 +96,24 @@ export type Database = {
           id: number
           league_price_cents: number
           payment_mode: Database["public"]["Enums"]["payment_mode"]
+          promo_price_cents: number | null
+          promo_until: string | null
           updated_at: string
         }
         Insert: {
           id?: number
           league_price_cents?: number
           payment_mode?: Database["public"]["Enums"]["payment_mode"]
+          promo_price_cents?: number | null
+          promo_until?: string | null
           updated_at?: string
         }
         Update: {
           id?: number
           league_price_cents?: number
           payment_mode?: Database["public"]["Enums"]["payment_mode"]
+          promo_price_cents?: number | null
+          promo_until?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -117,9 +123,11 @@ export type Database = {
           area: string | null
           created_at: string
           current_round: string | null
+          display_name: string | null
           emblem_url: string | null
           id: string
           is_featured: boolean
+          is_published: boolean
           jokers_per_week: number
           last_synced_at: string | null
           max_jokers: number
@@ -140,9 +148,11 @@ export type Database = {
           area?: string | null
           created_at?: string
           current_round?: string | null
+          display_name?: string | null
           emblem_url?: string | null
           id?: string
           is_featured?: boolean
+          is_published?: boolean
           jokers_per_week?: number
           last_synced_at?: string | null
           max_jokers?: number
@@ -163,9 +173,11 @@ export type Database = {
           area?: string | null
           created_at?: string
           current_round?: string | null
+          display_name?: string | null
           emblem_url?: string | null
           id?: string
           is_featured?: boolean
+          is_published?: boolean
           jokers_per_week?: number
           last_synced_at?: string | null
           max_jokers?: number
@@ -534,6 +546,7 @@ export type Database = {
         Row: {
           approved_at: string | null
           approved_by: string | null
+          confronto_enabled: boolean
           created_at: string
           deleted_at: string | null
           deleted_by: string | null
@@ -544,6 +557,7 @@ export type Database = {
           logo_url: string | null
           max_members: number | null
           name: string
+          name_approved: boolean
           owner_id: string
           payment_status: Database["public"]["Enums"]["payment_status"]
           slug: string
@@ -554,6 +568,7 @@ export type Database = {
         Insert: {
           approved_at?: string | null
           approved_by?: string | null
+          confronto_enabled?: boolean
           created_at?: string
           deleted_at?: string | null
           deleted_by?: string | null
@@ -564,6 +579,7 @@ export type Database = {
           logo_url?: string | null
           max_members?: number | null
           name: string
+          name_approved?: boolean
           owner_id: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
           slug: string
@@ -574,6 +590,7 @@ export type Database = {
         Update: {
           approved_at?: string | null
           approved_by?: string | null
+          confronto_enabled?: boolean
           created_at?: string
           deleted_at?: string | null
           deleted_by?: string | null
@@ -584,6 +601,7 @@ export type Database = {
           logo_url?: string | null
           max_members?: number | null
           name?: string
+          name_approved?: boolean
           owner_id?: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
           slug?: string
@@ -925,11 +943,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_approve_league_name: {
+        Args: { p_league_id: string }
+        Returns: undefined
+      }
       admin_comp_league: {
         Args: { p_league_id: string }
         Returns: {
           approved_at: string | null
           approved_by: string | null
+          confronto_enabled: boolean
           created_at: string
           deleted_at: string | null
           deleted_by: string | null
@@ -940,6 +963,7 @@ export type Database = {
           logo_url: string | null
           max_members: number | null
           name: string
+          name_approved: boolean
           owner_id: string
           payment_status: Database["public"]["Enums"]["payment_status"]
           slug: string
@@ -954,6 +978,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_delete_competition: { Args: { p_id: string }; Returns: undefined }
       admin_list_deleted_leagues: {
         Args: never
         Returns: {
@@ -975,9 +1000,38 @@ export type Database = {
           is_app_admin: boolean
         }[]
       }
+      admin_rename_competition: {
+        Args: { p_display_name: string; p_id: string }
+        Returns: undefined
+      }
       admin_restore_league: {
         Args: { p_league_id: string }
         Returns: undefined
+      }
+      admin_set_competition_published: {
+        Args: { p_id: string; p_value: boolean }
+        Returns: undefined
+      }
+      admin_set_confronto_enabled: {
+        Args: { p_league_id: string; p_value: boolean }
+        Returns: undefined
+      }
+      admin_set_promo: {
+        Args: { p_promo_price_cents?: number; p_promo_until?: string }
+        Returns: {
+          id: number
+          league_price_cents: number
+          payment_mode: Database["public"]["Enums"]["payment_mode"]
+          promo_price_cents: number | null
+          promo_until: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "app_settings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       admin_soft_delete_league: {
         Args: { p_league_id: string }
@@ -992,6 +1046,8 @@ export type Database = {
           id: number
           league_price_cents: number
           payment_mode: Database["public"]["Enums"]["payment_mode"]
+          promo_price_cents: number | null
+          promo_until: string | null
           updated_at: string
         }
         SetofOptions: {
@@ -1006,6 +1062,7 @@ export type Database = {
         Returns: {
           approved_at: string | null
           approved_by: string | null
+          confronto_enabled: boolean
           created_at: string
           deleted_at: string | null
           deleted_by: string | null
@@ -1016,6 +1073,7 @@ export type Database = {
           logo_url: string | null
           max_members: number | null
           name: string
+          name_approved: boolean
           owner_id: string
           payment_status: Database["public"]["Enums"]["payment_status"]
           slug: string
@@ -1184,6 +1242,7 @@ export type Database = {
         Returns: {
           approved_at: string | null
           approved_by: string | null
+          confronto_enabled: boolean
           created_at: string
           deleted_at: string | null
           deleted_by: string | null
@@ -1194,6 +1253,7 @@ export type Database = {
           logo_url: string | null
           max_members: number | null
           name: string
+          name_approved: boolean
           owner_id: string
           payment_status: Database["public"]["Enums"]["payment_status"]
           slug: string
@@ -1228,6 +1288,7 @@ export type Database = {
         Returns: {
           approved_at: string | null
           approved_by: string | null
+          confronto_enabled: boolean
           created_at: string
           deleted_at: string | null
           deleted_by: string | null
@@ -1238,6 +1299,7 @@ export type Database = {
           logo_url: string | null
           max_members: number | null
           name: string
+          name_approved: boolean
           owner_id: string
           payment_status: Database["public"]["Enums"]["payment_status"]
           slug: string

@@ -46,6 +46,7 @@ import {
   useUpdateMember,
   useRemoveMember,
   useLeaveLeague,
+  useSetConfrontoEnabled,
   useAddLeagueCompetition,
   useDeleteLeagueCompetition,
   useUpdateLeagueLogo,
@@ -78,6 +79,7 @@ export function LigaDetailPage() {
   const { data: standings, isLoading: loadingStandings } = useStandings(activeLcId);
 
   const leave = useLeaveLeague();
+  const setConfronto = useSetConfrontoEnabled();
   const checkout = useLeagueCheckout();
   const simulate = useSimulatePayment();
   const comp = useCompLeague();
@@ -132,6 +134,8 @@ export function LigaDetailPage() {
       </Page>
     );
   }
+
+  const confrontoEnabled = (league as { confronto_enabled?: boolean }).confronto_enabled ?? false;
 
   function copyCode() {
     if (!league?.join_code) return;
@@ -303,6 +307,50 @@ export function LigaDetailPage() {
           currentLogo={league.logo_url}
           onClose={() => setEscudoOpen(false)}
         />
+      )}
+
+      {isAppAdmin && (
+        <Card className="mb-4 border border-brand-200 bg-brand-500/5 p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="flex items-center gap-1.5 text-sm font-bold text-ink-900">
+                <Sparkles className="size-4 text-brand-600" />
+                Modo Confronto (teste)
+                <span className="rounded-pill bg-brand-600 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                  admin
+                </span>
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-ink-500">
+                {confrontoEnabled
+                  ? "Liberado: esta federação pode criar disputas de Liga e Copa, sortear os confrontos e adicionar várias competições."
+                  : "Bloqueado: Liga e Copa aparecem como “em breve”. Libere para esta federação testar o Confronto e o sorteio."}
+              </p>
+            </div>
+            <Button
+              size="sm"
+              variant={confrontoEnabled ? "outline" : undefined}
+              loading={setConfronto.isPending}
+              onClick={() =>
+                setConfronto.mutate(
+                  { leagueId: league.id, value: !confrontoEnabled },
+                  {
+                    onSuccess: () =>
+                      toast(
+                        confrontoEnabled
+                          ? "Confronto desativado nesta federação."
+                          : "Confronto liberado para esta federação.",
+                        "success",
+                      ),
+                    onError: (e) =>
+                      toast(e instanceof Error ? e.message : "Erro ao atualizar.", "error"),
+                  },
+                )
+              }
+            >
+              {confrontoEnabled ? "Desativar" : "Ativar Confronto"}
+            </Button>
+          </div>
+        </Card>
       )}
 
       <SegmentedControl<Tab> className="mb-4" value={tab} onChange={setTab} options={tabs} />
