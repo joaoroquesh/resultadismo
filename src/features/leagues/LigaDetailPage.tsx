@@ -51,6 +51,7 @@ import {
   requiredPrefix,
   NAME_PREFIX_DEFAULTS,
 } from "./naming";
+import { RefundFederationButton } from "./RefundFederationButton";
 import type { LeagueMode } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -389,6 +390,14 @@ export function LigaDetailPage() {
         >
           <LogOut className="size-4" /> Sair da federação
         </Button>
+      )}
+
+      {isOwner && (
+        <RefundFederationButton
+          leagueId={league.id}
+          paymentStatus={league.payment_status}
+          approvedAt={(league as { approved_at?: string | null }).approved_at}
+        />
       )}
 
       <ConfirmDialog

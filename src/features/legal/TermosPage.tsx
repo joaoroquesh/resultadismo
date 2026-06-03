@@ -129,9 +129,11 @@ export function TermosPage() {
         <p>
           É uma cobrança avulsa, <strong>sem renovação automática</strong> e sem mensalidade — uma taxa
           de serviço para criar a federação, que não é aposta nem compra de prêmio. Conforme o Código de
-          Defesa do Consumidor, você pode pedir <strong>reembolso em até 7 dias</strong> da compra,
-          desde que a federação ainda não tenha sido usada (sem palpites lançados). Para isso, escreva para{" "}
-          <strong>{CONTATO}</strong>.
+          Defesa do Consumidor (art. 49), você tem <strong>direito de arrependimento em até 7 dias</strong>{" "}
+          da compra: pode <strong>cancelar a federação e receber o valor de volta você mesmo</strong>, na
+          própria página da federação, sem precisar justificar. O reembolso volta pelo mesmo meio de
+          pagamento (Pix na sua conta; no cartão, estornado na fatura em alguns dias) e a federação é
+          arquivada. Passado esse prazo, fale com a gente em <strong>{CONTATO}</strong>.
         </p>
       </LegalSection>
 

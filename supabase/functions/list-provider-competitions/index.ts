@@ -19,7 +19,7 @@ function json(body: unknown, status = 200) {
 }
 
 type ProviderCompetition = {
-  provider: "football_data" | "thesportsdb";
+  provider: "football_data" | "thesportsdb" | "espn";
   code: string;
   name: string;
   area: string | null;
@@ -150,7 +150,29 @@ Deno.serve(async (req) => {
       return json({ competitions });
     }
 
-    return json({ error: "provider inválido (use football_data ou thesportsdb)" }, 400);
+    if (provider === "espn") {
+      // ESPN não tem "listar tudo" limpo; curadoria dos slugs de scoreboard.
+      // O code é o slug ESPN (ex.: fifa.friendly). season não se aplica.
+      const competitions: ProviderCompetition[] = [
+        { provider: "espn", code: "fifa.friendly", name: "Amistosos Internacionais", area: "Mundo", country: "Mundo", emblem: null, type: null, season: null },
+        { provider: "espn", code: "fifa.world", name: "Copa do Mundo FIFA", area: "Mundo", country: "Mundo", emblem: null, type: null, season: null },
+        { provider: "espn", code: "fifa.worldq.conmebol", name: "Eliminatórias (América do Sul)", area: "Mundo", country: "Mundo", emblem: null, type: null, season: null },
+        { provider: "espn", code: "bra.1", name: "Brasileirão Série A", area: "Brasil", country: "Brasil", emblem: null, type: null, season: null },
+        { provider: "espn", code: "bra.2", name: "Brasileirão Série B", area: "Brasil", country: "Brasil", emblem: null, type: null, season: null },
+        { provider: "espn", code: "bra.copa_do_brazil", name: "Copa do Brasil", area: "Brasil", country: "Brasil", emblem: null, type: null, season: null },
+        { provider: "espn", code: "conmebol.libertadores", name: "Libertadores", area: "América do Sul", country: "América do Sul", emblem: null, type: null, season: null },
+        { provider: "espn", code: "conmebol.sudamericana", name: "Sul-Americana", area: "América do Sul", country: "América do Sul", emblem: null, type: null, season: null },
+        { provider: "espn", code: "uefa.champions", name: "Champions League", area: "Europa", country: "Europa", emblem: null, type: null, season: null },
+        { provider: "espn", code: "eng.1", name: "Premier League", area: "Inglaterra", country: "Inglaterra", emblem: null, type: null, season: null },
+        { provider: "espn", code: "esp.1", name: "La Liga", area: "Espanha", country: "Espanha", emblem: null, type: null, season: null },
+        { provider: "espn", code: "ita.1", name: "Serie A (Itália)", area: "Itália", country: "Itália", emblem: null, type: null, season: null },
+        { provider: "espn", code: "ger.1", name: "Bundesliga", area: "Alemanha", country: "Alemanha", emblem: null, type: null, season: null },
+        { provider: "espn", code: "fra.1", name: "Ligue 1", area: "França", country: "França", emblem: null, type: null, season: null },
+      ];
+      return json({ competitions });
+    }
+
+    return json({ error: "provider inválido (use football_data, thesportsdb ou espn)" }, 400);
   } catch (e) {
     return json({ error: e instanceof Error ? e.message : String(e) }, 500);
   }

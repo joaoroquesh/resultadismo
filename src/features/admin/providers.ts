@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 
-export type ProviderName = "football_data" | "thesportsdb";
+export type ProviderName = "football_data" | "thesportsdb" | "espn";
 
 export type ProviderCompetition = {
   provider: ProviderName;
