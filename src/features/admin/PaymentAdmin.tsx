@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Ticket } from "lucide-react";
+import { Plus, Trash2, Ticket, ShieldCheck } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -15,6 +15,10 @@ import {
   useCreateDiscount,
   useToggleDiscount,
   useDeleteDiscount,
+  useNameReviewLeagues,
+  useApproveName,
+  isPromoActive,
+  effectivePriceCents,
   type PaymentMode,
   type DiscountCode,
 } from "@/features/payments/api";
@@ -22,9 +26,50 @@ import {
 export function PaymentAdmin() {
   return (
     <div className="space-y-4">
+      <NameReviewCard />
       <PaymentSettingsCard />
       <DiscountCodesCard />
     </div>
+  );
+}
+
+function NameReviewCard() {
+  const { data: leagues, isLoading } = useNameReviewLeagues();
+  const approve = useApproveName();
+  const { toast } = useToast();
+  const list = leagues ?? [];
+
+  // Só aparece quando há nomes pendentes de revisão.
+  if (isLoading || list.length === 0) return null;
+
+  return (
+    <Card className="space-y-3 p-4">
+      <div className="flex items-center gap-2 text-sm font-bold text-ink-900">
+        <ShieldCheck className="size-4 text-brand-600" /> Nomes a revisar ({list.length})
+      </div>
+      <p className="text-xs text-ink-500">
+        Federações pagas já entram ativas; aprove o nome (ou exclua na aba Federações se for impróprio).
+      </p>
+      <ul className="space-y-2">
+        {list.map((l) => (
+          <li key={l.id} className="flex items-center gap-2 rounded-md border border-border p-2.5">
+            <span className="min-w-0 flex-1 truncate font-semibold text-ink-900">{l.name}</span>
+            <Button
+              size="sm"
+              loading={approve.isPending}
+              onClick={() =>
+                approve.mutate(l.id, {
+                  onSuccess: () => toast("Nome aprovado!", "success"),
+                  onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
+                })
+              }
+            >
+              Aprovar nome
+            </Button>
+          </li>
+        ))}
+      </ul>
+    </Card>
   );
 }
 
@@ -33,12 +78,21 @@ function PaymentSettingsCard() {
   const update = useUpdatePaymentSettings();
   const { toast } = useToast();
   const [mode, setMode] = useState<PaymentMode>("disabled");
-  const [priceReais, setPriceReais] = useState("9,90");
+  const [priceReais, setPriceReais] = useState("19,90");
+  const [promoOn, setPromoOn] = useState(false);
+  const [promoPriceReais, setPromoPriceReais] = useState("9,90");
+  const [promoUntil, setPromoUntil] = useState(""); // yyyy-mm-dd
 
   useEffect(() => {
     if (settings) {
       setMode(settings.payment_mode);
       setPriceReais((settings.league_price_cents / 100).toFixed(2).replace(".", ","));
+      const hasPromo = settings.promo_price_cents != null;
+      setPromoOn(hasPromo);
+      if (hasPromo) {
+        setPromoPriceReais(((settings.promo_price_cents as number) / 100).toFixed(2).replace(".", ","));
+      }
+      setPromoUntil(settings.promo_until ? settings.promo_until.slice(0, 10) : "");
     }
   }, [settings]);
 
@@ -46,14 +100,37 @@ function PaymentSettingsCard() {
 
   function save() {
     const cents = Math.round(parseFloat(priceReais.replace(",", ".")) * 100);
+    let promoPriceCents: number | null = null;
+    let promoUntilIso: string | null = null;
+    if (promoOn) {
+      if (!promoUntil) {
+        toast("Defina a data fim da promoção.", "error");
+        return;
+      }
+      const pc = Math.round(parseFloat(promoPriceReais.replace(",", ".")) * 100);
+      if (!Number.isFinite(pc)) {
+        toast("Preço promocional inválido.", "error");
+        return;
+      }
+      promoPriceCents = pc;
+      // fim do dia escolhido, horário de Brasília
+      promoUntilIso = new Date(`${promoUntil}T23:59:59-03:00`).toISOString();
+    }
     update.mutate(
-      { mode, priceCents: Number.isFinite(cents) ? cents : 990 },
+      {
+        mode,
+        priceCents: Number.isFinite(cents) ? cents : 1990,
+        promoPriceCents,
+        promoUntil: promoUntilIso,
+      },
       {
         onSuccess: () => toast("Configuração de pagamento salva.", "success"),
         onError: (e) => toast(e instanceof Error ? e.message : "Erro ao salvar.", "error"),
       },
     );
   }
+
+  const promoLive = isPromoActive(settings); // promo valendo AGORA (conforme já salvo)
 
   return (
     <Card className="space-y-4 p-4">
@@ -83,13 +160,54 @@ function PaymentSettingsCard() {
       </div>
 
       {mode !== "disabled" && (
-        <Input
-          label="Preço da federação (R$)"
-          value={priceReais}
-          onChange={(e) => setPriceReais(e.target.value)}
-          inputMode="decimal"
-          placeholder="9,90"
-        />
+        <>
+          <Input
+            label="Preço base da federação (R$)"
+            value={priceReais}
+            onChange={(e) => setPriceReais(e.target.value)}
+            inputMode="decimal"
+            placeholder="19,90"
+          />
+
+          <div className="space-y-3 rounded-md border border-border p-3">
+            <label className="flex items-center gap-2 text-sm font-medium text-ink-800">
+              <input
+                type="checkbox"
+                checked={promoOn}
+                onChange={(e) => setPromoOn(e.target.checked)}
+                className="size-4 accent-brand-600"
+              />
+              Promoção por tempo limitado
+            </label>
+            {promoOn && (
+              <div className="grid grid-cols-2 gap-2">
+                <Input
+                  label="Preço promocional (R$)"
+                  value={promoPriceReais}
+                  onChange={(e) => setPromoPriceReais(e.target.value)}
+                  inputMode="decimal"
+                  placeholder="9,90"
+                />
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-ink-800">Promoção até</label>
+                  <input
+                    type="date"
+                    value={promoUntil}
+                    onChange={(e) => setPromoUntil(e.target.value)}
+                    className="h-11 rounded-md border border-ink-200 bg-surface px-3 text-ink-950 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+                  />
+                </div>
+              </div>
+            )}
+            <p className="text-xs leading-snug text-ink-500">
+              {promoLive
+                ? `Preço vigente agora: ${formatBRL(effectivePriceCents(settings))} — promoção ativa.`
+                : promoOn
+                  ? "A promoção passa a valer ao salvar, até a data escolhida (fim do dia, horário de Brasília)."
+                  : `Preço vigente agora: ${formatBRL(effectivePriceCents(settings))}.`}
+            </p>
+          </div>
+        </>
       )}
 
       <Button fullWidth loading={update.isPending} onClick={save}>

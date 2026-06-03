@@ -48,14 +48,20 @@ Deno.serve(async (req) => {
   }
   if (!body.leagueId) return json({ error: "leagueId é obrigatório" }, 400);
 
-  // Configurações de pagamento (modo + preço)
+  // Configurações de pagamento (modo + preço base + promoção opcional)
   const { data: settings } = await admin
     .from("app_settings")
-    .select("payment_mode, league_price_cents")
+    .select("payment_mode, league_price_cents, promo_price_cents, promo_until")
     .eq("id", 1)
     .maybeSingle();
   const mode = settings?.payment_mode ?? "disabled";
-  const priceCents = Number(settings?.league_price_cents ?? 990);
+  const baseCents = Number(settings?.league_price_cents ?? 990);
+  // Preço promocional vale enquanto now() < promo_until (autoritativo no servidor).
+  const promoCents = settings?.promo_price_cents;
+  const promoUntil = settings?.promo_until;
+  const promoActive =
+    promoCents != null && promoUntil != null && new Date(promoUntil).getTime() > Date.now();
+  const priceCents = promoActive ? Number(promoCents) : baseCents;
 
   if (mode !== "live") {
     return json({ error: "Pagamento não está no modo Mercado Pago." }, 409);
@@ -73,8 +79,10 @@ Deno.serve(async (req) => {
   if (error) return json({ error: error.message }, 500);
   if (!league) return json({ error: "Federação não encontrada" }, 404);
   if (league.owner_id !== user.id) return json({ error: "Você não é o dono desta federação" }, 403);
-  if (league.payment_status === "paid" || league.status === "active") {
-    return json({ error: "Esta federação já está ativa." }, 409);
+  // Só bloqueia se já estiver PAGA. status 'active' sozinho pode ser aprovação do admin
+  // sem pagamento (estado em que ainda faz sentido pagar).
+  if (league.payment_status === "paid") {
+    return json({ error: "Esta federação já está paga." }, 409);
   }
 
   // Desconto (opcional)
@@ -103,7 +111,12 @@ Deno.serve(async (req) => {
     });
     await admin
       .from("leagues")
-      .update({ payment_status: "paid", status: "active", approved_at: new Date().toISOString() })
+      .update({
+        payment_status: "paid",
+        status: "active",
+        approved_at: new Date().toISOString(),
+        name_approved: false,
+      })
       .eq("id", league.id);
     return json({ free: true });
   }
@@ -124,7 +137,8 @@ Deno.serve(async (req) => {
     ],
     external_reference: league.id,
     metadata: { league_id: league.id, user_id: user.id, discount_code: discountCode },
-    payment_methods: { installments: 1 },
+    // Sem boleto (R$ 3,49 fixo não faz sentido p/ R$ 9,90) — Pix/cartão/débito.
+    payment_methods: { installments: 1, excluded_payment_types: [{ id: "ticket" }] },
     back_urls: {
       success: `${appUrl}/federacoes/${league.slug}?pagamento=sucesso`,
       pending: `${appUrl}/federacoes/${league.slug}?pagamento=processando`,

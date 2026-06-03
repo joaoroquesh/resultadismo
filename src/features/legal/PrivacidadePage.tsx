@@ -8,9 +8,11 @@ export function PrivacidadePage() {
       <p>
         Esta Política explica como o <strong>Resultadismo</strong> ("nós", "app") coleta, usa e
         protege seus dados quando você usa o site e o aplicativo em{" "}
-        <strong>resultadismo.com</strong>. O Resultadismo é um jogo gratuito de palpites de futebol
-        entre amigos, sem apostas e sem dinheiro real. Ao usar o app, você concorda com esta
-        Política, em conformidade com a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018).
+        <strong>resultadismo.com</strong>. O Resultadismo é um jogo de palpites de futebol entre
+        amigos — <strong>gratuito para jogar e participar</strong>; criar uma federação própria (o
+        espaço onde você joga com seus amigos) pode ter uma taxa única. Não há apostas nem dinheiro
+        real em jogo. Ao usar o app, você concorda com esta Política, em conformidade com a Lei Geral
+        de Proteção de Dados (LGPD, Lei nº 13.709/2018).
       </p>
       <p>
         <strong>Controlador dos dados:</strong> o Resultadismo, projeto independente mantido de forma

@@ -20,6 +20,10 @@ export type PaymentMode = "disabled" | "test" | "live";
 export type PaymentSettings = {
   payment_mode: PaymentMode;
   league_price_cents: number;
+  /** Preço promocional (centavos). Se definido e dentro da validade, vale no lugar do base. */
+  promo_price_cents: number | null;
+  /** Promoção vale até este instante (ISO). */
+  promo_until: string | null;
 };
 
 export type DiscountInfo = {
@@ -42,7 +46,24 @@ export type DiscountCode = {
   created_at: string;
 };
 
-const DEFAULT_SETTINGS: PaymentSettings = { payment_mode: "disabled", league_price_cents: 990 };
+const DEFAULT_SETTINGS: PaymentSettings = {
+  payment_mode: "disabled",
+  league_price_cents: 990,
+  promo_price_cents: null,
+  promo_until: null,
+};
+
+/** Promoção está valendo agora? (preço promocional definido e dentro da validade) */
+export function isPromoActive(s?: PaymentSettings | null): boolean {
+  if (!s || s.promo_price_cents == null || !s.promo_until) return false;
+  return new Date(s.promo_until).getTime() > Date.now();
+}
+
+/** Preço vigente em centavos: promocional se a promo estiver valendo, senão o base. */
+export function effectivePriceCents(s?: PaymentSettings | null): number {
+  if (!s) return DEFAULT_SETTINGS.league_price_cents;
+  return isPromoActive(s) ? (s.promo_price_cents as number) : s.league_price_cents;
+}
 
 export function usePaymentSettings() {
   return useQuery({
@@ -51,7 +72,7 @@ export function usePaymentSettings() {
     queryFn: async (): Promise<PaymentSettings> => {
       const { data, error } = await db
         .from("app_settings")
-        .select("payment_mode, league_price_cents")
+        .select("payment_mode, league_price_cents, promo_price_cents, promo_until")
         .eq("id", 1)
         .maybeSingle();
       if (error) throw error;
@@ -63,12 +84,24 @@ export function usePaymentSettings() {
 export function useUpdatePaymentSettings() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { mode: PaymentMode; priceCents: number }) => {
+    mutationFn: async (input: {
+      mode: PaymentMode;
+      priceCents: number;
+      promoPriceCents: number | null;
+      promoUntil: string | null;
+    }) => {
+      // 1) modo + preço base
       const { error } = await db.rpc("admin_update_payment_settings", {
         p_mode: input.mode,
         p_price_cents: input.priceCents,
       });
       if (error) throw error;
+      // 2) promoção (preço + validade); promo_price_cents null limpa a promo
+      const { error: promoErr } = await db.rpc("admin_set_promo", {
+        p_promo_price_cents: input.promoPriceCents,
+        p_promo_until: input.promoUntil,
+      });
+      if (promoErr) throw promoErr;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["payment-settings"] }),
   });
@@ -118,6 +151,40 @@ export function useCompLeague() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["league"] });
       qc.invalidateQueries({ queryKey: ["my-leagues"] });
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Admin · moderação do NOME (pago ativa na hora; só o nome fica em revisão)
+// ---------------------------------------------------------------------------
+export function useApproveName() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (leagueId: string) => {
+      const { error } = await db.rpc("admin_approve_league_name", { p_league_id: leagueId });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["league"] });
+      qc.invalidateQueries({ queryKey: ["name-review"] });
+    },
+  });
+}
+
+export function useNameReviewLeagues(enabled = true) {
+  return useQuery({
+    enabled,
+    queryKey: ["name-review"],
+    queryFn: async (): Promise<{ id: string; name: string; slug: string }[]> => {
+      const { data, error } = await db
+        .from("leagues")
+        .select("id, name, slug")
+        .eq("name_approved", false)
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data as { id: string; name: string; slug: string }[]) ?? [];
     },
   });
 }

@@ -207,28 +207,50 @@ async function syncTheSportsDb(
   key: string,
 ): Promise<{ teams: number; matches: number }> {
   if (!comp.provider_code) throw new Error("provider_code ausente (id da liga no TheSportsDB)");
-  const season = comp.provider_season ?? "";
-  const url = `https://www.thesportsdb.com/api/v1/json/${key}/eventsseason.php?id=${comp.provider_code}${season ? `&s=${season}` : ""}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`thesportsdb ${res.status}`);
-  const data = await res.json();
-  const events: any[] = data.events ?? [];
+
+  // eventsseason.php no Free CORTA em 15 eventos (ex.: pegava só jan/fev de uma temporada inteira).
+  // PAST + NEXT cobrem a janela atual da liga (até 15 últimos finalizados + 15 próximos agendados).
+  const base = `https://www.thesportsdb.com/api/v1/json/${key}`;
+  const id = comp.provider_code;
+  const [pastRes, nextRes] = await Promise.all([
+    fetch(`${base}/eventspastleague.php?id=${id}`),
+    fetch(`${base}/eventsnextleague.php?id=${id}`),
+  ]);
+  if (!pastRes.ok && !nextRes.ok) {
+    throw new Error(`thesportsdb erro: past=${pastRes.status} next=${nextRes.status}`);
+  }
+  const past = pastRes.ok ? ((await pastRes.json()).events ?? []) : [];
+  const next = nextRes.ok ? ((await nextRes.json()).events ?? []) : [];
+
+  // dedup por idEvent (raramente sobrepõe past+next, mas garante)
+  const byId = new Map<string, Record<string, unknown>>();
+  for (const e of [...past, ...next]) {
+    if (e?.idEvent) byId.set(String(e.idEvent), e);
+  }
+  const events = Array.from(byId.values());
 
   const ts = new Date().toISOString();
-  const rows = events.map((e) => {
-    const finished = e.strStatus === "Match Finished" || e.strStatus === "FT";
-    const kickoff = e.strTimestamp ?? (e.dateEvent && e.strTime ? `${e.dateEvent}T${e.strTime}Z` : null);
+  const rows = events.map((e: Record<string, unknown>) => {
+    const status = String(e.strStatus ?? "");
+    const finished = status === "Match Finished" || status === "FT";
+    const live = !!status && !finished && status !== "Not Started";
+    const dateEvent = e.dateEvent as string | undefined;
+    const strTime = e.strTime as string | undefined;
+    const kickoff = (e.strTimestamp as string | undefined)
+      ?? (dateEvent && strTime ? `${dateEvent}T${strTime}Z` : null);
+    const hs = e.intHomeScore;
+    const as_ = e.intAwayScore;
     return {
       competition_id: comp.id,
       provider: "thesportsdb" as const,
       provider_ref: String(e.idEvent),
       round: e.intRound ? `Rodada ${e.intRound}` : null,
-      home_team_name: e.strHomeTeam ?? "A definir",
-      away_team_name: e.strAwayTeam ?? "A definir",
+      home_team_name: (e.strHomeTeam as string | undefined) ?? "A definir",
+      away_team_name: (e.strAwayTeam as string | undefined) ?? "A definir",
       kickoff_at: kickoff,
-      status: finished ? ("finished" as const) : ("scheduled" as const),
-      home_score: finished ? Number(e.intHomeScore ?? null) : null,
-      away_score: finished ? Number(e.intAwayScore ?? null) : null,
+      status: finished ? ("finished" as const) : live ? ("live" as const) : ("scheduled" as const),
+      home_score: (finished || live) && hs != null ? Number(hs) : null,
+      away_score: (finished || live) && as_ != null ? Number(as_) : null,
       last_synced_at: ts,
     };
   });
