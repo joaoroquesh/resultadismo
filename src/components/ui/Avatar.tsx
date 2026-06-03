@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { cn, initials } from "@/lib/utils";
 import { parseGenAvatar, shapeStyle, avatarBackground, avatarTextColor } from "@/lib/avatar";
+import { isCrest } from "@/lib/crest";
+import { CrestMask } from "./CrestMask";
 
 type Size = "xs" | "sm" | "md" | "lg" | "xl";
 
-const sizes: Record<Size, string> = {
-  xs: "size-6 text-[10px]",
-  sm: "size-8 text-xs",
-  md: "size-10 text-sm",
-  lg: "size-14 text-lg",
-  xl: "size-20 text-2xl",
+// px + classe de fonte da inicial por tamanho
+const sizes: Record<Size, { px: number; text: string; cls: string }> = {
+  xs: { px: 24, text: "text-[10px]", cls: "size-6 text-[10px]" },
+  sm: { px: 32, text: "text-xs", cls: "size-8 text-xs" },
+  md: { px: 40, text: "text-sm", cls: "size-10 text-sm" },
+  lg: { px: 56, text: "text-lg", cls: "size-14 text-lg" },
+  xl: { px: 80, text: "text-2xl", cls: "size-20 text-2xl" },
 };
 
 export function Avatar({
@@ -24,15 +27,30 @@ export function Avatar({
   className?: string;
 }) {
   const [errored, setErrored] = useState(false);
-  const gen = parseGenAvatar(src);
+  const s = sizes[size];
 
-  // Avatar gerado (forma + cores + inicial)
+  // Novo sistema: escudo recortando cores/foto (e null → escudo padrão do nome).
+  if (isCrest(src) || !src) {
+    return (
+      <CrestMask
+        src={src}
+        name={name}
+        px={s.px}
+        defaultKind="escudo"
+        withLetter
+        className={className}
+      />
+    );
+  }
+
+  // Legado: avatar gerado por clip-path (gen:forma:cores:rotação)
+  const gen = parseGenAvatar(src);
   if (gen) {
     const multi = gen.colors.length > 1;
     const initial = (name?.trim()?.[0] ?? "?").toUpperCase();
     return (
       <span
-        className={cn("inline-flex shrink-0 items-center justify-center font-bold", sizes[size], className)}
+        className={cn("inline-flex shrink-0 items-center justify-center font-bold", s.cls, className)}
         style={{
           background: avatarBackground(gen.colors, gen.rotation),
           color: avatarTextColor(gen.colors),
@@ -45,12 +63,13 @@ export function Avatar({
     );
   }
 
+  // Legado: foto crua (URL do Google salva direto)
   const showImg = src && !errored;
   return (
     <span
       className={cn(
         "inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-100 font-bold text-brand-800 ring-1 ring-border",
-        sizes[size],
+        s.cls,
         className,
       )}
     >
