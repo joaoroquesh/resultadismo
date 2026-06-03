@@ -79,6 +79,9 @@ export interface TieDetailRow {
   b_away: number | null;
   b_pts: number | null;
   b_joker: boolean;
+  /** Se cada lado palpitou (sempre disponível, sem revelar o palpite). */
+  a_palpitou: boolean;
+  b_palpitou: boolean;
 }
 
 /** Detalhe jogo a jogo de um confronto (meu palpite x o do adversário). */

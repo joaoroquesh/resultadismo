@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Swords, ChevronRight } from "lucide-react";
+import { Swords, ChevronRight, Lock } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar";
 import { Modal } from "@/components/ui/Modal";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -325,7 +325,7 @@ export function TieDetailModal({
           <ul className="divide-y divide-border overflow-hidden rounded-md ring-1 ring-border">
             {rows.map((m) => (
               <li key={m.match_id} className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 py-2 text-xs">
-                <Palpite home={m.a_home} away={m.a_away} pts={m.a_pts} joker={m.a_joker} align="left" />
+                <Palpite home={m.a_home} away={m.a_away} pts={m.a_pts} joker={m.a_joker} palpitou={m.a_palpitou} align="left" />
                 <div className="flex flex-col items-center">
                   <span className="whitespace-nowrap font-semibold text-ink-700">
                     {m.home_name} <span className="text-ink-300">x</span> {m.away_name}
@@ -334,7 +334,7 @@ export function TieDetailModal({
                     {m.home_score != null ? `${m.home_score} × ${m.away_score}` : "a jogar"}
                   </span>
                 </div>
-                <Palpite home={m.b_home} away={m.b_away} pts={m.b_pts} joker={m.b_joker} align="right" />
+                <Palpite home={m.b_home} away={m.b_away} pts={m.b_pts} joker={m.b_joker} palpitou={m.b_palpitou} align="right" />
               </li>
             ))}
           </ul>
@@ -349,31 +349,53 @@ function Palpite({
   away,
   pts,
   joker,
+  palpitou,
   align,
 }: {
   home: number | null;
   away: number | null;
   pts: number | null;
   joker: boolean;
+  palpitou: boolean;
   align: "left" | "right";
 }) {
-  const has = home != null && away != null;
+  const revealed = home != null && away != null;
+
+  // Antes do jogo começar o palpite do adversário fica escondido: só dizemos se
+  // a pessoa palpitou ou não (sem revelar placar/pontos/joker).
+  if (!revealed) {
+    return (
+      <div className={cn("flex items-center gap-1.5", align === "right" ? "flex-row-reverse" : "")}>
+        {palpitou ? (
+          <span
+            className="inline-flex items-center gap-1 rounded bg-surface-2 px-1.5 py-0.5 font-semibold text-ink-400"
+            title="Palpite escondido até o jogo começar"
+          >
+            <Lock className="size-3" /> palpitou
+          </span>
+        ) : (
+          <span className="rounded bg-surface-2 px-1.5 py-0.5 font-medium text-ink-300">
+            sem palpite
+          </span>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className={cn("flex items-center gap-1.5", align === "right" ? "flex-row-reverse" : "")}>
       <span className="rounded bg-surface-2 px-1.5 py-0.5 font-bold tabular-nums text-ink-700">
-        {has ? `${home}×${away}` : "—"}
+        {home}×{away}
       </span>
-      {has && (
-        <span
-          className={cn(
-            "rounded-pill px-1.5 text-[10px] font-bold tabular-nums",
-            (pts ?? 0) > 0 ? "bg-grass-100 text-grass-800" : "bg-ink-100 text-ink-400",
-          )}
-        >
-          +{pts ?? 0}
-          {joker && "·2×"}
-        </span>
-      )}
+      <span
+        className={cn(
+          "rounded-pill px-1.5 text-[10px] font-bold tabular-nums",
+          (pts ?? 0) > 0 ? "bg-grass-100 text-grass-800" : "bg-ink-100 text-ink-400",
+        )}
+      >
+        +{pts ?? 0}
+        {joker && "·2×"}
+      </span>
     </div>
   );
 }
