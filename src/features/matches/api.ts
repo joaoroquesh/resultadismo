@@ -86,6 +86,47 @@ export function useMatches(competitionId: string | undefined) {
   });
 }
 
+/**
+ * "Todos os campeonatos": jogos visíveis de todas as competições ativas
+ * (publicadas, p/ não-admin), respeitando o created_at de cada uma e o hidden.
+ * Janela: dos últimos 7 dias em diante (foco no que está rolando/por vir).
+ */
+export function useAllMatches(enabled = true) {
+  const { isAppAdmin } = useAuth();
+  return useQuery({
+    enabled,
+    queryKey: ["matches", "all", isAppAdmin ? "admin" : "public"],
+    staleTime: 30_000,
+    placeholderData: keepPreviousData,
+    queryFn: async (): Promise<MatchWithTeams[]> => {
+      let cq = supabase.from("competitions").select("id, created_at").eq("status", "active");
+      if (!isAppAdmin)
+        cq = (cq as unknown as { eq: (c: string, v: unknown) => typeof cq }).eq("is_published", true);
+      const { data: comps, error: ce } = await cq;
+      if (ce) throw ce;
+      const ids = (comps ?? []).map((c) => (c as { id: string }).id);
+      if (ids.length === 0) return [];
+      const createdMap = new Map<string, string | null>(
+        (comps ?? []).map((c) => [(c as { id: string }).id, (c as { created_at?: string }).created_at ?? null]),
+      );
+      const floor = new Date(Date.now() - 7 * 86_400_000).toISOString();
+      const { data, error } = await supabase
+        .from("matches")
+        .select(MATCH_SELECT)
+        .in("competition_id", ids)
+        .gte("kickoff_at", floor)
+        .order("kickoff_at", { ascending: true });
+      if (error) throw error;
+      return (data ?? []).filter((m) => {
+        const row = m as { hidden?: boolean; competition_id: string; kickoff_at: string | null };
+        if (row.hidden) return false;
+        const created = createdMap.get(row.competition_id);
+        return !created || !row.kickoff_at || row.kickoff_at >= created;
+      }) as unknown as MatchWithTeams[];
+    },
+  });
+}
+
 export function useMyPredictions(competitionId: string | undefined) {
   const { user } = useAuth();
   return useQuery({
@@ -106,6 +147,27 @@ export function useMyPredictions(competitionId: string | undefined) {
         const { matches: _m, ...pred } = row as Prediction & { matches: unknown };
         map.set(pred.match_id, pred as Prediction);
       }
+      return map;
+    },
+  });
+}
+
+/** Todos os palpites do usuário (modo "Todos os campeonatos"). */
+export function useAllMyPredictions(enabled = true) {
+  const { user } = useAuth();
+  return useQuery({
+    enabled: enabled && !!user,
+    queryKey: ["my-predictions", "all", user?.id],
+    staleTime: 30_000,
+    placeholderData: keepPreviousData,
+    queryFn: async (): Promise<Map<string, Prediction>> => {
+      const { data, error } = await supabase
+        .from("predictions")
+        .select("*")
+        .eq("user_id", user!.id);
+      if (error) throw error;
+      const map = new Map<string, Prediction>();
+      for (const row of data ?? []) map.set((row as Prediction).match_id, row as Prediction);
       return map;
     },
   });
