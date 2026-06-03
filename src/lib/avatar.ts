@@ -32,6 +32,8 @@ export const AVATAR_COLORS: { key: string; hex: string; dark?: boolean }[] = [
   { key: "vermelho", hex: "#E21818" },
   { key: "roxo", hex: "#7C3AED" },
   { key: "grafite", hex: "#3D3D3D" },
+  // opção clara (branco gelo, levemente tintado de turquesa) — texto escuro
+  { key: "gelo", hex: "#EAF0F0", dark: true },
 ];
 
 export const AVATAR_ROTATIONS = [0, 45, 90, 135];
