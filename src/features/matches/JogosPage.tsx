@@ -122,6 +122,9 @@ export function JogosPage() {
     return sum;
   }, [dayMatches, predMap]);
 
+  // o resumo de pontos do dia só faz sentido quando há jogo encerrado no dia
+  const dayScored = useMemo(() => dayMatches.some((m) => m.status === "finished"), [dayMatches]);
+
   const totalPoints = useMemo(() => {
     let sum = 0;
     predMap?.forEach((p) => {
@@ -219,12 +222,15 @@ export function JogosPage() {
         </div>
       )}
 
-      {/* resumo: pontos do dia + dobros da semana (só por campeonato) */}
-      {predMap && (dayPoints > 0 || !isAll) && (
+      {/* resumo: pontos DO DIA selecionado (escopo atual) + dobros da semana */}
+      {session && (dayScored || !isAll) && (
         <div className="mb-3 flex flex-wrap items-center justify-center gap-2 text-xs">
-          {dayPoints > 0 && (
-            <span className="font-medium text-ink-500">
-              Você fez <span className="font-bold text-brand-700">{dayPoints} pts</span> neste dia
+          {dayScored && (
+            <span className="inline-flex items-center gap-1 rounded-pill bg-ink-100 px-2.5 py-0.5 font-medium text-ink-600">
+              Neste dia:{" "}
+              <span className="font-bold text-brand-700">
+                {dayPoints} {dayPoints === 1 ? "pt" : "pts"}
+              </span>
             </span>
           )}
           {!isAll && (
