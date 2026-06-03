@@ -266,7 +266,8 @@ export function CrestEditor({
                   onClick={() => setColorAt(activeDiv, c.key)}
                   className={cn(
                     "grid size-9 place-items-center rounded-full ring-2 ring-offset-2 ring-offset-surface transition",
-                    selected ? "ring-brand-600" : "ring-transparent hover:ring-border",
+                    // borda sutil em todos (senão o gelo some no fundo claro)
+                    selected ? "ring-brand-600" : "ring-border hover:ring-ink-300",
                   )}
                   style={{ background: c.hex }}
                 >

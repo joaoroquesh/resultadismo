@@ -59,6 +59,10 @@ export function CrestMask({
     maskPosition: "center",
     WebkitMaskSize: "contain",
     maskSize: "contain",
+    // drop-shadow segue o recorte do SVG: dá uma borda fina + leve elevação,
+    // pra um escudo claro (gelo/branco) não sumir no fundo claro.
+    filter:
+      "drop-shadow(0 0 0.5px rgba(12,22,22,0.35)) drop-shadow(0 1px 1.5px rgba(12,22,22,0.18))",
   } as const;
 
   return (
