@@ -48,22 +48,26 @@ export function CrestMask({
   // mask-mode: alpha → usa o canal alfa do SVG (área pintada = opaca = mostra o
   // fundo; fora do desenho = transparente). Assim a cor do traço no SVG não
   // importa, só a silhueta. WebKit já usa alpha por padrão.
-  const maskStyle = {
-    background: bg,
-    WebkitMaskImage: `url("${maskUrl}")`,
-    maskImage: `url("${maskUrl}")`,
-    maskMode: "alpha",
-    WebkitMaskRepeat: "no-repeat",
-    maskRepeat: "no-repeat",
-    WebkitMaskPosition: "center",
-    maskPosition: "center",
-    WebkitMaskSize: "contain",
-    maskSize: "contain",
-    // drop-shadow segue o recorte do SVG: dá uma borda fina + leve elevação,
-    // pra um escudo claro (gelo/branco) não sumir no fundo claro.
-    filter:
-      "drop-shadow(0 0 0.5px rgba(12,22,22,0.35)) drop-shadow(0 1px 1.5px rgba(12,22,22,0.18))",
-  } as const;
+  // Sem máscara (pasta de formas vazia) → cai num círculo simples, sem virar
+  // um quadrado de cor cheio.
+  const maskStyle = maskUrl
+    ? ({
+        background: bg,
+        WebkitMaskImage: `url("${maskUrl}")`,
+        maskImage: `url("${maskUrl}")`,
+        maskMode: "alpha",
+        WebkitMaskRepeat: "no-repeat",
+        maskRepeat: "no-repeat",
+        WebkitMaskPosition: "center",
+        maskPosition: "center",
+        WebkitMaskSize: "contain",
+        maskSize: "contain",
+        // drop-shadow segue o recorte do SVG: dá uma borda fina + leve elevação,
+        // pra um escudo claro (gelo/branco) não sumir no fundo claro.
+        filter:
+          "drop-shadow(0 0 0.5px rgba(12,22,22,0.35)) drop-shadow(0 1px 1.5px rgba(12,22,22,0.18))",
+      } as const)
+    : ({ background: bg, borderRadius: "9999px" } as const);
 
   return (
     <span

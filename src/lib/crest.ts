@@ -16,20 +16,68 @@ export type CrestKind = "escudo" | "flamula";
 export type CrestFill = "solid" | "stripes" | "grid" | "ball" | "photo";
 
 // ---------------------------------------------------------------------------
-// Catálogo de formas (precisa bater com os arquivos em /public)
+// Catálogo de formas — montado AUTOMATICAMENTE a partir das pastas:
+//   src/assets/escudos/escudo-<id>.svg    (perfil; "escudo-padrao" é o default)
+//   src/assets/federacoes/flamula-<id>.svg (federação)
+// Pra adicionar/remover/trocar uma forma, é só largar/apagar o SVG na pasta
+// (nome no padrão "escudo-<id>.svg" / "flamula-<id>.svg") e rebuildar. O <id>
+// vira o identificador salvo no crest, então mantenha nomes estáveis.
+// import.meta.glob lê em tempo de build (Vite não enxerga a pasta public).
 // ---------------------------------------------------------------------------
-// 15 escudos opcionais + o padrão (recorte da logo). "padrao" é o default.
-export const ESCUDO_SHAPES: string[] = [
-  "padrao",
-  ...Array.from({ length: 15 }, (_, i) => String(i + 1)),
-];
+const ESCUDO_FILES = import.meta.glob("../assets/escudos/*.svg", {
+  eager: true,
+  query: "?url",
+  import: "default",
+}) as Record<string, string>;
+const FLAMULA_FILES = import.meta.glob("../assets/federacoes/*.svg", {
+  eager: true,
+  query: "?url",
+  import: "default",
+}) as Record<string, string>;
 
-// 3 flâmulas (federação).
-export const FLAMULA_SHAPES: string[] = ["1", "2", "3"];
+// id (estável) -> url empacotada. id = nome sem o prefixo e sem ".svg".
+function buildCatalog(files: Record<string, string>, prefix: string): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const [path, url] of Object.entries(files)) {
+    const stem = (path.split("/").pop() ?? "").replace(/\.svg$/i, "");
+    const id = stem.startsWith(`${prefix}-`) ? stem.slice(prefix.length + 1) : stem;
+    if (id) map.set(id, url);
+  }
+  return map;
+}
 
+// "padrao" primeiro; depois numéricos crescentes; depois alfabético.
+function sortShapeIds(ids: string[]): string[] {
+  return [...ids].sort((a, b) => {
+    if (a === "padrao") return -1;
+    if (b === "padrao") return 1;
+    const na = Number(a);
+    const nb = Number(b);
+    const aNum = a !== "" && !Number.isNaN(na);
+    const bNum = b !== "" && !Number.isNaN(nb);
+    if (aNum && bNum) return na - nb;
+    if (aNum) return -1;
+    if (bNum) return 1;
+    return a.localeCompare(b);
+  });
+}
+
+const ESCUDO_CATALOG = buildCatalog(ESCUDO_FILES, "escudo");
+const FLAMULA_CATALOG = buildCatalog(FLAMULA_FILES, "flamula");
+
+export const ESCUDO_SHAPES: string[] = sortShapeIds([...ESCUDO_CATALOG.keys()]);
+export const FLAMULA_SHAPES: string[] = sortShapeIds([...FLAMULA_CATALOG.keys()]);
+
+// Default de cada tipo (resiliente: usa "padrao" se existir, senão a 1ª forma).
+export const DEFAULT_ESCUDO_SHAPE =
+  ESCUDO_CATALOG.has("padrao") ? "padrao" : ESCUDO_SHAPES[0] ?? "padrao";
+export const DEFAULT_FLAMULA_SHAPE = FLAMULA_SHAPES[0] ?? "1";
+
+/** URL empacotada da forma. Cai no default se o id não existir mais (forma removida). */
 export function crestShapeUrl(kind: CrestKind, shape: string): string {
-  if (kind === "flamula") return `/federacoes/flamula-${shape}.svg`;
-  return shape === "padrao" ? "/escudos/escudo-padrao.svg" : `/escudos/escudo-${shape}.svg`;
+  const catalog = kind === "flamula" ? FLAMULA_CATALOG : ESCUDO_CATALOG;
+  const fallback = kind === "flamula" ? DEFAULT_FLAMULA_SHAPE : DEFAULT_ESCUDO_SHAPE;
+  return catalog.get(shape) ?? catalog.get(fallback) ?? "";
 }
 
 // ---------------------------------------------------------------------------
@@ -71,7 +119,7 @@ export function parseCrest(src: string | null | undefined): CrestConfig | null {
   if (!isCrest(src)) return null;
   const parts = src!.split(":");
   const kind: CrestKind = parts[1] === "flamula" ? "flamula" : "escudo";
-  const shape = parts[2] || (kind === "flamula" ? "1" : "padrao");
+  const shape = parts[2] || (kind === "flamula" ? DEFAULT_FLAMULA_SHAPE : DEFAULT_ESCUDO_SHAPE);
   const fill = (parts[3] as CrestFill) || "solid";
   const colors = (parts[4] || "").split("-").filter(Boolean);
   const rotation = Number.parseInt(parts[5] ?? "0", 10) || 0;
@@ -117,13 +165,13 @@ export function defaultCrestFromName(
     const c2 = AVATAR_COLORS[(h >> 3) % AVATAR_COLORS.length]!.key;
     return {
       kind,
-      shape: "1",
+      shape: DEFAULT_FLAMULA_SHAPE,
       fill: c2 === color ? "solid" : "stripes",
       colors: c2 === color ? [color] : [color, c2],
       rotation: 0,
     };
   }
-  return { kind, shape: "padrao", fill: "solid", colors: [color], rotation: 0 };
+  return { kind, shape: DEFAULT_ESCUDO_SHAPE, fill: "solid", colors: [color], rotation: 0 };
 }
 
 // ---------------------------------------------------------------------------
