@@ -45,6 +45,12 @@ import {
   useLeagueCheckout,
 } from "./api";
 import { usePaymentSettings, useSimulatePayment, useCompLeague } from "@/features/payments/api";
+import {
+  useNamePrefixes,
+  competitionNameError,
+  requiredPrefix,
+  NAME_PREFIX_DEFAULTS,
+} from "./naming";
 import type { LeagueMode } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -66,6 +72,7 @@ export function LigaDetailPage() {
 
   const [tab, setTab] = useState<Tab>("classificacao");
   const [escudoOpen, setEscudoOpen] = useState(false);
+  const [leaveOpen, setLeaveOpen] = useState(false);
   const [lcId, setLcId] = useState<string>();
   const activeLcId = lcId ?? comps?.[0]?.id;
   const { data: standings, isLoading: loadingStandings } = useStandings(activeLcId);
@@ -374,10 +381,34 @@ export function LigaDetailPage() {
       )}
 
       {myMember && !isOwner && (
-        <Button variant="ghost" fullWidth className="mt-6 text-flame-600" onClick={handleLeave}>
+        <Button
+          variant="ghost"
+          fullWidth
+          className="mt-6 text-flame-600"
+          onClick={() => setLeaveOpen(true)}
+        >
           <LogOut className="size-4" /> Sair da federação
         </Button>
       )}
+
+      <ConfirmDialog
+        open={leaveOpen}
+        title="Sair da federação?"
+        message={
+          confrontoEnabled
+            ? "Você vai sair desta federação. Não vai mais participar e precisará ser convidado de novo para voltar. Se houver uma Liga ou Copa em andamento, você perde os confrontos restantes por W.O. e não volta a essas disputas — nem reentrando na federação."
+            : "Você vai sair desta federação. Não vai mais participar e precisará ser convidado de novo para voltar."
+        }
+        step2Message={
+          confrontoEnabled
+            ? "Confirmação final: sair mesmo? Os confrontos em andamento viram derrota por W.O."
+            : "Confirmação final: sair mesmo desta federação?"
+        }
+        confirmLabel="Sair da federação"
+        loading={leave.isPending}
+        onConfirm={handleLeave}
+        onCancel={() => setLeaveOpen(false)}
+      />
     </Page>
   );
 }
@@ -403,6 +434,33 @@ function ClassificacaoTab({
   leagueId: string;
   memberCount: number;
 }) {
+  // Separa as disputas por tipo: Pontos (corrida por campeonato) e Confronto (Liga/Copa).
+  const isConfronto = (m: string) => m === "liga" || m === "cup";
+  const pontos = comps.filter((c) => !isConfronto(c.mode));
+  const confronto = comps.filter((c) => isConfronto(c.mode));
+  const hasBoth = pontos.length > 0 && confronto.length > 0;
+  const activeComp = comps.find((c) => c.id === activeLcId);
+  const [view, setView] = useState<"pontos" | "confronto">(
+    activeComp && isConfronto(activeComp.mode)
+      ? "confronto"
+      : pontos.length === 0 && confronto.length > 0
+        ? "confronto"
+        : "pontos",
+  );
+
+  const group: "pontos" | "confronto" = hasBoth
+    ? view
+    : confronto.length > 0
+      ? "confronto"
+      : "pontos";
+  const list = group === "confronto" ? confronto : pontos;
+  const active = list.find((c) => c.id === activeLcId) ?? list[0];
+
+  // Mantém a seleção do pai (e a query de classificação) em sincronia com a aba visível.
+  useEffect(() => {
+    if (active && active.id !== activeLcId) onSelect(active.id);
+  }, [active, activeLcId, onSelect]);
+
   if (comps.length === 0) {
     return (
       <EmptyState
@@ -411,30 +469,54 @@ function ClassificacaoTab({
       />
     );
   }
-  const active = comps.find((c) => c.id === activeLcId);
+
   return (
     <div className="space-y-3">
-      {comps.length > 1 && (
+      {hasBoth && (
+        <>
+          <SegmentedControl<"pontos" | "confronto">
+            value={view}
+            onChange={setView}
+            options={[
+              { value: "pontos", label: "Pontos" },
+              { value: "confronto", label: "Confronto" },
+            ]}
+          />
+          <p className="px-1 text-xs leading-relaxed text-ink-500">
+            {group === "pontos"
+              ? "Corrida de pontos por campeonato — quem somou mais lidera."
+              : "Duelos diretos: Liga (tabela 3/1/0) e Copa (mata-mata)."}
+          </p>
+        </>
+      )}
+
+      {list.length > 1 && (
         <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
-          {comps.map((c) => (
+          {list.map((c) => (
             <button
               key={c.id}
               onClick={() => onSelect(c.id)}
               className={cn(
-                "shrink-0 rounded-pill border px-3 py-1.5 text-sm font-semibold transition",
-                activeLcId === c.id
+                "inline-flex shrink-0 items-center gap-1.5 rounded-pill border px-3 py-1.5 text-sm font-semibold transition",
+                active?.id === c.id
                   ? "border-brand-600 bg-brand-50 text-brand-700"
                   : "border-ink-200 bg-surface text-ink-600",
               )}
             >
               {c.name}
+              {isConfronto(c.mode) && (
+                <span className="rounded-pill bg-ink-100 px-1.5 text-[10px] font-bold uppercase tracking-wide text-ink-500">
+                  {c.mode === "cup" ? "Copa" : "Liga"}
+                </span>
+              )}
             </button>
           ))}
         </div>
       )}
-      {active && activeLcId && (active.mode === "liga" || active.mode === "cup") ? (
+
+      {active && isConfronto(active.mode) ? (
         <ConfrontoSection
-          lcId={activeLcId}
+          lcId={active.id}
           leagueId={leagueId}
           competitionId={active.competition_id}
           mode={active.mode}
@@ -562,13 +644,18 @@ function CompeticoesTab({
   const [formato, setFormato] = useState<"liga" | "cup">("liga");
   const mode: LeagueMode = !confrontoEnabled || tipo === "pontos" ? "points" : formato;
 
+  // Regra de nome por tipo (Copa.../Liga.../Bolão...), configurável no admin.
+  const { data: prefixesData } = useNamePrefixes();
+  const prefixes = prefixesData ?? NAME_PREFIX_DEFAULTS;
+  const nameErr = competitionNameError(name, mode, prefixes);
+
   // Pré-seleciona Copa do Mundo no formulário ao abrir, se ainda não escolheu.
   useEffect(() => {
     if (!open || competitionId || !competitions?.length) return;
     const wc = findWorldCupCompetition(competitions);
     if (wc) {
       setCompetitionId(wc.id);
-      setName((cur) => cur || "Copa do Mundo 2026 — Pontos");
+      setName((cur) => cur || `${NAME_PREFIX_DEFAULTS.points} da Copa do Mundo 2026`);
     }
   }, [open, competitions, competitionId]);
 
@@ -577,6 +664,10 @@ function CompeticoesTab({
 
   async function handleAdd() {
     if (!competitionId || !name.trim()) return;
+    if (nameErr) {
+      toast(nameErr, "error");
+      return;
+    }
     try {
       await add.mutateAsync({ leagueId, competitionId, name: name.trim(), mode });
       toast("Competição adicionada!", "success");
@@ -646,9 +737,17 @@ function CompeticoesTab({
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Nome do bolão"
+            placeholder={`${requiredPrefix(mode, prefixes)} dos amigos`}
             className="h-11 w-full rounded-md border border-ink-200 bg-surface px-3.5 outline-none focus:border-brand-500"
           />
+          {name.trim() && nameErr ? (
+            <p className="-mt-1.5 text-xs font-medium text-flame-600">{nameErr}</p>
+          ) : (
+            <p className="-mt-1.5 text-xs text-ink-400">
+              Comece o nome com{" "}
+              <span className="font-semibold text-ink-600">"{requiredPrefix(mode, prefixes)}"</span>.
+            </p>
+          )}
           {confrontoEnabled ? (
             <div className="space-y-2">
               <label className="text-sm font-medium text-ink-800">Tipo de disputa</label>

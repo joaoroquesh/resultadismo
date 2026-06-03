@@ -95,6 +95,9 @@ export type Database = {
         Row: {
           id: number
           league_price_cents: number
+          name_prefix_cup: string
+          name_prefix_liga: string
+          name_prefix_points: string
           payment_mode: Database["public"]["Enums"]["payment_mode"]
           promo_price_cents: number | null
           promo_until: string | null
@@ -103,6 +106,9 @@ export type Database = {
         Insert: {
           id?: number
           league_price_cents?: number
+          name_prefix_cup?: string
+          name_prefix_liga?: string
+          name_prefix_points?: string
           payment_mode?: Database["public"]["Enums"]["payment_mode"]
           promo_price_cents?: number | null
           promo_until?: string | null
@@ -111,6 +117,9 @@ export type Database = {
         Update: {
           id?: number
           league_price_cents?: number
+          name_prefix_cup?: string
+          name_prefix_liga?: string
+          name_prefix_points?: string
           payment_mode?: Database["public"]["Enums"]["payment_mode"]
           promo_price_cents?: number | null
           promo_until?: string | null
@@ -250,6 +259,7 @@ export type Database = {
           slot: number
           status: string
           updated_at: string
+          walkover_user: string | null
           window_end: string | null
           window_start: string | null
           winner_id: string | null
@@ -268,6 +278,7 @@ export type Database = {
           slot: number
           status?: string
           updated_at?: string
+          walkover_user?: string | null
           window_end?: string | null
           window_start?: string | null
           winner_id?: string | null
@@ -286,6 +297,7 @@ export type Database = {
           slot?: number
           status?: string
           updated_at?: string
+          walkover_user?: string | null
           window_end?: string | null
           window_start?: string | null
           winner_id?: string | null
@@ -1016,11 +1028,18 @@ export type Database = {
         Args: { p_league_id: string; p_value: boolean }
         Returns: undefined
       }
+      admin_set_name_prefixes: {
+        Args: { p_cup: string; p_liga: string; p_points: string }
+        Returns: undefined
+      }
       admin_set_promo: {
         Args: { p_promo_price_cents?: number; p_promo_until?: string }
         Returns: {
           id: number
           league_price_cents: number
+          name_prefix_cup: string
+          name_prefix_liga: string
+          name_prefix_points: string
           payment_mode: Database["public"]["Enums"]["payment_mode"]
           promo_price_cents: number | null
           promo_until: string | null
@@ -1045,6 +1064,9 @@ export type Database = {
         Returns: {
           id: number
           league_price_cents: number
+          name_prefix_cup: string
+          name_prefix_liga: string
+          name_prefix_points: string
           payment_mode: Database["public"]["Enums"]["payment_mode"]
           promo_price_cents: number | null
           promo_until: string | null
@@ -1143,6 +1165,7 @@ export type Database = {
           round_label: string
           round_order: number
           slot: number
+          walkover: boolean
           winner: string
         }[]
       }
@@ -1180,12 +1203,14 @@ export type Database = {
           a_away: number
           a_home: number
           a_joker: boolean
+          a_palpitou: boolean
           a_pts: number
           away_name: string
           away_score: number
           b_away: number
           b_home: number
           b_joker: boolean
+          b_palpitou: boolean
           b_pts: number
           home_name: string
           home_score: number
@@ -1232,6 +1257,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      leave_league: { Args: { p_league_id: string }; Returns: undefined }
       match_is_locked: { Args: { p_match_id: string }; Returns: boolean }
       nudge_for_match: {
         Args: { p_match_id: string; p_to_user: string }

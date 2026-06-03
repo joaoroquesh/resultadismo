@@ -304,18 +304,18 @@ export function useRemoveMember() {
 }
 
 export function useLeaveLeague() {
-  const { user } = useAuth();
   const qc = useQueryClient();
   return useMutation({
+    // RPC: remove o vínculo e aplica W.O. nos confrontos não resolvidos (se houver disputa sorteada).
     mutationFn: async (leagueId: string) => {
-      const { error } = await supabase
-        .from("league_members")
-        .delete()
-        .eq("league_id", leagueId)
-        .eq("user_id", user!.id);
-      if (error) throw error;
+      const { error } = await supabase.rpc("leave_league", { p_league_id: leagueId });
+      if (error) throw new Error(error.message);
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-leagues"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-leagues"] });
+      qc.invalidateQueries({ queryKey: ["confronto-ties"] });
+      qc.invalidateQueries({ queryKey: ["confronto-standings"] });
+    },
   });
 }
 

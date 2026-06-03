@@ -14,6 +14,7 @@ import { PaymentAdmin } from "./PaymentAdmin";
 import { cn } from "@/lib/utils";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
+import { NameRulesCard } from "./NameRulesCard";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Avatar } from "@/components/ui/Avatar";
@@ -355,6 +356,7 @@ function CompeticoesAdmin() {
 
   return (
     <div className="space-y-3">
+      <NameRulesCard />
       <Button variant="outline" fullWidth loading={sync.isPending} onClick={() => handleSync()}>
         <RefreshCw className="size-4" /> Sincronizar todas
       </Button>

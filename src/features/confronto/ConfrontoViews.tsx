@@ -137,6 +137,13 @@ export function TieRow({
         <span className="shrink-0 rounded-pill bg-ink-100 px-2 py-0.5 text-[10px] font-semibold text-ink-400">
           passou (bye)
         </span>
+      ) : tie.walkover ? (
+        <span
+          className="shrink-0 rounded-pill bg-flame-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-flame-700"
+          title="Vitória por W.O. — o adversário saiu da federação"
+        >
+          W.O.
+        </span>
       ) : (
         <span className="flex shrink-0 items-center gap-1 text-sm font-extrabold tabular-nums">
           <span className={cn(aWin ? "text-brand-700" : "text-ink-500")}>{tie.pa}</span>
@@ -226,12 +233,12 @@ export function MyConfrontoCard({
     statusTxt = "Você passou direto (bye)";
   } else if (mine.resolved) {
     if (mine.winner === currentUserId) {
-      statusTxt = "Você venceu!";
+      statusTxt = mine.walkover ? "Você venceu (W.O.)" : "Você venceu!";
       statusTone = "text-grass-600";
     } else if (mine.winner === null) {
       statusTxt = "Empate";
     } else {
-      statusTxt = "Você perdeu";
+      statusTxt = mine.walkover ? "Você perdeu (W.O.)" : "Você perdeu";
       statusTone = "text-flame-600";
     }
   } else if (mePts > opPts) {

@@ -35,6 +35,8 @@ export interface ConfrontoTie {
   pb: number;
   winner: string | null;
   resolved: boolean;
+  /** Confronto decidido por W.O. (um lado saiu da federação). */
+  walkover: boolean;
 }
 
 /** Classificação 3/1/0 da Liga. */
