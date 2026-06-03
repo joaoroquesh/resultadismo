@@ -35,6 +35,12 @@ import {
 } from "./api";
 import type { DataProvider } from "@/lib/types";
 
+const PROVIDER_LABEL: Record<ProviderName, string> = {
+  espn: "ESPN",
+  football_data: "football-data.org",
+  thesportsdb: "TheSportsDB",
+};
+
 type Tab = "federações" | "competicoes" | "usuarios" | "pagamento";
 
 export function AdminPage() {
@@ -237,7 +243,7 @@ function CompeticoesAdmin() {
   const setPub = useSetCompetitionPublished();
   const rename = useRenameCompetition();
   const { toast } = useToast();
-  const [provider, setProvider] = useState<ProviderName>("football_data");
+  const [provider, setProvider] = useState<ProviderName>("espn");
   const [filter, setFilter] = useState("");
   const { data: catalog, isLoading: loadingCatalog, error: catalogError } =
     useProviderCompetitions(provider);
@@ -454,7 +460,7 @@ function CompeticoesAdmin() {
           </p>
         </div>
         <div className="flex gap-1 rounded-pill bg-ink-100 p-1">
-          {(["football_data", "thesportsdb"] as ProviderName[]).map((p) => (
+          {(["espn", "football_data", "thesportsdb"] as ProviderName[]).map((p) => (
             <button
               key={p}
               type="button"
@@ -466,7 +472,7 @@ function CompeticoesAdmin() {
                   : "text-ink-500 hover:text-ink-700",
               )}
             >
-              {p === "football_data" ? "football-data.org" : "TheSportsDB"}
+              {PROVIDER_LABEL[p]}
             </button>
           ))}
         </div>
@@ -529,7 +535,7 @@ function CompeticoesAdmin() {
         )}
         <p className="text-[11px] text-ink-400">
           {filtered.length} de {catalog?.length ?? 0} ·{" "}
-          {provider === "football_data" ? "football-data.org" : "TheSportsDB"}
+          {PROVIDER_LABEL[provider]}
         </p>
       </Card>
 
