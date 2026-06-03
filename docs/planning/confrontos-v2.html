@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Confrontos v2 — Planejamento · Resultadismo</title>
+<style>
+  :root{
+    --brand:#1CB19C; --brand-d:#138a7a; --brand-l:#e6f7f4;
+    --ink-950:#0f1719; --ink-900:#1b2629; --ink-700:#3c4a4e; --ink-500:#67797d;
+    --ink-300:#aab8bb; --ink-100:#e7edee; --bg:#f4f7f7; --surface:#ffffff; --border:#e1e8e9;
+    --gold:#d9a400; --grass:#43921e; --flame:#e21818; --aqua:#0a93a3;
+    --radius:16px; --shadow:0 1px 2px rgba(15,23,25,.06),0 8px 28px rgba(15,23,25,.06);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--ink-900);
+    font-family:Ubuntu,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    line-height:1.55;font-size:16px;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:28px 20px 80px}
+  a{color:var(--brand-d)}
+  /* hero */
+  .hero{
+    background:linear-gradient(135deg,var(--brand) 0%,var(--brand-d) 100%);
+    color:#fff;border-radius:var(--radius);padding:34px 28px;box-shadow:var(--shadow);
+    position:relative;overflow:hidden;
+  }
+  .hero h1{margin:0 0 6px;font-size:30px;letter-spacing:-.02em;font-weight:800}
+  .hero p{margin:0;color:rgba(255,255,255,.92);font-size:16px;max-width:60ch}
+  .tag{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.16);
+    border-radius:999px;padding:4px 12px;font-size:12px;font-weight:700;margin-bottom:14px;
+    letter-spacing:.04em;text-transform:uppercase}
+  .badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:5px 11px;font-size:12.5px;font-weight:600}
+  .badge b{font-weight:800}
+  /* sections */
+  section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:22px 24px;margin-top:18px;box-shadow:var(--shadow)}
+  h2{font-size:20px;margin:0 0 4px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+  h2 .n{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--brand-l);
+    color:var(--brand-d);font-size:14px;font-weight:800;flex:none}
+  h3{font-size:15px;margin:20px 0 8px;color:var(--ink-900);font-weight:700}
+  .lead{color:var(--ink-500);margin:2px 0 0 40px}
+  section > p, section > ul, section > .grid, section > .tree, section > table, section > .steps,
+  section > .note{margin-left:40px}
+  @media(max-width:600px){ .lead, section > p, section > ul, section > .grid, section > .tree,
+    section > table, section > .steps, section > .note{margin-left:0} }
+  ul{padding-left:20px}
+  li{margin:5px 0}
+  code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;
+    background:var(--ink-100);padding:1px 6px;border-radius:6px;color:var(--ink-900)}
+  .pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:700}
+  .p-brand{background:var(--brand-l);color:var(--brand-d)}
+  .p-gold{background:#fbf0cf;color:#7a5c00}
+  .p-grass{background:#e3f3d9;color:#2f6712}
+  .p-flame{background:#fde1e1;color:#a01111}
+  /* hierarchy tree */
+  .tree{background:var(--ink-950);color:#cfe9e5;border-radius:12px;padding:18px 20px;
+    font-family:ui-monospace,Menlo,monospace;font-size:13.5px;line-height:1.8;overflow-x:auto;
+    white-space:pre-wrap;word-break:break-word}
+  .tree .k{color:#7fe3d4;font-weight:700}
+  .tree .c{color:#7e8e92}
+  /* steps */
+  .steps{display:flex;gap:10px;flex-wrap:wrap}
+  .step{flex:1;min-width:160px;border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:#fafdfd}
+  .step .st{font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--brand-d)}
+  .step h4{margin:6px 0 4px;font-size:15px}
+  .step p{margin:0;font-size:13.5px;color:var(--ink-500)}
+  .arrow{display:flex;align-items:center;color:var(--ink-300);font-size:20px;font-weight:800}
+  @media(max-width:600px){.arrow{display:none}}
+  /* grid cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+  .card{border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:#fafdfd}
+  .card h4{margin:0 0 6px;font-size:15px;display:flex;align-items:center;gap:8px}
+  .card p{margin:0;font-size:13.5px;color:var(--ink-500)}
+  .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--brand-l);
+    color:var(--brand-d);flex:none;font-size:15px}
+  /* tables */
+  table{border-collapse:collapse;width:100%;font-size:14px;margin-top:6px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border)}
+  th{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-500);font-weight:700}
+  tbody tr:hover{background:#fafdfd}
+  td.center,th.center{text-align:center}
+  .ok{color:var(--grass);font-weight:800}
+  /* note box */
+  .note{background:var(--brand-l);border-radius:12px;padding:13px 16px;font-size:13.5px;color:var(--brand-d)}
+  .note.warn{background:#fdf4e3;color:#8a5a00}
+  .note b{font-weight:800}
+  /* checklist */
+  .check{list-style:none;padding:0;margin-left:40px}
+  .check li{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed var(--border)}
+  .check .cb{color:var(--grass);font-weight:800;flex:none}
+  .check b{color:var(--ink-900)}
+  @media(max-width:600px){.check{margin-left:0}}
+  footer{margin-top:26px;text-align:center;color:var(--ink-300);font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <span class="tag">⚽ Resultadismo · branch feat/confrontos</span>
+    <h1>Confrontos v2 — Planejamento</h1>
+    <p>Modelo de modos (Pontos vs Confronto → Liga/Copa), sorteio com trava de participantes,
+       telas de confronto e simulador. Foco: Copa do Mundo 2026.</p>
+    <div class="badges">
+      <span class="badge">✅ <b>Liga</b> verificada end-to-end</span>
+      <span class="badge">✅ <b>Copa</b> (chaveamento) verificada</span>
+      <span class="badge">✅ Sorteio + desfazer</span>
+      <span class="badge">✅ Desktop + Mobile</span>
+      <span class="badge">✅ Build prod-ready</span>
+    </div>
+  </header>
+
+  <section>
+    <h2><span class="n">1</span> Hierarquia e modos</h2>
+    <p class="lead">Dois modos de disputa. Dentro de <b>Confronto</b>, dois formatos.</p>
+    <div class="tree">
+<span class="k">Federação</span> <span class="c">(grupo social + membros + pagamento)</span>
+ └─ <span class="k">Disputa</span> <span class="c">(vinculada a 1 campeonato — ex.: Copa do Mundo)</span>
+     modo:
+       • <span class="k">Pontos</span>    <span class="c">→ ranking por acúmulo (aberto, entra quando quiser)</span>
+       • <span class="k">Confronto</span> <span class="c">→ mano a mano. formato:</span>
+            – <span class="k">Liga</span>  <span class="c">→ todos contra todos → tabela 3/1/0</span>
+            – <span class="k">Copa</span>  <span class="c">→ mata-mata (chaveamento), eliminação simples</span>
+    </div>
+    <div class="grid" style="margin-top:14px">
+      <div class="card"><h4><span class="ic">≣</span> Pontos</h4>
+        <p>Todo mundo acumula os pontos dos palpites; quem somou mais lidera. Aberto, sem sorteio.</p></div>
+      <div class="card"><h4><span class="ic">⚔︎</span> Confronto · Liga</h4>
+        <p>Todos contra todos. Cada confronto vale <span class="pill p-grass">3</span>
+           <span class="pill p-gold">1</span> <span class="pill p-flame">0</span> e forma uma tabela.</p></div>
+      <div class="card"><h4><span class="ic">🏆</span> Confronto · Copa</h4>
+        <p>Mata-mata. Quem perde o confronto está fora, até sobrar o campeão.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">2</span> Ciclo de vida do confronto</h2>
+    <p class="lead">Status sempre visível (heurística de Nielsen #1).</p>
+    <div class="steps">
+      <div class="step"><span class="st">Rascunho</span><h4>Configurar</h4>
+        <p>Admin escolhe formato e período, vê o simulador, ajusta. Nada travado.</p></div>
+      <div class="arrow">→</div>
+      <div class="step"><span class="st">Sorteada</span><h4>Em jogo</h4>
+        <p>Snapshot dos participantes + confrontos montados. Pontua conforme os jogos saem.</p></div>
+      <div class="arrow">→</div>
+      <div class="step"><span class="st">Encerrada</span><h4>Campeão</h4>
+        <p>Tudo decidido. Histórico read-only.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">3</span> Sorteio — o coração do fluxo</h2>
+    <p class="lead">Ação deliberada, confirmada e reversível.</p>
+    <ul>
+      <li><b>Trava os participantes</b>: ao sortear, tira um snapshot. Quem entrar na federação depois
+        joga o Pontos e confrontos futuros, mas <b>não</b> esta Liga/Copa.</li>
+      <li><b>Confirmação</b> com a consequência explícita antes de sortear (prevenção de erro · Nielsen #5).</li>
+      <li><b>Desfazer / Refazer</b> enquanto nenhuma rodada começou (controle e liberdade · Nielsen #3).
+        Depois que a 1ª janela começa, trava para preservar a integridade.</li>
+      <li>Atômico no banco: <code>draw_confronto</code> / <code>undo_confronto_draw</code> (admin-only, transacional).</li>
+    </ul>
+    <div class="note">💡 Mensagem real do app: <i>"O sorteio vai <b>travar os N participantes</b> atuais e montar os
+      confrontos. Quem entrar depois não joga esta Liga. Tranquilo: dá pra refazer ou desfazer enquanto
+      nenhuma rodada começar."</i></div>
+  </section>
+
+  <section>
+    <h2><span class="n">4</span> Períodos (repensado p/ a Copa)</h2>
+    <p class="lead">Cada confronto é decidido num período = janela do calendário da Copa.</p>
+    <ul>
+      <li><b>Por fase / rodada</b> (padrão): cada rodada da fase de grupos + cada fase do mata-mata.
+        Poucos, mas com jogos suficientes (duelo justo).</li>
+      <li><b>Semanal</b>: cada semana da Copa.</li>
+      <li><i>"Diário" saiu do foco da Copa</i> — poucos jogos por dia tornam o duelo injusto.</li>
+    </ul>
+    <p>Pontuação no período: soma os pontos de palpite (com Joker 2×); quem fez mais vence o confronto
+      (<span class="pill p-grass">Liga 3/1/0</span> · <span class="pill p-brand">Copa avança</span>).</p>
+  </section>
+
+  <section>
+    <h2><span class="n">5</span> Estrutura por nº de jogadores</h2>
+    <p class="lead">O simulador encaixa no calendário real e avisa a viabilidade antes do sorteio.</p>
+    <h3>Copa (mata-mata) — cabe em qualquer tamanho</h3>
+    <table>
+      <thead><tr><th>Jogadores</th><th>Chaveamento</th><th class="center">Rodadas</th><th class="center">Cabe?</th></tr></thead>
+      <tbody>
+        <tr><td>4</td><td>Semifinais → Final</td><td class="center">2</td><td class="center ok">✓</td></tr>
+        <tr><td>5–8</td><td>Quartas (com byes)</td><td class="center">3</td><td class="center ok">✓</td></tr>
+        <tr><td>9–16</td><td>Oitavas → … → Final</td><td class="center">4</td><td class="center ok">✓</td></tr>
+        <tr><td>17–30</td><td>Fase de 32 (com byes)</td><td class="center">5</td><td class="center ok">✓</td></tr>
+      </tbody>
+    </table>
+    <h3>Liga (todos contra todos)</h3>
+    <table>
+      <thead><tr><th>Jogadores</th><th>Formato</th><th class="center">Rodadas</th><th>Observação</th></tr></thead>
+      <tbody>
+        <tr><td>4–7</td><td>Round-robin completo</td><td class="center">3–6</td><td>cabe na fase de grupos</td></tr>
+        <tr><td>8</td><td>Round-robin</td><td class="center">7</td><td>cabe por fase</td></tr>
+        <tr><td>9–30</td><td>Liga grande</td><td class="center">—</td><td>round-robin completo não cabe → sugerir <b>Copa</b> (ou Liga em grupos, evolução futura)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2><span class="n">6</span> Telas (UX impecável)</h2>
+    <p class="lead">Várias telas para o admin que cria, para quem acessa e para quem joga.</p>
+    <div class="grid">
+      <div class="card"><h4><span class="ic">＋</span> Criar disputa</h4>
+        <p>Pontos ou Confronto → Liga/Copa, com explicação e aviso do sorteio.</p></div>
+      <div class="card"><h4><span class="ic">🎲</span> Sortear (admin)</h4>
+        <p>Simulador embutido + confirmação de trava + desfazer.</p></div>
+      <div class="card"><h4><span class="ic">⚔︎</span> Meu confronto</h4>
+        <p>Eu × adversário no período, placar ao vivo, "quem está ganhando", bye.</p></div>
+      <div class="card"><h4><span class="ic">≣</span> Liga</h4>
+        <p>Classificação 3/1/0 (V/E/D, saldo) + abas Classificação / Rodadas.</p></div>
+      <div class="card"><h4><span class="ic">🏆</span> Copa</h4>
+        <p>Chaveamento com avanço, byes e "a definir".</p></div>
+      <div class="card"><h4><span class="ic">🔍</span> Detalhe do confronto</h4>
+        <p>Jogo a jogo: meu palpite + pontos × o do adversário no período.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">7</span> Heurísticas de Nielsen aplicadas</h2>
+    <ul class="check">
+      <li><span class="cb">✓</span><span><b>Status visível</b> — estados Rascunho/Sorteada/Encerrada, "período atual", "quem está ganhando" ao vivo.</span></li>
+      <li><span class="cb">✓</span><span><b>Mundo real</b> — confronto, rodada, mata-mata, chaveamento (linguagem de futebol).</span></li>
+      <li><span class="cb">✓</span><span><b>Controle e liberdade</b> — refazer/desfazer sorteio antes de começar; voltar sempre; sem becos.</span></li>
+      <li><span class="cb">✓</span><span><b>Consistência</b> — modos nomeados igual em todo o app (Pontos/Confronto/Liga/Copa).</span></li>
+      <li><span class="cb">✓</span><span><b>Prevenção de erro</b> — confirmação do sorteio com consequência; viabilidade bloqueia o impossível.</span></li>
+      <li><span class="cb">✓</span><span><b>Reconhecer &gt; lembrar</b> — simulador mostra a estrutura visual antes de comprometer.</span></li>
+      <li><span class="cb">✓</span><span><b>Estético e minimalista</b> — tabelas/bracket limpos, divulgação progressiva.</span></li>
+      <li><span class="cb">✓</span><span><b>Recuperação de erro</b> — mensagens claras ("não cabe → sugestão"), desfazer.</span></li>
+      <li><span class="cb">✓</span><span><b>Ajuda</b> — "Como funciona" explica Pontos vs Confronto (Liga/Copa).</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="n">8</span> Banco (migrations aditivas)</h2>
+    <ul>
+      <li><code>league_competitions</code>: <code>confronto_state</code> (draft/drawn/finished), <code>period_kind</code>, <code>drawn_at</code>.</li>
+      <li><code>confronto_participants</code> — snapshot dos participantes travados no sorteio.</li>
+      <li><code>cup_ties</code> — confrontos (rodada/slot/membros/pontos/vencedor/matchday).</li>
+      <li>RPCs: <code>draw_confronto</code>, <code>undo_confronto_draw</code>, <code>get_confronto_ties</code>,
+        <code>get_confronto_standings</code>, <code>get_tie_detail</code>.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="n">9</span> Status &amp; como subir</h2>
+    <p class="lead">Tudo na branch <code>feat/confrontos</code>, isolada do <code>main</code> (outras chats).</p>
+    <div class="note">✅ <b>Verificado end-to-end</b> no navegador (Liga e Copa, desktop e mobile): sorteio real,
+      classificação 3/1/0 correta, chaveamento com bye, detalhe jogo a jogo. Build de produção passa.</div>
+    <div class="note warn" style="margin-top:10px">⚠️ <b>Notas honestas</b>: o avanço <i>ao vivo</i> da Copa só dá pra
+      ver quando os jogos do mata-mata saírem (ainda não há dados); estrutura e Liga 100% verificadas.
+      Liga grande na janela curta da Copa → o simulador sugere Copa.</div>
+    <p style="margin-top:12px">Para produção: revisar e <b>mergear <code>feat/confrontos</code> → <code>main</code></b>
+      (o push aplica as migrations e sobe o front). Não foi mergeado sozinho para você revisar e evitar
+      conflito com as outras chats no <code>main</code>.</p>
+  </section>
+
+  <footer>Resultadismo · Confrontos v2 · planejamento gerado a partir de docs/planning/confrontos-v2.md</footer>
+</div>
+</body>
+</html>
