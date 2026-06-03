@@ -1423,7 +1423,7 @@ export type Database = {
       validate_discount_code: { Args: { p_code: string }; Returns: Json }
     }
     Enums: {
-      data_provider: "manual" | "football_data" | "thesportsdb"
+      data_provider: "manual" | "football_data" | "thesportsdb" | "espn"
       join_policy: "open" | "approval" | "invite"
       league_mode: "table" | "cup" | "points" | "liga"
       league_status: "pending" | "active" | "rejected" | "archived"
@@ -1569,7 +1569,7 @@ export const Constants = {
   },
   public: {
     Enums: {
-      data_provider: ["manual", "football_data", "thesportsdb"],
+      data_provider: ["manual", "football_data", "thesportsdb", "espn"],
       join_policy: ["open", "approval", "invite"],
       league_mode: ["table", "cup", "points", "liga"],
       league_status: ["pending", "active", "rejected", "archived"],
