@@ -1233,8 +1233,8 @@ export type Database = {
         }
       }
       match_is_locked: { Args: { p_match_id: string }; Returns: boolean }
-      nudge_member: {
-        Args: { p_league_id: string; p_to_user: string }
+      nudge_for_match: {
+        Args: { p_match_id: string; p_to_user: string }
         Returns: undefined
       }
       reject_league: {

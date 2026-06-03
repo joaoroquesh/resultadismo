@@ -47,9 +47,12 @@ export function useMarkAllRead() {
 
 export function useNudge() {
   return useMutation({
-    mutationFn: async (input: { leagueId: string; toUser: string }) => {
-      const { error } = await supabase.rpc("nudge_member", {
-        p_league_id: input.leagueId,
+    mutationFn: async (input: { matchId: string; toUser: string }) => {
+      // Cutucada só pra quem ainda não palpitou o jogo. O backend valida:
+      // jogo aberto, alvo não palpitou, par compartilha federação que dispute
+      // aquela competição, anti-spam de 30 min.
+      const { error } = await supabase.rpc("nudge_for_match", {
+        p_match_id: input.matchId,
         p_to_user: input.toUser,
       });
       if (error) throw error;

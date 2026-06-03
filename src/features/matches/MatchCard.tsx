@@ -376,7 +376,7 @@ function PredictStatus({ matchId }: { matchId: string }) {
                 disabled={nudge.isPending}
                 onClick={() =>
                   nudge.mutate(
-                    { leagueId: m.league_id, toUser: m.user_id },
+                    { matchId, toUser: m.user_id },
                     {
                       onSuccess: () => toast("Cutucada enviada! 👉", "success"),
                       onError: (e) => toast(e instanceof Error ? e.message : "Erro", "error"),
