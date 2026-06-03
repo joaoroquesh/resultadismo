@@ -654,6 +654,7 @@ export type Database = {
           competition_id: string
           created_at: string
           group_name: string | null
+          hidden: boolean
           home_pen: number | null
           home_score: number | null
           home_team_id: string | null
@@ -678,6 +679,7 @@ export type Database = {
           competition_id: string
           created_at?: string
           group_name?: string | null
+          hidden?: boolean
           home_pen?: number | null
           home_score?: number | null
           home_team_id?: string | null
@@ -702,6 +704,7 @@ export type Database = {
           competition_id?: string
           created_at?: string
           group_name?: string | null
+          hidden?: boolean
           home_pen?: number | null
           home_score?: number | null
           home_team_id?: string | null
