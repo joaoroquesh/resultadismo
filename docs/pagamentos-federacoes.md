@@ -1,8 +1,9 @@
 # Documentação — Pagamento de Federações (Resultadismo)
 
-> Documento gerado em **03/06/2026**. Registra, em ordem cronológica, todas as decisões e
-> mudanças de código do sistema de **cobrança pela criação de Federações** (taxa única via
-> Mercado Pago), incluindo data e hora (horário de Brasília, UTC−3).
+> Documento gerado em **03/06/2026** e **atualizado em 03/06/2026** (inclui o reembolso
+> self-service). Registra, em ordem cronológica, todas as decisões e mudanças de código do
+> sistema de **cobrança pela criação de Federações** (taxa única via Mercado Pago), incluindo
+> data e hora (horário de Brasília, UTC−3).
 >
 > Fontes: histórico do Git (timestamps dos commits), memória do projeto e o histórico das
 > conversas que conduziram cada decisão.
@@ -17,11 +18,12 @@
 4. [Arquitetura técnica](#4-arquitetura-técnica)
 5. [Modelo de preços (base + promoção)](#5-modelo-de-preços-base--promoção)
 6. [Fluxos principais](#6-fluxos-principais)
-7. [Painel de administração (aba "Pgto")](#7-painel-de-administração-aba-pgto)
-8. [Estado atual em produção](#8-estado-atual-em-produção)
-9. [Segurança, conformidade e boundaries](#9-segurança-conformidade-e-boundaries)
-10. [Pendências e próximos passos](#10-pendências-e-próximos-passos)
-11. [Anexo — referência de arquivos, migrations e commits](#11-anexo--referência-de-arquivos-migrations-e-commits)
+7. [Reembolso / direito de arrependimento](#7-reembolso--direito-de-arrependimento)
+8. [Painel de administração (aba "Pgto")](#8-painel-de-administração-aba-pgto)
+9. [Estado atual em produção](#9-estado-atual-em-produção)
+10. [Segurança, conformidade e boundaries](#10-segurança-conformidade-e-boundaries)
+11. [Pendências e próximos passos](#11-pendências-e-próximos-passos)
+12. [Anexo — referência de arquivos, migrations e commits](#12-anexo--referência-de-arquivos-migrations-e-commits)
 
 ---
 
@@ -151,6 +153,33 @@ de código.
   não havia avançado). Deploy verde; **verificado no navegador** (tela mostra R$ 9,90 com R$ 19,90
   riscado). Branch e worktree removidos após o merge.
 
+### 03/06/2026 11:54 — Documentação criada · commit `d8e3da1`
+
+- Criado este documento (`docs/pagamentos-federacoes.md`) com a cronologia completa até a promo.
+  Mesclado **sozinho** na main (diff de 1 arquivo; sem impacto funcional/deploy).
+
+### 03/06/2026 (tarde) — Análise de reembolso + decisão
+
+- Estudo do **direito de arrependimento (CDC art. 49)** e da **mecânica de devolução do Mercado
+  Pago** (fatos pesquisados na doc oficial — ver seção 7). Apresentados 3 modelos (manual /
+  automático self-service / pedido + aprovação).
+- **Decisão do João:** **modelo automático self-service** dentro de 7 dias.
+- Decisão paralela: **editar nome/descrição** da federação após criação fica com a **sessão do
+  escudo** (mesma tela de editar federação) — não foi feito aqui para evitar colisão.
+
+### 03/06/2026 17:10 — **Reembolso self-service** · commit `41e9eaf` (deploy em prod)
+
+- Migration **`20260603000015_league_refund.sql`**: `confirm_league_payment` passa a **arquivar**
+  (soft-delete) a federação ao receber `refunded` — fecha a lacuna (antes só refletia `paid`).
+  Vale para qualquer origem: self-service, estorno manual no painel do MP (via webhook) e admin.
+- Edge Function **`cancel-league-refund`**: valida (dono + pago + ≤7 dias) → chama a **API de
+  devolução do Mercado Pago** (reembolso total, com `X-Idempotency-Key`) → arquiva a federação.
+- Front: hook **`useRefundLeague`** + componente isolado **`RefundFederationButton`** (só dono,
+  ≤7 dias, confirmação em 2 passos). **Termos §12** atualizados (arrependimento self-service,
+  **sem condicionar ao "não uso"**).
+- Validado: typecheck + **e2e no DB** (`refunded` → `status=archived`, soft-deleted). Merge por
+  fast-forward `feat/reembolso:main`; deploy verde (migration + função `cancel-league-refund`).
+
 ---
 
 ## 3. Decisões de produto consolidadas
@@ -163,6 +192,8 @@ de código.
 | **Ativação** | Pago **ativa na hora**; só o **nome** fica sob revisão do admin. |
 | **Preço** | Base **R$ 19,90**; **R$ 9,90** na promoção da Copa (até **20/07/2026**), automático. |
 | **Meios de pagamento** | **Pix** (0,99%) e **cartão** (3,98–4,98%). **Boleto removido** (R$ 3,49 fixo). |
+| **Reembolso** | **Self-service**: o dono cancela e recebe de volta em até **7 dias**, **sem justificar** e **sem condicionar ao uso** (direito de arrependimento). |
+| **Cancelamento** | Federação reembolsada é **arquivada** (soft-delete) — recuperável na Lixeira do admin. |
 | **Controles do admin** | Modo (Desativado/Teste/Mercado Pago), preço base, promoção, cupons, cortesia (liberar grátis), aprovar nome. |
 | **Escopo V1** | Apenas modo **Tabela/Pontos** (Copa). Confronto/Liga (round-robin) é de outra frente. |
 | **Campeonatos futuros** | Brasileirão, top 5 da Europa, Série B, Libertadores, Copa do Brasil. |
@@ -177,17 +208,19 @@ de código.
 
 - **Enums:** `payment_status` (`none`,`pending`,`paid`,`failed`,`refunded`); `payment_mode`
   (`disabled`,`test`,`live`).
-- **`leagues`** (Federações): colunas `payment_status` e `name_approved`.
+- **`leagues`** (Federações): colunas `payment_status`, `name_approved`, `status`
+  (`pending`/`active`/`rejected`/`archived`) e `deleted_at` (soft-delete).
 - **`league_payments`:** registro de cada pagamento (provider, payment_id, status, amount_cents,
   discount_code) — `payment_id` único (idempotência).
 - **`app_settings`** (singleton `id=1`): `payment_mode`, `league_price_cents` (base),
   `promo_price_cents` (promo, opcional), `promo_until` (validade da promo).
 - **`discount_codes`:** cupons (% ou R$, `max_uses`, `used_count`, `active`, `expires_at`).
 - **Triggers:** `leagues_before_insert` e `leagues_guard_status` protegem `status`/`payment_status`/
-  `name_approved` contra alteração indevida; **bypass** apenas para `service_role`/admin via GUC
-  `app.settle_bypass`.
+  `name_approved` contra alteração indevida; **liberados** apenas para `service_role`/admin
+  (`can_settle_leagues()` = admin OU `service_role`) ou via GUC `app.settle_bypass`.
 - **RPCs (funções):**
-  - `confirm_league_payment` — idempotente; ativa a federação após pagamento confirmado.
+  - `confirm_league_payment` — idempotente; `paid` → **ativa** a federação; `refunded` → **arquiva**
+    (soft-delete). Chamada pela webhook (service_role).
   - `simulate_league_payment` — modo **teste**, simula pagamento aprovado (sem MP).
   - `admin_update_payment_settings(mode, price_cents)` — modo + preço base.
   - `admin_set_promo(promo_price_cents, promo_until)` — define/limpa a promoção (null limpa).
@@ -205,24 +238,32 @@ de código.
 - **`mercadopago-webhook`** (público, `verify_jwt=false`): consulta o pagamento na **API do MP
   (autoritativo)**, chama `confirm_league_payment` e registra o uso do cupom. Opcional:
   `MP_WEBHOOK_SECRET` para validar assinatura.
+- **`cancel-league-refund`** (autenticado): reembolso self-service. Valida **dono + pago + ≤7 dias**
+  (a partir de `approved_at`), chama a **API de devolução do MP** (`POST /v1/payments/{id}/refunds`,
+  corpo vazio = total, com `X-Idempotency-Key`) e **arquiva** a federação. Cortesia/100%-off/teste:
+  cancela **sem** chamar o MP. Respostas sempre `200 { ok, error? }` (evita o swallow de mensagem
+  do `functions.invoke`). Secret: `MERCADOPAGO_ACCESS_TOKEN`.
 
 ### 4.3 Frontend (React + React Query)
 
 - **`src/features/payments/api.ts`** — módulo de pagamentos. Hooks: `usePaymentSettings`,
-  `useUpdatePaymentSettings`, `useSimulatePayment`, `useCompLeague`, `useDiscountCodes` /
-  `useCreateDiscount` / `useToggleDiscount` / `useDeleteDiscount`, `useApproveName`,
-  `useNameReviewLeagues`. Helpers: **`isPromoActive`**, **`effectivePriceCents`**,
+  `useUpdatePaymentSettings`, `useSimulatePayment`, `useCompLeague`, **`useRefundLeague`**,
+  `useDiscountCodes` / `useCreateDiscount` / `useToggleDiscount` / `useDeleteDiscount`,
+  `useApproveName`, `useNameReviewLeagues`. Helpers: **`isPromoActive`**, **`effectivePriceCents`**,
   `applyDiscount`, `validateDiscount`. (Casts contidos via `LooseClient` para não mexer no
   `database.ts` e reduzir conflito com outras sessões.)
 - **`src/features/leagues/NovaLigaPage.tsx`** — criar Federação: clique único, preço vigente,
   selo de promoção "de R$ 19,90 por R$ 9,90", cupom.
-- **`src/features/leagues/LigaDetailPage.tsx`** — banner "Pagar agora" (pendentes) e disclaimer de
-  nome em revisão.
+- **`src/features/leagues/LigaDetailPage.tsx`** — banner "Pagar agora" (pendentes), disclaimer de
+  nome em revisão e (só dono) o botão de reembolso.
+- **`src/features/leagues/RefundFederationButton.tsx`** — componente isolado: botão "Cancelar e
+  reembolsar" (só dono, ≤7 dias) com diálogo de confirmação em 2 passos.
 - **`src/features/leagues/api.ts`** — `startLeagueCheckout`, `useLeagueCheckout`.
 - **`src/features/admin/PaymentAdmin.tsx`** — aba **"Pgto"**: "Nomes a revisar", "Pagamento de
   federações" (modo + preço base + promoção) e "Cupons de desconto".
 - **`src/features/help/ComoFuncionaPage.tsx`**, **`src/features/landing/LandingSections.tsx`**,
-  **`src/features/legal/TermosPage.tsx`** e **`PrivacidadePage.tsx`** — conteúdo de pagamento.
+  **`src/features/legal/TermosPage.tsx`** (seção 12) e **`PrivacidadePage.tsx`** — conteúdo de
+  pagamento e reembolso.
 - **`src/lib/pricing.ts`** — `formatBRL` (formatação de centavos para exibição).
 
 ---
@@ -261,9 +302,60 @@ cupons (% ou R$). Cupom de 100% ativa sem passar pelo MP.
 **Moderação do nome:** toda federação paga nasce ativa com `name_approved=false`; o admin aprova
 o nome em "Nomes a revisar" (ou exclui se for impróprio).
 
+**Reembolso (arrependimento):** detalhado na seção 7.
+
 ---
 
-## 7. Painel de administração (aba "Pgto")
+## 7. Reembolso / direito de arrependimento
+
+### 7.1 Base legal
+
+Conforme o **Código de Defesa do Consumidor (art. 49)**, em compra **online** o consumidor pode
+**desistir em até 7 dias**, com **reembolso integral** e **sem precisar justificar**. O dever de
+reembolsar é do **Resultadismo** (o Mercado Pago é apenas o meio). Os Termos (§12) já asseguram
+esse direito, agora de forma **incondicional** dentro dos 7 dias (sem exigir que a federação "não
+tenha sido usada" — condição que é juridicamente frágil contra o direito de arrependimento).
+
+> *Observação:* este documento não é parecer jurídico; convém validar com um advogado ao
+> formalizar o MEI.
+
+### 7.2 Mecânica de devolução no Mercado Pago (verificada na doc oficial)
+
+| Item | Realidade |
+|------|-----------|
+| **API** | `POST /v1/payments/{id}/refunds` — corpo vazio = **total**; `{amount}` = **parcial** |
+| **Prazo para reembolsar** | até **180 dias** da aprovação do pagamento |
+| **Pix** | o valor volta para a **mesma conta** do pagador (rápido) |
+| **Cartão** | estorno na fatura: o **banco emissor** leva **7–10 dias úteis**, podendo aparecer em até ~60 dias |
+| **Taxa do MP** | no reembolso **total**, a **Taxa de venda é estornada ao vendedor** (não se perde a tarifa) |
+| **Origem do valor** | sai do **saldo** do vendedor no Mercado Pago |
+
+### 7.3 Modelo escolhido — automático self-service (≤ 7 dias)
+
+- **Onde:** botão **"Cancelar e reembolsar"** na página da federação, visível **só para o dono**,
+  com federação **paga** e **dentro de 7 dias** do pagamento (`approved_at`). Confirmação em
+  **2 passos**.
+- **Servidor (`cancel-league-refund`):** revalida dono + pago + janela de 7 dias + ainda não
+  reembolsada → chama a **devolução total no Mercado Pago** (idempotente) → marca o pagamento como
+  `refunded` e **arquiva** a federação (`status='archived'`, `payment_status='refunded'`,
+  `deleted_at=now()`).
+- **Cortesia / 100% off / teste:** não há o que estornar — apenas **cancela** a federação.
+- **O que acontece com a federação:** vai para a **Lixeira** do admin (soft-delete) — fica oculta
+  para todos, mas **recuperável**. Os membros perdem o acesso.
+
+### 7.4 Lacuna fechada (consistência)
+
+Antes, `confirm_league_payment` só refletia `paid` (ativava). A migration
+`20260603000015_league_refund.sql` faz a função **arquivar** quando o status é `refunded`. Assim,
+**qualquer** caminho de reembolso deixa a federação no mesmo estado:
+
+- **Self-service** (Edge Function) — arquiva direto;
+- **Estorno manual** no painel do Mercado Pago — chega pela **webhook** → `confirm_league_payment`;
+- **Ação administrativa** — idem.
+
+---
+
+## 8. Painel de administração (aba "Pgto")
 
 - **Nomes a revisar** — aprova o nome das federações já ativas.
 - **Pagamento de federações** — **Modo** (Desativado / Teste / Mercado Pago), **Preço base**,
@@ -275,24 +367,29 @@ o nome em "Nomes a revisar" (ou exclui se for impróprio).
 
 ---
 
-## 8. Estado atual em produção
+## 9. Estado atual em produção
 
-- **`origin/main` = `a257c14`** (03/06/2026 00:13).
+- **`origin/main` = `41e9eaf`** (03/06/2026 17:10).
 - **Modo:** Mercado Pago (**live**) — cobrando de verdade (token de **produção** + chave Pix
   configurados pelo João).
 - **Preço:** base **R$ 19,90**; promo **R$ 9,90** até **20/07/2026**.
-- **Migrations aplicadas** até `20260603000001_promo_pricing`.
+- **Reembolso self-service ativo** (botão na página da federação, ≤ 7 dias).
+- **Migrations aplicadas** até `20260603000015_league_refund`.
 - **Deploys** (Supabase Preview + Vercel + Deploy Edge Functions) verdes em todos os merges.
 
 ---
 
-## 9. Segurança, conformidade e boundaries
+## 10. Segurança, conformidade e boundaries
 
 - **Credenciais financeiras:** o **Access Token do Mercado Pago nunca foi digitado pelo agente** —
   o João colou. Nunca houve login na conta do Mercado Pago.
+- **Movimentação de dinheiro:** o agente **não executa estornos no painel do MP**. O reembolso
+  self-service é código do app (lógica própria); **testar o fluxo significa um estorno real** — o
+  teste é feito pelo João.
 - **Deploy em produção** só com **autorização explícita** do João a cada merge na main.
 - **Concorrência:** múltiplas sessões no mesmo repositório → trabalho isolado em **worktrees**;
   o diretório principal fica em `feat/confrontos` (outra sessão) — **não commitar/resetar lá**.
+  Antes de cada push, conferir se a `main` avançou (fast-forward direto `branch:main`).
 - **LGPD:** contato único `resultadismoapp@gmail.com` (Controlador + Encarregado/DPO); Mercado Pago
   como **operador** de pagamento; Termos com cláusula de pagamento (seção 12) e direito de
   arrependimento; menções a ANPD e retenção. Dados de cartão ficam **com o Mercado Pago**, nunca
@@ -300,9 +397,14 @@ o nome em "Nomes a revisar" (ou exclui se for impróprio).
 
 ---
 
-## 10. Pendências e próximos passos
+## 11. Pendências e próximos passos
 
 - **Validar Pix em pagamento real** (em produção, conta verificada + chave Pix já cadastrada).
+- **Trava anti-abuso no reembolso (opcional):** hoje o reembolso self-service é incondicional em
+  7 dias; se desejado, bloquear quando o usuário já lançou palpites (encaminhando ao suporte).
+- **Editar nome/descrição da federação após criação:** decidido ficar com a **sessão do escudo**
+  (`claude/escudos-svg`) — mesma tela de editar federação. Nome editado deve voltar à revisão do
+  admin (`name_approved=false`); descrição pode ficar sempre aberta.
 - **Causa-raiz do bug "Pagar agora":** o botão **"Aprovar" do admin não deveria aparecer** para
   federações `payment_status='pending'` (elas esperam **pagamento**, não aprovação) — ajuste na
   fila de aprovação (frente do admin, outra sessão).
@@ -315,7 +417,7 @@ o nome em "Nomes a revisar" (ou exclui se for impróprio).
 
 ---
 
-## 11. Anexo — referência de arquivos, migrations e commits
+## 12. Anexo — referência de arquivos, migrations e commits
 
 ### Migrations (ordem de aplicação)
 
@@ -325,13 +427,15 @@ o nome em "Nomes a revisar" (ou exclui se for impróprio).
 | `20260531000021_payment_settings_discounts.sql` | `payment_mode`, `app_settings`, `discount_codes`, RPCs de admin/simulação/cupom |
 | `20260602000022_federacao_name_review.sql` | `leagues.name_approved`, `admin_approve_league_name`, ativa-na-hora |
 | `20260603000001_promo_pricing.sql` | `app_settings.promo_price_cents` + `promo_until`, `admin_set_promo` |
+| `20260603000015_league_refund.sql` | `confirm_league_payment` arquiva a federação ao receber `refunded` |
 
 ### Edge Functions
 
 | Função | Papel |
 |--------|-------|
 | `supabase/functions/create-league-checkout/index.ts` | Cria preferência MP; calcula preço efetivo; aplica cupom |
-| `supabase/functions/mercadopago-webhook/index.ts` | Confirma pagamento (consulta MP); ativa federação |
+| `supabase/functions/mercadopago-webhook/index.ts` | Confirma pagamento (consulta MP); ativa/arquiva federação |
+| `supabase/functions/cancel-league-refund/index.ts` | Reembolso self-service: devolução total no MP + arquiva |
 
 ### Commits-chave (horário de Brasília)
 
@@ -343,6 +447,8 @@ o nome em "Nomes a revisar" (ou exclui se for impróprio).
 | 02/06/2026 21:40 | `d459677` | Renumera migration name_review → 022; **merge na main (deploy)** |
 | 02/06/2026 23:10 | `7c69577` | **Fix** "Pagar agora" (409 em federação ativa+pendente) |
 | 03/06/2026 00:13 | `a257c14` | **Preço base R$ 19,90 + promo R$ 9,90** (Copa), com validade |
+| 03/06/2026 11:54 | `d8e3da1` | Documentação completa do pagamento de federações |
+| 03/06/2026 17:10 | `41e9eaf` | **Reembolso self-service** (direito de arrependimento, 7 dias) |
 
 ### Secrets (Supabase, produção)
 
