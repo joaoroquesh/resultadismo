@@ -30,14 +30,12 @@ import {
   useAdminCompetitions,
   useCreateCompetition,
   useSyncFootball,
-  useAdminMatches,
-  useSaveMatchResult,
   useAllProfiles,
   useSetAppAdmin,
 } from "./api";
-import type { DataProvider, MatchStatus } from "@/lib/types";
+import type { DataProvider } from "@/lib/types";
 
-type Tab = "federações" | "competicoes" | "jogos" | "usuarios" | "pagamento";
+type Tab = "federações" | "competicoes" | "usuarios" | "pagamento";
 
 export function AdminPage() {
   const navigate = useNavigate();
@@ -59,14 +57,12 @@ export function AdminPage() {
         options={[
           { value: "federações", label: "Federações" },
           { value: "competicoes", label: "Comp." },
-          { value: "jogos", label: "Jogos" },
           { value: "usuarios", label: "Users" },
           { value: "pagamento", label: "Pgto" },
         ]}
       />
       {tab === "federações" && <LigasAdmin />}
       {tab === "competicoes" && <CompeticoesAdmin />}
-      {tab === "jogos" && <JogosAdmin />}
       {tab === "usuarios" && <UsuariosAdmin />}
       {tab === "pagamento" && <PaymentAdmin />}
     </Page>
@@ -423,9 +419,9 @@ function CompeticoesAdmin() {
                     <Pencil className="size-4" /> Renomear
                   </Button>
                   <Link
-                    to={`/?comp=${c.id}`}
+                    to={`/admin/competicoes/${c.id}/jogos`}
                     className="inline-flex items-center gap-1 rounded-pill px-2 py-1 text-xs font-semibold text-brand-600 hover:bg-brand-500/10"
-                    title="Pré-visualizar os jogos antes de publicar"
+                    title="Ver e gerenciar os jogos desta competição"
                   >
                     <Eye className="size-3.5" /> Ver jogos
                   </Link>
@@ -548,95 +544,6 @@ function CompeticoesAdmin() {
         onCancel={() => setToDelete(null)}
       />
     </div>
-  );
-}
-
-function JogosAdmin() {
-  const { data: comps } = useAdminCompetitions();
-  const [compId, setCompId] = useState<string>();
-  const activeId = compId ?? comps?.[0]?.id;
-  const { data: matches, isLoading } = useAdminMatches(activeId);
-
-  return (
-    <div className="space-y-3">
-      <select
-        value={activeId ?? ""}
-        onChange={(e) => setCompId(e.target.value)}
-        className="h-11 w-full rounded-md border border-ink-200 bg-surface px-3 outline-none focus:border-brand-500"
-      >
-        {comps?.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.name}
-          </option>
-        ))}
-      </select>
-
-      {isLoading ? (
-        <Skeleton className="h-40 w-full" />
-      ) : (
-        matches?.map((m) => <MatchAdminRow key={m.id} match={m} />)
-      )}
-    </div>
-  );
-}
-
-function MatchAdminRow({ match }: { match: { id: string; home_team_name: string | null; away_team_name: string | null; home_score: number | null; away_score: number | null; status: string } }) {
-  const save = useSaveMatchResult();
-  const { toast } = useToast();
-  const [home, setHome] = useState(match.home_score?.toString() ?? "");
-  const [away, setAway] = useState(match.away_score?.toString() ?? "");
-  const [status, setStatus] = useState<MatchStatus>(match.status as MatchStatus);
-
-  return (
-    <Card className="space-y-2 p-3">
-      <div className="flex items-center justify-between gap-2 text-sm font-semibold text-ink-800">
-        <span className="flex-1 truncate text-right">{match.home_team_name}</span>
-        <input
-          type="number"
-          value={home}
-          onChange={(e) => setHome(e.target.value)}
-          className="size-10 rounded-md border border-ink-200 text-center font-bold outline-none focus:border-brand-500"
-        />
-        <span className="text-ink-300">×</span>
-        <input
-          type="number"
-          value={away}
-          onChange={(e) => setAway(e.target.value)}
-          className="size-10 rounded-md border border-ink-200 text-center font-bold outline-none focus:border-brand-500"
-        />
-        <span className="flex-1 truncate">{match.away_team_name}</span>
-      </div>
-      <div className="flex items-center gap-2">
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value as MatchStatus)}
-          className="h-9 flex-1 rounded-md border border-ink-200 bg-surface px-2 text-sm outline-none focus:border-brand-500"
-        >
-          <option value="scheduled">Agendado</option>
-          <option value="live">Ao vivo</option>
-          <option value="finished">Encerrado</option>
-          <option value="postponed">Adiado</option>
-          <option value="cancelled">Cancelado</option>
-        </select>
-        <Button
-          size="sm"
-          loading={save.isPending}
-          onClick={() =>
-            save.mutate(
-              {
-                matchId: match.id,
-                home: home === "" ? null : Number(home),
-                away: away === "" ? null : Number(away),
-                status,
-              },
-              { onSuccess: () => toast("Resultado salvo!", "success") },
-            )
-          }
-        >
-          Salvar
-        </Button>
-      </div>
-    </Card>
   );
 }
 

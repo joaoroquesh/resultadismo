@@ -10,6 +10,7 @@ import { NovaLigaPage } from "@/features/leagues/NovaLigaPage";
 import { LigaDetailPage } from "@/features/leagues/LigaDetailPage";
 import { EditarPerfilPage } from "@/features/profile/EditarPerfilPage";
 import { AdminPage } from "@/features/admin/AdminPage";
+import { AdminCompMatchesPage } from "@/features/admin/AdminCompMatchesPage";
 import { PlayerProfilePage } from "@/features/players/PlayerProfilePage";
 import { ComoFuncionaPage } from "@/features/help/ComoFuncionaPage";
 import { Onboarding } from "@/features/onboarding/Onboarding";
@@ -57,6 +58,7 @@ export default function App() {
           <Route path="/jogador/:id" element={<PlayerProfilePage />} />
           <Route element={<RequireAdmin />}>
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="/admin/competicoes/:id/jogos" element={<AdminCompMatchesPage />} />
           </Route>
         </Route>
       </Route>

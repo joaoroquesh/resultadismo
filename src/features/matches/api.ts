@@ -76,7 +76,12 @@ export function useMatches(competitionId: string | undefined) {
       if (since) q = q.gte("kickoff_at", since);
       const { data, error } = await q;
       if (error) throw error;
-      return (data ?? []) as unknown as MatchWithTeams[];
+      // jogos ocultados pelo admin não entram para palpitar. Filtro client-side
+      // (resiliente: se a coluna `hidden` ainda não existir no deploy, m.hidden
+      // é undefined e nada é escondido — sem quebrar a tela).
+      return (data ?? []).filter(
+        (m) => !(m as { hidden?: boolean }).hidden,
+      ) as unknown as MatchWithTeams[];
     },
   });
 }

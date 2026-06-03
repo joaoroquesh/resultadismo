@@ -112,18 +112,57 @@ export function useSyncFootball() {
   });
 }
 
+export type AdminMatch = {
+  id: string;
+  competition_id: string;
+  provider: string;
+  round: string | null;
+  home_team_name: string | null;
+  away_team_name: string | null;
+  home_team: { name: string | null; short_name: string | null; crest_url: string | null } | null;
+  away_team: { name: string | null; short_name: string | null; crest_url: string | null } | null;
+  kickoff_at: string | null;
+  status: MatchStatus;
+  home_score: number | null;
+  away_score: number | null;
+  home_pen: number | null;
+  away_pen: number | null;
+  hidden: boolean;
+};
+
+const ADMIN_MATCH_SELECT =
+  "id, competition_id, provider, round, home_team_name, away_team_name, kickoff_at, status, home_score, away_score, home_pen, away_pen, hidden, home_team:teams!matches_home_team_id_fkey(name,short_name,crest_url), away_team:teams!matches_away_team_id_fkey(name,short_name,crest_url)";
+
 export function useAdminMatches(competitionId: string | undefined) {
   return useQuery({
     enabled: !!competitionId,
     queryKey: ["admin", "matches", competitionId],
-    queryFn: async () => {
+    queryFn: async (): Promise<AdminMatch[]> => {
       const { data, error } = await supabase
         .from("matches")
-        .select("*")
+        .select(ADMIN_MATCH_SELECT)
         .eq("competition_id", competitionId!)
         .order("kickoff_at");
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as unknown as AdminMatch[];
+    },
+  });
+}
+
+export function useSetMatchHidden() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { matchId: string; hidden: boolean }) => {
+      // coluna nova (fora dos types gerados) → cast pontual
+      const { error } = await supabase
+        .from("matches")
+        .update({ hidden: input.hidden } as never)
+        .eq("id", input.matchId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "matches"] });
+      qc.invalidateQueries({ queryKey: ["matches"] });
     },
   });
 }
