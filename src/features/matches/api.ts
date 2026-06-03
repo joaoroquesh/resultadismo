@@ -7,6 +7,28 @@ import type { Competition, MatchWithTeams, Prediction } from "@/lib/types";
 const MATCH_SELECT =
   "*, home_team:teams!matches_home_team_id_fkey(*), away_team:teams!matches_away_team_id_fkey(*), competition:competitions(id,name,slug,emblem_url)";
 
+/**
+ * Acha a Copa do Mundo no catálogo da liga. Default sazonal da temporada
+ * (Copa do Mundo 2026) — reaproveitado pelo NovaLigaPage e pela aba de
+ * Competições da federação. Quando a Copa sair do calendário a gente
+ * troca aqui só uma vez.
+ */
+export function findWorldCupCompetition(
+  comps: Competition[] | undefined,
+): Competition | undefined {
+  if (!comps?.length) return undefined;
+  return comps.find((c) => {
+    const code = (c.provider_code ?? "").toUpperCase();
+    const name = `${(c as { display_name?: string | null }).display_name ?? ""} ${c.name}`.toLowerCase();
+    return (
+      code === "WC" ||
+      code === "4429" || // TheSportsDB FIFA World Cup
+      name.includes("copa do mundo") ||
+      name.includes("world cup")
+    );
+  });
+}
+
 export function useCompetitions() {
   const { isAppAdmin } = useAuth();
   return useQuery({

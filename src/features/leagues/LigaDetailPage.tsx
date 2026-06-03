@@ -35,7 +35,7 @@ import {
 } from "@/lib/avatar";
 import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/features/auth/AuthProvider";
-import { useCompetitions } from "@/features/matches/api";
+import { useCompetitions, findWorldCupCompetition } from "@/features/matches/api";
 import { useStandings } from "./api";
 import { StandingsTable } from "@/features/standings/StandingsTable";
 import { ConfrontoView } from "@/features/confronto/ConfrontoView";
@@ -510,14 +510,10 @@ function CompeticoesTab({
   // Pré-seleciona Copa do Mundo no formulário ao abrir, se ainda não escolheu.
   useEffect(() => {
     if (!open || competitionId || !competitions?.length) return;
-    const wc = competitions.find((c) => {
-      const code = (c.provider_code ?? "").toUpperCase();
-      const n = `${(c as { display_name?: string | null }).display_name ?? ""} ${c.name}`.toLowerCase();
-      return code === "WC" || code === "4429" || n.includes("copa do mundo") || n.includes("world cup");
-    });
+    const wc = findWorldCupCompetition(competitions);
     if (wc) {
       setCompetitionId(wc.id);
-      setName((cur) => cur || `Copa do Mundo · ${wc.name}`);
+      setName((cur) => cur || "Copa do Mundo 2026 — Pontos");
     }
   }, [open, competitions, competitionId]);
 
