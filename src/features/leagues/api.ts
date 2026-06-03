@@ -213,6 +213,8 @@ export function useAddLeagueCompetition() {
       competitionId: string;
       name: string;
       mode: LeagueMode;
+      /** Confronto: como os participantes entram ('admin' seleciona | 'optin' cada um aceita). */
+      participantMode?: "admin" | "optin";
     }) => {
       const { data, error } = await supabase
         .from("league_competitions")
@@ -221,6 +223,7 @@ export function useAddLeagueCompetition() {
           competition_id: input.competitionId,
           name: input.name,
           mode: input.mode,
+          ...(input.participantMode ? { participant_mode: input.participantMode } : {}),
         })
         .select()
         .single();

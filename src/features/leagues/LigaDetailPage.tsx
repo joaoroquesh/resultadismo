@@ -424,7 +424,14 @@ function ClassificacaoTab({
   leagueId,
   memberCount,
 }: {
-  comps: { id: string; name: string; mode: string; competition_id: string; confronto_state?: string }[];
+  comps: {
+    id: string;
+    name: string;
+    mode: string;
+    competition_id: string;
+    confronto_state?: string;
+    participant_mode?: string;
+  }[];
   activeLcId?: string;
   onSelect: (id: string) => void;
   standings: ReturnType<typeof useStandings>["data"];
@@ -524,6 +531,7 @@ function ClassificacaoTab({
           memberCount={memberCount}
           isAdmin={isAdmin}
           currentUserId={currentUserId}
+          participantMode={active.participant_mode ?? "admin"}
         />
       ) : loading ? (
         <Skeleton className="h-64 w-full" />
@@ -642,6 +650,7 @@ function CompeticoesTab({
   // Confronto (Liga/Copa) e pode criar várias competições (sem o limite do MVP).
   const [tipo, setTipo] = useState<"pontos" | "confronto">("pontos");
   const [formato, setFormato] = useState<"liga" | "cup">("liga");
+  const [participantMode, setParticipantMode] = useState<"admin" | "optin">("admin");
   const mode: LeagueMode = !confrontoEnabled || tipo === "pontos" ? "points" : formato;
 
   // Regra de nome por tipo (Copa.../Liga.../Bolão...), configurável no admin.
@@ -669,7 +678,13 @@ function CompeticoesTab({
       return;
     }
     try {
-      await add.mutateAsync({ leagueId, competitionId, name: name.trim(), mode });
+      await add.mutateAsync({
+        leagueId,
+        competitionId,
+        name: name.trim(),
+        mode,
+        participantMode: mode === "liga" || mode === "cup" ? participantMode : undefined,
+      });
       toast("Competição adicionada!", "success");
       setOpen(false);
       setName("");
@@ -776,6 +791,24 @@ function CompeticoesTab({
                     ? "Liga: todos contra todos; cada rodada vale 3/1/0 e forma uma tabela."
                     : "Copa: mata-mata; quem perde o confronto está fora."}
               </p>
+              {tipo === "confronto" && (
+                <div className="space-y-1 pt-1">
+                  <label className="text-sm font-medium text-ink-800">Quem entra</label>
+                  <SegmentedControl<"admin" | "optin">
+                    value={participantMode}
+                    onChange={setParticipantMode}
+                    options={[
+                      { value: "admin", label: "Admin escolhe" },
+                      { value: "optin", label: "Cada um aceita" },
+                    ]}
+                  />
+                  <p className="text-xs leading-snug text-ink-500">
+                    {participantMode === "admin"
+                      ? "No sorteio, você marca quais membros entram."
+                      : "Cada membro confirma que quer jogar; você sorteia com quem topou."}
+                  </p>
+                </div>
+              )}
               {tipo === "confronto" && (
                 <p className="rounded-md bg-brand-500/10 px-3 py-2 text-[11px] leading-relaxed text-brand-700">
                   Depois de criar, você <span className="font-semibold">sorteia os confrontos</span>.

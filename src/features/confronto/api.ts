@@ -144,6 +144,35 @@ export function useConfrontoParticipants(lcId: string | undefined, enabled = tru
   });
 }
 
+/** IDs dos membros inscritos (opt-in) numa disputa. */
+export function useConfrontoOptins(lcId: string | undefined, enabled = true) {
+  return useQuery({
+    enabled: !!lcId && enabled,
+    queryKey: ["confronto-optins", lcId],
+    queryFn: async (): Promise<string[]> => {
+      const { data, error } = await supabase
+        .from("confronto_optins")
+        .select("user_id")
+        .eq("league_competition_id", lcId!);
+      if (error) throw error;
+      return (data ?? []).map((r) => r.user_id as string);
+    },
+  });
+}
+
+/** Membro liga/desliga a própria inscrição (opt-in). */
+export function useToggleOptin() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (lcId: string) => {
+      const { data, error } = await supabase.rpc("toggle_confronto_optin", { p_lc_id: lcId });
+      if (error) throw new Error(error.message);
+      return data as boolean;
+    },
+    onSuccess: (_r, lcId) => qc.invalidateQueries({ queryKey: ["confronto-optins", lcId] }),
+  });
+}
+
 function invalidateConfronto(qc: ReturnType<typeof useQueryClient>, lcId: string, leagueId?: string) {
   qc.invalidateQueries({ queryKey: ["confronto-standings", lcId] });
   qc.invalidateQueries({ queryKey: ["confronto-ties", lcId] });
@@ -167,16 +196,21 @@ export function useDrawConfronto() {
       rounds?: number;
       /** Forma das rodadas: por fase (grupos+mata-mata) ou por semana. */
       kind?: PeriodKind;
+      /** Participantes escolhidos (ordem = seed). Se omitido, usa todos os membros ativos. */
+      memberIds?: string[];
     }) => {
-      const { data: mem, error: memErr } = await supabase
-        .from("league_members")
-        .select("user_id, joined_at")
-        .eq("league_id", input.leagueId)
-        .eq("status", "active")
-        .order("joined_at", { ascending: true });
-      if (memErr) throw memErr;
-      const ids = (mem ?? []).map((m) => m.user_id as string);
-      if (ids.length < 2) throw new Error("Precisa de pelo menos 2 participantes ativos.");
+      let ids = input.memberIds ?? [];
+      if (ids.length === 0) {
+        const { data: mem, error: memErr } = await supabase
+          .from("league_members")
+          .select("user_id, joined_at")
+          .eq("league_id", input.leagueId)
+          .eq("status", "active")
+          .order("joined_at", { ascending: true });
+        if (memErr) throw memErr;
+        ids = (mem ?? []).map((m) => m.user_id as string);
+      }
+      if (ids.length < 2) throw new Error("Precisa de pelo menos 2 participantes.");
 
       const { data: pdata, error: perr } = await supabase.rpc("get_competition_periods", {
         p_competition_id: input.competitionId,

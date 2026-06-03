@@ -24,6 +24,8 @@ import { roundsNeeded, buildLigaFixtures, buildCopaFixtures, type Period, type D
 import {
   useConfrontoTies,
   useConfrontoPeriods,
+  useConfrontoOptins,
+  useToggleOptin,
   useDrawConfronto,
   useUndoDraw,
   type ConfrontoFormato,
@@ -41,6 +43,7 @@ export function ConfrontoSection({
   memberCount,
   isAdmin,
   currentUserId,
+  participantMode = "admin",
 }: {
   lcId: string;
   leagueId: string;
@@ -50,6 +53,7 @@ export function ConfrontoSection({
   memberCount: number;
   isAdmin: boolean;
   currentUserId?: string;
+  participantMode?: string; // 'admin' | 'optin'
 }) {
   const formato: ConfrontoFormato = mode === "cup" ? "cup" : "liga";
 
@@ -62,6 +66,8 @@ export function ConfrontoSection({
         formato={formato}
         memberCount={memberCount}
         isAdmin={isAdmin}
+        participantMode={participantMode}
+        currentUserId={currentUserId}
       />
     );
   }
@@ -90,6 +96,8 @@ function SorteioPanel({
   formato,
   memberCount,
   isAdmin,
+  participantMode = "admin",
+  currentUserId,
 }: {
   lcId: string;
   leagueId: string;
@@ -97,9 +105,14 @@ function SorteioPanel({
   formato: ConfrontoFormato;
   memberCount: number;
   isAdmin: boolean;
+  participantMode?: string;
+  currentUserId?: string;
 }) {
   const { toast } = useToast();
   const draw = useDrawConfronto();
+  const isOptin = participantMode === "optin";
+  const { data: optins } = useConfrontoOptins(lcId, isOptin);
+  const toggleOptin = useToggleOptin();
   const [kind, setKind] = useState<PeriodKind>("phase");
   const { data: periods, isLoading: loadingPeriods } = useConfrontoPeriods(competitionId, kind);
   const [confirm, setConfirm] = useState(false);
@@ -107,32 +120,11 @@ function SorteioPanel({
   const [testN, setTestN] = useState(Math.max(2, memberCount));
 
   const isLiga = formato === "liga";
-  const n = Math.max(2, memberCount);
-  const P = periods?.length ?? 0;
-  const fullTurno = Math.max(1, n - 1);
-  const defaultRounds = Math.min(fullTurno, P || fullTurno);
-  const [rounds, setRounds] = useState(defaultRounds);
-
-  // Mantém o nº de rodadas dentro de [1, P] quando períodos/membros chegam.
-  useEffect(() => {
-    if (!P) return;
-    setRounds((r) => Math.min(Math.max(1, r || defaultRounds), P));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [P, fullTurno]);
-
-  // Estrutura real (com os participantes atuais).
-  const realRounds = isLiga ? rounds : roundsNeeded("cup", n);
-  const viavel = P > 0 && realRounds <= P;
-  const confrontosPorRodada = Math.floor(n / 2);
   const Icon = formato === "cup" ? Trophy : ListOrdered;
 
-  // Preview de teste (hipotético — só simulação, não altera o sorteio real).
-  const testRounds = roundsNeeded(isLiga ? "liga" : "cup", testN);
-  const testViavel = P > 0 && (isLiga ? Math.min(testRounds, P) : testRounds) <= P;
-
-  // Prévia REAL do sorteio: mesmos participantes/ordem que o sorteio usa (seed = entrada).
+  // Membros ativos na ordem de entrada (= seed do sorteio).
   const { data: members } = useLeagueMembers(leagueId);
-  const players = useMemo(() => {
+  const allPlayers = useMemo(() => {
     const active = (members ?? []).filter((m) => m.status === "active");
     active.sort((a, b) => (a.joined_at ?? "").localeCompare(b.joined_at ?? ""));
     return active
@@ -140,7 +132,42 @@ function SorteioPanel({
       .filter((p) => p.id);
   }, [members]);
   const nameOf = (id: string | null) =>
-    id ? (players.find((p) => p.id === id)?.name ?? "—") : "—";
+    id ? (allPlayers.find((p) => p.id === id)?.name ?? "—") : "—";
+
+  // Seleção (modo admin): todos marcados por padrão. Opt-in: usa as inscrições.
+  const [selected, setSelected] = useState<Record<string, boolean> | null>(null);
+  const sel = selected ?? Object.fromEntries(allPlayers.map((p) => [p.id, true]));
+  const optedSet = useMemo(() => new Set(optins ?? []), [optins]);
+  const [cap, setCap] = useState<number | null>(null);
+
+  // Participantes resolvidos (ordem de entrada) + limite opcional de vagas.
+  const players = useMemo(() => {
+    const base = isOptin
+      ? allPlayers.filter((p) => optedSet.has(p.id))
+      : allPlayers.filter((p) => sel[p.id]);
+    return cap && cap > 0 ? base.slice(0, cap) : base;
+  }, [allPlayers, isOptin, optedSet, sel, cap]);
+
+  const n = Math.max(2, players.length);
+  const P = periods?.length ?? 0;
+  const fullTurno = Math.max(1, n - 1);
+  const defaultRounds = Math.min(fullTurno, P || fullTurno);
+  const [rounds, setRounds] = useState(defaultRounds);
+
+  // Mantém o nº de rodadas dentro de [1, P] quando períodos/participantes mudam.
+  useEffect(() => {
+    if (!P) return;
+    setRounds((r) => Math.min(Math.max(1, r || defaultRounds), P));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [P, fullTurno]);
+
+  const realRounds = isLiga ? rounds : roundsNeeded("cup", n);
+  const viavel = P > 0 && realRounds <= P && players.length >= 2;
+  const confrontosPorRodada = Math.floor(n / 2);
+
+  // Preview de teste (hipotético — só simulação, não altera o sorteio real).
+  const testRounds = roundsNeeded(isLiga ? "liga" : "cup", testN);
+  const testViavel = P > 0 && (isLiga ? Math.min(testRounds, P) : testRounds) <= P;
   const periodList: Period[] = useMemo(
     () => (periods ?? []).map((p) => ({ kind: p.kind, value: p.value, label: p.label, games: p.games })),
     [periods],
@@ -159,7 +186,15 @@ function SorteioPanel({
 
   const doDraw = () =>
     draw.mutate(
-      { lcId, leagueId, competitionId, formato, kind, rounds: isLiga ? rounds : undefined },
+      {
+        lcId,
+        leagueId,
+        competitionId,
+        formato,
+        kind,
+        rounds: isLiga ? rounds : undefined,
+        memberIds: players.map((p) => p.id),
+      },
       {
         onSuccess: (r) => {
           toast(`Sorteado! ${r.ties} confrontos entre ${r.participants} jogadores.`, "success");
@@ -171,6 +206,110 @@ function SorteioPanel({
 
   return (
     <div className="space-y-3">
+      {/* Participantes: admin marca quem entra, ou usa as inscrições (opt-in) */}
+      <div className="rounded-lg bg-surface p-4 shadow-[var(--shadow-soft)] ring-1 ring-border">
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <p className="text-sm font-semibold text-ink-800">
+            {isOptin ? "Inscritos" : "Participantes"}
+          </p>
+          <span className="text-xs text-ink-400">
+            {players.length} de {allPlayers.length}
+          </span>
+        </div>
+
+        {isOptin ? (
+          optedSet.size === 0 ? (
+            <p className="text-xs leading-relaxed text-ink-500">
+              Ninguém se inscreveu ainda. Cada membro confirma com “Quero jogar”.
+            </p>
+          ) : (
+            <ul className="flex flex-wrap gap-1.5">
+              {allPlayers
+                .filter((p) => optedSet.has(p.id))
+                .map((p) => (
+                  <li
+                    key={p.id}
+                    className="rounded-pill bg-brand-500/10 px-2.5 py-1 text-xs font-semibold text-brand-700"
+                  >
+                    {p.name}
+                  </li>
+                ))}
+            </ul>
+          )
+        ) : isAdmin ? (
+          <>
+            <div className="mb-2 flex gap-2 text-xs">
+              <button
+                type="button"
+                onClick={() => setSelected(Object.fromEntries(allPlayers.map((p) => [p.id, true])))}
+                className="font-semibold text-brand-600"
+              >
+                Todos
+              </button>
+              <span className="text-ink-300">·</span>
+              <button
+                type="button"
+                onClick={() => setSelected(Object.fromEntries(allPlayers.map((p) => [p.id, false])))}
+                className="font-semibold text-ink-500"
+              >
+                Limpar
+              </button>
+            </div>
+            <ul className="no-scrollbar max-h-44 space-y-0.5 overflow-y-auto">
+              {allPlayers.map((p) => (
+                <li key={p.id}>
+                  <label className="flex cursor-pointer items-center gap-2 rounded-md px-1.5 py-1 text-sm hover:bg-ink-50">
+                    <input
+                      type="checkbox"
+                      checked={!!sel[p.id]}
+                      onChange={(e) => setSelected({ ...sel, [p.id]: e.target.checked })}
+                      className="size-4 accent-brand-600"
+                    />
+                    <span className="min-w-0 truncate text-ink-800">{p.name}</span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <p className="text-xs text-ink-500">
+            {players.length} {players.length === 1 ? "jogador entra" : "jogadores entram"} nesta disputa.
+          </p>
+        )}
+
+        {/* Limite de vagas (Copa: fechar potência de 2) */}
+        {!isLiga && isAdmin && allPlayers.length > 2 && (
+          <div className="mt-3 border-t border-ink-100 pt-3">
+            <p className="mb-1.5 text-xs font-medium text-ink-700">Fechar mata-mata (limite de vagas)</p>
+            <div className="flex flex-wrap gap-1.5">
+              {[4, 8, 16, 32].filter((s) => s <= allPlayers.length).map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setCap(s)}
+                  className={cn(
+                    "rounded-pill px-2.5 py-0.5 text-[11px] font-semibold transition-colors",
+                    cap === s ? "bg-brand-600 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200",
+                  )}
+                >
+                  {s}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => setCap(null)}
+                className={cn(
+                  "rounded-pill px-2.5 py-0.5 text-[11px] font-semibold transition-colors",
+                  cap === null ? "bg-brand-600 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200",
+                )}
+              >
+                sem limite
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Forma das rodadas: por fase (grupos+mata-mata) ou por semana, com nº de jogos */}
       <div className="rounded-lg bg-surface p-4 shadow-[var(--shadow-soft)] ring-1 ring-border">
         <div className="mb-2 flex items-center justify-between gap-2">
@@ -402,15 +541,32 @@ function SorteioPanel({
       {/* Ação */}
       {isAdmin ? (
         <>
-          <Button fullWidth disabled={memberCount < 2 || !viavel} onClick={() => setConfirm(true)}>
+          <Button fullWidth disabled={players.length < 2 || !viavel} onClick={() => setConfirm(true)}>
             <Dices className="size-4" /> Sortear confrontos
           </Button>
-          {memberCount < 2 && (
+          {players.length < 2 && (
             <p className="px-1 text-center text-xs text-ink-400">
-              Você precisa de pelo menos 2 participantes para sortear.
+              {isOptin
+                ? "Aguarde pelo menos 2 inscritos para sortear."
+                : "Selecione pelo menos 2 participantes."}
             </p>
           )}
         </>
+      ) : isOptin ? (
+        <Button
+          fullWidth
+          variant={currentUserId && optedSet.has(currentUserId) ? "outline" : undefined}
+          loading={toggleOptin.isPending}
+          onClick={() =>
+            toggleOptin.mutate(lcId, {
+              onSuccess: (joined) =>
+                toast(joined ? "Você está dentro! Boa sorte." : "Inscrição cancelada.", joined ? "success" : "info"),
+              onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
+            })
+          }
+        >
+          {currentUserId && optedSet.has(currentUserId) ? "Sair da disputa" : "Quero jogar"}
+        </Button>
       ) : (
         <div className="flex items-center justify-center gap-2 rounded-md bg-surface-2 px-3 py-3 text-sm text-ink-500">
           <Clock className="size-4" /> Aguardando o administrador sortear os confrontos.

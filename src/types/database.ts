@@ -205,6 +205,42 @@ export type Database = {
         }
         Relationships: []
       }
+      confronto_optins: {
+        Row: {
+          created_at: string
+          id: string
+          league_competition_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          league_competition_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          league_competition_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "confronto_optins_league_competition_id_fkey"
+            columns: ["league_competition_id"]
+            isOneToOne: false
+            referencedRelation: "league_competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "confronto_optins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       confronto_participants: {
         Row: {
           created_at: string
@@ -396,6 +432,7 @@ export type Database = {
           league_id: string
           mode: Database["public"]["Enums"]["league_mode"]
           name: string
+          participant_mode: string
           period_kind: string
           settings: Json
           starts_on: string | null
@@ -411,6 +448,7 @@ export type Database = {
           league_id: string
           mode?: Database["public"]["Enums"]["league_mode"]
           name: string
+          participant_mode?: string
           period_kind?: string
           settings?: Json
           starts_on?: string | null
@@ -426,6 +464,7 @@ export type Database = {
           league_id?: string
           mode?: Database["public"]["Enums"]["league_mode"]
           name?: string
+          participant_mode?: string
           period_kind?: string
           settings?: Json
           starts_on?: string | null
@@ -1372,6 +1411,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      toggle_confronto_optin: { Args: { p_lc_id: string }; Returns: boolean }
       undo_confronto_draw: { Args: { p_lc_id: string }; Returns: undefined }
       validate_discount_code: { Args: { p_code: string }; Returns: Json }
     }
