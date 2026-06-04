@@ -14,6 +14,16 @@ export type PeriodKind = "phase" | "week";
 
 export type ConfrontoFormato = "liga" | "cup";
 
+// Tipos de retorno das RPCs de confronto — mantidos À MÃO de propósito.
+// O ideal seria derivar de Database["public"]["Functions"][fn]["Returns"] (como
+// lib/types.ts faz com StandingRow), mas o gerador do Supabase marca TODAS as
+// colunas de funções `returns table` como NÃO-nuláveis — e aqui várias são
+// nuláveis de verdade (member_a/member_b/winner/name_*/avatar_*/matchday/a_pts…,
+// nulos em bye, slot vazio do mata-mata ou palpite escondido antes do kickoff).
+// Derivar perderia essa nullability e abriria bug de null-safety nos consumidores.
+// Portanto os tipos abaixo são a fonte da verdade; ao mudar as colunas de uma
+// função SQL, atualize a interface correspondente.
+
 export interface ConfrontoStanding {
   user_id: string;
   display_name: string;
