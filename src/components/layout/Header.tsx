@@ -1,10 +1,14 @@
 import { type ReactNode } from "react";
 import { Link } from "react-router-dom";
+import { LogIn } from "lucide-react";
 import { useAuth } from "@/features/auth/AuthProvider";
+import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import { NotificationsBell } from "@/features/notifications/NotificationsBell";
+import { Button } from "@/components/ui/Button";
 
 export function Header({ title, action }: { title?: string; action?: ReactNode }) {
   const { session } = useAuth();
+  const { open: openLogin } = useLoginModal();
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-surface/85 backdrop-blur-md lg:hidden">
       <div className="mx-auto flex h-14 max-w-2xl items-center justify-between gap-3 px-4">
@@ -16,7 +20,13 @@ export function Header({ title, action }: { title?: string; action?: ReactNode }
         </Link>
         <div className="flex items-center gap-1">
           {action}
-          {session && <NotificationsBell />}
+          {session ? (
+            <NotificationsBell />
+          ) : (
+            <Button size="sm" onClick={openLogin}>
+              <LogIn className="size-4" /> Entrar
+            </Button>
+          )}
         </div>
       </div>
     </header>
