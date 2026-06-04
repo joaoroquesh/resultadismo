@@ -2,6 +2,8 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
+
+    <!-- Ícones / PWA -->
     <link rel="icon" type="image/svg+xml" href="/brand/app-icon.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
@@ -15,17 +17,185 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#1CB19C" />
-    <meta name="description" content="Resultadismo - o jogo de palpites de futebol. Crave o placar, suba na classificação." />
-    <meta property="og:title" content="Resultadismo" />
-    <meta property="og:description" content="O jogo de palpites de futebol. Crave o placar, suba na classificação." />
+
+    <!-- ======================= SEO ======================= -->
+    <title>Bolão da Copa do Mundo 2026 com os amigos | Resultadismo</title>
+    <meta
+      name="description"
+      content="Crie seu bolão da Copa do Mundo 2026 e dispute com os amigos. Crave o placar dos jogos, some pontos e suba na classificação. Grátis pra jogar, fácil de chamar a galera."
+    />
+    <meta
+      name="keywords"
+      content="bolão da copa, bolão copa do mundo 2026, bolão online, bolão grátis, bolão entre amigos, palpites de futebol, bolão do whatsapp, jogo de palpites de futebol, bolão da copa 2026"
+    />
+    <meta name="author" content="Resultadismo" />
+    <meta name="application-name" content="Resultadismo" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="language" content="pt-BR" />
+    <link rel="canonical" href="https://www.resultadismo.com/" />
+
+    <!-- ================= Open Graph (WhatsApp, Facebook, etc.) ================= -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Resultadismo" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:url" content="https://www.resultadismo.com/" />
+    <meta property="og:title" content="Bolão da Copa do Mundo 2026 com os amigos | Resultadismo" />
+    <meta
+      property="og:description"
+      content="Crave o placar dos jogos, dispute com os amigos e veja quem manda no grupo. Bolão da Copa do Mundo 2026, grátis pra jogar. ⚽"
+    />
+    <meta property="og:image" content="https://www.resultadismo.com/og-image.jpg" />
+    <meta property="og:image:secure_url" content="https://www.resultadismo.com/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Resultadismo — bolão da Copa do Mundo 2026: crave o placar e dispute com os amigos."
+    />
+
+    <!-- ===================== Twitter / X Card ===================== -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Bolão da Copa do Mundo 2026 com os amigos | Resultadismo" />
+    <meta
+      name="twitter:description"
+      content="Crave o placar dos jogos, dispute com os amigos e veja quem manda no grupo. Grátis pra jogar. ⚽"
+    />
+    <meta name="twitter:image" content="https://www.resultadismo.com/og-image.jpg" />
+    <meta
+      name="twitter:image:alt"
+      content="Resultadismo — bolão da Copa do Mundo 2026: crave o placar e dispute com os amigos."
+    />
+
+    <!-- ===================== Dados estruturados (JSON-LD) ===================== -->
+    <!-- Um único @graph com Organization, WebSite, SoftwareApplication e FAQPage.
+         Ajuda buscadores (rich results / Knowledge Graph) e motores de IA (GEO):
+         as perguntas viram respostas extraíveis e citáveis. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.resultadismo.com/#organization",
+            "name": "Resultadismo",
+            "url": "https://www.resultadismo.com/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://www.resultadismo.com/favicon/android-chrome-512x512.png",
+              "width": 512,
+              "height": 512
+            },
+            "image": "https://www.resultadismo.com/og-image.jpg",
+            "description": "Bolão de futebol online e gratuito para jogar com os amigos, com foco na Copa do Mundo 2026.",
+            "email": "resultadismoapp@gmail.com",
+            "foundingDate": "2026",
+            "inLanguage": "pt-BR"
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.resultadismo.com/#website",
+            "url": "https://www.resultadismo.com/",
+            "name": "Resultadismo",
+            "description": "Bolão da Copa do Mundo 2026 online e grátis para jogar com os amigos.",
+            "publisher": { "@id": "https://www.resultadismo.com/#organization" },
+            "inLanguage": "pt-BR"
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://www.resultadismo.com/#app",
+            "name": "Resultadismo",
+            "url": "https://www.resultadismo.com/",
+            "applicationCategory": "GameApplication",
+            "applicationSubCategory": "Bolão de futebol",
+            "operatingSystem": "Web, Android, iOS",
+            "browserRequirements": "Requer navegador moderno com JavaScript.",
+            "inLanguage": "pt-BR",
+            "description": "Bolão de futebol online: palpite o placar dos jogos da Copa do Mundo 2026, ganhe pontos pela proximidade com o resultado real e dispute a classificação numa federação com os amigos. Jogar é grátis.",
+            "image": "https://www.resultadismo.com/og-image.jpg",
+            "featureList": [
+              "Palpitar no placar de cada jogo",
+              "Pontuação: +3 cravou o placar, +2 acertou o saldo, +1 acertou quem venceu",
+              "Criar federações (grupos privados) e convidar amigos por link",
+              "Modos Bolão (pontos), Liga (pontos corridos) e Copa (mata-mata)",
+              "Classificação que atualiza a cada jogo",
+              "Funciona no navegador e como app (PWA)"
+            ],
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "BRL",
+              "description": "Criar conta, palpitar e entrar nas federações dos amigos é grátis."
+            },
+            "publisher": { "@id": "https://www.resultadismo.com/#organization" }
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://www.resultadismo.com/#faq",
+            "inLanguage": "pt-BR",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "O que é o Resultadismo?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "O Resultadismo é um bolão de futebol online e gratuito para jogar com os amigos. Você palpita o placar dos jogos, ganha pontos pela proximidade com o resultado real e disputa a classificação do seu grupo. O foco atual é a Copa do Mundo 2026."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Como funciona o bolão da Copa do Mundo 2026?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Você cria ou entra numa federação (um grupo privado), dá um palpite de placar para cada jogo da Copa, como 2×1, e soma pontos: 3 por cravar o placar exato, 2 por acertar o saldo de gols e 1 por acertar só quem venceu. Quem somar mais pontos lidera a classificação."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "O Resultadismo é grátis?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Sim. Criar conta, palpitar e entrar nas federações dos amigos é 100% grátis. Só quem quer criar a própria federação paga uma taxa única, por Pix ou cartão: R$ 9,90 na Copa do Mundo, depois R$ 19,90. É o que mantém o app no ar e sem anúncios."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Como criar um bolão da Copa com os amigos?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Crie sua conta no Resultadismo, crie uma federação e compartilhe o link de convite no WhatsApp. Quem entrar pelo link já começa a palpitar nos jogos e a disputar a classificação do grupo."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Como funciona a pontuação dos palpites?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "São 3 pontos por cravar o placar exato, 2 pontos por acertar o saldo de gols (o que inclui cravar o empate) e 1 ponto por acertar só quem venceu. Quanto mais perto do resultado real, mais pontos você leva."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Preciso instalar algum aplicativo para jogar?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Não. O Resultadismo funciona direto no navegador do celular ou do computador. Se quiser, dá para instalar como aplicativo (PWA) na tela inicial, sem precisar de loja de apps."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+
+    <!-- Fontes -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400;1,500&display=swap"
       rel="stylesheet"
     />
-    <title>Resultadismo</title>
+
     <script>
       // Captura cedo o evento de instalação PWA (Android/Chromium), antes do bundle,
       // para que a opção de instalar apareça já no primeiro carregamento.

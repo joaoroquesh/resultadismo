@@ -1,0 +1,41 @@
+# Resultadismo — bolão de futebol online (Copa do Mundo 2026)
+# https://www.resultadismo.com
+
+# Buscadores tradicionais e gerais: liberado.
+User-agent: *
+Allow: /
+Disallow: /auth/
+Disallow: /admin
+
+# Crawlers de IA generativa (GEO): bem-vindos a indexar e citar.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+Sitemap: https://www.resultadismo.com/sitemap.xml

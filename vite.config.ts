@@ -18,7 +18,8 @@ export default defineConfig({
       manifest: {
         name: "Resultadismo",
         short_name: "Resultadismo",
-        description: "O jogo de palpites de futebol. Crave o placar, suba na classificação.",
+        description:
+          "Bolão da Copa do Mundo 2026 grátis: crave o placar dos jogos e dispute com os amigos.",
         lang: "pt-BR",
         theme_color: "#1CB19C",
         background_color: "#ececed",
