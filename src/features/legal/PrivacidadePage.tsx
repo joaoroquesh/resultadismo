@@ -4,7 +4,7 @@ const CONTATO = "resultadismoapp@gmail.com";
 
 export function PrivacidadePage() {
   return (
-    <LegalLayout title="Política de Privacidade" updatedAt="31 de maio de 2026">
+    <LegalLayout title="Política de Privacidade" updatedAt="4 de junho de 2026">
       <p>
         Esta Política explica como o <strong>Resultadismo</strong> ("nós", "app") coleta, usa e
         protege seus dados quando você usa o site e o aplicativo em{" "}
@@ -50,10 +50,17 @@ export function PrivacidadePage() {
             pagamento é processado pelo Mercado Pago. Guardamos apenas o status e um identificador da
             transação; os dados do seu cartão ficam com o Mercado Pago, nunca conosco.
           </li>
+          <li>
+            <strong>Dados de uso (apenas com seu consentimento):</strong> se você aceitar no banner
+            de cookies, usamos o <strong>Google Analytics 4</strong> para entender de forma agregada
+            como o app é usado (telas mais visitadas, dispositivo, país aproximado pelo IP). O IP é
+            anonimizado pelo próprio Google. Se você recusar, esse rastreamento não acontece.
+          </li>
         </ul>
         <p>
-          Não coletamos dados sensíveis, não rastreamos você para publicidade e não usamos cookies de
-          rastreamento de terceiros.
+          Não coletamos dados sensíveis e <strong>não rastreamos você para publicidade</strong>. Os
+          únicos cookies/armazenamento de terceiros que podem ser ativados são os do Google Analytics,
+          e só quando você aceita no banner de consentimento.
         </p>
       </LegalSection>
 
@@ -99,6 +106,10 @@ export function PrivacidadePage() {
             <strong>Mercado Pago</strong> — processamento de pagamentos, apenas se você criar uma federação
             paga.
           </li>
+          <li>
+            <strong>Google Analytics 4</strong> — métricas de uso agregadas e anonimizadas, apenas
+            se você aceitar no banner de consentimento. Não usamos para publicidade.
+          </li>
         </ul>
         <p>
           Dentro de uma federação, seu nome, avatar e estatísticas ficam visíveis aos demais participantes,
@@ -122,8 +133,13 @@ export function PrivacidadePage() {
       <LegalSection title="6. Armazenamento no seu dispositivo">
         <p>
           Usamos armazenamento local do navegador (localStorage) e um service worker para manter você
-          conectado, lembrar preferências (tema, dispensa de avisos) e permitir o uso como app
-          instalável (PWA). Não são cookies de rastreamento publicitário.
+          conectado, lembrar preferências (tema, dispensa de avisos, sua escolha no banner de
+          consentimento) e permitir o uso como app instalável (PWA). Não são cookies de rastreamento
+          publicitário.
+        </p>
+        <p>
+          Se você aceitar no banner de cookies, o Google Analytics grava também cookies próprios
+          (`_ga`, `_ga_*`) para medir uso agregado. Se recusar, esses cookies não são gravados.
         </p>
       </LegalSection>
 

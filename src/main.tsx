@@ -7,7 +7,14 @@ import { AuthProvider } from "@/features/auth/AuthProvider";
 import { LoginModalProvider } from "@/features/auth/LoginModalProvider";
 import { ToastProvider } from "@/components/ui/Toast";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { applyStoredConsent } from "@/features/consent/consent";
 import "./index.css";
+
+// Reaplica a escolha de consentimento do usuário (se já decidiu) assim que o
+// app sobe. Sem isso, o gtag (que foi inicializado com default "denied" no
+// index.html) ficaria negado pra quem já aceitou em visitas anteriores até a
+// próxima interação com o banner.
+applyStoredConsent();
 
 // PWA: quando um novo service worker assume, recarrega 1x para aplicar a atualização
 // (sem isso, a página fica na versão antiga em cache mesmo após o SW trocar).

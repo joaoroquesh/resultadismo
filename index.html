@@ -188,6 +188,25 @@
       }
     </script>
 
+    <!-- ===================== Google Analytics (GA4 + Consent Mode v2) ===================== -->
+    <!-- Default = tudo "denied" (LGPD). O banner de consentimento libera apenas
+         analytics_storage se o usuário aceitar; ad_* nunca são liberados (não fazemos
+         tracking publicitário). O gtag carrega async pra não bloquear a renderização. -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P86V27WXK2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'denied',
+        wait_for_update: 500
+      });
+      gtag('js', new Date());
+      gtag('config', 'G-P86V27WXK2', { anonymize_ip: true });
+    </script>
+
     <!-- Fontes -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

@@ -18,6 +18,7 @@
 | **Utils de classe** | `clsx` + `tailwind-merge` (helper `cn`) |
 | **Dados de futebol** | football-data.org, **ESPN (JSON público)**, TheSportsDB — via Edge Function |
 | **Pagamento** | Mercado Pago (Checkout Pro hosted) |
+| **Analytics** | **Google Analytics 4** (`G-P86V27WXK2`) com Consent Mode v2; default `denied`, liberado só com o "Aceitar" do banner LGPD em `features/consent` |
 | **Deploy** | **Vercel** (frontend estático) + **Supabase** (backend), disparados por push na `main` |
 
 > Não há servidor próprio nem ORM: o app fala direto com o Supabase (PostgREST + RPC + functions).
