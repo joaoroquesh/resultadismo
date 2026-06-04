@@ -37,8 +37,10 @@ export function ConsentBanner() {
           </Link>
           .
         </p>
-        <div className="flex shrink-0 items-center gap-4">
-          {/* Recusar fica como link discreto pra não competir com o CTA. */}
+        <div className="flex w-full shrink-0 items-center justify-between gap-4 sm:w-auto sm:justify-start">
+          {/* Recusar fica como link discreto pra não competir com o CTA. No
+              mobile o pai empilha vertical e este container abre os dois nas
+              extremidades (Recusar à esquerda, Aceitar à direita). */}
           <button
             type="button"
             onClick={() => choose("denied")}
