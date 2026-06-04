@@ -18,6 +18,16 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+### Corrigido
+- **`npm run homolog:pull` (homologação local, dev-only):** o snapshot read-only de produção não
+  carregava nada. Dois ajustes no `scripts/homolog-pull-prod.sh`: (1) dumpa só `auth.users` +
+  `auth.identities` em vez do schema `auth` inteiro — a nuvem tem tabelas de subsistema
+  (oauth/mfa/saml/webauthn/`custom_oauth_providers`) que não existem/diferem no Supabase local e
+  abortavam a carga; (2) trunca **todo** o schema `public` dinamicamente antes de carregar, evitando
+  conflito de PK com as linhas-padrão que as migrations inserem (`access_control`/`app_settings`).
+  Validado ponta a ponta com dados reais (23 usuários, 3 grupos, 215 jogos, 206 palpites). **Não toca
+  produção** (`pg_dump` só lê).
+
 ### Documentação
 - **Guia de UX Writing** (`.claude/10-UX-WRITING.md`): voz, tom, glossário + linguagem proibida de
   aposta, padrões de microcopy (erro/vazio/sucesso/confirmação/push), acessibilidade e benchmarks —
