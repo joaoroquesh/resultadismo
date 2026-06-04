@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { LogIn } from "lucide-react";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { ConsentLink } from "@/features/consent/ConsentDialog";
 import { Button } from "@/components/ui/Button";
 
 /**
@@ -72,6 +73,7 @@ function PublicFooter({ onLogin }: { onLogin: () => void }) {
             <Link to="/privacidade" className="transition-colors hover:text-ink-900">
               Privacidade
             </Link>
+            <ConsentLink />
           </nav>
           <ThemeToggle />
         </div>

@@ -33,6 +33,35 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ---
 
+## [2.3.0] — 2026-06-04
+
+**Centro de controle de privacidade.** O usuário ganha um lugar pra revisar e
+alternar o consentimento do GA a qualquer momento — exigência da LGPD (art.
+18, IX) e prática que reforça a integridade do consentimento (sem aceite por
+inércia/timer, que a ANPD desaconselha no Guia de Cookies de 2023).
+
+### Adicionado
+- **Modal `ConsentDialog`** (`src/features/consent/`): mostra o estado atual
+  (Compartilhando / Sem compartilhar / Sem decisão), permite alternar e tem
+  link discreto para "Resetar minha escolha" — banner volta a aparecer.
+- **`ConsentLink`** reusável (botão estilizado como link de rodapé) que
+  abre o diálogo. Plugado em:
+  - rodapé do `PublicShell` (visitante deslogado), ao lado de Termos/Privacidade;
+  - rodapé do `PerfilPage` (logado), na mesma fileira.
+- **Hook `useConsent()`** (`consent.ts`) usando `useSyncExternalStore`: banner
+  e diálogo reagem em tempo real à escolha — inclusive entre abas (storage
+  event).
+- **`clearConsent()`** (`consent.ts`): API pra resetar a escolha, voltando o
+  gtag pra `denied` e reabrindo o banner.
+
+### Alterado
+- **Copy do banner refinado:** mais convidativo ("Topa nos ajudar a melhorar o
+  app?") e explícito sobre as garantias (IP anonimizado, sem rastreio
+  publicitário, dá pra desativar a qualquer momento). Mantém o aceite
+  explícito — sem timer / sem auto-accept.
+
+---
+
 ## [2.2.2] — 2026-06-04
 
 **Ambiente de homologação local + DevPanel.** Tudo **só de desenvolvimento** — gateado por

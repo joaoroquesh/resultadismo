@@ -1,5 +1,6 @@
 import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { ConsentLink } from "@/features/consent/ConsentDialog";
 import {
   LogOut,
   ShieldCheck,
@@ -282,6 +283,7 @@ export function PerfilPage() {
           <Link to="/privacidade" className="transition-colors hover:text-ink-900">
             Privacidade
           </Link>
+          <ConsentLink />
         </div>
         <p className="text-center text-xs text-ink-400">
           Resultadismo © {new Date().getFullYear()}
