@@ -56,6 +56,7 @@ daquele assunto.
 | 07 | [`07-BUILD-E-DEPLOY.md`](07-BUILD-E-DEPLOY.md) | Build, variáveis de ambiente, como o deploy chega em produção, secrets. |
 | 08 | [`08-PROCESSO.md`](08-PROCESSO.md) | **Como subir uma mudança** do começo ao fim (detalha o protocolo da seção 5). |
 | 09 | [`09-PARALELISMO.md`](09-PARALELISMO.md) | **Vários chats/sessões no mesmo repo.** Regras anti-colisão. Ler antes de qualquer `git`. |
+| 10 | [`10-UX-WRITING.md`](10-UX-WRITING.md) | Escrever textos do app (microcopy): clareza/simplicidade, voz, tom, glossário, padrões de erro/vazio/sucesso. |
 | — | [`CHANGELOG.md`](CHANGELOG.md) | O que mudou em cada versão. **Atualizar a cada mudança que sobe.** |
 | — | [`HISTORICO.md`](HISTORICO.md) | Narrativa de como o projeto evoluiu até aqui (consolida `docs/`). Contexto, não regra. |
 
@@ -102,9 +103,12 @@ de docs + changelog (seção 5). Cada uma tem dono num doc específico.
    **confirme com o João** antes de seguir (não mude por conta própria). → §5 passos 1–2.
 12. **Sinal de conformidade.** Toda resposta da IA neste repositório termina com **"Fui
    resultadista"** (ver o topo). Sem a frase, presuma que estas regras não foram seguidas.
-13. **UI/UX impecável.** Qualquer alteração que toque na **UI ou UX** do site passa pela skill
-   **`impeccable`**, pelas **melhores práticas de UI/UX** e pelas **10 heurísticas de Nielsen**.
-   Design não é opcional aqui — é parte da marca. → [`02`](02-CODIGO.md) §4, [`DESIGN.md`](../DESIGN.md).
+13. **UI/UX impecável, claro e simples.** Qualquer alteração que toque na **UI ou UX** passa pela
+   skill **`impeccable`**, pelas **10 heurísticas de Nielsen** e pelas melhores práticas de UI/UX.
+   **Princípio reitor: clareza e simplicidade máximas** — qualquer pessoa, mesmo quem nunca ouviu
+   falar do jogo, entende **rápido** o que fazer e o que está acontecendo; o que estiver complexo,
+   simplifique (sem infantilizar). Vale para **design e texto**. → [`10`](10-UX-WRITING.md) (texto),
+   [`02`](02-CODIGO.md) §4, [`DESIGN.md`](../DESIGN.md).
 
 ---
 

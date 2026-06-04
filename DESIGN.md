@@ -2,6 +2,8 @@
 
 Mobile-first, claro por padrão + modo escuro completo. Register: product (familiaridade ganha; a ferramenta some na tarefa). Estética calorosa/animada (Nubank/Apple), não fria (Sofascore).
 
+> **Princípio reitor — clareza e simplicidade máximas.** Qualquer pessoa, mesmo leiga no jogo, entende rápido o que fazer e o que está acontecendo. O que estiver complexo, simplifique (sem infantilizar). Vale para layout, fluxo **e** texto (regra central 13 do `.claude/MESTRE.md`; escrita em `.claude/10-UX-WRITING.md`).
+
 ## Color (OKLCH)
 
 Estratégia: **Restrained++** — neutros tintados de turquesa + turquesa como ação primária/seleção + o sistema de pontuação (dourado/verde/ciano) como cor semântica vívida e celebratória (não decorativa). Nunca `#000`/`#fff`.

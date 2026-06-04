@@ -18,7 +18,13 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
-_(Nada ainda. Próximas mudanças entram aqui antes de virar uma versão.)_
+### Documentação
+- **Guia de UX Writing** (`.claude/10-UX-WRITING.md`): voz, tom, glossário + linguagem proibida de
+  aposta, padrões de microcopy (erro/vazio/sucesso/confirmação/push), acessibilidade e benchmarks —
+  com base na skill global `ux-writing`. **Princípio reitor: clareza e simplicidade máximas** (leigo
+  entende rápido).
+- **Regra central 13 (MESTRE) + `DESIGN.md`:** o princípio de clareza/simplicidade máximas passa a
+  reger o **design**, não só o texto.
 
 ---
 
