@@ -565,7 +565,7 @@ export function SorteioPanel({
             ) : (
               "o chaveamento da Copa"
             )}
-            . Quem entrar na federação depois <span className="font-semibold">não joga</span> esta{" "}
+            . Quem entrar no grupo depois <span className="font-semibold">não joga</span> esta{" "}
             {isLiga ? "Liga" : "Copa"}.
           </p>
           <div className="space-y-2">

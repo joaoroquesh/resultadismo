@@ -61,7 +61,7 @@ export function LigaDetailPage() {
   const qc = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Enquanto o pagamento estiver pendente, atualiza a federação periodicamente
+  // Enquanto o pagamento estiver pendente, atualiza o grupo periodicamente
   // (a webhook do Mercado Pago a ativa em segundos).
   useEffect(() => {
     if (league?.payment_status !== "pending") return;
@@ -78,9 +78,9 @@ export function LigaDetailPage() {
   useEffect(() => {
     const pag = searchParams.get("pagamento");
     if (!pag) return;
-    if (pag === "sucesso") toast("Pagamento recebido! Ativando sua federação…", "success");
+    if (pag === "sucesso") toast("Pagamento recebido! Ativando seu grupo…", "success");
     else if (pag === "processando")
-      toast("Pagamento em processamento. A federação será ativada em instantes.", "info");
+      toast("Pagamento em processamento. O grupo será ativada em instantes.", "info");
     else if (pag === "falhou")
       toast("O pagamento não foi concluído. Você pode tentar de novo.", "error");
     searchParams.delete("pagamento");
@@ -98,15 +98,15 @@ export function LigaDetailPage() {
 
   if (isLoading) {
     return (
-      <Page title="Federação">
+      <Page title="Grupo">
         <Skeleton className="h-40 w-full" />
       </Page>
     );
   }
   if (!league) {
     return (
-      <Page title="Federação">
-        <EmptyState title="Federação não encontrada" description="Verifique o link ou o código." />
+      <Page title="Grupo">
+        <EmptyState title="Grupo não encontrada" description="Verifique o link ou o código." />
       </Page>
     );
   }
@@ -136,7 +136,7 @@ No Resultadismo você:
 
 📲 Abre pelo celular e instala como app em 10 segundos. ⚽
 
-Bora jogar junto? Entra na minha federação:
+Bora jogar junto? Entra na meu grupo:
 Código: ${league.join_code}
 👉 https://www.resultadismo.com`;
 
@@ -159,8 +159,8 @@ Código: ${league.join_code}
     if (!league) return;
     try {
       await leave.mutateAsync(league.id);
-      toast("Você saiu da federação.", "info");
-      navigate("/federacoes");
+      toast("Você saiu do grupo.", "info");
+      navigate("/grupos");
     } catch (err) {
       toast(err instanceof Error ? err.message : "Erro ao sair.", "error");
     }
@@ -170,7 +170,7 @@ Código: ${league.join_code}
     <Page
       title={league.name}
       action={
-        <Button variant="ghost" size="icon" onClick={() => navigate("/federacoes")} aria-label="Voltar">
+        <Button variant="ghost" size="icon" onClick={() => navigate("/grupos")} aria-label="Voltar">
           <ArrowLeft className="size-5" />
         </Button>
       }
@@ -179,7 +179,7 @@ Código: ${league.join_code}
           <div className="mb-4 flex items-start gap-2 rounded-md bg-brand-50 p-3 text-sm text-brand-800">
             <Clock className="mt-0.5 size-4 shrink-0" />
             <p>
-              Sua federação está <strong>ativa</strong> e já dá pra jogar! Só o <strong>nome</strong>{" "}
+              Seu grupo está <strong>ativa</strong> e já dá pra jogar! Só o <strong>nome</strong>{" "}
               está em análise rápida da moderação — se precisar de ajuste, a gente te avisa.
             </p>
           </div>
@@ -191,8 +191,8 @@ Código: ${league.join_code}
             <Clock className="mt-0.5 size-4 shrink-0" />
             <p>
               {payMode === "test"
-                ? "Modo de teste: conclua o pagamento simulado para ativar esta federação."
-                : "Esta federação será ativada assim que o pagamento for confirmado. Acabou de pagar? Pode levar alguns segundos."}
+                ? "Modo de teste: conclua o pagamento simulado para ativar este grupo."
+                : "Este grupo será ativada assim que o pagamento for confirmado. Acabou de pagar? Pode levar alguns segundos."}
             </p>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -204,7 +204,7 @@ Código: ${league.join_code}
                   simulate.mutate(
                     { leagueId: league.id },
                     {
-                      onSuccess: () => toast("Pagamento simulado — federação ativa!", "success"),
+                      onSuccess: () => toast("Pagamento simulado — grupo ativo!", "success"),
                       onError: (e) => toast(e instanceof Error ? e.message : "Erro ao simular.", "error"),
                     },
                   )
@@ -237,7 +237,7 @@ Código: ${league.join_code}
                 loading={comp.isPending}
                 onClick={() =>
                   comp.mutate(league.id, {
-                    onSuccess: () => toast("Federação liberada sem pagamento.", "success"),
+                    onSuccess: () => toast("Grupo liberada sem pagamento.", "success"),
                     onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
                   })
                 }
@@ -251,7 +251,7 @@ Código: ${league.join_code}
         <div className="mb-4 rounded-md bg-gold-100 p-3 text-sm text-gold-800">
           <div className="flex items-start gap-2">
             <Clock className="mt-0.5 size-4 shrink-0" />
-            <p>Esta federação aguarda aprovação de um administrador para ficar ativa.</p>
+            <p>Este grupo aguarda aprovação de um administrador para ficar ativa.</p>
           </div>
           {isAppAdmin && (
             <Button
@@ -261,7 +261,7 @@ Código: ${league.join_code}
               loading={comp.isPending}
               onClick={() =>
                 comp.mutate(league.id, {
-                  onSuccess: () => toast("Federação liberada.", "success"),
+                  onSuccess: () => toast("Grupo liberada.", "success"),
                   onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
                 })
               }
@@ -343,8 +343,8 @@ Código: ${league.join_code}
               </p>
               <p className="mt-1 text-xs leading-relaxed text-ink-500">
                 {confrontoEnabled
-                  ? "Liberado: esta federação pode criar disputas de Liga e Copa, sortear os confrontos e adicionar várias competições."
-                  : "Bloqueado: Liga e Copa aparecem como “em breve”. Libere para esta federação testar o Confronto e o sorteio."}
+                  ? "Liberado: este grupo pode criar disputas de Liga e Copa, sortear os confrontos e adicionar várias competições."
+                  : "Bloqueado: Liga e Copa aparecem como “em breve”. Libere para este grupo testar o Confronto e o sorteio."}
               </p>
             </div>
             <Button
@@ -358,8 +358,8 @@ Código: ${league.join_code}
                     onSuccess: () =>
                       toast(
                         confrontoEnabled
-                          ? "Confronto desativado nesta federação."
-                          : "Confronto liberado para esta federação.",
+                          ? "Confronto desativado neste grupo."
+                          : "Confronto liberado para este grupo.",
                         "success",
                       ),
                     onError: (e) =>
@@ -409,7 +409,7 @@ Código: ${league.join_code}
           className="mt-6 text-flame-600"
           onClick={() => setLeaveOpen(true)}
         >
-          <LogOut className="size-4" /> Sair da federação
+          <LogOut className="size-4" /> Sair do grupo
         </Button>
       )}
 
@@ -423,18 +423,18 @@ Código: ${league.join_code}
 
       <ConfirmDialog
         open={leaveOpen}
-        title="Sair da federação?"
+        title="Sair do grupo?"
         message={
           confrontoEnabled
-            ? "Você vai sair desta federação. Não vai mais participar e precisará ser convidado de novo para voltar. Se houver uma Liga ou Copa em andamento, você perde os confrontos restantes por W.O. e não volta a essas disputas — nem reentrando na federação."
-            : "Você vai sair desta federação. Não vai mais participar e precisará ser convidado de novo para voltar."
+            ? "Você vai sair deste grupo. Não vai mais participar e precisará ser convidado de novo para voltar. Se houver uma Liga ou Copa em andamento, você perde os confrontos restantes por W.O. e não volta a essas disputas — nem reentrando no grupo."
+            : "Você vai sair deste grupo. Não vai mais participar e precisará ser convidado de novo para voltar."
         }
         step2Message={
           confrontoEnabled
             ? "Confirmação final: sair mesmo? Os confrontos em andamento viram derrota por W.O."
-            : "Confirmação final: sair mesmo desta federação?"
+            : "Confirmação final: sair mesmo deste grupo?"
         }
-        confirmLabel="Sair da federação"
+        confirmLabel="Sair do grupo"
         loading={leave.isPending}
         onConfirm={handleLeave}
         onCancel={() => setLeaveOpen(false)}

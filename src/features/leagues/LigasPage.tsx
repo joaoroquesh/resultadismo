@@ -23,7 +23,7 @@ export function LigasPage() {
     if (!code.trim()) return;
     try {
       await join.mutateAsync(code.trim());
-      toast("Você entrou na federação!", "success");
+      toast("Você entrou no grupo!", "success");
       setCode("");
     } catch (err) {
       toast(err instanceof Error ? err.message : "Não foi possível entrar.", "error");
@@ -32,9 +32,9 @@ export function LigasPage() {
 
   return (
     <Page
-      title="Federações"
+      title="Grupos"
       action={
-        <Link to="/federacoes/nova">
+        <Link to="/grupos/nova">
           <Button size="sm">
             <Plus className="size-4" /> Criar
           </Button>
@@ -63,12 +63,12 @@ export function LigasPage() {
       ) : !leagues || leagues.length === 0 ? (
         <EmptyState
           icon={<Shield className="size-7" />}
-          title="Nenhuma federação ainda"
-          description="Crie sua federação e convide os amigos, ou entre numa federação existente com um código."
+          title="Nenhum grupo ainda"
+          description="Crie seu grupo e convide os amigos, ou entre num grupo existente com um código."
           action={
-            <Link to="/federacoes/nova">
+            <Link to="/grupos/nova">
               <Button>
-                <Plus className="size-4" /> Criar federação
+                <Plus className="size-4" /> Criar grupo
               </Button>
             </Link>
           }
@@ -76,7 +76,7 @@ export function LigasPage() {
       ) : (
         <div className="space-y-3">
           {leagues.map((l) => (
-            <Link key={l.id} to={`/federacoes/${l.slug}`}>
+            <Link key={l.id} to={`/grupos/${l.slug}`}>
               <Card className="flex items-center gap-3 p-4 transition active:scale-[0.99]">
                 <Escudo src={l.logo_url} name={l.name} size="md" />
                 <div className="min-w-0 flex-1">

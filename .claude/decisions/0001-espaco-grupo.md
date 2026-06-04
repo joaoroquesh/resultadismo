@@ -1,8 +1,8 @@
 # ADR 0001 — Nome do espaço dos grupos de amigos: "Federação" → "Grupo"
 
-> **Status:** ✅ Aprovada (2026-06-04, decisão do João). **Documentação `.claude/` já renomeada;
-> a UI/rotas de produção estão sendo atualizadas** (mesma onda — coerência, regra central 9). Este é
-> o registro do estudo e da decisão.
+> **Status:** ✅ **Implementada (2026-06-04).** Doc, UI, rotas e copy renomeadas (Federação → Grupo);
+> redirects de `/federacoes/*` e `/ligas/*` mantidos; ícone do menu virou ranking (`Trophy`). Banco
+> segue `leagues`. Abaixo, o estudo e a decisão.
 
 ## Contexto
 

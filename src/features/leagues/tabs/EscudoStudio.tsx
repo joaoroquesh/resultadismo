@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/Toast";
 import { useUpdateLeagueLogo } from "../api";
 
 /**
- * Editor da flâmula da federação: forma (3 flâmulas) + cores (sólido/listras/
+ * Editor da flâmula do grupo: forma (3 flâmulas) + cores (sólido/listras/
  * grade/bola) e rotação. Salvo como `crest:flamula:...` em `leagues.logo_url`,
  * então o mesmo renderer (`Escudo`) pinta em qualquer lugar do app.
  */
@@ -49,7 +49,7 @@ export function EscudoStudio({
 
   return (
     <Card className="mb-4 space-y-4 p-4">
-      <p className="text-sm font-semibold text-ink-800">Flâmula da federação</p>
+      <p className="text-sm font-semibold text-ink-800">Flâmula do grupo</p>
 
       {/* Preview ao vivo */}
       <div className="flex items-center gap-4 rounded-md bg-ink-50 p-3">
@@ -57,7 +57,7 @@ export function EscudoStudio({
         <div className="min-w-0">
           <p className="truncate font-bold text-ink-900">{leagueName}</p>
           <p className="text-xs text-ink-500">
-            Pré-visualização — a flâmula aparece na federação e na classificação.
+            Pré-visualização — a flâmula aparece no grupo e na classificação.
           </p>
         </div>
       </div>

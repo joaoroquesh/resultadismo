@@ -83,7 +83,7 @@ nunca debocha de quem errou nem exclui ninguém. Calibragem **equilibrada**: zoe
 **O que significa:** a gente fala a verdade sobre dinheiro, prazos e regras, sem pressão, sem
 linguagem de aposta/odds/risco. Ver a **linguagem proibida** (seção 4).
 
-- ✅ "Criar umo grupo custa R$ 9,90 (taxa única). Jogar é grátis."
+- ✅ "Criar um grupo custa R$ 9,90 (taxa única). Jogar é grátis."
 - ✅ "Mudou de ideia? Você pode cancelar e receber de volta em até 7 dias."
 - ❌ "Aposte agora e ganhe!" / "Última chance!" / "Suas odds de cravar."
 - ❌ Esconder o custo ou criar falsa urgência.
@@ -174,7 +174,7 @@ Empático, sem culpar, sempre com saída. 12–18 palavras.
 | Palpite após o apito | "O jogo já começou — os palpites travaram aqui." | "Operação não permitida." |
 | Sem conexão ao salvar | "Não deu pra salvar. Confira a internet e tente de novo." | "Erro ao salvar." |
 | Pagamento recusado | "O pagamento não passou. Tente outro cartão ou Pix." | "Falha na transação." |
-| Código de convite inválido | "Não achamos esso grupo. Confira o código." | "Código inválido." |
+| Código de convite inválido | "Não achamos esse grupo. Confira o código." | "Código inválido." |
 
 ### Mensagens de sucesso — `[Ação] [resultado]`
 Passado, específico, proporcional.
@@ -182,7 +182,7 @@ Passado, específico, proporcional.
 - ❌ "Sucesso!" · "Operação concluída."
 
 ### Estados vazios — explicação + próximo passo
-- Sem grupos: **"Você ainda não está em nenhumo grupo."** + "Crie a sua ou entre com um
+- Sem grupos: **"Você ainda não está em nenhum grupo."** + "Crie a sua ou entre com um
   código de convite."
 - Sem jogos no dia: **"Nenhum jogo hoje."** + "Veja os próximos ou troque de campeonato."
 
@@ -250,7 +250,7 @@ Avalie cada texto nas 4 dimensões (some um 5º: on-brand). Nota baixa → reesc
 | "Erro: operação inválida." | "O jogo já começou — os palpites travaram." | explica + sem culpar |
 | "Deseja realmente sair?" | "Sair agora dá W.O. nos seus confrontos. Tem certeza?" | consequência clara |
 | "Adquira sua liga." | "Crie suo grupo — taxa única de R$ 9,90." | termo certo, honesto, sem "aposta" |
-| "Nenhum dado encontrado." | "Você ainda não está em nenhumo grupo." + CTA | ensina o próximo passo |
+| "Nenhum dado encontrado." | "Você ainda não está em nenhum grupo." + CTA | ensina o próximo passo |
 
 ---
 

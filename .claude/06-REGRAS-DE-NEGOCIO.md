@@ -74,7 +74,7 @@ possível) e **acertividade** (% de palpites que pontuaram). Detalhe da fórmula
 ## 4. Grupos
 
 > **Renome "Federação" → "Grupo" (2026-06-04, ADR [`0001`](decisions/0001-espaco-grupo.md)):** mais
-> claro pro leigo. Documentação atualizada; a UI/rotas de produção estão sendo atualizadas.
+> claro pro leigo. **Implementado** — doc, UI, rotas e copy renomeadas; banco segue `leagues`.
 
 **Grupo** = o espaço social onde a turma joga. A tabela continua `leagues`; só o **rótulo** evoluiu:
 **Liga → Federação → Grupo** (rotas `/grupos`, com redirects de `/federacoes/*` e `/ligas/*`). ⚠️ "Liga" passou a significar um **modo de disputa** dentro do grupo (ver §6) — é
@@ -98,7 +98,7 @@ uma troca de significado proposital.
 
 > História cronológica completa do pagamento: [`HISTORICO.md`](HISTORICO.md) (consolidado).
 
-**Regra-mãe:** cobra-se **só pela criação de umo Grupo** — **taxa única**, enquadrada como **taxa
+**Regra-mãe:** cobra-se **só pela criação de um Grupo** — **taxa única**, enquadrada como **taxa
 de serviço**. **Jogar, palpitar e participar é grátis.** **Não é casa de apostas** (sem aposta, sem
 prêmio em dinheiro, sem pote — Lei 14.790/2023).
 
@@ -150,7 +150,7 @@ painel. Token de produção e teste de estorno são do João. → [`04`](04-ADMI
 
 ## 6. Confrontos (Liga / Copa)
 
-Dentro de umo grupo, uma disputa tem um **modo**: **Pontos** (ranking por acúmulo) ou
+Dentro de um grupo, uma disputa tem um **modo**: **Pontos** (ranking por acúmulo) ou
 **Confronto** (duelo direto) — e Confronto se subdivide em **Liga** (pontos corridos 3/1/0) e
 **Copa** (mata-mata). Tudo sobre os **mesmos jogos** que o grupo já palpita.
 

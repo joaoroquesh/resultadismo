@@ -133,7 +133,7 @@ pontos DESC
 ```
 
 Os pontos por tipo são lidos de `league_competitions.settings.points` (default cravada 3 / saldo 2 /
-acerto 1), então umo grupo pode customizar a pontuação sem mudar a função.
+acerto 1), então um grupo pode customizar a pontuação sem mudar a função.
 
 ## 7. Autenticação (login/logout)
 

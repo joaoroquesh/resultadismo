@@ -191,8 +191,8 @@ export function PerfilPage() {
               <ChevronRight className="size-4 text-ink-400" />
             </Link>
           )}
-          <Link to="/federacoes" className="flex items-center gap-3 p-4 transition hover:bg-ink-50">
-            <span className="flex-1 font-medium text-ink-900">Minhas federações</span>
+          <Link to="/grupos" className="flex items-center gap-3 p-4 transition hover:bg-ink-50">
+            <span className="flex-1 font-medium text-ink-900">Meus grupos</span>
             <ChevronRight className="size-4 text-ink-400" />
           </Link>
           <Link

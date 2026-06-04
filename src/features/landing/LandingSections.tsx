@@ -249,8 +249,8 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
             </FeatureRow>
           </Reveal>
           <Reveal delay={60}>
-            <FeatureRow icon={Users} title="Criar ou entrar em federações">
-              Monte uma federação privada e chame a galera com um link. Trabalho, família, panela de
+            <FeatureRow icon={Users} title="Criar ou entrar em grupos">
+              Monte um grupo privado e chame a galera com um link. Trabalho, família, panela de
               amigos — você decide quem entra.
             </FeatureRow>
           </Reveal>
@@ -325,9 +325,9 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
             Palpitar e disputar não custa nada
           </h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-ink-500">
-            Criar a conta, cravar os placares e entrar nas federações dos amigos é{" "}
+            Criar a conta, cravar os placares e entrar nos grupos dos amigos é{" "}
             <span className="font-semibold text-ink-700">100% grátis</span>. Só quem quer{" "}
-            <span className="font-semibold text-ink-700">criar a própria federação</span> — o espaço
+            <span className="font-semibold text-ink-700">criar a próprio grupo</span> — o espaço
             onde a sua turma joga — paga uma{" "}
             <span className="font-semibold text-ink-700">taxa única</span> (Pix ou cartão). É o que
             mantém o app no ar e sem anúncios.{" "}

@@ -46,7 +46,7 @@ export function useLeague(slug: string | undefined) {
         .eq("slug", slug!)
         .maybeSingle();
       if (error) throw new Error(error.message);
-      // federação excluída (soft) não abre pra ninguém (admin restaura pela Lixeira)
+      // grupo excluída (soft) não abre pra ninguém (admin restaura pela Lixeira)
       if (data?.deleted_at) return null;
       return data;
     },
@@ -175,7 +175,7 @@ export function useCreateLeague() {
   });
 }
 
-/** Reabre o checkout de uma federação pendente (botão "Pagar agora", modo Mercado Pago). */
+/** Reabre o checkout de um grupo pendente (botão "Pagar agora", modo Mercado Pago). */
 export function useLeagueCheckout() {
   const qc = useQueryClient();
   return useMutation({
@@ -243,7 +243,7 @@ export function useUpdateLeagueLogo() {
   return useMutation({
     mutationFn: async (input: { leagueId: string; logoUrl: string | null }) => {
       // Escudo gerado vai como "gen:shield:cor1-cor2:rotação" em leagues.logo_url.
-      // RLS já garante: só dono/admin da federação consegue gravar.
+      // RLS já garante: só dono/admin do grupo consegue gravar.
       const { error } = await supabase
         .from("leagues")
         .update({ logo_url: input.logoUrl })
@@ -262,7 +262,7 @@ export function useDeleteLeagueCompetition() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: { leagueId: string; lcId: string }) => {
-      // RLS já enforça: só admin da federação (ou app_admin) consegue deletar.
+      // RLS já enforça: só admin do grupo (ou app_admin) consegue deletar.
       // cascade nos predictions/cup_ties/etc. cuida do resto.
       const { error } = await supabase
         .from("league_competitions")
@@ -326,7 +326,7 @@ export function useLeaveLeague() {
 }
 
 /**
- * Liga/desliga o modo Confronto (Liga/Copa + sorteio) de uma federação.
+ * Liga/desliga o modo Confronto (Liga/Copa + sorteio) de um grupo.
  * Só o app admin executa — a RPC `admin_set_confronto_enabled` enforça no servidor.
  */
 export function useSetConfrontoEnabled() {

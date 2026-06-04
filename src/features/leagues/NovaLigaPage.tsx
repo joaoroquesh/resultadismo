@@ -83,7 +83,7 @@ export function NovaLigaPage() {
     setRedirecting(true);
     try {
       // Fallback robusto: se o catálogo chegou tarde e o useEffect não pré-selecionou
-      // a Copa, ainda assim cravamos ela no submit. Toda federação nasce com competição.
+      // a Copa, ainda assim cravamos ela no submit. Todo grupo nasce com competição.
       const finalCompId = competitionId || findWorldCupCompetition(competitions)?.id;
       const finalMode: LeagueMode =
         finalCompId && finalCompId === findWorldCupCompetition(competitions)?.id ? "points" : mode;
@@ -97,10 +97,10 @@ export function NovaLigaPage() {
       });
       const slug = league.slug;
 
-      // Modo desativado: federação gratuita (passa pela aprovação do admin, como antes).
+      // Modo desativado: grupo gratuito (passa pela aprovação do admin, como antes).
       if (payMode === "disabled") {
-        toast("Federação criada! Aguarde a aprovação para começar.", "success");
-        navigate(`/federacoes/${slug}`);
+        toast("Grupo criado! Aguarde a aprovação para começar.", "success");
+        navigate(`/grupos/${slug}`);
         return;
       }
 
@@ -108,11 +108,11 @@ export function NovaLigaPage() {
       if (payMode === "test") {
         try {
           await simulate.mutateAsync({ leagueId: league.id, code: appliedCode });
-          toast("Pagamento simulado aprovado — federação ativa!", "success");
+          toast("Pagamento simulado aprovado — grupo ativo!", "success");
         } catch {
-          toast("Federação criada. Conclua o pagamento de teste na página dela.", "info");
+          toast("Grupo criado. Conclua o pagamento de teste na página dela.", "info");
         }
-        navigate(`/federacoes/${slug}`);
+        navigate(`/grupos/${slug}`);
         return;
       }
 
@@ -120,8 +120,8 @@ export function NovaLigaPage() {
       try {
         const res = await startLeagueCheckout(league.id, appliedCode);
         if (res.free) {
-          toast("Federação ativada com desconto!", "success");
-          navigate(`/federacoes/${slug}`);
+          toast("Grupo ativado com desconto!", "success");
+          navigate(`/grupos/${slug}`);
           return;
         }
         if (res.url) {
@@ -131,14 +131,14 @@ export function NovaLigaPage() {
       } catch (payErr) {
         toast(
           payErr instanceof Error
-            ? `Federação criada, mas o pagamento não iniciou: ${payErr.message}`
-            : "Federação criada. Finalize o pagamento para ativá-la.",
+            ? `Grupo criado, mas o pagamento não iniciou: ${payErr.message}`
+            : "Grupo criado. Finalize o pagamento para ativá-lo.",
           "info",
         );
-        navigate(`/federacoes/${slug}`);
+        navigate(`/grupos/${slug}`);
       }
     } catch (err) {
-      toast(err instanceof Error ? err.message : "Erro ao criar federação.", "error");
+      toast(err instanceof Error ? err.message : "Erro ao criar grupo.", "error");
       setRedirecting(false); // deu erro ao criar: libera o botão de novo
     }
   }
@@ -147,7 +147,7 @@ export function NovaLigaPage() {
 
   return (
     <Page
-      title="Nova federação"
+      title="Novo grupo"
       action={
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)} aria-label="Voltar">
           <ArrowLeft className="size-5" />
@@ -157,7 +157,7 @@ export function NovaLigaPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <Card className="space-y-4 p-4">
           <Input
-            label="Nome da federação"
+            label="Nome do grupo"
             placeholder="Ex.: Amigos da Pelada"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -171,7 +171,7 @@ export function NovaLigaPage() {
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
               maxLength={200}
-              placeholder="Do que se trata a federação?"
+              placeholder="Do que se trata o grupo?"
               className="rounded-md border border-ink-200 bg-surface px-3.5 py-2.5 text-ink-950 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
             />
           </div>
@@ -179,7 +179,7 @@ export function NovaLigaPage() {
 
         <Coachmark
           storageKey="resultadismo-coach-liga-acesso-v1"
-          title="Quem entra na federação"
+          title="Quem entra no grupo"
           placement="bottom"
           content={
             <>
@@ -207,8 +207,8 @@ export function NovaLigaPage() {
               />
               <p className="text-xs leading-snug text-ink-500">
                 {visibility === "private"
-                  ? "Só membros enxergam a federação — ninguém de fora encontra."
-                  : "Qualquer pessoa pode encontrar e acompanhar a federação. A entrada fica liberada para todos."}
+                  ? "Só membros enxergam o grupo — ninguém de fora encontra."
+                  : "Qualquer pessoa pode encontrar e acompanhar o grupo. A entrada fica liberada para todos."}
               </p>
             </div>
             <div className="flex flex-col gap-2">
@@ -224,9 +224,9 @@ export function NovaLigaPage() {
               />
               <p className="text-xs leading-snug text-ink-500">
                 {visibility === "public"
-                  ? "Federações públicas são sempre abertas: quem quiser entra na hora."
+                  ? "Grupos públicos são sempre abertas: quem quiser entra na hora."
                   : joinPolicy === "invite"
-                    ? "Só entra quem recebe o código de convite da federação."
+                    ? "Só entra quem recebe o código de convite do grupo."
                     : joinPolicy === "approval"
                       ? "Qualquer um pode pedir para entrar, mas um admin precisa aprovar."
                       : "Entrada livre: quem quiser participar entra sem convite nem aprovação."}
@@ -258,7 +258,7 @@ export function NovaLigaPage() {
               <p>
                 <strong>Copa do Mundo 2026 — modo Pontos</strong> vem ativa por padrão. É a
                 disputa da temporada: cada palpite vale pontos e quem somar mais lidera.
-                Você pode trocar a competição depois, lá na página da federação.
+                Você pode trocar a competição depois, lá na página do grupo.
               </p>
             </div>
           ) : (
@@ -269,7 +269,7 @@ export function NovaLigaPage() {
                 placement="top"
                 content={
                   <>
-                    <span className="font-bold text-ink-50">Tabela</span>: a federação acompanha
+                    <span className="font-bold text-ink-50">Tabela</span>: o grupo acompanha
                     um campeonato e quem somar mais pontos nos jogos lidera.{" "}
                     <span className="font-bold text-ink-50">Pontos</span>: disputa corrida,
                     valendo o total de pontos que cada um faz.
@@ -336,17 +336,17 @@ export function NovaLigaPage() {
           <p>
             {payMode === "disabled" ? (
               <>
-                Para evitar abusos, novas federações passam por uma aprovação rápida de um administrador
+                Para evitar abusos, novos grupos passam por uma aprovação rápida de um administrador
                 antes de ficarem ativas.
               </>
             ) : payMode === "test" ? (
               <>
                 <strong>Modo de teste:</strong> o pagamento é simulado (sem cobrança real) só para você
-                testar o fluxo. A federação ativa na hora.
+                testar o fluxo. O grupo ativa na hora.
               </>
             ) : (
               <>
-                Criar uma federação tem uma{" "}
+                Criar um grupo tem uma{" "}
                 <strong>taxa única de {formatBRL(currentCents)}</strong>
                 {promoActive && (
                   <>
@@ -367,7 +367,7 @@ export function NovaLigaPage() {
         </div>
 
         <div className="rounded-md border border-border bg-surface p-3 text-xs leading-relaxed text-ink-500">
-          <strong className="text-ink-700">O que é uma federação?</strong> É o espaço onde você e seus
+          <strong className="text-ink-700">O que é um grupo?</strong> É o espaço onde você e seus
           amigos jogam. Hoje ela roda o <strong>bolão da Copa</strong> (modo Tabela — quem soma mais
           pontos lidera). Depois da Copa, dará para adicionar ligas de vários campeonatos: Brasileirão,
           top 5 da Europa, Série B, Libertadores e Copa do Brasil.
@@ -384,8 +384,8 @@ export function NovaLigaPage() {
               ? "Abrindo o Mercado Pago…"
               : "Processando…"
             : isPaid
-              ? `Criar federação • ${formatBRL(effectiveCents)}`
-              : "Criar federação"}
+              ? `Criar grupo • ${formatBRL(effectiveCents)}`
+              : "Criar grupo"}
         </Button>
       </form>
     </Page>

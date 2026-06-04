@@ -10,7 +10,7 @@ const MATCH_SELECT =
 /**
  * Acha a Copa do Mundo no catálogo da liga. Default sazonal da temporada
  * (Copa do Mundo 2026) — reaproveitado pelo NovaLigaPage e pela aba de
- * Competições da federação. Quando a Copa sair do calendário a gente
+ * Competições do grupo. Quando a Copa sair do calendário a gente
  * troca aqui só uma vez.
  */
 export function findWorldCupCompetition(
@@ -247,7 +247,7 @@ export type MatchPredictStatus = {
   league_id: string;
 };
 
-/** Antes do kickoff: membros da(s) federação(s) do usuário e quem já palpitou (sem o placar). */
+/** Antes do kickoff: membros da(s) grupo(s) do usuário e quem já palpitou (sem o placar). */
 export function useMatchPredictStatus(matchId: string, enabled: boolean) {
   return useQuery({
     enabled,

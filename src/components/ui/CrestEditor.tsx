@@ -14,7 +14,7 @@ import {
   type CrestKind,
 } from "@/lib/crest";
 
-// Editor compartilhado de escudo (perfil) / flâmula (federação).
+// Editor compartilhado de escudo (perfil) / flâmula (grupo).
 // Emite a string `crest:` pronta via onChange a cada mudança.
 
 const FILL_LABEL: Record<CrestFill, string> = {
@@ -64,7 +64,7 @@ export type CrestEditorProps = {
   /** perfil: permite usar foto do Google como máscara */
   allowPhoto?: boolean;
   photoUrl?: string | null;
-  /** federação: permite o padrão "bola no centro" */
+  /** grupo: permite o padrão "bola no centro" */
   allowBall?: boolean;
   onChange: (crest: string) => void;
 };

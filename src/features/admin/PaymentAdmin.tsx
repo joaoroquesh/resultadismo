@@ -48,7 +48,7 @@ function NameReviewCard() {
         <ShieldCheck className="size-4 text-brand-600" /> Nomes a revisar ({list.length})
       </div>
       <p className="text-xs text-ink-500">
-        Federações pagas já entram ativas; aprove o nome (ou exclua na aba Federações se for impróprio).
+        Grupos pagos já entram ativas; aprove o nome (ou exclua na aba Grupos se for impróprio).
       </p>
       <ul className="space-y-2">
         {list.map((l) => (
@@ -135,8 +135,8 @@ function PaymentSettingsCard() {
   return (
     <Card className="space-y-4 p-4">
       <div>
-        <h2 className="text-sm font-bold text-ink-900">Pagamento de federações</h2>
-        <p className="text-xs text-ink-500">Controla a cobrança para criar uma federação.</p>
+        <h2 className="text-sm font-bold text-ink-900">Pagamento de grupos</h2>
+        <p className="text-xs text-ink-500">Controla a cobrança para criar um grupo.</p>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -152,7 +152,7 @@ function PaymentSettingsCard() {
         />
         <p className="text-xs leading-snug text-ink-500">
           {mode === "disabled"
-            ? "Criar federação é grátis (passa pela aprovação do admin, como antes)."
+            ? "Criar grupo é grátis (passa pela aprovação do admin, como antes)."
             : mode === "test"
               ? "Cobrança simulada (sem dinheiro real) — para testar o fluxo de ponta a ponta."
               : "Cobrança real via Mercado Pago (Pix/cartão). Requer os secrets configurados."}
@@ -162,7 +162,7 @@ function PaymentSettingsCard() {
       {mode !== "disabled" && (
         <>
           <Input
-            label="Preço base da federação (R$)"
+            label="Preço base do grupo (R$)"
             value={priceReais}
             onChange={(e) => setPriceReais(e.target.value)}
             inputMode="decimal"

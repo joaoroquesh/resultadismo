@@ -23,7 +23,7 @@ Versão atual do projeto: **2.2.2** · App em produção: **https://www.resultad
 
 Jogo social de **palpites de placares de futebol**. Você crava o placar de jogos reais, ganha
 pontos (**cravada +3 / saldo +2 / acerto +1**) e disputa em **grupos** privados de amigos com classificação, confrontos e zoeira saudável. **Jogar e palpitar é grátis**; cobra-se
-só pela **criação de umo Grupo** (taxa única). Não é casa de apostas: não há aposta nem prêmio
+só pela **criação de um Grupo** (taxa única). Não é casa de apostas: não há aposta nem prêmio
 em dinheiro.
 
 - **Stack:** SPA Vite + React 19 + TypeScript + Tailwind v4, backend **Supabase** (Postgres, Auth

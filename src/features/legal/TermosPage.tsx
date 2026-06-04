@@ -18,9 +18,9 @@ export function TermosPage() {
       <LegalSection title="1. O que é o Resultadismo">
         <p>
           O Resultadismo é um jogo de <strong>entretenimento</strong>: você palpita os placares de jogos
-          reais de futebol, ganha pontos por acerto e disputa com amigos em federações.{" "}
+          reais de futebol, ganha pontos por acerto e disputa com amigos em grupos.{" "}
           <strong>Não é uma casa de apostas.</strong> Não há aposta de dinheiro nem prêmios em dinheiro.
-          Jogar e participar de federações é <strong>gratuito</strong>; criar uma federação própria pode ter uma
+          Jogar e participar de grupos é <strong>gratuito</strong>; criar um grupo próprio pode ter uma
           taxa única de serviço (ver seção 12).
         </p>
       </LegalSection>
@@ -37,17 +37,17 @@ export function TermosPage() {
         <p>Para manter a brincadeira justa e saudável, você concorda em não:</p>
         <ul className="list-disc space-y-1 pl-5">
           <li>Trapacear, usar bots, automações ou explorar falhas para obter vantagem.</li>
-          <li>Usar nomes de federação, perfil ou textos ofensivos, ilegais ou que violem direitos de terceiros.</li>
+          <li>Usar nomes de grupo, perfil ou textos ofensivos, ilegais ou que violem direitos de terceiros.</li>
           <li>Abusar de recursos sociais (ex.: cutucadas) para incomodar outros jogadores.</li>
           <li>Tentar acessar dados de outras pessoas ou prejudicar o funcionamento do serviço.</li>
         </ul>
       </LegalSection>
 
-      <LegalSection title="4. Federações e moderação">
+      <LegalSection title="4. Grupos e moderação">
         <p>
-          Você pode criar e administrar federações. A criação de federações pode passar por aprovação. O
-          administrador da federação gere seus membros e competições. O administrador geral do Resultadismo
-          pode <strong>moderar, aprovar, recusar ou excluir</strong> federações e conteúdos que violem estes
+          Você pode criar e administrar grupos. A criação de grupos pode passar por aprovação. O
+          administrador do grupo gere seus membros e competições. O administrador geral do Resultadismo
+          pode <strong>moderar, aprovar, recusar ou excluir</strong> grupos e conteúdos que violem estes
           Termos, a fim de manter a integridade do jogo.
         </p>
       </LegalSection>
@@ -89,7 +89,7 @@ export function TermosPage() {
           informativos do jogo.
         </p>
         <p>
-          Ao criar federações, escolher nomes ou enviar um avatar, você nos concede uma licença limitada e
+          Ao criar grupos, escolher nomes ou enviar um avatar, você nos concede uma licença limitada e
           gratuita para exibir esse conteúdo dentro do app, apenas com a finalidade de operar o jogo.
         </p>
       </LegalSection>
@@ -119,20 +119,20 @@ export function TermosPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="12. Pagamentos e reembolso (criação de federações)">
+      <LegalSection title="12. Pagamentos e reembolso (criação de grupos)">
         <p>
-          Jogar e participar de federações é gratuito. <strong>Criar uma federação própria</strong> pode ter uma{" "}
+          Jogar e participar de grupos é gratuito. <strong>Criar um grupo próprio</strong> pode ter uma{" "}
           <strong>taxa única de serviço</strong>, exibida antes da confirmação. O pagamento é processado
           pelo <strong>Mercado Pago</strong> (Pix ou cartão); não recebemos nem armazenamos os dados do
-          seu cartão. A federação é ativada automaticamente após a confirmação do pagamento.
+          seu cartão. O grupo é ativada automaticamente após a confirmação do pagamento.
         </p>
         <p>
           É uma cobrança avulsa, <strong>sem renovação automática</strong> e sem mensalidade — uma taxa
-          de serviço para criar a federação, que não é aposta nem compra de prêmio. Conforme o Código de
+          de serviço para criar o grupo, que não é aposta nem compra de prêmio. Conforme o Código de
           Defesa do Consumidor (art. 49), você tem <strong>direito de arrependimento em até 7 dias</strong>{" "}
-          da compra: pode <strong>cancelar a federação e receber o valor de volta você mesmo</strong>, na
-          própria página da federação, sem precisar justificar. O reembolso volta pelo mesmo meio de
-          pagamento (Pix na sua conta; no cartão, estornado na fatura em alguns dias) e a federação é
+          da compra: pode <strong>cancelar o grupo e receber o valor de volta você mesmo</strong>, na
+          própria página do grupo, sem precisar justificar. O reembolso volta pelo mesmo meio de
+          pagamento (Pix na sua conta; no cartão, estornado na fatura em alguns dias) e o grupo é
           arquivada. Passado esse prazo, fale com a gente em <strong>{CONTATO}</strong>.
         </p>
       </LegalSection>

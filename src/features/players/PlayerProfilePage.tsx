@@ -22,7 +22,7 @@ function Stat({ value, label, accent }: { value: string | number; label: string;
 const FUTURE_BADGES = [
   { label: "Primeira cravada", icon: Trophy },
   { label: "Sequência de 5", icon: Trophy },
-  { label: "Top 3 numa federação", icon: Shield },
+  { label: "Top 3 num grupo", icon: Shield },
 ];
 
 export function PlayerProfilePage() {
@@ -100,17 +100,17 @@ export function PlayerProfilePage() {
             </div>
           </div>
 
-          {/* Federações */}
+          {/* Grupos */}
           {player.leagues.length > 0 && (
             <div>
               <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wide text-ink-400">
-                Federações
+                Grupos
               </h3>
               <Card className="divide-y divide-border">
                 {player.leagues.map((l) => (
                   <Link
                     key={l.id}
-                    to={`/federacoes/${l.slug}`}
+                    to={`/grupos/${l.slug}`}
                     className="flex items-center gap-3 p-4 transition hover:bg-ink-50"
                   >
                     <Shield className="size-5 text-brand-600" />

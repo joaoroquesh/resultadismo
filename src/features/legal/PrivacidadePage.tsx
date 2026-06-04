@@ -9,7 +9,7 @@ export function PrivacidadePage() {
         Esta Política explica como o <strong>Resultadismo</strong> ("nós", "app") coleta, usa e
         protege seus dados quando você usa o site e o aplicativo em{" "}
         <strong>resultadismo.com</strong>. O Resultadismo é um jogo de palpites de futebol entre
-        amigos — <strong>gratuito para jogar e participar</strong>; criar uma federação própria (o
+        amigos — <strong>gratuito para jogar e participar</strong>; criar um grupo próprio (o
         espaço onde você joga com seus amigos) pode ter uma taxa única. Não há apostas nem dinheiro
         real em jogo. Ao usar o app, você concorda com esta Política, em conformidade com a Lei Geral
         de Proteção de Dados (LGPD, Lei nº 13.709/2018).
@@ -33,7 +33,7 @@ export function PrivacidadePage() {
             você escolher).
           </li>
           <li>
-            <strong>Atividade no jogo:</strong> seus palpites de placar, as federações que você cria ou
+            <strong>Atividade no jogo:</strong> seus palpites de placar, os grupos que você cria ou
             participa, e a pontuação resultante.
           </li>
           <li>
@@ -46,7 +46,7 @@ export function PrivacidadePage() {
             manter o serviço estável e prevenir abusos.
           </li>
           <li>
-            <strong>Pagamentos (ao criar federação paga):</strong> ao pagar a taxa de criação de federação, o
+            <strong>Pagamentos (ao criar grupo pago):</strong> ao pagar a taxa de criação de grupo, o
             pagamento é processado pelo Mercado Pago. Guardamos apenas o status e um identificador da
             transação; os dados do seu cartão ficam com o Mercado Pago, nunca conosco.
           </li>
@@ -67,7 +67,7 @@ export function PrivacidadePage() {
       <LegalSection title="2. Como usamos seus dados">
         <ul className="list-disc space-y-1 pl-5">
           <li>Autenticar seu acesso e manter sua sessão.</li>
-          <li>Registrar palpites, calcular a pontuação e montar as classificações das federações.</li>
+          <li>Registrar palpites, calcular a pontuação e montar as classificações dos grupos.</li>
           <li>Mostrar seu perfil público (nome, avatar e estatísticas) a outros jogadores.</li>
           <li>Enviar notificações que você ativou (lembretes de palpite e cutucadas).</li>
           <li>Manter a segurança, prevenir abusos e operar o serviço.</li>
@@ -103,7 +103,7 @@ export function PrivacidadePage() {
             ativar notificações, para entregá-las ao seu dispositivo.
           </li>
           <li>
-            <strong>Mercado Pago</strong> — processamento de pagamentos, apenas se você criar uma federação
+            <strong>Mercado Pago</strong> — processamento de pagamentos, apenas se você criar um grupo
             paga.
           </li>
           <li>
@@ -112,7 +112,7 @@ export function PrivacidadePage() {
           </li>
         </ul>
         <p>
-          Dentro de uma federação, seu nome, avatar e estatísticas ficam visíveis aos demais participantes,
+          Dentro de um grupo, seu nome, avatar e estatísticas ficam visíveis aos demais participantes,
           e seus palpites tornam-se visíveis após o início de cada jogo. Seu e-mail nunca é exposto a
           outros jogadores.
         </p>

@@ -23,10 +23,10 @@ const PrivacidadePage = lazy(() => import("@/features/legal/PrivacidadePage").th
 const TermosPage = lazy(() => import("@/features/legal/TermosPage").then((m) => ({ default: m.TermosPage })));
 const SimuladorPage = lazy(() => import("@/features/confronto/SimuladorPage").then((m) => ({ default: m.SimuladorPage })));
 
-// Redireciona links antigos /ligas/:slug para /federacoes/:slug (rename Liga -> Federação)
+// Redireciona links antigos /ligas/:slug para /grupos/:slug (rename Liga -> Grupo)
 function FederacaoSlugRedirect() {
   const { slug } = useParams();
-  return <Navigate to={`/federacoes/${slug ?? ""}`} replace />;
+  return <Navigate to={`/grupos/${slug ?? ""}`} replace />;
 }
 
 function PageFallback() {
@@ -50,10 +50,14 @@ export default function App() {
           <Route path="/privacidade" element={<PrivacidadePage />} />
           <Route path="/termos" element={<TermosPage />} />
 
-          {/* compat: links antigos de "liga" agora apontam para "federação" */}
-          <Route path="/ligas" element={<Navigate to="/federacoes" replace />} />
-          <Route path="/ligas/nova" element={<Navigate to="/federacoes/nova" replace />} />
+          {/* compat: links antigos de "liga" agora apontam para "grupo" */}
+          <Route path="/ligas" element={<Navigate to="/grupos" replace />} />
+          <Route path="/ligas/nova" element={<Navigate to="/grupos/nova" replace />} />
           <Route path="/ligas/:slug" element={<FederacaoSlugRedirect />} />
+          {/* compat: links antigos de "federação" agora apontam para "grupo" */}
+          <Route path="/federacoes" element={<Navigate to="/grupos" replace />} />
+          <Route path="/federacoes/nova" element={<Navigate to="/grupos/nova" replace />} />
+          <Route path="/federacoes/:slug" element={<FederacaoSlugRedirect />} />
 
           <Route element={<AppShell />}>
             {/* público: ver jogos sem login */}
@@ -62,10 +66,10 @@ export default function App() {
 
             {/* exige login */}
             <Route element={<RequireAuth />}>
-              <Route path="/federacoes" element={<LigasPage />} />
-              <Route path="/federacoes/nova" element={<NovaLigaPage />} />
-              <Route path="/federacoes/:slug" element={<LigaDetailPage />} />
-              <Route path="/classificacao" element={<Navigate to="/federacoes" replace />} />
+              <Route path="/grupos" element={<LigasPage />} />
+              <Route path="/grupos/nova" element={<NovaLigaPage />} />
+              <Route path="/grupos/:slug" element={<LigaDetailPage />} />
+              <Route path="/classificacao" element={<Navigate to="/grupos" replace />} />
               <Route path="/perfil" element={<PerfilPage />} />
               <Route path="/perfil/editar" element={<EditarPerfilPage />} />
               <Route path="/simulador" element={<SimuladorPage />} />

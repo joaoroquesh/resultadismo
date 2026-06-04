@@ -120,7 +120,7 @@ export function ComoFuncionaPage() {
           <p className="text-sm leading-relaxed text-ink-700">
             No <span className="font-bold text-brand-700">Resultadismo</span> você crava o placar dos
             jogos antes da bola rolar. Quanto mais perto do resultado real, mais pontos você ganha — e
-            sobe na classificação das suas federações. Aqui vão as regras, sem complicação.
+            sobe na classificação dos seus grupos. Aqui vão as regras, sem complicação.
           </p>
         </div>
 
@@ -199,7 +199,7 @@ export function ComoFuncionaPage() {
           title="Como a disputa funciona"
         >
           <p className="-mt-1 text-sm leading-relaxed text-ink-600">
-            Cada disputa dentro de uma federação tem um{" "}
+            Cada disputa dentro de um grupo tem um{" "}
             <span className="font-semibold text-ink-900">modo</span>. São dois jeitos de jogar:
           </p>
           <div className="space-y-2">
@@ -277,10 +277,10 @@ export function ComoFuncionaPage() {
           </Card>
         </Section>
 
-        {/* Federações */}
-        <Section icon={<ShieldCheck className="size-4" strokeWidth={2.4} />} title="Federações">
+        {/* Grupos */}
+        <Section icon={<ShieldCheck className="size-4" strokeWidth={2.4} />} title="Grupos">
           <p className="-mt-1 text-sm leading-relaxed text-ink-600">
-            A <span className="font-semibold text-ink-900">federação</span> é o espaço onde você e seus
+            O <span className="font-semibold text-ink-900">grupo</span> é o espaço onde você e seus
             amigos jogam. Dentro dela rolam as{" "}
             <span className="font-semibold text-ink-900">disputas</span>: hoje, o{" "}
             <span className="font-semibold text-ink-900">bolão da Copa do Mundo</span> (modo Tabela).
@@ -290,28 +290,28 @@ export function ComoFuncionaPage() {
           </p>
           <p className="text-sm leading-relaxed text-ink-600">
             Jogar e participar é <span className="font-semibold text-ink-900">de graça</span>.{" "}
-            <span className="font-semibold text-ink-900">Criar</span> uma federação própria tem uma{" "}
+            <span className="font-semibold text-ink-900">Criar</span> um grupo próprio tem uma{" "}
             <span className="font-semibold text-ink-900">taxa única de R$ 19,90</span> —{" "}
             <span className="font-semibold text-grass-700">R$ 9,90 na promoção da Copa</span> (Pix ou
             cartão), o que mantém o app no ar, sem anúncios. Ao criar, você define quem pode{" "}
             <span className="font-semibold text-ink-900">ver</span> e quem pode{" "}
-            <span className="font-semibold text-ink-900">entrar</span> na federação.
+            <span className="font-semibold text-ink-900">entrar</span> no grupo.
           </p>
 
           <div>
             <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wide text-ink-400">
-              Visibilidade — quem enxerga a federação
+              Visibilidade — quem enxerga o grupo
             </h3>
             <Card className="divide-y divide-border">
               <OptionRow
                 icon={<EyeOff className="size-4" strokeWidth={2.2} />}
                 title="Privada"
-                desc="Só aparece para quem é membro. Ninguém de fora encontra a federação — ideal para a turma fechada de amigos."
+                desc="Só aparece para quem é membro. Ninguém de fora encontra o grupo — ideal para a turma fechada de amigos."
               />
               <OptionRow
                 icon={<Eye className="size-4" strokeWidth={2.2} />}
                 title="Pública"
-                desc="Qualquer pessoa pode encontrar e acompanhar a federação. Como é aberta a todos, a entrada fica liberada automaticamente."
+                desc="Qualquer pessoa pode encontrar e acompanhar o grupo. Como é aberta a todos, a entrada fica liberada automaticamente."
               />
             </Card>
           </div>
@@ -324,17 +324,17 @@ export function ComoFuncionaPage() {
               <OptionRow
                 icon={<Mail className="size-4" strokeWidth={2.2} />}
                 title="Convite"
-                desc="Só entra quem recebe o código de convite da federação. O controle é todo seu."
+                desc="Só entra quem recebe o código de convite do grupo. O controle é todo seu."
               />
               <OptionRow
                 icon={<UserCheck className="size-4" strokeWidth={2.2} />}
                 title="Aprovação"
-                desc="Qualquer um pode pedir para entrar, mas um administrador da federação precisa aprovar antes."
+                desc="Qualquer um pode pedir para entrar, mas um administrador do grupo precisa aprovar antes."
               />
               <OptionRow
                 icon={<DoorOpen className="size-4" strokeWidth={2.2} />}
                 title="Aberta"
-                desc="Entrada livre: quem quiser participar entra na hora, sem convite nem aprovação. (Federações públicas usam sempre esta opção.)"
+                desc="Entrada livre: quem quiser participar entra na hora, sem convite nem aprovação. (Grupos públicos usam sempre esta opção.)"
               />
             </Card>
           </div>
@@ -342,7 +342,7 @@ export function ComoFuncionaPage() {
           <div className="flex items-start gap-2 rounded-md bg-brand-500/10 p-3 text-xs leading-relaxed text-brand-800">
             <ShieldCheck className="mt-0.5 size-4 shrink-0" />
             <p>
-              Assim que o pagamento é confirmado, sua federação fica{" "}
+              Assim que o pagamento é confirmado, seu grupo fica{" "}
               <span className="font-semibold">ativa na hora</span>. Só o{" "}
               <span className="font-semibold">nome</span> passa por uma revisão rápida da moderação (pra
               evitar nomes ofensivos) — e você já joga normalmente enquanto isso.
@@ -360,9 +360,9 @@ export function ComoFuncionaPage() {
               </Button>
             </Link>
             {session ? (
-              <Link to="/federacoes/nova" className="sm:w-auto">
+              <Link to="/grupos/nova" className="sm:w-auto">
                 <Button fullWidth>
-                  <Trophy className="size-4" /> Criar uma federação
+                  <Trophy className="size-4" /> Criar um grupo
                 </Button>
               </Link>
             ) : (

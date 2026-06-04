@@ -1,5 +1,5 @@
 // Sistema de escudos/flâmulas baseado em MÁSCARA de SVG.
-// O SVG (em /public/escudos ou /public/federacoes) recorta um fundo de cor
+// O SVG (em /public/escudos ou /public/grupos) recorta um fundo de cor
 // (sólido, listras, grade ou bola) ou uma foto. A identidade visual fica
 // codificada numa string `crest:` salva em profiles.avatar_url e leagues.logo_url.
 //
@@ -19,7 +19,7 @@ const CREST_FILLS: readonly CrestFill[] = ["solid", "stripes", "grid", "ball", "
 // ---------------------------------------------------------------------------
 // Catálogo de formas — montado AUTOMATICAMENTE a partir das pastas:
 //   src/assets/escudos/escudo-<id>.svg    (perfil; "escudo-padrao" é o default)
-//   src/assets/federacoes/flamula-<id>.svg (federação)
+//   src/assets/grupos/flamula-<id>.svg (grupo)
 // Pra adicionar/remover/trocar uma forma, é só largar/apagar o SVG na pasta
 // (nome no padrão "escudo-<id>.svg" / "flamula-<id>.svg") e rebuildar. O <id>
 // vira o identificador salvo no crest, então mantenha nomes estáveis.
@@ -30,7 +30,7 @@ const ESCUDO_FILES = import.meta.glob("../assets/escudos/*.svg", {
   query: "?url",
   import: "default",
 }) as Record<string, string>;
-const FLAMULA_FILES = import.meta.glob("../assets/federacoes/*.svg", {
+const FLAMULA_FILES = import.meta.glob("../assets/grupos/*.svg", {
   eager: true,
   query: "?url",
   import: "default",

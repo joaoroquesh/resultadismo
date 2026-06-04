@@ -18,9 +18,9 @@ export type CrestMaskProps = {
   name?: string | null;
   /** dimensão em px (lado do quadrado) */
   px: number;
-  /** tipo padrão quando src é nulo (escudo p/ perfil, flamula p/ federação) */
+  /** tipo padrão quando src é nulo (escudo p/ perfil, flamula p/ grupo) */
   defaultKind?: CrestKind;
-  /** mostra a inicial do nome (perfil sim, federação não) */
+  /** mostra a inicial do nome (perfil sim, grupo não) */
   withLetter?: boolean;
   className?: string;
 };

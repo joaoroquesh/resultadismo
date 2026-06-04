@@ -114,10 +114,10 @@ const SLIDES: Slide[] = [
   {
     icon: <Users className="size-9" />,
     iconWrap: "bg-brand-500/15 text-brand-600",
-    title: "Dispute em federações",
+    title: "Dispute em grupos",
     body: (
       <p className="text-sm leading-relaxed text-ink-600">
-        Crie uma federação e chame os amigos, ou entre numa já existente. Cada federação tem sua
+        Crie um grupo e chame os amigos, ou entre numa já existente. Cada grupo tem sua
         classificação — é a sua disputa particular pra ver quem termina no topo. Bora palpitar!
       </p>
     ),

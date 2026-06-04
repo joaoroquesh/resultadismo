@@ -18,7 +18,7 @@
 > (trigger `handle_new_user`). É assim que o João vira admin sem configuração manual. → [`05`](05-DADOS-E-AUTH.md).
 
 **Proteção do dono do grupo:** o trigger `protect_league_owner` impede remover/rebaixar o
-`owner` — nem um app-admin tira o poder do dono de umo grupo sem regra explícita.
+`owner` — nem um app-admin tira o poder do dono de um grupo sem regra explícita.
 
 ## 2. Painel do app-admin (`/admin` — `features/admin/AdminPage.tsx`)
 
@@ -53,7 +53,7 @@ banco** — o guard de UI é conveniência, não segurança.
 - **Pagamento de grupos**: modo (Desativado/Teste/Mercado Pago), preço base, promoção
   (`admin_update_payment_settings`, `admin_set_promo`). Mostra o "preço vigente agora".
 - **Cupons de desconto**: criar/ativar/excluir (`discount_codes`).
-- **Cortesia**: liberar umo grupo de graça (`admin_comp_league`).
+- **Cortesia**: liberar um grupo de graça (`admin_comp_league`).
 
 ### Tela de jogos por competição (`/admin/competicoes/:id/jogos` — `AdminCompMatchesPage`)
 - Curadoria por jogo: ocultar/mostrar (`matches.hidden`, RPC/`useSetMatchHidden`) e **override
@@ -61,7 +61,7 @@ banco** — o guard de UI é conveniência, não segurança.
 
 ## 3. Admin de grupo (dentro de `LigaDetailPage`)
 
-Quem é `owner`/`admin` de umo grupo pode:
+Quem é `owner`/`admin` de um grupo pode:
 - **Membros**: aprovar entradas pendentes, remover, promover/rebaixar (menos o dono).
 - **Competições do grupo**: adicionar competição + escolher o **modo** (Pontos / Liga / Copa,
   estes últimos só se `confronto_enabled`).

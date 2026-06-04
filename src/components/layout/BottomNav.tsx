@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Goal, Shield, User, LogIn } from "lucide-react";
+import { Goal, Trophy, User, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
@@ -12,7 +12,7 @@ export function BottomNav() {
     { to: "/", label: "Jogos", icon: Goal, end: true },
     ...(session
       ? [
-          { to: "/federacoes", label: "Federações", icon: Shield, end: false },
+          { to: "/grupos", label: "Grupos", icon: Trophy, end: false },
           { to: "/perfil", label: "Perfil", icon: User, end: false },
         ]
       : []),

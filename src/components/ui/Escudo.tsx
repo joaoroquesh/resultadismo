@@ -8,8 +8,8 @@ import {
 } from "@/lib/avatar";
 import { CrestMask } from "./CrestMask";
 
-// Flâmula da federação: recorta cores/listras/grade/bola pela máscara do SVG.
-// Sem letra (federações são só cores). Mantém compat com logos antigas (gen:)
+// Flâmula do grupo: recorta cores/listras/grade/bola pela máscara do SVG.
+// Sem letra (grupos são só cores). Mantém compat com logos antigas (gen:)
 // e com URL crua (upload futuro).
 
 type Size = "sm" | "md" | "lg" | "xl";

@@ -9,11 +9,11 @@ import { LigasAdmin } from "./LigasAdmin";
 import { CompeticoesAdmin } from "./CompeticoesAdmin";
 import { UsuariosAdmin } from "./UsuariosAdmin";
 
-type Tab = "federações" | "competicoes" | "usuarios" | "pagamento";
+type Tab = "grupos" | "competicoes" | "usuarios" | "pagamento";
 
 export function AdminPage() {
   const navigate = useNavigate();
-  const [tab, setTab] = useState<Tab>("federações");
+  const [tab, setTab] = useState<Tab>("grupos");
 
   return (
     <Page
@@ -29,13 +29,13 @@ export function AdminPage() {
         value={tab}
         onChange={setTab}
         options={[
-          { value: "federações", label: "Federações" },
+          { value: "grupos", label: "Grupos" },
           { value: "competicoes", label: "Comp." },
           { value: "usuarios", label: "Users" },
           { value: "pagamento", label: "Pgto" },
         ]}
       />
-      {tab === "federações" && <LigasAdmin />}
+      {tab === "grupos" && <LigasAdmin />}
       {tab === "competicoes" && <CompeticoesAdmin />}
       {tab === "usuarios" && <UsuariosAdmin />}
       {tab === "pagamento" && <PaymentAdmin />}

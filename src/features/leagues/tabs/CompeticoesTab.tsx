@@ -11,7 +11,7 @@ import { useAddLeagueCompetition, useDeleteLeagueCompetition } from "../api";
 import { useNamePrefixes, requiredPrefix, NAME_PREFIX_DEFAULTS } from "../naming";
 import type { LeagueMode } from "@/lib/types";
 
-// Limite inicial: 1 competição por federação. Quando a base de usuários crescer e
+// Limite inicial: 1 competição por grupo. Quando a base de usuários crescer e
 // os modos extras (Liga / Copa) estiverem prontos, soltamos o limite e habilitamos
 // os outros modos de disputa.
 const MAX_COMPETITIONS_PER_LEAGUE = 1;
@@ -34,8 +34,8 @@ export function CompeticoesTab({
   const [name, setName] = useState("");
   const [toDelete, setToDelete] = useState<{ id: string; name: string } | null>(null);
 
-  // Federação comum: modo fixo em "points" (Liga/Copa ficam como "em breve").
-  // Federação habilitada pelo admin (confronto_enabled): o admin escolhe Pontos ou
+  // Grupo comum: modo fixo em "points" (Liga/Copa ficam como "em breve").
+  // Grupo habilitada pelo admin (confronto_enabled): o admin escolhe Pontos ou
   // Confronto (Liga/Copa) e pode criar várias competições (sem o limite do MVP).
   const [tipo, setTipo] = useState<"pontos" | "confronto">("pontos");
   const [formato, setFormato] = useState<"liga" | "cup">("liga");
@@ -58,7 +58,7 @@ export function CompeticoesTab({
     }
   }, [open, competitions, competitionId]);
 
-  // Federações habilitadas (teste de Confronto) não têm limite de competições.
+  // Grupos habilitadas (teste de Confronto) não têm limite de competições.
   const reachedLimit = !confrontoEnabled && comps.length >= MAX_COMPETITIONS_PER_LEAGUE;
 
   async function handleAdd() {
@@ -123,7 +123,7 @@ export function CompeticoesTab({
 
       {reachedLimit ? (
         <p className="rounded-md bg-ink-50 px-3 py-2 text-xs text-ink-500">
-          Limite inicial de {MAX_COMPETITIONS_PER_LEAGUE} competição por federação.
+          Limite inicial de {MAX_COMPETITIONS_PER_LEAGUE} competição por grupo.
           Remova a atual para trocar por outra.
         </p>
       ) : open ? (
@@ -261,7 +261,7 @@ export function CompeticoesTab({
       <ConfirmDialog
         open={!!toDelete}
         title="Remover competição"
-        message={`Remover "${toDelete?.name ?? ""}" da federação? A classificação dela e o histórico de palpites somem junto.`}
+        message={`Remover "${toDelete?.name ?? ""}" do grupo? A classificação dela e o histórico de palpites somem junto.`}
         step2Message="Confirmação final: remover esta competição e o que está dentro?"
         confirmLabel="Remover competição"
         loading={del.isPending}

@@ -108,7 +108,7 @@ export async function validateDiscount(code: string): Promise<DiscountInfo> {
   return (data as DiscountInfo) ?? { valid: false, reason: "Código inválido." };
 }
 
-/** MODO TESTE: simula um pagamento aprovado (sem Mercado Pago) e ativa a federação. */
+/** MODO TESTE: simula um pagamento aprovado (sem Mercado Pago) e ativa o grupo. */
 export function useSimulatePayment() {
   const qc = useQueryClient();
   return useMutation({
@@ -126,7 +126,7 @@ export function useSimulatePayment() {
   });
 }
 
-/** ADMIN: libera uma federação sem pagamento (cortesia). */
+/** ADMIN: libera um grupo sem pagamento (cortesia). */
 export function useCompLeague() {
   const qc = useQueryClient();
   return useMutation({
@@ -144,7 +144,7 @@ export function useCompLeague() {
 /**
  * Reembolso self-service (direito de arrependimento — 7 dias). Chama a Edge
  * Function `cancel-league-refund`, que estorna no Mercado Pago e arquiva a
- * federação. A function responde sempre 200 com { ok, error? }.
+ * grupo. A function responde sempre 200 com { ok, error? }.
  */
 export function useRefundLeague() {
   const qc = useQueryClient();

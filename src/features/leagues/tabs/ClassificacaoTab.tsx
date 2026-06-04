@@ -71,7 +71,7 @@ export function ClassificacaoTab({
     return (
       <EmptyState
         title="Sem competições"
-        description="Um administrador precisa vincular uma competição a esta federação."
+        description="Um administrador precisa vincular uma competição a este grupo."
       />
     );
   }

@@ -34,8 +34,8 @@ type Persona = {
 const PERSONAS: Persona[] = [
   { id: "out", label: "Deslogado", hint: "visitante / landing", icon: LogOut, kind: "logout" },
   { id: "admin", label: "Admin", hint: "app-admin", icon: Shield, email: "joao.crf93@gmail.com", kind: "login" },
-  { id: "member", label: "Membro", hint: "não-admin, numa federação", icon: User, email: "bruno@teste.com", kind: "login" },
-  { id: "owner", label: "Dono", hint: "dono de federação (não-admin)", icon: Crown, email: "dona@teste.com", kind: "login" },
+  { id: "member", label: "Membro", hint: "não-admin, num grupo", icon: User, email: "bruno@teste.com", kind: "login" },
+  { id: "owner", label: "Dono", hint: "dono de grupo (não-admin)", icon: Crown, email: "dona@teste.com", kind: "login" },
   { id: "first", label: "1º acesso", hint: "usuário novo + onboarding", icon: Sparkles, email: "novato@teste.com", kind: "first" },
 ];
 
