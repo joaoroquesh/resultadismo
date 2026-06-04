@@ -110,6 +110,13 @@ de docs + changelog (seção 5). Cada uma tem dono num doc específico.
    falar do jogo, entende **rápido** o que fazer e o que está acontecendo; o que estiver complexo,
    simplifique (sem infantilizar). Vale para **design e texto**. → [`10`](10-UX-WRITING.md) (texto),
    [`02`](02-CODIGO.md) §4, [`DESIGN.md`](../DESIGN.md).
+14. **Homologação local antes do deploy (checagem do João).** Toda mudança passa **primeiro** pela
+   checagem do João em **homologação local**. Antes de `git push`/merge na `main` (que dispara o
+   deploy em produção), a IA **abre a mudança rodando localmente** (`npm run dev` — idealmente com o
+   snapshot real via `npm run homolog:pull`) e **espera o aval explícito do João**; **sobretudo em
+   qualquer alteração de UI/UX**, que ele precisa **ver no navegador** antes de subir. Sem o OK do
+   João, **não há push/merge na `main`**. → §5 passo 9, [`07`](07-BUILD-E-DEPLOY.md),
+   [`08`](08-PROCESSO.md).
 
 ---
 
@@ -173,7 +180,13 @@ de docs + changelog (seção 5). Cada uma tem dono num doc específico.
    versão** (ver seção 6) + `package.json`. Decisão de mudar uma regra ou marco grande → **também**
    uma nota em [`HISTORICO.md`](HISTORICO.md).
 
-**9. Subir com segurança.** Só então: push (conforme doc 09 — fast-forward sobre `origin/main`,
+**9. Homologar com o João (gate antes do deploy).** Antes de subir, **abra a mudança rodando
+   localmente** (`npm run dev`; quando fizer sentido, com dados reais via `npm run homolog:pull`) e
+   **espere o aval explícito do João** — **sobretudo em qualquer alteração de UI/UX**, que ele
+   precisa **ver no navegador**. Sem o OK do João, **não** se faz push/merge na `main`. (regra
+   central 14)
+
+**10. Subir com segurança.** Só então: push (conforme doc 09 — fast-forward sobre `origin/main`,
    só os **seus** arquivos). Push na `main` = **deploy em produção**: confirme os checks verdes
    (Supabase Preview, Vercel, Deploy Edge Functions).
 

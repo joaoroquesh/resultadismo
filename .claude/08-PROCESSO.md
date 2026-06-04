@@ -16,7 +16,8 @@
 6. Propagar para TODOS os pontos de contato do site que falam daquilo (coerência)
 7. Atualizar a documentação .claude/ afetada (01–09)
 8. Registrar no CHANGELOG + versionar (+ HISTORICO se decisão/marco)
-9. Subir com segurança (push conforme 09 = deploy em produção)
+9. Homologar com o João: abrir local (npm run dev) + aval explícito antes de subir — sobretudo UI/UX (MESTRE §3 regra 14)
+10. Subir com segurança (push conforme 09 = deploy em produção)
 ```
 
 > **Se a mudança sobe, a coerência do site + a doc + o changelog sobem junto.** Mudar comportamento
@@ -78,6 +79,10 @@ coisa — **nunca** um ponto novo e outro velho.
   [`HISTORICO.md`](HISTORICO.md).
 
 ## 7. Subir (push = deploy em produção)
+
+> **Gate (MESTRE §3 regra 14):** antes de qualquer push/merge na `main`, **abra a mudança rodando
+> localmente** (`npm run dev`; com dados reais via `npm run homolog:pull` quando ajudar) e **espere o
+> aval explícito do João** — sobretudo em **UI/UX**, que ele precisa ver no navegador. Sem OK, não sobe.
 
 1. `git fetch` de novo; rebase/merge de `origin/main` se andou (→ [`09`](09-PARALELISMO.md)).
 2. **Stage explícito por arquivo** (nunca `git add -A`). Conferir `git diff --cached --name-only` —
