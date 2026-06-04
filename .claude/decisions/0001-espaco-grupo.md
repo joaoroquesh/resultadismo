@@ -1,8 +1,8 @@
 # ADR 0001 — Nome do espaço dos grupos de amigos: "Federação" → "Grupo"
 
-> **Status:** ✅ Aprovada (2026-06-04, decisão do João) · **a implementar no código.**
-> Até a troca subir nas telas, a UI **ainda diz "Federação"** — coerência (regra central 9 do
-> [`MESTRE.md`](../MESTRE.md)). Este é o registro do estudo e da decisão.
+> **Status:** ✅ Aprovada (2026-06-04, decisão do João). **Documentação `.claude/` já renomeada;
+> a UI/rotas de produção estão sendo atualizadas** (mesma onda — coerência, regra central 9). Este é
+> o registro do estudo e da decisão.
 
 ## Contexto
 

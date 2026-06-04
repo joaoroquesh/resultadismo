@@ -33,7 +33,7 @@ resultadismo/
 ├── public/              Favicons, ícones PWA, estáticos servidos como estão
 ├── src/
 │   ├── main.tsx          Bootstrap: providers (Query, Auth, Toast, Theme, LoginModal) + SW
-│   ├── App.tsx           Tabela de rotas + guards (RequireAuth/RequireAdmin) + redirects /ligas→/federacoes
+│   ├── App.tsx           Tabela de rotas + guards (RequireAuth/RequireAdmin) + redirects /ligas→/grupos
 │   ├── index.css         Tailwind v4 + Design System (cores OKLCH, tema claro/escuro via [data-theme])
 │   ├── sw.ts             Service Worker (Workbox precache + listener de Web Push)
 │   ├── types/database.ts GERADO por `supabase gen types` — tipos do schema. NÃO editar à mão.
@@ -64,7 +64,7 @@ Cada domínio vive em `src/features/<dominio>/` e tipicamente contém:
 - arquivos de lógica pura quando faz sentido (`build.ts`, `stats.ts`, `naming.ts`…).
 
 Features existentes: `access` (sala de espera), `admin`, `auth`, `confronto`, `help`, `landing`,
-`leagues` (federações), `legal`, `matches` (jogos/palpites), `notifications`, `onboarding`,
+`leagues` (grupos), `legal`, `matches` (jogos/palpites), `notifications`, `onboarding`,
 `payments`, `players`, `profile`, `standings`.
 
 ## 3. Fluxo de dados (request → tela)

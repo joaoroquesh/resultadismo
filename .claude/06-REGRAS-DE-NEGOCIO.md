@@ -5,7 +5,7 @@
 > código, está citado — a **migration/função é a fonte de verdade**; este texto é o contrato legível.
 
 Índice: [1. Pontuação](#1-pontuação-o-coração) · [2. Palpite/jogo](#2-ciclo-de-vida-do-palpite-e-do-jogo)
-· [3. Classificação/desempate](#3-classificação-e-desempate) · [4. Federações](#4-federações)
+· [3. Classificação/desempate](#3-classificação-e-desempate) · [4. Grupos](#4-grupos)
 · [5. Pagamento](#5-monetização--pagamento) · [6. Confrontos](#6-confrontos-liga--copa)
 · [7. Escudos](#7-escudos) · [8. Notificações](#8-notificações) · [9. Outras regras](#9-outras-regras)
 
@@ -27,10 +27,10 @@
   `matches_rescore_predictions`, `20260526000004`). → [`05`](05-DADOS-E-AUTH.md) §5.
 - **Placar que conta:** 90' + prorrogação. **Pênaltis NÃO contam** para a pontuação (são
   informativos).
-- **Pontos por tipo são configuráveis por federação** (`league_competitions.settings.points`),
+- **Pontos por tipo são configuráveis por grupo** (`league_competitions.settings.points`),
   default 3/2/1 — então a função usa o que estiver no settings.
 
-### Dobro (Joker / 2×)
+### Dobro (2×) — o "coringa"
 - Marca `predictions.is_joker`; o palpite vale **em dobro** naquela disputa.
 - **Limite por semana, por competição** (semana civil ancorada em America/Sao_Paulo), garantido por
   trigger (`enforce_joker_limit`, migrations de joker `…012`/`…014`). O número exato do limite está
@@ -47,7 +47,7 @@ ou por **override manual do admin** (`AdminCompMatchesPage`).
 **Palpite:**
 - Editável **até o `kickoff_at`**. A partir do apito, **trava** (`match_is_locked` + RLS de
   `predictions`): não dá para criar, editar nem apagar. → [`05`](05-DADOS-E-AUTH.md) §3.
-- É **global por (usuário, jogo)**: o mesmo palpite conta em **todas** as federações que disputam
+- É **global por (usuário, jogo)**: o mesmo palpite conta em **todas** os grupos que disputam
   aquela competição.
 - **Privacidade até o apito:** você só vê o palpite dos outros **depois** que o jogo começa. Antes,
   no máximo "fulano já palpitou / não palpitou" (vale também no detalhe de confronto — anti-trapaça).
@@ -71,28 +71,25 @@ possível) e **acertividade** (% de palpites que pontuaram). Detalhe da fórmula
 
 ---
 
-## 4. Federações
+## 4. Grupos
 
-> ⚠️ **Decisão aprovada (2026-06-04, a implementar):** este espaço será renomeado de
-> **Federação → "Grupo"** na UI e nas rotas (banco segue `leagues`). Motivo e plano em
-> [`decisions/0001-espaco-grupo.md`](decisions/0001-espaco-grupo.md). **Até a troca subir no código,
-> a UI e esta doc ainda usam "Federação".**
+> **Renome "Federação" → "Grupo" (2026-06-04, ADR [`0001`](decisions/0001-espaco-grupo.md)):** mais
+> claro pro leigo. Documentação atualizada; a UI/rotas de produção estão sendo atualizadas.
 
-**Federação** = o grupo social onde a turma joga (antigo "Liga/Grupo"). A tabela continua
-`leagues`; só o **rótulo** mudou (rebrand **Liga → Federação**, rotas `/federacoes`, redirects de
-`/ligas/*`). ⚠️ "Liga" passou a significar um **modo de disputa** dentro da federação (ver §6) — é
+**Grupo** = o espaço social onde a turma joga. A tabela continua `leagues`; só o **rótulo** evoluiu:
+**Liga → Federação → Grupo** (rotas `/grupos`, com redirects de `/federacoes/*` e `/ligas/*`). ⚠️ "Liga" passou a significar um **modo de disputa** dentro do grupo (ver §6) — é
 uma troca de significado proposital.
 
 - **Papéis:** `owner` (criador, protegido contra remoção/rebaixamento), `admin`, `member`.
 - **Visibilidade/entrada:** `visibility` (public/private) + `join_policy`
   (invite/open/approval) + `join_code` (6 caracteres). Entrar por código respeita a política.
-- **Criação → ativação:** depende do **modo de pagamento** global (ver §5). Toda federação tem
+- **Criação → ativação:** depende do **modo de pagamento** global (ver §5). Todo grupo tem
   `status` (pending/active/rejected/archived) e `payment_status`.
-- **Revisão de nome:** federação paga **ativa na hora**; só o **nome** entra em revisão do admin
+- **Revisão de nome:** grupo pago **ativa na hora**; só o **nome** entra em revisão do admin
   (`name_approved`) — disclaimer some quando o admin aprova (`admin_approve_league_name`).
 - **Nome por prefixo-badge:** o tipo vira um prefixo fixo no nome — **Bolão** (Pontos), **Liga**,
   **Copa** — configurável no admin (`app_settings`). O usuário digita só o complemento.
-- **Escopo V1:** na prática, **1 competição por federação** e foco no modo Tabela/Pontos (Copa do
+- **Escopo V1:** na prática, **1 competição por grupo** e foco no modo Tabela/Pontos (Copa do
   Mundo é o padrão na criação). Liga/Copa (confronto) ficam atrás de gate (§6).
 
 ---
@@ -101,14 +98,14 @@ uma troca de significado proposital.
 
 > História cronológica completa do pagamento: [`HISTORICO.md`](HISTORICO.md) (consolidado).
 
-**Regra-mãe:** cobra-se **só pela criação de uma Federação** — **taxa única**, enquadrada como **taxa
+**Regra-mãe:** cobra-se **só pela criação de umo Grupo** — **taxa única**, enquadrada como **taxa
 de serviço**. **Jogar, palpitar e participar é grátis.** **Não é casa de apostas** (sem aposta, sem
 prêmio em dinheiro, sem pote — Lei 14.790/2023).
 
 **Modo global** (`app_settings.payment_mode`, aba Pgto do admin):
 - `disabled` — criação grátis (sem cobrança).
 - `test` — pagamento **simulado** sem Mercado Pago (`simulate_league_payment` — **só app-admin** desde
-  2.1.0, p/ o modo teste nunca virar "federação grátis" pra usuário comum); seguro para testar.
+  2.1.0, p/ o modo teste nunca virar "grupo grátis" pra usuário comum); seguro para testar.
 - `live` — **Mercado Pago** de verdade (estado atual de produção).
 
 **Preço:** base `league_price_cents` + promoção opcional (`promo_price_cents`/`promo_until`).
@@ -121,22 +118,22 @@ prêmio em dinheiro, sem pote — Lei 14.790/2023).
 **Cupons** (`discount_codes`): % **ou** R$ fixo, com `max_uses`/validade. Incidem sobre o preço
 vigente. **100% off → ativa grátis** (sem passar pelo MP). `validate_discount_code` para preview.
 
-**Fluxo (modo live):** cria federação (`pending`) → `create-league-checkout` calcula preço + cupom e
+**Fluxo (modo live):** crio grupo (`pending`) → `create-league-checkout` calcula preço + cupom e
 cria a preferência → usuário paga (Pix/cartão; **boleto removido**) no checkout hosted →
 **`mercadopago-webhook`** consulta o MP (autoritativo) → `confirm_league_payment` **ativa na hora**
 (nome em revisão). Idempotente por `payment_id`. Cortesia do admin: `admin_comp_league`.
 - **Endurecimento (2.1.0):** o webhook só ativa se o **pagador == dono** (`metadata.user_id`) e o
   **valor ≥ preço esperado** (quando sem cupom); tem anti-replay (`ts`) e rate limit por IP.
   `confirm_league_payment` tem **guarda de estado terminal** (`for update`): uma vez `refunded`, um
-  `paid` reentregue **não** reativa a federação.
+  `paid` reentregue **não** reativa o grupo.
 
 **Reembolso (direito de arrependimento — CDC art. 49):** **self-service, automático, ≤ 7 dias**.
-- Botão "Cancelar e reembolsar" **só para o dono**, federação **paga**, dentro de **7 dias** do
+- Botão "Cancelar e reembolsar" **só para o dono**, grupo **paga**, dentro de **7 dias** do
   **pagamento** (`league_payments.created_at` — corrigido em 2.1.0; antes usava `approved_at`, que
   podia ser anterior ao pagamento e negar reembolso válido), confirmação em 2 passos. A mutação é
   atômica (`refund_league`, `for update`).
 - `cancel-league-refund` revalida no servidor → devolução **total** no MP (`POST /refunds`,
-  idempotente) → marca `refunded` e **arquiva** a federação (`status=archived`, `deleted_at=now()` →
+  idempotente) → marca `refunded` e **arquiva** o grupo (`status=archived`, `deleted_at=now()` →
   Lixeira do admin, recuperável). Cortesia/100%-off/teste: cancela sem chamar o MP.
 - **Incondicional** dentro dos 7 dias (sem exigir "não uso" — mais seguro juridicamente).
 - Qualquer caminho de `refunded` (self-service, estorno manual no painel do MP via webhook, ação
@@ -153,11 +150,11 @@ painel. Token de produção e teste de estorno são do João. → [`04`](04-ADMI
 
 ## 6. Confrontos (Liga / Copa)
 
-Dentro de uma federação, uma disputa tem um **modo**: **Pontos** (ranking por acúmulo) ou
+Dentro de umo grupo, uma disputa tem um **modo**: **Pontos** (ranking por acúmulo) ou
 **Confronto** (duelo direto) — e Confronto se subdivide em **Liga** (pontos corridos 3/1/0) e
-**Copa** (mata-mata). Tudo sobre os **mesmos jogos** que a federação já palpita.
+**Copa** (mata-mata). Tudo sobre os **mesmos jogos** que o grupo já palpita.
 
-> **Gate:** o modo Confronto só aparece nas federações com `leagues.confronto_enabled = true`,
+> **Gate:** o modo Confronto só aparece nos grupos com `leagues.confronto_enabled = true`,
 > ligado **só pelo app-admin** (`admin_set_confronto_enabled`). As demais veem "em breve". A
 > estrutura toda está em produção **atrás desse gate**.
 
@@ -167,7 +164,7 @@ mata-mata, ou uma semana (`period_kind` = phase/week). Quem fizer **mais pontos 
 o confronto (Liga: 3/1/0; empate de pontos = 1/1. Copa: o vencedor **avança** —
 `advance_confronto_cup` promove p/ a fase seguinte, empate de mata-mata desempata por **seed**).
 `get_competition_periods` lê o calendário real (ex.: Copa 2026 = 8 fases ou ~6 semanas). A **semana**
-é ancorada em **America/Sao_Paulo** (BRT, igual ao joker e à tela de Jogos — unificado em 2.1.0).
+é ancorada em **America/Sao_Paulo** (BRT, igual ao dobro e à tela de Jogos — unificado em 2.1.0).
 
 **Estados** (`league_competitions.confronto_state`): `draft` (rascunho, só admin vê) → `scheduled`
 (sorteado, **oculto até o horário** — enforçado **no servidor** desde 2.1.0: `get_confronto_ties`/
@@ -193,7 +190,7 @@ um se inscreve em `confronto_optins`, válido só em `draft`).
 **Regras de integridade:**
 - **Anti-trapaça:** palpite/pontos do oponente ficam ocultos até o jogo começar (`get_tie_detail`
   revela só no apito ou para o próprio).
-- **Saída = W.O.:** sair da federação durante uma Liga/Copa ativa dá **W.O.** nos confrontos em
+- **Saída = W.O.:** sair do grupo durante uma Liga/Copa ativa dá **W.O.** nos confrontos em
   aberto (oponente vence) e remove o membro (`leave_league`, dupla confirmação).
 - **Bye:** sem oponente no período → **vence** (conta como vitória na classificação de confronto;
   ajustado em 2.1.0 — antes não pontuava).
@@ -202,17 +199,17 @@ um se inscreve em `confronto_optins`, válido só em `draft`).
 
 ## 7. Escudos
 
-Identidade visual de **perfis** e **federações** por **máscara SVG**: o SVG recorta (via
+Identidade visual de **perfis** e **grupos** por **máscara SVG**: o SVG recorta (via
 `mask-image`, alpha) um fundo de cor/padrão/foto. Desacopla **forma** de **conteúdo**.
 
 - **Catálogo automático** via `import.meta.glob` de `src/assets/escudos/*.svg` (escudo-padrao +
-  escudo-1..16) e `src/assets/federacoes/*.svg` (flamula-1..3). Gerenciar = largar/remover arquivo.
-  **Não renomear** arquivos em uso (o `<id>` fica salvo no perfil/federação).
+  escudo-1..16) e `src/assets/grupos/*.svg` (flamula-1..3). Gerenciar = largar/remover arquivo.
+  **Não renomear** arquivos em uso (o `<id>` fica salvo no perfil/grupo).
 - **Encoding:** `crest:kind:shape:fill:cores:rotação:foto` salvo em `profiles.avatar_url` /
   `leagues.logo_url`. Fundos: sólido / listras / grade / bola / foto.
 - **Todo perfil tem escudo** sem migration: `legacyToCrest` adapta avatares antigos no render
   (`gen:` antigo, foto crua do Google, ou `null` → escudo padrão determinístico pelo nome).
-- Edição: `CrestEditor` (perfil em `EditarPerfilPage`; federação na tela de editar federação).
+- Edição: `CrestEditor` (perfil em `EditarPerfilPage`; grupo na tela de editar grupo).
 
 ---
 

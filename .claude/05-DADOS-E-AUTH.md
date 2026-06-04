@@ -28,9 +28,9 @@
 | `teams` | Times | `name`, `tla`, `crest_url`/`local_crest`, `country`, `provider_ref` |
 | `matches` | Jogos reais | `competition_id`, times, `kickoff_at`, `status` (scheduled/live/finished/…), `home_score`/`away_score`, pênaltis (informativo), **`hidden`** (curadoria) |
 | `predictions` | **1 palpite por usuário por jogo** (global — vale em toda liga que disputa aquela competição) | `user_id`,`match_id` (único), `home_pred`/`away_pred` (0–99), `score_type`, `points`, `is_joker` (dobro) |
-| `leagues` | **Federações** (grupos sociais) | `name`, `slug`, `owner_id`, `visibility`, `join_policy`, `join_code`, `status` (pending/active/rejected/archived), **`payment_status`**, **`name_approved`**, **`confronto_enabled`**, `deleted_at` (soft-delete) |
-| `league_members` | Membros da federação | `league_id`,`user_id` (único), `role` (owner/admin/member), `status` |
-| `league_competitions` | Uma competição disputada na federação, num **modo** | `league_id`,`competition_id`, `mode` (table/points/liga/cup), `settings` (jsonb — pontos por tipo), `starts_on`, `confronto_state`, `period_kind`, `participant_mode`, `liga_format`, `scheduled_draw_at` |
+| `leagues` | **Grupos** (grupos sociais) | `name`, `slug`, `owner_id`, `visibility`, `join_policy`, `join_code`, `status` (pending/active/rejected/archived), **`payment_status`**, **`name_approved`**, **`confronto_enabled`**, `deleted_at` (soft-delete) |
+| `league_members` | Membros do grupo | `league_id`,`user_id` (único), `role` (owner/admin/member), `status` |
+| `league_competitions` | Uma competição disputada no grupo, num **modo** | `league_id`,`competition_id`, `mode` (table/points/liga/cup), `settings` (jsonb — pontos por tipo), `starts_on`, `confronto_state`, `period_kind`, `participant_mode`, `liga_format`, `scheduled_draw_at` |
 | `cup_ties` | Confronto A×B (Liga/Copa) | `league_competition_id`, `round_order`/`round_label`/`slot`, `member_a`/`member_b`, `points_a`/`points_b`, `winner_id`, `matchday`, `period_kind`/`period_value`, `walkover_user` |
 | `confronto_participants` | Snapshot de quem entrou no sorteio | `league_competition_id`,`user_id`,`seed` |
 | `confronto_optins` | Inscrições (modo opt-in) | `league_competition_id`,`user_id` (válidas só em `draft`) |
@@ -56,9 +56,9 @@ Padrão geral: **app-admin sempre pode**; o resto depende de propriedade/papel/v
 - **`leagues`**: vê se é pública, ou dono, ou membro, ou app-admin. Status/`payment_status`/
   `name_approved` são protegidos por trigger — só mudam via `service_role`/admin ou pelo contexto de
   liquidação (GUC `app.settle_bypass`). `confronto_enabled` protegido por trigger próprio.
-- **`league_members`**: membros se veem; só admin da federação adiciona/edita; o **dono é
+- **`league_members`**: membros se veem; só admin do grupo adiciona/edita; o **dono é
   protegido** (`protect_league_owner`).
-- **`league_competitions` / `cup_ties` / `confronto_*`**: visíveis a quem vê a federação; escrita
+- **`league_competitions` / `cup_ties` / `confronto_*`**: visíveis a quem vê o grupo; escrita
   **só via RPC** `SECURITY DEFINER` — a policy de escrita direta em `cup_ties` foi **removida em
   2.1.0** (não há mais `INSERT/UPDATE/DELETE` direto via PostgREST; tudo passa por `draw_confronto`/
   `append_confronto_ties`/`advance_confronto_cup`/`leave_league`).
@@ -80,7 +80,7 @@ Padrão geral: **app-admin sempre pode**; o resto depende de propriedade/papel/v
 - `advance_confronto_cup(lc_id)` — Copa: promove o vencedor de cada chave p/ a fase seguinte
   (idempotente; empate desempata por seed). Chamada "lazy" pelo client ao abrir o chaveamento.
 
-**Federação**
+**Grupo**
 - `join_league_by_code(code)` / `join_public_league(id)` — entrar (respeita `join_policy`).
 - `approve_league` / `reject_league` / `set_app_admin` — admin. → [`04`](04-ADMIN.md).
 - `draw_confronto` / `undo_confronto_draw` / `toggle_confronto_optin` / `leave_league` — confronto.
@@ -117,7 +117,7 @@ Realtime**); `nudge_member` (cutucar, anti-spam 30 min).
 - `run_football_sync()` — sincroniza jogos (a cada ~15 min) via Edge Function.
 - `create_deadline_reminders()` — lembrete de prazo de palpite (jogo começando, membro não palpitou).
 - `release_scheduled_confrontos()` — libera sorteios agendados (a cada 5 min).
-- Purga de federações `pending`+não pagas após ~24h.
+- Purga de grupos `pending`+não pagas após ~24h.
 
 ## 6. O desempate (fixo) — `get_league_standings`
 
@@ -133,7 +133,7 @@ pontos DESC
 ```
 
 Os pontos por tipo são lidos de `league_competitions.settings.points` (default cravada 3 / saldo 2 /
-acerto 1), então uma federação pode customizar a pontuação sem mudar a função.
+acerto 1), então umo grupo pode customizar a pontuação sem mudar a função.
 
 ## 7. Autenticação (login/logout)
 

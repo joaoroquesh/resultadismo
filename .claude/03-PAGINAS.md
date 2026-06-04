@@ -14,17 +14,17 @@
 | `/termos` | `legal/TermosPage` | **Sempre público** |
 | `/` | `matches/JogosPage` | **Público** (vê jogos sem login; palpita logado) |
 | `/como-funciona` | `help/ComoFuncionaPage` | Público |
-| `/federacoes` | `leagues/LigasPage` | Logado |
-| `/federacoes/nova` | `leagues/NovaLigaPage` | Logado |
-| `/federacoes/:slug` | `leagues/LigaDetailPage` | Logado (membro/admin) |
+| `/grupos` | `leagues/LigasPage` | Logado |
+| `/grupos/nova` | `leagues/NovaLigaPage` | Logado |
+| `/grupos/:slug` | `leagues/LigaDetailPage` | Logado (membro/admin) |
 | `/perfil` | `profile/PerfilPage` | Logado |
 | `/perfil/editar` | `profile/EditarPerfilPage` | Logado |
 | `/jogador/:id` | `players/PlayerProfilePage` | Logado |
 | `/simulador` | `confronto/SimuladorPage` | Logado (uso típico: app-admin) |
 | `/admin` | `admin/AdminPage` | **App-admin** (`RequireAdmin`) |
 | `/admin/competicoes/:id/jogos` | `admin/AdminCompMatchesPage` | **App-admin** |
-| `/classificacao` | → redireciona p/ `/federacoes` | — |
-| `/ligas`, `/ligas/nova`, `/ligas/:slug` | → redireciona p/ `/federacoes/*` | Compat (rename Liga→Federação) |
+| `/classificacao` | → redireciona p/ `/grupos` | — |
+| `/ligas`, `/ligas/nova`, `/ligas/:slug` | → redireciona p/ `/grupos/*` | Compat (renames Liga→Federação→Grupo) |
 | `*` | → redireciona p/ `/` | 404 |
 
 **Guards** (`src/features/auth/guards.tsx`): `RequireAuth` (manda p/ `/login` se deslogado),
@@ -37,8 +37,8 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
 |---|---|
 | `layout/AppShell` | Casca logada: `Sidebar` (desktop) + `BottomNav` (mobile) + `Outlet` + `InstallPrompt`. Envolve o conteúdo com a sala de espera (`AccessGate`). Sem sessão → `PublicShell`. |
 | `layout/PublicShell` | Casca pública (sem sidebar/bottomnav). |
-| `layout/Sidebar` | Nav desktop (≥lg): Jogos, Federações, Perfil, Admin (se app-admin), Como funciona + ThemeToggle + card do usuário/Entrar. |
-| `layout/BottomNav` | Nav mobile (barra inferior, safe-area): Jogos, Federações, Perfil, Entrar. |
+| `layout/Sidebar` | Nav desktop (≥lg): Jogos, Grupos, Perfil, Admin (se app-admin), Como funciona + ThemeToggle + card do usuário/Entrar. |
+| `layout/BottomNav` | Nav mobile (barra inferior, safe-area): Jogos, Grupos, Perfil, Entrar. |
 | `layout/Header` / `layout/Page` | Cabeçalho e container padrão de cada página (title + action). |
 
 ## 3. Catálogo de páginas (por feature)
@@ -51,12 +51,12 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
   palpite (auto-save com debounce), botão **2×** (dobro), resultado + tipo de pontuação colorido,
   "Galera" (quem palpitou). Trava ao chegar o `kickoff_at`.
 
-### Federações — `features/leagues`
-- **`LigasPage`** (`/federacoes`): minhas federações + entrar por código.
-- **`NovaLigaPage`** (`/federacoes/nova`): criar federação — nome (com **prefixo-badge**
+### Grupos — `features/leagues`
+- **`LigasPage`** (`/grupos`): minhos grupos + entrar por código.
+- **`NovaLigaPage`** (`/grupos/nova`): criar grupo — nome (com **prefixo-badge**
   Bolão/Liga/Copa), descrição, visibilidade, política de entrada, competição inicial (padrão Copa do
   Mundo), modo, cupom (se pagamento ativo). → checkout/ativação conforme o modo de pagamento.
-- **`LigaDetailPage`** (`/federacoes/:slug`): detalhe — escudo/nome/código de convite, abas
+- **`LigaDetailPage`** (`/grupos/:slug`): detalhe — escudo/nome/código de convite, abas
   **Classificação** (tabela de Pontos ou `ConfrontoSection`), **Membros** (papéis, aprovar/remover),
   **Competições** (admin: adicionar competição/modo). Banner "Pagar agora" se pendente; botão de
   reembolso só p/ dono (≤7 dias).
@@ -64,11 +64,11 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
 
 ### Classificação — `features/standings`
 - **`StandingsTable`**: tabela de Pontos (pos, jogador, pontos, cravadas, saldos, acertividade,
-  aproveitamento). Linha do usuário em destaque. Embutida no detalhe da federação.
+  aproveitamento). Linha do usuário em destaque. Embutida no detalhe do grupo.
 
 ### Confronto — `features/confronto`
 - **`ConfrontoSection`**: orquestra o modo Confronto (Liga/Copa) por estado (rascunho → painel de
-  sorteio; agendado → contagem; sorteado/encerrado → tabela/bracket). Só aparece nas federações com
+  sorteio; agendado → contagem; sorteado/encerrado → tabela/bracket). Só aparece nos grupos com
   `confronto_enabled`.
 - **`ConfrontoViews`**: tabela da Liga, rodadas, bracket da Copa, "meu confronto", detalhe A×B.
 - **`SimuladorPage`** (`/simulador`) + `simulator.ts`: simulador autônomo de estrutura (não
@@ -76,19 +76,19 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
 
 ### Perfil & jogadores — `features/profile`, `features/players`
 - **`PerfilPage`** (`/perfil`): avatar/escudo, stats globais, menu (Admin/Simulador/tour se
-  app-admin; federações; como funciona), Aparência (tema), Instalar app (PWA), Notificações
+  app-admin; grupos; como funciona), Aparência (tema), Instalar app (PWA), Notificações
   (push), Sair.
 - **`EditarPerfilPage`** (`/perfil/editar`): editor de escudo (`CrestEditor`), nome, time do coração.
-- **`PlayerProfilePage`** (`/jogador/:id`): perfil público de outro jogador (stats + federações
+- **`PlayerProfilePage`** (`/jogador/:id`): perfil público de outro jogador (stats + grupos
   visíveis).
 
 ### Admin — `features/admin` → ver [`04-ADMIN.md`](04-ADMIN.md)
-- **`AdminPage`** (`/admin`): abas **Federações / Comp. / Users / Pgto**.
+- **`AdminPage`** (`/admin`): abas **Grupos / Comp. / Users / Pgto**.
 - **`AdminCompMatchesPage`** (`/admin/competicoes/:id/jogos`): gerir jogos de uma competição
   (curadoria `hidden`, override de placar/status).
 
 ### Conteúdo / sistema
-- **`help/ComoFuncionaPage`** (`/como-funciona`): regras do jogo (pontuação, modos, federação,
+- **`help/ComoFuncionaPage`** (`/como-funciona`): regras do jogo (pontuação, modos, grupo,
   desempate, promoção).
 - **`landing/LandingSections`**: hero + features para visitantes (dentro da JogosPage deslogada).
 - **`legal/PrivacidadePage` / `TermosPage`**: páginas legais (LGPD, pagamento §12, arrependimento).
@@ -113,7 +113,7 @@ Tema: `theme/ThemeProvider` + `ThemeToggle`. PWA: `pwa/InstallPrompt`.
   cria/carrega profile → `Onboarding` no 1º acesso.
 - **Palpitar**: `JogosPage` → escolhe competição/dia → `MatchCard` (inputs auto-save) → opcional 2×
   → resultado pontua sozinho ao encerrar o jogo.
-- **Criar/entrar federação**: `NovaLigaPage` (cria → checkout/ativação) **ou** `LigasPage` (entrar
+- **Criar/entrar grupo**: `NovaLigaPage` (cria → checkout/ativação) **ou** `LigasPage` (entrar
   por código) → `LigaDetailPage`.
 - **Ver classificação/confronto**: `LigaDetailPage` → aba Classificação → `StandingsTable` (Pontos)
   ou `ConfrontoSection` (Liga/Copa).

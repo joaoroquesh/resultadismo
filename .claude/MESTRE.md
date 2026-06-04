@@ -22,9 +22,8 @@ Versão atual do projeto: **2.2.2** · App em produção: **https://www.resultad
 ## 1. O que é o Resultadismo (30 segundos)
 
 Jogo social de **palpites de placares de futebol**. Você crava o placar de jogos reais, ganha
-pontos (**cravada +3 / saldo +2 / acerto +1**) e disputa em **Federações** (grupos privados de
-amigos) com classificação, confrontos e zoeira saudável. **Jogar e palpitar é grátis**; cobra-se
-só pela **criação de uma Federação** (taxa única). Não é casa de apostas: não há aposta nem prêmio
+pontos (**cravada +3 / saldo +2 / acerto +1**) e disputa em **grupos** privados de amigos com classificação, confrontos e zoeira saudável. **Jogar e palpitar é grátis**; cobra-se
+só pela **criação de umo Grupo** (taxa única). Não é casa de apostas: não há aposta nem prêmio
 em dinheiro.
 
 - **Stack:** SPA Vite + React 19 + TypeScript + Tailwind v4, backend **Supabase** (Postgres, Auth
@@ -50,9 +49,9 @@ daquele assunto.
 | 01 | [`01-ARQUITETURA.md`](01-ARQUITETURA.md) | Entender stack, pastas, fluxo de dados, integrações, modelo de deploy. |
 | 02 | [`02-CODIGO.md`](02-CODIGO.md) | Antes de escrever código: convenções de React/TS/Tailwind, design tokens, padrões de dados. |
 | 03 | [`03-PAGINAS.md`](03-PAGINAS.md) | Mexer em telas/rotas: catálogo de páginas, navegação, componentes de UI. |
-| 04 | [`04-ADMIN.md`](04-ADMIN.md) | Mexer em admin: app-admin × admin de federação, painel, RPCs de admin. |
+| 04 | [`04-ADMIN.md`](04-ADMIN.md) | Mexer em admin: app-admin × admin de grupo, painel, RPCs de admin. |
 | 05 | [`05-DADOS-E-AUTH.md`](05-DADOS-E-AUTH.md) | Mexer em banco/login: tabelas, RLS, RPCs, autenticação, login/logout. |
-| 06 | [`06-REGRAS-DE-NEGOCIO.md`](06-REGRAS-DE-NEGOCIO.md) | **A constituição.** Pontuação, federações, pagamento, confrontos, escudos, notificações. |
+| 06 | [`06-REGRAS-DE-NEGOCIO.md`](06-REGRAS-DE-NEGOCIO.md) | **A constituição.** Pontuação, grupos, pagamento, confrontos, escudos, notificações. |
 | 07 | [`07-BUILD-E-DEPLOY.md`](07-BUILD-E-DEPLOY.md) | Build, variáveis de ambiente, como o deploy chega em produção, secrets. |
 | 08 | [`08-PROCESSO.md`](08-PROCESSO.md) | **Como subir uma mudança** do começo ao fim (detalha o protocolo da seção 5). |
 | 09 | [`09-PARALELISMO.md`](09-PARALELISMO.md) | **Vários chats/sessões no mesmo repo.** Regras anti-colisão. Ler antes de qualquer `git`. |
@@ -75,7 +74,7 @@ de docs + changelog (seção 5). Cada uma tem dono num doc específico.
    client). → [`06`](06-REGRAS-DE-NEGOCIO.md), [`05`](05-DADOS-E-AUTH.md).
 2. **Desempate fixo:** pontos → cravadas → saldos → aproveitamento → acertividade → membro mais
    antigo. Já existe em `get_league_standings`. → [`06`](06-REGRAS-DE-NEGOCIO.md).
-3. **Não é casa de apostas.** Cobra-se taxa de serviço pela **criação de Federação**, nunca aposta
+3. **Não é casa de apostas.** Cobra-se taxa de serviço pela **criação de Grupo**, nunca aposta
    nem prêmio. Sem pote/stakes (Lei 14.790/2023). → [`06`](06-REGRAS-DE-NEGOCIO.md).
 4. **Segurança é no banco (RLS-first).** Toda regra de acesso vive em RLS/RPC `SECURITY DEFINER`.
    O frontend **espelha**, nunca é a fonte de verdade. → [`05`](05-DADOS-E-AUTH.md).
@@ -134,7 +133,7 @@ de docs + changelog (seção 5). Cada uma tem dono num doc específico.
 
 **1. Questionar com espírito crítico.** Seja crítico em **cada** alteração. A mudança faz sentido frente a:
    - as **regras de negócio** (doc 06) — ela respeita pontuação, desempate, "não é aposta", regras
-     de federação/pagamento/confronto?
+     de grupo/pagamento/confronto?
    - a **arquitetura e o código** (docs 01, 02, 05) — cabe nos padrões? mexe em RLS/segurança?
    - os **processos e a identidade** (docs 07, 08, `DESIGN.md`) — é deployável com segurança? está
      on-brand?
@@ -208,7 +207,7 @@ de docs + changelog (seção 5). Cada uma tem dono num doc específico.
 | Que telas existem e em que rota | [`03-PAGINAS.md`](03-PAGINAS.md) |
 | Regras de admin | [`04-ADMIN.md`](04-ADMIN.md) |
 | Tabelas, RLS, login/logout | [`05-DADOS-E-AUTH.md`](05-DADOS-E-AUTH.md) |
-| Pontuação, federação, pagamento, confronto, escudo | [`06-REGRAS-DE-NEGOCIO.md`](06-REGRAS-DE-NEGOCIO.md) |
+| Pontuação, grupo, pagamento, confronto, escudo | [`06-REGRAS-DE-NEGOCIO.md`](06-REGRAS-DE-NEGOCIO.md) |
 | Subir uma mudança sem quebrar nada | [`08-PROCESSO.md`](08-PROCESSO.md) |
 | Trabalhar junto com outro chat | [`09-PARALELISMO.md`](09-PARALELISMO.md) |
 | Código-fonte do banco | [`supabase/migrations/`](../supabase/migrations/) · [`supabase/functions/`](../supabase/functions/) |

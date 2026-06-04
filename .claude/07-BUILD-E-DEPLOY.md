@@ -91,8 +91,8 @@ npm run dev          # Vite em http://localhost:5173  (ou 5180 via .claude/launc
 - Portas **5442x** (deslocadas p/ não colidir com outro projeto Supabase na máquina).
 - Após mudar schema local: `npm run db:reset` (re-aplica tudo) e `npm run db:types` (regenera tipos).
 - Usuários de teste no seed (senha `resultadismo123`): `joao.crf93@gmail.com` (admin),
-  `bruno@teste.com` / `luan@teste.com` (membros), `dona@teste.com` (dona de federação, não-admin),
-  `novato@teste.com` (1º acesso, sem federação).
+  `bruno@teste.com` / `luan@teste.com` (membros), `dona@teste.com` (dona de grupo, não-admin),
+  `novato@teste.com` (1º acesso, sem grupo).
 
 ## 6. Go-live de cobrança (referência — já feito pelo João)
 

@@ -66,7 +66,7 @@ nunca debocha de quem errou nem exclui ninguém. Calibragem **equilibrada**: zoe
 - ✅ "Cutuca o preguiçoso que ainda não palpitou. 👉"
 - ✅ "Tá quieto demais nessa rodada, hein?"
 - ❌ "Que palpite ridículo." (debochar do usuário)
-- ❌ Zoeira em momento sério (erro de pagamento, reembolso, sair da federação).
+- ❌ Zoeira em momento sério (erro de pagamento, reembolso, sair do grupo).
 
 ### Conceito 3 — Direto e claro (sem corporatês)
 **Características:** coloquial, objetivo, simples.
@@ -83,7 +83,7 @@ nunca debocha de quem errou nem exclui ninguém. Calibragem **equilibrada**: zoe
 **O que significa:** a gente fala a verdade sobre dinheiro, prazos e regras, sem pressão, sem
 linguagem de aposta/odds/risco. Ver a **linguagem proibida** (seção 4).
 
-- ✅ "Criar uma federação custa R$ 9,90 (taxa única). Jogar é grátis."
+- ✅ "Criar umo grupo custa R$ 9,90 (taxa única). Jogar é grátis."
 - ✅ "Mudou de ideia? Você pode cancelar e receber de volta em até 7 dias."
 - ❌ "Aposte agora e ganhe!" / "Última chance!" / "Suas odds de cravar."
 - ❌ Esconder o custo ou criar falsa urgência.
@@ -124,32 +124,32 @@ Regra de ouro: **quanto mais sério o momento (dinheiro, perda, erro), menos zoe
 ### Termos oficiais (use exatamente estes)
 | Use | Não use | Observação |
 |---|---|---|
-| **federação** → **grupo** | liga, bolão* | o espaço social. ⚠️ **Decisão: renomear p/ "grupo"** (a implementar — [`decisions/0001`](decisions/0001-espaco-grupo.md)). (*Bolão/Liga/Copa são **prefixos**, não sinônimos) |
+| **grupo** | federação, liga, bolão* | o espaço social (antes "Federação"). (*Bolão/Liga/Copa são **prefixos**, não sinônimos) |
 | **palpite** / **palpitar** | aposta, chute, previsão | a ação central |
 | **cravar** / **cravada** | acertar em cheio | placar exato (+3) |
 | **saldo** | — | vencedor + diferença de gols (+2) |
 | **acerto** | — | só o vencedor (+1) |
-| **dobro (2×)** | joker, coringa, multiplicador | rótulo visível: **"Dobro (2×)"** |
+| **dobro (2×)** | **joker** (anglicismo), multiplicador | rótulo: **"Dobro (2×)"**. Metáfora de carta? use **"coringa"** (PT), nunca "joker". |
 | **confronto** | duelo, mata-mata* | duelo A×B (*mata-mata = a Copa) |
 | **Liga / Copa** | — | modos de confronto (Liga = pontos corridos; Copa = mata-mata) |
 | **classificação** | tabela | "ranking" é aceitável se for mais claro no contexto |
 | **cutucar** | nudge, alertar | lembrar quem não palpitou |
-| **escudo** | avatar, brasão | identidade visual de perfil/federação |
+| **escudo** | avatar, brasão | identidade visual de perfil/grupo |
 | **jogo** | partida, match | |
 
 ### ⛔ Linguagem PROIBIDA (regra de negócio 3 — "não é casa de apostas")
 **Nunca** use, em nenhum texto do site: **aposta/apostar, odds, banca, prêmio em dinheiro, ganhe
 dinheiro, jackpot, cassino, "última chance", urgência predatória.** Cobra-se uma **taxa de serviço**
-pela criação de federação — fale sempre nesses termos. → [`06`](06-REGRAS-DE-NEGOCIO.md) §5.
+pela criação de grupo — fale sempre nesses termos. → [`06`](06-REGRAS-DE-NEGOCIO.md) §5.
 
 ### Convenções
 - **Tratamento:** **"você"**, sempre (sem "tu"/"cês").
 - **Anglicismos — priorize a clareza:** use o termo que a pessoa entende **mais rápido**. PT-BR
   quando for igualmente claro (classificação, dobro, ao vivo); o termo consagrado quando for o mais
   óbvio (ex.: "Pix", "app", "login"). **Clareza acima de purismo** — e acima de soar bonito.
-- **Capitalização:** *sentence case* (só a 1ª letra). "Criar federação", não "Criar Federação".
+- **Capitalização:** *sentence case* (só a 1ª letra). "Criar grupo", não "Criar Grupo".
 - **CTAs herói** (marca): imperativo na 2ª pessoa — "Crave o placar", "Faça seu palpite".
-- **Botões funcionais:** infinitivo curto — "Salvar", "Criar federação", "Entrar", "Cancelar".
+- **Botões funcionais:** infinitivo curto — "Salvar", "Criar grupo", "Entrar", "Cancelar".
 - **Números/placar:** algarismos sempre (3 × 1, +3, R$ 9,90). Vírgula decimal, "R$" com espaço.
 - **Emojis:** com **parcimônia**, só em festa/leveza. Lista oficial: **🔥** (cravada/grande momento),
   **👉** (cutucada), **⚽** (jogos), **⏰** (prazo). **Nunca** em erro, dinheiro ou confirmação séria.
@@ -160,12 +160,12 @@ pela criação de federação — fale sempre nesses termos. → [`06`](06-REGRA
 
 ### Botões e CTAs
 Verbo de ação + objeto, *sentence case*. 2–4 palavras. Nada de "OK", "Enviar", "Clique aqui".
-- ✅ "Fazer palpite" · "Criar federação" · "Entrar com código" · "Cancelar e reembolsar"
+- ✅ "Fazer palpite" · "Criar grupo" · "Entrar com código" · "Cancelar e reembolsar"
 - ❌ "OK" · "Enviar" · "Confirmar" (sozinho, sem objeto)
 
 ### Títulos
 Frase-substantivo curta (≤ 40 caracteres), *sentence case*, orienta onde estou.
-- ✅ "Suas federações" · "Como funciona" · "Jogos de hoje"
+- ✅ "Suos grupos" · "Como funciona" · "Jogos de hoje"
 
 ### Mensagens de erro — `[O que falhou]. [Por quê]. [O que fazer].`
 Empático, sem culpar, sempre com saída. 12–18 palavras.
@@ -174,31 +174,31 @@ Empático, sem culpar, sempre com saída. 12–18 palavras.
 | Palpite após o apito | "O jogo já começou — os palpites travaram aqui." | "Operação não permitida." |
 | Sem conexão ao salvar | "Não deu pra salvar. Confira a internet e tente de novo." | "Erro ao salvar." |
 | Pagamento recusado | "O pagamento não passou. Tente outro cartão ou Pix." | "Falha na transação." |
-| Código de convite inválido | "Não achamos essa federação. Confira o código." | "Código inválido." |
+| Código de convite inválido | "Não achamos esso grupo. Confira o código." | "Código inválido." |
 
 ### Mensagens de sucesso — `[Ação] [resultado]`
 Passado, específico, proporcional.
-- ✅ "Palpite salvo." · "Você entrou na federação." · "Cravou! +3 pra você. 🔥"
+- ✅ "Palpite salvo." · "Você entrou no grupo." · "Cravou! +3 pra você. 🔥"
 - ❌ "Sucesso!" · "Operação concluída."
 
 ### Estados vazios — explicação + próximo passo
-- Sem federações: **"Você ainda não está em nenhuma federação."** + "Crie a sua ou entre com um
+- Sem grupos: **"Você ainda não está em nenhumo grupo."** + "Crie a sua ou entre com um
   código de convite."
 - Sem jogos no dia: **"Nenhum jogo hoje."** + "Veja os próximos ou troque de campeonato."
 
 ### Confirmações (destrutivo / sério) — consequência clara, fácil voltar
-- Sair da federação (com confronto ativo): **"Sair agora dá W.O. nos seus confrontos em aberto — o
+- Sair do grupo (com confronto ativo): **"Sair agora dá W.O. nos seus confrontos em aberto — o
   adversário vence. Tem certeza?"** → "Sair" / "Voltar". (2 passos, ver `ConfirmDialog`.)
-- Reembolso: **"Cancelar e reembolsar? A federação vai pra Lixeira e o valor volta em até 7 dias."**
+- Reembolso: **"Cancelar e reembolsar? O grupo vai pra Lixeira e o valor volta em até 7 dias."**
 
 ### Formulários
-- **Label** visível e curto ("Nome da federação"). Sem campo só-placeholder.
+- **Label** visível e curto ("Nome do grupo"). Sem campo só-placeholder.
 - **Ajuda** explica o porquê quando precisa ("Esse código deixa seus amigos entrarem.").
 - **Erro inline:** abaixo do campo, específico ("O nome precisa de pelo menos 3 letras.").
 
 ### Notificações / Web Push — título (verbo) + corpo curto
 - Lembrete de prazo: **"Não esquece de palpitar! ⏰"** + "Brasil × Argentina começa logo."
-- Cutucada: **"Cutucada! 👉"** + "Fulano tá esperando seu palpite na [federação]."
+- Cutucada: **"Cutucada! 👉"** + "Fulano tá esperando seu palpite na [grupo]."
 
 ### Onboarding
 Convida sem afogar, foca no valor, comemora o 1º acerto. Um conceito por tela.
@@ -249,8 +249,8 @@ Avalie cada texto nas 4 dimensões (some um 5º: on-brand). Nota baixa → reesc
 | "Previsão registrada." | "Palpite salvo." | termo oficial, conversacional |
 | "Erro: operação inválida." | "O jogo já começou — os palpites travaram." | explica + sem culpar |
 | "Deseja realmente sair?" | "Sair agora dá W.O. nos seus confrontos. Tem certeza?" | consequência clara |
-| "Adquira sua liga." | "Crie sua federação — taxa única de R$ 9,90." | termo certo, honesto, sem "aposta" |
-| "Nenhum dado encontrado." | "Você ainda não está em nenhuma federação." + CTA | ensina o próximo passo |
+| "Adquira sua liga." | "Crie suo grupo — taxa única de R$ 9,90." | termo certo, honesto, sem "aposta" |
+| "Nenhum dado encontrado." | "Você ainda não está em nenhumo grupo." + CTA | ensina o próximo passo |
 
 ---
 

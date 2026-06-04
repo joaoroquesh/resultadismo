@@ -102,7 +102,7 @@ Regras:
 | `<button>` sem `type` dentro de `<form>` dispara **submit** | O `Button` base já assume `type="button"`. Botões de envio reais declaram `type="submit"`. |
 | `PostgrestError` engolido como "Erro." | Relance `new Error(error.message)` para o toast. |
 | Vite **não enumera `public/`** | Assets que precisam de `import.meta.glob` (ex.: escudos) ficam em `src/assets/`. |
-| Renomear `escudo-<id>.svg`/`flamula-<id>.svg` em uso | **Não renomeie** — o `<id>` fica salvo no perfil/federação. Adicione novos. |
+| Renomear `escudo-<id>.svg`/`flamula-<id>.svg` em uso | **Não renomeie** — o `<id>` fica salvo no perfil/grupo. Adicione novos. |
 | Mudar tipo de retorno de função SQL | `drop function` antes de `create` (Postgres não troca assinatura com `create or replace`). |
 | Editar `src/types/database.ts` à mão | É **gerado**. Rode `npm run db:types` após mudar o schema local. |
 | Recalcular pontuação no client | **Nunca.** Pontuação/classificação vêm do banco. |

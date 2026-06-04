@@ -88,7 +88,7 @@ colidem com frequência**:
 
 | Área | Arquivos quentes | Risco |
 |---|---|---|
-| Federações/ligas | `leagues` (DB + `features/leagues` + `database.ts`) | Alto — pagamento, confronto e moderação mexem todos aqui |
+| Grupos/ligas | `leagues` (DB + `features/leagues` + `database.ts`) | Alto — pagamento, confronto e moderação mexem todos aqui |
 | Pagamento | `app_settings`, `league_payments`, `features/payments`, functions MP | Alto — dinheiro ao vivo |
 | Confronto | `cup_ties`, `league_competitions`, `features/confronto` | Alto — muitas migrations |
 | Admin | `features/admin`, RPCs `admin_*` | Médio |

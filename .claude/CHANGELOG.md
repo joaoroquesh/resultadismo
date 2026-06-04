@@ -27,9 +27,10 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   reger o **design**, não só o texto.
 
 ### Decisões
-- **ADR 0001 — "Federação" → "Grupo"** ([`.claude/decisions/0001-espaco-grupo.md`](decisions/0001-espaco-grupo.md)):
-  decisão aprovada de renomear o espaço dos grupos de amigos para **"Grupo"** (clareza pro leigo;
-  "Liga"/"Bolão" já são modos). **A implementar** na UI/rotas (banco segue `leagues`).
+- **Renome "Federação" → "Grupo"** (ADR [`0001`](decisions/0001-espaco-grupo.md)): termo mais claro
+  pro leigo ("Liga"/"Bolão" já são modos). **Documentação `.claude/` renomeada**; a UI/rotas de
+  produção estão sendo atualizadas (banco segue `leagues`). Também **"joker" → "coringa"** no
+  glossário (PT, não anglicismo).
 
 ---
 
