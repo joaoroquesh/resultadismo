@@ -173,13 +173,13 @@ export function ConfrontoRounds({
       if (!map.has(t.round_order)) map.set(t.round_order, { label: t.round_label, ties: [] });
       map.get(t.round_order)!.ties.push(t);
     }
-    return [...map.entries()].sort((a, b) => a[0] - b[0]).map(([, v]) => v);
+    return [...map.entries()].sort((a, b) => a[0] - b[0]).map(([order, v]) => ({ order, ...v }));
   }, [ties]);
 
   return (
     <div className="space-y-3">
-      {rounds.map((r, i) => (
-        <div key={i}>
+      {rounds.map((r) => (
+        <div key={r.order}>
           <h4 className="mb-1.5 px-1 text-xs font-bold uppercase tracking-wide text-ink-400">
             {r.label}
           </h4>
@@ -425,14 +425,14 @@ export function CopaBracket({
     }
     return [...map.entries()]
       .sort((a, b) => a[0] - b[0])
-      .map(([, v]) => ({ ...v, ties: v.ties.sort((a, b) => a.slot - b.slot) }));
+      .map(([order, v]) => ({ order, ...v, ties: v.ties.sort((a, b) => a.slot - b.slot) }));
   }, [ties]);
 
   return (
     <div className="no-scrollbar overflow-x-auto pb-2">
       <div className="flex gap-3" style={{ minWidth: rounds.length * 180 }}>
-        {rounds.map((r, i) => (
-          <div key={i} className="flex min-w-[168px] flex-1 flex-col justify-around gap-3">
+        {rounds.map((r) => (
+          <div key={r.order} className="flex min-w-[168px] flex-1 flex-col justify-around gap-3">
             <h4 className="text-center text-xs font-bold uppercase tracking-wide text-ink-400">
               {r.label}
             </h4>

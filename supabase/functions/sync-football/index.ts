@@ -6,12 +6,7 @@
 // Chamada agendada (cron): POST com a service_role key no Authorization.
 
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+import { corsHeaders, timingSafeEqual } from "../_shared/security.ts";
 
 type MatchStatus = "scheduled" | "live" | "finished" | "postponed" | "cancelled";
 
@@ -21,13 +16,6 @@ interface CompetitionRow {
   provider: "manual" | "football_data" | "thesportsdb" | "espn";
   provider_code: string | null;
   provider_season: string | null;
-}
-
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
 }
 
 // ---------------------------------------------------------------------------
@@ -125,7 +113,8 @@ async function syncFootballData(
 
   const res = await fetch(url, { headers: { "X-Auth-Token": token } });
   if (!res.ok) {
-    throw new Error(`football-data ${res.status}: ${await res.text()}`);
+    console.error("football-data sync error", res.status, await res.text());
+    throw new Error(`football-data indisponível (${res.status})`);
   }
   const data = await res.json();
   const matches: any[] = data.matches ?? [];
@@ -395,7 +384,10 @@ async function syncEspn(
 
   // 1) seed (hoje) → traz o calendar (datas com jogo)
   const seedRes = await fetch(`${base}?dates=${ymd(today)}`);
-  if (!seedRes.ok) throw new Error(`espn ${seedRes.status}: ${await seedRes.text()}`);
+  if (!seedRes.ok) {
+    console.error("espn sync error", seedRes.status, await seedRes.text());
+    throw new Error(`espn indisponível (${seedRes.status})`);
+  }
   const seed = await seedRes.json();
 
   // janela: -3 a +28 dias, dentro do calendar (teto de 30 requisições)
@@ -491,7 +483,13 @@ async function syncEspn(
 // Handler
 // ---------------------------------------------------------------------------
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const cors = corsHeaders(req);
+  const json = (body: unknown, status = 200) =>
+    new Response(JSON.stringify(body), {
+      status,
+      headers: { ...cors, "Content-Type": "application/json" },
+    });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -506,7 +504,9 @@ Deno.serve(async (req) => {
   // Autorização: cron (service key ou CRON_SECRET) ou usuário app_admin
   const authHeader = req.headers.get("Authorization") ?? "";
   const jwt = authHeader.replace("Bearer ", "");
-  let authorized = jwt === serviceKey || (!!cronSecret && jwt === cronSecret);
+  let authorized =
+    (!!jwt && timingSafeEqual(jwt, serviceKey)) ||
+    (!!cronSecret && !!jwt && timingSafeEqual(jwt, cronSecret));
   if (!authorized && jwt) {
     const { data: userData } = await admin.auth.getUser(jwt);
     if (userData.user) {

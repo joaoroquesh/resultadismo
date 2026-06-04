@@ -33,16 +33,6 @@ export type MatchWithTeams = Match & {
   competition?: Pick<Competition, "id" | "name" | "slug" | "emblem_url"> | null;
 };
 
-export type MatchWithPrediction = MatchWithTeams & {
-  prediction: Prediction | null;
-};
-
-export type LeagueWithMembership = League & {
-  member_count?: number;
-  my_role?: MemberRole | null;
-  my_status?: MemberStatus | null;
-};
-
 export const SCORE_POINTS: Record<ScoreType, number> = {
   cravada: 3,
   saldo: 2,

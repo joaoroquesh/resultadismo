@@ -106,7 +106,7 @@ export function JogosPage() {
     if (!matches || !predMap) return m;
     for (const mt of matches) {
       if (!predMap.get(mt.id)?.is_joker) continue;
-      const compKey = (mt as { competition_id?: string }).competition_id ?? "?";
+      const compKey = mt.competition_id ?? "?";
       const k = `${compKey}:${weekKey(mt.kickoff_at)}`;
       m.set(k, (m.get(k) ?? 0) + 1);
     }
@@ -274,7 +274,7 @@ export function JogosPage() {
       ) : (
         <div className="space-y-3">
           {dayMatches.map((m) => {
-            const compKey = (m as { competition_id?: string }).competition_id ?? "?";
+            const compKey = m.competition_id ?? "?";
             const wk = weekKey(m.kickoff_at);
             return (
               <MatchCard

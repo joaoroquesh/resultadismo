@@ -50,13 +50,20 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((t) => (
           <div
             key={t.id}
+            role={t.tone === "error" ? "alert" : "status"}
+            aria-live={t.tone === "error" ? "assertive" : "polite"}
+            aria-atomic="true"
             className={cn(
               "animate-pop-in pointer-events-auto flex w-full max-w-sm items-center gap-3 rounded-md bg-surface p-3 shadow-[var(--shadow-pop)] ring-1 ring-border",
             )}
           >
             {icons[t.tone]}
             <p className="flex-1 text-sm font-medium text-ink-900">{t.message}</p>
-            <button onClick={() => remove(t.id)} className="text-ink-400 hover:text-ink-700">
+            <button
+              onClick={() => remove(t.id)}
+              aria-label="Fechar"
+              className="text-ink-400 hover:text-ink-700"
+            >
               <X className="size-4" />
             </button>
           </div>

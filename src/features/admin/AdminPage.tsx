@@ -88,7 +88,7 @@ function LigasAdmin() {
   if (isLoading) return <Skeleton className="h-40 w-full" />;
 
   // federações já excluídas (soft) saem das listas normais e vão pra Lixeira
-  const live = (leagues ?? []).filter((l) => !(l as { deleted_at?: string | null }).deleted_at);
+  const live = (leagues ?? []).filter((l) => !l.deleted_at);
   const pending = live.filter((l) => l.status === "pending");
   const others = live.filter((l) => l.status !== "pending");
 
@@ -266,7 +266,7 @@ function CompeticoesAdmin() {
   const dupGroups = useMemo(() => {
     const m = new Map<string, string[]>();
     for (const c of comps ?? []) {
-      const k = normalizeName((c as { display_name?: string }).display_name || c.name);
+      const k = normalizeName(c.display_name || c.name);
       if (!k) continue;
       const arr = m.get(k) ?? [];
       arr.push(c.id);

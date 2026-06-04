@@ -55,7 +55,7 @@ export function useConfrontoStandings(lcId: string | undefined, enabled = true) 
     queryKey: ["confronto-standings", lcId],
     queryFn: async (): Promise<ConfrontoStanding[]> => {
       const { data, error } = await supabase.rpc("get_confronto_standings", { p_lc_id: lcId! });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return (data ?? []) as ConfrontoStanding[];
     },
   });
@@ -68,7 +68,7 @@ export function useConfrontoTies(lcId: string | undefined, enabled = true) {
     queryKey: ["confronto-ties", lcId],
     queryFn: async (): Promise<ConfrontoTie[]> => {
       const { data, error } = await supabase.rpc("get_confronto_ties", { p_lc_id: lcId! });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return (data ?? []) as ConfrontoTie[];
     },
   });
@@ -102,7 +102,7 @@ export function useTieDetail(tieId: string | undefined, enabled = true) {
     queryKey: ["tie-detail", tieId],
     queryFn: async (): Promise<TieDetailRow[]> => {
       const { data, error } = await supabase.rpc("get_tie_detail", { p_tie_id: tieId! });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return (data ?? []) as TieDetailRow[];
     },
   });
@@ -128,25 +128,8 @@ export function useConfrontoPeriods(competitionId: string | undefined, kind: Per
         p_competition_id: competitionId!,
         p_kind: kind,
       });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return (data ?? []) as ConfrontoPeriod[];
-    },
-  });
-}
-
-/** Participantes travados no sorteio. */
-export function useConfrontoParticipants(lcId: string | undefined, enabled = true) {
-  return useQuery({
-    enabled: !!lcId && enabled,
-    queryKey: ["confronto-participants", lcId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("confronto_participants")
-        .select("user_id, seed, profile:profiles(display_name, avatar_url)")
-        .eq("league_competition_id", lcId!)
-        .order("seed");
-      if (error) throw error;
-      return data ?? [];
     },
   });
 }
@@ -161,7 +144,7 @@ export function useConfrontoOptins(lcId: string | undefined, enabled = true) {
         .from("confronto_optins")
         .select("user_id")
         .eq("league_competition_id", lcId!);
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return (data ?? []).map((r) => r.user_id as string);
     },
   });
@@ -250,7 +233,7 @@ export function useDrawConfronto() {
         p_period_kind: input.kind ?? "phase",
         p_scheduled_draw_at: input.scheduledDrawAt ?? undefined,
       });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return { ties: ties.length, participants: ids.length, scheduled: !!input.scheduledDrawAt };
     },
     onSuccess: (_r, v) => invalidateConfronto(qc, v.lcId, v.leagueId),
@@ -263,7 +246,7 @@ export function useUndoDraw() {
   return useMutation({
     mutationFn: async (input: { lcId: string; leagueId: string }) => {
       const { error } = await supabase.rpc("undo_confronto_draw", { p_lc_id: input.lcId });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
     },
     onSuccess: (_r, v) => invalidateConfronto(qc, v.lcId, v.leagueId),
   });
@@ -339,5 +322,24 @@ export function useAdvanceSwiss() {
       return { lcId: input.lcId, created: newTies.length, round: maxRound + 1 };
     },
     onSuccess: (r) => invalidateConfronto(qc, r.lcId),
+  });
+}
+
+/**
+ * Copa (mata-mata): promove o vencedor de cada chave para a próxima fase.
+ * Idempotente (só preenche slot vazio) — chamada "lazy" pelo client ao abrir o
+ * chaveamento; o avanço de fato acontece no servidor (advance_confronto_cup).
+ */
+export function useAdvanceCup() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { lcId: string; leagueId?: string }) => {
+      const { data, error } = await supabase.rpc("advance_confronto_cup", { p_lc_id: input.lcId });
+      if (error) throw new Error(error.message);
+      return (data ?? 0) as number;
+    },
+    onSuccess: (created, v) => {
+      if (created > 0) invalidateConfronto(qc, v.lcId, v.leagueId);
+    },
   });
 }

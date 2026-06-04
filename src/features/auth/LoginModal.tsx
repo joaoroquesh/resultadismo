@@ -46,9 +46,20 @@ export function LoginModal({ open, onClose }: { open: boolean; onClose: () => vo
     // sucesso: o OAuth redireciona; não precisa mexer no estado aqui
   }
 
+  // Login de desenvolvimento: só aparece quando rodando em DEV e quando AMBAS as
+  // variáveis (e-mail + senha) estiverem definidas no ambiente. Sem credenciais
+  // hardcoded no código.
+  const devLogin =
+    import.meta.env.DEV &&
+    import.meta.env.VITE_DEV_LOGIN_EMAIL &&
+    import.meta.env.VITE_DEV_LOGIN_PASSWORD;
+
   async function handleDevLogin() {
     setBusy(true);
-    const { error } = await signInWithPassword("joao.crf93@gmail.com", "resultadismo123");
+    const { error } = await signInWithPassword(
+      import.meta.env.VITE_DEV_LOGIN_EMAIL,
+      import.meta.env.VITE_DEV_LOGIN_PASSWORD,
+    );
     if (error) {
       toast(error, "error");
       setBusy(false);
@@ -77,7 +88,7 @@ export function LoginModal({ open, onClose }: { open: boolean; onClose: () => vo
           </Button>
           <p className="mt-3 text-xs text-ink-400">Rapidinho, sem senha nova pra decorar.</p>
 
-          {import.meta.env.DEV && (
+          {devLogin && (
             <button
               type="button"
               onClick={handleDevLogin}

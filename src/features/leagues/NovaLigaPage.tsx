@@ -239,13 +239,14 @@ export function NovaLigaPage() {
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-ink-800">Competição (bolão inicial)</label>
             <select
+              aria-label="Competição (bolão inicial)"
               value={competitionId}
               onChange={(e) => setCompetitionId(e.target.value)}
               className="h-11 rounded-md border border-ink-200 bg-surface px-3 text-ink-950 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
             >
               {competitions?.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {(c as { display_name?: string | null }).display_name ?? c.name}
+                  {c.display_name ?? c.name}
                 </option>
               ))}
             </select>

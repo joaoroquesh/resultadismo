@@ -12,25 +12,19 @@
 // (evita o swallow de mensagem do supabase-js functions.invoke em status != 2xx).
 
 import { createClient } from "npm:@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
-
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
+import { corsHeaders } from "../_shared/security.ts";
 
 const REFUND_WINDOW_DAYS = 7;
 const DAY_MS = 86_400_000;
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const cors = corsHeaders(req);
+  const json = (body: unknown, status = 200) =>
+    new Response(JSON.stringify(body), {
+      status,
+      headers: { ...cors, "Content-Type": "application/json" },
+    });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -70,7 +64,23 @@ Deno.serve(async (req) => {
   if (league.payment_status !== "paid")
     return json({ ok: false, error: "Só federações pagas podem ser reembolsadas." });
 
-  const paidAt = league.approved_at ? new Date(league.approved_at).getTime() : 0;
+  // Pagamento PAGO registrado (pega o payment_id real do Mercado Pago)
+  const { data: pay } = await admin
+    .from("league_payments")
+    .select("payment_id, provider, amount_cents, created_at")
+    .eq("league_id", league.id)
+    .eq("status", "paid")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  // Janela de arrependimento contada a partir do PAGAMENTO (não do approved_at,
+  // que pode ter sido setado na aprovação do admin, antes do pagamento real).
+  const paidAt = pay?.created_at
+    ? new Date(pay.created_at).getTime()
+    : league.approved_at
+      ? new Date(league.approved_at).getTime()
+      : 0;
   const daysSince = paidAt ? (Date.now() - paidAt) / DAY_MS : Number.POSITIVE_INFINITY;
   if (daysSince > REFUND_WINDOW_DAYS) {
     return json({
@@ -78,16 +88,6 @@ Deno.serve(async (req) => {
       error: "O prazo de 7 dias para reembolso automático já passou. Fale com o suporte para avaliar.",
     });
   }
-
-  // Pagamento PAGO registrado (pega o payment_id real do Mercado Pago)
-  const { data: pay } = await admin
-    .from("league_payments")
-    .select("payment_id, provider, amount_cents")
-    .eq("league_id", league.id)
-    .eq("status", "paid")
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
 
   const paymentId = pay?.payment_id ?? null;
   const isRealMpPayment =
@@ -122,23 +122,15 @@ Deno.serve(async (req) => {
   }
   // Cortesia / 100% off / teste: nada a estornar — apenas cancela a federação.
 
-  // 2) Marca pagamento(s) como reembolsado(s) + arquiva a federação.
+  // 2) Marca reembolsado + arquiva a federação — atômico (for update), idempotente.
   //    service_role ⇒ can_settle_leagues() = true ⇒ o guard libera status/payment_status.
-  await admin
-    .from("league_payments")
-    .update({ status: "refunded" })
-    .eq("league_id", league.id)
-    .eq("status", "paid");
-
-  const { error: upErr } = await admin
-    .from("leagues")
-    .update({
-      payment_status: "refunded",
-      status: "archived",
-      deleted_at: new Date().toISOString(),
-    })
-    .eq("id", league.id);
+  const { data: didRefund, error: upErr } = await admin.rpc("refund_league", {
+    p_league_id: league.id,
+  });
   if (upErr) return json({ ok: false, error: upErr.message });
+  if (didRefund === false) {
+    return json({ ok: false, error: "Esta federação já foi cancelada/reembolsada." });
+  }
 
   return json({ ok: true, leagueId: league.id, refunded: isRealMpPayment });
 });

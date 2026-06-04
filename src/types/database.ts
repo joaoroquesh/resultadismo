@@ -962,6 +962,24 @@ export type Database = {
           },
         ]
       }
+      rate_limits: {
+        Row: {
+          bucket: string
+          count: number
+          window_start: string
+        }
+        Insert: {
+          bucket: string
+          count?: number
+          window_start?: string
+        }
+        Update: {
+          bucket?: string
+          count?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       teams: {
         Row: {
           country: string | null
@@ -1133,6 +1151,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      advance_confronto_cup: { Args: { p_lc_id: string }; Returns: number }
       append_confronto_ties: {
         Args: { p_lc_id: string; p_ties: Json }
         Returns: number
@@ -1351,6 +1370,11 @@ export type Database = {
         Args: { p_match_id: string; p_to_user: string }
         Returns: undefined
       }
+      rate_limit_hit: {
+        Args: { p_bucket: string; p_max: number; p_window_seconds: number }
+        Returns: boolean
+      }
+      refund_league: { Args: { p_league_id: string }; Returns: boolean }
       reject_league: {
         Args: { p_league_id: string }
         Returns: {

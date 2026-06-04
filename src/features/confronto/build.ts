@@ -159,6 +159,33 @@ export function pairKey(a: string, b: string): string {
 }
 
 /**
+ * Embaralhamento determinístico (Fisher-Yates) com seed — o "sorteio" da ordem.
+ * Seedado pelo id da disputa: o resultado é estável (a prévia bate com o que é
+ * gravado e não muda a cada render), mas não segue a ordem de entrada — tira o
+ * viés de "quem entrou primeiro pega o seed 1".
+ */
+export function shuffleSeeded<T>(arr: T[], seed: string): T[] {
+  let h = 1779033703 ^ seed.length;
+  for (let i = 0; i < seed.length; i++) {
+    h = Math.imul(h ^ seed.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  let a = h >>> 0;
+  const rng = () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  const out = [...arr];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [out[i], out[j]] = [out[j]!, out[i]!];
+  }
+  return out;
+}
+
+/**
  * Suíço: monta a PRÓXIMA rodada pareando por classificação (`order`, melhor
  * primeiro) e evitando revanches (`played`). Ímpar → último ganha folga (bye).
  */

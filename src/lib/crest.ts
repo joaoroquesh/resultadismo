@@ -14,6 +14,7 @@ import { AVATAR_COLORS, parseGenAvatar } from "./avatar";
 
 export type CrestKind = "escudo" | "flamula";
 export type CrestFill = "solid" | "stripes" | "grid" | "ball" | "photo";
+const CREST_FILLS: readonly CrestFill[] = ["solid", "stripes", "grid", "ball", "photo"];
 
 // ---------------------------------------------------------------------------
 // Catálogo de formas — montado AUTOMATICAMENTE a partir das pastas:
@@ -120,12 +121,16 @@ export function parseCrest(src: string | null | undefined): CrestConfig | null {
   const parts = src!.split(":");
   const kind: CrestKind = parts[1] === "flamula" ? "flamula" : "escudo";
   const shape = parts[2] || (kind === "flamula" ? DEFAULT_FLAMULA_SHAPE : DEFAULT_ESCUDO_SHAPE);
-  const fill = (parts[3] as CrestFill) || "solid";
+  const fill: CrestFill = CREST_FILLS.includes(parts[3] as CrestFill)
+    ? (parts[3] as CrestFill)
+    : "solid";
   const colors = (parts[4] || "").split("-").filter(Boolean);
   const rotation = Number.parseInt(parts[5] ?? "0", 10) || 0;
   // foto vem encodada e sem ":", mas faço join por segurança.
   const photoEnc = parts.slice(6).join(":");
-  const photo = photoEnc ? safeDecode(photoEnc) : undefined;
+  // sanitiza: avatar_url/logo_url são texto livre escrito pelo usuário; sem isso,
+  // uma foto forjada quebra o url("...") do CSS e injeta background (CSS injection).
+  const photo = photoEnc ? sanitizePhotoUrl(safeDecode(photoEnc)) : undefined;
   return {
     kind,
     shape,
@@ -142,6 +147,25 @@ function safeDecode(s: string): string | undefined {
   } catch {
     return undefined;
   }
+}
+
+/**
+ * Sanitiza a URL da foto antes de virar CSS `url(...)`. Rejeita qualquer coisa que
+ * quebre o `url("...")` ou injete outra declaração (aspas, parênteses, espaço, `;`,
+ * `<`, `>`, barra invertida) e só aceita http(s) absoluto. Caso contrário → undefined
+ * (o render cai no fundo sólido). Defesa contra CSS injection armazenada.
+ */
+function sanitizePhotoUrl(raw: string | null | undefined): string | undefined {
+  if (!raw) return undefined;
+  const s = raw.trim();
+  if (!s || /[\s"'()\\;<>]/.test(s)) return undefined;
+  try {
+    const u = new URL(s);
+    if (u.protocol === "https:" || u.protocol === "http:") return u.href;
+  } catch {
+    // não é URL absoluta válida
+  }
+  return undefined;
 }
 
 // ---------------------------------------------------------------------------
@@ -215,11 +239,12 @@ export function crestBackground(cfg: CrestConfig): string {
   const c = cfg.colors.map(hexOf);
   const rot = cfg.rotation;
   switch (cfg.fill) {
-    case "photo":
-      // sem foto: cai num sólido (a letra entra por cima no Avatar)
-      return cfg.photo
-        ? `center / cover no-repeat url("${cfg.photo}")`
-        : c[0] ?? hexOf("turquesa");
+    case "photo": {
+      // sanitiza no sink (cobre qualquer caller, não só o que passou por parseCrest);
+      // sem foto válida cai num sólido (a letra entra por cima no Avatar)
+      const safe = sanitizePhotoUrl(cfg.photo);
+      return safe ? `center / cover no-repeat url("${safe}")` : c[0] ?? hexOf("turquesa");
+    }
     case "stripes":
       if (c.length <= 1) return c[0] ?? hexOf("turquesa");
       if (c.length === 2)
@@ -255,20 +280,4 @@ export function crestTextColor(cfg: CrestConfig): string {
     return isDark(cfg.colors[0] ?? "") ? "#232323" : "#ffffff";
   }
   return "#ffffff";
-}
-
-/** quantas cores cada padrão usa (p/ os editores). */
-export function colorsForFill(fill: CrestFill): number {
-  switch (fill) {
-    case "solid":
-      return 1;
-    case "ball":
-      return 2;
-    case "grid":
-      return 4;
-    case "stripes":
-      return 2; // editor permite alternar 2 ou 3
-    default:
-      return 1;
-  }
 }

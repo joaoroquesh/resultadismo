@@ -20,7 +20,14 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import { useLeagueMembers } from "@/features/leagues/api";
 import { MAX_JOGADORES } from "./simulator";
-import { roundsNeeded, buildLigaFixtures, buildCopaFixtures, type Period, type DrawTie } from "./build";
+import {
+  roundsNeeded,
+  buildLigaFixtures,
+  buildCopaFixtures,
+  shuffleSeeded,
+  type Period,
+  type DrawTie,
+} from "./build";
 import {
   useConfrontoTies,
   useConfrontoPeriods,
@@ -29,6 +36,7 @@ import {
   useDrawConfronto,
   useUndoDraw,
   useAdvanceSwiss,
+  useAdvanceCup,
   type ConfrontoFormato,
   type ConfrontoTie,
   type PeriodKind,
@@ -210,11 +218,12 @@ function SorteioPanel({
   const { data: members } = useLeagueMembers(leagueId);
   const allPlayers = useMemo(() => {
     const active = (members ?? []).filter((m) => m.status === "active");
-    active.sort((a, b) => (a.joined_at ?? "").localeCompare(b.joined_at ?? ""));
-    return active
+    const mapped = active
       .map((m) => ({ id: m.profile?.id as string, name: m.profile?.display_name ?? "—" }))
       .filter((p) => p.id);
-  }, [members]);
+    // "sorteio" da ordem: embaralha de forma estável (seed = id da disputa).
+    return shuffleSeeded(mapped, lcId);
+  }, [members, lcId]);
   const nameOf = (id: string | null) =>
     id ? (allPlayers.find((p) => p.id === id)?.name ?? "—") : "—";
 
@@ -574,9 +583,9 @@ function SorteioPanel({
             {isLiga ? "Rodada 1" : (previewRound1[0]?.round_label ?? "1ª fase")}
           </p>
           <ul className="space-y-1">
-            {previewRound1.map((t, i) => (
+            {previewRound1.map((t) => (
               <li
-                key={i}
+                key={`${t.round_order}-${t.slot}`}
                 className="flex items-center gap-2 rounded-md bg-surface-2 px-2.5 py-1.5 text-sm"
               >
                 <span className="min-w-0 flex-1 truncate text-right font-semibold text-ink-900">
@@ -619,7 +628,7 @@ function SorteioPanel({
             </p>
           )}
           <p className="mt-2 text-[11px] leading-relaxed text-ink-400">
-            A ordem segue a entrada na federação. É exatamente o confronto que será criado.
+            A ordem dos confrontos é sorteada. É exatamente o confronto que será criado.
           </p>
         </div>
       )}
@@ -800,8 +809,18 @@ function DrawnView({
   const { data: ties, isLoading } = useConfrontoTies(lcId);
   const undo = useUndoDraw();
   const advance = useAdvanceSwiss();
+  const advanceCup = useAdvanceCup();
   const [openTie, setOpenTie] = useState<ConfrontoTie | null>(null);
   const [tab, setTab] = useState<"tabela" | "rodadas">("tabela");
+
+  // Copa: ao abrir o chaveamento (e quando os resultados mudam), promove os
+  // vencedores p/ a próxima fase. Idempotente — converge (só invalida se mexeu).
+  useEffect(() => {
+    if (formato === "cup" && (ties?.length ?? 0) > 0) {
+      advanceCup.mutate({ lcId });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formato, lcId, ties]);
 
   if (isLoading) return <Skeleton className="h-64 w-full" />;
   const list = ties ?? [];

@@ -20,7 +20,6 @@ interface AuthContextValue {
   refreshProfile: () => Promise<void>;
   signInWithGoogle: () => Promise<{ error: string | null }>;
   signInWithPassword: (email: string, password: string) => Promise<{ error: string | null }>;
-  signUp: (email: string, password: string, name: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -98,15 +97,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message ?? null };
   }, []);
 
-  const signUp = useCallback(async (email: string, password: string, name: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: name } },
-    });
-    return { error: error?.message ?? null };
-  }, []);
-
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
     setProfile(null);
@@ -122,10 +112,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshProfile,
       signInWithGoogle,
       signInWithPassword,
-      signUp,
       signOut,
     }),
-    [session, profile, loading, refreshProfile, signInWithGoogle, signInWithPassword, signUp, signOut],
+    [session, profile, loading, refreshProfile, signInWithGoogle, signInWithPassword, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
