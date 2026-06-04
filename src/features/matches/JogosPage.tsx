@@ -24,12 +24,16 @@ import { LandingSections } from "@/features/landing/LandingSections";
 const ALL = "all" as const;
 type Scope = typeof ALL | string;
 
-const dayKey = (iso: string | null) => (iso ? dayjs(iso).format("YYYY-MM-DD") : "sem-data");
+// Dia/semana ancorados no fuso de Brasília (igual ao limite de joker no servidor),
+// pra a tela e a regra de "dobros nesta semana" não divergirem na virada do dia.
+const TZ = "America/Sao_Paulo";
+const dayKey = (iso: string | null) =>
+  iso ? dayjs(iso).tz(TZ).format("YYYY-MM-DD") : "sem-data";
 
 // segunda-feira (âncora da semana seg–dom) do dia, no formato YYYY-MM-DD
 const weekKey = (iso: string | null) => {
   if (!iso) return "sem-data";
-  const d = dayjs(iso);
+  const d = dayjs(iso).tz(TZ);
   const dow = (d.day() + 6) % 7; // 0=seg … 6=dom
   return d.subtract(dow, "day").format("YYYY-MM-DD");
 };
