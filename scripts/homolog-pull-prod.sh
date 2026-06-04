@@ -8,9 +8,14 @@
 # Uso:
 #   PROD_DB_URL="postgresql://USUARIO:SENHA@HOST:5432/postgres" npm run homolog:pull
 #
-# Pegue a connection string em: Supabase Dashboard → Project Settings → Database
-# → Connection string. Prefira um usuário/role READ-ONLY (mais seguro ainda —
-# garante leitura mesmo se algo der errado). NÃO commite a URL.
+# Onde achar a connection string (Supabase Dashboard):
+#   botão "Connect" (topo) → aba "Direct · Connection string" → método
+#   "Session pooler" (IPv4; necessário p/ pg_dump fora de rede IPv6).
+#   A SENHA do banco NÃO é exibida após a criação do projeto — se você não a
+#   guardou, use "Reset password" na mesma tela (Database settings). Resetar não
+#   afeta o app (front usa anon key; functions usam service key/access token;
+#   migrations sobem pela integração nativa do GitHub — nada usa a senha crua).
+#   Prefira um usuário/role READ-ONLY. NÃO commite a URL.
 #
 # ⚠️ Os dados de produção contêm dados reais de usuários (nomes, e-mails em
 # auth.users). Eles vão para a sua máquina local. Use com responsabilidade
@@ -30,15 +35,16 @@ docker ps --format '{{.Names}}' | grep -q "^${DB}$" || {
 
 echo "==> 1/4  Dump READ-ONLY de produção (pg_dump só lê)…"
 # Usa o pg_dump do container local como CLIENTE apontando para PROD. --data-only.
-docker exec -e U="$PROD_DB_URL" "$DB" pg_dump "$PROD_DB_URL" \
-  --data-only --no-owner --no-privileges --disable-triggers \
-  --schema=public --schema=auth \
-  --exclude-table-data='auth.schema_migrations' \
-  --exclude-table-data='auth.audit_log_entries' \
-  --exclude-table-data='auth.flow_state' \
-  --exclude-table-data='auth.sessions' \
-  --exclude-table-data='auth.refresh_tokens' \
-  --exclude-table-data='auth.one_time_tokens' \
+# Dumpamos TODO o schema public + APENAS auth.users e auth.identities.
+# NÃO dumpamos o schema `auth` inteiro de propósito: a nuvem tem tabelas de
+# subsistema (oauth/mfa/saml/sso/webauthn/custom_oauth_providers/instances) que
+# não batem com o Supabase local (versão diferente do GoTrue) e fariam a carga
+# abortar. Para logar/impersonar localmente só precisamos de users + identities.
+docker exec "$DB" pg_dump "$PROD_DB_URL" \
+  --data-only --no-owner --no-privileges \
+  --table='public.*' \
+  --table='auth.users' \
+  --table='auth.identities' \
   --exclude-table-data='public.rate_limits' \
   > "$DUMP"
 echo "    snapshot salvo ($(wc -l < "$DUMP" | tr -d ' ') linhas)"
@@ -46,20 +52,25 @@ echo "    snapshot salvo ($(wc -l < "$DUMP" | tr -d ' ') linhas)"
 echo "==> 2/4  Reset do banco LOCAL (schema das migrations)…"
 supabase db reset >/dev/null
 
-echo "==> 3/4  Limpa o seed local e carrega o snapshot de produção…"
-docker exec -i "$DB" psql -U postgres -d postgres -q -v ON_ERROR_STOP=1 <<'SQL'
+echo "==> 3/4  Limpa o local e carrega o snapshot de produção…"
+# Trunca TODO o schema public dinamicamente (não uma lista fixa): as migrations
+# inserem linhas-padrão em access_control/app_settings que dariam conflito de PK
+# com o snapshot. session_replication_role=replica desliga FKs e triggers
+# (inclusive handle_new_user) durante a carga.
+{
+  cat <<'SQL'
 set session_replication_role = replica;
-truncate
-  public.predictions, public.cup_ties, public.confronto_participants, public.confronto_optins,
-  public.league_competitions, public.league_members, public.leagues, public.league_payments,
-  public.matches, public.teams, public.competitions, public.notifications,
-  public.push_subscriptions, public.discount_codes, public.profiles
-  restart identity cascade;
-delete from auth.identities;
-delete from auth.users;
+do $$
+declare r record;
+begin
+  for r in select tablename from pg_tables where schemaname = 'public' loop
+    execute format('truncate public.%I restart identity cascade', r.tablename);
+  end loop;
+end $$;
+truncate auth.users, auth.identities cascade;
 SQL
-{ echo "set session_replication_role = replica;"; cat "$DUMP"; } \
-  | docker exec -i "$DB" psql -U postgres -d postgres -q -v ON_ERROR_STOP=1
+  cat "$DUMP"
+} | docker exec -i "$DB" psql -U postgres -d postgres -q -v ON_ERROR_STOP=1
 
 echo "==> 4/4  Senha de dev em todos os usuários locais (login via DevPanel)…"
 docker exec -i "$DB" psql -U postgres -d postgres -q -v ON_ERROR_STOP=1 <<SQL
