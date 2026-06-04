@@ -22,6 +22,28 @@ _(Nada ainda. Próximas mudanças entram aqui antes de virar uma versão.)_
 
 ---
 
+## [2.2.2] — 2026-06-04
+
+**Ambiente de homologação local + DevPanel.** Tudo **só de desenvolvimento** — gateado por
+`import.meta.env.DEV`; **não entra no bundle de produção** (confirmado: ausente em `dist/`) e não
+muda nada do app em produção.
+
+### Adicionado
+- **DevPanel** (`src/features/dev/DevPanel.tsx`): chip flutuante **arrastável/reposicionável** e
+  recolhível p/ alternar a visualização — **Deslogado / Admin / Membro / Dono / 1º acesso** — e
+  **"entrar como <e-mail>"** (qualquer usuário). Montado no `AppShell` só sob `import.meta.env.DEV`.
+- **Snapshot read-only de produção** (`npm run homolog:pull` → `scripts/homolog-pull-prod.sh`):
+  `pg_dump` que **só lê** prod e carrega a cópia no Supabase local; seta a senha de dev nos usuários
+  locais p/ logar como qualquer um. Opção `ANONYMIZE=1` (LGPD). Produção nunca é tocada.
+- **Seed** ganhou `novato@teste.com` (1º acesso, sem federação) e `dona@teste.com` (dona não-admin,
+  federação "Galera do Trampo").
+
+### Documentação
+- [`07-BUILD-E-DEPLOY.md`](07-BUILD-E-DEPLOY.md) §7 "Homologação local" — arquitetura, como usar e por
+  que local+snapshot em vez de read-replica/staging project.
+
+---
+
 ## [2.2.1] — 2026-06-04
 
 ### Alterado

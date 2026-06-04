@@ -14,7 +14,7 @@
 > É a prova de que a IA leu e está obedecendo as regras do `.claude/`. Se a frase **não** aparecer,
 > presuma que estas regras não foram lidas/seguidas.
 
-Versão atual do projeto: **2.2.1** · App em produção: **https://www.resultadismo.com** ·
+Versão atual do projeto: **2.2.2** · App em produção: **https://www.resultadismo.com** ·
 Última revisão desta doc: **2026-06-04**.
 
 ---
