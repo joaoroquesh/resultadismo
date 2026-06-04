@@ -33,6 +33,21 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ---
 
+## [2.3.1] — 2026-06-04
+
+### Corrigido
+- **`ConsentDialog` (centro de privacidade)** estava com layout quebrado: título
+  cortado na borda e botão "Compartilhar" com aparência desbotada (era
+  `disabled` quando o estado já era `granted` — parecia bug). Redesenhado
+  seguindo a premissa de clareza/simplicidade máximas (`MESTRE` §3 regra 13 +
+  `DESIGN.md`): padding correto pra acomodar o X de fechar, card de status com
+  **cor semântica** (grass / neutro / brand) e ícone em círculo, e **apenas uma
+  ação contextual** quando o usuário já decidiu (sem botões `disabled`). Tom
+  coloquial mantido ("Você tá ajudando a melhorar o app", "Topa nos ajudar
+  com métricas anônimas?").
+
+---
+
 ## [2.3.0] — 2026-06-04
 
 **Centro de controle de privacidade.** O usuário ganha um lugar pra revisar e

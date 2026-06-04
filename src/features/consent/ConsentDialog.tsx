@@ -1,113 +1,125 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, X } from "lucide-react";
+import { Check, X as XIcon } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
-import { clearConsent, setConsent, useConsent } from "./consent";
+import { setConsent, useConsent, type ConsentChoice } from "./consent";
 
 /**
- * Modal de gerenciamento do consentimento.
- * Mostra o estado atual e permite alternar a qualquer momento — atende ao
- * direito de revogação (LGPD art. 18, IX). Quem ainda não decidiu vê os mesmos
- * dois botões e pode resolver direto por aqui (sem precisar voltar pro banner).
+ * Modal de gerenciamento do consentimento. Atende ao direito de revogação
+ * (LGPD art. 18, IX) e ao princípio reitor do projeto: clareza máxima.
+ *
+ * Decisões de design (impeccable / DESIGN.md):
+ * - Estado visual com cor semântica (grass = positivo / surface-2 = neutro /
+ *   brand = aguardando decisão). Sem cards idênticos.
+ * - Apenas UMA ação principal quando o usuário já decidiu (não usa botões
+ *   "disabled" — eles pareciam quebrados em vez de informativos).
+ * - Header com `pr-10` pra reservar espaço pro botão `X` de fechar do Modal.
  */
 export function ConsentDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const choice = useConsent();
-
   const granted = choice === "granted";
   const denied = choice === "denied";
+  const undecided = choice === null;
+
+  function change(c: ConsentChoice) {
+    setConsent(c);
+    onClose();
+  }
 
   return (
-    <Modal open={open} onClose={onClose} label="Compartilhamento de dados" className="max-w-md">
-      <div className="space-y-4">
-        <header>
-          <h2 className="text-lg font-bold text-ink-900">Compartilhamento de dados</h2>
-          <p className="mt-1 text-sm text-ink-500">
-            A gente usa <strong>Google Analytics</strong> para entender quais telas a galera usa
-            mais e melhorar o app. IP anonimizado, sem rastreio publicitário.
-          </p>
-        </header>
+    <Modal open={open} onClose={onClose} label="Compartilhamento de dados" className="max-w-sm">
+      <div className="space-y-5 p-5 sm:p-6">
+        <h2 className="pr-10 text-xl font-extrabold tracking-tight text-ink-900">
+          Compartilhamento de dados
+        </h2>
 
-        <div className="rounded-xl border border-border bg-surface-2 p-3">
-          <p className="text-xs font-medium uppercase tracking-wide text-ink-400">Agora está</p>
-          <p
+        {/* Status — cor semântica, ícone em círculo */}
+        <div
+          className={cn(
+            "flex items-start gap-3 rounded-xl p-3.5 ring-1",
+            granted && "bg-grass-50 ring-grass-200/70",
+            denied && "bg-surface-2 ring-border",
+            undecided && "bg-brand-50 ring-brand-200/70",
+          )}
+        >
+          <span
+            aria-hidden
             className={cn(
-              "mt-1 inline-flex items-center gap-1.5 text-sm font-bold",
-              granted && "text-grass-600",
-              denied && "text-flame-600",
-              choice === null && "text-ink-700",
+              "mt-0.5 grid size-5 shrink-0 place-items-center rounded-full text-white",
+              granted && "bg-grass-600",
+              denied && "bg-ink-300",
+              undecided && "bg-brand-600",
             )}
           >
-            {granted && (
-              <>
-                <Check className="size-4" /> Compartilhando dados
-              </>
-            )}
-            {denied && (
-              <>
-                <X className="size-4" /> Sem compartilhar dados
-              </>
-            )}
-            {choice === null && "Você ainda não escolheu"}
-          </p>
+            {granted && <Check className="size-3" strokeWidth={3.5} />}
+            {denied && <XIcon className="size-3" strokeWidth={3.5} />}
+            {undecided && <span className="text-[10px] font-bold leading-none">?</span>}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p
+              className={cn(
+                "text-sm font-bold leading-snug",
+                granted && "text-grass-800",
+                denied && "text-ink-800",
+                undecided && "text-brand-800",
+              )}
+            >
+              {granted && "Você tá ajudando a melhorar o app"}
+              {denied && "Você não tá compartilhando dados"}
+              {undecided && "A gente ainda não tem sua resposta"}
+            </p>
+            <p className="mt-0.5 text-xs leading-snug text-ink-500">
+              {granted && "Métricas de uso anônimas, IP anonimizado pelo Google."}
+              {denied && "Nenhum dado de uso é enviado pra gente."}
+              {undecided && "Topa nos ajudar com métricas anônimas?"}
+            </p>
+          </div>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Button
-            variant="outline"
-            fullWidth
-            disabled={denied}
-            onClick={() => {
-              setConsent("denied");
-              onClose();
-            }}
-          >
+        <p className="text-sm leading-relaxed text-ink-500">
+          A gente usa <strong className="font-semibold text-ink-700">Google Analytics</strong> pra
+          saber quais telas a galera curte e melhorar o que importa.{" "}
+          <strong className="font-semibold text-ink-700">
+            IP anonimizado, sem rastreio publicitário.
+          </strong>
+        </p>
+
+        {/* Ação contextual: 2 botões quando indeciso, 1 quando já decidiu */}
+        {undecided ? (
+          <div className="flex gap-2">
+            <Button variant="outline" fullWidth onClick={() => change("denied")}>
+              Recusar
+            </Button>
+            <Button fullWidth onClick={() => change("granted")}>
+              Compartilhar
+            </Button>
+          </div>
+        ) : granted ? (
+          <Button variant="outline" fullWidth onClick={() => change("denied")}>
             Parar de compartilhar
           </Button>
-          <Button
-            fullWidth
-            disabled={granted}
-            onClick={() => {
-              setConsent("granted");
-              onClose();
-            }}
-          >
-            Compartilhar
+        ) : (
+          <Button fullWidth onClick={() => change("granted")}>
+            Compartilhar dados
           </Button>
-        </div>
-
-        {choice !== null && (
-          <button
-            type="button"
-            onClick={() => {
-              clearConsent();
-              onClose();
-            }}
-            className="block w-full text-center text-xs font-medium text-ink-400 underline-offset-2 hover:text-ink-600 hover:underline"
-          >
-            Resetar minha escolha
-          </button>
         )}
 
-        <p className="text-center text-xs text-ink-400">
-          Detalhes na{" "}
-          <Link
-            to="/privacidade"
-            onClick={onClose}
-            className="font-semibold text-brand-600 underline-offset-2 hover:underline"
-          >
-            Política de Privacidade
-          </Link>
-          .
-        </p>
+        <Link
+          to="/privacidade"
+          onClick={onClose}
+          className="block text-center text-xs font-medium text-ink-400 underline-offset-2 transition-colors hover:text-ink-600 hover:underline"
+        >
+          Mais detalhes na Política de Privacidade
+        </Link>
       </div>
     </Modal>
   );
 }
 
 /**
- * Acionador reusável: um botão estilizado como link de rodapé que abre o
+ * Acionador reusável: botão estilizado como link de rodapé que abre o
  * `ConsentDialog`. Usado no `PublicShell` (rodapé deslogado) e na
  * `PerfilPage` (rodapé do perfil logado).
  */
@@ -118,10 +130,7 @@ export function ConsentLink({ className }: { className?: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={cn(
-          "transition-colors hover:text-ink-900",
-          className,
-        )}
+        className={cn("transition-colors hover:text-ink-900", className)}
       >
         Compartilhamento de dados
       </button>
