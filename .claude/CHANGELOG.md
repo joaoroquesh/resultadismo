@@ -26,6 +26,11 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 - **Regra central 13 (MESTRE) + `DESIGN.md`:** o princípio de clareza/simplicidade máximas passa a
   reger o **design**, não só o texto.
 
+### Decisões
+- **ADR 0001 — "Federação" → "Grupo"** ([`.claude/decisions/0001-espaco-grupo.md`](decisions/0001-espaco-grupo.md)):
+  decisão aprovada de renomear o espaço dos grupos de amigos para **"Grupo"** (clareza pro leigo;
+  "Liga"/"Bolão" já são modos). **A implementar** na UI/rotas (banco segue `leagues`).
+
 ---
 
 ## [2.2.2] — 2026-06-04

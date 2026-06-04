@@ -73,6 +73,11 @@ possível) e **acertividade** (% de palpites que pontuaram). Detalhe da fórmula
 
 ## 4. Federações
 
+> ⚠️ **Decisão aprovada (2026-06-04, a implementar):** este espaço será renomeado de
+> **Federação → "Grupo"** na UI e nas rotas (banco segue `leagues`). Motivo e plano em
+> [`decisions/0001-espaco-grupo.md`](decisions/0001-espaco-grupo.md). **Até a troca subir no código,
+> a UI e esta doc ainda usam "Federação".**
+
 **Federação** = o grupo social onde a turma joga (antigo "Liga/Grupo"). A tabela continua
 `leagues`; só o **rótulo** mudou (rebrand **Liga → Federação**, rotas `/federacoes`, redirects de
 `/ligas/*`). ⚠️ "Liga" passou a significar um **modo de disputa** dentro da federação (ver §6) — é

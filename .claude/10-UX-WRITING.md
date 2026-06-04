@@ -124,7 +124,7 @@ Regra de ouro: **quanto mais sério o momento (dinheiro, perda, erro), menos zoe
 ### Termos oficiais (use exatamente estes)
 | Use | Não use | Observação |
 |---|---|---|
-| **federação** | liga, grupo, bolão* | o espaço social. (*"Bolão/Liga/Copa" são **prefixos** de nome, não sinônimos) |
+| **federação** → **grupo** | liga, bolão* | o espaço social. ⚠️ **Decisão: renomear p/ "grupo"** (a implementar — [`decisions/0001`](decisions/0001-espaco-grupo.md)). (*Bolão/Liga/Copa são **prefixos**, não sinônimos) |
 | **palpite** / **palpitar** | aposta, chute, previsão | a ação central |
 | **cravar** / **cravada** | acertar em cheio | placar exato (+3) |
 | **saldo** | — | vencedor + diferença de gols (+2) |
