@@ -1,3 +1,4 @@
+import { memo, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import {
   type CrestKind,
@@ -24,50 +25,57 @@ export type CrestMaskProps = {
   className?: string;
 };
 
-export function CrestMask({
+const CrestMaskBase = ({
   src,
   name,
   px,
   defaultKind = "escudo",
   withLetter = false,
   className,
-}: CrestMaskProps) {
-  const cfg = parseCrest(src) ?? defaultCrestFromName(name, defaultKind);
-  const maskUrl = crestShapeUrl(cfg.kind, cfg.shape);
-  const bg = crestBackground(cfg);
+}: CrestMaskProps) => {
+  const { maskStyle, showLetter, initial, fontSize, textColor, textShadow } = useMemo(() => {
+    const cfg = parseCrest(src) ?? defaultCrestFromName(name, defaultKind);
+    const maskUrl = crestShapeUrl(cfg.kind, cfg.shape);
+    const bg = crestBackground(cfg);
 
-  // letra só aparece quando NÃO há foto de verdade exibida
-  const hasPhoto = cfg.fill === "photo" && !!cfg.photo;
-  const showLetter = withLetter && !hasPhoto;
-  const initial = (name?.trim()?.[0] ?? "?").toUpperCase();
+    // letra só aparece quando NÃO há foto de verdade exibida
+    const hasPhoto = cfg.fill === "photo" && !!cfg.photo;
 
-  // Inicial proporcional ao escudo: ~30px no preview grande (80px) e escala
-  // junto nos tamanhos menores. Peso 800. Centralizada.
-  const fontSize = Math.round(px * 0.375);
+    // mask-mode: alpha → usa o canal alfa do SVG (área pintada = opaca = mostra o
+    // fundo; fora do desenho = transparente). Assim a cor do traço no SVG não
+    // importa, só a silhueta. WebKit já usa alpha por padrão.
+    // Sem máscara (pasta de formas vazia) → cai num círculo simples, sem virar
+    // um quadrado de cor cheio.
+    const maskStyle = maskUrl
+      ? ({
+          background: bg,
+          WebkitMaskImage: `url("${maskUrl}")`,
+          maskImage: `url("${maskUrl}")`,
+          maskMode: "alpha",
+          WebkitMaskRepeat: "no-repeat",
+          maskRepeat: "no-repeat",
+          WebkitMaskPosition: "center",
+          maskPosition: "center",
+          WebkitMaskSize: "contain",
+          maskSize: "contain",
+          // drop-shadow segue o recorte do SVG: dá uma borda fina + leve elevação,
+          // pra um escudo claro (gelo/branco) não sumir no fundo claro.
+          filter:
+            "drop-shadow(0 0 0.5px rgba(12,22,22,0.35)) drop-shadow(0 1px 1.5px rgba(12,22,22,0.18))",
+        } as const)
+      : ({ background: bg, borderRadius: "9999px" } as const);
 
-  // mask-mode: alpha → usa o canal alfa do SVG (área pintada = opaca = mostra o
-  // fundo; fora do desenho = transparente). Assim a cor do traço no SVG não
-  // importa, só a silhueta. WebKit já usa alpha por padrão.
-  // Sem máscara (pasta de formas vazia) → cai num círculo simples, sem virar
-  // um quadrado de cor cheio.
-  const maskStyle = maskUrl
-    ? ({
-        background: bg,
-        WebkitMaskImage: `url("${maskUrl}")`,
-        maskImage: `url("${maskUrl}")`,
-        maskMode: "alpha",
-        WebkitMaskRepeat: "no-repeat",
-        maskRepeat: "no-repeat",
-        WebkitMaskPosition: "center",
-        maskPosition: "center",
-        WebkitMaskSize: "contain",
-        maskSize: "contain",
-        // drop-shadow segue o recorte do SVG: dá uma borda fina + leve elevação,
-        // pra um escudo claro (gelo/branco) não sumir no fundo claro.
-        filter:
-          "drop-shadow(0 0 0.5px rgba(12,22,22,0.35)) drop-shadow(0 1px 1.5px rgba(12,22,22,0.18))",
-      } as const)
-    : ({ background: bg, borderRadius: "9999px" } as const);
+    return {
+      maskStyle,
+      showLetter: withLetter && !hasPhoto,
+      initial: (name?.trim()?.[0] ?? "?").toUpperCase(),
+      // Inicial proporcional ao escudo: ~30px no preview grande (80px) e escala
+      // junto nos tamanhos menores. Peso 800. Centralizada.
+      fontSize: Math.round(px * 0.375),
+      textColor: crestTextColor(cfg),
+      textShadow: cfg.fill === "solid" ? undefined : "0 1px 3px rgba(0,0,0,0.4)",
+    };
+  }, [src, name, px, defaultKind, withLetter]);
 
   return (
     <span
@@ -80,10 +88,10 @@ export function CrestMask({
         <span
           className="absolute inset-0 grid place-items-center leading-none"
           style={{
-            color: crestTextColor(cfg),
+            color: textColor,
             fontWeight: 800,
             fontSize,
-            textShadow: cfg.fill === "solid" ? undefined : "0 1px 3px rgba(0,0,0,0.4)",
+            textShadow,
           }}
         >
           {initial}
@@ -91,4 +99,6 @@ export function CrestMask({
       )}
     </span>
   );
-}
+};
+
+export const CrestMask = memo(CrestMaskBase);

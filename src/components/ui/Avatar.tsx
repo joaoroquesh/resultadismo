@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { legacyToCrest } from "@/lib/crest";
 import { CrestMask } from "./CrestMask";
 
@@ -26,9 +27,10 @@ export function Avatar({
   size?: Size;
   className?: string;
 }) {
+  const crest = useMemo(() => legacyToCrest(src), [src]);
   return (
     <CrestMask
-      src={legacyToCrest(src)}
+      src={crest}
       name={name}
       px={px[size]}
       defaultKind="escudo"

@@ -5,20 +5,19 @@
 
 import webpush from "npm:web-push@3";
 import { createClient } from "npm:@supabase/supabase-js@2";
-
-const cors = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+import { corsHeaders, timingSafeEqual } from "../_shared/security.ts";
 
 Deno.serve(async (req) => {
+  const cors = corsHeaders(req);
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
   const token = (req.headers.get("Authorization") ?? "").replace("Bearer ", "");
-  if (token !== serviceKey && !(cronSecret && token === cronSecret)) {
+  const authed =
+    (!!token && timingSafeEqual(token, serviceKey)) ||
+    (!!cronSecret && !!token && timingSafeEqual(token, cronSecret));
+  if (!authed) {
     return new Response(JSON.stringify({ error: "unauthorized" }), { status: 403, headers: cors });
   }
 

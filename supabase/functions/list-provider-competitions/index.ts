@@ -4,19 +4,7 @@
 // no navegador. Apenas app_admin pode chamar.
 
 import { createClient } from "npm:@supabase/supabase-js@2";
-
-const cors = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
-
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...cors, "Content-Type": "application/json" },
-  });
-}
+import { corsHeaders } from "../_shared/security.ts";
 
 type ProviderCompetition = {
   provider: "football_data" | "thesportsdb" | "espn";
@@ -30,6 +18,12 @@ type ProviderCompetition = {
 };
 
 Deno.serve(async (req) => {
+  const cors = corsHeaders(req);
+  const json = (body: unknown, status = 200) =>
+    new Response(JSON.stringify(body), {
+      status,
+      headers: { ...cors, "Content-Type": "application/json" },
+    });
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -67,7 +61,8 @@ Deno.serve(async (req) => {
         headers: { "X-Auth-Token": fdToken },
       });
       if (!res.ok) {
-        return json({ error: `football-data ${res.status}: ${await res.text()}` }, 502);
+        console.error("football-data list error", res.status, await res.text());
+        return json({ error: `Provedor indisponível (${res.status}).` }, 502);
       }
       const data = await res.json();
       const competitions: ProviderCompetition[] = (data.competitions ?? []).map((c: {

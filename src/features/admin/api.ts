@@ -10,7 +10,7 @@ export function usePendingLeagues() {
         .from("leagues")
         .select("*, owner:profiles!leagues_owner_id_fkey(display_name)")
         .order("created_at", { ascending: false });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return (data ?? []) as unknown as (League & { owner: { display_name: string } | null })[];
     },
   });
@@ -21,7 +21,7 @@ export function useApproveLeague() {
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.rpc("approve_league", { p_league_id: id });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "pending-leagues"] }),
   });
@@ -32,7 +32,7 @@ export function useRejectLeague() {
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.rpc("reject_league", { p_league_id: id });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "pending-leagues"] }),
   });
@@ -46,7 +46,7 @@ export function useAdminCompetitions() {
         .from("competitions")
         .select("*")
         .order("created_at", { ascending: false });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return data ?? [];
     },
   });
@@ -104,7 +104,7 @@ export function useSyncFootball() {
       const { data, error } = await supabase.functions.invoke("sync-football", {
         body: competitionId ? { competitionId } : {},
       });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return data as { synced: number; results: { competition: string; ok: boolean; error?: string }[] };
     },
     onSuccess: () => {
@@ -145,7 +145,7 @@ export function useAdminMatches(competitionId: string | undefined) {
         .select(ADMIN_MATCH_SELECT)
         .eq("competition_id", competitionId!)
         .order("kickoff_at");
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return (data ?? []) as unknown as AdminMatch[];
     },
   });
@@ -155,12 +155,11 @@ export function useSetMatchHidden() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: { matchId: string; hidden: boolean }) => {
-      // coluna nova (fora dos types gerados) → cast pontual
       const { error } = await supabase
         .from("matches")
-        .update({ hidden: input.hidden } as never)
+        .update({ hidden: input.hidden })
         .eq("id", input.matchId);
-      if (error) throw error;
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin", "matches"] });
@@ -186,7 +185,7 @@ export function useSaveMatchResult() {
           status: input.status,
         })
         .eq("id", input.matchId);
-      if (error) throw error;
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin", "matches"] });
@@ -217,7 +216,7 @@ export function useCreateMatch() {
         group_name: input.groupName || null,
         status: "scheduled",
       });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "matches"] }),
   });
@@ -239,7 +238,7 @@ export function useAllProfiles() {
       // E-mail não fica mais em public.profiles (PII). A RPC lê de auth.users
       // e só responde para app_admin.
       const { data, error } = await supabase.rpc("admin_list_users");
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return (data ?? []) as AdminUser[];
     },
   });
@@ -253,7 +252,7 @@ export function useSetAppAdmin() {
         p_user_id: input.userId,
         p_value: input.value,
       });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "profiles"] }),
   });

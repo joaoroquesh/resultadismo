@@ -1,22 +1,27 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate, useParams } from "react-router-dom";
 import { RequireAuth, RequireAdmin } from "@/features/auth/guards";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { AuthCallback } from "@/features/auth/AuthCallback";
 import { AppShell } from "@/components/layout/AppShell";
 import { JogosPage } from "@/features/matches/JogosPage";
-import { PerfilPage } from "@/features/profile/PerfilPage";
-import { LigasPage } from "@/features/leagues/LigasPage";
-import { NovaLigaPage } from "@/features/leagues/NovaLigaPage";
-import { LigaDetailPage } from "@/features/leagues/LigaDetailPage";
-import { EditarPerfilPage } from "@/features/profile/EditarPerfilPage";
-import { AdminPage } from "@/features/admin/AdminPage";
-import { AdminCompMatchesPage } from "@/features/admin/AdminCompMatchesPage";
-import { PlayerProfilePage } from "@/features/players/PlayerProfilePage";
-import { ComoFuncionaPage } from "@/features/help/ComoFuncionaPage";
 import { Onboarding } from "@/features/onboarding/Onboarding";
-import { PrivacidadePage } from "@/features/legal/PrivacidadePage";
-import { TermosPage } from "@/features/legal/TermosPage";
-import { SimuladorPage } from "@/features/confronto/SimuladorPage";
+
+// Code-splitting: o primeiro paint (landing de Jogos + login) não baixa admin,
+// confronto/simulador, editor de perfil nem páginas secundárias — elas carregam
+// sob demanda. Corta um bom pedaço do bundle inicial.
+const PerfilPage = lazy(() => import("@/features/profile/PerfilPage").then((m) => ({ default: m.PerfilPage })));
+const LigasPage = lazy(() => import("@/features/leagues/LigasPage").then((m) => ({ default: m.LigasPage })));
+const NovaLigaPage = lazy(() => import("@/features/leagues/NovaLigaPage").then((m) => ({ default: m.NovaLigaPage })));
+const LigaDetailPage = lazy(() => import("@/features/leagues/LigaDetailPage").then((m) => ({ default: m.LigaDetailPage })));
+const EditarPerfilPage = lazy(() => import("@/features/profile/EditarPerfilPage").then((m) => ({ default: m.EditarPerfilPage })));
+const AdminPage = lazy(() => import("@/features/admin/AdminPage").then((m) => ({ default: m.AdminPage })));
+const AdminCompMatchesPage = lazy(() => import("@/features/admin/AdminCompMatchesPage").then((m) => ({ default: m.AdminCompMatchesPage })));
+const PlayerProfilePage = lazy(() => import("@/features/players/PlayerProfilePage").then((m) => ({ default: m.PlayerProfilePage })));
+const ComoFuncionaPage = lazy(() => import("@/features/help/ComoFuncionaPage").then((m) => ({ default: m.ComoFuncionaPage })));
+const PrivacidadePage = lazy(() => import("@/features/legal/PrivacidadePage").then((m) => ({ default: m.PrivacidadePage })));
+const TermosPage = lazy(() => import("@/features/legal/TermosPage").then((m) => ({ default: m.TermosPage })));
+const SimuladorPage = lazy(() => import("@/features/confronto/SimuladorPage").then((m) => ({ default: m.SimuladorPage })));
 
 // Redireciona links antigos /ligas/:slug para /federacoes/:slug (rename Liga -> Federação)
 function FederacaoSlugRedirect() {
@@ -24,47 +29,57 @@ function FederacaoSlugRedirect() {
   return <Navigate to={`/federacoes/${slug ?? ""}`} replace />;
 }
 
+function PageFallback() {
+  return (
+    <div className="flex min-h-[40vh] items-center justify-center p-8 text-sm opacity-60">
+      Carregando…
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <>
       <Onboarding />
-      <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/auth/callback" element={<AuthCallback />} />
+      <Suspense fallback={<PageFallback />}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
 
-      {/* públicas e sempre acessíveis (Google exige links públicos) */}
-      <Route path="/privacidade" element={<PrivacidadePage />} />
-      <Route path="/termos" element={<TermosPage />} />
+          {/* públicas e sempre acessíveis (Google exige links públicos) */}
+          <Route path="/privacidade" element={<PrivacidadePage />} />
+          <Route path="/termos" element={<TermosPage />} />
 
-      {/* compat: links antigos de "liga" agora apontam para "federação" */}
-      <Route path="/ligas" element={<Navigate to="/federacoes" replace />} />
-      <Route path="/ligas/nova" element={<Navigate to="/federacoes/nova" replace />} />
-      <Route path="/ligas/:slug" element={<FederacaoSlugRedirect />} />
+          {/* compat: links antigos de "liga" agora apontam para "federação" */}
+          <Route path="/ligas" element={<Navigate to="/federacoes" replace />} />
+          <Route path="/ligas/nova" element={<Navigate to="/federacoes/nova" replace />} />
+          <Route path="/ligas/:slug" element={<FederacaoSlugRedirect />} />
 
-      <Route element={<AppShell />}>
-        {/* público: ver jogos sem login */}
-        <Route path="/" element={<JogosPage />} />
-        <Route path="/como-funciona" element={<ComoFuncionaPage />} />
+          <Route element={<AppShell />}>
+            {/* público: ver jogos sem login */}
+            <Route path="/" element={<JogosPage />} />
+            <Route path="/como-funciona" element={<ComoFuncionaPage />} />
 
-        {/* exige login */}
-        <Route element={<RequireAuth />}>
-          <Route path="/federacoes" element={<LigasPage />} />
-          <Route path="/federacoes/nova" element={<NovaLigaPage />} />
-          <Route path="/federacoes/:slug" element={<LigaDetailPage />} />
-          <Route path="/classificacao" element={<Navigate to="/federacoes" replace />} />
-          <Route path="/perfil" element={<PerfilPage />} />
-          <Route path="/perfil/editar" element={<EditarPerfilPage />} />
-          <Route path="/simulador" element={<SimuladorPage />} />
-          <Route path="/jogador/:id" element={<PlayerProfilePage />} />
-          <Route element={<RequireAdmin />}>
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/admin/competicoes/:id/jogos" element={<AdminCompMatchesPage />} />
+            {/* exige login */}
+            <Route element={<RequireAuth />}>
+              <Route path="/federacoes" element={<LigasPage />} />
+              <Route path="/federacoes/nova" element={<NovaLigaPage />} />
+              <Route path="/federacoes/:slug" element={<LigaDetailPage />} />
+              <Route path="/classificacao" element={<Navigate to="/federacoes" replace />} />
+              <Route path="/perfil" element={<PerfilPage />} />
+              <Route path="/perfil/editar" element={<EditarPerfilPage />} />
+              <Route path="/simulador" element={<SimuladorPage />} />
+              <Route path="/jogador/:id" element={<PlayerProfilePage />} />
+              <Route element={<RequireAdmin />}>
+                <Route path="/admin" element={<AdminPage />} />
+                <Route path="/admin/competicoes/:id/jogos" element={<AdminCompMatchesPage />} />
+              </Route>
+            </Route>
           </Route>
-        </Route>
-      </Route>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     </>
   );
 }

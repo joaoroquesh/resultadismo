@@ -23,7 +23,7 @@ export function useMyLeagues() {
         .from("league_members")
         .select("role, status, league:leagues(*)")
         .eq("user_id", user!.id);
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return (data ?? [])
         .filter((r) => r.league && !(r.league as { deleted_at?: string | null }).deleted_at)
         .map((r) => ({
@@ -45,9 +45,9 @@ export function useLeague(slug: string | undefined) {
         .select("*")
         .eq("slug", slug!)
         .maybeSingle();
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       // federação excluída (soft) não abre pra ninguém (admin restaura pela Lixeira)
-      if ((data as { deleted_at?: string | null } | null)?.deleted_at) return null;
+      if (data?.deleted_at) return null;
       return data;
     },
   });
@@ -71,7 +71,7 @@ export function useLeagueMembers(leagueId: string | undefined) {
         .select("id, role, status, joined_at, profile:profiles(id, display_name, avatar_url)")
         .eq("league_id", leagueId!)
         .order("joined_at");
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return (data ?? []) as unknown as MemberWithProfile[];
     },
   });
@@ -87,7 +87,7 @@ export function useLeagueCompetitions(leagueId: string | undefined) {
         .select("*, competition:competitions(name, emblem_url)")
         .eq("league_id", leagueId!)
         .order("created_at");
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return (data ?? []) as unknown as (LeagueCompetition & {
         competition: { name: string; emblem_url: string | null } | null;
       })[];
@@ -101,7 +101,7 @@ export function useStandings(lcId: string | undefined) {
     queryKey: ["standings", lcId],
     queryFn: async (): Promise<StandingRow[]> => {
       const { data, error } = await supabase.rpc("get_league_standings", { p_lc_id: lcId! });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return data ?? [];
     },
   });
@@ -156,7 +156,7 @@ export function useCreateLeague() {
         })
         .select()
         .single();
-      if (error) throw error;
+      if (error) throw new Error(error.message);
 
       if (input.competitionId) {
         const { error: lcErr } = await supabase.from("league_competitions").insert({
@@ -198,7 +198,7 @@ export function useJoinByCode() {
   return useMutation({
     mutationFn: async (code: string) => {
       const { data, error } = await supabase.rpc("join_league_by_code", { p_code: code });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return data;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["my-leagues"] }),
@@ -230,7 +230,7 @@ export function useAddLeagueCompetition() {
         })
         .select()
         .single();
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return data;
     },
     onSuccess: (_d, v) =>
@@ -248,7 +248,7 @@ export function useUpdateLeagueLogo() {
         .from("leagues")
         .update({ logo_url: input.logoUrl })
         .eq("id", input.leagueId);
-      if (error) throw error;
+      if (error) throw new Error(error.message);
     },
     onSuccess: (_d, v) => {
       qc.invalidateQueries({ queryKey: ["league"] });
@@ -268,7 +268,7 @@ export function useDeleteLeagueCompetition() {
         .from("league_competitions")
         .delete()
         .eq("id", input.lcId);
-      if (error) throw error;
+      if (error) throw new Error(error.message);
     },
     onSuccess: (_d, v) => {
       qc.invalidateQueries({ queryKey: ["league-competitions", v.leagueId] });
@@ -292,7 +292,7 @@ export function useUpdateMember() {
         .from("league_members")
         .update(patch)
         .eq("id", input.memberId);
-      if (error) throw error;
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["league-members"] }),
   });
@@ -303,7 +303,7 @@ export function useRemoveMember() {
   return useMutation({
     mutationFn: async (memberId: string) => {
       const { error } = await supabase.from("league_members").delete().eq("id", memberId);
-      if (error) throw error;
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["league-members"] }),
   });

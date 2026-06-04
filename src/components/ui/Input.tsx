@@ -1,4 +1,4 @@
-import { type InputHTMLAttributes, forwardRef, type ReactNode } from "react";
+import { type InputHTMLAttributes, forwardRef, type ReactNode, useId } from "react";
 import { cn } from "@/lib/utils";
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -11,10 +11,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   { className, icon, error, label, id, ...props },
   ref,
 ) {
+  const reactId = useId();
+  const inputId = id ?? reactId;
   return (
     <div className="flex w-full flex-col gap-1.5">
       {label && (
-        <label htmlFor={id} className="text-sm font-medium text-ink-800">
+        <label htmlFor={inputId} className="text-sm font-medium text-ink-800">
           {label}
         </label>
       )}
@@ -28,7 +30,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         {icon && <span className="shrink-0 text-ink-400">{icon}</span>}
         <input
           ref={ref}
-          id={id}
+          id={inputId}
           className={cn(
             "h-11 w-full bg-transparent text-ink-950 outline-none placeholder:text-ink-400",
             className,

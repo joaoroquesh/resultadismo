@@ -33,11 +33,6 @@ export function formatDayLabel(iso: string | null): string {
   return d.format("dddd, DD [de] MMMM");
 }
 
-export function formatShortDate(iso: string | null): string {
-  if (!iso) return "—";
-  return dayjs(iso).format("DD/MM");
-}
-
 export function formatTime(iso: string | null): string {
   if (!iso) return "--:--";
   return dayjs(iso).format("HH:mm");

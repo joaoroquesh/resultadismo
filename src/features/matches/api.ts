@@ -19,7 +19,7 @@ export function findWorldCupCompetition(
   if (!comps?.length) return undefined;
   return comps.find((c) => {
     const code = (c.provider_code ?? "").toUpperCase();
-    const name = `${(c as { display_name?: string | null }).display_name ?? ""} ${c.name}`.toLowerCase();
+    const name = `${c.display_name ?? ""} ${c.name}`.toLowerCase();
     return (
       code === "WC" ||
       code === "4429" || // TheSportsDB FIFA World Cup
@@ -37,15 +37,13 @@ export function useCompetitions() {
     staleTime: 5 * 60_000,
     placeholderData: keepPreviousData,
     queryFn: async (): Promise<Competition[]> => {
-      // colunas `is_published` e `display_name` foram adicionadas via migração
-      // depois dos types gerados — cast para `any` evita ter que rerodar `supabase gen types`.
       let q = supabase.from("competitions").select("*").eq("status", "active");
       // público só vê publicadas; admin enxerga tudo (incl. rascunhos)
-      if (!isAppAdmin) q = (q as unknown as { eq: (c: string, v: unknown) => typeof q }).eq("is_published", true);
+      if (!isAppAdmin) q = q.eq("is_published", true);
       const { data, error } = await q
         .order("is_featured", { ascending: false })
         .order("name");
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return data ?? [];
     },
   });
@@ -65,23 +63,21 @@ export function useMatches(competitionId: string | undefined) {
         .select("created_at")
         .eq("id", competitionId!)
         .maybeSingle();
-      if (compErr) throw compErr;
+      if (compErr) throw new Error(compErr.message);
       const since = comp?.created_at ?? null;
 
+      // jogos ocultados pelo admin saem no servidor (usa o índice parcial
+      // matches_visible_idx) — não viajam pela rede nem aparecem para palpitar.
       let q = supabase
         .from("matches")
         .select(MATCH_SELECT)
         .eq("competition_id", competitionId!)
+        .eq("hidden", false)
         .order("kickoff_at", { ascending: true });
       if (since) q = q.gte("kickoff_at", since);
       const { data, error } = await q;
-      if (error) throw error;
-      // jogos ocultados pelo admin não entram para palpitar. Filtro client-side
-      // (resiliente: se a coluna `hidden` ainda não existir no deploy, m.hidden
-      // é undefined e nada é escondido — sem quebrar a tela).
-      return (data ?? []).filter(
-        (m) => !(m as { hidden?: boolean }).hidden,
-      ) as unknown as MatchWithTeams[];
+      if (error) throw new Error(error.message);
+      return (data ?? []) as unknown as MatchWithTeams[];
     },
   });
 }
@@ -100,26 +96,26 @@ export function useAllMatches(enabled = true) {
     placeholderData: keepPreviousData,
     queryFn: async (): Promise<MatchWithTeams[]> => {
       let cq = supabase.from("competitions").select("id, created_at").eq("status", "active");
-      if (!isAppAdmin)
-        cq = (cq as unknown as { eq: (c: string, v: unknown) => typeof cq }).eq("is_published", true);
+      if (!isAppAdmin) cq = cq.eq("is_published", true);
       const { data: comps, error: ce } = await cq;
-      if (ce) throw ce;
-      const ids = (comps ?? []).map((c) => (c as { id: string }).id);
+      if (ce) throw new Error(ce.message);
+      const ids = (comps ?? []).map((c) => c.id);
       if (ids.length === 0) return [];
       const createdMap = new Map<string, string | null>(
-        (comps ?? []).map((c) => [(c as { id: string }).id, (c as { created_at?: string }).created_at ?? null]),
+        (comps ?? []).map((c) => [c.id, c.created_at ?? null]),
       );
       const floor = new Date(Date.now() - 7 * 86_400_000).toISOString();
       const { data, error } = await supabase
         .from("matches")
         .select(MATCH_SELECT)
         .in("competition_id", ids)
+        .eq("hidden", false)
         .gte("kickoff_at", floor)
         .order("kickoff_at", { ascending: true });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
+      // só resta o piso por-competição (created_at), que é por linha → fica em JS.
       return (data ?? []).filter((m) => {
-        const row = m as { hidden?: boolean; competition_id: string; kickoff_at: string | null };
-        if (row.hidden) return false;
+        const row = m as unknown as { competition_id: string; kickoff_at: string | null };
         const created = createdMap.get(row.competition_id);
         return !created || !row.kickoff_at || row.kickoff_at >= created;
       }) as unknown as MatchWithTeams[];
@@ -141,7 +137,7 @@ export function useMyPredictions(competitionId: string | undefined) {
         .select("*, matches!inner(competition_id)")
         .eq("user_id", user!.id)
         .eq("matches.competition_id", competitionId!);
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       const map = new Map<string, Prediction>();
       for (const row of data ?? []) {
         const { matches: _m, ...pred } = row as Prediction & { matches: unknown };
@@ -165,7 +161,7 @@ export function useAllMyPredictions(enabled = true) {
         .from("predictions")
         .select("*")
         .eq("user_id", user!.id);
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       const map = new Map<string, Prediction>();
       for (const row of data ?? []) map.set((row as Prediction).match_id, row as Prediction);
       return map;
@@ -191,7 +187,7 @@ export function useSavePrediction() {
         )
         .select()
         .single();
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return data;
     },
     onSuccess: () => {
@@ -210,7 +206,7 @@ export function useSetJoker() {
         .update({ is_joker: input.value })
         .eq("user_id", user!.id)
         .eq("match_id", input.matchId);
-      if (error) throw error;
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["my-predictions"] }),
   });
@@ -237,7 +233,7 @@ export function useMatchPredictions(matchId: string, enabled: boolean) {
         )
         .eq("match_id", matchId)
         .order("points", { ascending: false, nullsFirst: false });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return (data ?? []) as unknown as MatchPrediction[];
     },
   });
@@ -260,7 +256,7 @@ export function useMatchPredictStatus(matchId: string, enabled: boolean) {
       const { data, error } = await supabase.rpc("get_match_predict_status", {
         p_match_id: matchId,
       });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return (data ?? []) as MatchPredictStatus[];
     },
   });

@@ -67,6 +67,7 @@ Deno.serve(async (req) => {
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const mpToken = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN") ?? "";
   const webhookSecret = Deno.env.get("MP_WEBHOOK_SECRET") ?? "";
+  const admin = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
 
   // A notificação pode vir no body (JSON) e/ou na query string.
   const u = new URL(req.url);
@@ -90,9 +91,23 @@ Deno.serve(async (req) => {
   // Só tratamos eventos de pagamento.
   if (type !== "payment" || !dataId) return json({ ok: true, ignored: true });
 
+  // Rate limit por IP (endpoint público): freia abuso/amplificação.
+  const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0]?.trim() || "unknown";
+  const { data: rlOk } = await admin.rpc("rate_limit_hit", {
+    p_bucket: `mpwh:${ip}`,
+    p_max: 120,
+    p_window_seconds: 60,
+  });
+  if (rlOk === false) return json({ error: "rate limited" }, 429);
+
   if (webhookSecret) {
     const ok = await validSignature(req, dataId, webhookSecret);
     if (!ok) return json({ error: "assinatura inválida" }, 401);
+    // Anti-replay: rejeita assinaturas com ts muito antigo (> 10 min).
+    const sigTs = Number((req.headers.get("x-signature") ?? "").match(/ts=([0-9]+)/)?.[1] ?? 0);
+    if (sigTs && Math.abs(Date.now() / 1000 - sigTs) > 600) {
+      return json({ error: "assinatura expirada" }, 401);
+    }
   }
   if (!mpToken) return json({ error: "token MP ausente" }, 503);
 
@@ -103,7 +118,7 @@ Deno.serve(async (req) => {
   if (!payRes.ok) return json({ error: `MP ${payRes.status}` }, 502);
   const pay = await payRes.json();
 
-  const meta = (pay.metadata ?? {}) as { league_id?: string; discount_code?: string };
+  const meta = (pay.metadata ?? {}) as { league_id?: string; user_id?: string; discount_code?: string };
   const leagueId: string | undefined = pay.external_reference ?? meta.league_id;
   if (!leagueId) return json({ ok: true, ignored: "sem external_reference" });
 
@@ -111,7 +126,38 @@ Deno.serve(async (req) => {
   const amountCents = Math.round(Number(pay.transaction_amount ?? 0) * 100);
   const preferenceId = pay.order?.id ? String(pay.order.id) : null;
 
-  const admin = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
+  // Só ativa se o PAGADOR for o dono da federação (fecha cross-league /
+  // external_reference forjado / pagamento de terceiro p/ liga alheia).
+  const { data: lg } = await admin
+    .from("leagues")
+    .select("owner_id")
+    .eq("id", leagueId)
+    .maybeSingle();
+  if (!lg) return json({ ok: true, ignored: "liga inexistente" });
+  if (status === "paid" && meta.user_id && meta.user_id !== lg.owner_id) {
+    console.error("webhook: payer != owner", { leagueId });
+    return json({ ok: true, ignored: "payer mismatch" });
+  }
+
+  // Sanidade de valor (sem cupom): rejeita ativação por valor muito abaixo do esperado.
+  if (status === "paid" && !meta.discount_code) {
+    const { data: st } = await admin
+      .from("app_settings")
+      .select("league_price_cents, promo_price_cents, promo_until")
+      .eq("id", 1)
+      .maybeSingle();
+    const baseCents = Number(st?.league_price_cents ?? 0);
+    const promoActive =
+      st?.promo_price_cents != null &&
+      st?.promo_until != null &&
+      new Date(st.promo_until).getTime() > Date.now();
+    const expected = promoActive ? Number(st?.promo_price_cents) : baseCents;
+    if (expected > 0 && amountCents + 50 < expected) {
+      console.error("webhook: valor abaixo do esperado", { leagueId, amountCents, expected });
+      return json({ ok: true, ignored: "amount below expected" });
+    }
+  }
+
   const { error } = await admin.rpc("confirm_league_payment", {
     p_league_id: leagueId,
     p_payment_id: String(pay.id),

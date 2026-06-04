@@ -47,12 +47,22 @@ export function LoginPage() {
 
   async function handleDevLogin() {
     setBusy(true);
-    const { error } = await signInWithPassword("joao.crf93@gmail.com", "resultadismo123");
+    const { error } = await signInWithPassword(
+      import.meta.env.VITE_DEV_LOGIN_EMAIL,
+      import.meta.env.VITE_DEV_LOGIN_PASSWORD,
+    );
     if (error) {
       toast(error, "error");
       setBusy(false);
     }
   }
+
+  // Login de desenvolvimento: só em DEV e somente quando AMBAS as variáveis
+  // (e-mail + senha) estiverem definidas. Sem credenciais hardcoded no código.
+  const devLogin =
+    import.meta.env.DEV &&
+    import.meta.env.VITE_DEV_LOGIN_EMAIL &&
+    import.meta.env.VITE_DEV_LOGIN_PASSWORD;
 
   return (
     <div className="grid min-h-dvh place-items-center bg-background px-5 py-10">
@@ -72,7 +82,7 @@ export function LoginPage() {
             Use sua conta Google para entrar e jogar.
           </p>
 
-          {import.meta.env.DEV && (
+          {devLogin && (
             <button
               type="button"
               onClick={handleDevLogin}

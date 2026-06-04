@@ -11,18 +11,6 @@ export type AvatarShape =
   | "hexagon"
   | "diamond";
 
-export const AVATAR_SHAPES: { key: AvatarShape; label: string }[] = [
-  // escudos de clube primeiro
-  { key: "shield", label: "Escudo" },
-  { key: "ogival", label: "Ogival" },
-  { key: "banner", label: "Bandeira" },
-  // formas geométricas
-  { key: "circle", label: "Círculo" },
-  { key: "squircle", label: "Quadrado" },
-  { key: "hexagon", label: "Hexágono" },
-  { key: "diamond", label: "Losango" },
-];
-
 export const AVATAR_COLORS: { key: string; hex: string; dark?: boolean }[] = [
   { key: "turquesa", hex: "#1CB19C" },
   { key: "verde", hex: "#43921E" },
@@ -35,8 +23,6 @@ export const AVATAR_COLORS: { key: string; hex: string; dark?: boolean }[] = [
   // opção clara (branco gelo, levemente tintado de turquesa) — texto escuro
   { key: "gelo", hex: "#EAF0F0", dark: true },
 ];
-
-export const AVATAR_ROTATIONS = [0, 45, 90, 135];
 
 // polígonos em % (escalam em qualquer tamanho). Crests com vértices suficientes
 // para um silhueta de escudo de futebol limpa.
@@ -65,11 +51,7 @@ export function shapeStyle(shape: AvatarShape): CSSProperties {
   }
 }
 
-export type AvatarConfig = { shape: AvatarShape; colors: string[]; rotation: number };
-
-export function buildGenAvatar(shape: AvatarShape, colors: string[], rotation: number): string {
-  return `gen:${shape}:${colors.join("-")}:${rotation}`;
-}
+type AvatarConfig = { shape: AvatarShape; colors: string[]; rotation: number };
 
 export function parseGenAvatar(src: string | null | undefined): AvatarConfig | null {
   if (!src || !src.startsWith("gen:")) return null;

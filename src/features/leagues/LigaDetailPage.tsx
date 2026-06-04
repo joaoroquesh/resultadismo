@@ -87,8 +87,11 @@ export function LigaDetailPage() {
   // (a webhook do Mercado Pago a ativa em segundos).
   useEffect(() => {
     if (league?.payment_status !== "pending") return;
+    let ticks = 0;
     const t = setInterval(() => {
+      ticks += 1;
       qc.invalidateQueries({ queryKey: ["league", slug] });
+      if (ticks >= 36) clearInterval(t); // para após ~3 min (evita poll indefinido)
     }, 5000);
     return () => clearInterval(t);
   }, [league?.payment_status, slug, qc]);
@@ -130,7 +133,7 @@ export function LigaDetailPage() {
     );
   }
 
-  const confrontoEnabled = (league as { confronto_enabled?: boolean }).confronto_enabled ?? false;
+  const confrontoEnabled = league.confronto_enabled ?? false;
 
   function copyCode() {
     if (!league?.join_code) return;
@@ -158,8 +161,7 @@ export function LigaDetailPage() {
         </Button>
       }
     >
-      {league.status === "active" &&
-        (league as { name_approved?: boolean }).name_approved === false && (
+      {league.status === "active" && league.name_approved === false && (
           <div className="mb-4 flex items-start gap-2 rounded-md bg-brand-50 p-3 text-sm text-brand-800">
             <Clock className="mt-0.5 size-4 shrink-0" />
             <p>
@@ -372,7 +374,7 @@ export function LigaDetailPage() {
         <CompeticoesTab
           leagueId={league.id}
           comps={comps ?? []}
-          confrontoEnabled={(league as { confronto_enabled?: boolean }).confronto_enabled ?? false}
+          confrontoEnabled={confrontoEnabled}
         />
       )}
 
@@ -391,7 +393,7 @@ export function LigaDetailPage() {
         <RefundFederationButton
           leagueId={league.id}
           paymentStatus={league.payment_status}
-          approvedAt={(league as { approved_at?: string | null }).approved_at}
+          approvedAt={league.approved_at}
         />
       )}
 
@@ -751,6 +753,7 @@ function CompeticoesTab({
       ) : open ? (
         <Card className="space-y-3 p-4">
           <select
+            aria-label="Competição"
             value={competitionId}
             onChange={(e) => setCompetitionId(e.target.value)}
             className="h-11 w-full rounded-md border border-ink-200 bg-surface px-3 outline-none focus:border-brand-500"

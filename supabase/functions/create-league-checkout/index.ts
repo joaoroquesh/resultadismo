@@ -9,22 +9,16 @@
 // Secrets: MERCADOPAGO_ACCESS_TOKEN, APP_URL
 
 import { createClient } from "npm:@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
-
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
+import { corsHeaders } from "../_shared/security.ts";
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const cors = corsHeaders(req);
+  const json = (body: unknown, status = 200) =>
+    new Response(JSON.stringify(body), {
+      status,
+      headers: { ...cors, "Content-Type": "application/json" },
+    });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -39,6 +33,14 @@ Deno.serve(async (req) => {
   const { data: userData } = await admin.auth.getUser(jwt);
   const user = userData.user;
   if (!user) return json({ error: "Não autorizado" }, 401);
+
+  // Rate limit por usuário (evita spam de criação de preferência no MP).
+  const { data: rlOk } = await admin.rpc("rate_limit_hit", {
+    p_bucket: `checkout:${user.id}`,
+    p_max: 20,
+    p_window_seconds: 60,
+  });
+  if (rlOk === false) return json({ error: "Muitas tentativas. Tente novamente em instantes." }, 429);
 
   let body: { leagueId?: string; discountCode?: string } = {};
   try {
@@ -154,7 +156,10 @@ Deno.serve(async (req) => {
     headers: { Authorization: `Bearer ${mpToken}`, "Content-Type": "application/json" },
     body: JSON.stringify(preference),
   });
-  if (!res.ok) return json({ error: `Mercado Pago ${res.status}: ${await res.text()}` }, 502);
+  if (!res.ok) {
+    console.error("Mercado Pago preference error", res.status, await res.text());
+    return json({ error: `Pagamento indisponível no momento (${res.status}).` }, 502);
+  }
   const pref = await res.json();
   const url = pref.init_point ?? pref.sandbox_init_point;
   if (!url) return json({ error: "Mercado Pago não retornou a URL de pagamento." }, 502);
