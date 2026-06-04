@@ -14,8 +14,8 @@
 > É a prova de que a IA leu e está obedecendo as regras do `.claude/`. Se a frase **não** aparecer,
 > presuma que estas regras não foram lidas/seguidas.
 
-Versão atual do projeto: **2.0.0** · App em produção: **https://www.resultadismo.com** ·
-Última revisão desta doc: **2026-06-03**.
+Versão atual do projeto: **2.2.1** · App em produção: **https://www.resultadismo.com** ·
+Última revisão desta doc: **2026-06-04**.
 
 ---
 
@@ -102,6 +102,9 @@ de docs + changelog (seção 5). Cada uma tem dono num doc específico.
    **confirme com o João** antes de seguir (não mude por conta própria). → §5 passos 1–2.
 12. **Sinal de conformidade.** Toda resposta da IA neste repositório termina com **"Fui
    resultadista"** (ver o topo). Sem a frase, presuma que estas regras não foram seguidas.
+13. **UI/UX impecável.** Qualquer alteração que toque na **UI ou UX** do site passa pela skill
+   **`impeccable`**, pelas **melhores práticas de UI/UX** e pelas **10 heurísticas de Nielsen**.
+   Design não é opcional aqui — é parte da marca. → [`02`](02-CODIGO.md) §4, [`DESIGN.md`](../DESIGN.md).
 
 ---
 

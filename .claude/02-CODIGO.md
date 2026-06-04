@@ -73,6 +73,13 @@ Regras:
 
 ## 4. Design System (sempre use, não recrie)
 
+> **🎨 UI/UX impecável (obrigatório — regra central 13 do [`MESTRE.md`](MESTRE.md)).** Qualquer
+> alteração que toque na **interface (UI) ou na experiência (UX)** passa pela skill **`impeccable`**
+> (crítica + polish), pelas **melhores práticas de UI/UX** e pelas **10 heurísticas de Nielsen**
+> (visibilidade do estado, linguagem do mundo real, controle/liberdade, consistência, prevenção de
+> erro, reconhecer > lembrar, flexibilidade, estético/minimalista, recuperação de erro, ajuda). Não
+> entregue UI sem essa passada. → [`DESIGN.md`](../DESIGN.md).
+
 - Componentes em `src/components/ui/`: `Button`, `Card`, `Input`, `Badge`, `Avatar`, `Modal`,
   `ConfirmDialog`, `SegmentedControl`, `Skeleton`, `EmptyState`, `Toast`, `Spinner`, `Coachmark`,
   `CrestEditor`, `CrestMask`, `Escudo`. Layout em `src/components/layout/`. → [`03`](03-PAGINAS.md).

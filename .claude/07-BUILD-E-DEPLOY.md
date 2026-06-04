@@ -11,7 +11,9 @@
   `injectManifest`, `src/sw.ts` + Workbox precache).
 - **Config:** `vite.config.ts` (React + Tailwind v4 + PWA + alias `@`→`src`), `tsconfig*.json`
   (strict, paths `@/*`), `index.html` (manifest, Apple meta tags, captura de `beforeinstallprompt`).
-- **Roteamento SPA:** `vercel.json` reescreve tudo para `/index.html`.
+- **Roteamento SPA:** `vercel.json` reescreve tudo para `/index.html`, **e** aplica **CSP + headers de
+  segurança** (`Content-Security-Policy`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`,
+  `X-Frame-Options: DENY`) — adicionados em 2.1.0.
 
 > O build só afeta o **frontend**. Banco e Edge Functions têm pipelines próprios (§3).
 
@@ -26,6 +28,7 @@
 | `VITE_VAPID_PUBLIC_KEY` | Chave pública VAPID (Web Push) — opcional |
 | `VITE_APP_NAME` | Nome do app — opcional |
 | `VITE_LEAGUE_PRICE_CENTS` | Preço só p/ exibição (deve bater com o servidor) — opcional |
+| `VITE_DEV_LOGIN_EMAIL` / `VITE_DEV_LOGIN_PASSWORD` | **Só dev** (2.1.0): login rápido de teste. Sem eles, o botão de dev não aparece. **Nunca** setar em produção. |
 
 > `.env.local` (gitignored) já aponta para o Supabase local. Modelo em `.env.example`.
 
@@ -39,6 +42,11 @@
 | `FOOTBALL_DATA_TOKEN` / `THESPORTSDB_KEY` | sync de jogos |
 | `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | Web Push (`send-push`) |
 | `SUPABASE_ACCESS_TOKEN` | secret de **repo** (GitHub Action de deploy de functions) |
+
+> **CORS das Edge Functions (2.1.0):** não usam mais `Access-Control-Allow-Origin: *` — só `www`/apex
+> de `resultadismo.com`, `*.vercel.app` e localhost (helper em `supabase/functions/_shared/`). Se o
+> domínio de produção mudar, ajustar lá (ou setar `APP_URL`). `MP_WEBHOOK_SECRET` segue opcional, mas
+> **recomendado** (o webhook já está protegido por checagem de pagador/valor/estado mesmo sem ele).
 
 ## 3. Como o deploy chega em produção
 

@@ -102,7 +102,8 @@ prêmio em dinheiro, sem pote — Lei 14.790/2023).
 
 **Modo global** (`app_settings.payment_mode`, aba Pgto do admin):
 - `disabled` — criação grátis (sem cobrança).
-- `test` — pagamento **simulado** sem Mercado Pago (`simulate_league_payment`); seguro para testar.
+- `test` — pagamento **simulado** sem Mercado Pago (`simulate_league_payment` — **só app-admin** desde
+  2.1.0, p/ o modo teste nunca virar "federação grátis" pra usuário comum); seguro para testar.
 - `live` — **Mercado Pago** de verdade (estado atual de produção).
 
 **Preço:** base `league_price_cents` + promoção opcional (`promo_price_cents`/`promo_until`).
@@ -119,10 +120,16 @@ vigente. **100% off → ativa grátis** (sem passar pelo MP). `validate_discount
 cria a preferência → usuário paga (Pix/cartão; **boleto removido**) no checkout hosted →
 **`mercadopago-webhook`** consulta o MP (autoritativo) → `confirm_league_payment` **ativa na hora**
 (nome em revisão). Idempotente por `payment_id`. Cortesia do admin: `admin_comp_league`.
+- **Endurecimento (2.1.0):** o webhook só ativa se o **pagador == dono** (`metadata.user_id`) e o
+  **valor ≥ preço esperado** (quando sem cupom); tem anti-replay (`ts`) e rate limit por IP.
+  `confirm_league_payment` tem **guarda de estado terminal** (`for update`): uma vez `refunded`, um
+  `paid` reentregue **não** reativa a federação.
 
 **Reembolso (direito de arrependimento — CDC art. 49):** **self-service, automático, ≤ 7 dias**.
-- Botão "Cancelar e reembolsar" **só para o dono**, federação **paga**, dentro de **7 dias** de
-  `approved_at`, confirmação em 2 passos.
+- Botão "Cancelar e reembolsar" **só para o dono**, federação **paga**, dentro de **7 dias** do
+  **pagamento** (`league_payments.created_at` — corrigido em 2.1.0; antes usava `approved_at`, que
+  podia ser anterior ao pagamento e negar reembolso válido), confirmação em 2 passos. A mutação é
+  atômica (`refund_league`, `for update`).
 - `cancel-league-refund` revalida no servidor → devolução **total** no MP (`POST /refunds`,
   idempotente) → marca `refunded` e **arquiva** a federação (`status=archived`, `deleted_at=now()` →
   Lixeira do admin, recuperável). Cortesia/100%-off/teste: cancela sem chamar o MP.
@@ -152,11 +159,14 @@ Dentro de uma federação, uma disputa tem um **modo**: **Pontos** (ranking por 
 **Conceito central — o confronto se resolve por PERÍODO, não por "dia":** o problema da Copa é ter
 poucos jogos por dia. A unidade do duelo é um **período** — uma rodada da fase de grupos, uma fase do
 mata-mata, ou uma semana (`period_kind` = phase/week). Quem fizer **mais pontos no período** vence
-o confronto (Liga: 3/1/0; empate de pontos = 1/1. Copa: avança). `get_competition_periods` lê o
-calendário real (ex.: Copa 2026 = 8 fases ou ~6 semanas).
+o confronto (Liga: 3/1/0; empate de pontos = 1/1. Copa: o vencedor **avança** —
+`advance_confronto_cup` promove p/ a fase seguinte, empate de mata-mata desempata por **seed**).
+`get_competition_periods` lê o calendário real (ex.: Copa 2026 = 8 fases ou ~6 semanas). A **semana**
+é ancorada em **America/Sao_Paulo** (BRT, igual ao joker e à tela de Jogos — unificado em 2.1.0).
 
 **Estados** (`league_competitions.confronto_state`): `draft` (rascunho, só admin vê) → `scheduled`
-(sorteado, oculto até o horário) → `drawn` (no ar) → `finished`.
+(sorteado, **oculto até o horário** — enforçado **no servidor** desde 2.1.0: `get_confronto_ties`/
+`get_tie_detail` retornam vazio enquanto `scheduled`, não só na UI) → `drawn` (no ar) → `finished`.
 
 **Sorteio:**
 - Fixtures gerados no **client** (`features/confronto/build.ts`: round-robin pelo método do círculo,
@@ -180,7 +190,8 @@ um se inscreve em `confronto_optins`, válido só em `draft`).
   revela só no apito ou para o próprio).
 - **Saída = W.O.:** sair da federação durante uma Liga/Copa ativa dá **W.O.** nos confrontos em
   aberto (oponente vence) e remove o membro (`leave_league`, dupla confirmação).
-- **Bye:** sem oponente no período → passa.
+- **Bye:** sem oponente no período → **vence** (conta como vitória na classificação de confronto;
+  ajustado em 2.1.0 — antes não pontuava).
 
 ---
 

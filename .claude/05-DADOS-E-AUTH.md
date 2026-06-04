@@ -40,6 +40,7 @@
 | `discount_codes` | Cupons | `code`, `percent_off` **ou** `amount_off_cents`, `max_uses`/`used_count`, `active`, `expires_at` |
 | `league_payments` | Trilha de pagamentos (auditoria/idempotência) | `league_id`,`user_id`, `provider` (mercadopago/comp/test), `payment_id` (único), `status`, `amount_cents`, `discount_code` |
 | `access_control` / `access_sessions` | Sala de espera (fila FIFO) | config singleton + 1 linha por aba (`state` active/waiting) |
+| `rate_limits` | Rate limit das Edge Functions (janela fixa por bucket) — **2.1.0** | `bucket` (pk), `window_start`, `count`. Sem acesso de cliente; só `service_role`/`rate_limit_hit`. |
 | `private.sync_config` | Config server-side do sync (URL das functions + service_key) | schema **`private`** — não exposto na API |
 
 ## 3. RLS — regras de acesso (resumo)
@@ -57,8 +58,10 @@ Padrão geral: **app-admin sempre pode**; o resto depende de propriedade/papel/v
   liquidação (GUC `app.settle_bypass`). `confronto_enabled` protegido por trigger próprio.
 - **`league_members`**: membros se veem; só admin da federação adiciona/edita; o **dono é
   protegido** (`protect_league_owner`).
-- **`league_competitions` / `cup_ties` / `confronto_*`**: visíveis a quem vê a federação; escrita só
-  por admin (em geral via RPC transacional, não direto).
+- **`league_competitions` / `cup_ties` / `confronto_*`**: visíveis a quem vê a federação; escrita
+  **só via RPC** `SECURITY DEFINER` — a policy de escrita direta em `cup_ties` foi **removida em
+  2.1.0** (não há mais `INSERT/UPDATE/DELETE` direto via PostgREST; tudo passa por `draw_confronto`/
+  `append_confronto_ties`/`advance_confronto_cup`/`leave_league`).
 - **`league_payments`**: dono lê os seus; escrita só `service_role` (webhook).
 - **`app_settings`**: todos leem (modo/preço); escrita só via RPC de admin. **`discount_codes`**:
   CRUD só admin (usuário valida via `validate_discount_code`).
@@ -71,7 +74,11 @@ Padrão geral: **app-admin sempre pode**; o resto depende de propriedade/papel/v
 - `get_league_standings(lc_id)` → classificação com o **desempate fixo** (ver §6). `SECURITY
   DEFINER`, com guarda de acesso (membro/público/admin).
 - `get_confronto_standings` / `get_confronto_ties` / `get_tie_detail` / `get_competition_periods` —
-  confronto por período. → [`06`](06-REGRAS-DE-NEGOCIO.md).
+  confronto por período. **Guarda de visibilidade desde 2.1.0** (membro/público/admin — não vazam
+  liga privada p/ anon); `ties`/`tie_detail` retornam vazio enquanto o sorteio está `scheduled`. →
+  [`06`](06-REGRAS-DE-NEGOCIO.md).
+- `advance_confronto_cup(lc_id)` — Copa: promove o vencedor de cada chave p/ a fase seguinte
+  (idempotente; empate desempata por seed). Chamada "lazy" pelo client ao abrir o chaveamento.
 
 **Federação**
 - `join_league_by_code(code)` / `join_public_league(id)` — entrar (respeita `join_policy`).
@@ -79,8 +86,11 @@ Padrão geral: **app-admin sempre pode**; o resto depende de propriedade/papel/v
 - `draw_confronto` / `undo_confronto_draw` / `toggle_confronto_optin` / `leave_league` — confronto.
 
 **Pagamento** (detalhe em [`06`](06-REGRAS-DE-NEGOCIO.md))
-- `confirm_league_payment` (webhook, idempotente; `paid`→ativa, `refunded`→arquiva),
-  `simulate_league_payment` (modo teste), `validate_discount_code`, `admin_*` de pagamento.
+- `confirm_league_payment` (webhook, idempotente; `paid`→ativa, `refunded`→arquiva). **2.1.0:**
+  trava a liga (`for update`) e tem **guarda de estado terminal** (`refunded` não volta a `paid`).
+- `simulate_league_payment` (modo teste — **só app-admin** desde 2.1.0), `refund_league` (reembolso
+  atômico, `for update`, só `service_role`), `rate_limit_hit` (janela fixa por bucket, só
+  `service_role`), `validate_discount_code`, `admin_*` de pagamento.
 
 **Helpers de segurança**: `is_app_admin()`, `is_league_member(id)`, `is_league_admin(id)`,
 `can_settle_leagues()`, `match_is_locked(id)`.
@@ -99,7 +109,9 @@ Realtime**); `nudge_member` (cutucar, anti-spam 30 min).
 - `leagues_before_insert` (gera `join_code`, força status/payment conforme modo/papel) +
   `leagues_after_insert` (adiciona o dono como membro).
 - Guards: `leagues_guard_status`, `protect_league_owner`, `leagues_guard_confronto_enabled`,
-  `profiles_guard`, `enforce_joker_limit`, `league_payments_count_discount`.
+  `profiles_guard`, `enforce_joker_limit` (com `pg_advisory_xact_lock` desde 2.1.0 — sem corrida no
+  limite 2/semana), `league_payments_count_discount` (conta o cupom de forma **atômica**, não estoura
+  `max_uses`).
 
 **Cron (pg_cron)**
 - `run_football_sync()` — sincroniza jogos (a cada ~15 min) via Edge Function.
