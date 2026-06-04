@@ -10,6 +10,8 @@ function originAllowed(origin: string): boolean {
   if (!origin) return false;
   const o = origin.replace(/\/+$/, "");
   if (APP_ORIGINS.includes(o)) return true;
+  // domínio de produção (apex + www) — robusto mesmo se APP_URL não estiver setado
+  if (/^https:\/\/(www\.)?resultadismo\.com$/.test(o)) return true;
   // dev local
   if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(o)) return true;
   // previews da Vercel
