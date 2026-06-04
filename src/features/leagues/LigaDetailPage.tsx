@@ -139,7 +139,12 @@ export function LigaDetailPage() {
     toast("Código copiado!", "success");
   }
 
-  // Abre o WhatsApp com texto pronto. wa.me funciona em mobile (app) e desktop (web).
+  // Compartilha o convite. Estratégia: tenta a Web Share API primeiro porque
+  // ela passa o texto NATIVO (sem URL-encoding), preservando emojis multi-byte
+  // que o wa.me/?text= corrompe em alguns clientes WhatsApp (🏆 ✅ 📲 👉 viravam
+  // � � � � pra alguns destinatários). No mobile o sistema abre o "Compartilhar
+  // com…" com WhatsApp em destaque (1 toque). No desktop sem Web Share, cai no
+  // wa.me como fallback.
   function shareWhatsApp() {
     if (!league?.join_code) return;
     const text = `🏆 Achei o melhor bolão pra Copa do Mundo!
@@ -154,7 +159,20 @@ No Resultadismo você:
 Bora jogar junto? Entra na minha federação:
 Código: ${league.join_code}
 👉 https://www.resultadismo.com`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+
+    const fallback = () =>
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+
+    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+      navigator.share({ text }).catch((err: unknown) => {
+        const name = (err as { name?: string } | undefined)?.name;
+        // AbortError = usuário cancelou no share sheet; não cai no fallback.
+        if (name !== "AbortError") fallback();
+      });
+      return;
+    }
+
+    fallback();
   }
 
   async function handleLeave() {
