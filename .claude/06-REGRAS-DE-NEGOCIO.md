@@ -1,0 +1,237 @@
+# 06 — Regras de negócio (a constituição)
+
+> As regras que **definem o que o Resultadismo é**. Mudar qualquer uma exige decisão consciente do
+> João + atualização de doc + changelog (ver [`MESTRE.md`](MESTRE.md) §5). Onde a regra mora no
+> código, está citado — a **migration/função é a fonte de verdade**; este texto é o contrato legível.
+
+Índice: [1. Pontuação](#1-pontuação-o-coração) · [2. Palpite/jogo](#2-ciclo-de-vida-do-palpite-e-do-jogo)
+· [3. Classificação/desempate](#3-classificação-e-desempate) · [4. Federações](#4-federações)
+· [5. Pagamento](#5-monetização--pagamento) · [6. Confrontos](#6-confrontos-liga--copa)
+· [7. Escudos](#7-escudos) · [8. Notificações](#8-notificações) · [9. Outras regras](#9-outras-regras)
+
+---
+
+## 1. Pontuação (o coração)
+
+| Tipo | Pontos | Quando |
+|---|:---:|---|
+| **Cravada** | **3** | Placar **exato** (acertou os dois números). |
+| **Saldo** | **2** | Vencedor certo **+ mesma diferença de gols** (cobre empates: empate previsto com a mesma diferença = saldo). |
+| **Acerto** | **1** | Só o **vencedor** certo (sem ser saldo). |
+| **Erro** | **0** | Errou o vencedor. |
+
+- Calculada **no banco**: `compute_score_type()` + `score_points()`
+  (`20260526000002_football_data.sql`). O client **nunca** recalcula — só exibe.
+- **Quando pontua:** ao escrever o palpite, se o jogo já está `finished`; e **re-pontua
+  automaticamente** quando o resultado do jogo muda (triggers `predictions_score_on_write` e
+  `matches_rescore_predictions`, `20260526000004`). → [`05`](05-DADOS-E-AUTH.md) §5.
+- **Placar que conta:** 90' + prorrogação. **Pênaltis NÃO contam** para a pontuação (são
+  informativos).
+- **Pontos por tipo são configuráveis por federação** (`league_competitions.settings.points`),
+  default 3/2/1 — então a função usa o que estiver no settings.
+
+### Dobro (Joker / 2×)
+- Marca `predictions.is_joker`; o palpite vale **em dobro** naquela disputa.
+- **Limite por semana, por competição** (semana civil ancorada em America/Sao_Paulo), garantido por
+  trigger (`enforce_joker_limit`, migrations de joker `…012`/`…014`). O número exato do limite está
+  na migration/competição — **conferir lá** antes de afirmar um valor.
+
+---
+
+## 2. Ciclo de vida do palpite e do jogo
+
+**Jogo (`matches.status`):** `scheduled` → `live` → `finished` (também `postponed`/`cancelled`).
+O resultado entra por **sync automático** (Edge Function, provedores ESPN/football-data/TheSportsDB)
+ou por **override manual do admin** (`AdminCompMatchesPage`).
+
+**Palpite:**
+- Editável **até o `kickoff_at`**. A partir do apito, **trava** (`match_is_locked` + RLS de
+  `predictions`): não dá para criar, editar nem apagar. → [`05`](05-DADOS-E-AUTH.md) §3.
+- É **global por (usuário, jogo)**: o mesmo palpite conta em **todas** as federações que disputam
+  aquela competição.
+- **Privacidade até o apito:** você só vê o palpite dos outros **depois** que o jogo começa. Antes,
+  no máximo "fulano já palpitou / não palpitou" (vale também no detalhe de confronto — anti-trapaça).
+
+**Curadoria:** o admin pode **ocultar** um jogo (`matches.hidden`) para não entrar nos palpites.
+
+---
+
+## 3. Classificação e desempate
+
+Modo **Pontos/Tabela**: ranking por soma de pontos via `get_league_standings` (com dobros).
+**Desempate fixo** (não inventar outro):
+
+```
+pontos → cravadas → saldos → aproveitamento → acertividade → membro mais antigo
+```
+
+Métricas exibidas: jogos, pontos, cravadas, saldos, **aproveitamento** (% de pontos vs máximo
+possível) e **acertividade** (% de palpites que pontuaram). Detalhe da fórmula em
+[`05`](05-DADOS-E-AUTH.md) §6.
+
+---
+
+## 4. Federações
+
+**Federação** = o grupo social onde a turma joga (antigo "Liga/Grupo"). A tabela continua
+`leagues`; só o **rótulo** mudou (rebrand **Liga → Federação**, rotas `/federacoes`, redirects de
+`/ligas/*`). ⚠️ "Liga" passou a significar um **modo de disputa** dentro da federação (ver §6) — é
+uma troca de significado proposital.
+
+- **Papéis:** `owner` (criador, protegido contra remoção/rebaixamento), `admin`, `member`.
+- **Visibilidade/entrada:** `visibility` (public/private) + `join_policy`
+  (invite/open/approval) + `join_code` (6 caracteres). Entrar por código respeita a política.
+- **Criação → ativação:** depende do **modo de pagamento** global (ver §5). Toda federação tem
+  `status` (pending/active/rejected/archived) e `payment_status`.
+- **Revisão de nome:** federação paga **ativa na hora**; só o **nome** entra em revisão do admin
+  (`name_approved`) — disclaimer some quando o admin aprova (`admin_approve_league_name`).
+- **Nome por prefixo-badge:** o tipo vira um prefixo fixo no nome — **Bolão** (Pontos), **Liga**,
+  **Copa** — configurável no admin (`app_settings`). O usuário digita só o complemento.
+- **Escopo V1:** na prática, **1 competição por federação** e foco no modo Tabela/Pontos (Copa do
+  Mundo é o padrão na criação). Liga/Copa (confronto) ficam atrás de gate (§6).
+
+---
+
+## 5. Monetização / pagamento
+
+> História cronológica completa do pagamento: [`HISTORICO.md`](HISTORICO.md) (consolidado).
+
+**Regra-mãe:** cobra-se **só pela criação de uma Federação** — **taxa única**, enquadrada como **taxa
+de serviço**. **Jogar, palpitar e participar é grátis.** **Não é casa de apostas** (sem aposta, sem
+prêmio em dinheiro, sem pote — Lei 14.790/2023).
+
+**Modo global** (`app_settings.payment_mode`, aba Pgto do admin):
+- `disabled` — criação grátis (sem cobrança).
+- `test` — pagamento **simulado** sem Mercado Pago (`simulate_league_payment`); seguro para testar.
+- `live` — **Mercado Pago** de verdade (estado atual de produção).
+
+**Preço:** base `league_price_cents` + promoção opcional (`promo_price_cents`/`promo_until`).
+- **Preço efetivo = promo enquanto `now() < promo_until`, senão base** — decidido **no servidor**
+  (`create-league-checkout`); o front só **espelha** (`isPromoActive`/`effectivePriceCents`).
+- Valores atuais: base **R$ 19,90**; promo **R$ 9,90 até 20/07/2026** (fim da Copa), depois volta
+  sozinho. ⚠️ Textos da landing/Como Funciona citam esses valores **hardcoded** — se mudar o preço
+  no admin, atualizar o copy à mão.
+
+**Cupons** (`discount_codes`): % **ou** R$ fixo, com `max_uses`/validade. Incidem sobre o preço
+vigente. **100% off → ativa grátis** (sem passar pelo MP). `validate_discount_code` para preview.
+
+**Fluxo (modo live):** cria federação (`pending`) → `create-league-checkout` calcula preço + cupom e
+cria a preferência → usuário paga (Pix/cartão; **boleto removido**) no checkout hosted →
+**`mercadopago-webhook`** consulta o MP (autoritativo) → `confirm_league_payment` **ativa na hora**
+(nome em revisão). Idempotente por `payment_id`. Cortesia do admin: `admin_comp_league`.
+
+**Reembolso (direito de arrependimento — CDC art. 49):** **self-service, automático, ≤ 7 dias**.
+- Botão "Cancelar e reembolsar" **só para o dono**, federação **paga**, dentro de **7 dias** de
+  `approved_at`, confirmação em 2 passos.
+- `cancel-league-refund` revalida no servidor → devolução **total** no MP (`POST /refunds`,
+  idempotente) → marca `refunded` e **arquiva** a federação (`status=archived`, `deleted_at=now()` →
+  Lixeira do admin, recuperável). Cortesia/100%-off/teste: cancela sem chamar o MP.
+- **Incondicional** dentro dos 7 dias (sem exigir "não uso" — mais seguro juridicamente).
+- Qualquer caminho de `refunded` (self-service, estorno manual no painel do MP via webhook, ação
+  admin) leva ao mesmo estado arquivado.
+- **Fatos do Mercado Pago (reembolso):** prazo para estornar até **180 dias** da aprovação; **Pix**
+  volta à conta do pagador; **cartão** estorna em **7–10 dias úteis** (controla o banco emissor); no
+  reembolso **total** a **taxa de venda é devolvida ao vendedor**; o valor sai do **saldo** do
+  vendedor no MP.
+
+**Boundaries:** a IA **não digita** o Access Token, não loga no MP, **não executa estornos** no
+painel. Token de produção e teste de estorno são do João. → [`04`](04-ADMIN.md) §5.
+
+---
+
+## 6. Confrontos (Liga / Copa)
+
+Dentro de uma federação, uma disputa tem um **modo**: **Pontos** (ranking por acúmulo) ou
+**Confronto** (duelo direto) — e Confronto se subdivide em **Liga** (pontos corridos 3/1/0) e
+**Copa** (mata-mata). Tudo sobre os **mesmos jogos** que a federação já palpita.
+
+> **Gate:** o modo Confronto só aparece nas federações com `leagues.confronto_enabled = true`,
+> ligado **só pelo app-admin** (`admin_set_confronto_enabled`). As demais veem "em breve". A
+> estrutura toda está em produção **atrás desse gate**.
+
+**Conceito central — o confronto se resolve por PERÍODO, não por "dia":** o problema da Copa é ter
+poucos jogos por dia. A unidade do duelo é um **período** — uma rodada da fase de grupos, uma fase do
+mata-mata, ou uma semana (`period_kind` = phase/week). Quem fizer **mais pontos no período** vence
+o confronto (Liga: 3/1/0; empate de pontos = 1/1. Copa: avança). `get_competition_periods` lê o
+calendário real (ex.: Copa 2026 = 8 fases ou ~6 semanas).
+
+**Estados** (`league_competitions.confronto_state`): `draft` (rascunho, só admin vê) → `scheduled`
+(sorteado, oculto até o horário) → `drawn` (no ar) → `finished`.
+
+**Sorteio:**
+- Fixtures gerados no **client** (`features/confronto/build.ts`: round-robin pelo método do círculo,
+  bracket por seed, **suíço** progressivo) e persistidos por **uma RPC transacional**
+  (`draw_confronto`, admin-only) que trava os participantes (`confronto_participants`) e monta os
+  `cup_ties`. `undo_confronto_draw` reverte **enquanto nenhuma rodada começou**.
+- **Quando sortear:** instantâneo, agendado para data/hora, ou no 1º jogo do campeonato
+  (`scheduled_draw_at`; liberado por cron `release_scheduled_confrontos` + gatilho lazy).
+- **Simulador** (`/simulador` + painel no sorteio): mostra pares J1×J2, byes, chaveamento e a
+  **viabilidade** (o que cabe no calendário) **antes** de comprometer, com slider "e se".
+
+**Formato da Liga** (`liga_format`, escolhido **no sorteio**): turno parcial / ida e volta / **suíço**
+(para 9+ jogadores, já que round-robin completo não cabe na janela curta da Copa; `append_confronto_ties`
+gera a próxima rodada).
+
+**Participantes** (`participant_mode`, escolhido na criação): **admin seleciona** OU **opt-in** (cada
+um se inscreve em `confronto_optins`, válido só em `draft`).
+
+**Regras de integridade:**
+- **Anti-trapaça:** palpite/pontos do oponente ficam ocultos até o jogo começar (`get_tie_detail`
+  revela só no apito ou para o próprio).
+- **Saída = W.O.:** sair da federação durante uma Liga/Copa ativa dá **W.O.** nos confrontos em
+  aberto (oponente vence) e remove o membro (`leave_league`, dupla confirmação).
+- **Bye:** sem oponente no período → passa.
+
+---
+
+## 7. Escudos
+
+Identidade visual de **perfis** e **federações** por **máscara SVG**: o SVG recorta (via
+`mask-image`, alpha) um fundo de cor/padrão/foto. Desacopla **forma** de **conteúdo**.
+
+- **Catálogo automático** via `import.meta.glob` de `src/assets/escudos/*.svg` (escudo-padrao +
+  escudo-1..16) e `src/assets/federacoes/*.svg` (flamula-1..3). Gerenciar = largar/remover arquivo.
+  **Não renomear** arquivos em uso (o `<id>` fica salvo no perfil/federação).
+- **Encoding:** `crest:kind:shape:fill:cores:rotação:foto` salvo em `profiles.avatar_url` /
+  `leagues.logo_url`. Fundos: sólido / listras / grade / bola / foto.
+- **Todo perfil tem escudo** sem migration: `legacyToCrest` adapta avatares antigos no render
+  (`gen:` antigo, foto crua do Google, ou `null` → escudo padrão determinístico pelo nome).
+- Edição: `CrestEditor` (perfil em `EditarPerfilPage`; federação na tela de editar federação).
+
+---
+
+## 8. Notificações
+
+- **Web Push (VAPID):** inscrição em `push_subscriptions`; Service Worker (`sw.ts`) exibe a
+  notificação; envio pela Edge Function `send-push`. Permissão pedida no onboarding/perfil.
+- **Lembrete de prazo:** cron `create_deadline_reminders()` — jogo começando em breve + membro **não
+  palpitou** + sem lembrete anterior → cria notificação `deadline` (com push).
+- **Cutucar (nudge):** `nudge_member` — membro cutuca outro membro que não palpitou. **Anti-spam:**
+  no máx. 1 por par a cada 30 min.
+
+---
+
+## 9. Outras regras
+
+- **Leitura anônima:** visitante vê jogos/competições/landing sem login (RLS anon de leitura);
+  palpitar exige login.
+- **Sala de espera:** em pico, fila FIFO protege o Realtime (fail-open). → [`05`](05-DADOS-E-AUTH.md) §7.
+- **Competições reais:** sincronizadas de provedores (ESPN preferido: grátis, status ao vivo,
+  escudos, nomes PT). football-data.org Free é limitado; API-Football Free é travado em 2022–2024
+  (descartado p/ 2026). Admin publica (`is_published`) e renomeia em PT-BR (`display_name`).
+- **Privacidade/LGPD:** contato único `resultadismoapp@gmail.com` (Controlador + DPO). Dados de
+  cartão ficam **com o Mercado Pago**, nunca com o app. Termos §12 cobrem pagamento e arrependimento.
+
+---
+
+### Quando uma mudança toca uma regra de negócio
+Antes de implementar, confronte-a com a regra acima (passo 1 do protocolo no
+[`MESTRE.md`](MESTRE.md)). Se a mudança **altera** a regra:
+1. **Confirme com o João** (especialmente se fere uma regra central).
+2. **Atualize TODOS os pontos de contato do site** que falam sobre ela — muitas destas regras
+   (pontuação, preço, desempate, "não é casa de apostas") aparecem em **vários lugares**: home,
+   "Como funciona", onboarding, landing, copy de UI, **Termos** e **Privacidade**. O site inteiro
+   tem que comunicar a mesma coisa — nada de um ponto novo e outro velho. (passo 6 do protocolo)
+3. **Atualize esta doc** e qualquer outra afetada em `.claude/`.
+4. **Registre no [`CHANGELOG.md`](CHANGELOG.md)** (e no [`HISTORICO.md`](HISTORICO.md) se foi decisão
+   de mudar uma regra).

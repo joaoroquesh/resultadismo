@@ -1,0 +1,8 @@
+# Worktrees temporários de agentes (criados pelo harness) — não versionar
+worktrees/
+
+# Config local de permissões/sessão — específica da máquina
+settings.local.json
+
+# macOS
+.DS_Store
