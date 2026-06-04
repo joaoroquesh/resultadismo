@@ -98,15 +98,17 @@ uma troca de significado proposital.
 
 > História cronológica completa do pagamento: [`HISTORICO.md`](HISTORICO.md) (consolidado).
 
-**Regra-mãe:** cobra-se **só pela criação de um Grupo** — **taxa única**, enquadrada como **taxa
-de serviço**. **Jogar, palpitar e participar é grátis.** **Não é casa de apostas** (sem aposta, sem
-prêmio em dinheiro, sem pote — Lei 14.790/2023).
+**Regra-mãe (atual — 2026-06, ADR [`0002`](decisions/0002-pagamento-desligado-gratis.md)):** **criar
+grupos é gratuito** — pagamento no modo **`disabled`**. **Jogar, palpitar, participar e criar grupos é
+grátis.** **Não é casa de apostas** (sem aposta, sem prêmio em dinheiro, sem pote — Lei 14.790/2023).
+A **infra de pagamento abaixo fica preservada** (test/live, Mercado Pago, cupom, reembolso), apenas
+**desligada** — se voltar a cobrar, é **taxa de serviço** pela criação de Grupo, nunca aposta/prêmio.
 
 **Modo global** (`app_settings.payment_mode`, aba Pgto do admin):
-- `disabled` — criação grátis (sem cobrança).
+- `disabled` — criação grátis (sem cobrança). **← modo atual em produção (ADR 0002).**
 - `test` — pagamento **simulado** sem Mercado Pago (`simulate_league_payment` — **só app-admin** desde
   2.1.0, p/ o modo teste nunca virar "grupo grátis" pra usuário comum); seguro para testar.
-- `live` — **Mercado Pago** de verdade (estado atual de produção).
+- `live` — **Mercado Pago** de verdade (cobrança real; **desligado por ora** — ver ADR 0002).
 
 **Preço:** base `league_price_cents` + promoção opcional (`promo_price_cents`/`promo_until`).
 - **Preço efetivo = promo enquanto `now() < promo_until`, senão base** — decidido **no servidor**

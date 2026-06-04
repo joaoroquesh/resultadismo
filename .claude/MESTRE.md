@@ -14,7 +14,7 @@
 > É a prova de que a IA leu e está obedecendo as regras do `.claude/`. Se a frase **não** aparecer,
 > presuma que estas regras não foram lidas/seguidas.
 
-Versão atual do projeto: **2.2.2** · App em produção: **https://www.resultadismo.com** ·
+Versão atual do projeto: **2.4.0** · App em produção: **https://www.resultadismo.com** ·
 Última revisão desta doc: **2026-06-04**.
 
 ---
@@ -22,9 +22,9 @@ Versão atual do projeto: **2.2.2** · App em produção: **https://www.resultad
 ## 1. O que é o Resultadismo (30 segundos)
 
 Jogo social de **palpites de placares de futebol**. Você crava o placar de jogos reais, ganha
-pontos (**cravada +3 / saldo +2 / acerto +1**) e disputa em **grupos** privados de amigos com classificação, confrontos e zoeira saudável. **Jogar e palpitar é grátis**; cobra-se
-só pela **criação de um Grupo** (taxa única). Não é casa de apostas: não há aposta nem prêmio
-em dinheiro.
+pontos (**cravada +3 / saldo +2 / acerto +1**) e disputa em **grupos** privados de amigos com classificação, confrontos e zoeira saudável. **Jogar, palpitar e criar grupos é grátis**
+(pagamento desligado por ora — ver [`06`](06-REGRAS-DE-NEGOCIO.md) §5 e ADR [`0002`](decisions/0002-pagamento-desligado-gratis.md)).
+Não é casa de apostas: não há aposta nem prêmio em dinheiro.
 
 - **Stack:** SPA Vite + React 19 + TypeScript + Tailwind v4, backend **Supabase** (Postgres, Auth
   Google, RLS, Edge Functions Deno, pg_cron). Deploy: **Vercel** (frontend) + **Supabase**
@@ -74,8 +74,10 @@ de docs + changelog (seção 5). Cada uma tem dono num doc específico.
    client). → [`06`](06-REGRAS-DE-NEGOCIO.md), [`05`](05-DADOS-E-AUTH.md).
 2. **Desempate fixo:** pontos → cravadas → saldos → aproveitamento → acertividade → membro mais
    antigo. Já existe em `get_league_standings`. → [`06`](06-REGRAS-DE-NEGOCIO.md).
-3. **Não é casa de apostas.** Cobra-se taxa de serviço pela **criação de Grupo**, nunca aposta
-   nem prêmio. Sem pote/stakes (Lei 14.790/2023). → [`06`](06-REGRAS-DE-NEGOCIO.md).
+3. **Não é casa de apostas.** Sem aposta nem prêmio em dinheiro, sem pote/stakes (Lei 14.790/2023).
+   **Criar grupos é gratuito por ora** (pagamento em modo `disabled`); se voltar a cobrar, é **taxa
+   de serviço** pela criação de Grupo, nunca aposta/prêmio. → [`06`](06-REGRAS-DE-NEGOCIO.md) §5,
+   ADR [`0002`](decisions/0002-pagamento-desligado-gratis.md).
 4. **Segurança é no banco (RLS-first).** Toda regra de acesso vive em RLS/RPC `SECURITY DEFINER`.
    O frontend **espelha**, nunca é a fonte de verdade. → [`05`](05-DADOS-E-AUTH.md).
 5. **Deploy é só por push na `main`.** Push aplica migrations em produção e sobe Vercel + Edge

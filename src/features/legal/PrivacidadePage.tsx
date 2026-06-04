@@ -9,9 +9,8 @@ export function PrivacidadePage() {
         Esta Política explica como o <strong>Resultadismo</strong> ("nós", "app") coleta, usa e
         protege seus dados quando você usa o site e o aplicativo em{" "}
         <strong>resultadismo.com</strong>. O Resultadismo é um jogo de palpites de futebol entre
-        amigos — <strong>gratuito para jogar e participar</strong>; criar um grupo próprio (o
-        espaço onde você joga com seus amigos) pode ter uma taxa única. Não há apostas nem dinheiro
-        real em jogo. Ao usar o app, você concorda com esta Política, em conformidade com a Lei Geral
+        amigos — <strong>gratuito para jogar, participar e criar grupos</strong>. Não há apostas nem
+        dinheiro real em jogo. Ao usar o app, você concorda com esta Política, em conformidade com a Lei Geral
         de Proteção de Dados (LGPD, Lei nº 13.709/2018).
       </p>
       <p>
@@ -44,11 +43,6 @@ export function PrivacidadePage() {
             <strong>Dados técnicos:</strong> registros mínimos de funcionamento e segurança gerados pelo
             nosso provedor de backend (ex.: data e hora de acesso e endereço IP), usados para autenticar,
             manter o serviço estável e prevenir abusos.
-          </li>
-          <li>
-            <strong>Pagamentos (ao criar grupo pago):</strong> ao pagar a taxa de criação de grupo, o
-            pagamento é processado pelo Mercado Pago. Guardamos apenas o status e um identificador da
-            transação; os dados do seu cartão ficam com o Mercado Pago, nunca conosco.
           </li>
           <li>
             <strong>Dados de uso (apenas com seu consentimento):</strong> se você aceitar no banner
@@ -101,10 +95,6 @@ export function PrivacidadePage() {
           <li>
             <strong>Serviços de push do navegador</strong> (Google, Apple, Mozilla) — apenas se você
             ativar notificações, para entregá-las ao seu dispositivo.
-          </li>
-          <li>
-            <strong>Mercado Pago</strong> — processamento de pagamentos, apenas se você criar um grupo
-            paga.
           </li>
           <li>
             <strong>Google Analytics 4</strong> — métricas de uso agregadas e anonimizadas, apenas

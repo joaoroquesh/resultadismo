@@ -80,7 +80,7 @@ export function LigaDetailPage() {
     if (!pag) return;
     if (pag === "sucesso") toast("Pagamento recebido! Ativando seu grupo…", "success");
     else if (pag === "processando")
-      toast("Pagamento em processamento. O grupo será ativada em instantes.", "info");
+      toast("Pagamento em processamento. O grupo será ativado em instantes.", "info");
     else if (pag === "falhou")
       toast("O pagamento não foi concluído. Você pode tentar de novo.", "error");
     searchParams.delete("pagamento");
@@ -192,7 +192,7 @@ Código: ${league.join_code}
             <p>
               {payMode === "test"
                 ? "Modo de teste: conclua o pagamento simulado para ativar este grupo."
-                : "Este grupo será ativada assim que o pagamento for confirmado. Acabou de pagar? Pode levar alguns segundos."}
+                : "Este grupo será ativado assim que o pagamento for confirmado. Acabou de pagar? Pode levar alguns segundos."}
             </p>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">

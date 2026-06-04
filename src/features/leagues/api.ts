@@ -46,7 +46,7 @@ export function useLeague(slug: string | undefined) {
         .eq("slug", slug!)
         .maybeSingle();
       if (error) throw new Error(error.message);
-      // grupo excluída (soft) não abre pra ninguém (admin restaura pela Lixeira)
+      // grupo excluído (soft) não abre pra ninguém (admin restaura pela Lixeira)
       if (data?.deleted_at) return null;
       return data;
     },

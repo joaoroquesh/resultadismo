@@ -18,6 +18,25 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+_Nada pendente._
+
+---
+
+## [2.4.0] — 2026-06-04
+
+### Alterado
+- **Pagamento desligado: criar grupos é 100% grátis** (`payment_mode = disabled`; ADR
+  [`0002`](decisions/0002-pagamento-desligado-gratis.md)). Toda a copy pública passa a comunicar
+  "grátis" — home/landing, "Como funciona", criar grupo, Termos, Privacidade e SEO
+  (`index.html`/JSON-LD/`llms.txt`). A **infra de pagamento** (Mercado Pago, preço, cupons, reembolso,
+  `PaymentAdmin`) fica **preservada, apenas desligada** — reativável no futuro.
+- **Rename "Federação" → "Grupo"** propagado também no **SEO** (`index.html` JSON-LD/FAQ + `llms.txt`),
+  que tinham ficado de fora; concordância de gênero revisada na copy (um/o grupo, grupo ativo/criado…).
+
+### Removido
+- Menções a **taxa / R$ 9,90 / R$ 19,90 / Mercado Pago / reembolso** da copy pública (passa a dizer
+  "grátis"). Só o código de infra (dormente) mantém o fluxo de pagamento.
+
 ### Corrigido
 - **`npm run homolog:pull` (homologação local, dev-only):** o snapshot read-only de produção não
   carregava nada. Dois ajustes no `scripts/homolog-pull-prod.sh`: (1) dumpa só `auth.users` +
@@ -37,10 +56,13 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   reger o **design**, não só o texto.
 
 ### Decisões
+- **Pagamento desligado — tudo grátis por ora** (ADR [`0002`](decisions/0002-pagamento-desligado-gratis.md)):
+  criar grupos deixa de cobrar (modo `disabled`). **Conflita com a regra central 3** (cobrança) —
+  decisão explícita do João, com a regra 3 (MESTRE) e [`06`](06-REGRAS-DE-NEGOCIO.md) §5 atualizadas.
+  Infra preservada, reversível.
 - **Renome "Federação" → "Grupo"** (ADR [`0001`](decisions/0001-espaco-grupo.md)): termo mais claro
-  pro leigo ("Liga"/"Bolão" já são modos). **Documentação `.claude/` renomeada**; a UI/rotas de
-  produção estão sendo atualizadas (banco segue `leagues`). Também **"joker" → "coringa"** no
-  glossário (PT, não anglicismo).
+  pro leigo ("Liga"/"Bolão" já são modos). Documentação `.claude/`, **UI, rotas e SEO** renomeadas
+  (banco segue `leagues`). Também **"joker" → "coringa"** no glossário (PT, não anglicismo).
 
 ---
 

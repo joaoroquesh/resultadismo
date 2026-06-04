@@ -281,7 +281,7 @@ export function ComoFuncionaPage() {
         <Section icon={<ShieldCheck className="size-4" strokeWidth={2.4} />} title="Grupos">
           <p className="-mt-1 text-sm leading-relaxed text-ink-600">
             O <span className="font-semibold text-ink-900">grupo</span> é o espaço onde você e seus
-            amigos jogam. Dentro dela rolam as{" "}
+            amigos jogam. Dentro dele rolam as{" "}
             <span className="font-semibold text-ink-900">disputas</span>: hoje, o{" "}
             <span className="font-semibold text-ink-900">bolão da Copa do Mundo</span> (modo Tabela).
             Depois da Copa, dará para adicionar ligas de vários campeonatos — Brasileirão, top 5 da
@@ -289,11 +289,9 @@ export function ComoFuncionaPage() {
             Copa do Brasil.
           </p>
           <p className="text-sm leading-relaxed text-ink-600">
-            Jogar e participar é <span className="font-semibold text-ink-900">de graça</span>.{" "}
-            <span className="font-semibold text-ink-900">Criar</span> um grupo próprio tem uma{" "}
-            <span className="font-semibold text-ink-900">taxa única de R$ 19,90</span> —{" "}
-            <span className="font-semibold text-grass-700">R$ 9,90 na promoção da Copa</span> (Pix ou
-            cartão), o que mantém o app no ar, sem anúncios. Ao criar, você define quem pode{" "}
+            Jogar, participar e <span className="font-semibold text-ink-900">criar grupos</span> é{" "}
+            <span className="font-semibold text-grass-700">100% grátis</span> — sem taxa, sem
+            mensalidade, sem anúncio. Ao criar, você define quem pode{" "}
             <span className="font-semibold text-ink-900">ver</span> e quem pode{" "}
             <span className="font-semibold text-ink-900">entrar</span> no grupo.
           </p>
@@ -342,8 +340,7 @@ export function ComoFuncionaPage() {
           <div className="flex items-start gap-2 rounded-md bg-brand-500/10 p-3 text-xs leading-relaxed text-brand-800">
             <ShieldCheck className="mt-0.5 size-4 shrink-0" />
             <p>
-              Assim que o pagamento é confirmado, seu grupo fica{" "}
-              <span className="font-semibold">ativa na hora</span>. Só o{" "}
+              Seu grupo fica <span className="font-semibold">ativo na hora</span>. Só o{" "}
               <span className="font-semibold">nome</span> passa por uma revisão rápida da moderação (pra
               evitar nomes ofensivos) — e você já joga normalmente enquanto isso.
             </p>

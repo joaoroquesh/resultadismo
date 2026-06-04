@@ -83,7 +83,7 @@ nunca debocha de quem errou nem exclui ninguém. Calibragem **equilibrada**: zoe
 **O que significa:** a gente fala a verdade sobre dinheiro, prazos e regras, sem pressão, sem
 linguagem de aposta/odds/risco. Ver a **linguagem proibida** (seção 4).
 
-- ✅ "Criar um grupo custa R$ 9,90 (taxa única). Jogar é grátis."
+- ✅ "Criar grupo é grátis. É só dar um nome e chamar a galera."
 - ✅ "Mudou de ideia? Você pode cancelar e receber de volta em até 7 dias."
 - ❌ "Aposte agora e ganhe!" / "Última chance!" / "Suas odds de cravar."
 - ❌ Esconder o custo ou criar falsa urgência.
@@ -139,8 +139,9 @@ Regra de ouro: **quanto mais sério o momento (dinheiro, perda, erro), menos zoe
 
 ### ⛔ Linguagem PROIBIDA (regra de negócio 3 — "não é casa de apostas")
 **Nunca** use, em nenhum texto do site: **aposta/apostar, odds, banca, prêmio em dinheiro, ganhe
-dinheiro, jackpot, cassino, "última chance", urgência predatória.** Cobra-se uma **taxa de serviço**
-pela criação de grupo — fale sempre nesses termos. → [`06`](06-REGRAS-DE-NEGOCIO.md) §5.
+dinheiro, jackpot, cassino, "última chance", urgência predatória.** Hoje **criar grupos é grátis**
+(ADR [`0002`](decisions/0002-pagamento-desligado-gratis.md)); se voltar a cobrar, é **taxa de
+serviço** pela criação de grupo, nunca "aposta". → [`06`](06-REGRAS-DE-NEGOCIO.md) §5.
 
 ### Convenções
 - **Tratamento:** **"você"**, sempre (sem "tu"/"cês").
@@ -165,7 +166,7 @@ Verbo de ação + objeto, *sentence case*. 2–4 palavras. Nada de "OK", "Enviar
 
 ### Títulos
 Frase-substantivo curta (≤ 40 caracteres), *sentence case*, orienta onde estou.
-- ✅ "Suos grupos" · "Como funciona" · "Jogos de hoje"
+- ✅ "Seus grupos" · "Como funciona" · "Jogos de hoje"
 
 ### Mensagens de erro — `[O que falhou]. [Por quê]. [O que fazer].`
 Empático, sem culpar, sempre com saída. 12–18 palavras.
@@ -249,7 +250,7 @@ Avalie cada texto nas 4 dimensões (some um 5º: on-brand). Nota baixa → reesc
 | "Previsão registrada." | "Palpite salvo." | termo oficial, conversacional |
 | "Erro: operação inválida." | "O jogo já começou — os palpites travaram." | explica + sem culpar |
 | "Deseja realmente sair?" | "Sair agora dá W.O. nos seus confrontos. Tem certeza?" | consequência clara |
-| "Adquira sua liga." | "Crie suo grupo — taxa única de R$ 9,90." | termo certo, honesto, sem "aposta" |
+| "Adquira sua liga." | "Crie seu grupo — é grátis." | termo certo, honesto, sem "aposta" |
 | "Nenhum dado encontrado." | "Você ainda não está em nenhum grupo." + CTA | ensina o próximo passo |
 
 ---

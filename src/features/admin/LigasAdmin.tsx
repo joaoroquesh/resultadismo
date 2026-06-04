@@ -33,7 +33,7 @@ export function LigasAdmin() {
     if (!toDelete) return;
     softDelete.mutate(toDelete.id, {
       onSuccess: () => {
-        toast("Grupo excluída. Você tem 10 min para desfazer na Lixeira.", "success");
+        toast("Grupo excluído. Você tem 10 min para desfazer na Lixeira.", "success");
         setToDelete(null);
       },
       onError: (e) => toast(e instanceof Error ? e.message : "Erro ao excluir.", "error"),
@@ -62,7 +62,7 @@ export function LigasAdmin() {
                   fullWidth
                   loading={approve.isPending}
                   onClick={() =>
-                    approve.mutate(l.id, { onSuccess: () => toast("Grupo aprovada!", "success") })
+                    approve.mutate(l.id, { onSuccess: () => toast("Grupo aprovado!", "success") })
                   }
                 >
                   <Check className="size-4" /> Aprovar
@@ -135,7 +135,7 @@ export function LigasAdmin() {
                   loading={restore.isPending}
                   onClick={() =>
                     restore.mutate(d.id, {
-                      onSuccess: () => toast("Grupo restaurada!", "success"),
+                      onSuccess: () => toast("Grupo restaurado!", "success"),
                       onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
                     })
                   }

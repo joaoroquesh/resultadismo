@@ -342,7 +342,7 @@ export function NovaLigaPage() {
             ) : payMode === "test" ? (
               <>
                 <strong>Modo de teste:</strong> o pagamento é simulado (sem cobrança real) só para você
-                testar o fluxo. O grupo ativa na hora.
+                testar o fluxo. O grupo fica ativo na hora.
               </>
             ) : (
               <>

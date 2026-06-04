@@ -24,6 +24,7 @@
 | 2026-06-03 | Promo da Copa + reembolso self-service | v2.0.0-dev.6 |
 | **2026-06-03** | **Consolidação + sistema de documentação `.claude/`** | **v2.0.0** |
 | 2026-06-04 | Ultra code review (7 revisores): endurecimento de segurança (RLS de confronto, estado terminal do pagamento, CSS injection do escudo, `cup_ties` só-RPC, webhook), correções de confronto (avanço da Copa, sorteio aleatório, bye=vitória, semana BRT), performance (lazy routes), **god-split** dos componentes grandes. Regularizado retroativamente na doc. | **v2.1.0** |
+| 2026-06-04 | Renome **Federação → Grupo** (UI, rotas, SEO) + **pagamento desligado**: criar grupos passa a ser **grátis** (modo `disabled`, ADR 0002 — conflita com a regra central 3; infra de pagamento preservada e reversível) | **v2.4.0** |
 
 ---
 

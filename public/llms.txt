@@ -1,6 +1,6 @@
 # Resultadismo
 
-> Resultadismo é um bolão de futebol online e gratuito para jogar com os amigos, com foco na Copa do Mundo 2026. Você palpita o placar de cada jogo (ex.: 2×1), ganha pontos pela proximidade com o resultado real e disputa a classificação dentro de uma "federação" — um grupo privado criado por você ou pelos seus amigos. Funciona no navegador e como app (PWA), em português do Brasil.
+> Resultadismo é um bolão de futebol online e gratuito para jogar com os amigos, com foco na Copa do Mundo 2026. Você palpita o placar de cada jogo (ex.: 2×1), ganha pontos pela proximidade com o resultado real e disputa a classificação dentro de um grupo privado criado por você ou pelos seus amigos. Funciona no navegador e como app (PWA), em português do Brasil.
 
 ## O que é
 
@@ -24,8 +24,8 @@
 
 ## Preço
 
-- **Jogar é grátis:** criar conta, palpitar e entrar nas federações dos amigos não custa nada.
-- **Criar a própria federação** (o espaço onde a turma joga) tem uma **taxa única** via Pix ou cartão — R$ 9,90 na Copa (depois R$ 19,90). É o que mantém o app no ar e sem anúncios.
+- **Jogar é grátis:** criar conta, palpitar, criar grupos e entrar nos dos amigos não custa nada.
+- **Criar grupos é grátis:** montar o próprio grupo (o espaço onde a turma joga) não custa nada — sem taxa, sem mensalidade e sem anúncio.
 
 ## Páginas
 

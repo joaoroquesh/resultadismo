@@ -319,20 +319,16 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
       <section>
         <Reveal className="rounded-xl bg-surface-2 px-6 py-8 text-center ring-1 ring-border">
           <span className="inline-flex items-center gap-1.5 rounded-pill bg-grass-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-grass-800">
-            <Gift className="size-3.5" /> jogar é de graça
+            <Gift className="size-3.5" /> 100% grátis
           </span>
           <h2 className="mx-auto mt-4 max-w-md text-2xl font-extrabold tracking-tight text-ink-950">
-            Palpitar e disputar não custa nada
+            Tudo grátis. É só jogar.
           </h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-ink-500">
-            Criar a conta, cravar os placares e entrar nos grupos dos amigos é{" "}
-            <span className="font-semibold text-ink-700">100% grátis</span>. Só quem quer{" "}
-            <span className="font-semibold text-ink-700">criar a próprio grupo</span> — o espaço
-            onde a sua turma joga — paga uma{" "}
-            <span className="font-semibold text-ink-700">taxa única</span> (Pix ou cartão). É o que
-            mantém o app no ar e sem anúncios.{" "}
-            <span className="font-semibold text-grass-700">Na Copa, sai por R$ 9,90</span> (depois
-            R$ 19,90).
+            Criar a conta, cravar os placares e montar seus{" "}
+            <span className="font-semibold text-ink-700">grupos</span> com a galera é{" "}
+            <span className="font-semibold text-grass-700">100% grátis</span>. Sem taxa, sem
+            mensalidade, sem anúncio — é só entrar e disputar.
           </p>
           <div className="mt-6">
             <Button size="lg" onClick={onOpenLogin}>

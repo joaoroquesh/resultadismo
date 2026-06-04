@@ -20,8 +20,7 @@ export function TermosPage() {
           O Resultadismo é um jogo de <strong>entretenimento</strong>: você palpita os placares de jogos
           reais de futebol, ganha pontos por acerto e disputa com amigos em grupos.{" "}
           <strong>Não é uma casa de apostas.</strong> Não há aposta de dinheiro nem prêmios em dinheiro.
-          Jogar e participar de grupos é <strong>gratuito</strong>; criar um grupo próprio pode ter uma
-          taxa única de serviço (ver seção 12).
+          Jogar, participar e <strong>criar grupos é gratuito</strong> (ver seção 12).
         </p>
       </LegalSection>
 
@@ -119,21 +118,15 @@ export function TermosPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="12. Pagamentos e reembolso (criação de grupos)">
+      <LegalSection title="12. Pagamentos">
         <p>
-          Jogar e participar de grupos é gratuito. <strong>Criar um grupo próprio</strong> pode ter uma{" "}
-          <strong>taxa única de serviço</strong>, exibida antes da confirmação. O pagamento é processado
-          pelo <strong>Mercado Pago</strong> (Pix ou cartão); não recebemos nem armazenamos os dados do
-          seu cartão. O grupo é ativada automaticamente após a confirmação do pagamento.
+          Hoje, <strong>criar e participar de grupos é totalmente gratuito</strong> — sem taxa, sem
+          mensalidade e sem cobrança de qualquer tipo. Não há aposta de dinheiro nem prêmios em dinheiro.
         </p>
         <p>
-          É uma cobrança avulsa, <strong>sem renovação automática</strong> e sem mensalidade — uma taxa
-          de serviço para criar o grupo, que não é aposta nem compra de prêmio. Conforme o Código de
-          Defesa do Consumidor (art. 49), você tem <strong>direito de arrependimento em até 7 dias</strong>{" "}
-          da compra: pode <strong>cancelar o grupo e receber o valor de volta você mesmo</strong>, na
-          própria página do grupo, sem precisar justificar. O reembolso volta pelo mesmo meio de
-          pagamento (Pix na sua conta; no cartão, estornado na fatura em alguns dias) e o grupo é
-          arquivada. Passado esse prazo, fale com a gente em <strong>{CONTATO}</strong>.
+          Se, no futuro, oferecermos recursos pagos, o valor e as condições serão{" "}
+          <strong>apresentados com clareza antes de qualquer cobrança</strong> — você só paga se optar por
+          eles. Em qualquer dúvida, fale com a gente em <strong>{CONTATO}</strong>.
         </p>
       </LegalSection>
 

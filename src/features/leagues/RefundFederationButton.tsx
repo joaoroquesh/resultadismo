@@ -41,7 +41,7 @@ export function RefundFederationButton({
     refund.mutate(leagueId, {
       onSuccess: () => {
         toast(
-          "Reembolso solicitado. O grupo foi cancelada e o valor será devolvido.",
+          "Reembolso solicitado. O grupo foi cancelado e o valor será devolvido.",
           "success",
         );
         navigate("/grupos");
