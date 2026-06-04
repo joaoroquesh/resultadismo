@@ -43,10 +43,15 @@ export function ConsentBanner() {
           </Link>
           .
         </p>
-        <div className="flex shrink-0 gap-2">
-          <Button variant="outline" size="sm" onClick={() => choose("denied")}>
+        <div className="flex shrink-0 items-center gap-4">
+          {/* Recusar fica como link discreto pra não competir com o CTA. */}
+          <button
+            type="button"
+            onClick={() => choose("denied")}
+            className="text-xs font-medium text-ink-400 underline-offset-2 transition-colors hover:text-ink-600 hover:underline"
+          >
             Recusar
-          </Button>
+          </button>
           <Button size="sm" onClick={() => choose("granted")}>
             Aceitar
           </Button>

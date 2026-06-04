@@ -22,6 +22,16 @@ _(Nada ainda. Próximas mudanças entram aqui antes de virar uma versão.)_
 
 ---
 
+## [2.2.1] — 2026-06-04
+
+### Alterado
+- **Banner de consentimento (UI):** "Recusar" virou link discreto (texto cinza
+  com sublinhado no hover) em vez de botão outline, pra não competir
+  visualmente com o CTA "Aceitar". Comportamento e a11y mantidos (continua
+  `<button>` focável).
+
+---
+
 ## [2.2.0] — 2026-06-04
 
 **Google Analytics + consentimento LGPD.** Liga o GA4 à property `resultadismo-site`
