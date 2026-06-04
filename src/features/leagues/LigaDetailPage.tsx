@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   Copy,
+  MessageCircle,
   Clock,
   Check,
   Trash2,
@@ -136,6 +137,24 @@ export function LigaDetailPage() {
     if (!league?.join_code) return;
     navigator.clipboard.writeText(league.join_code);
     toast("Código copiado!", "success");
+  }
+
+  // Abre o WhatsApp com texto pronto. wa.me funciona em mobile (app) e desktop (web).
+  function shareWhatsApp() {
+    if (!league?.join_code) return;
+    const text = `🏆 Achei o melhor bolão pra Copa do Mundo!
+
+No Resultadismo você:
+✅ palpita no placar dos jogos
+✅ ganha pontos cada vez que acerta
+✅ enfrenta os amigos no ranking ao vivo
+
+📲 Abre pelo celular e instala como app em 10 segundos. ⚽
+
+Bora jogar junto? Entra na minha federação:
+Código: ${league.join_code}
+👉 https://www.resultadismo.com`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
   }
 
   async function handleLeave() {
@@ -280,18 +299,28 @@ export function LigaDetailPage() {
         </div>
 
         {(isAdmin || myMember) && league.join_code && (
-          <button
-            onClick={copyCode}
-            className="mt-4 flex w-full items-center justify-between rounded-md border border-dashed border-ink-200 px-3 py-2.5 text-left transition hover:bg-ink-50"
-          >
-            <div>
-              <p className="text-xs text-ink-400">Código de convite</p>
-              <p className="font-mono text-lg font-bold tracking-widest text-ink-900">
-                {league.join_code}
-              </p>
-            </div>
-            <Copy className="size-5 text-brand-600" />
-          </button>
+          <>
+            <button
+              onClick={copyCode}
+              className="mt-4 flex w-full items-center justify-between rounded-md border border-dashed border-ink-200 px-3 py-2.5 text-left transition hover:bg-ink-50"
+            >
+              <div>
+                <p className="text-xs text-ink-400">Código de convite</p>
+                <p className="font-mono text-lg font-bold tracking-widest text-ink-900">
+                  {league.join_code}
+                </p>
+              </div>
+              <Copy className="size-5 text-brand-600" />
+            </button>
+            <button
+              type="button"
+              onClick={shareWhatsApp}
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-md bg-grass-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-grass-700"
+            >
+              <MessageCircle className="size-4" />
+              Compartilhar no WhatsApp
+            </button>
+          </>
         )}
       </Card>
 
