@@ -1,6 +1,6 @@
 {
   "name": "resultadismo",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "private": true,
   "type": "module",
   "description": "Resultadismo - jogo de palpites de futebol",
@@ -13,7 +13,8 @@
     "db:start": "supabase start",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
-    "db:types": "supabase gen types typescript --local > src/types/database.ts"
+    "db:types": "supabase gen types typescript --local > src/types/database.ts",
+    "homolog:pull": "bash scripts/homolog-pull-prod.sh"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.2",

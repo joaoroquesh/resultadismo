@@ -41,6 +41,8 @@ declare
   u_joao uuid;
   u_bruno uuid;
   u_luan uuid;
+  u_novato uuid;  -- 1º acesso (sem federação)
+  u_dona uuid;    -- dona de federação (não app-admin)
   c_wc uuid := gen_random_uuid();
   t_bra uuid := gen_random_uuid();
   t_arg uuid := gen_random_uuid();
@@ -59,11 +61,15 @@ declare
   m_g uuid := gen_random_uuid();   -- ao vivo
   lg uuid := gen_random_uuid();
   lc uuid := gen_random_uuid();
+  lg2 uuid := gen_random_uuid();  -- federação da dona
+  lc2 uuid := gen_random_uuid();
 begin
   -- Usuários (o primeiro vira app_admin via trigger handle_new_user)
   u_joao := public.seed_user('joao.crf93@gmail.com', 'João Roque', 'resultadismo123');
   u_bruno := public.seed_user('bruno@teste.com', 'João Bruno', 'resultadismo123');
   u_luan := public.seed_user('luan@teste.com', 'Luan Hatsuo', 'resultadismo123');
+  u_novato := public.seed_user('novato@teste.com', 'Novato da Silva', 'resultadismo123');
+  u_dona := public.seed_user('dona@teste.com', 'Dona Federação', 'resultadismo123');
 
   -- Competição: Copa do Mundo 2026
   insert into public.competitions (id, name, slug, short_name, area, type, provider, provider_code, provider_season, season_start, season_end, status, is_featured)
@@ -108,6 +114,14 @@ begin
   -- liga-competição (modo tabela) para a Copa
   insert into public.league_competitions (id, league_id, competition_id, name, mode)
   values (lc, lg, c_wc, 'Bolão da Copa 2026', 'table');
+
+  -- Federação 2: a DONA é dona (não app-admin) — exercita o perfil "Dono" do DevPanel.
+  insert into public.leagues (id, name, slug, description, owner_id, visibility, join_policy, join_code, status, approved_at, approved_by)
+  values (lg2, 'Galera do Trampo', 'galera-do-trampo', 'Federação criada pela dona (não-admin).', u_dona, 'private', 'invite', 'TRAMPO', 'active', now(), u_joao);
+  insert into public.league_members (league_id, user_id, role, status) values (lg2, u_bruno, 'member', 'active');
+  insert into public.league_competitions (id, league_id, competition_id, name, mode)
+  values (lc2, lg2, c_wc, 'Bolão do Trampo', 'table');
+  -- (novato@teste.com fica SEM federação de propósito → testa o 1º acesso/onboarding)
 
   -- Palpites nos jogos finalizados (cobrem cravada/saldo/acerto/erro)
   insert into public.predictions (user_id, match_id, home_pred, away_pred) values

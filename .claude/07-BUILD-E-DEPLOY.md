@@ -91,7 +91,8 @@ npm run dev          # Vite em http://localhost:5173  (ou 5180 via .claude/launc
 - Portas **5442x** (deslocadas p/ não colidir com outro projeto Supabase na máquina).
 - Após mudar schema local: `npm run db:reset` (re-aplica tudo) e `npm run db:types` (regenera tipos).
 - Usuários de teste no seed (senha `resultadismo123`): `joao.crf93@gmail.com` (admin),
-  `bruno@teste.com`, `luan@teste.com`.
+  `bruno@teste.com` / `luan@teste.com` (membros), `dona@teste.com` (dona de federação, não-admin),
+  `novato@teste.com` (1º acesso, sem federação).
 
 ## 6. Go-live de cobrança (referência — já feito pelo João)
 
@@ -100,3 +101,36 @@ de **produção**, (2) modo **"Mercado Pago"** no admin (senão o app simula), (
 + conta bancária, (4) **chave Pix** cadastrada (p/ Pix aparecer), (5) opcional: webhook no painel MP
 + `MP_WEBHOOK_SECRET`, e (6) um pagamento real de teste ponta a ponta. **Ordem:** token de produção
 primeiro, depois virar o modo (evita janela com modo live + token de teste).
+
+## 7. Homologação local (testar como qualquer usuário, sem tocar produção)
+
+O ambiente de homologação **é o Supabase local** — roda idêntico a produção (mesmas migrations/RLS/
+Edge Functions), mas isolado. Dois **modos de dados**:
+
+1. **Seed (padrão):** dados de teste curados (`supabase/seed.sql`) — rápido, zero risco. Cobre os
+   perfis admin / membro / dono / 1º acesso.
+2. **Snapshot read-only de produção:** `npm run homolog:pull` faz `pg_dump` que **só LÊ** prod (nunca
+   escreve) e carrega a cópia no local. Você vê os **dados reais**; qualquer escrita sua bate no
+   **local**, jamais em prod. Refaça quando quiser dados frescos.
+   ```bash
+   PROD_DB_URL="postgresql://USUARIO:SENHA@HOST:5432/postgres" npm run homolog:pull
+   # ANONYMIZE=1 troca nomes/e-mails (LGPD). URL: Dashboard → Project Settings → Database → Connection string (use o role read-only).
+   ```
+   > ⚠️ Traz **PII real** para a sua máquina — você é o controlador (LGPD). O script só faz `pg_dump`
+   > (leitura) contra prod; toda escrita é no banco LOCAL. Produção **nunca** é tocada.
+
+**DevPanel** (`src/features/dev/DevPanel.tsx`): chip flutuante **só em dev** — gate `import.meta.env.DEV`
+no `AppShell`, então **não entra no bundle de produção** (confirmado: não aparece em `dist/`).
+Arrastável/reposicionável (não tampa nada), recolhível. Alterna **Deslogado / Admin / Membro / Dono /
+1º acesso** e **"entrar como <e-mail>"** (qualquer usuário — essencial no snapshot). Login por senha
+(`VITE_DEV_LOGIN_PASSWORD`, default = senha do seed); o `homolog:pull` seta essa senha em todos os
+usuários locais p/ logar como qualquer um (os reais entram por Google, sem senha — por isso o script
+seta uma).
+
+**Por que não read-replica / staging project:** replica (paga) deixa a **escrita quebrar** (ruim p/
+testar fluxos); staging project é mais infra/custo. Local + snapshot é **grátis**, mais real (você
+escreve à vontade na cópia) e **zero risco a produção**.
+
+**Fluxo:** desenvolve local (seed p/ rapidez, snapshot p/ realismo) → valida (build + navegador) →
+sobe p/ prod por **push na main** (§3). O DevPanel/seed/snapshot são puramente de dev — não afetam o
+app em produção.

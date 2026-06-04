@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { lazy, Suspense, type ReactNode } from "react";
 import { Outlet } from "react-router-dom";
 import { BottomNav } from "./BottomNav";
 import { Sidebar } from "./Sidebar";
@@ -7,6 +7,12 @@ import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { AccessGate } from "@/features/access/AccessGate";
 import { ConsentBanner } from "@/features/consent/ConsentBanner";
 import { useAuth } from "@/features/auth/AuthProvider";
+
+// DevPanel de homologação — SÓ em dev. Lazy + gate garantem que não entra no
+// bundle de produção (em prod, import.meta.env.DEV é false → nunca importa).
+const DevPanel = import.meta.env.DEV
+  ? lazy(() => import("@/features/dev/DevPanel").then((m) => ({ default: m.DevPanel })))
+  : null;
 
 export function AppShell() {
   const { session, loading } = useAuth();
@@ -47,6 +53,11 @@ export function AppShell() {
     <>
       {content}
       <ConsentBanner />
+      {DevPanel && (
+        <Suspense fallback={null}>
+          <DevPanel />
+        </Suspense>
+      )}
     </>
   );
 }
