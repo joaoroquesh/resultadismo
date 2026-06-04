@@ -235,3 +235,72 @@ export function roundsNeeded(formato: "liga" | "cup", n: number): number {
   if (formato === "cup") return Math.max(1, Math.round(Math.log2(nextPow2(Math.max(2, n)))));
   return Math.max(1, n - 1);
 }
+
+/** Formato da Liga escolhido no painel de sorteio. */
+export type LigaFmt = "turno" | "returno" | "swiss";
+
+/** Plano de viabilidade/rodadas de um sorteio (Liga ou Copa). */
+export interface ConfrontoViability {
+  n: number; // jogadores efetivos (mín. 2)
+  fullTurno: number; // rodadas de um turno completo (n-1)
+  rounds: number; // rodadas a gerar conforme o formato
+  realRounds: number; // rodadas efetivas (exibição)
+  turnoCabe: boolean;
+  returnoCabe: boolean;
+  viavel: boolean;
+  confrontosPorRodada: number;
+}
+
+/**
+ * Viabilidade + nº de rodadas do sorteio, dado o nº de participantes e os
+ * períodos disponíveis. Pura e testável — espelha exatamente o cálculo que o
+ * painel de sorteio (`SorteioPanel`) usava inline.
+ */
+export function confrontoViability(
+  formato: "liga" | "cup",
+  playerCount: number,
+  periods: number,
+  ligaFmt: LigaFmt,
+): ConfrontoViability {
+  const isLiga = formato === "liga";
+  const isSwiss = isLiga && ligaFmt === "swiss";
+  const n = Math.max(2, playerCount);
+  const P = periods;
+  const fullTurno = Math.max(1, n - 1);
+  // turno = n-1 rodadas; returno = 2(n-1); ambos limitados pelos períodos. Suíço = progressivo.
+  const rounds = isSwiss
+    ? 1
+    : ligaFmt === "returno"
+      ? Math.min(2 * fullTurno, P || 2 * fullTurno)
+      : Math.min(fullTurno, P || fullTurno);
+  const turnoCabe = fullTurno <= P;
+  const returnoCabe = 2 * fullTurno <= P;
+  const realRounds = isLiga ? (isSwiss ? Math.min(P, fullTurno) : rounds) : roundsNeeded("cup", n);
+  const viavel =
+    P > 0 &&
+    playerCount >= 2 &&
+    (isLiga
+      ? isSwiss
+        ? true
+        : ligaFmt === "returno"
+          ? returnoCabe
+          : turnoCabe
+      : realRounds <= P);
+  const confrontosPorRodada = Math.floor(n / 2);
+  return { n, fullTurno, rounds, realRounds, turnoCabe, returnoCabe, viavel, confrontosPorRodada };
+}
+
+/**
+ * Teste hipotético: rodadas + viabilidade para um nº arbitrário de jogadores
+ * (preview do "testar com mais jogadores", não altera o sorteio real).
+ */
+export function testViability(
+  formato: "liga" | "cup",
+  testN: number,
+  periods: number,
+): { rounds: number; viavel: boolean } {
+  const isLiga = formato === "liga";
+  const rounds = roundsNeeded(isLiga ? "liga" : "cup", testN);
+  const viavel = periods > 0 && (isLiga ? Math.min(rounds, periods) : rounds) <= periods;
+  return { rounds, viavel };
+}
