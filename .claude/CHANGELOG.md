@@ -18,6 +18,10 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+---
+
+## [2.7.0] — 2026-06-05
+
 ### Alterado
 - **Primeira dobra da home: no máximo 2 linhas de jogos.** O teaser deslogado deixa de usar a altura
   do viewport como teto e passa a mostrar **no máximo 2 linhas** de jogos (4 no desktop, 2 no mobile);
@@ -28,7 +32,7 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   `RequireAuth` e `AuthCallback` redirecionam pra `/`; CTAs "Entrar para palpitar"/"Entrar e jogar"
   abrem o modal. `LoginPage.tsx` excluído.
 
-### Admin v2 (em validação — worktree `feat/admin-v2`, migrations `20260604000004`–`000007`)
+### Admin v2 — overhaul do painel administrativo (migrations `20260604000004`–`000007`)
 - **Corrigido — toggle (Switch) do admin** com aparência invertida (translate arbitrário não
   animava); reescrito com `inline-flex` + classes padrão.
 - **Corrigido — "jogo oculto não existe" também no "ao vivo":** `should_sync_scores()` e o
