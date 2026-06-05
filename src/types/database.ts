@@ -1198,6 +1198,7 @@ export type Database = {
         Returns: {
           competition_id: string
           competition_name: string
+          competition_provider: string
           created_at: string
           id: string
           kind: string
@@ -1227,6 +1228,7 @@ export type Database = {
           created_at: string
           detail: Json
           entity_id: string
+          entity_label: string
           entity_type: string
           id: string
         }[]

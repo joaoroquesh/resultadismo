@@ -3,6 +3,7 @@ import {
   RefreshCw,
   AlertTriangle,
   BellRing,
+  Inbox,
   Radio,
   CalendarClock,
   Users2,
@@ -23,7 +24,9 @@ import {
   useSetCompetitionSync,
   useSetMaintenance,
   useRecentAudit,
+  ONLINE_ALERT_THRESHOLD,
   type CompHealth,
+  type AuditEntry,
 } from "./sync";
 
 // Switch acessível simples (o projeto não tem um primitivo de toggle).
@@ -47,14 +50,17 @@ function Switch({
       disabled={disabled}
       onClick={() => onChange(!on)}
       className={cn(
-        "relative h-6 w-10 shrink-0 rounded-pill transition-colors disabled:opacity-50",
-        on ? "bg-brand-600" : "bg-ink-200",
+        // inline-flex + items-center = posicionamento à prova de falha (sem
+        // valor arbitrário de translate que pode não compilar). Thumb à esq.
+        // quando off, à dir. quando on, usando classes padrão translate-x-*.
+        "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full px-0.5 transition-colors disabled:opacity-50",
+        on ? "bg-brand-600" : "bg-ink-300",
       )}
     >
       <span
         className={cn(
-          "absolute top-0.5 size-5 rounded-full bg-white shadow transition-transform duration-200",
-          on ? "translate-x-[1.125rem]" : "translate-x-0.5",
+          "size-5 rounded-full bg-white shadow transition-transform duration-200",
+          on ? "translate-x-5" : "translate-x-0",
         )}
       />
     </button>
@@ -117,6 +123,8 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => vo
 
   const hasProblem = health.sync_problems > 0;
   const hasPending = health.pending_alerts > 0;
+  const hasPendingLeagues = health.pending_leagues > 0;
+  const onlineSpike = health.active_sessions >= ONLINE_ALERT_THRESHOLD;
 
   return (
     <div className="space-y-4">
@@ -157,11 +165,47 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => vo
         </button>
       )}
 
+      {hasPendingLeagues && (
+        <button
+          type="button"
+          onClick={() => onNavigate("grupos")}
+          className="flex w-full items-center gap-3 rounded-lg bg-brand-50 p-3.5 text-left ring-1 ring-brand-200/60 transition hover:bg-brand-100/70"
+        >
+          <Inbox className="size-5 shrink-0 text-brand-700" />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold text-brand-800">
+              {health.pending_leagues} grupo(s) aguardando aprovação
+            </p>
+            <p className="text-xs text-brand-700/80">Toque pra revisar e aprovar/rejeitar.</p>
+          </div>
+          <ChevronRight className="size-4 shrink-0 text-brand-600" />
+        </button>
+      )}
+
+      {onlineSpike && (
+        <div className="flex w-full items-center gap-3 rounded-lg bg-flame-500/10 p-3.5 ring-1 ring-flame-500/30">
+          <Users2 className="size-5 shrink-0 text-flame-600" />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold text-flame-700">
+              Pico de acesso: {health.active_sessions} pessoas online agora
+            </p>
+            <p className="text-xs text-ink-500">
+              Acima de {ONLINE_ALERT_THRESHOLD}. De olho na fila de acesso e no Realtime.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Agora — visão de um glance */}
       <Card className="flex items-stretch divide-x divide-border p-0">
         <Stat icon={<Radio className="size-5" />} value={health.live_now} label="Ao vivo" accent="flame" />
-        <Stat icon={<CalendarClock className="size-5" />} value={health.next_24h} label="Próx. 24h" accent="ink" />
-        <Stat icon={<Users2 className="size-5" />} value={health.active_sessions} label="Online" accent="brand" />
+        <Stat icon={<CalendarClock className="size-5" />} value={health.today} label="Hoje" accent="ink" />
+        <Stat
+          icon={<Users2 className="size-5" />}
+          value={health.active_sessions}
+          label="Online"
+          accent={onlineSpike ? "flame" : "brand"}
+        />
       </Card>
 
       {/* Sincronização */}
@@ -289,15 +333,24 @@ function MaintenanceCard({ on }: { on: boolean }) {
   );
 }
 
-function actionLabel(action: string): string {
-  const map: Record<string, string> = {
-    alert_approve: "aprovou um alerta",
-    alert_reject: "recusou um alerta",
-    competition_sync_toggle: "alterou o sync de uma competição",
-    maintenance_toggle: "alterou a manutenção",
-    match_reopen: "reabriu palpites de um jogo",
-  };
-  return map[action] ?? action;
+// Descreve a ação do audit em linguagem clara, com o nome da entidade quando
+// disponível (qual competição / grupo / jogo) — Nielsen #2: linguagem do mundo real.
+function describeAudit(e: AuditEntry): string {
+  const label = e.entity_label ? ` "${e.entity_label}"` : "";
+  switch (e.action) {
+    case "alert_approve":
+      return `aprovou um alerta${label}`;
+    case "alert_reject":
+      return `recusou um alerta${label}`;
+    case "competition_sync_toggle":
+      return `${e.detail?.sync_enabled ? "ligou" : "pausou"} o sync de${label || " uma competição"}`;
+    case "maintenance_toggle":
+      return e.detail?.on ? "ligou o modo manutenção" : "desligou o modo manutenção";
+    case "match_reopen":
+      return `reabriu palpites de${label || " um jogo"}`;
+    default:
+      return label ? `${e.action}${label}` : e.action;
+  }
 }
 
 function AuditCard() {
@@ -324,7 +377,7 @@ function AuditCard() {
             data.slice(0, 20).map((e) => (
               <div key={e.id} className="flex items-baseline justify-between gap-3 px-3.5 py-2 text-sm">
                 <span className="min-w-0 flex-1 truncate text-ink-700">
-                  <span className="font-semibold text-ink-900">{e.actor_name}</span> {actionLabel(e.action)}
+                  <span className="font-semibold text-ink-900">{e.actor_name}</span> {describeAudit(e)}
                 </span>
                 <span className="shrink-0 text-xs text-ink-400">{fromNow(e.created_at)}</span>
               </div>

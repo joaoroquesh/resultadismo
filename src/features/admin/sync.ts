@@ -17,13 +17,18 @@ export type CompHealth = {
 
 export type SystemHealth = {
   live_now: number;
+  today: number;
   next_24h: number;
   pending_alerts: number;
+  pending_leagues: number;
   active_sessions: number;
   maintenance_mode: boolean;
   sync_problems: number;
   competitions: CompHealth[];
 };
+
+// Acima disso, o dashboard mostra um alerta de pico de gente online.
+export const ONLINE_ALERT_THRESHOLD = 100;
 
 export type SyncAlertKind =
   | "new_match"
@@ -36,6 +41,7 @@ export type SyncAlert = {
   id: string;
   competition_id: string | null;
   competition_name: string | null;
+  competition_provider: string | null;
   match_id: string | null;
   kind: SyncAlertKind;
   status: "pending" | "approved" | "rejected" | "applied";
@@ -51,6 +57,7 @@ export type AuditEntry = {
   action: string;
   entity_type: string | null;
   entity_id: string | null;
+  entity_label: string | null;
   detail: Record<string, unknown>;
   created_at: string;
 };

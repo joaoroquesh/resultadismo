@@ -62,8 +62,10 @@ function PendingAlert({ alert }: { alert: SyncAlert }) {
           <span className="shrink-0 text-[11px] text-ink-400">{fromNow(alert.created_at)}</span>
         </div>
         <p className="mt-0.5 text-sm font-medium text-ink-900">{alert.message}</p>
-        {alert.competition_name && (
-          <p className="text-xs text-ink-400">{alert.competition_name}</p>
+        {(alert.competition_name || alert.competition_provider) && (
+          <p className="text-xs text-ink-400">
+            {[alert.competition_name, alert.competition_provider].filter(Boolean).join(" · ")}
+          </p>
         )}
         <div className="mt-2 flex gap-2">
           <Button
@@ -95,7 +97,14 @@ function HistoryRow({ alert }: { alert: SyncAlert }) {
       <span className={cn("grid size-6 shrink-0 place-items-center rounded-full", TONE_BG[meta.tone])}>
         <Icon className="size-3" />
       </span>
-      <p className="min-w-0 flex-1 truncate text-sm text-ink-600">{alert.message}</p>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm text-ink-600">{alert.message}</p>
+        {(alert.competition_name || alert.competition_provider) && (
+          <p className="truncate text-[11px] text-ink-400">
+            {[alert.competition_name, alert.competition_provider].filter(Boolean).join(" · ")}
+          </p>
+        )}
+      </div>
       <span className="shrink-0 text-[11px] text-ink-400">
         {resolvedLabel} · {fromNow(alert.resolved_at ?? alert.created_at)}
       </span>
