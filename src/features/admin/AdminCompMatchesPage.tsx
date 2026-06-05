@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, RefreshCw, Eye, EyeOff, Pencil, Check, X, ExternalLink, Clock } from "lucide-react";
+import { ArrowLeft, RefreshCw, Eye, EyeOff, Pencil, Check, X, ExternalLink, Clock, ChevronDown, ChevronRight } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -156,22 +156,59 @@ export function AdminCompMatchesPage() {
           }
         />
       ) : (
-        <div className="space-y-5">
-          {groups.map(([key, list]) => (
-            <section key={key} className="space-y-2">
-              <h2 className="px-1 text-xs font-bold uppercase tracking-wide text-ink-400">
-                {formatDayLabel(list[0]?.kickoff_at ?? null)}
-              </h2>
-              <div className="space-y-2">
-                {list.map((m) => (
-                  <AdminMatchRow key={m.id} match={m} />
-                ))}
-              </div>
-            </section>
-          ))}
+        <div className="space-y-2.5">
+          {(() => {
+            // Acordeão: só o dia de HOJE aberto por padrão (ou o próximo dia com
+            // jogo, se não houver jogo hoje). Os outros começam recolhidos.
+            const todayKey = dayjs().format("YYYY-MM-DD");
+            const keys = groups.map(([k]) => k);
+            const openKey = keys.includes(todayKey)
+              ? todayKey
+              : (keys.find((k) => k >= todayKey) ?? keys[keys.length - 1]);
+            return groups.map(([key, list]) => (
+              <DaySection key={key} list={list} defaultOpen={key === openKey} />
+            ));
+          })()}
         </div>
       )}
     </Page>
+  );
+}
+
+// Seção de um dia, recolhível (acordeão). Mostra contagem e badge de "ao vivo".
+function DaySection({ list, defaultOpen }: { list: AdminMatch[]; defaultOpen: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
+  const liveCount = list.filter((m) => m.status === "live").length;
+  return (
+    <section className="overflow-hidden rounded-lg ring-1 ring-border">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center gap-2 bg-surface-2 px-3 py-2.5 text-left"
+      >
+        {open ? (
+          <ChevronDown className="size-4 shrink-0 text-ink-400" />
+        ) : (
+          <ChevronRight className="size-4 shrink-0 text-ink-400" />
+        )}
+        <span className="text-sm font-bold text-ink-800">
+          {formatDayLabel(list[0]?.kickoff_at ?? null)}
+        </span>
+        <span className="text-xs text-ink-400">· {list.length} jogo{list.length === 1 ? "" : "s"}</span>
+        {liveCount > 0 && (
+          <span className="ml-auto inline-flex items-center gap-1 rounded-pill bg-flame-500/12 px-2 py-0.5 text-[11px] font-bold text-flame-600">
+            <span className="size-1.5 animate-pulse rounded-full bg-flame-500" /> {liveCount} ao vivo
+          </span>
+        )}
+      </button>
+      {open && (
+        <div className="space-y-2 p-2">
+          {list.map((m) => (
+            <AdminMatchRow key={m.id} match={m} />
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
 
