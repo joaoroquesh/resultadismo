@@ -138,6 +138,7 @@ export type Database = {
           name_prefix_cup: string
           name_prefix_liga: string
           name_prefix_points: string
+          online_alert_threshold: number
           payment_mode: Database["public"]["Enums"]["payment_mode"]
           promo_price_cents: number | null
           promo_until: string | null
@@ -151,6 +152,7 @@ export type Database = {
           name_prefix_cup?: string
           name_prefix_liga?: string
           name_prefix_points?: string
+          online_alert_threshold?: number
           payment_mode?: Database["public"]["Enums"]["payment_mode"]
           promo_price_cents?: number | null
           promo_until?: string | null
@@ -164,6 +166,7 @@ export type Database = {
           name_prefix_cup?: string
           name_prefix_liga?: string
           name_prefix_points?: string
+          online_alert_threshold?: number
           payment_mode?: Database["public"]["Enums"]["payment_mode"]
           promo_price_cents?: number | null
           promo_until?: string | null
@@ -1269,6 +1272,10 @@ export type Database = {
         Args: { p_cup: string; p_liga: string; p_points: string }
         Returns: undefined
       }
+      admin_set_online_threshold: {
+        Args: { p_value: number }
+        Returns: undefined
+      }
       admin_set_promo: {
         Args: { p_promo_price_cents?: number; p_promo_until?: string }
         Returns: {
@@ -1279,6 +1286,7 @@ export type Database = {
           name_prefix_cup: string
           name_prefix_liga: string
           name_prefix_points: string
+          online_alert_threshold: number
           payment_mode: Database["public"]["Enums"]["payment_mode"]
           promo_price_cents: number | null
           promo_until: string | null
@@ -1296,6 +1304,10 @@ export type Database = {
         Returns: undefined
       }
       admin_system_health: { Args: never; Returns: Json }
+      admin_update_access: {
+        Args: { p_enabled: boolean; p_max_active: number }
+        Returns: undefined
+      }
       admin_update_payment_settings: {
         Args: {
           p_mode: Database["public"]["Enums"]["payment_mode"]
@@ -1309,6 +1321,7 @@ export type Database = {
           name_prefix_cup: string
           name_prefix_liga: string
           name_prefix_points: string
+          online_alert_threshold: number
           payment_mode: Database["public"]["Enums"]["payment_mode"]
           promo_price_cents: number | null
           promo_until: string | null

@@ -23,11 +23,15 @@ export type SystemHealth = {
   pending_leagues: number;
   active_sessions: number;
   maintenance_mode: boolean;
+  online_alert_threshold: number;
+  access_enabled: boolean;
+  access_max_active: number;
   sync_problems: number;
   competitions: CompHealth[];
 };
 
-// Acima disso, o dashboard mostra um alerta de pico de gente online.
+// Fallback se o banco ainda não respondeu (o valor real vem de app_settings,
+// editável pelo admin em Visão → Configurações).
 export const ONLINE_ALERT_THRESHOLD = 100;
 
 export type SyncAlertKind =
@@ -145,6 +149,31 @@ export function useSetMaintenance() {
       qc.invalidateQueries({ queryKey: ["admin", "health"] });
       qc.invalidateQueries({ queryKey: ["maintenance"] });
     },
+  });
+}
+
+export function useSetOnlineThreshold() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (value: number) => {
+      const { error } = await supabase.rpc("admin_set_online_threshold", { p_value: value });
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "health"] }),
+  });
+}
+
+export function useUpdateAccess() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { enabled: boolean; maxActive: number }) => {
+      const { error } = await supabase.rpc("admin_update_access", {
+        p_enabled: input.enabled,
+        p_max_active: input.maxActive,
+      });
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "health"] }),
   });
 }
 

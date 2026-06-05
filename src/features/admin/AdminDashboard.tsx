@@ -23,6 +23,8 @@ import {
   useSyncNow,
   useSetCompetitionSync,
   useSetMaintenance,
+  useSetOnlineThreshold,
+  useUpdateAccess,
   useRecentAudit,
   ONLINE_ALERT_THRESHOLD,
   type CompHealth,
@@ -124,7 +126,8 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => vo
   const hasProblem = health.sync_problems > 0;
   const hasPending = health.pending_alerts > 0;
   const hasPendingLeagues = health.pending_leagues > 0;
-  const onlineSpike = health.active_sessions >= ONLINE_ALERT_THRESHOLD;
+  const onlineThreshold = health.online_alert_threshold ?? ONLINE_ALERT_THRESHOLD;
+  const onlineSpike = health.active_sessions >= onlineThreshold;
 
   return (
     <div className="space-y-4">
@@ -190,7 +193,7 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => vo
               Pico de acesso: {health.active_sessions} pessoas online agora
             </p>
             <p className="text-xs text-ink-500">
-              Acima de {ONLINE_ALERT_THRESHOLD}. De olho na fila de acesso e no Realtime.
+              Acima de {onlineThreshold}. De olho na fila de acesso e no Realtime.
             </p>
           </div>
         </div>
@@ -225,10 +228,151 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => vo
         </Card>
       </section>
 
+      <ConfigCard
+        threshold={onlineThreshold}
+        accessEnabled={health.access_enabled}
+        maxActive={health.access_max_active}
+      />
+
       <MaintenanceCard on={health.maintenance_mode} />
 
       <AuditCard />
     </div>
+  );
+}
+
+// Linha de configuração: rótulo + ajuda à esquerda, controle à direita.
+function SettingRow({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center gap-3 py-3">
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold text-ink-900">{label}</p>
+        <p className="text-xs text-ink-400">{hint}</p>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+// Input numérico com "Salvar" que só habilita quando o valor muda (Nielsen #1:
+// estado visível; sem salvar à toa). Confirma com toast.
+function NumberSetting({
+  value,
+  min,
+  onSave,
+  saving,
+  suffix,
+}: {
+  value: number;
+  min: number;
+  onSave: (v: number) => void;
+  saving: boolean;
+  suffix?: string;
+}) {
+  const [draft, setDraft] = useState(String(value));
+  const parsed = Number(draft);
+  const valid = Number.isFinite(parsed) && parsed >= min;
+  const dirty = valid && parsed !== value;
+  return (
+    <div className="flex shrink-0 items-center gap-2">
+      <input
+        type="number"
+        inputMode="numeric"
+        min={min}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        aria-label={suffix}
+        className="h-9 w-20 rounded-md border border-ink-200 bg-surface px-2.5 text-center text-sm font-semibold tabular-nums outline-none focus:border-brand-500"
+      />
+      <Button
+        size="sm"
+        variant={dirty ? "primary" : "ghost"}
+        disabled={!dirty || saving}
+        loading={saving}
+        onClick={() => onSave(parsed)}
+      >
+        Salvar
+      </Button>
+    </div>
+  );
+}
+
+function ConfigCard({
+  threshold,
+  accessEnabled,
+  maxActive,
+}: {
+  threshold: number;
+  accessEnabled: boolean;
+  maxActive: number;
+}) {
+  const setThreshold = useSetOnlineThreshold();
+  const updateAccess = useUpdateAccess();
+  const { toast } = useToast();
+
+  return (
+    <section className="space-y-2">
+      <h2 className="text-xs font-bold uppercase tracking-wide text-ink-400">Configurações</h2>
+      <Card className="divide-y divide-border px-4 py-1">
+        <SettingRow
+          label="Alerta de pico de acesso"
+          hint="Avisa aqui quando passar desse número de pessoas online ao mesmo tempo."
+        >
+          <NumberSetting
+            value={threshold}
+            min={1}
+            saving={setThreshold.isPending}
+            suffix="Pessoas online para alertar"
+            onSave={(v) =>
+              setThreshold.mutate(v, { onSuccess: () => toast("Limiar de alerta salvo.", "success") })
+            }
+          />
+        </SettingRow>
+
+        <SettingRow
+          label="Sala de espera"
+          hint={accessEnabled ? "Ligada: segura novos acessos no pico." : "Desligada: ninguém entra na fila."}
+        >
+          <Switch
+            on={accessEnabled}
+            disabled={updateAccess.isPending}
+            label="Sala de espera"
+            onChange={(v) =>
+              updateAccess.mutate(
+                { enabled: v, maxActive },
+                { onSuccess: () => toast(v ? "Fila ligada." : "Fila desligada.", "info") },
+              )
+            }
+          />
+        </SettingRow>
+
+        <SettingRow
+          label="Limite de simultâneos"
+          hint="Quantas pessoas entram antes da fila segurar. Deixe abaixo do teto do seu plano."
+        >
+          <NumberSetting
+            value={maxActive}
+            min={1}
+            saving={updateAccess.isPending}
+            suffix="Limite de acessos simultâneos"
+            onSave={(v) =>
+              updateAccess.mutate(
+                { enabled: accessEnabled, maxActive: v },
+                { onSuccess: () => toast("Limite de simultâneos salvo.", "success") },
+              )
+            }
+          />
+        </SettingRow>
+      </Card>
+    </section>
   );
 }
 
