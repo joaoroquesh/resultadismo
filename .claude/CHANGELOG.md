@@ -18,7 +18,19 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
-_Nada pendente._
+### Adicionado
+- **Home pública (deslogado) — primeira dobra + convite de rolagem.** Num dia cheio, os jogos
+  aparecem só até a altura do viewport (cortando onde estiver, com fade) e um convite "Conheça o
+  Resultadismo" fixo na base leva às seções de venda — teaser em vez de despejar a lista toda
+  (`src/features/landing/FirstFold.tsx` + `ScrollCue.tsx`).
+
+### Alterado
+- **Home no desktop usa a largura toda** (container igual ao header), com **jogos em 2 colunas** e as
+  seções de venda (o que dá pra fazer / pontuação / competições) em colunas — aproveita o espaço
+  lateral e encurta a página.
+- **Microinterações/animações sutis na landing** (IntersectionObserver + CSS `ease-out-expo`):
+  reveals com _stagger_, _hover lift_ e deriva no convite de rolagem. Sem bounce; respeita
+  `prefers-reduced-motion` (DESIGN.md). Sem dependência nova (sem GSAP).
 
 ---
 

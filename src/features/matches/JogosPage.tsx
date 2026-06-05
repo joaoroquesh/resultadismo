@@ -20,6 +20,7 @@ import {
 } from "./api";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import { LandingSections } from "@/features/landing/LandingSections";
+import { FirstFold } from "@/features/landing/FirstFold";
 
 const ALL = "all" as const;
 type Scope = typeof ALL | string;
@@ -145,8 +146,28 @@ export function JogosPage() {
 
   const hasComps = (competitions?.length ?? 0) > 0;
 
+  // Grade de jogos: 1 coluna no mobile, 2 no desktop pra aproveitar a largura.
+  const gamesGrid = (
+    <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+      {dayMatches.map((m) => {
+        const compKey = m.competition_id ?? "?";
+        const wk = weekKey(m.kickoff_at);
+        return (
+          <MatchCard
+            key={m.id}
+            match={m}
+            prediction={predMap?.get(m.id) ?? null}
+            jokersUsed={jokersByCompWeek.get(`${compKey}:${wk}`) ?? 0}
+            maxJokers={jokerMax.get(compKey) ?? 2}
+          />
+        );
+      })}
+    </div>
+  );
+
   return (
     <Page
+      wide
       title={session ? "Jogos" : undefined}
       action={
         totalPoints > 0 ? (
@@ -260,7 +281,7 @@ export function JogosPage() {
       )}
 
       {loadingMatches ? (
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-28 w-full" />
           ))}
@@ -275,22 +296,10 @@ export function JogosPage() {
               : "Quando houver jogos nesta competição, eles aparecem aqui por dia."
           }
         />
+      ) : !session ? (
+        <FirstFold scrollTargetId="conheca-resultadismo">{gamesGrid}</FirstFold>
       ) : (
-        <div className="space-y-3">
-          {dayMatches.map((m) => {
-            const compKey = m.competition_id ?? "?";
-            const wk = weekKey(m.kickoff_at);
-            return (
-              <MatchCard
-                key={m.id}
-                match={m}
-                prediction={predMap?.get(m.id) ?? null}
-                jokersUsed={jokersByCompWeek.get(`${compKey}:${wk}`) ?? 0}
-                maxJokers={jokerMax.get(compKey) ?? 2}
-              />
-            );
-          })}
-        </div>
+        gamesGrid
       )}
 
       {/* Landing híbrida para visitantes deslogados. */}
