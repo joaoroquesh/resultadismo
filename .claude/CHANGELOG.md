@@ -22,6 +22,18 @@ _Nada pendente._
 
 ---
 
+## [2.6.1] — 2026-06-05
+
+### Corrigido
+- **Jogo oculto não conta mais para a pontuação.** Quando o admin oculta um jogo (`matches.hidden`),
+  os palpites nele param de somar pontos — **mesmo que alguém já tivesse palpitado antes** de ocultar.
+  Filtro de leitura `and m.hidden = false` em **todas** as funções que somam/decidem pontos
+  (`get_league_standings`, `get_player_profile`, `get_confronto_standings`/`_ties`, `get_tie_detail`,
+  `advance_confronto_cup`; migration `20260603000028`). Desocultar volta a contar na hora; não muda
+  o 3/2/1 nem o desempate. (O ponto-do-dia no client já excluía oculto — só busca jogos visíveis.)
+
+---
+
 ## [2.6.0] — 2026-06-05
 
 ### Adicionado
