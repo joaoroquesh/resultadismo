@@ -19,6 +19,10 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Alterado
+- **Primeira dobra da home: no máximo 2 linhas de jogos.** O teaser deslogado deixa de usar a altura
+  do viewport como teto e passa a mostrar **no máximo 2 linhas** de jogos (4 no desktop, 2 no mobile);
+  o convite "Conheça o Resultadismo" cola **logo abaixo** dos jogos visíveis, acabando com o espaço
+  vazio que sobrava em dias com poucos jogos. (`src/features/landing/FirstFold.tsx`)
 - **Página de login removida.** `/login` deixou de existir; o **único** login é o bottom-sheet
   (`LoginModal`) com Google, aberto pelo botão "Entrar". Logout volta pra **Home** (`/`);
   `RequireAuth` e `AuthCallback` redirecionam pra `/`; CTAs "Entrar para palpitar"/"Entrar e jogar"

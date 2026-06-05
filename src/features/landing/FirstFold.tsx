@@ -1,16 +1,23 @@
-import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { ScrollCue } from "./ScrollCue";
 
 const prefersReduced = () =>
   typeof window !== "undefined" &&
   !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
+/** Teaser deslogado: no máximo 2 linhas de jogos. */
+const MAX_ROWS = 2;
+
 /**
- * Primeira dobra da home pública (só visitantes deslogados): mostra os jogos
- * apenas até a altura do viewport — cortando onde estiver — com um fade no fim
- * e um convite de rolagem fixo na base. Clicar (ou rolar) revela as seções de
- * "venda" abaixo. A ideia é teaser: o visitante vê que tem jogo e é convidado a
- * descer, sem despejar a lista inteira num dia cheio.
+ * Primeira dobra da home pública (só visitantes deslogados).
+ *
+ * Mostra **no máximo 2 linhas de jogos** (4 no desktop, 2 no mobile) e o convite
+ * de rolagem cola **logo abaixo** dos jogos visíveis — sem espaço vazio:
+ *  - 1–2 linhas de jogos → a dobra tem o tamanho exato dos jogos;
+ *  - mais que isso → corta na 2ª linha (as demais ficam pra quem entra) e o
+ *    convite segue logo abaixo.
+ *
+ * Teaser: o visitante vê que tem jogo e é convidado a descer pras seções.
  */
 export function FirstFold({
   children,
@@ -19,27 +26,39 @@ export function FirstFold({
   children: ReactNode;
   scrollTargetId: string;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState<number>();
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [maxH, setMaxH] = useState<number>();
+
+  const measure = useCallback(() => {
+    const grid = contentRef.current?.firstElementChild as HTMLElement | null;
+    if (!grid) return;
+    const cards = Array.from(grid.children) as HTMLElement[];
+    // nº de colunas atual (responsivo) lido direto do CSS grid
+    const cols =
+      getComputedStyle(grid).gridTemplateColumns.split(" ").filter(Boolean).length || 1;
+    const limit = cols * MAX_ROWS;
+    if (cards.length > limit) {
+      // teto = base da última carta da 2ª linha (corta a 3ª linha em diante)
+      const top = grid.getBoundingClientRect().top;
+      const lastVisible = cards[limit - 1]!;
+      setMaxH(Math.round(lastVisible.getBoundingClientRect().bottom - top));
+    } else {
+      setMaxH(undefined); // cabe em ≤2 linhas → sem corte, encolhe pro conteúdo
+    }
+  }, []);
 
   useLayoutEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const compute = () => {
-      // distância do topo do bloco até o documento; com a página no topo isso é
-      // o quanto sobra até o fim do viewport. Cap mínimo pra telas baixinhas.
-      const docTop = el.getBoundingClientRect().top + window.scrollY;
-      setHeight(Math.max(280, Math.round(window.innerHeight - docTop - 8)));
-    };
-    compute();
-    window.addEventListener("resize", compute);
-    // recalcula depois que fontes/layout assentam (evita corte no lugar errado)
-    const t = window.setTimeout(compute, 250);
+    measure();
+    window.addEventListener("resize", measure);
+    const t = window.setTimeout(measure, 250); // fontes/layout assentam
+    const ro = new ResizeObserver(measure); // jogos carregam async / quebra de coluna
+    if (contentRef.current) ro.observe(contentRef.current);
     return () => {
-      window.removeEventListener("resize", compute);
+      window.removeEventListener("resize", measure);
       window.clearTimeout(t);
+      ro.disconnect();
     };
-  }, []);
+  }, [measure]);
 
   const goMore = () => {
     const target = document.getElementById(scrollTargetId);
@@ -48,16 +67,21 @@ export function FirstFold({
     else window.scrollTo({ top: window.innerHeight, behavior });
   };
 
-  return (
-    <div ref={ref} className="relative overflow-hidden" style={height ? { height } : undefined}>
-      {children}
+  const clamped = maxH != null;
 
-      {/* fade do corte + convite, fixos na base da dobra */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center">
-        <div className="h-28 w-full bg-gradient-to-t from-background via-background/85 to-transparent" />
-        <div className="pointer-events-auto flex w-full justify-center bg-background pb-2">
-          <ScrollCue onClick={goMore} />
-        </div>
+  return (
+    <div>
+      <div
+        ref={contentRef}
+        className={clamped ? "overflow-hidden" : undefined}
+        style={clamped ? { maxHeight: maxH } : undefined}
+      >
+        {children}
+      </div>
+
+      {/* convite cola logo abaixo dos jogos visíveis (sem espaço vazio) */}
+      <div className="mt-5 flex justify-center">
+        <ScrollCue onClick={goMore} />
       </div>
     </div>
   );
