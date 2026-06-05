@@ -4,14 +4,14 @@ import { useAuth } from "./AuthProvider";
 import { LoadingScreen } from "@/components/ui/Spinner";
 
 export function AuthCallback() {
-  const { session, loading } = useAuth();
+  const { loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!loading) {
-      navigate(session ? "/" : "/login", { replace: true });
+      navigate("/", { replace: true });
     }
-  }, [session, loading, navigate]);
+  }, [loading, navigate]);
 
   return <LoadingScreen label="Entrando…" />;
 }

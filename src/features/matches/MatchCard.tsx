@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import { Check, Loader2, Lock, ChevronDown, Users, Zap, Hand } from "lucide-react";
 import { TeamCrest } from "@/components/TeamCrest";
 import { ScorePill } from "@/components/ScorePill";
@@ -33,6 +33,7 @@ export function MatchCard({
   maxJokers?: number;
 }) {
   const { session } = useAuth();
+  const { open: openLogin } = useLoginModal();
   const { toast } = useToast();
 
   // Tick a cada 30s só pra jogos perto do horário (6h antes → 4h depois), pra o
@@ -219,12 +220,13 @@ export function MatchCard({
           )}
         </div>
       ) : !session && !finished && !live ? (
-        <Link
-          to="/login"
-          className="flex h-9 items-center justify-center gap-1.5 border-t border-border text-[11px] font-semibold text-brand-600 transition-colors hover:bg-ink-50"
+        <button
+          type="button"
+          onClick={openLogin}
+          className="flex h-9 w-full items-center justify-center gap-1.5 border-t border-border text-[11px] font-semibold text-brand-600 transition-colors hover:bg-ink-50"
         >
           Entrar para palpitar
-        </Link>
+        </button>
       ) : locked && session && !prediction ? (
         <div className="flex h-8 items-center justify-center gap-1 border-t border-border text-[11px] text-ink-400">
           <Lock className="size-3" /> você não palpitou

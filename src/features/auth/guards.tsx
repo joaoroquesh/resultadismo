@@ -5,7 +5,7 @@ import { LoadingScreen } from "@/components/ui/Spinner";
 export function RequireAuth() {
   const { session, loading } = useAuth();
   if (loading) return <LoadingScreen />;
-  if (!session) return <Navigate to="/login" replace />;
+  if (!session) return <Navigate to="/" replace />;
   return <Outlet />;
 }
 

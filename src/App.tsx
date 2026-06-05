@@ -1,7 +1,6 @@
 import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate, useParams } from "react-router-dom";
 import { RequireAuth, RequireAdmin } from "@/features/auth/guards";
-import { LoginPage } from "@/features/auth/LoginPage";
 import { AuthCallback } from "@/features/auth/AuthCallback";
 import { AppShell } from "@/components/layout/AppShell";
 import { JogosPage } from "@/features/matches/JogosPage";
@@ -43,7 +42,6 @@ export default function App() {
       <Onboarding />
       <Suspense fallback={<PageFallback />}>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
 
           {/* públicas e sempre acessíveis (Google exige links públicos) */}

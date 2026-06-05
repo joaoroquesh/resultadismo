@@ -18,7 +18,11 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
-_Nada pendente._
+### Alterado
+- **Página de login removida.** `/login` deixou de existir; o **único** login é o bottom-sheet
+  (`LoginModal`) com Google, aberto pelo botão "Entrar". Logout volta pra **Home** (`/`);
+  `RequireAuth` e `AuthCallback` redirecionam pra `/`; CTAs "Entrar para palpitar"/"Entrar e jogar"
+  abrem o modal. `LoginPage.tsx` excluído.
 
 ---
 

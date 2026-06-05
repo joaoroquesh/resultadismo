@@ -29,7 +29,7 @@ function GoogleIcon() {
 
 /**
  * Modal de login que sobe sobre a home (hero/CTA da landing e botão "Entrar"
- * da Sidebar). Entrada via Google; a rota /login continua como fallback.
+ * da Sidebar/BottomNav). Entrada via Google. É o ÚNICO ponto de login do app.
  */
 export function LoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { signInWithGoogle, signInWithPassword } = useAuth();

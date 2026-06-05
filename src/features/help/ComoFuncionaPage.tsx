@@ -1,5 +1,6 @@
 import { type ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import {
   ArrowLeft,
   Target,
@@ -102,6 +103,7 @@ function OptionRow({
 }
 
 export function ComoFuncionaPage() {
+  const { open: openLogin } = useLoginModal();
   const navigate = useNavigate();
   const { session } = useAuth();
 
@@ -363,9 +365,9 @@ export function ComoFuncionaPage() {
                 </Button>
               </Link>
             ) : (
-              <Link to="/login" className="sm:w-auto">
-                <Button fullWidth>Entrar e jogar</Button>
-              </Link>
+              <div className="sm:w-auto">
+                <Button fullWidth onClick={openLogin}>Entrar e jogar</Button>
+              </div>
             )}
           </div>
         </div>

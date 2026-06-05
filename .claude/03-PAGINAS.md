@@ -8,7 +8,6 @@
 
 | Rota | Página | Acesso |
 |---|---|---|
-| `/login` | `auth/LoginPage` | Público (deslogado) |
 | `/auth/callback` | `auth/AuthCallback` | Fluxo OAuth |
 | `/privacidade` | `legal/PrivacidadePage` | **Sempre público** (exigido pelo Google) |
 | `/termos` | `legal/TermosPage` | **Sempre público** |
@@ -27,7 +26,7 @@
 | `/ligas`, `/ligas/nova`, `/ligas/:slug` | → redireciona p/ `/grupos/*` | Compat (renames Liga→Federação→Grupo) |
 | `*` | → redireciona p/ `/` | 404 |
 
-**Guards** (`src/features/auth/guards.tsx`): `RequireAuth` (manda p/ `/login` se deslogado),
+**Guards** (`src/features/auth/guards.tsx`): `RequireAuth` (manda p/ `/` se deslogado — login é só pelo **modal/bottom-sheet**, não há página de login),
 `RequireAdmin` (manda p/ `/` se não for app-admin). As rotas logadas ficam dentro do `<AppShell>`;
 as duas de admin ficam dentro de `<RequireAdmin>`.
 
@@ -95,7 +94,7 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
 - **`landing/LandingSections`**: hero + features para visitantes (dentro da JogosPage deslogada).
 - **`legal/PrivacidadePage` / `TermosPage`**: páginas legais (LGPD, pagamento §12, arrependimento).
 - **`onboarding/Onboarding`**: tour de primeiro acesso (montado no `App` root; refazível pelo admin).
-- **`auth/*`**: `LoginPage`, `LoginModal` (overlay global), `AuthCallback`, `AuthProvider`, guards.
+- **`auth/*`**: `LoginModal` (bottom-sheet — **único** login do app), `AuthCallback`, `AuthProvider`, guards.
 - **`notifications/NotificationsBell`**: sino + lista de notificações.
 - **`access/AccessGate` + `WaitingRoom`**: sala de espera (fila FIFO em pico). → [`05`](05-DADOS-E-AUTH.md).
 
@@ -111,7 +110,7 @@ Tema: `theme/ThemeProvider` + `ThemeToggle`. PWA: `pwa/InstallPrompt`.
 
 ## 5. Fluxos principais (telas que participam)
 
-- **Login**: `/` (deslogado) → `LoginModal`/`LoginPage` → Google → `/auth/callback` → `AuthProvider`
+- **Login**: `/` (deslogado) → botão "Entrar" abre o **`LoginModal`** (bottom-sheet) → Google → `/auth/callback` → `AuthProvider`
   cria/carrega profile → `Onboarding` no 1º acesso.
 - **Palpitar**: `JogosPage` → escolhe competição/dia → `MatchCard` (inputs auto-save) → opcional 2×
   → resultado pontua sozinho ao encerrar o jogo.
