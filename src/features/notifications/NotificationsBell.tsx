@@ -45,7 +45,9 @@ export function NotificationsBell({ className }: { className?: string }) {
             onClick={() => setOpen(false)}
             className="fixed inset-0 z-40 cursor-default"
           />
-          <div className="animate-pop-in absolute right-0 top-11 z-50 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg bg-surface shadow-[var(--shadow-pop)] ring-1 ring-border">
+          {/* Mobile (sino à direita no header) abre p/ esquerda; desktop (sino no
+              sidebar à esquerda) abre p/ direita — senão sai da tela. */}
+          <div className="animate-pop-in absolute right-0 top-11 z-50 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg bg-surface shadow-[var(--shadow-pop)] ring-1 ring-border lg:left-0 lg:right-auto">
             <div className="border-b border-border px-4 py-2.5 text-sm font-bold text-ink-900">
               Notificações
             </div>
