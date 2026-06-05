@@ -1,0 +1,337 @@
+import { useState } from "react";
+import {
+  RefreshCw,
+  AlertTriangle,
+  BellRing,
+  Radio,
+  CalendarClock,
+  Users2,
+  Wrench,
+  History,
+  ChevronRight,
+  ChevronDown,
+} from "lucide-react";
+import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { useToast } from "@/components/ui/Toast";
+import { cn } from "@/lib/utils";
+import { fromNow } from "@/lib/format";
+import {
+  useSystemHealth,
+  useSyncNow,
+  useSetCompetitionSync,
+  useSetMaintenance,
+  useRecentAudit,
+  type CompHealth,
+} from "./sync";
+
+// Switch acessível simples (o projeto não tem um primitivo de toggle).
+function Switch({
+  on,
+  onChange,
+  label,
+  disabled,
+}: {
+  on: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      aria-label={label}
+      disabled={disabled}
+      onClick={() => onChange(!on)}
+      className={cn(
+        "relative h-6 w-10 shrink-0 rounded-pill transition-colors disabled:opacity-50",
+        on ? "bg-brand-600" : "bg-ink-200",
+      )}
+    >
+      <span
+        className={cn(
+          "absolute top-0.5 size-5 rounded-full bg-white shadow transition-transform duration-200",
+          on ? "translate-x-[1.125rem]" : "translate-x-0.5",
+        )}
+      />
+    </button>
+  );
+}
+
+function Stat({
+  icon,
+  value,
+  label,
+  accent,
+}: {
+  icon: React.ReactNode;
+  value: number;
+  label: string;
+  accent: "flame" | "brand" | "ink";
+}) {
+  return (
+    <div className="flex flex-1 flex-col items-center gap-0.5 px-2 py-3 text-center">
+      <span
+        className={cn(
+          "flex items-center gap-1 text-2xl font-extrabold tabular-nums",
+          accent === "flame" && value > 0 && "text-flame-600",
+          accent === "brand" && "text-brand-700",
+          accent === "ink" && "text-ink-900",
+        )}
+      >
+        {icon}
+        {value}
+      </span>
+      <span className="text-[11px] font-medium uppercase tracking-wide text-ink-400">{label}</span>
+    </div>
+  );
+}
+
+export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => void }) {
+  const { data: health, isLoading } = useSystemHealth();
+  const syncNow = useSyncNow();
+  const { toast } = useToast();
+
+  async function syncAll() {
+    try {
+      const r = await syncNow.mutateAsync({ mode: "catalog" });
+      const failed = r.results.filter((x) => !x.ok);
+      if (failed.length) toast(`Sincronizado com ${failed.length} problema(s).`, "error");
+      else toast(`Sincronizado (${r.synced} competição/ões).`, "success");
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Erro ao sincronizar.", "error");
+    }
+  }
+
+  if (isLoading || !health) {
+    return (
+      <div className="space-y-3">
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-40 w-full" />
+      </div>
+    );
+  }
+
+  const hasProblem = health.sync_problems > 0;
+  const hasPending = health.pending_alerts > 0;
+
+  return (
+    <div className="space-y-4">
+      {/* Banners de atenção (Nielsen #1: visibilidade do estado do sistema) */}
+      {hasProblem && (
+        <button
+          type="button"
+          onClick={() => onNavigate("alertas")}
+          className="flex w-full items-center gap-3 rounded-lg bg-flame-500/10 p-3.5 text-left ring-1 ring-flame-500/30 transition hover:bg-flame-500/15"
+        >
+          <AlertTriangle className="size-5 shrink-0 text-flame-600" />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold text-flame-700">
+              {health.sync_problems} competição(ões) com sincronização falhando
+            </p>
+            <p className="text-xs text-ink-500">
+              A API pode ter mudado ou caído. Toque pra ver os detalhes.
+            </p>
+          </div>
+          <ChevronRight className="size-4 shrink-0 text-flame-500" />
+        </button>
+      )}
+
+      {hasPending && (
+        <button
+          type="button"
+          onClick={() => onNavigate("alertas")}
+          className="flex w-full items-center gap-3 rounded-lg bg-gold-100 p-3.5 text-left ring-1 ring-gold-300/60 transition hover:bg-gold-200/70"
+        >
+          <BellRing className="size-5 shrink-0 text-gold-700" />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold text-gold-800">
+              {health.pending_alerts} alerta(s) esperando sua decisão
+            </p>
+            <p className="text-xs text-gold-700/80">Jogos novos, cancelamentos e afins.</p>
+          </div>
+          <ChevronRight className="size-4 shrink-0 text-gold-600" />
+        </button>
+      )}
+
+      {/* Agora — visão de um glance */}
+      <Card className="flex items-stretch divide-x divide-border p-0">
+        <Stat icon={<Radio className="size-5" />} value={health.live_now} label="Ao vivo" accent="flame" />
+        <Stat icon={<CalendarClock className="size-5" />} value={health.next_24h} label="Próx. 24h" accent="ink" />
+        <Stat icon={<Users2 className="size-5" />} value={health.active_sessions} label="Online" accent="brand" />
+      </Card>
+
+      {/* Sincronização */}
+      <section className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-bold uppercase tracking-wide text-ink-400">Sincronização</h2>
+          <Button size="sm" variant="ghost" loading={syncNow.isPending} onClick={syncAll}>
+            <RefreshCw className="size-4" /> Sincronizar tudo
+          </Button>
+        </div>
+        <Card className="divide-y divide-border p-0">
+          {health.competitions.length === 0 ? (
+            <p className="px-4 py-6 text-center text-sm text-ink-400">Nenhuma competição ativa.</p>
+          ) : (
+            health.competitions.map((c) => <SyncRow key={c.id} comp={c} />)
+          )}
+        </Card>
+      </section>
+
+      <MaintenanceCard on={health.maintenance_mode} />
+
+      <AuditCard />
+    </div>
+  );
+}
+
+function SyncRow({ comp }: { comp: CompHealth }) {
+  const setSync = useSetCompetitionSync();
+  const syncNow = useSyncNow();
+  const { toast } = useToast();
+
+  const dot =
+    comp.last_sync_ok === true
+      ? "bg-grass-500"
+      : comp.last_sync_ok === false
+        ? "bg-flame-500"
+        : "bg-ink-300";
+
+  async function syncOne() {
+    try {
+      await syncNow.mutateAsync({ competitionId: comp.id, mode: "catalog" });
+      toast(`${comp.name} sincronizada.`, "success");
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Erro.", "error");
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-3 px-3.5 py-3">
+      <span className={cn("size-2.5 shrink-0 rounded-full", dot)} title="Status do último sync" />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold text-ink-900">{comp.name}</p>
+        <p className="truncate text-xs text-ink-400">
+          {comp.provider}
+          {comp.last_synced_at ? ` · sync ${fromNow(comp.last_synced_at)}` : " · nunca sincronizou"}
+        </p>
+        {comp.last_sync_ok === false && comp.last_sync_error && (
+          <p className="mt-0.5 line-clamp-2 text-xs font-medium text-flame-600">{comp.last_sync_error}</p>
+        )}
+      </div>
+      <Button
+        size="icon"
+        variant="ghost"
+        aria-label={`Sincronizar ${comp.name}`}
+        loading={syncNow.isPending}
+        onClick={syncOne}
+      >
+        <RefreshCw className="size-4" />
+      </Button>
+      <Switch
+        on={comp.sync_enabled}
+        disabled={setSync.isPending}
+        label={`Sync automático de ${comp.name}`}
+        onChange={(v) =>
+          setSync.mutate(
+            { id: comp.id, value: v },
+            { onSuccess: () => toast(v ? "Sync ligado." : "Sync pausado.", "info") },
+          )
+        }
+      />
+    </div>
+  );
+}
+
+function MaintenanceCard({ on }: { on: boolean }) {
+  const setMaint = useSetMaintenance();
+  const { toast } = useToast();
+  const [msg, setMsg] = useState("");
+
+  return (
+    <section className="space-y-2">
+      <h2 className="text-xs font-bold uppercase tracking-wide text-ink-400">Manutenção</h2>
+      <Card className="space-y-3 p-4">
+        <div className="flex items-center gap-3">
+          <Wrench className={cn("size-5 shrink-0", on ? "text-flame-600" : "text-ink-400")} />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-ink-900">Modo manutenção</p>
+            <p className="text-xs text-ink-400">
+              {on ? "Banner de aviso ativo pra todo mundo." : "Mostra um aviso global no app."}
+            </p>
+          </div>
+          <Switch
+            on={on}
+            disabled={setMaint.isPending}
+            label="Modo manutenção"
+            onChange={(v) =>
+              setMaint.mutate(
+                { on: v, message: v ? msg.trim() || undefined : undefined },
+                { onSuccess: () => toast(v ? "Manutenção ligada." : "Manutenção desligada.", "info") },
+              )
+            }
+          />
+        </div>
+        {!on && (
+          <input
+            value={msg}
+            onChange={(e) => setMsg(e.target.value)}
+            maxLength={140}
+            placeholder="Mensagem (opcional): ex.: Voltamos já, atualizando os jogos."
+            className="h-10 w-full rounded-md border border-ink-200 bg-surface px-3 text-sm outline-none focus:border-brand-500"
+          />
+        )}
+      </Card>
+    </section>
+  );
+}
+
+function actionLabel(action: string): string {
+  const map: Record<string, string> = {
+    alert_approve: "aprovou um alerta",
+    alert_reject: "recusou um alerta",
+    competition_sync_toggle: "alterou o sync de uma competição",
+    maintenance_toggle: "alterou a manutenção",
+    match_reopen: "reabriu palpites de um jogo",
+  };
+  return map[action] ?? action;
+}
+
+function AuditCard() {
+  const [open, setOpen] = useState(false);
+  const { data, isLoading } = useRecentAudit();
+
+  return (
+    <section className="space-y-2">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center gap-2 text-xs font-bold uppercase tracking-wide text-ink-400"
+      >
+        <History className="size-3.5" /> Atividade recente
+        {open ? <ChevronDown className="size-3.5" /> : <ChevronRight className="size-3.5" />}
+      </button>
+      {open && (
+        <Card className="divide-y divide-border p-0">
+          {isLoading ? (
+            <Skeleton className="m-3 h-16" />
+          ) : !data || data.length === 0 ? (
+            <p className="px-4 py-5 text-center text-sm text-ink-400">Nada por aqui ainda.</p>
+          ) : (
+            data.slice(0, 20).map((e) => (
+              <div key={e.id} className="flex items-baseline justify-between gap-3 px-3.5 py-2 text-sm">
+                <span className="min-w-0 flex-1 truncate text-ink-700">
+                  <span className="font-semibold text-ink-900">{e.actor_name}</span> {actionLabel(e.action)}
+                </span>
+                <span className="shrink-0 text-xs text-ink-400">{fromNow(e.created_at)}</span>
+              </div>
+            ))
+          )}
+        </Card>
+      )}
+    </section>
+  );
+}
