@@ -7,6 +7,8 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { dayjs } from "@/lib/format";
+import { useAuth } from "@/features/auth/AuthProvider";
+import { UserModerationPanel } from "@/features/admin/UserModerationPanel";
 import { usePlayerProfile } from "./api";
 
 function Stat({ value, label, accent }: { value: string | number; label: string; accent?: string }) {
@@ -35,7 +37,9 @@ export function PlayerProfilePage() {
       : "") ||
     undefined;
   const navigate = useNavigate();
+  const { user, isAppAdmin } = useAuth();
   const { data: player, isLoading } = usePlayerProfile(id);
+  const canModerate = isAppAdmin && !!id && id !== user?.id;
 
   return (
     <Page
@@ -120,6 +124,14 @@ export function PlayerProfilePage() {
                 ))}
               </Card>
             </div>
+          )}
+
+          {canModerate && id && (
+            <UserModerationPanel
+              userId={id}
+              userName={player.display_name}
+              onDeleted={() => navigate("/admin?t=usuarios")}
+            />
           )}
         </div>
       )}

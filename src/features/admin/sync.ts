@@ -205,6 +205,58 @@ export function useRecentAudit() {
   });
 }
 
+// ---------------------------------------------------------------------------
+// Moderação de usuário (só app-admin; 3 níveis). Ver migration 20260604000007.
+// ---------------------------------------------------------------------------
+export type UserModeration = {
+  suspended: boolean;
+  usage_seconds: number;
+  last_active_at: string | null;
+  is_online: boolean;
+};
+
+export function useUserModeration(userId: string | undefined, enabled: boolean) {
+  return useQuery({
+    enabled: enabled && !!userId,
+    queryKey: ["admin", "user-moderation", userId],
+    queryFn: async (): Promise<UserModeration> => {
+      const { data, error } = await supabase.rpc("admin_user_moderation", { p_user_id: userId! });
+      if (error) throw new Error(error.message);
+      return data as unknown as UserModeration;
+    },
+  });
+}
+
+export function useSuspendUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { userId: string; suspended: boolean }) => {
+      const { error } = await supabase.rpc("admin_set_user_suspended", {
+        p_user_id: input.userId,
+        p_suspended: input.suspended,
+      });
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: ["admin", "user-moderation", v.userId] });
+      qc.invalidateQueries({ queryKey: ["admin", "profiles"] });
+    },
+  });
+}
+
+export function useDeleteUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { userId: string; blockEmail: boolean; reason?: string }) => {
+      const { error } = input.blockEmail
+        ? await supabase.rpc("admin_block_email", { p_user_id: input.userId, p_reason: input.reason })
+        : await supabase.rpc("admin_delete_user", { p_user_id: input.userId });
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "profiles"] }),
+  });
+}
+
 // Sincroniza agora (botão manual): mode catalog (= completo) ou scores.
 export function useSyncNow() {
   const qc = useQueryClient();

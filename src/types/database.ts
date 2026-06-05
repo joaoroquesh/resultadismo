@@ -174,6 +174,35 @@ export type Database = {
         }
         Relationships: []
       }
+      blocked_emails: {
+        Row: {
+          blocked_by: string | null
+          created_at: string
+          email: string
+          reason: string | null
+        }
+        Insert: {
+          blocked_by?: string | null
+          created_at?: string
+          email: string
+          reason?: string | null
+        }
+        Update: {
+          blocked_by?: string | null
+          created_at?: string
+          email?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blocked_emails_blocked_by_fkey"
+            columns: ["blocked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       competitions: {
         Row: {
           area: string | null
@@ -961,7 +990,9 @@ export type Database = {
           favorite_team: string | null
           id: string
           is_app_admin: boolean
+          last_active_at: string | null
           updated_at: string
+          usage_seconds: number
         }
         Insert: {
           avatar_url?: string | null
@@ -970,7 +1001,9 @@ export type Database = {
           favorite_team?: string | null
           id: string
           is_app_admin?: boolean
+          last_active_at?: string | null
           updated_at?: string
+          usage_seconds?: number
         }
         Update: {
           avatar_url?: string | null
@@ -979,7 +1012,9 @@ export type Database = {
           favorite_team?: string | null
           id?: string
           is_app_admin?: boolean
+          last_active_at?: string | null
           updated_at?: string
+          usage_seconds?: number
         }
         Relationships: []
       }
@@ -1154,6 +1189,10 @@ export type Database = {
         Args: { p_league_id: string }
         Returns: undefined
       }
+      admin_block_email: {
+        Args: { p_reason?: string; p_user_id: string }
+        Returns: undefined
+      }
       admin_comp_league: {
         Args: { p_league_id: string }
         Returns: {
@@ -1186,6 +1225,7 @@ export type Database = {
         }
       }
       admin_delete_competition: { Args: { p_id: string }; Returns: undefined }
+      admin_delete_user: { Args: { p_user_id: string }; Returns: undefined }
       admin_list_deleted_leagues: {
         Args: never
         Returns: {
@@ -1221,6 +1261,9 @@ export type Database = {
           email: string
           id: string
           is_app_admin: boolean
+          is_online: boolean
+          last_active_at: string
+          usage_seconds: number
         }[]
       }
       admin_recent_audit: {
@@ -1299,6 +1342,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_set_user_suspended: {
+        Args: { p_suspended: boolean; p_user_id: string }
+        Returns: undefined
+      }
       admin_soft_delete_league: {
         Args: { p_league_id: string }
         Returns: undefined
@@ -1334,6 +1381,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_user_moderation: { Args: { p_user_id: string }; Returns: Json }
       advance_confronto_cup: { Args: { p_lc_id: string }; Returns: number }
       append_confronto_ties: {
         Args: { p_lc_id: string; p_ties: Json }

@@ -229,6 +229,9 @@ export type AdminUser = {
   is_app_admin: boolean;
   email: string | null;
   created_at: string;
+  is_online: boolean;
+  usage_seconds: number;
+  last_active_at: string | null;
 };
 
 export function useAllProfiles() {
