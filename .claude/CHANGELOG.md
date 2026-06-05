@@ -28,6 +28,28 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   `RequireAuth` e `AuthCallback` redirecionam pra `/`; CTAs "Entrar para palpitar"/"Entrar e jogar"
   abrem o modal. `LoginPage.tsx` excluído.
 
+### Admin v2 (em validação — worktree `feat/admin-v2`, migrations `20260604000004`–`000007`)
+- **Corrigido — toggle (Switch) do admin** com aparência invertida (translate arbitrário não
+  animava); reescrito com `inline-flex` + classes padrão.
+- **Corrigido — "jogo oculto não existe" também no "ao vivo":** `should_sync_scores()` e o
+  `live_now` do dashboard ignoram `matches.hidden`.
+- **Visão (dashboard) mais completa:** "Hoje" no lugar de "Próx. 24h"; banner de **grupos
+  aguardando aprovação**; **alerta de pico** de online; atividade recente com **nome da entidade**;
+  alertas com **competição + provedor (API)**.
+- **Configurações editáveis no painel:** limiar do alerta de online + sala de espera (ligar/desligar
+  + limite de simultâneos) — antes hardcoded/só-SQL (`app_settings.online_alert_threshold`; RPCs
+  `admin_set_online_threshold` / `admin_update_access`).
+- **Usuários:** busca + **ordenação** (nome/recentes/antigos/mais uso), **online** (só admin),
+  **tempo de uso** acumulado por heartbeat (`profiles.usage_seconds`), data de entrada, **clique →
+  perfil**.
+- **Grupos:** ordenação + **data de criação** na lista.
+- **Moderação de usuário (3 níveis, só app-admin, dupla verificação)** no perfil: **suspender**
+  (reversível), **excluir** (e-mail recadastra), **excluir + bloquear e-mail**. Guard
+  `private.assert_can_moderate`; `blocked_emails` + `handle_new_user` rejeita.
+- **Competições:** catálogo **ESPN no cliente** (corrige o "Erro ao buscar catálogo"); jogos por
+  competição em **acordeão** por data (só hoje aberto).
+- _Pendente p/ depois (a pedido): tagueamento de eventos no Google Analytics._
+
 ---
 
 ## [2.6.2] — 2026-06-05
