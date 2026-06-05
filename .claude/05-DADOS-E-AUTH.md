@@ -23,7 +23,7 @@
 
 | Tabela | Para que serve | Colunas/relacionamentos importantes |
 |---|---|---|
-| `profiles` | Perfil público do jogador (espelha `auth.users`) | `id`(=auth.users), `display_name`, `avatar_url` (escudo `crest:…`), `favorite_team`, **`is_app_admin`**. Sem `email`. |
+| `profiles` | Perfil público do jogador (espelha `auth.users`) | `id`(=auth.users), `display_name`, `avatar_url` (escudo `crest:…`), `favorite_team`, **`is_app_admin`**, **`notif_prefs`** (jsonb `deadline`/`nudge`/`broadcast`, default tudo on), `last_active_at` (presença). Sem `email`. |
 | `competitions` | Campeonatos reais sincronizados | `name`, `slug`, `type` (LEAGUE/CUP), `provider` (manual/football_data/espn/thesportsdb), `provider_code` (ex.: WC, BSA), `is_published`, `display_name`, `sync_enabled`, **`catalog_seeded`** (1ª sync já feita), **`last_sync_ok`/`last_sync_error`/`last_sync_checked_at`** (saúde), datas, limite de dobros |
 | `teams` | Times | `name`, `tla`, `crest_url`/`local_crest`, `country`, `provider_ref` |
 | `matches` | Jogos reais | `competition_id`, times, `kickoff_at`, `status` (scheduled/live/finished/…), `home_score`/`away_score`, pênaltis (informativo), **`hidden`** (curadoria) |
@@ -34,8 +34,9 @@
 | `cup_ties` | Confronto A×B (Liga/Copa) | `league_competition_id`, `round_order`/`round_label`/`slot`, `member_a`/`member_b`, `points_a`/`points_b`, `winner_id`, `matchday`, `period_kind`/`period_value`, `walkover_user` |
 | `confronto_participants` | Snapshot de quem entrou no sorteio | `league_competition_id`,`user_id`,`seed` |
 | `confronto_optins` | Inscrições (modo opt-in) | `league_competition_id`,`user_id` (válidas só em `draft`) |
-| `notifications` | Notificações in-app | `user_id`, `type` (nudge/deadline/result/…), `title`/`body`/`data`, `read_at` |
+| `notifications` | Notificações in-app | `user_id`, `type` (nudge/deadline/**broadcast**/**admin_alert**/result/…), `title`/`body`/`data`, `read_at` |
 | `push_subscriptions` | Inscrições de Web Push | `user_id`, `endpoint` (único), `p256dh`, `auth` |
+| `notification_broadcasts` | Histórico dos avisos em massa do admin — **2.8.0** | `title`/`body`/`url`, `segment`, `segment_league_id`/`segment_lc_id`/`segment_top_n`, `sent_count`, `created_by`. **RLS ligado sem policy** — acesso só via `admin_list_broadcasts`. |
 | `app_settings` | **Singleton (id=1)** de config global | `payment_mode`, `league_price_cents`, `promo_price_cents`/`promo_until`, prefixos de nome, **`maintenance_mode`/`maintenance_message`** |
 | `sync_alerts` | Fila de decisões do admin sobre o catálogo — **2.5.0** | `competition_id`, `match_id`, `provider_ref`, `kind` (new_match/cancelled/api_error = acionável; team_resolved/kickoff_changed = informativo), `status` (pending/approved/rejected/applied), `payload`. Sem acesso de cliente; só RPCs `admin_*`. |
 | `admin_audit_log` | Histórico de ações sync/admin — **2.5.0** | `actor` (null = sistema/cron), `action`, `entity_type`/`entity_id`, `detail` |
@@ -100,6 +101,17 @@ Padrão geral: **app-admin sempre pode**; o resto depende de propriedade/papel/v
 **Acesso/notificação**: `request_access`/`heartbeat_access`/`release_access` (fila, **só RPC, nunca
 Realtime**); `nudge_member` (cutucar, anti-spam 30 min).
 
+**Notificações (2.8.0)**
+- `get_notification_prefs()` / `set_notification_pref(type, enabled)` — preferências por usuário
+  (`deadline`/`nudge`/`broadcast`), self via `auth.uid()`. `get_unread_count()` — badge do sininho.
+- `admin_broadcast_preview(segment, arg)` / `admin_send_broadcast(title, body, url, segment, arg)` /
+  `admin_list_broadcasts(limit)` / `admin_list_group_targets()` — avisos em massa, gate
+  `is_app_admin()`. → [`04`](04-ADMIN.md). Segmentos: all/no_prediction/online/group/group_top.
+- **Internas** (`execute` revogado de todos; só rodam via outras funções/triggers):
+  `wants_notification(user, type)` (admin_alert ignora prefs), `private.broadcast_recipients(segment,
+  arg)` (cada segmento já filtra quem desligou avisos), `fan_notify_admins(...)` (alerta pros
+  app-admins com dedupe 6h). `create_deadline_reminders` e `nudge_for_match` respeitam a preferência.
+
 ## 5. Triggers e cron
 
 **Triggers-chave**
@@ -114,6 +126,15 @@ Realtime**); `nudge_member` (cutucar, anti-spam 30 min).
   `profiles_guard`, `enforce_joker_limit` (com `pg_advisory_xact_lock` desde 2.1.0 — sem corrida no
   limite 2/semana), `league_payments_count_discount` (conta o cupom de forma **atômica**, não estoura
   `max_uses`).
+
+- **Alertas pro admin (2.8.0)**: `notify_admins_sync_alert` (AFTER INSERT em `sync_alerts` `pending`)
+  e `notify_admins_name_review` (AFTER INSERT/UPDATE de `name_approved` em `leagues`, dispara só com
+  `name_approved=false AND status='active'` — não em `pending`, senão spammaria todo grupo recém-
+  criado). Ambos chamam `fan_notify_admins` e são **fail-safe** (`exception when others then return
+  new`): nunca quebram a escrita-base.
+- `notifications_send_push` (AFTER INSERT em `notifications`): empurra o Web Push de cada notificação
+  (lê `private.sync_config`; no-op se não configurado). É o que faz broadcast/cutucada/prazo virar
+  push no celular.
 
 **Cron (pg_cron)**
 - `run_football_sync(mode)` — dispara a Edge Function `sync-football`. **2.5.0**: `scores` a cada

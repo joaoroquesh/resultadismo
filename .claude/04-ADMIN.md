@@ -24,7 +24,7 @@
 
 **Dashboard-first**, navegação por **abas na URL** (`?t=`) — rolável (não espreme no mobile);
 voltar de "ver jogos" cai na aba certa. Abas: **Visão · Alertas · Grupos · Competições · Usuários ·
-Pagamento**. Todas as ações chamam RPCs que **revalidam `is_app_admin()` no banco** — o guard de UI
+Pagamento · Avisos**. Todas as ações chamam RPCs que **revalidam `is_app_admin()` no banco** — o guard de UI
 é conveniência, não segurança.
 
 ### Aba **Visão** (`AdminDashboard`) — saúde do sistema
@@ -78,6 +78,20 @@ Pagamento**. Todas as ações chamam RPCs que **revalidam `is_app_admin()` no ba
 - **Cupons de desconto**: criar/ativar/excluir (`discount_codes`).
 - **Cortesia**: liberar um grupo de graça (`admin_comp_league`).
 
+### Aba **Avisos** (`BroadcastPanel`) — notificações em massa
+- **Compositor**: título (obrigatório), mensagem e link opcionais; **pré-visualização de alcance**
+  (debounce 400ms via `admin_broadcast_preview`) antes de enviar. Botão **Enviar** só libera com
+  título e alcance > 0 (o motivo do bloqueio aparece ao lado quando só falta o título).
+- **Segmentos** (`admin_send_broadcast`): **todo mundo**, **não palpitou hoje** (tem jogo de hoje
+  numa federação ativa e ainda não palpitou), **online agora** (presença < 90s), **um grupo**
+  (membros de uma federação) e **topo de um grupo** (os N primeiros — 1 a 50 — da classificação de
+  uma competição). Os selects de grupo/competição vêm de `admin_list_group_targets`.
+- Todo segmento **desconta quem desligou avisos** (`profiles.notif_prefs.broadcast`). Disparo
+  grande (> 50 pessoas) pede **confirmação dupla** (`ConfirmDialog tone="warn"`).
+- **Histórico** (`admin_list_broadcasts`): o que já foi enviado, com segmento, alcance e autor.
+- O envio insere 1 notificação por destinatário (o trigger `notifications_send_push` empurra o push
+  de cada uma) e **audita** em `admin_audit_log` (`broadcast_send`).
+
 ### Tela de jogos por competição (`/admin/competicoes/:id/jogos` — `AdminCompMatchesPage`)
 - Curadoria por jogo: ocultar/mostrar (`matches.hidden`, RPC/`useSetMatchHidden`) e **override
   manual** de placar/status. Separada da tela de palpites.
@@ -113,6 +127,9 @@ Quem é `owner`/`admin` de um grupo pode:
 | `admin_set_confronto_enabled(league_id, value)` | Destrava Liga/Copa por grupo | `is_app_admin()` |
 | `admin_update_payment_settings(mode, price)` / `admin_set_promo(...)` / `admin_comp_league(id)` | Pagamento/promo/cortesia | `is_app_admin()` |
 | `draw_confronto` / `undo_confronto_draw` | Sorteio do confronto | `is_league_admin()` ou `is_app_admin()` |
+| `admin_broadcast_preview(segment, arg)` | Conta o alcance de um aviso | `is_app_admin()` |
+| `admin_send_broadcast(title, body, url, segment, arg)` | Dispara o aviso + grava histórico + audita | `is_app_admin()` |
+| `admin_list_broadcasts(limit)` / `admin_list_group_targets()` | Histórico de avisos / alvos de grupo | `is_app_admin()` |
 
 > Os nomes/assinaturas exatos estão nas migrations de cada feature em
 > [`supabase/migrations/`](../supabase/migrations/). A migration é a fonte de verdade.

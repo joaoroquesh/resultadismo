@@ -9,11 +9,13 @@ import { CompeticoesAdmin } from "./CompeticoesAdmin";
 import { UsuariosAdmin } from "./UsuariosAdmin";
 import { AdminDashboard } from "./AdminDashboard";
 import { SyncAlertsPanel } from "./SyncAlertsPanel";
+import { BroadcastPanel } from "./BroadcastPanel";
 import { useSystemHealth } from "./sync";
 
 const NAV = [
   { key: "visao", label: "Visão" },
   { key: "alertas", label: "Alertas" },
+  { key: "avisos", label: "Avisos" },
   { key: "grupos", label: "Grupos" },
   { key: "competicoes", label: "Competições" },
   { key: "usuarios", label: "Usuários" },
@@ -79,6 +81,7 @@ export function AdminPage() {
 
       {tab === "visao" && <AdminDashboard onNavigate={(t) => setTab(t as TabKey)} />}
       {tab === "alertas" && <SyncAlertsPanel />}
+      {tab === "avisos" && <BroadcastPanel />}
       {tab === "grupos" && <LigasAdmin />}
       {tab === "competicoes" && <CompeticoesAdmin />}
       {tab === "usuarios" && <UsuariosAdmin />}

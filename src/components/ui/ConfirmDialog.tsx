@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Megaphone } from "lucide-react";
 import { Button } from "./Button";
 
 /**
@@ -13,6 +13,7 @@ export function ConfirmDialog({
   step2Message = "Confirme novamente para concluir. Esta ação é importante.",
   confirmLabel = "Confirmar",
   loading = false,
+  tone = "danger",
   onConfirm,
   onCancel,
 }: {
@@ -22,6 +23,8 @@ export function ConfirmDialog({
   step2Message?: string;
   confirmLabel?: string;
   loading?: boolean;
+  /** "danger" (destrutivo, flame) ou "warn" (alto impacto não-destrutivo, brand). */
+  tone?: "danger" | "warn";
   onConfirm: () => void;
   onCancel: () => void;
 }) {
@@ -46,8 +49,14 @@ export function ConfirmDialog({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-3 flex items-start gap-3">
-          <div className="grid size-10 shrink-0 place-items-center rounded-md bg-flame-500/10 text-flame-600">
-            <AlertTriangle className="size-5" />
+          <div
+            className={
+              tone === "warn"
+                ? "grid size-10 shrink-0 place-items-center rounded-md bg-brand-500/10 text-brand-600"
+                : "grid size-10 shrink-0 place-items-center rounded-md bg-flame-500/10 text-flame-600"
+            }
+          >
+            {tone === "warn" ? <Megaphone className="size-5" /> : <AlertTriangle className="size-5" />}
           </div>
           <div className="min-w-0">
             <h3 className="text-base font-bold text-ink-900">{title}</h3>
@@ -61,7 +70,7 @@ export function ConfirmDialog({
               <Button variant="ghost" size="sm" onClick={onCancel}>
                 Cancelar
               </Button>
-              <Button variant="danger" size="sm" onClick={() => setStep(2)}>
+              <Button variant={tone === "warn" ? "primary" : "danger"} size="sm" onClick={() => setStep(2)}>
                 Continuar
               </Button>
             </>
@@ -70,7 +79,7 @@ export function ConfirmDialog({
               <Button variant="ghost" size="sm" onClick={() => setStep(1)} disabled={loading}>
                 Voltar
               </Button>
-              <Button variant="danger" size="sm" loading={loading} onClick={onConfirm}>
+              <Button variant={tone === "warn" ? "primary" : "danger"} size="sm" loading={loading} onClick={onConfirm}>
                 {confirmLabel}
               </Button>
             </>

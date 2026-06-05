@@ -34,16 +34,30 @@ self.addEventListener("push", (event) => {
   );
 });
 
+// Zera o badge do ícone (App Badging API). Feature-detect + try/catch porque
+// nem todo browser/SW expõe o método. No-op fora do PWA instalado.
+function clearAppBadge(): void {
+  try {
+    const nav = self.navigator as Navigator & { clearAppBadge?: () => Promise<void> };
+    void nav.clearAppBadge?.().catch(() => {});
+  } catch {
+    /* ignore */
+  }
+}
+
 // Clique na notificação: foca/abre o app
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   const url = (event.notification.data as { url?: string })?.url ?? "/";
   event.waitUntil(
-    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
-      for (const client of clients) {
-        if ("focus" in client) return (client as WindowClient).focus();
-      }
-      return self.clients.openWindow(url);
-    }),
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((clients) => {
+        for (const client of clients) {
+          if ("focus" in client) return (client as WindowClient).focus();
+        }
+        return self.clients.openWindow(url);
+      })
+      .finally(() => clearAppBadge()),
   );
 });

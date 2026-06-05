@@ -20,6 +20,52 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ---
 
+## [2.8.0] — 2026-06-05
+
+### Adicionado
+- **Central de avisos do admin (`Admin → Avisos`).** Disparo de notificação (in-app + push) por
+  segmento, com pré-visualização de alcance antes de mandar e histórico do que já foi enviado.
+  Segmentos: **todo mundo**, **não palpitou hoje** (tem jogo de hoje numa federação ativa e ainda
+  não palpitou), **online agora** (presença < 90s), **um grupo** (membros de uma federação) e
+  **topo de um grupo** (os N primeiros da classificação de uma competição, N de 1 a 50). Todo
+  segmento já **desconta quem desligou avisos**. Disparo grande (> 50 pessoas) pede confirmação
+  dupla. Backend: `admin_broadcast_preview`, `admin_send_broadcast` (grava em
+  `notification_broadcasts`, insere 1 notificação por destinatário, audita em `admin_audit_log`),
+  `admin_list_broadcasts`, `admin_list_group_targets` — todas com gate `is_app_admin()`.
+- **Preferências de notificação por usuário (`Perfil → Notificações`).** Cada pessoa liga/desliga
+  **lembretes de prazo**, **cutucadas** e **avisos do app**, valendo para a conta toda (in-app +
+  push). Coluna `profiles.notif_prefs` (default tudo ligado); RPCs `get_notification_prefs` e
+  `set_notification_pref`. Alertas operacionais do admin **não** respeitam preferência.
+- **Alertas para o admin.** Notificação automática quando entra um **alerta de sincronização
+  pendente** e quando uma **federação ativa fica com nome pendente de revisão**, com dedupe de 6h
+  (`fan_notify_admins` + triggers em `sync_alerts` e `leagues`). Os triggers são fail-safe
+  (`exception when others then return new`): nunca quebram a escrita-base.
+- **Badge no ícone do app (PWA).** O número de não lidas aparece no ícone instalado via
+  `navigator.setAppBadge` (no-op no navegador), zerado ao abrir as notificações. Nova RPC
+  `get_unread_count`.
+- **Dica de push no iOS.** No iOS fora do PWA instalado, um aviso curto explica que push só funciona
+  com o app na tela de início (limitação do iOS 16.4+).
+
+### Corrigido
+- **Dropdown do sininho cortava no desktop.** O menu de notificações abre para a esquerda no mobile
+  (sino no header, à direita) e para a direita no desktop (sino na sidebar, à esquerda), em vez de
+  sair da tela.
+
+### Segurança
+- Funções internas (`wants_notification`, `private.broadcast_recipients`, `fan_notify_admins`) têm
+  `execute` revogado de `public`/`anon`/`authenticated` — só rodam via outras funções/triggers. As
+  chamáveis pelo cliente são `SECURITY DEFINER` com `search_path=''` e gate explícito
+  (`is_app_admin()` para as de admin, `auth.uid()` para as de preferência). A tabela
+  `notification_broadcasts` tem RLS ligado **sem policy** (leitura só via `admin_list_broadcasts`).
+- **`notif_prefs` blindado contra escrita maliciosa.** Como a coluna é gravável direto via RLS, um
+  usuário poderia gravar lixo (ex.: `broadcast: "maybe"`) e quebrar o cast em `wants_notification`,
+  derrubando todo o broadcast do admin. Fechado em duas camadas: CHECK `profiles_notif_prefs_valid`
+  (objeto com chaves booleanas) na escrita + cast tolerante (`jsonb_typeof` antes do `::boolean`,
+  default `true`) na leitura. O trigger de revisão de nome só dispara em transição real de
+  `name_approved` (não em qualquer edição de grupo).
+
+---
+
 ## [2.7.5] — 2026-06-05
 
 ### Alterado

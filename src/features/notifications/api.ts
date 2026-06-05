@@ -32,6 +32,23 @@ export function useNotifications() {
   });
 }
 
+/**
+ * Total real de não lidas (o badge do app). A lista de notificações é limitada
+ * a 30; esta RPC conta TODAS sem teto, pra reconciliar o número ao abrir o app.
+ */
+export function useUnreadCount() {
+  const { user } = useAuth();
+  return useQuery({
+    enabled: !!user,
+    queryKey: ["notifications-unread", user?.id],
+    queryFn: async (): Promise<number> => {
+      const { data, error } = await supabase.rpc("get_unread_count");
+      if (error) throw error;
+      return (data ?? 0) as number;
+    },
+  });
+}
+
 export function useMarkAllRead() {
   const { user } = useAuth();
   const qc = useQueryClient();
@@ -43,7 +60,10 @@ export function useMarkAllRead() {
         .is("read_at", null);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["notifications", user?.id] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["notifications", user?.id] });
+      qc.invalidateQueries({ queryKey: ["notifications-unread", user?.id] });
+    },
   });
 }
 
@@ -73,10 +93,10 @@ export function useNotificationsRealtime() {
     let timer: ReturnType<typeof setTimeout> | undefined;
     const invalidate = () => {
       if (timer) clearTimeout(timer);
-      timer = setTimeout(
-        () => qc.invalidateQueries({ queryKey: ["notifications", user.id] }),
-        800,
-      );
+      timer = setTimeout(() => {
+        qc.invalidateQueries({ queryKey: ["notifications", user.id] });
+        qc.invalidateQueries({ queryKey: ["notifications-unread", user.id] });
+      }, 800);
     };
     const channel = supabase
       .channel(`notifications-${user.id}-${Math.random().toString(36).slice(2)}`)

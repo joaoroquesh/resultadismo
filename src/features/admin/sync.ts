@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import type { Json } from "@/types/database";
 
 // ---------------------------------------------------------------------------
 // Tipos (espelham os jsonb/tabelas das RPCs de admin de sincronização)
@@ -255,6 +256,104 @@ export function useDeleteUser() {
       if (error) throw new Error(error.message);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "profiles"] }),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Avisos (broadcasts) — disparo de notificação por segmento. Ver migration
+// 20260605000002_notifications_overhaul. Cada segmento já desconta quem
+// desativou avisos; o gate de admin mora nas RPCs.
+// ---------------------------------------------------------------------------
+export type SegmentKey = "all" | "no_prediction" | "online" | "group" | "group_top";
+
+// Alvos pros selects de 'group' / 'group_top' (federações + competições ativas)
+export type GroupTarget = {
+  league_id: string;
+  lc_id: string;
+  league_name: string;
+  competition_name: string;
+};
+
+export type Broadcast = {
+  id: string;
+  title: string;
+  body: string | null;
+  url: string;
+  segment: string;
+  segment_label: string | null;
+  sent_count: number | null;
+  author_name: string;
+  created_at: string;
+};
+
+export function useGroupTargets() {
+  return useQuery({
+    queryKey: ["admin", "group-targets"],
+    staleTime: 60_000,
+    queryFn: async (): Promise<GroupTarget[]> => {
+      const { data, error } = await supabase.rpc("admin_list_group_targets");
+      if (error) throw new Error(error.message);
+      return (data ?? []) as GroupTarget[];
+    },
+  });
+}
+
+// Quanta gente recebe esse aviso (debounce fica no componente). Habilitável
+// para não chamar a RPC antes de o segmento/argumento estarem prontos.
+export function useBroadcastPreview(
+  segment: SegmentKey,
+  arg: Record<string, unknown>,
+  enabled: boolean,
+) {
+  return useQuery({
+    enabled,
+    queryKey: ["admin", "broadcast-preview", segment, arg],
+    queryFn: async (): Promise<number> => {
+      const { data, error } = await supabase.rpc("admin_broadcast_preview", {
+        p_segment: segment,
+        p_arg: arg as Json,
+      });
+      if (error) throw new Error(error.message);
+      return (data ?? 0) as number;
+    },
+  });
+}
+
+export function useSendBroadcast() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      title: string;
+      body: string;
+      url: string;
+      segment: SegmentKey;
+      arg: Record<string, unknown>;
+    }): Promise<number> => {
+      const { data, error } = await supabase.rpc("admin_send_broadcast", {
+        p_title: input.title,
+        p_body: input.body,
+        p_url: input.url,
+        p_segment: input.segment,
+        p_arg: input.arg as Json,
+      });
+      if (error) throw new Error(error.message);
+      return (data ?? 0) as number;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "broadcasts"] });
+    },
+  });
+}
+
+export function useBroadcasts() {
+  return useQuery({
+    queryKey: ["admin", "broadcasts"],
+    refetchInterval: 30_000,
+    queryFn: async (): Promise<Broadcast[]> => {
+      const { data, error } = await supabase.rpc("admin_list_broadcasts", { p_limit: 50 });
+      if (error) throw new Error(error.message);
+      return (data ?? []) as Broadcast[];
+    },
   });
 }
 

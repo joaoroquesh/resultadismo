@@ -1,16 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { fromNow } from "@/lib/format";
-import { useNotifications, useMarkAllRead, useNotificationsRealtime } from "./api";
+import {
+  useNotifications,
+  useUnreadCount,
+  useMarkAllRead,
+  useNotificationsRealtime,
+} from "./api";
+import { setBadge } from "./badge";
 
 export function NotificationsBell({ className }: { className?: string }) {
   const { data: notifications } = useNotifications();
+  const { data: unreadTotal } = useUnreadCount();
   const markRead = useMarkAllRead();
   useNotificationsRealtime();
   const [open, setOpen] = useState(false);
 
+  // Pra exibir, conta na lista local (capada em 30); pro badge do app, usa o
+  // total real do banco (get_unread_count) quando já carregou.
   const unread = (notifications ?? []).filter((n) => !n.read_at).length;
+  const badgeCount = unreadTotal ?? unread;
+
+  // Badge do ícone do app (só PWA instalado; no-op no navegador).
+  useEffect(() => {
+    setBadge(badgeCount);
+  }, [badgeCount]);
 
   function toggle() {
     const next = !open;

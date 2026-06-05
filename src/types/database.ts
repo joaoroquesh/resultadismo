@@ -884,6 +884,70 @@ export type Database = {
           },
         ]
       }
+      notification_broadcasts: {
+        Row: {
+          body: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          segment: string | null
+          segment_lc_id: string | null
+          segment_league_id: string | null
+          segment_top_n: number | null
+          sent_count: number | null
+          title: string | null
+          url: string | null
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          segment?: string | null
+          segment_lc_id?: string | null
+          segment_league_id?: string | null
+          segment_top_n?: number | null
+          sent_count?: number | null
+          title?: string | null
+          url?: string | null
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          segment?: string | null
+          segment_lc_id?: string | null
+          segment_league_id?: string | null
+          segment_top_n?: number | null
+          sent_count?: number | null
+          title?: string | null
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_broadcasts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_broadcasts_segment_lc_id_fkey"
+            columns: ["segment_lc_id"]
+            isOneToOne: false
+            referencedRelation: "league_competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_broadcasts_segment_league_id_fkey"
+            columns: ["segment_league_id"]
+            isOneToOne: false
+            referencedRelation: "leagues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           body: string | null
@@ -991,6 +1055,7 @@ export type Database = {
           id: string
           is_app_admin: boolean
           last_active_at: string | null
+          notif_prefs: Json
           updated_at: string
           usage_seconds: number
         }
@@ -1002,6 +1067,7 @@ export type Database = {
           id: string
           is_app_admin?: boolean
           last_active_at?: string | null
+          notif_prefs?: Json
           updated_at?: string
           usage_seconds?: number
         }
@@ -1013,6 +1079,7 @@ export type Database = {
           id?: string
           is_app_admin?: boolean
           last_active_at?: string | null
+          notif_prefs?: Json
           updated_at?: string
           usage_seconds?: number
         }
@@ -1193,6 +1260,10 @@ export type Database = {
         Args: { p_reason?: string; p_user_id: string }
         Returns: undefined
       }
+      admin_broadcast_preview: {
+        Args: { p_arg?: Json; p_segment: string }
+        Returns: number
+      }
       admin_comp_league: {
         Args: { p_league_id: string }
         Returns: {
@@ -1226,6 +1297,20 @@ export type Database = {
       }
       admin_delete_competition: { Args: { p_id: string }; Returns: undefined }
       admin_delete_user: { Args: { p_user_id: string }; Returns: undefined }
+      admin_list_broadcasts: {
+        Args: { p_limit?: number }
+        Returns: {
+          author_name: string
+          body: string
+          created_at: string
+          id: string
+          segment: string
+          segment_label: string
+          sent_count: number
+          title: string
+          url: string
+        }[]
+      }
       admin_list_deleted_leagues: {
         Args: never
         Returns: {
@@ -1234,6 +1319,15 @@ export type Database = {
           name: string
           owner_name: string
           slug: string
+        }[]
+      }
+      admin_list_group_targets: {
+        Args: never
+        Returns: {
+          competition_name: string
+          lc_id: string
+          league_id: string
+          league_name: string
         }[]
       }
       admin_list_sync_alerts: {
@@ -1294,6 +1388,16 @@ export type Database = {
       admin_restore_league: {
         Args: { p_league_id: string }
         Returns: undefined
+      }
+      admin_send_broadcast: {
+        Args: {
+          p_arg?: Json
+          p_body: string
+          p_segment: string
+          p_title: string
+          p_url: string
+        }
+        Returns: number
       }
       admin_set_competition_published: {
         Args: { p_id: string; p_value: boolean }
@@ -1446,6 +1550,16 @@ export type Database = {
         }
         Returns: undefined
       }
+      fan_notify_admins: {
+        Args: {
+          p_body: string
+          p_kind: string
+          p_ref: string
+          p_title: string
+          p_url: string
+        }
+        Returns: undefined
+      }
       gen_join_code: { Args: never; Returns: string }
       get_competition_periods: {
         Args: { p_competition_id: string; p_kind: string }
@@ -1542,6 +1656,7 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_notification_prefs: { Args: never; Returns: Json }
       get_player_profile: { Args: { p_user_id: string }; Returns: Json }
       get_tie_detail: {
         Args: { p_tie_id: string }
@@ -1565,6 +1680,7 @@ export type Database = {
           status: Database["public"]["Enums"]["match_status"]
         }[]
       }
+      get_unread_count: { Args: never; Returns: number }
       heartbeat_access: { Args: { p_token: string }; Returns: Json }
       is_app_admin: { Args: never; Returns: boolean }
       is_league_admin: { Args: { p_league_id: string }; Returns: boolean }
@@ -1675,8 +1791,11 @@ export type Database = {
         Args: { p_user_id: string; p_value: boolean }
         Returns: undefined
       }
+      set_notification_pref: {
+        Args: { p_enabled: boolean; p_type: string }
+        Returns: Json
+      }
       should_sync_scores: { Args: never; Returns: boolean }
-      touch_presence: { Args: never; Returns: undefined }
       simulate_league_payment: {
         Args: { p_discount_code?: string; p_league_id: string }
         Returns: {
@@ -1709,6 +1828,7 @@ export type Database = {
         }
       }
       toggle_confronto_optin: { Args: { p_lc_id: string }; Returns: boolean }
+      touch_presence: { Args: never; Returns: undefined }
       undo_confronto_draw: { Args: { p_lc_id: string }; Returns: undefined }
       update_group_info: {
         Args: { p_description: string; p_league_id: string; p_name: string }
@@ -1742,6 +1862,10 @@ export type Database = {
         }
       }
       validate_discount_code: { Args: { p_code: string }; Returns: Json }
+      wants_notification: {
+        Args: { p_type: string; p_user: string }
+        Returns: boolean
+      }
     }
     Enums: {
       data_provider: "manual" | "football_data" | "thesportsdb" | "espn"

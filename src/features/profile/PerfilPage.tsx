@@ -29,6 +29,8 @@ import {
   getPushState,
   type PushState,
 } from "@/features/notifications/push";
+import { NotifPrefsCard } from "@/features/notifications/NotifPrefsCard";
+import { IosPushHint } from "@/features/notifications/IosPushHint";
 import { useInstallState, promptInstall, isIOS } from "@/lib/pwa";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -264,13 +266,19 @@ export function PerfilPage() {
         </Card>
 
         {/* Notificações */}
-        <Card className="flex items-center justify-between gap-3 p-4">
-          <div className="min-w-0">
-            <p className="font-medium text-ink-900">Notificações</p>
-            <p className="text-xs text-ink-500">{notifHelp}</p>
-          </div>
-          {notifControl}
-        </Card>
+        <div className="space-y-2">
+          <Card className="flex items-center justify-between gap-3 p-4">
+            <div className="min-w-0">
+              <p className="font-medium text-ink-900">Notificações</p>
+              <p className="text-xs text-ink-500">{notifHelp}</p>
+            </div>
+            {notifControl}
+          </Card>
+          {/* iPhone: precisa instalar o app antes de poder receber push. */}
+          <IosPushHint subscribed={!!push?.subscribed} />
+          {/* Já inscrito: deixa escolher o que receber (vale pra conta toda). */}
+          {push?.subscribed && <NotifPrefsCard />}
+        </div>
 
         <Button variant="outline" fullWidth onClick={signOut}>
           <LogOut className="size-4" /> Sair
