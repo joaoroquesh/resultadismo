@@ -22,6 +22,20 @@ _Nada pendente._
 
 ---
 
+## [2.6.2] — 2026-06-05
+
+### Corrigido
+- **Jogo oculto também não notifica.** Complementa a ...028: o admin ocultar um jogo agora cobre
+  toda a superfície — lembrete "Não esquece de palpitar! ⏰" não é mais criado pra jogo oculto
+  (`create_deadline_reminders` ganhou `m.hidden = false`), cutucada de jogo oculto falha como
+  "Jogo não encontrado." (`nudge_for_match`), e os lembretes/cutucadas **antigos** de jogos que
+  foram ocultados depois somem da bell — leitura passa por uma RPC nova
+  `get_my_notifications(p_limit)` que filtra via `not exists` em `matches.hidden=true`.
+  É filtro de leitura, reversível: desocultar o jogo faz a notificação reaparecer.
+  Migration `20260604000003`.
+
+---
+
 ## [2.6.1] — 2026-06-05
 
 ### Corrigido

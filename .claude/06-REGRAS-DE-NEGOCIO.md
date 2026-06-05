@@ -52,7 +52,7 @@ ou por **override manual do admin** (`AdminCompMatchesPage`).
 - **Privacidade até o apito:** você só vê o palpite dos outros **depois** que o jogo começa. Antes,
   no máximo "fulano já palpitou / não palpitou" (vale também no detalhe de confronto — anti-trapaça).
 
-**Curadoria:** o admin pode **ocultar** um jogo (`matches.hidden`): ele sai dos palpites **e não conta para a pontuação** — mesmo que alguém já tenha palpitado **antes** de ocultar. É filtro de leitura (`and m.hidden = false`) em **todas** as funções de pontuação (standings, perfil, confronto); **desocultar volta a contar na hora**. (migration `…028`)
+**Curadoria:** o admin pode **ocultar** um jogo (`matches.hidden`): ele sai dos palpites **e não conta para a pontuação** — mesmo que alguém já tenha palpitado **antes** de ocultar. É filtro de leitura (`and m.hidden = false`) em **todas** as funções de pontuação (standings, perfil, confronto); **desocultar volta a contar na hora**. (migrations `…028`/`…029`). Também não gera nem aparece em **notificação** ("Não esquece de palpitar! ⏰"/cutucada) — `create_deadline_reminders`/`nudge_for_match` filtram `hidden=false` e a leitura passa pela RPC `get_my_notifications` (lembretes/cutucadas antigos somem da bell; desocultar faz reaparecer)
 
 ---
 

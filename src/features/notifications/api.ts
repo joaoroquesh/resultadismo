@@ -19,11 +19,12 @@ export function useNotifications() {
     enabled: !!user,
     queryKey: ["notifications", user?.id],
     queryFn: async (): Promise<Notification[]> => {
-      const { data, error } = await supabase
-        .from("notifications")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(30);
+      // RPC server-side: filtra notificações de jogos OCULTOS (migration ...029).
+      // Quando o admin oculta um jogo, é como se ele não existisse — palpite
+      // não soma pontos (...028) e o lembrete/cutucada some daqui.
+      const { data, error } = await supabase.rpc("get_my_notifications", {
+        p_limit: 30,
+      });
       if (error) throw error;
       return (data ?? []) as unknown as Notification[];
     },

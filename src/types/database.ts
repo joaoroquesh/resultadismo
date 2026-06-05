@@ -1460,6 +1460,25 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_my_notifications: {
+        Args: { p_limit?: number }
+        Returns: {
+          body: string | null
+          created_at: string
+          data: Json
+          id: string
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "notifications"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_player_profile: { Args: { p_user_id: string }; Returns: Json }
       get_tie_detail: {
         Args: { p_tie_id: string }
@@ -1627,6 +1646,37 @@ export type Database = {
       }
       toggle_confronto_optin: { Args: { p_lc_id: string }; Returns: boolean }
       undo_confronto_draw: { Args: { p_lc_id: string }; Returns: undefined }
+      update_group_info: {
+        Args: { p_description: string; p_league_id: string; p_name: string }
+        Returns: {
+          approved_at: string | null
+          approved_by: string | null
+          confronto_enabled: boolean
+          created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          description: string | null
+          id: string
+          join_code: string | null
+          join_policy: Database["public"]["Enums"]["join_policy"]
+          logo_url: string | null
+          max_members: number | null
+          name: string
+          name_approved: boolean
+          owner_id: string
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          slug: string
+          status: Database["public"]["Enums"]["league_status"]
+          updated_at: string
+          visibility: Database["public"]["Enums"]["league_visibility"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "leagues"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       validate_discount_code: { Args: { p_code: string }; Returns: Json }
     }
     Enums: {
