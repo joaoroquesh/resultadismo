@@ -18,6 +18,12 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+### Corrigido
+- **Card ao vivo na primeira dobra não tem mais a borda cortada.** O teto de 2 linhas do teaser
+  deslogado (2.7.0) passou a limitar a **quantidade** de cards renderizados, em vez de
+  `overflow-hidden` — que clipava o anel (`ring`) dos jogos AO VIVO. Mesma regra (máx 2 linhas, sem
+  espaço vazio), agora sem corte. (`FirstFold` + `JogosPage`)
+
 ---
 
 ## [2.7.0] — 2026-06-05

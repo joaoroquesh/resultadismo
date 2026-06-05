@@ -147,9 +147,17 @@ export function JogosPage() {
   const hasComps = (competitions?.length ?? 0) > 0;
 
   // Grade de jogos: 1 coluna no mobile, 2 no desktop pra aproveitar a largura.
+  // Teaser deslogado: no máximo 2 linhas (4 no desktop, 2 no mobile). Limita o que
+  // renderiza — sem overflow/clip, pra não cortar o anel (ring) dos cards ao vivo.
+  const foldGames = session ? dayMatches : dayMatches.slice(0, 4);
   const gamesGrid = (
-    <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-      {dayMatches.map((m) => {
+    <div
+      className={cn(
+        "grid grid-cols-1 gap-3 lg:grid-cols-2",
+        !session && "max-lg:[&>*:nth-child(n+3)]:hidden", // mobile: só 2 (2 linhas)
+      )}
+    >
+      {foldGames.map((m) => {
         const compKey = m.competition_id ?? "?";
         const wk = weekKey(m.kickoff_at);
         return (
