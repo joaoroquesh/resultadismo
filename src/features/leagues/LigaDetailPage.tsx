@@ -332,10 +332,10 @@ Código: ${league.join_code}
 
       {isAppAdmin && (
         <Card className="mb-4 border border-brand-200 bg-brand-500/5 p-4">
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <p className="flex items-center gap-1.5 text-sm font-bold text-ink-900">
-                <Sparkles className="size-4 text-brand-600" />
+              <p className="flex flex-wrap items-center gap-1.5 text-sm font-bold text-ink-900">
+                <Sparkles className="size-4 shrink-0 text-brand-600" />
                 Modo Confronto (teste)
                 <span className="rounded-pill bg-brand-600 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
                   admin
@@ -349,6 +349,7 @@ Código: ${league.join_code}
             </div>
             <Button
               size="sm"
+              className="w-full shrink-0 sm:w-auto"
               variant={confrontoEnabled ? "outline" : undefined}
               loading={setConfronto.isPending}
               onClick={() =>

@@ -22,6 +22,21 @@ _Nada pendente._
 
 ---
 
+## [2.4.1] — 2026-06-04
+
+### Corrigido
+- **Reembolso não aparece mais com a cobrança desligada.** O botão self-service "Cancelar e
+  reembolsar" (detalhe do grupo) só é exibido quando o pagamento está em `test`/`live`; com
+  `payment_mode = disabled` (ADR [`0002`](decisions/0002-pagamento-desligado-gratis.md)) ele fica
+  **dormente** junto com o resto da infra — e volta sozinho se a cobrança for reativada. Antes
+  aparecia em grupos com `payment_status = paid` mesmo sendo grátis, contradizendo o "grátis".
+- **Card "Modo Confronto (teste)" não quebra mais no mobile.** No detalhe do grupo (admin), o
+  botão "Ativar/Desativar Confronto" passa a **empilhar abaixo do texto, em largura total** em
+  telas estreitas (segue inline no desktop) e o título ganha `flex-wrap`. Some a quebra feia do
+  rótulo do botão e do título.
+
+---
+
 ## [2.4.0] — 2026-06-04
 
 ### Alterado

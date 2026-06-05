@@ -4,7 +4,7 @@ import { RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
-import { useRefundLeague } from "@/features/payments/api";
+import { useRefundLeague, usePaymentSettings } from "@/features/payments/api";
 
 const REFUND_WINDOW_DAYS = 7;
 const DAY_MS = 86_400_000;
@@ -27,10 +27,14 @@ export function RefundFederationButton({
   approvedAt?: string | null;
 }) {
   const refund = useRefundLeague();
+  const { data: settings } = usePaymentSettings();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
+  // Pagamento desligado (ADR 0002): a infra de reembolso fica DORMENTE — não aparece.
+  // (Volta sozinha se a cobrança for reativada — modo 'test'/'live'.)
+  if ((settings?.payment_mode ?? "disabled") === "disabled") return null;
   // Só grupo pago e dentro da janela de 7 dias.
   if (paymentStatus !== "paid" || !approvedAt) return null;
   const daysSince = (Date.now() - new Date(approvedAt).getTime()) / DAY_MS;
