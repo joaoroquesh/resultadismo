@@ -4,6 +4,7 @@ import { BottomNav } from "./BottomNav";
 import { Sidebar } from "./Sidebar";
 import { PublicShell } from "./PublicShell";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
+import { MaintenanceBanner } from "./MaintenanceBanner";
 import { AccessGate } from "@/features/access/AccessGate";
 import { ConsentBanner } from "@/features/consent/ConsentBanner";
 import { useAuth } from "@/features/auth/AuthProvider";
@@ -51,6 +52,7 @@ export function AppShell() {
 
   return (
     <>
+      <MaintenanceBanner />
       {content}
       <ConsentBanner />
       {DevPanel && (

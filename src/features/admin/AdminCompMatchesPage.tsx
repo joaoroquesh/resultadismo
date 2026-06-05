@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, RefreshCw, Eye, EyeOff, Pencil, Check, X, ExternalLink } from "lucide-react";
+import { ArrowLeft, RefreshCw, Eye, EyeOff, Pencil, Check, X, ExternalLink, Clock } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -19,6 +19,7 @@ import {
   useSyncFootball,
   type AdminMatch,
 } from "./api";
+import { useReopenMatch } from "./sync";
 
 const STATUS_OPTS: { value: MatchStatus; label: string }[] = [
   { value: "scheduled", label: "Agendado" },
@@ -177,6 +178,7 @@ export function AdminCompMatchesPage() {
 function AdminMatchRow({ match }: { match: AdminMatch }) {
   const save = useSaveMatchResult();
   const setHidden = useSetMatchHidden();
+  const reopen = useReopenMatch();
   const { toast } = useToast();
   const [editing, setEditing] = useState(false);
   const [home, setHome] = useState(match.home_score?.toString() ?? "");
@@ -301,6 +303,25 @@ function AdminMatchRow({ match }: { match: AdminMatch }) {
               <Check className="size-4" /> Salvar resultado
             </Button>
           </div>
+
+          {/* Reabrir palpites: emergência (jogo adiado). Empurra o kickoff 15 min
+              pra frente, destravando os palpites. */}
+          <button
+            type="button"
+            disabled={reopen.isPending}
+            onClick={() =>
+              reopen.mutate(
+                { matchId: match.id, minutes: 15 },
+                {
+                  onSuccess: () => toast("Palpites reabertos por 15 min.", "success"),
+                  onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
+                },
+              )
+            }
+            className="flex w-full items-center justify-center gap-1.5 text-xs font-medium text-ink-400 underline-offset-2 hover:text-ink-600 hover:underline disabled:opacity-50"
+          >
+            <Clock className="size-3.5" /> Reabrir palpites por 15 min (jogo adiado)
+          </button>
         </div>
       )}
     </Card>

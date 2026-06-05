@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, X, Trash2, RotateCcw, Settings, Clock } from "lucide-react";
+import { Check, X, Trash2, RotateCcw, Settings, Clock, Search } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { dayjs } from "@/lib/format";
 import { useDeletedLeagues, useSoftDeleteLeague, useRestoreLeague } from "./moderation";
@@ -21,13 +21,25 @@ export function LigasAdmin() {
   const restore = useRestoreLeague();
   const { toast } = useToast();
   const [toDelete, setToDelete] = useState<{ id: string; name: string } | null>(null);
-
-  if (isLoading) return <Skeleton className="h-40 w-full" />;
+  const [q, setQ] = useState("");
 
   // grupos já excluídas (soft) saem das listas normais e vão pra Lixeira
   const live = (leagues ?? []).filter((l) => !l.deleted_at);
   const pending = live.filter((l) => l.status === "pending");
   const others = live.filter((l) => l.status !== "pending");
+
+  // busca na lista "Todos os grupos" (por nome ou dono)
+  const filteredOthers = useMemo(() => {
+    const term = q.trim().toLowerCase();
+    if (!term) return others;
+    return others.filter(
+      (l) =>
+        l.name.toLowerCase().includes(term) ||
+        (l.owner?.display_name ?? "").toLowerCase().includes(term),
+    );
+  }, [others, q]);
+
+  if (isLoading) return <Skeleton className="h-40 w-full" />;
 
   function confirmDelete() {
     if (!toDelete) return;
@@ -85,8 +97,26 @@ export function LigasAdmin() {
 
       {others.length > 0 && (
         <section className="space-y-2">
-          <h2 className="text-xs font-bold uppercase tracking-wide text-ink-400">Todos os grupos</h2>
-          {others.map((l) => (
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-xs font-bold uppercase tracking-wide text-ink-400">
+              Todos os grupos ({others.length})
+            </h2>
+          </div>
+          {others.length > 5 && (
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-400" />
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Buscar grupo por nome ou dono…"
+                className="h-10 w-full rounded-md border border-ink-200 bg-surface pl-9 pr-3 text-sm outline-none focus:border-brand-500"
+              />
+            </div>
+          )}
+          {filteredOthers.length === 0 ? (
+            <EmptyState title="Nenhum grupo encontrado" description="Tente outro termo." />
+          ) : (
+            filteredOthers.map((l) => (
             <Card key={l.id} className="flex items-center gap-2 p-3.5">
               <div className="min-w-0 flex-1">
                 <p className="truncate font-semibold text-ink-900">{l.name}</p>
@@ -109,7 +139,8 @@ export function LigasAdmin() {
                 <Trash2 className="size-4 text-flame-500" />
               </Button>
             </Card>
-          ))}
+            ))
+          )}
         </section>
       )}
 
