@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { track } from "@/lib/analytics";
 import { useAuth } from "@/features/auth/AuthProvider";
 
 export type Notification = {
@@ -58,6 +59,7 @@ export function useNudge() {
       });
       if (error) throw error;
     },
+    onSuccess: () => track("nudge_sent"),
   });
 }
 

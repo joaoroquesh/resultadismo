@@ -20,6 +20,23 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ---
 
+## [2.7.3] — 2026-06-05
+
+### Adicionado
+- **Tagueamento de eventos no Google Analytics (funil).** Novo helper `track()`
+  (`src/lib/analytics.ts`) dispara eventos GA4 respeitando o Consent Mode v2 (pings cookieless
+  quando negado) e **sem PII** nos parâmetros. Eventos instrumentados:
+  - **`login`** `{ method: "google" }` — clique em "Entrar com Google".
+  - **`cta_click`** `{ location }` — CTAs de conversão (`hero`, `pricing`, `footer`, `match_card`,
+    `como_funciona`).
+  - **`save_prediction`**, **`set_joker`** `{ enabled }` — engajamento no palpite (nos hooks).
+  - **`create_group`** `{ visibility }`, **`join_group`** `{ method: "code" }` — crescimento.
+  - **`share`** `{ method: "whatsapp", content_type: "group_invite" }`, **`copy_invite`** — viralização.
+  - **`nudge_sent`** — cutucada; **`consent_set`** `{ choice }` — aceite/recusa do banner.
+  - Instrumentado preferencialmente nos hooks de mutation (1 ponto cobre todos os call sites).
+
+---
+
 ## [2.7.2] — 2026-06-05
 
 ### Alterado

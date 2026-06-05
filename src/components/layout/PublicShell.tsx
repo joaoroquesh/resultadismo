@@ -1,4 +1,5 @@
 import { type ReactNode } from "react";
+import { track } from "@/lib/analytics";
 import { Link } from "react-router-dom";
 import { LogIn } from "lucide-react";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
@@ -56,7 +57,13 @@ function PublicFooter({ onLogin }: { onLogin: () => void }) {
           <p className="max-w-sm text-balance text-lg font-bold tracking-tight text-ink-950">
             Palpite nos jogos e dispute com os amigos.
           </p>
-          <Button size="lg" onClick={onLogin}>
+          <Button
+            size="lg"
+            onClick={() => {
+              track("cta_click", { location: "footer" });
+              onLogin();
+            }}
+          >
             Criar conta grátis
           </Button>
         </div>

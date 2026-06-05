@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/features/auth/AuthProvider";
+import { track } from "@/lib/analytics";
 import type { Competition, MatchWithTeams, Prediction } from "@/lib/types";
 
 const MATCH_SELECT =
@@ -211,6 +212,7 @@ export function useSavePrediction() {
       return data;
     },
     onSuccess: () => {
+      track("save_prediction");
       qc.invalidateQueries({ queryKey: ["my-predictions"] });
     },
   });
@@ -228,7 +230,10 @@ export function useSetJoker() {
         .eq("match_id", input.matchId);
       if (error) throw new Error(error.message);
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-predictions"] }),
+    onSuccess: (_data, input) => {
+      track("set_joker", { enabled: input.value });
+      qc.invalidateQueries({ queryKey: ["my-predictions"] });
+    },
   });
 }
 

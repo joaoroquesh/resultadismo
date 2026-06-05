@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { track } from "@/lib/analytics";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Copy, Clock, LogOut, Pencil, Sparkles, MessageCircle } from "lucide-react";
@@ -116,6 +117,7 @@ export function LigaDetailPage() {
   function copyCode() {
     if (!league?.join_code) return;
     navigator.clipboard.writeText(league.join_code);
+    track("copy_invite", { content_type: "group_invite" });
     toast("Código copiado!", "success");
   }
 
@@ -127,6 +129,7 @@ export function LigaDetailPage() {
   // wa.me como fallback.
   function shareWhatsApp() {
     if (!league?.join_code) return;
+    track("share", { method: "whatsapp", content_type: "group_invite" });
     const text = `🏆 Achei o melhor bolão pra Copa do Mundo!
 
 No Resultadismo você:

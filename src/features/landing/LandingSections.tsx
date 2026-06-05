@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { track } from "@/lib/analytics";
 import {
   Target,
   Users,
@@ -257,7 +258,10 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
           <div className="mt-6 flex flex-col items-center gap-4">
             <Button
               size="lg"
-              onClick={onOpenLogin}
+              onClick={() => {
+                track("cta_click", { location: "hero" });
+                onOpenLogin();
+              }}
               className="bg-white text-brand-700 shadow-[var(--shadow-pop)] hover:bg-white/90"
             >
               Criar conta grátis
@@ -371,7 +375,13 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
             mensalidade, sem anúncio — é só entrar e disputar.
           </p>
           <div className="mt-6">
-            <Button size="lg" onClick={onOpenLogin}>
+            <Button
+              size="lg"
+              onClick={() => {
+                track("cta_click", { location: "pricing" });
+                onOpenLogin();
+              }}
+            >
               Criar conta grátis
             </Button>
           </div>

@@ -13,6 +13,7 @@
 // Nunca liberamos ad_*: o Resultadismo não faz tracking publicitário.
 
 import { useSyncExternalStore } from "react";
+import { track } from "@/lib/analytics";
 
 const STORAGE_KEY = "rd_consent_v1";
 const EVENT_NAME = "rd:consent-change";
@@ -71,6 +72,9 @@ export function applyStoredConsent(): void {
 export function setConsent(choice: ConsentChoice): void {
   writeStored(choice);
   pushConsentUpdate(choice);
+  // Depois do pushConsentUpdate: se concedeu, o evento já sai com
+  // analytics_storage liberado (medição completa).
+  track("consent_set", { choice });
   emitChange();
 }
 

@@ -1,4 +1,5 @@
 import { type ReactNode } from "react";
+import { track } from "@/lib/analytics";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import {
@@ -366,7 +367,15 @@ export function ComoFuncionaPage() {
               </Link>
             ) : (
               <div className="sm:w-auto">
-                <Button fullWidth onClick={openLogin}>Entrar e jogar</Button>
+                <Button
+                  fullWidth
+                  onClick={() => {
+                    track("cta_click", { location: "como_funciona" });
+                    openLogin();
+                  }}
+                >
+                  Entrar e jogar
+                </Button>
               </div>
             )}
           </div>

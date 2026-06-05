@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { track } from "@/lib/analytics";
 import { useAuth } from "@/features/auth/AuthProvider";
 import type {
   League,
@@ -169,7 +170,8 @@ export function useCreateLeague() {
       }
       return league;
     },
-    onSuccess: () => {
+    onSuccess: (_league, input) => {
+      track("create_group", { visibility: input.visibility });
       qc.invalidateQueries({ queryKey: ["my-leagues"] });
     },
   });
@@ -201,7 +203,10 @@ export function useJoinByCode() {
       if (error) throw new Error(error.message);
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-leagues"] }),
+    onSuccess: () => {
+      track("join_group", { method: "code" });
+      qc.invalidateQueries({ queryKey: ["my-leagues"] });
+    },
   });
 }
 

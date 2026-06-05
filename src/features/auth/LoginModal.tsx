@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "./AuthProvider";
 import { useToast } from "@/components/ui/Toast";
+import { track } from "@/lib/analytics";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 
@@ -38,6 +39,7 @@ export function LoginModal({ open, onClose }: { open: boolean; onClose: () => vo
 
   async function handleGoogle() {
     setBusy(true);
+    track("login", { method: "google" });
     const { error } = await signInWithGoogle();
     if (error) {
       toast(error, "error");

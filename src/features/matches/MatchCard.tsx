@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { track } from "@/lib/analytics";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import { Check, Loader2, Lock, ChevronDown, Users, Zap, Hand } from "lucide-react";
 import { TeamCrest } from "@/components/TeamCrest";
@@ -222,7 +223,10 @@ export function MatchCard({
       ) : !session && !finished && !live ? (
         <button
           type="button"
-          onClick={openLogin}
+          onClick={() => {
+            track("cta_click", { location: "match_card" });
+            openLogin();
+          }}
           className="flex h-9 w-full items-center justify-center gap-1.5 border-t border-border text-[11px] font-semibold text-brand-600 transition-colors hover:bg-ink-50"
         >
           Entrar para palpitar
