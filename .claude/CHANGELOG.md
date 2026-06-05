@@ -22,6 +22,22 @@ _Nada pendente._
 
 ---
 
+## [2.6.0] — 2026-06-05
+
+### Adicionado
+- **Editar grupo (nome + descrição + escudo) pelo dono/admin.** No detalhe do grupo, o botão
+  **"Editar"** abre um editor único com **nome**, **descrição** e **escudo** juntos. Trocar o nome
+  **re-dispara a moderação** (`name_approved=false`, volta à fila do admin) — o grupo segue ativo.
+  RPC `update_group_info` (SECURITY DEFINER; gate `is_league_admin`/`is_app_admin`; bypass do guard
+  p/ re-moderar). Migration `20260604000002`.
+
+### Alterado
+- **Cabeçalho do grupo reorganizado em 2 cards:** **Identidade** (escudo + descrição + Editar) e
+  **Convide** (código + WhatsApp) — cada card com um trabalho só. Descrição vazia agora é um convite
+  **"+ Adicionar descrição"** (antes era um "Sem descrição." morto).
+
+---
+
 ## [2.5.0] — 2026-06-05
 
 **Sincronização inteligente de jogos + saúde da API + Admin redesenhado.** O sync deixa de ser

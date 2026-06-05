@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Copy, Clock, LogOut, Palette, Sparkles, MessageCircle } from "lucide-react";
+import { ArrowLeft, Copy, Clock, LogOut, Pencil, Sparkles, MessageCircle } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -26,7 +26,7 @@ import { RefundFederationButton } from "./RefundFederationButton";
 import { ClassificacaoTab } from "./tabs/ClassificacaoTab";
 import { MembrosTab } from "./tabs/MembrosTab";
 import { CompeticoesTab } from "./tabs/CompeticoesTab";
-import { EscudoStudio } from "./tabs/EscudoStudio";
+import { GrupoEditor } from "./tabs/GrupoEditor";
 
 type Tab = "classificacao" | "membros" | "competicoes";
 
@@ -45,7 +45,7 @@ export function LigaDetailPage() {
   const isOwner = myMember?.role === "owner";
 
   const [tab, setTab] = useState<Tab>("classificacao");
-  const [escudoOpen, setEscudoOpen] = useState(false);
+  const [editorOpen, setEditorOpen] = useState(false);
   const [leaveOpen, setLeaveOpen] = useState(false);
   const [lcId, setLcId] = useState<string>();
   const activeLcId = lcId ?? comps?.[0]?.id;
@@ -272,62 +272,73 @@ Código: ${league.join_code}
         </div>
       ) : null}
 
-      {/* cabeçalho — escudo + descrição + identidade */}
+      {/* Card 1 — Identidade: escudo + descrição + Editar */}
       <Card className="mb-4 p-4">
         <div className="flex items-start gap-3">
           <Escudo src={league.logo_url} name={league.name} size="xl" />
           <div className="min-w-0 flex-1">
             {league.description ? (
               <p className="text-sm text-ink-600">{league.description}</p>
+            ) : isAdmin ? (
+              <button
+                type="button"
+                onClick={() => setEditorOpen(true)}
+                className="text-sm font-medium text-brand-600 transition hover:text-brand-700"
+              >
+                + Adicionar descrição
+              </button>
             ) : (
               <p className="text-xs italic text-ink-400">Sem descrição.</p>
             )}
-            {isAdmin && (
-              <button
-                type="button"
-                onClick={() => setEscudoOpen((v) => !v)}
-                className="mt-2 inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-xs font-semibold text-brand-600 transition hover:bg-brand-500/10"
-              >
-                <Palette className="size-3.5" />
-                {escudoOpen ? "Fechar editor" : "Personalizar escudo"}
-              </button>
-            )}
           </div>
+          {isAdmin && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="shrink-0"
+              onClick={() => setEditorOpen((v) => !v)}
+            >
+              <Pencil className="size-4" /> {editorOpen ? "Fechar" : "Editar"}
+            </Button>
+          )}
         </div>
-
-        {(isAdmin || myMember) && league.join_code && (
-          <>
-            <button
-              onClick={copyCode}
-              className="mt-4 flex w-full items-center justify-between rounded-md border border-dashed border-ink-200 px-3 py-2.5 text-left transition hover:bg-ink-50"
-            >
-              <div>
-                <p className="text-xs text-ink-400">Código de convite</p>
-                <p className="font-mono text-lg font-bold tracking-widest text-ink-900">
-                  {league.join_code}
-                </p>
-              </div>
-              <Copy className="size-5 text-brand-600" />
-            </button>
-            <button
-              type="button"
-              onClick={shareWhatsApp}
-              className="mt-2 flex w-full items-center justify-center gap-2 rounded-md bg-grass-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-grass-700"
-            >
-              <MessageCircle className="size-4" />
-              Compartilhar no WhatsApp
-            </button>
-          </>
-        )}
       </Card>
 
-      {isAdmin && escudoOpen && (
-        <EscudoStudio
+      {/* Editor do grupo — nome + descrição + escudo */}
+      {isAdmin && editorOpen && (
+        <GrupoEditor
           leagueId={league.id}
-          leagueName={league.name}
+          currentName={league.name}
+          currentDescription={league.description}
           currentLogo={league.logo_url}
-          onClose={() => setEscudoOpen(false)}
+          onClose={() => setEditorOpen(false)}
         />
+      )}
+
+      {/* Card 2 — Convide: código + WhatsApp */}
+      {(isAdmin || myMember) && league.join_code && (
+        <Card className="mb-4 p-4">
+          <button
+            onClick={copyCode}
+            className="flex w-full items-center justify-between rounded-md border border-dashed border-ink-200 px-3 py-2.5 text-left transition hover:bg-ink-50"
+          >
+            <div>
+              <p className="text-xs text-ink-400">Código de convite</p>
+              <p className="font-mono text-lg font-bold tracking-widest text-ink-900">
+                {league.join_code}
+              </p>
+            </div>
+            <Copy className="size-5 text-brand-600" />
+          </button>
+          <button
+            type="button"
+            onClick={shareWhatsApp}
+            className="mt-2 flex w-full items-center justify-center gap-2 rounded-md bg-grass-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-grass-700"
+          >
+            <MessageCircle className="size-4" />
+            Compartilhar no WhatsApp
+          </button>
+        </Card>
       )}
 
       {isAppAdmin && (

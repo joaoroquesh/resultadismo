@@ -56,7 +56,9 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
 - **`NovaLigaPage`** (`/grupos/nova`): criar grupo — nome (com **prefixo-badge**
   Bolão/Liga/Copa), descrição, visibilidade, política de entrada, competição inicial (padrão Copa do
   Mundo), modo, cupom (se pagamento ativo). → checkout/ativação conforme o modo de pagamento.
-- **`LigaDetailPage`** (`/grupos/:slug`): detalhe — escudo/nome/código de convite, abas
+- **`LigaDetailPage`** (`/grupos/:slug`): detalhe — identidade (escudo/nome/descrição) + código de
+  convite; **dono/admin edita nome, descrição e escudo** em "Editar grupo" (`GrupoEditor`; trocar o
+  nome volta à moderação). Abas
   **Classificação** (tabela de Pontos ou `ConfrontoSection`), **Membros** (papéis, aprovar/remover),
   **Competições** (admin: adicionar competição/modo). Banner "Pagar agora" se pendente; botão de
   reembolso só p/ dono (≤7 dias).

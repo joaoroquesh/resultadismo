@@ -258,6 +258,32 @@ export function useUpdateLeagueLogo() {
   });
 }
 
+/** Edita nome + descrição do grupo (RPC update_group_info; re-modera o nome). */
+export function useUpdateGroupInfo() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { leagueId: string; name: string; description: string | null }) => {
+      // RPC nova, ainda fora dos tipos gerados — cast contido.
+      const { error } = await (
+        supabase.rpc as unknown as (
+          fn: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ error: { message: string } | null }>
+      )("update_group_info", {
+        p_league_id: input.leagueId,
+        p_name: input.name,
+        p_description: input.description,
+      });
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: ["league"] });
+      qc.invalidateQueries({ queryKey: ["my-leagues"] });
+      qc.invalidateQueries({ queryKey: ["league-members", v.leagueId] });
+    },
+  });
+}
+
 export function useDeleteLeagueCompetition() {
   const qc = useQueryClient();
   return useMutation({
