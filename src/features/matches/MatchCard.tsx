@@ -34,12 +34,35 @@ export function MatchCard({
 }) {
   const { session } = useAuth();
   const { toast } = useToast();
+
+  // Tick a cada 30s só pra jogos perto do horário (6h antes → 4h depois), pra o
+  // "ao vivo automático" virar na hora sem depender de uma resposta da API.
+  const [, forceTick] = useState(0);
+  const kickoffMs = match.kickoff_at ? new Date(match.kickoff_at).getTime() : null;
+  useEffect(() => {
+    if (match.status !== "scheduled" || kickoffMs == null) return;
+    const delta = kickoffMs - Date.now();
+    if (delta > 6 * 3_600_000 || delta < -4 * 3_600_000) return;
+    const id = setInterval(() => forceTick((t) => t + 1), 30_000);
+    return () => clearInterval(id);
+  }, [match.status, kickoffMs]);
+
   const finished = match.status === "finished";
-  const live = match.status === "live";
+  // Ao vivo automático: o jogo aparece AO VIVO (0×0) assim que dá o horário,
+  // mesmo antes da API confirmar. Janela de 4h cobre 90'+prorrogação; se a API
+  // nunca atualizar (provável quebra → vira alerta no admin), reverte depois.
+  const autoLive =
+    match.status === "scheduled" &&
+    kickoffMs != null &&
+    kickoffMs <= Date.now() &&
+    Date.now() - kickoffMs < 4 * 3_600_000;
+  const live = match.status === "live" || autoLive;
   const locked = match.status !== "scheduled" || isLocked(match.kickoff_at);
   const canEdit = !locked && !!session;
   const pending = canEdit && !prediction;
-  const hasResult = match.home_score != null && match.away_score != null;
+  // Placar mostrado ao vivo: o da API, ou 0×0 enquanto ela não confirma.
+  const liveHome = match.home_score ?? 0;
+  const liveAway = match.away_score ?? 0;
   const isJoker = prediction?.is_joker ?? false;
 
   const save = useSavePrediction();
@@ -135,12 +158,12 @@ export function MatchCard({
         <TeamSide name={match.away_team?.short_name ?? match.away_team_name} team={match.away_team} align="left" />
       </div>
 
-      {/* resultado real */}
-      {(finished || (live && hasResult)) && (
+      {/* resultado real (ao vivo mostra 0×0 enquanto a API não confirma) */}
+      {(finished || live) && (
         <div className="flex items-center justify-center gap-2 border-t border-border py-1.5 text-xs">
-          <span className="text-ink-400">Resultado</span>
+          <span className="text-ink-400">{live ? "Ao vivo" : "Resultado"}</span>
           <span className={cn("font-extrabold tabular-nums", live ? "text-flame-600" : "text-ink-800")}>
-            {match.home_score} × {match.away_score}
+            {finished ? `${match.home_score} × ${match.away_score}` : `${liveHome} × ${liveAway}`}
           </span>
           {finished && scoreType && <ScorePill type={scoreType} withLabel doubled={isJoker} />}
         </div>
