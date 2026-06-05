@@ -7,20 +7,39 @@ import { Badge } from "@/components/ui/Badge";
 import { Avatar } from "@/components/ui/Avatar";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { SortControl, type SortDir, type SortFieldDef } from "@/components/ui/SortControl";
 import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/lib/utils";
 import { fromNow } from "@/lib/format";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useAllProfiles, useSetAppAdmin, type AdminUser } from "./api";
 
-type SortKey = "nome" | "recentes" | "antigos" | "uso";
+type UserSortKey = "online" | "nome" | "entrada" | "uso";
 
-const SORTS: { key: SortKey; label: string }[] = [
-  { key: "nome", label: "Nome" },
-  { key: "recentes", label: "Recentes" },
-  { key: "antigos", label: "Antigos" },
-  { key: "uso", label: "Mais uso" },
+const USER_FIELDS: readonly SortFieldDef<UserSortKey>[] = [
+  { key: "online", label: "Online", defaultDir: "desc", ascLabel: "Offline 1º", descLabel: "Online 1º" },
+  { key: "nome", label: "Nome", defaultDir: "asc", ascLabel: "A→Z", descLabel: "Z→A" },
+  { key: "entrada", label: "Entrada", defaultDir: "desc", ascLabel: "Mais antigos", descLabel: "Mais recentes" },
+  { key: "uso", label: "Uso", defaultDir: "desc", ascLabel: "Menos uso", descLabel: "Mais uso" },
 ];
+
+// Comparação em ordem CRESCENTE; a direção é aplicada por fora (sinal).
+function cmpUsers(a: AdminUser, b: AdminUser, key: UserSortKey): number {
+  switch (key) {
+    case "online": {
+      const d = (a.is_online ? 1 : 0) - (b.is_online ? 1 : 0);
+      if (d !== 0) return d;
+      // desempate: atividade mais recente por último (no "Online 1º" fica no topo)
+      return (a.last_active_at ?? "").localeCompare(b.last_active_at ?? "");
+    }
+    case "entrada":
+      return a.created_at.localeCompare(b.created_at);
+    case "uso":
+      return (a.usage_seconds ?? 0) - (b.usage_seconds ?? 0);
+    default:
+      return a.display_name.localeCompare(b.display_name, "pt-BR");
+  }
+}
 
 function fmtUsage(s: number): string {
   if (!s || s < 60) return s ? `${s}s de uso` : "sem uso ainda";
@@ -37,7 +56,8 @@ export function UsuariosAdmin() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
-  const [sort, setSort] = useState<SortKey>("nome");
+  const [sort, setSort] = useState<UserSortKey>("online");
+  const [dir, setDir] = useState<SortDir>("desc");
 
   const list = useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -47,22 +67,9 @@ export function UsuariosAdmin() {
         p.display_name.toLowerCase().includes(term) ||
         (p.email ?? "").toLowerCase().includes(term),
     );
-    const sorted = [...filtered];
-    sorted.sort((a, b) => {
-      switch (sort) {
-        case "recentes":
-          return b.created_at.localeCompare(a.created_at);
-        case "antigos":
-          return a.created_at.localeCompare(b.created_at);
-        case "uso":
-          return (b.usage_seconds ?? 0) - (a.usage_seconds ?? 0);
-        default: // nome — admins primeiro, depois alfabético
-          if (a.is_app_admin !== b.is_app_admin) return a.is_app_admin ? -1 : 1;
-          return a.display_name.localeCompare(b.display_name, "pt-BR");
-      }
-    });
-    return sorted;
-  }, [profiles, q, sort]);
+    const sign = dir === "asc" ? 1 : -1;
+    return [...filtered].sort((a, b) => sign * cmpUsers(a, b, sort));
+  }, [profiles, q, sort, dir]);
 
   if (isLoading) return <Skeleton className="h-40 w-full" />;
 
@@ -81,25 +88,26 @@ export function UsuariosAdmin() {
         />
       </div>
 
-      <div className="flex items-center justify-between gap-2">
-        <div className="no-scrollbar flex gap-1.5 overflow-x-auto">
-          {SORTS.map((s) => (
-            <button
-              key={s.key}
-              type="button"
-              onClick={() => setSort(s.key)}
-              className={cn(
-                "shrink-0 rounded-pill px-2.5 py-1 text-xs font-semibold transition",
-                sort === s.key ? "bg-brand-600 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200",
-              )}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
-        <span className="shrink-0 text-xs text-ink-400">
-          {list.length} · {onlineCount} on · {adminCount} adm
+      <SortControl
+        fields={USER_FIELDS}
+        value={sort}
+        dir={dir}
+        onChange={(k, d) => {
+          setSort(k);
+          setDir(d);
+        }}
+      />
+
+      {/* Resumo — "online" em destaque (verde) p/ ficar claro quem está conectado */}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-500">
+        <span>
+          <strong className="font-bold text-ink-700">{list.length}</strong> usuários
         </span>
+        <span className="inline-flex items-center gap-1.5 font-semibold text-grass-600">
+          <span className="size-2 animate-pulse-live rounded-full bg-grass-500" />
+          {onlineCount} online agora
+        </span>
+        <span>{adminCount} admin</span>
       </div>
 
       {list.length === 0 ? (
@@ -141,20 +149,32 @@ function UserRow({
   onToggleAdmin: () => void;
 }) {
   return (
-    <Card className="flex items-center gap-3 p-3">
+    <Card
+      className={cn(
+        "flex items-center gap-3 p-3",
+        p.is_online && "ring-1 ring-grass-400/50",
+      )}
+    >
       {/* clicar no corpo abre o perfil do jogador */}
       <button type="button" onClick={onOpen} className="flex min-w-0 flex-1 items-center gap-3 text-left">
         <div className="relative shrink-0">
           <Avatar src={p.avatar_url} name={p.display_name} size="md" />
           {p.is_online && (
             <span
-              className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full bg-grass-500 ring-2 ring-surface"
+              className="absolute -bottom-0.5 -right-0.5 size-3 animate-pulse-live rounded-full bg-grass-500 ring-2 ring-surface"
               title="Online agora"
             />
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold text-ink-900">{p.display_name}</p>
+          <div className="flex items-center gap-1.5">
+            <p className="truncate font-semibold text-ink-900">{p.display_name}</p>
+            {p.is_online && (
+              <span className="shrink-0 rounded-pill bg-grass-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-grass-700">
+                online
+              </span>
+            )}
+          </div>
           <p className="truncate text-xs text-ink-500">{p.email}</p>
           <p className="truncate text-[11px] text-ink-400">
             entrou {fromNow(p.created_at)} · {fmtUsage(p.usage_seconds)}

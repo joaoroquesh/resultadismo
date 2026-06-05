@@ -45,7 +45,9 @@ Pagamento**. Todas as ações chamam RPCs que **revalidam `is_app_admin()` no ba
 ### Aba **Grupos** (`LigasAdmin`)
 - **Aguardando aprovação**: grupos `pending` → **Aprovar** (`approve_league`) / **Rejeitar**
   (`reject_league`).
-- **Todas**: status + **Gerir** (abre o detalhe) + **Excluir** (soft-delete → Lixeira).
+- **Todos os grupos**: **busca** (nome/dono) + **ordenação** (`SortControl`: Nome ou Criação,
+  crescente/decrescente) — sempre visíveis. Cada grupo: status + **Gerir** (abre o detalhe) +
+  **Excluir** (soft-delete → Lixeira).
 - **Lixeira**: grupos soft-deletadas (recuperáveis) → **Restaurar** (`admin_restore_league`).
 - ⚠️ Grupos com `payment_status='pending'` esperam **pagamento do usuário**, não aprovação do
   admin — "Aprovar" não deveria aparecer para elas (causa-raiz registrada de um bug antigo do
@@ -63,7 +65,10 @@ Pagamento**. Todas as ações chamam RPCs que **revalidam `is_app_admin()` no ba
 ### Aba **Usuários** (`UsuariosAdmin`)
 - Lista todos os perfis **com e-mail** via RPC `admin_list_users` (lê `auth.users`;
   `SECURITY DEFINER`, só app-admin — a coluna `email` foi **removida** de `profiles` por privacidade).
-- **Busca** por nome/e-mail + **ordenação** (admins primeiro, depois alfabético).
+- **Busca** por nome/e-mail + **ordenação** (`SortControl`): por **Online**, **Nome**, **Entrada**
+  (data de criação) ou **Uso**, cada um **crescente/decrescente** (padrão: Online primeiro). Os
+  **online** ficam com selo verde + anel no card + ponto pulsante, e a contagem aparece no topo
+  (`is_online` = `last_active_at` recente, <90s).
 - Promover/rebaixar app-admin (`set_app_admin`).
 
 ### Aba **Pgto** (`PaymentAdmin`) → detalhe em [`06`](06-REGRAS-DE-NEGOCIO.md) §pagamento

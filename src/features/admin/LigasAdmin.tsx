@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Check, X, Trash2, RotateCcw, Settings, Clock, Search } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { cn } from "@/lib/utils";
 import { dayjs, fromNow } from "@/lib/format";
 import { useDeletedLeagues, useSoftDeleteLeague, useRestoreLeague } from "./moderation";
 import { Card } from "@/components/ui/Card";
@@ -10,8 +9,16 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { SortControl, type SortDir, type SortFieldDef } from "@/components/ui/SortControl";
 import { useToast } from "@/components/ui/Toast";
 import { usePendingLeagues, useApproveLeague, useRejectLeague } from "./api";
+
+type GroupSortKey = "nome" | "criacao";
+
+const GROUP_FIELDS: readonly SortFieldDef<GroupSortKey>[] = [
+  { key: "nome", label: "Nome", defaultDir: "asc", ascLabel: "A→Z", descLabel: "Z→A" },
+  { key: "criacao", label: "Criação", defaultDir: "desc", ascLabel: "Mais antigos", descLabel: "Mais recentes" },
+];
 
 export function LigasAdmin() {
   const { data: leagues, isLoading } = usePendingLeagues();
@@ -23,34 +30,35 @@ export function LigasAdmin() {
   const { toast } = useToast();
   const [toDelete, setToDelete] = useState<{ id: string; name: string } | null>(null);
   const [q, setQ] = useState("");
-  const [sort, setSort] = useState<"recentes" | "antigos" | "nome">("recentes");
+  const [sort, setSort] = useState<GroupSortKey>("criacao");
+  const [dir, setDir] = useState<SortDir>("desc");
 
   // grupos já excluídas (soft) saem das listas normais e vão pra Lixeira
   const live = (leagues ?? []).filter((l) => !l.deleted_at);
   const pending = live.filter((l) => l.status === "pending");
   const others = live.filter((l) => l.status !== "pending");
 
-  // busca (nome ou dono) + ordenação na lista "Todos os grupos"
+  // busca (nome ou dono) + ordenação (campo + direção) na lista "Todos os grupos".
+  // Recalcula a base a partir de `leagues` (valor estável do hook) — não de um
+  // array derivado inline, que o React Compiler não consegue memoizar.
   const filteredOthers = useMemo(() => {
+    const base = (leagues ?? []).filter((l) => !l.deleted_at && l.status !== "pending");
     const term = q.trim().toLowerCase();
-    const arr = others.filter(
+    const arr = base.filter(
       (l) =>
         !term ||
         l.name.toLowerCase().includes(term) ||
         (l.owner?.display_name ?? "").toLowerCase().includes(term),
     );
+    const sign = dir === "asc" ? 1 : -1;
     return [...arr].sort((a, b) => {
-      if (sort === "nome") return a.name.localeCompare(b.name, "pt-BR");
-      const cmp = String(a.created_at).localeCompare(String(b.created_at));
-      return sort === "antigos" ? cmp : -cmp;
+      const c =
+        sort === "nome"
+          ? a.name.localeCompare(b.name, "pt-BR")
+          : String(a.created_at).localeCompare(String(b.created_at));
+      return sign * c;
     });
-  }, [others, q, sort]);
-
-  const SORTS = [
-    { key: "recentes", label: "Recentes" },
-    { key: "antigos", label: "Antigos" },
-    { key: "nome", label: "Nome" },
-  ] as const;
+  }, [leagues, q, sort, dir]);
 
   if (isLoading) return <Skeleton className="h-40 w-full" />;
 
@@ -110,67 +118,58 @@ export function LigasAdmin() {
 
       {others.length > 0 && (
         <section className="space-y-2">
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="text-xs font-bold uppercase tracking-wide text-ink-400">
-              Todos os grupos ({others.length})
-            </h2>
+          <h2 className="text-xs font-bold uppercase tracking-wide text-ink-400">
+            Todos os grupos ({others.length})
+          </h2>
+
+          {/* Busca + ordenação — sempre disponíveis */}
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-400" />
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Buscar grupo por nome ou dono…"
+              className="h-10 w-full rounded-md border border-ink-200 bg-surface pl-9 pr-3 text-sm outline-none focus:border-brand-500"
+            />
           </div>
-          {others.length > 3 && (
-            <>
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-400" />
-                <input
-                  value={q}
-                  onChange={(e) => setQ(e.target.value)}
-                  placeholder="Buscar grupo por nome ou dono…"
-                  className="h-10 w-full rounded-md border border-ink-200 bg-surface pl-9 pr-3 text-sm outline-none focus:border-brand-500"
-                />
-              </div>
-              <div className="flex gap-1.5">
-                {SORTS.map((s) => (
-                  <button
-                    key={s.key}
-                    type="button"
-                    onClick={() => setSort(s.key)}
-                    className={cn(
-                      "rounded-pill px-2.5 py-1 text-xs font-semibold transition",
-                      sort === s.key ? "bg-brand-600 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200",
-                    )}
-                  >
-                    {s.label}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
+          <SortControl
+            fields={GROUP_FIELDS}
+            value={sort}
+            dir={dir}
+            onChange={(k, d) => {
+              setSort(k);
+              setDir(d);
+            }}
+          />
+
           {filteredOthers.length === 0 ? (
             <EmptyState title="Nenhum grupo encontrado" description="Tente outro termo." />
           ) : (
             filteredOthers.map((l) => (
-            <Card key={l.id} className="flex items-center gap-2 p-3.5">
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-semibold text-ink-900">{l.name}</p>
-                <p className="truncate text-xs text-ink-500">
-                  por {l.owner?.display_name ?? "—"} · criado {fromNow(l.created_at)}
-                </p>
-              </div>
-              <Badge tone={l.status === "active" ? "grass" : l.status === "rejected" ? "flame" : "neutral"}>
-                {l.status}
-              </Badge>
-              <Link to={`/grupos/${l.slug}`} aria-label="Gerir grupo">
-                <Button size="icon" variant="ghost">
-                  <Settings className="size-4" />
+              <Card key={l.id} className="flex items-center gap-2 p-3.5">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-semibold text-ink-900">{l.name}</p>
+                  <p className="truncate text-xs text-ink-500">
+                    por {l.owner?.display_name ?? "—"} · criado {fromNow(l.created_at)}
+                  </p>
+                </div>
+                <Badge tone={l.status === "active" ? "grass" : l.status === "rejected" ? "flame" : "neutral"}>
+                  {l.status}
+                </Badge>
+                <Link to={`/grupos/${l.slug}`} aria-label="Gerir grupo">
+                  <Button size="icon" variant="ghost">
+                    <Settings className="size-4" />
+                  </Button>
+                </Link>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  aria-label="Excluir grupo"
+                  onClick={() => setToDelete({ id: l.id, name: l.name })}
+                >
+                  <Trash2 className="size-4 text-flame-500" />
                 </Button>
-              </Link>
-              <Button
-                size="icon"
-                variant="ghost"
-                aria-label="Excluir grupo"
-                onClick={() => setToDelete({ id: l.id, name: l.name })}
-              >
-                <Trash2 className="size-4 text-flame-500" />
-              </Button>
-            </Card>
+              </Card>
             ))
           )}
         </section>

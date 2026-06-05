@@ -20,6 +20,23 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ---
 
+## [2.7.2] — 2026-06-05
+
+### Alterado
+- **Ordenação do admin refeita (Usuários e Grupos) — campo + direção explícitos.** Novo
+  `SortControl` reutilizável (`src/components/ui/SortControl.tsx`): escolhe-se o **campo** (chips) e a
+  **direção** num botão sempre visível, com rótulo contextual (ex.: "A→Z", "Mais recentes", "Mais
+  uso"). Substitui as pills que misturavam campo+direção ("Recentes/Antigos").
+  - **Usuários:** ordenar por **Online**, **Nome**, **Entrada** (data de criação) ou **Uso**, cada um
+    **crescente/decrescente** (padrão: Online primeiro).
+  - **Grupos:** **busca** + ordenação (**Nome** ou **Criação**, crescente/decrescente) agora
+    **sempre visíveis** — antes só apareciam com mais de 3 grupos, então sumiam de fato.
+- **Usuários online muito mais claros:** selo verde **ONLINE** ao lado do nome, **anel** verde no
+  card, ponto **pulsante** no avatar e contagem **"N online agora"** em destaque no topo.
+  (`src/features/admin/UsuariosAdmin.tsx`, `LigasAdmin.tsx`)
+
+---
+
 ## [2.7.1] — 2026-06-05
 
 ### Corrigido
