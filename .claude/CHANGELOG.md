@@ -32,6 +32,14 @@ _Nada pendente._
   `advance_confronto_cup`; migration `20260603000028`). Desocultar volta a contar na hora; não muda
   o 3/2/1 nem o desempate. (O ponto-do-dia no client já excluía oculto — só busca jogos visíveis.)
 
+### Alterado
+- **Home pública (LandingSections) — redesign impecável pós-`/design-critique`.**
+  Remove o CTA final duplicado (rodapé já fecha), CTA primário consistente em todo lugar
+  ("Criar conta grátis"). Cards de pontuação com exemplo ancorado e sem ponto redundante.
+  **Faixa de confiança** no herói (100% grátis · sem anúncios · Google · não é aposta) e
+  **FAQ em acordeão** (6 perguntas — quebra de objeções "é pago?", "precisa de app?", "é aposta?").
+  Microinterações sutis (hover lift, ease-out-expo). Sem dependência nova.
+
 ---
 
 ## [2.6.0] — 2026-06-05

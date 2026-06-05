@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import {
   Target,
   Users,
@@ -7,6 +7,8 @@ import {
   Sparkles,
   Gift,
   ArrowRight,
+  ChevronDown,
+  Check,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -129,7 +131,7 @@ function ScoreRow({
 
   return (
     <div className="flex h-full flex-col rounded-lg bg-surface p-3.5 shadow-[var(--shadow-soft)] ring-1 ring-border transition-all duration-200 [transition-timing-function:var(--ease-out-quart)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-pop)] hover:ring-brand-200">
-      <div className="flex items-center gap-3">
+      <div className="mb-3 flex items-center gap-3">
         <span
           className={cn(
             "grid size-12 shrink-0 place-items-center rounded-md text-2xl font-extrabold tabular-nums ring-1 ring-inset",
@@ -142,12 +144,9 @@ function ScoreRow({
           <p className="font-bold text-ink-950">{label}</p>
           <p className="text-sm text-ink-500">{desc}</p>
         </div>
-        <span className={cn("shrink-0 text-sm font-bold tabular-nums", styles.pts)}>
-          {pts} {pts === 1 ? "ponto" : "pontos"}
-        </span>
       </div>
-      {/* exemplo concreto: palpite → resultado */}
-      <div className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-md bg-ink-100/70 px-3 py-2 text-xs">
+      {/* exemplo concreto: palpite → resultado (ancorado na base p/ alinhar os cards) */}
+      <div className="mt-auto flex flex-wrap items-center gap-x-2 gap-y-1 rounded-md bg-ink-100/70 px-3 py-2 text-xs">
         <span className="font-medium text-ink-400">Você palpita</span>
         <span className="rounded bg-surface px-1.5 py-0.5 font-bold tabular-nums text-ink-800 ring-1 ring-border">
           {palpite}
@@ -195,10 +194,49 @@ function CompetitionPill({
   );
 }
 
+/** Pergunta do FAQ — acordeão acessível (aria-expanded), anima via grid-rows. */
+function FaqItem({ q, children }: { q: string; children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const id = useId();
+  return (
+    <div
+      className={cn(
+        "overflow-hidden rounded-lg bg-surface ring-1 transition-colors",
+        open ? "ring-brand-200" : "ring-border",
+      )}
+    >
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-controls={id}
+        className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left font-semibold text-ink-900 transition-colors hover:text-brand-700"
+      >
+        <span>{q}</span>
+        <ChevronDown
+          className={cn(
+            "size-4 shrink-0 transition-transform duration-200 [transition-timing-function:var(--ease-out-quart)]",
+            open ? "rotate-180 text-brand-600" : "text-ink-400",
+          )}
+        />
+      </button>
+      <div
+        id={id}
+        className="grid transition-[grid-template-rows] duration-300 [transition-timing-function:var(--ease-out-quart)]"
+        style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
+      >
+        <div className="overflow-hidden">
+          <p className="px-4 pb-4 text-sm leading-relaxed text-ink-500">{children}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /**
  * Seções de "venda" da home híbrida: aparecem ao rolar para visitantes
- * deslogados. Vendem o jogo (o que é, o que dá pra fazer, pontuação,
- * competições, preço) e terminam num CTA que abre o modal de login.
+ * deslogados. Vendem o jogo (o que é, o que faz, pontuação, competições,
+ * grátis), tiram dúvidas (FAQ); o rodapé fecha com o CTA de entrar.
  */
 export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
   return (
@@ -216,7 +254,7 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
             Palpite nos jogos de verdade, some pontos a cada acerto e veja quem manda no grupo.
             Sem planilha, só futebol e rivalidade boa.
           </p>
-          <div className="mt-6 flex flex-col items-center gap-2">
+          <div className="mt-6 flex flex-col items-center gap-4">
             <Button
               size="lg"
               onClick={onOpenLogin}
@@ -224,7 +262,14 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
             >
               Criar conta grátis
             </Button>
-            <span className="text-xs text-white/80">Leva 10 segundos. É de graça.</span>
+            <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-xs font-medium text-white/90">
+              {["100% grátis", "Sem anúncios", "Entra com Google", "Não é aposta"].map((t) => (
+                <li key={t} className="inline-flex items-center gap-1.5">
+                  <Check className="size-3.5 shrink-0" strokeWidth={2.5} />
+                  {t}
+                </li>
+              ))}
+            </ul>
           </div>
         </Reveal>
       </section>
@@ -327,28 +372,39 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
           </p>
           <div className="mt-6">
             <Button size="lg" onClick={onOpenLogin}>
-              Quero jogar agora
+              Criar conta grátis
             </Button>
           </div>
         </Reveal>
       </section>
 
-      {/* ---- CTA FINAL ---- */}
+      {/* ---- FAQ (quebra de objeções, antes do fechamento do rodapé) ---- */}
       <section>
-        <Reveal className="text-center">
-          <img src="/brand/Resultadismo.svg" alt="" className="mx-auto size-12 opacity-90" />
-          <h2 className="mt-3 text-xl font-extrabold tracking-tight text-ink-950">
-            Bora cravar o próximo placar?
-          </h2>
-          <p className="mx-auto mt-1 max-w-xs text-sm text-ink-500">
-            Entre, chame a galera e comece a disputar.
-          </p>
-          <div className="mt-5">
-            <Button size="lg" onClick={onOpenLogin}>
-              Entrar e jogar
-            </Button>
-          </div>
-          <p className="mt-8 text-xs text-ink-300">Feito pra torcedor. ⚽</p>
+        <SectionTitle kicker="Perguntas" title="Ainda na dúvida?" />
+        <Reveal className="mx-auto max-w-2xl space-y-2.5">
+          <FaqItem q="Preciso pagar pra jogar?">
+            Não. Criar conta, cravar os placares e montar grupos com a galera é 100% grátis. Sem taxa,
+            sem mensalidade, sem anúncio.
+          </FaqItem>
+          <FaqItem q="Preciso baixar algum aplicativo?">
+            Não. Roda no navegador do celular ou do computador. Se quiser, dá pra instalar como app
+            (atalho na tela inicial) em um toque.
+          </FaqItem>
+          <FaqItem q="Como eu entro?">
+            Com a sua conta Google, em uns 10 segundos. Sem formulário e sem criar senha nova.
+          </FaqItem>
+          <FaqItem q="Como funciona a pontuação?">
+            Cravou o placar exato: +3. Acertou o saldo de gols (ou o empate): +2. Acertou só quem
+            venceu: +1. Quanto mais perto do resultado real, mais ponto você leva.
+          </FaqItem>
+          <FaqItem q="Dá pra jogar com os meus amigos?">
+            Sim, é a graça. Crie um grupo privado e chame a galera com um link ou código. Trabalho,
+            família ou panela de amigos: você decide quem entra.
+          </FaqItem>
+          <FaqItem q="Isso é site de aposta?">
+            Não. Não tem aposta, pote nem prêmio em dinheiro. É disputa e zoeira entre amigos pelo
+            orgulho de cravar mais placares que eles.
+          </FaqItem>
         </Reveal>
       </section>
     </div>
