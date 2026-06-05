@@ -18,7 +18,34 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+_Nada pendente._
+
+---
+
+## [2.5.0] — 2026-06-05
+
+**Sincronização inteligente de jogos + saúde da API + Admin redesenhado.** O sync deixa de ser
+manual: placares entram sozinhos, a API é monitorada (a ESPN é não-oficial e pode quebrar), e o
+painel admin vira um centro de comando. ⚠️ _Migration `20260604000001` + mudança na edge function
+`sync-football`. O cron só dispara de fato quando `private.sync_config` for populado (ação do João
+com a service key — fora do código)._
+
 ### Adicionado
+- **Sync inteligente (backend):** modos `scores` (só atualiza placar/status de jogos existentes,
+  cron `*/5` guardado por `should_sync_scores()` — só gasta requisição se há jogo ao vivo/prestes/
+  recém) e `catalog` (reconcilia 1×/dia). 1ª vez insere tudo; depois **jogo novo → alerta** (não
+  insere cego), cancelamento → alerta, mata-mata "A definir"→time real → aplica+alerta, horário
+  mudou → aplica+alerta. Tabelas `sync_alerts` e `admin_audit_log`; coluna `competitions.catalog_seeded`.
+- **Saúde da API (nunca falhar em silêncio):** falha HTTP, formato inesperado ou "0 jogos com jogos
+  futuros" → marca a competição (`last_sync_ok/error/checked_at`) + alerta `api_error` + **push pros
+  admins**; auto-recupera quando volta.
+- **Ao vivo automático:** o jogo aparece AO VIVO (0×0) no horário do kickoff, sem esperar a API
+  (janela de 4h); placar real aparece quando a API confirma (`MatchCard`).
+- **Admin redesenhado** (`AdminPage` dashboard-first, nav por URL `?t=`): aba **Visão** (saúde do
+  sistema: ao vivo/próx 24h/online, status de sync por competição, banners de alerta), aba
+  **Alertas** (aprovar/recusar pendências + histórico). Busca+ordenação em Usuários (admins primeiro)
+  e Grupos. **Modo manutenção** (banner global `MaintenanceBanner`), **reabrir palpites** (jogo
+  adiado), **atividade recente** (audit). RPCs `admin_*` (`SECURITY DEFINER`, app-admin).
 - **Home pública (deslogado) — primeira dobra + convite de rolagem.** Num dia cheio, os jogos
   aparecem só até a altura do viewport (cortando onde estiver, com fade) e um convite "Conheça o
   Resultadismo" fixo na base leva às seções de venda — teaser em vez de despejar a lista toda
@@ -31,6 +58,11 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 - **Microinterações/animações sutis na landing** (IntersectionObserver + CSS `ease-out-expo`):
   reveals com _stagger_, _hover lift_ e deriva no convite de rolagem. Sem bounce; respeita
   `prefers-reduced-motion` (DESIGN.md). Sem dependência nova (sem GSAP).
+
+### Documentação
+- [`04-ADMIN.md`](04-ADMIN.md): painel redesenhado (Visão/Alertas + abas), sync inteligente e RPCs.
+- [`05-DADOS-E-AUTH.md`](05-DADOS-E-AUTH.md): tabelas `sync_alerts`/`admin_audit_log`, RPCs de sync e
+  o cron `scores`/`catalog`.
 
 ---
 

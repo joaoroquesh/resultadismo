@@ -24,7 +24,7 @@
 | Tabela | Para que serve | Colunas/relacionamentos importantes |
 |---|---|---|
 | `profiles` | Perfil público do jogador (espelha `auth.users`) | `id`(=auth.users), `display_name`, `avatar_url` (escudo `crest:…`), `favorite_team`, **`is_app_admin`**. Sem `email`. |
-| `competitions` | Campeonatos reais sincronizados | `name`, `slug`, `type` (LEAGUE/CUP), `provider` (manual/football_data/espn/thesportsdb), `provider_code` (ex.: WC, BSA), `is_published`, `display_name`, datas, limite de dobros |
+| `competitions` | Campeonatos reais sincronizados | `name`, `slug`, `type` (LEAGUE/CUP), `provider` (manual/football_data/espn/thesportsdb), `provider_code` (ex.: WC, BSA), `is_published`, `display_name`, `sync_enabled`, **`catalog_seeded`** (1ª sync já feita), **`last_sync_ok`/`last_sync_error`/`last_sync_checked_at`** (saúde), datas, limite de dobros |
 | `teams` | Times | `name`, `tla`, `crest_url`/`local_crest`, `country`, `provider_ref` |
 | `matches` | Jogos reais | `competition_id`, times, `kickoff_at`, `status` (scheduled/live/finished/…), `home_score`/`away_score`, pênaltis (informativo), **`hidden`** (curadoria) |
 | `predictions` | **1 palpite por usuário por jogo** (global — vale em toda liga que disputa aquela competição) | `user_id`,`match_id` (único), `home_pred`/`away_pred` (0–99), `score_type`, `points`, `is_joker` (dobro) |
@@ -36,7 +36,9 @@
 | `confronto_optins` | Inscrições (modo opt-in) | `league_competition_id`,`user_id` (válidas só em `draft`) |
 | `notifications` | Notificações in-app | `user_id`, `type` (nudge/deadline/result/…), `title`/`body`/`data`, `read_at` |
 | `push_subscriptions` | Inscrições de Web Push | `user_id`, `endpoint` (único), `p256dh`, `auth` |
-| `app_settings` | **Singleton (id=1)** de config global | `payment_mode`, `league_price_cents`, `promo_price_cents`/`promo_until`, prefixos de nome |
+| `app_settings` | **Singleton (id=1)** de config global | `payment_mode`, `league_price_cents`, `promo_price_cents`/`promo_until`, prefixos de nome, **`maintenance_mode`/`maintenance_message`** |
+| `sync_alerts` | Fila de decisões do admin sobre o catálogo — **2.5.0** | `competition_id`, `match_id`, `provider_ref`, `kind` (new_match/cancelled/api_error = acionável; team_resolved/kickoff_changed = informativo), `status` (pending/approved/rejected/applied), `payload`. Sem acesso de cliente; só RPCs `admin_*`. |
+| `admin_audit_log` | Histórico de ações sync/admin — **2.5.0** | `actor` (null = sistema/cron), `action`, `entity_type`/`entity_id`, `detail` |
 | `discount_codes` | Cupons | `code`, `percent_off` **ou** `amount_off_cents`, `max_uses`/`used_count`, `active`, `expires_at` |
 | `league_payments` | Trilha de pagamentos (auditoria/idempotência) | `league_id`,`user_id`, `provider` (mercadopago/comp/test), `payment_id` (único), `status`, `amount_cents`, `discount_code` |
 | `access_control` / `access_sessions` | Sala de espera (fila FIFO) | config singleton + 1 linha por aba (`state` active/waiting) |
@@ -114,7 +116,12 @@ Realtime**); `nudge_member` (cutucar, anti-spam 30 min).
   `max_uses`).
 
 **Cron (pg_cron)**
-- `run_football_sync()` — sincroniza jogos (a cada ~15 min) via Edge Function.
+- `run_football_sync(mode)` — dispara a Edge Function `sync-football`. **2.5.0**: `scores` a cada
+  `*/5` (mas só chama a API se `should_sync_scores()` = há jogo ao vivo/prestes/recém) e `catalog`
+  diário 09:00 UTC. Só dispara de fato com `private.sync_config` populado (URL + service_key).
+  RPCs de admin: `admin_list_sync_alerts`, `admin_resolve_sync_alert`, `admin_set_competition_sync`,
+  `admin_set_maintenance`, `admin_reopen_match`, `admin_recent_audit`, `admin_system_health` (todas
+  `SECURITY DEFINER`, app-admin).
 - `create_deadline_reminders()` — lembrete de prazo de palpite (jogo começando, membro não palpitou).
 - `release_scheduled_confrontos()` — libera sorteios agendados (a cada 5 min).
 - Purga de grupos `pending`+não pagas após ~24h.

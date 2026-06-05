@@ -22,8 +22,24 @@
 
 ## 2. Painel do app-admin (`/admin` — `features/admin/AdminPage.tsx`)
 
-Quatro abas (SegmentedControl). Todas as ações chamam RPCs que **revalidam `is_app_admin()` no
-banco** — o guard de UI é conveniência, não segurança.
+**Dashboard-first**, navegação por **abas na URL** (`?t=`) — rolável (não espreme no mobile);
+voltar de "ver jogos" cai na aba certa. Abas: **Visão · Alertas · Grupos · Competições · Usuários ·
+Pagamento**. Todas as ações chamam RPCs que **revalidam `is_app_admin()` no banco** — o guard de UI
+é conveniência, não segurança.
+
+### Aba **Visão** (`AdminDashboard`) — saúde do sistema
+- Strip "ao vivo / próx. 24h / online" (`admin_system_health`, refetch 30s).
+- **Sincronização**: status por competição (verde/vermelho/cinza = último sync ok/erro/nunca),
+  última sync, **Sincronizar** (manual = modo `catalog`) e **ligar/pausar** sync
+  (`admin_set_competition_sync`). "Sincronizar tudo".
+- **Banners de alerta** (Nielsen #1): sync com problema (flame) e pendências (gold) → levam a Alertas.
+- **Modo manutenção** (`admin_set_maintenance` → banner global `MaintenanceBanner`), **Atividade
+  recente** (`admin_recent_audit`).
+
+### Aba **Alertas** (`SyncAlertsPanel`)
+- **Precisam de você** (pendentes): jogo novo (`new_match`→inserir), cancelamento (`cancelled`),
+  API com problema (`api_error`) → **aprovar/recusar** (`admin_resolve_sync_alert`).
+- **Histórico**: aplicados/resolvidos (mata-mata definido, horário mudou).
 
 ### Aba **Grupos** (`LigasAdmin`)
 - **Aguardando aprovação**: grupos `pending` → **Aprovar** (`approve_league`) / **Rejeitar**
@@ -43,9 +59,10 @@ banco** — o guard de UI é conveniência, não segurança.
   (`admin_delete_competition`).
 - **NameRulesCard**: prefixos de nome de grupo (Bolão/Liga/Copa) — `admin_set_name_prefixes`.
 
-### Aba **Users** (`UsuariosAdmin`)
+### Aba **Usuários** (`UsuariosAdmin`)
 - Lista todos os perfis **com e-mail** via RPC `admin_list_users` (lê `auth.users`;
   `SECURITY DEFINER`, só app-admin — a coluna `email` foi **removida** de `profiles` por privacidade).
+- **Busca** por nome/e-mail + **ordenação** (admins primeiro, depois alfabético).
 - Promover/rebaixar app-admin (`set_app_admin`).
 
 ### Aba **Pgto** (`PaymentAdmin`) → detalhe em [`06`](06-REGRAS-DE-NEGOCIO.md) §pagamento
@@ -58,6 +75,9 @@ banco** — o guard de UI é conveniência, não segurança.
 ### Tela de jogos por competição (`/admin/competicoes/:id/jogos` — `AdminCompMatchesPage`)
 - Curadoria por jogo: ocultar/mostrar (`matches.hidden`, RPC/`useSetMatchHidden`) e **override
   manual** de placar/status. Separada da tela de palpites.
+- **Reabrir palpites** (`admin_reopen_match`): emergência (jogo adiado) — empurra o `kickoff_at`
+  ~15 min e destrava os palpites.
+- ℹ️ O ideal é a API atualizar sozinha (sync inteligente — §sync abaixo); o override é exceção.
 
 ## 3. Admin de grupo (dentro de `LigaDetailPage`)
 
