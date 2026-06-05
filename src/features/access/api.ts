@@ -58,5 +58,27 @@ export async function heartbeatAccess(): Promise<boolean> {
 export function releaseAccess(): void {
   const token = getToken();
   if (!token) return;
-  void supabase.rpc("release_access", { p_token: token });
+  // Precisa de `fetch` com keepalive: no `pagehide` a página está morrendo, e um
+  // `supabase.rpc(...)` (builder lazy, não-awaited) nem chega a disparar — a vaga
+  // só sairia pelo TTL de 45s. keepalive deixa o POST sobreviver ao unload.
+  // `release_access` é grant `anon` (deleta a sessão pelo token-capacidade), então
+  // basta a apikey — não depende do token de sessão do usuário.
+  const url = import.meta.env.VITE_SUPABASE_URL as string;
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+  try {
+    void fetch(`${url}/rest/v1/rpc/release_access`, {
+      method: "POST",
+      keepalive: true,
+      headers: {
+        "Content-Type": "application/json",
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+      },
+      body: JSON.stringify({ p_token: token }),
+    }).catch(() => {
+      /* best-effort: o TTL de 45s é a rede de segurança */
+    });
+  } catch {
+    /* best-effort */
+  }
 }

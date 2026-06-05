@@ -8,6 +8,24 @@ const MATCH_SELECT =
   "*, home_team:teams!matches_home_team_id_fkey(*), away_team:teams!matches_away_team_id_fkey(*), competition:competitions(id,name,slug,emblem_url)";
 
 /**
+ * Polling de segurança do placar ao vivo: enquanto houver jogo AO VIVO (ou "ao
+ * vivo automático" — agendado cujo kickoff já passou há menos de 4h), revalida a
+ * cada 60s, caso o Realtime caia/sature. Em repouso retorna false (zero
+ * requisição extra). Combina com o Realtime (instantâneo) e o cron de 1 min.
+ */
+function liveRefetchInterval(rows: MatchWithTeams[] | undefined): number | false {
+  if (!rows?.length) return false;
+  const now = Date.now();
+  const liveish = rows.some((m) => {
+    if (m.status === "live") return true;
+    if (m.status !== "scheduled" || !m.kickoff_at) return false;
+    const k = new Date(m.kickoff_at).getTime();
+    return k <= now && now - k < 4 * 3_600_000;
+  });
+  return liveish ? 60_000 : false;
+}
+
+/**
  * Acha a Copa do Mundo no catálogo da liga. Default sazonal da temporada
  * (Copa do Mundo 2026) — reaproveitado pelo NovaLigaPage e pela aba de
  * Competições do grupo. Quando a Copa sair do calendário a gente
@@ -54,6 +72,7 @@ export function useMatches(competitionId: string | undefined) {
     enabled: !!competitionId,
     queryKey: ["matches", competitionId],
     staleTime: 30_000,
+    refetchInterval: (query) => liveRefetchInterval(query.state.data),
     placeholderData: keepPreviousData,
     queryFn: async (): Promise<MatchWithTeams[]> => {
       // Filtra jogos anteriores à data em que a competição foi adicionada no app.
@@ -93,6 +112,7 @@ export function useAllMatches(enabled = true) {
     enabled,
     queryKey: ["matches", "all", isAppAdmin ? "admin" : "public"],
     staleTime: 30_000,
+    refetchInterval: (query) => liveRefetchInterval(query.state.data),
     placeholderData: keepPreviousData,
     queryFn: async (): Promise<MatchWithTeams[]> => {
       let cq = supabase.from("competitions").select("id, created_at").eq("status", "active");
@@ -266,28 +286,32 @@ export function useMatchPredictStatus(matchId: string, enabled: boolean) {
 export function useMatchesRealtime(competitionId: string | undefined) {
   const qc = useQueryClient();
   useEffect(() => {
-    if (!competitionId) return;
     // Debounce: um sync atualiza vários jogos de uma vez; agrupamos a rajada
     // numa única revalidação para não disparar uma tempestade de refetch
-    // (especialmente o de standings, que é o mais pesado).
+    // (especialmente o de standings, que é o mais pesado). Invalidamos a família
+    // ["matches"] inteira — cobre a visão "Todos" (["matches","all",…]) E cada
+    // competição (["matches",id]), por isso o placar ao vivo atualiza em ambas.
     let timer: ReturnType<typeof setTimeout> | undefined;
     const invalidate = () => {
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
-        qc.invalidateQueries({ queryKey: ["matches", competitionId] });
-        qc.invalidateQueries({ queryKey: ["my-predictions", competitionId] });
+        qc.invalidateQueries({ queryKey: ["matches"] });
+        qc.invalidateQueries({ queryKey: ["my-predictions"] });
         qc.invalidateQueries({ queryKey: ["standings"] });
       }, 1200);
     };
+    // Sem competição (visão "Todos") assina a tabela inteira; com competição,
+    // filtra no servidor. A RLS de matches é pública (select using(true)), então
+    // a assinatura ampla não expõe nada além do que já é visível.
     const channel = supabase
-      .channel(`matches-${competitionId}-${Math.random().toString(36).slice(2)}`)
+      .channel(`matches-${competitionId ?? "all"}-${Math.random().toString(36).slice(2)}`)
       .on(
         "postgres_changes",
         {
           event: "*",
           schema: "public",
           table: "matches",
-          filter: `competition_id=eq.${competitionId}`,
+          ...(competitionId ? { filter: `competition_id=eq.${competitionId}` } : {}),
         },
         invalidate,
       )

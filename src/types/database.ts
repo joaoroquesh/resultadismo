@@ -1676,6 +1676,7 @@ export type Database = {
         Returns: undefined
       }
       should_sync_scores: { Args: never; Returns: boolean }
+      touch_presence: { Args: never; Returns: undefined }
       simulate_league_payment: {
         Args: { p_discount_code?: string; p_league_id: string }
         Returns: {

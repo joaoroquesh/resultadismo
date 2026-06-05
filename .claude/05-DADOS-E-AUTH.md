@@ -162,7 +162,14 @@ a sessão sai do `localStorage`.
 
 **Sala de espera (fila de acesso):** em pico, novos acessos entram numa fila FIFO (`AccessGate` +
 RPCs `request/heartbeat/release_access`) em vez de derrubar quem está dentro. **Fail-open**: qualquer
-erro no portão → admite (o portão nunca pode virar apagão). Usa **só RPC HTTP, nunca Realtime**.
+erro no portão → admite (o portão nunca pode virar apagão). Usa **só RPC HTTP, nunca Realtime**. Com a
+fila **desligada**, `request_access` admite direto (sem criar sessão) e o front **não** liga o
+heartbeat de fila.
+
+**Presença ("online") é separada da fila:** todo usuário logado bate `touch_presence`
+(`PresenceTracker`, ~30s, só com a aba visível), que grava `profiles.last_active_at` + acumula
+`usage_seconds`. O "online" do admin (dashboard, lista de usuários, perfil) = `last_active_at`
+recente (**90s**), **não** depende de `access_sessions` nem da fila estar ligada.
 
 ## 8. Edge Functions (banco ↔ serviços) → ver [`07`](07-BUILD-E-DEPLOY.md)
 

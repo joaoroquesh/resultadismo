@@ -21,6 +21,7 @@ export type SystemHealth = {
   next_24h: number;
   pending_alerts: number;
   pending_leagues: number;
+  online_now: number;
   active_sessions: number;
   maintenance_mode: boolean;
   online_alert_threshold: number;

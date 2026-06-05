@@ -18,11 +18,35 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+---
+
+## [2.7.1] — 2026-06-05
+
 ### Corrigido
 - **Card ao vivo na primeira dobra não tem mais a borda cortada.** O teto de 2 linhas do teaser
   deslogado (2.7.0) passou a limitar a **quantidade** de cards renderizados, em vez de
   `overflow-hidden` — que clipava o anel (`ring`) dos jogos AO VIVO. Mesma regra (máx 2 linhas, sem
   espaço vazio), agora sem corte. (`FirstFold` + `JogosPage`)
+- **"Online" e tempo de uso desacoplados da sala de espera.** Antes, a presença (quem está online,
+  `last_active_at`, `usage_seconds`) era parasita da fila de acesso: só era alimentada quando havia
+  sessão ativa em `access_sessions`. Como a fila vive **desligada** no dia a dia, ninguém aparecia
+  online e o tempo de uso não acumulava. Agora todo usuário logado emite um heartbeat leve próprio
+  (`touch_presence` + `PresenceTracker`), e o "online" é calculado por `profiles.last_active_at`
+  recente (limiar único de 90s) no dashboard, na lista de usuários e no perfil. (migration
+  `20260605000001`, `src/features/presence/PresenceTracker.tsx`)
+- **Sala de espera não "pisca" mais quando está desligada.** Com a fila off, `request_access` admite
+  sem criar sessão; o front iniciava o heartbeat mesmo assim e, a cada 20s, ele voltava `expired` e
+  jogava a tela de espera por um instante. Agora o heartbeat de fila só roda com a fila **ligada**, e
+  o `!ok` re-pede acesso sem pintar a espera de forma otimista. (`src/features/access/AccessGate.tsx`)
+- **Placar ao vivo atualiza sozinho.** (1) O cron de placares passou de 5 min para **1 min**
+  (`should_sync_scores()` continua barrando fora de jogo — custo de API só durante partidas). (2) Na
+  visão "Todos os campeonatos" o app não assinava Realtime (o hook saía cedo sem competição) — agora
+  assina a tabela inteira; e há um `refetchInterval` de 60s de segurança enquanto houver jogo ao vivo.
+  (migration `20260605000001`, `src/features/matches/api.ts`)
+- **Liberar a vaga da fila ao fechar a aba volta a funcionar.** `releaseAccess` usava
+  `void supabase.rpc(...)` — o builder do supabase-js é lazy e, sem `await`, **nunca disparava** (a
+  vaga só saía pelo TTL de 45s). Agora usa `fetch` com **`keepalive`** (sobrevive ao `pagehide`) na
+  RPC `release_access` (grant `anon`, só precisa da apikey). (`src/features/access/api.ts`)
 
 ---
 

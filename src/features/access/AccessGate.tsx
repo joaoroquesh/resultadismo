@@ -38,9 +38,11 @@ export function AccessGate({ children }: { children: ReactNode }) {
       hbTimer = setInterval(async () => {
         const ok = await heartbeatAccess();
         if (!ok && alive) {
-          // Perdeu a vaga (expirou/foi recuperada): volta para a fila.
+          // Perdeu a vaga (expirou/recuperada): re-pede acesso. NÃO pinta a sala
+          // de espera de forma otimista — quem decide o status é o check() com a
+          // resposta autoritativa do banco (re-admite sem flash; só vai pra
+          // "waiting" se de fato re-enfileirado).
           stopHeartbeat();
-          setStatus("waiting");
           void check();
         }
       }, HEARTBEAT_MS);
@@ -55,7 +57,12 @@ export function AccessGate({ children }: { children: ReactNode }) {
         if (res.admitted) {
           setStatus("admitted");
           stopPoll();
-          startHeartbeat();
+          // Heartbeat de FILA só quando a sala está LIGADA (há sessão a manter
+          // viva). Com a sala desligada, request_access admite sem criar sessão:
+          // o token é "seco", e bater heartbeat acharia v_state=null e nos jogaria
+          // pra "waiting" a cada 20s (o piscar). Presença/online é do PresenceTracker.
+          if (res.enabled === false) stopHeartbeat();
+          else startHeartbeat();
         } else {
           setStatus("waiting");
           stopPoll();

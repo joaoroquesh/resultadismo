@@ -28,7 +28,8 @@ Pagamento**. Todas as ações chamam RPCs que **revalidam `is_app_admin()` no ba
 é conveniência, não segurança.
 
 ### Aba **Visão** (`AdminDashboard`) — saúde do sistema
-- Strip "ao vivo / próx. 24h / online" (`admin_system_health`, refetch 30s).
+- Strip "ao vivo / hoje / online" (`admin_system_health`, refetch 30s). "Online" = presença real
+  (`profiles.last_active_at` < 90s via `touch_presence`), não a fila de acesso.
 - **Sincronização**: status por competição (verde/vermelho/cinza = último sync ok/erro/nunca),
   última sync, **Sincronizar** (manual = modo `catalog`) e **ligar/pausar** sync
   (`admin_set_competition_sync`). "Sincronizar tudo".

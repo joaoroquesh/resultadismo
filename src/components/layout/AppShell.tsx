@@ -6,6 +6,7 @@ import { PublicShell } from "./PublicShell";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { MaintenanceBanner } from "./MaintenanceBanner";
 import { AccessGate } from "@/features/access/AccessGate";
+import { PresenceTracker } from "@/features/presence/PresenceTracker";
 import { ConsentBanner } from "@/features/consent/ConsentBanner";
 import { useAuth } from "@/features/auth/AuthProvider";
 
@@ -38,6 +39,7 @@ export function AppShell() {
   } else {
     content = (
       <AccessGate>
+        <PresenceTracker />
         <div className="min-h-dvh lg:flex">
           <Sidebar />
           <div className="min-w-0 flex-1">

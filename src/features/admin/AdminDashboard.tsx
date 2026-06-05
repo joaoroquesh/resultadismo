@@ -127,7 +127,7 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => vo
   const hasPending = health.pending_alerts > 0;
   const hasPendingLeagues = health.pending_leagues > 0;
   const onlineThreshold = health.online_alert_threshold ?? ONLINE_ALERT_THRESHOLD;
-  const onlineSpike = health.active_sessions >= onlineThreshold;
+  const onlineSpike = health.online_now >= onlineThreshold;
 
   return (
     <div className="space-y-4">
@@ -190,7 +190,7 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => vo
           <Users2 className="size-5 shrink-0 text-flame-600" />
           <div className="min-w-0 flex-1">
             <p className="text-sm font-bold text-flame-700">
-              Pico de acesso: {health.active_sessions} pessoas online agora
+              Pico de acesso: {health.online_now} pessoas online agora
             </p>
             <p className="text-xs text-ink-500">
               Acima de {onlineThreshold}. De olho na fila de acesso e no Realtime.
@@ -205,7 +205,7 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => vo
         <Stat icon={<CalendarClock className="size-5" />} value={health.today} label="Hoje" accent="ink" />
         <Stat
           icon={<Users2 className="size-5" />}
-          value={health.active_sessions}
+          value={health.online_now}
           label="Online"
           accent={onlineSpike ? "flame" : "brand"}
         />
