@@ -8,6 +8,9 @@ export const ONBOARDING_KEY = "resultadismo-onboarding-v1";
 
 /** Evento p/ reabrir o tour manualmente (ex.: admin testando). */
 const REPLAY_EVENT = "resultadismo:replay-onboarding";
+// Utilitário (não-componente) exportado junto do componente: desabilita só o
+// aviso de Fast Refresh (HMR em dev) — zero impacto em runtime.
+// eslint-disable-next-line react-refresh/only-export-components
 export function replayOnboarding() {
   window.dispatchEvent(new Event(REPLAY_EVENT));
 }

@@ -228,25 +228,20 @@ export function MyConfrontoCard({
   const bye = mine.member_b === null;
 
   let statusTxt = "Confronto em andamento";
-  let statusTone = "text-ink-400";
   if (bye) {
     statusTxt = "Você passou direto (bye)";
   } else if (mine.resolved) {
     if (mine.winner === currentUserId) {
       statusTxt = mine.walkover ? "Você venceu (W.O.)" : "Você venceu!";
-      statusTone = "text-grass-600";
     } else if (mine.winner === null) {
       statusTxt = "Empate";
     } else {
       statusTxt = mine.walkover ? "Você perdeu (W.O.)" : "Você perdeu";
-      statusTone = "text-flame-600";
     }
   } else if (mePts > opPts) {
     statusTxt = "Você está ganhando";
-    statusTone = "text-grass-600";
   } else if (opPts > mePts) {
     statusTxt = "Você está perdendo";
-    statusTone = "text-flame-600";
   }
 
   return (

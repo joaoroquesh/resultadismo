@@ -31,13 +31,16 @@ export function RefundFederationButton({
   const { toast } = useToast();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  // Captura o "agora" na montagem (a janela de reembolso é de DIAS — não precisa
+  // ticar). Evita Date.now() no corpo do render (regra react-hooks/purity).
+  const [now] = useState(() => Date.now());
 
   // Pagamento desligado (ADR 0002): a infra de reembolso fica DORMENTE — não aparece.
   // (Volta sozinha se a cobrança for reativada — modo 'test'/'live'.)
   if ((settings?.payment_mode ?? "disabled") === "disabled") return null;
   // Só grupo pago e dentro da janela de 7 dias.
   if (paymentStatus !== "paid" || !approvedAt) return null;
-  const daysSince = (Date.now() - new Date(approvedAt).getTime()) / DAY_MS;
+  const daysSince = (now - new Date(approvedAt).getTime()) / DAY_MS;
   if (!(daysSince >= 0 && daysSince <= REFUND_WINDOW_DAYS)) return null;
   const daysLeft = Math.max(1, Math.ceil(REFUND_WINDOW_DAYS - daysSince));
 

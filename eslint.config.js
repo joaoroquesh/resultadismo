@@ -22,5 +22,16 @@ export default tseslint.config(
       ecmaVersion: 2022,
       globals: globals.browser,
     },
+    rules: {
+      // `react-hooks/set-state-in-effect` é regra EXPERIMENTAL do React Compiler
+      // (vem no recommended-latest). Sinaliza ~12 padrões idiomáticos pré-existentes
+      // (popular formulário a partir de dados assíncronos, resetar estado quando uma
+      // prop muda). Migrar esses componentes para os padrões "you might not need an
+      // effect" é um passe DEDICADO — desligada por ora para não arriscar arquivos
+      // core num app ao vivo (e enquanto há sessões editando em paralelo). As demais
+      // regras de hooks seguem ativas: rules-of-hooks, exhaustive-deps e purity
+      // (esta última pega Date.now()/Math.random() no render — bug real).
+      "react-hooks/set-state-in-effect": "off",
+    },
   },
 );

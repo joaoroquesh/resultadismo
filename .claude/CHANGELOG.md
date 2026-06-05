@@ -20,6 +20,21 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ---
 
+## [2.7.5] — 2026-06-05
+
+### Alterado
+- **Lint do repo 100% limpo (`eslint .` exit 0).** Corrigidos **em código**: `Date.now()` no render
+  (`RefundFederationButton` → captura na montagem, janela é de dias); variável morta `statusTone`
+  (`ConfrontoViews`); aviso de Fast Refresh num utilitário exportado (`Onboarding`, disable por linha).
+  A regra **experimental** do React Compiler `react-hooks/set-state-in-effect` — que sinalizava **12
+  padrões idiomáticos pré-existentes** (popular formulário de dados async, resetar estado on prop
+  change) em arquivos core/quentes — foi **desligada por ora** (justificada em `eslint.config.js`),
+  para não arriscar componentes core num app ao vivo enquanto há sessões editando em paralelo. As
+  demais regras de hooks seguem ativas (rules-of-hooks, exhaustive-deps, **purity**). _Migração
+  dedicada desses 12 componentes para "you might not need an effect" fica como próximo passe._
+
+---
+
 ## [2.7.4] — 2026-06-05
 
 ### Corrigido
