@@ -91,10 +91,50 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_audit_log: {
+        Row: {
+          action: string
+          actor: string | null
+          created_at: string
+          detail: Json
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+        }
+        Insert: {
+          action: string
+          actor?: string | null
+          created_at?: string
+          detail?: Json
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor?: string | null
+          created_at?: string
+          detail?: Json
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_audit_log_actor_fkey"
+            columns: ["actor"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_settings: {
         Row: {
           id: number
           league_price_cents: number
+          maintenance_message: string | null
+          maintenance_mode: boolean
           name_prefix_cup: string
           name_prefix_liga: string
           name_prefix_points: string
@@ -106,6 +146,8 @@ export type Database = {
         Insert: {
           id?: number
           league_price_cents?: number
+          maintenance_message?: string | null
+          maintenance_mode?: boolean
           name_prefix_cup?: string
           name_prefix_liga?: string
           name_prefix_points?: string
@@ -117,6 +159,8 @@ export type Database = {
         Update: {
           id?: number
           league_price_cents?: number
+          maintenance_message?: string | null
+          maintenance_mode?: boolean
           name_prefix_cup?: string
           name_prefix_liga?: string
           name_prefix_points?: string
@@ -130,6 +174,7 @@ export type Database = {
       competitions: {
         Row: {
           area: string | null
+          catalog_seeded: boolean
           created_at: string
           current_round: string | null
           display_name: string | null
@@ -138,6 +183,9 @@ export type Database = {
           is_featured: boolean
           is_published: boolean
           jokers_per_week: number
+          last_sync_checked_at: string | null
+          last_sync_error: string | null
+          last_sync_ok: boolean | null
           last_synced_at: string | null
           max_jokers: number
           name: string
@@ -155,6 +203,7 @@ export type Database = {
         }
         Insert: {
           area?: string | null
+          catalog_seeded?: boolean
           created_at?: string
           current_round?: string | null
           display_name?: string | null
@@ -163,6 +212,9 @@ export type Database = {
           is_featured?: boolean
           is_published?: boolean
           jokers_per_week?: number
+          last_sync_checked_at?: string | null
+          last_sync_error?: string | null
+          last_sync_ok?: boolean | null
           last_synced_at?: string | null
           max_jokers?: number
           name: string
@@ -180,6 +232,7 @@ export type Database = {
         }
         Update: {
           area?: string | null
+          catalog_seeded?: boolean
           created_at?: string
           current_round?: string | null
           display_name?: string | null
@@ -188,6 +241,9 @@ export type Database = {
           is_featured?: boolean
           is_published?: boolean
           jokers_per_week?: number
+          last_sync_checked_at?: string | null
+          last_sync_error?: string | null
+          last_sync_ok?: boolean | null
           last_synced_at?: string | null
           max_jokers?: number
           name?: string
@@ -980,6 +1036,70 @@ export type Database = {
         }
         Relationships: []
       }
+      sync_alerts: {
+        Row: {
+          competition_id: string | null
+          created_at: string
+          id: string
+          kind: string
+          match_id: string | null
+          message: string | null
+          payload: Json
+          provider_ref: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+        }
+        Insert: {
+          competition_id?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          match_id?: string | null
+          message?: string | null
+          payload?: Json
+          provider_ref?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+        }
+        Update: {
+          competition_id?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          match_id?: string | null
+          message?: string | null
+          payload?: Json
+          provider_ref?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sync_alerts_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sync_alerts_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sync_alerts_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       teams: {
         Row: {
           country: string | null
@@ -1073,6 +1193,21 @@ export type Database = {
           slug: string
         }[]
       }
+      admin_list_sync_alerts: {
+        Args: { p_limit?: number }
+        Returns: {
+          competition_id: string
+          competition_name: string
+          created_at: string
+          id: string
+          kind: string
+          match_id: string
+          message: string
+          payload: Json
+          resolved_at: string
+          status: string
+        }[]
+      }
       admin_list_users: {
         Args: never
         Returns: {
@@ -1084,8 +1219,28 @@ export type Database = {
           is_app_admin: boolean
         }[]
       }
+      admin_recent_audit: {
+        Args: { p_limit?: number }
+        Returns: {
+          action: string
+          actor_name: string
+          created_at: string
+          detail: Json
+          entity_id: string
+          entity_type: string
+          id: string
+        }[]
+      }
       admin_rename_competition: {
         Args: { p_display_name: string; p_id: string }
+        Returns: undefined
+      }
+      admin_reopen_match: {
+        Args: { p_match_id: string; p_minutes?: number }
+        Returns: undefined
+      }
+      admin_resolve_sync_alert: {
+        Args: { p_action: string; p_id: string }
         Returns: undefined
       }
       admin_restore_league: {
@@ -1096,8 +1251,16 @@ export type Database = {
         Args: { p_id: string; p_value: boolean }
         Returns: undefined
       }
+      admin_set_competition_sync: {
+        Args: { p_id: string; p_value: boolean }
+        Returns: undefined
+      }
       admin_set_confronto_enabled: {
         Args: { p_league_id: string; p_value: boolean }
+        Returns: undefined
+      }
+      admin_set_maintenance: {
+        Args: { p_message?: string; p_on: boolean }
         Returns: undefined
       }
       admin_set_name_prefixes: {
@@ -1109,6 +1272,8 @@ export type Database = {
         Returns: {
           id: number
           league_price_cents: number
+          maintenance_message: string | null
+          maintenance_mode: boolean
           name_prefix_cup: string
           name_prefix_liga: string
           name_prefix_points: string
@@ -1128,6 +1293,7 @@ export type Database = {
         Args: { p_league_id: string }
         Returns: undefined
       }
+      admin_system_health: { Args: never; Returns: Json }
       admin_update_payment_settings: {
         Args: {
           p_mode: Database["public"]["Enums"]["payment_mode"]
@@ -1136,6 +1302,8 @@ export type Database = {
         Returns: {
           id: number
           league_price_cents: number
+          maintenance_message: string | null
+          maintenance_mode: boolean
           name_prefix_cup: string
           name_prefix_liga: string
           name_prefix_points: string
@@ -1410,7 +1578,9 @@ export type Database = {
       release_confronto_if_due: { Args: { p_lc_id: string }; Returns: boolean }
       release_scheduled_confrontos: { Args: never; Returns: number }
       request_access: { Args: { p_token?: string }; Returns: Json }
-      run_football_sync: { Args: never; Returns: undefined }
+      run_football_sync:
+        | { Args: never; Returns: undefined }
+        | { Args: { p_mode?: string }; Returns: undefined }
       score_points: {
         Args: { st: Database["public"]["Enums"]["score_type"] }
         Returns: number
@@ -1423,6 +1593,7 @@ export type Database = {
         Args: { p_user_id: string; p_value: boolean }
         Returns: undefined
       }
+      should_sync_scores: { Args: never; Returns: boolean }
       simulate_league_payment: {
         Args: { p_discount_code?: string; p_league_id: string }
         Returns: {

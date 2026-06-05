@@ -1,14 +1,25 @@
 // Resultadismo · Edge Function · sync-football
 // Sincroniza times, jogos e resultados de provedores gratuitos para o banco.
-// Provedores: football-data.org (primário), TheSportsDB (extra), manual (ignorado).
+// Provedores: ESPN (preferido), football-data.org, TheSportsDB. manual = ignorado.
 //
-// Chamada manual (admin): supabase.functions.invoke("sync-football", { body: { competitionId } })
-// Chamada agendada (cron): POST com a service_role key no Authorization.
+// DUAS MODALIDADES (decididas pelo `mode` no body):
+//   • scores  — só ATUALIZA placar/status de jogos JÁ existentes. Não insere,
+//               não alerta. É o sync frequente (cron */5, guardado no banco por
+//               should_sync_scores()).
+//   • catalog — reconcilia o calendário. 1ª vez (catalog_seeded=false) insere
+//               tudo; depois, jogo novo → ALERTA pro admin (não insere cego),
+//               cancelamento → alerta, mata-mata "A definir"→time real → aplica
+//               + alerta informativo, mudança de horário → aplica + alerta.
+//   • (sem mode / "full") = manual do admin: trata como catalog.
+//
+// Chamada manual (admin): supabase.functions.invoke("sync-football", { body: { competitionId, mode } })
+// Chamada agendada (cron): POST com a service_role key + { mode }.
 
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders, timingSafeEqual } from "../_shared/security.ts";
 
 type MatchStatus = "scheduled" | "live" | "finished" | "postponed" | "cancelled";
+type SyncMode = "scores" | "catalog";
 
 interface CompetitionRow {
   id: string;
@@ -16,6 +27,225 @@ interface CompetitionRow {
   provider: "manual" | "football_data" | "thesportsdb" | "espn";
   provider_code: string | null;
   provider_season: string | null;
+  catalog_seeded: boolean;
+}
+
+// Jogo normalizado que cada provedor devolve. A escrita (insert/update/alerta)
+// acontece só na reconcile(), não nas funções de provedor.
+interface MatchRow {
+  competition_id: string;
+  provider: "manual" | "football_data" | "thesportsdb" | "espn";
+  provider_ref: string;
+  stage?: string | null;
+  group_name?: string | null;
+  round?: string | null;
+  matchday?: number | null;
+  home_team_id?: string | null;
+  away_team_id?: string | null;
+  home_team_name: string;
+  away_team_name: string;
+  kickoff_at: string | null;
+  status: MatchStatus;
+  home_score: number | null;
+  away_score: number | null;
+  home_pen?: number | null;
+  away_pen?: number | null;
+}
+
+interface ReconcileResult {
+  matches: number;
+  updated: number;
+  inserted: number;
+  alerted: number;
+}
+
+const HOUR_MS = 3_600_000;
+
+// Cria alerta de jogo novo só se ainda não houver um pendente/rejeitado pro
+// mesmo jogo (evita re-alertar o que o admin já recusou). Retorna se criou.
+async function alertNewMatchIfNew(
+  admin: SupabaseClient,
+  comp: CompetitionRow,
+  row: MatchRow,
+): Promise<boolean> {
+  const { data: prev } = await admin
+    .from("sync_alerts")
+    .select("id")
+    .eq("competition_id", comp.id)
+    .eq("provider_ref", row.provider_ref)
+    .eq("kind", "new_match")
+    .in("status", ["pending", "rejected"])
+    .limit(1);
+  if (prev && prev.length) return false;
+  const { error } = await admin.from("sync_alerts").insert({
+    competition_id: comp.id,
+    provider_ref: row.provider_ref,
+    kind: "new_match",
+    status: "pending",
+    message: `Jogo novo na API: ${row.home_team_name} x ${row.away_team_name}`,
+    payload: row as unknown as Record<string, unknown>,
+  });
+  return !error;
+}
+
+async function alertCancelIfNew(
+  admin: SupabaseClient,
+  comp: CompetitionRow,
+  matchId: string,
+  ref: string,
+  label: string,
+): Promise<boolean> {
+  const { data: prev } = await admin
+    .from("sync_alerts")
+    .select("id")
+    .eq("competition_id", comp.id)
+    .eq("provider_ref", ref)
+    .eq("kind", "cancelled")
+    .in("status", ["pending", "rejected"])
+    .limit(1);
+  if (prev && prev.length) return false;
+  const { error } = await admin.from("sync_alerts").insert({
+    competition_id: comp.id,
+    match_id: matchId,
+    provider_ref: ref,
+    kind: "cancelled",
+    status: "pending",
+    message: `Possível cancelamento na API: ${label}`,
+    payload: {},
+  });
+  return !error;
+}
+
+async function alertInfo(
+  admin: SupabaseClient,
+  comp: CompetitionRow,
+  matchId: string,
+  ref: string,
+  kind: "team_resolved" | "kickoff_changed",
+  message: string,
+  payload: Record<string, unknown>,
+): Promise<void> {
+  await admin.from("sync_alerts").insert({
+    competition_id: comp.id,
+    match_id: matchId,
+    provider_ref: ref,
+    kind,
+    status: "applied", // informativo: já aplicado, fora da fila de pendências
+    message,
+    payload,
+  });
+}
+
+// Reconcilia os jogos vindos do provedor com o banco, conforme o modo.
+async function reconcile(
+  admin: SupabaseClient,
+  comp: CompetitionRow,
+  rows: MatchRow[],
+  mode: SyncMode,
+): Promise<ReconcileResult> {
+  const ts = new Date().toISOString();
+  const { data: existing } = await admin
+    .from("matches")
+    .select(
+      "id, provider_ref, status, kickoff_at, home_team_name, away_team_name, home_team_id, away_team_id",
+    )
+    .eq("competition_id", comp.id)
+    .eq("provider", comp.provider);
+  const byRef = new Map(
+    (existing ?? []).map((m: Record<string, unknown>) => [String(m.provider_ref), m]),
+  );
+
+  let updated = 0;
+  let inserted = 0;
+  let alerted = 0;
+
+  for (const row of rows) {
+    const cur = byRef.get(row.provider_ref) as Record<string, unknown> | undefined;
+
+    // ----- jogo já existe → atualiza -----
+    if (cur) {
+      const patch: Record<string, unknown> = {
+        status: row.status,
+        home_score: row.home_score,
+        away_score: row.away_score,
+        last_synced_at: ts,
+      };
+      if (row.home_pen !== undefined) patch.home_pen = row.home_pen;
+      if (row.away_pen !== undefined) patch.away_pen = row.away_pen;
+
+      if (mode === "catalog") {
+        const wasPlaceholder =
+          cur.home_team_name === "A definir" ||
+          cur.away_team_name === "A definir" ||
+          !cur.home_team_id ||
+          !cur.away_team_id;
+        const nowReal =
+          row.home_team_name !== "A definir" && row.away_team_name !== "A definir";
+
+        if (row.home_team_id != null) patch.home_team_id = row.home_team_id;
+        if (row.away_team_id != null) patch.away_team_id = row.away_team_id;
+        patch.home_team_name = row.home_team_name;
+        patch.away_team_name = row.away_team_name;
+        if (row.stage !== undefined) patch.stage = row.stage;
+        if (row.group_name !== undefined) patch.group_name = row.group_name;
+        if (row.round !== undefined) patch.round = row.round;
+        if (row.matchday !== undefined) patch.matchday = row.matchday;
+
+        // mudança de horário > 1h: aplica + alerta informativo
+        if (row.kickoff_at && cur.kickoff_at) {
+          const diff = Math.abs(
+            new Date(row.kickoff_at).getTime() - new Date(String(cur.kickoff_at)).getTime(),
+          );
+          if (diff > HOUR_MS) {
+            await alertInfo(admin, comp, String(cur.id), row.provider_ref, "kickoff_changed",
+              `Horário mudou: ${row.home_team_name} x ${row.away_team_name}`,
+              { from: cur.kickoff_at, to: row.kickoff_at });
+            alerted++;
+          }
+          patch.kickoff_at = row.kickoff_at;
+        } else if (row.kickoff_at) {
+          patch.kickoff_at = row.kickoff_at;
+        }
+
+        // mata-mata "A definir" → times reais: aplica + alerta informativo
+        if (wasPlaceholder && nowReal) {
+          await alertInfo(admin, comp, String(cur.id), row.provider_ref, "team_resolved",
+            `Confronto definido: ${row.home_team_name} x ${row.away_team_name}`, {});
+          alerted++;
+        }
+
+        // cancelamento explícito da API → NÃO aplica sozinho, vira alerta
+        if (row.status === "cancelled" && cur.status !== "cancelled") {
+          patch.status = cur.status;
+          if (await alertCancelIfNew(admin, comp, String(cur.id), row.provider_ref,
+              `${row.home_team_name} x ${row.away_team_name}`)) {
+            alerted++;
+          }
+        }
+      }
+
+      await admin.from("matches").update(patch).eq("id", String(cur.id));
+      updated++;
+      continue;
+    }
+
+    // ----- jogo não existe -----
+    if (mode === "scores") continue; // scores nunca insere nem alerta
+    if (!comp.catalog_seeded) {
+      // primeira vez: insere tudo (admin revisa/oculta depois)
+      const { error } = await admin.from("matches").insert({ ...row, last_synced_at: ts });
+      if (!error) inserted++;
+    } else {
+      // depois: jogo novo vira alerta (admin decide)
+      if (await alertNewMatchIfNew(admin, comp, row)) alerted++;
+    }
+  }
+
+  if (mode === "catalog" && !comp.catalog_seeded) {
+    await admin.from("competitions").update({ catalog_seeded: true }).eq("id", comp.id);
+  }
+
+  return { matches: updated + inserted, updated, inserted, alerted };
 }
 
 // ---------------------------------------------------------------------------
@@ -106,7 +336,7 @@ async function syncFootballData(
   supabase: SupabaseClient,
   comp: CompetitionRow,
   token: string,
-): Promise<{ teams: number; matches: number }> {
+): Promise<MatchRow[]> {
   if (!comp.provider_code) throw new Error("provider_code ausente");
   const url = new URL(`https://api.football-data.org/v4/competitions/${comp.provider_code}/matches`);
   if (comp.provider_season) url.searchParams.set("season", comp.provider_season);
@@ -117,7 +347,11 @@ async function syncFootballData(
     throw new Error(`football-data indisponível (${res.status})`);
   }
   const data = await res.json();
-  const matches: any[] = data.matches ?? [];
+  // Guarda de formato: se `matches` não é array, o contrato mudou.
+  if (!data || !Array.isArray(data.matches)) {
+    throw new Error("football-data: formato de resposta inesperado (a API pode ter mudado).");
+  }
+  const matches: any[] = data.matches;
 
   // upsert times
   const teamMap = new Map<number, string>(); // provider id -> uuid
@@ -147,9 +381,8 @@ async function syncFootballData(
     for (const r of upTeams ?? []) teamMap.set(Number(r.provider_ref), r.id);
   }
 
-  // upsert de jogos em LOTE
-  const ts = new Date().toISOString();
-  const matchRows = matches.map((m) => {
+  // jogos normalizados (a escrita acontece na reconcile)
+  return matches.map((m): MatchRow => {
     const status = mapFootballDataStatus(m.status);
     const ft = m.score?.fullTime ?? {};
     const pens = m.score?.penalties ?? {};
@@ -158,7 +391,7 @@ async function syncFootballData(
     const hasLiveScore = status === "finished" || status === "live";
     return {
       competition_id: comp.id,
-      provider: "football_data" as const,
+      provider: "football_data",
       provider_ref: String(m.id),
       stage: m.stage ?? null,
       group_name: m.group ?? null,
@@ -174,27 +407,18 @@ async function syncFootballData(
       away_score: hasLiveScore ? (ft.away ?? null) : null,
       home_pen: pens.home ?? null,
       away_pen: pens.away ?? null,
-      last_synced_at: ts,
     };
   });
-  if (matchRows.length > 0) {
-    const { error } = await supabase
-      .from("matches")
-      .upsert(matchRows, { onConflict: "provider,provider_ref" });
-    if (error) throw error;
-  }
-
-  return { teams: teamMap.size, matches: matchRows.length };
 }
 
 // ---------------------------------------------------------------------------
 // TheSportsDB (v1, gratuito)
 // ---------------------------------------------------------------------------
 async function syncTheSportsDb(
-  supabase: SupabaseClient,
+  _supabase: SupabaseClient,
   comp: CompetitionRow,
   key: string,
-): Promise<{ teams: number; matches: number }> {
+): Promise<MatchRow[]> {
   if (!comp.provider_code) throw new Error("provider_code ausente (id da liga no TheSportsDB)");
 
   // eventsseason.php no Free CORTA em 15 eventos (ex.: pegava só jan/fev de uma temporada inteira).
@@ -218,8 +442,7 @@ async function syncTheSportsDb(
   }
   const events = Array.from(byId.values());
 
-  const ts = new Date().toISOString();
-  const rows = events.map((e: Record<string, unknown>) => {
+  return events.map((e: Record<string, unknown>): MatchRow => {
     const status = String(e.strStatus ?? "");
     const finished = status === "Match Finished" || status === "FT";
     const live = !!status && !finished && status !== "Not Started";
@@ -231,25 +454,17 @@ async function syncTheSportsDb(
     const as_ = e.intAwayScore;
     return {
       competition_id: comp.id,
-      provider: "thesportsdb" as const,
+      provider: "thesportsdb",
       provider_ref: String(e.idEvent),
       round: e.intRound ? `Rodada ${e.intRound}` : null,
       home_team_name: (e.strHomeTeam as string | undefined) ?? "A definir",
       away_team_name: (e.strAwayTeam as string | undefined) ?? "A definir",
       kickoff_at: kickoff,
-      status: finished ? ("finished" as const) : live ? ("live" as const) : ("scheduled" as const),
+      status: finished ? "finished" : live ? "live" : "scheduled",
       home_score: (finished || live) && hs != null ? Number(hs) : null,
       away_score: (finished || live) && as_ != null ? Number(as_) : null,
-      last_synced_at: ts,
     };
   });
-  if (rows.length > 0) {
-    const { error } = await supabase
-      .from("matches")
-      .upsert(rows, { onConflict: "provider,provider_ref" });
-    if (error) throw error;
-  }
-  return { teams: 0, matches: rows.length };
 }
 
 // ---------------------------------------------------------------------------
@@ -373,7 +588,7 @@ function mapEspnStatus(state: string, name: string): MatchStatus {
 async function syncEspn(
   supabase: SupabaseClient,
   comp: CompetitionRow,
-): Promise<{ teams: number; matches: number }> {
+): Promise<MatchRow[]> {
   if (!comp.provider_code) {
     throw new Error("provider_code ausente (slug ESPN, ex.: fifa.friendly, bra.1)");
   }
@@ -389,6 +604,12 @@ async function syncEspn(
     throw new Error(`espn indisponível (${seedRes.status})`);
   }
   const seed = await seedRes.json();
+
+  // Guarda de formato: a ESPN é não-oficial. Se a resposta não tem nem
+  // `leagues` nem `events`, a estrutura mudou → falha explícita (vira alerta).
+  if (!seed || (!Array.isArray(seed.leagues) && !Array.isArray(seed.events))) {
+    throw new Error("ESPN: formato de resposta inesperado (a API pode ter mudado).");
+  }
 
   // janela: -3 a +28 dias, dentro do calendar (teto de 30 requisições)
   const lo = new Date(today);
@@ -444,9 +665,8 @@ async function syncEspn(
     for (const r of up ?? []) teamMap.set(String(r.provider_ref), r.id);
   }
 
-  // jogos
-  const ts = new Date().toISOString();
-  const rows = events.map((e: any) => {
+  // jogos normalizados (a escrita acontece na reconcile)
+  return events.map((e: any): MatchRow => {
     const c0 = e?.competitions?.[0] ?? {};
     const cs = c0.competitors ?? [];
     const home = cs.find((c: any) => c.homeAway === "home") ?? cs[0] ?? {};
@@ -457,7 +677,7 @@ async function syncEspn(
     const num = (v: unknown) => (v != null && v !== "" ? Number(v) : null);
     return {
       competition_id: comp.id,
-      provider: "espn" as const,
+      provider: "espn",
       provider_ref: String(e.id),
       home_team_id: home.team?.id ? teamMap.get(String(home.team.id)) ?? null : null,
       away_team_id: away.team?.id ? teamMap.get(String(away.team.id)) ?? null : null,
@@ -467,16 +687,90 @@ async function syncEspn(
       status,
       home_score: live ? num(home.score) : null,
       away_score: live ? num(away.score) : null,
-      last_synced_at: ts,
     };
   });
-  if (rows.length) {
-    const { error } = await supabase
-      .from("matches")
-      .upsert(rows, { onConflict: "provider,provider_ref" });
-    if (error) throw error;
-  }
-  return { teams: teamMap.size, matches: rows.length };
+}
+
+// ---------------------------------------------------------------------------
+// Saúde da API — a ESPN é não-oficial e pode mudar/cair sem aviso. Nunca
+// falhar em silêncio: registra o resultado por competição e avisa os admins
+// (push) quando quebra; auto-recupera quando volta.
+// ---------------------------------------------------------------------------
+async function markSyncResult(
+  admin: SupabaseClient,
+  compId: string,
+  ok: boolean,
+  error: string | null,
+): Promise<void> {
+  await admin
+    .from("competitions")
+    .update({
+      last_sync_ok: ok,
+      last_sync_error: ok ? null : (error ?? "erro desconhecido").slice(0, 500),
+      last_sync_checked_at: new Date().toISOString(),
+    })
+    .eq("id", compId);
+}
+
+async function notifyAdmins(
+  admin: SupabaseClient,
+  title: string,
+  body: string,
+): Promise<void> {
+  const { data: admins } = await admin
+    .from("profiles")
+    .select("id")
+    .eq("is_app_admin", true);
+  if (!admins?.length) return;
+  await admin.from("notifications").insert(
+    admins.map((a: { id: string }) => ({
+      user_id: a.id,
+      type: "admin_sync",
+      title,
+      body,
+      data: { url: "/admin" },
+    })),
+  );
+}
+
+// Alerta de falha só se não houver um pendente pra essa competição (não spamma
+// a cada 5 min) + push pros admins. Retorna se criou.
+async function alertApiError(
+  admin: SupabaseClient,
+  comp: CompetitionRow,
+  message: string,
+): Promise<boolean> {
+  const { data: prev } = await admin
+    .from("sync_alerts")
+    .select("id")
+    .eq("competition_id", comp.id)
+    .eq("kind", "api_error")
+    .eq("status", "pending")
+    .limit(1);
+  if (prev && prev.length) return false;
+  await admin.from("sync_alerts").insert({
+    competition_id: comp.id,
+    kind: "api_error",
+    status: "pending",
+    message: `Sincronização falhando em ${comp.name}: ${message}`.slice(0, 300),
+    payload: { provider: comp.provider },
+  });
+  await notifyAdmins(
+    admin,
+    "⚠️ Sincronização com problema",
+    `${comp.name}: ${message}`.slice(0, 180),
+  );
+  return true;
+}
+
+// Quando o sync volta a funcionar, fecha sozinho os alertas de api_error.
+async function clearApiErrors(admin: SupabaseClient, compId: string): Promise<void> {
+  await admin
+    .from("sync_alerts")
+    .update({ status: "approved", resolved_at: new Date().toISOString() })
+    .eq("competition_id", compId)
+    .eq("kind", "api_error")
+    .eq("status", "pending");
 }
 
 // ---------------------------------------------------------------------------
@@ -520,16 +814,18 @@ Deno.serve(async (req) => {
   }
   if (!authorized) return json({ error: "Não autorizado" }, 403);
 
-  let body: { competitionId?: string } = {};
+  let body: { competitionId?: string; mode?: string } = {};
   try {
     body = await req.json();
   } catch {
-    // sem body = sincroniza todas
+    // sem body = sincroniza todas, modo catalog (= comportamento manual completo)
   }
+  // scores = só placar; qualquer outro valor (catalog / full / ausente) = catalog
+  const mode: SyncMode = body.mode === "scores" ? "scores" : "catalog";
 
   let query = admin
     .from("competitions")
-    .select("id, name, provider, provider_code, provider_season")
+    .select("id, name, provider, provider_code, provider_season, catalog_seeded")
     .neq("provider", "manual")
     .eq("sync_enabled", true);
   if (body.competitionId) query = query.eq("id", body.competitionId);
@@ -540,22 +836,44 @@ Deno.serve(async (req) => {
   const results: Record<string, unknown>[] = [];
   for (const comp of (comps ?? []) as CompetitionRow[]) {
     try {
-      let r: { teams: number; matches: number };
+      let rows: MatchRow[];
       if (comp.provider === "football_data") {
         if (!footballDataToken) throw new Error("FOOTBALL_DATA_TOKEN não configurado");
-        r = await syncFootballData(admin, comp, footballDataToken);
+        rows = await syncFootballData(admin, comp, footballDataToken);
       } else if (comp.provider === "thesportsdb") {
-        r = await syncTheSportsDb(admin, comp, theSportsDbKey);
+        rows = await syncTheSportsDb(admin, comp, theSportsDbKey);
       } else if (comp.provider === "espn") {
-        r = await syncEspn(admin, comp);
+        rows = await syncEspn(admin, comp);
       } else {
         continue;
       }
+
+      // Vazio suspeito: 0 jogos retornados, mas há jogos futuros agendados no
+      // banco → a API provavelmente mudou de formato. Alerta em vez de "sucesso".
+      if (rows.length === 0) {
+        const { count } = await admin
+          .from("matches")
+          .select("id", { count: "exact", head: true })
+          .eq("competition_id", comp.id)
+          .eq("status", "scheduled")
+          .gt("kickoff_at", new Date().toISOString());
+        if ((count ?? 0) > 0) {
+          const msg = "API retornou 0 jogos, mas há jogos futuros agendados (formato pode ter mudado).";
+          await markSyncResult(admin, comp.id, false, msg);
+          await alertApiError(admin, comp, "0 jogos retornados com jogos futuros pendentes");
+          results.push({ competition: comp.name, ok: false, error: msg });
+          continue;
+        }
+      }
+
+      const r = await reconcile(admin, comp, rows, mode);
       await admin
         .from("competitions")
         .update({ last_synced_at: new Date().toISOString() })
         .eq("id", comp.id);
-      results.push({ competition: comp.name, ok: true, ...r });
+      await markSyncResult(admin, comp.id, true, null);
+      await clearApiErrors(admin, comp.id);
+      results.push({ competition: comp.name, ok: true, mode, ...r });
     } catch (e) {
       const msg =
         e instanceof Error
@@ -563,6 +881,9 @@ Deno.serve(async (req) => {
           : typeof e === "object"
             ? JSON.stringify(e)
             : String(e);
+      // Não falha em silêncio: marca a competição e avisa os admins (push).
+      await markSyncResult(admin, comp.id, false, msg);
+      await alertApiError(admin, comp, msg);
       results.push({ competition: comp.name, ok: false, error: msg });
     }
   }
