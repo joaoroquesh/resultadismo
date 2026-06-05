@@ -39,13 +39,13 @@ export function MatchCard({
 
   // Tick a cada 30s só pra jogos perto do horário (6h antes → 4h depois), pra o
   // "ao vivo automático" virar na hora sem depender de uma resposta da API.
-  const [, forceTick] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
   const kickoffMs = match.kickoff_at ? new Date(match.kickoff_at).getTime() : null;
   useEffect(() => {
     if (match.status !== "scheduled" || kickoffMs == null) return;
     const delta = kickoffMs - Date.now();
     if (delta > 6 * 3_600_000 || delta < -4 * 3_600_000) return;
-    const id = setInterval(() => forceTick((t) => t + 1), 30_000);
+    const id = setInterval(() => setNow(Date.now()), 30_000);
     return () => clearInterval(id);
   }, [match.status, kickoffMs]);
 
@@ -56,8 +56,8 @@ export function MatchCard({
   const autoLive =
     match.status === "scheduled" &&
     kickoffMs != null &&
-    kickoffMs <= Date.now() &&
-    Date.now() - kickoffMs < 4 * 3_600_000;
+    kickoffMs <= now &&
+    now - kickoffMs < 4 * 3_600_000;
   const live = match.status === "live" || autoLive;
   const locked = match.status !== "scheduled" || isLocked(match.kickoff_at);
   const canEdit = !locked && !!session;
@@ -85,8 +85,8 @@ export function MatchCard({
     const a = parseInt(away, 10);
     if (Number.isNaN(h) || Number.isNaN(a)) return;
     if (prediction && prediction.home_pred === h && prediction.away_pred === a) return;
-    setSaveState("saving");
     const t = setTimeout(() => {
+      setSaveState("saving");
       save.mutate(
         { matchId: match.id, home: h, away: a },
         {

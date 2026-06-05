@@ -20,6 +20,18 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ---
 
+## [2.7.4] — 2026-06-05
+
+### Corrigido
+- **Lint do React Compiler no `MatchCard` e em `predictions` (sem mudança de comportamento).**
+  (1) O "ao vivo automático" lia `Date.now()` **durante o render** (impuro) — agora usa um estado
+  `now` que já era atualizado pelo tick de 30s; (2) o auto-save chamava `setState` de forma síncrona
+  no corpo do effect — movido para dentro do `setTimeout` do debounce; (3) removida a variável
+  não-usada do _omit_ em `useMyPredictions`. Auto-save validado (palpite salva + indicador). _Restam
+  ~15 erros pré-existentes da mesma classe em outros arquivos — fora deste passe._
+
+---
+
 ## [2.7.3] — 2026-06-05
 
 ### Adicionado

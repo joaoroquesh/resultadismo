@@ -161,8 +161,9 @@ export function useMyPredictions(competitionId: string | undefined) {
       if (error) throw new Error(error.message);
       const map = new Map<string, Prediction>();
       for (const row of data ?? []) {
-        const { matches: _m, ...pred } = row as Prediction & { matches: unknown };
-        map.set(pred.match_id, pred as Prediction);
+        // matches!inner vem só p/ filtrar por competição; guardar o campo extra é
+        // inócuo (o valor é tipado como Prediction) e evita a var não-usada do omit.
+        map.set((row as Prediction).match_id, row as Prediction);
       }
       return map;
     },
