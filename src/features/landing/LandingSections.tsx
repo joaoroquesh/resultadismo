@@ -6,7 +6,6 @@ import {
   Trophy,
   Sparkles,
   Gift,
-  ChevronDown,
   ArrowRight,
   type LucideIcon,
 } from "lucide-react";
@@ -50,7 +49,7 @@ function Reveal({
     <div
       ref={ref}
       className={cn(
-        "translate-y-3 opacity-0 transition-all duration-500 [transition-timing-function:var(--ease-out-quart)] [&.is-visible]:translate-y-0 [&.is-visible]:opacity-100",
+        "translate-y-5 opacity-0 transition-all duration-[600ms] [transition-timing-function:var(--ease-out-expo)] will-change-transform [&.is-visible]:translate-y-0 [&.is-visible]:opacity-100",
         className,
       )}
       style={delay ? { transitionDelay: `${delay}ms` } : undefined}
@@ -85,7 +84,7 @@ function FeatureRow({
   children: ReactNode;
 }) {
   return (
-    <div className="flex gap-3.5 rounded-lg bg-surface p-4 shadow-[var(--shadow-soft)] ring-1 ring-border">
+    <div className="flex h-full gap-3.5 rounded-lg bg-surface p-4 shadow-[var(--shadow-soft)] ring-1 ring-border transition-all duration-200 [transition-timing-function:var(--ease-out-quart)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-pop)] hover:ring-brand-200">
       <span className="grid size-11 shrink-0 place-items-center rounded-md bg-brand-500/10 text-brand-600">
         <Icon className="size-5.5" strokeWidth={2.2} />
       </span>
@@ -129,7 +128,7 @@ function ScoreRow({
   }[tone];
 
   return (
-    <div className="rounded-lg bg-surface p-3.5 shadow-[var(--shadow-soft)] ring-1 ring-border">
+    <div className="flex h-full flex-col rounded-lg bg-surface p-3.5 shadow-[var(--shadow-soft)] ring-1 ring-border transition-all duration-200 [transition-timing-function:var(--ease-out-quart)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-pop)] hover:ring-brand-200">
       <div className="flex items-center gap-3">
         <span
           className={cn(
@@ -174,9 +173,9 @@ function CompetitionPill({
   return (
     <div
       className={cn(
-        "flex items-center justify-between gap-2 rounded-pill border px-4 py-2.5 text-sm font-semibold",
+        "flex items-center justify-between gap-2 rounded-pill border px-4 py-2.5 text-sm font-semibold transition-all duration-200 [transition-timing-function:var(--ease-out-quart)] hover:-translate-y-0.5",
         live
-          ? "border-brand-300 bg-brand-500/10 text-brand-800"
+          ? "border-brand-300 bg-brand-500/10 text-brand-800 hover:shadow-[var(--shadow-soft)]"
           : "border-dashed border-ink-200 bg-surface text-ink-400",
       )}
     >
@@ -203,15 +202,7 @@ function CompetitionPill({
  */
 export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
   return (
-    <div className="mt-10 space-y-16 pb-4">
-      {/* divisor sutil entre os jogos e a parte de venda */}
-      <div className="flex flex-col items-center gap-1 text-ink-300">
-        <span className="text-xs font-semibold uppercase tracking-[0.18em]">
-          Conheça o Resultadismo
-        </span>
-        <ChevronDown className="size-4 animate-bounce [animation-duration:2s]" />
-      </div>
-
+    <div id="conheca-resultadismo" className="scroll-mt-6 space-y-16 pb-4 pt-6">
       {/* ---- HERO ---- */}
       <section>
         <Reveal className="rounded-xl bg-brand-600 px-6 py-9 text-center shadow-[var(--shadow-brand)] sm:px-8 sm:py-12">
@@ -241,7 +232,7 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
       {/* ---- O QUE VOCÊ PODE FAZER ---- */}
       <section>
         <SectionTitle kicker="O jogo" title="O que você pode fazer" />
-        <div className="space-y-3">
+        <div className="grid gap-3 lg:grid-cols-3">
           <Reveal>
             <FeatureRow icon={Target} title="Palpitar nos jogos">
               Para cada jogo, você dá um palpite de placar, tipo 2×1. Quanto mais perto do resultado
@@ -265,8 +256,8 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
       {/* ---- PONTUAÇÃO ---- */}
       <section>
         <SectionTitle kicker="Como pontua" title="Acertou, pontuou" />
-        <Reveal>
-          <div className="space-y-2.5">
+        <div className="grid gap-2.5 lg:grid-cols-3">
+          <Reveal>
             <ScoreRow
               tone="gold"
               pts={3}
@@ -275,6 +266,8 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
               palpite="2×1"
               resultado="2×1"
             />
+          </Reveal>
+          <Reveal delay={70}>
             <ScoreRow
               tone="grass"
               pts={2}
@@ -283,6 +276,8 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
               palpite="1×1"
               resultado="2×2"
             />
+          </Reveal>
+          <Reveal delay={140}>
             <ScoreRow
               tone="aqua"
               pts={1}
@@ -291,18 +286,18 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
               palpite="2×0"
               resultado="1×0"
             />
-          </div>
-          <p className="mt-3 text-center text-xs text-ink-400">
-            Quanto mais perto do resultado real, mais ponto você leva.
-          </p>
-        </Reveal>
+          </Reveal>
+        </div>
+        <p className="mt-3 text-center text-xs text-ink-400">
+          Quanto mais perto do resultado real, mais ponto você leva.
+        </p>
       </section>
 
       {/* ---- COMPETIÇÕES ---- */}
       <section>
         <SectionTitle kicker="Onde jogar" title="As competições" />
         <Reveal>
-          <div className="space-y-2.5">
+          <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
             <CompetitionPill name="Copa do Mundo 2026" status="ativa" />
             <CompetitionPill name="Brasileirão" status="em breve" />
             <CompetitionPill name="Libertadores" status="em breve" />
