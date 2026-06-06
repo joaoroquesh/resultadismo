@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Trophy, Filter, Globe2 } from "lucide-react";
+import { ArrowLeft, Trophy, Globe2, BarChart3 } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -12,27 +12,20 @@ import { useAuth } from "@/features/auth/AuthProvider";
 import { useCompetitions } from "@/features/matches/api";
 import { useGlobalStandings, useMyGlobalRank, type RTBRow } from "./api";
 
-// "Resultadismo The Best" — classificação global de todos os Resultadistas.
-// Default: nenhum filtro (tudo somado). Filtros: competição, ano.
+type Metric = "pontos" | "detalhe";
+
+// Resultadismo The Best — recorte SÓ por campeonato (tabs). "Todos" soma tudo.
+// Toggle pontos × detalhe (cravadas/saldos/acertos/aproveitamento).
 export function RankingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data: competitions } = useCompetitions();
   const [competitionId, setCompetitionId] = useState<string | null>(null);
-  const [year, setYear] = useState<number | null>(null);
+  const [metric, setMetric] = useState<Metric>("pontos");
 
-  const filter = useMemo(
-    () => ({ competitionId, year, teamId: null }),
-    [competitionId, year],
-  );
+  const filter = useMemo(() => ({ competitionId, year: null, teamId: null }), [competitionId]);
   const { data: rows, isLoading } = useGlobalStandings(filter, 50);
-  const { data: myRank } = useMyGlobalRank({ competitionId, year });
-
-  const compName = competitionId
-    ? competitions?.find((c) => c.id === competitionId)?.display_name ??
-      competitions?.find((c) => c.id === competitionId)?.name ??
-      "—"
-    : "Tudo somado";
+  const { data: myRank } = useMyGlobalRank({ competitionId });
 
   return (
     <Page
@@ -43,7 +36,23 @@ export function RankingPage() {
         </Button>
       }
     >
-      {/* Headline + posição do user (se logado e ranqueado) */}
+      {/* Tabs de campeonato (recorte) */}
+      <div className="no-scrollbar -mx-4 mb-4 flex gap-2 overflow-x-auto px-4">
+        <Tab active={competitionId === null} onClick={() => setCompetitionId(null)}>
+          Todos
+        </Tab>
+        {competitions?.map((c) => (
+          <Tab
+            key={c.id}
+            active={competitionId === c.id}
+            onClick={() => setCompetitionId(c.id)}
+          >
+            {c.display_name ?? c.name}
+          </Tab>
+        ))}
+      </div>
+
+      {/* Sua posição */}
       <Card className="mb-4 p-4">
         <div className="flex items-start gap-3">
           <span className="grid size-10 shrink-0 place-items-center rounded-md bg-brand-500/10 text-brand-600">
@@ -58,65 +67,40 @@ export function RankingPage() {
                 <Link to="/login" className="font-semibold text-brand-700 underline">
                   Entre
                 </Link>{" "}
-                pra entrar no ranking.
+                pra entrar na disputa.
               </p>
             ) : myRank ? (
               <p className="mt-1 text-sm leading-snug text-ink-700">
                 Você é o{" "}
                 <span className="font-extrabold text-ink-950 tabular-nums">{myRank.rank}º</span>{" "}
-                Resultadista <span className="text-ink-500">·</span>{" "}
-                <span className="font-bold tabular-nums">{myRank.pontos} pts</span> em{" "}
-                <span className="font-bold tabular-nums">{myRank.jogos}</span>{" "}
-                {myRank.jogos === 1 ? "jogo" : "jogos"}{" "}
-                <span className="text-ink-400">
-                  · de {myRank.total_resultadistas} no recorte
-                </span>
+                Resultadista <span className="text-ink-300">·</span>{" "}
+                <span className="font-bold tabular-nums">{myRank.pontos} pts</span>{" "}
+                <span className="text-ink-400">de {myRank.total_resultadistas}</span>
               </p>
             ) : (
               <p className="mt-1 text-sm text-ink-600">
-                Sem palpites pontuados nesse recorte ainda — faça seu palpite e entre na disputa.
+                Faça seu palpite e entre na disputa.{" "}
+                <Link to="/" className="font-semibold text-brand-700 underline">
+                  Ver jogos →
+                </Link>
               </p>
             )}
           </div>
         </div>
       </Card>
 
-      {/* Filtros — minimalistas */}
-      <Card className="mb-4 space-y-3 p-4">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-ink-400">
-          <Filter className="size-3.5" /> Recorte
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="block text-sm">
-            <span className="mb-1.5 block text-xs font-medium text-ink-500">Campeonato</span>
-            <select
-              value={competitionId ?? ""}
-              onChange={(e) => setCompetitionId(e.target.value || null)}
-              className="h-10 w-full rounded-md border border-ink-200 bg-surface px-3 text-sm text-ink-900 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
-            >
-              <option value="">Tudo somado</option>
-              {competitions?.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.display_name ?? c.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-sm">
-            <span className="mb-1.5 block text-xs font-medium text-ink-500">Ano</span>
-            <select
-              value={year ?? ""}
-              onChange={(e) => setYear(e.target.value ? Number(e.target.value) : null)}
-              className="h-10 w-full rounded-md border border-ink-200 bg-surface px-3 text-sm text-ink-900 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
-            >
-              <option value="">Todos os anos</option>
-              <option value="2026">2026</option>
-              <option value="2025">2025</option>
-            </select>
-          </label>
-        </div>
-        <p className="text-xs text-ink-400">Mostrando: {compName}{year ? ` · ${year}` : ""}</p>
-      </Card>
+      {/* Toggle métrica */}
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-ink-400">Classificação</h2>
+        <button
+          type="button"
+          onClick={() => setMetric((m) => (m === "pontos" ? "detalhe" : "pontos"))}
+          className="flex items-center gap-1.5 rounded-pill bg-ink-100 px-2.5 py-1 text-xs font-semibold text-ink-600 transition hover:bg-ink-200"
+        >
+          <BarChart3 className="size-3.5" />
+          {metric === "pontos" ? "Ver detalhes" : "Ver pontos"}
+        </button>
+      </div>
 
       {/* Lista */}
       {isLoading ? (
@@ -128,14 +112,12 @@ export function RankingPage() {
       ) : !rows || rows.length === 0 ? (
         <Card className="p-8 text-center">
           <Trophy className="mx-auto size-8 text-ink-300" />
-          <p className="mt-2 text-sm text-ink-500">
-            Sem Resultadistas pontuados nesse recorte ainda.
-          </p>
+          <p className="mt-2 text-sm text-ink-500">Sem Resultadistas pontuados nesse recorte ainda.</p>
         </Card>
       ) : (
         <div className="space-y-1.5">
           {rows.map((r) => (
-            <RankRow key={r.user_id} row={r} isMe={r.user_id === user?.id} />
+            <RankRow key={r.user_id} row={r} isMe={r.user_id === user?.id} metric={metric} />
           ))}
         </div>
       )}
@@ -143,9 +125,35 @@ export function RankingPage() {
   );
 }
 
-function RankRow({ row, isMe }: { row: RTBRow; isMe: boolean }) {
-  const medal =
-    row.rank === 1 ? "🥇" : row.rank === 2 ? "🥈" : row.rank === 3 ? "🥉" : null;
+function Tab({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={cn(
+        "shrink-0 rounded-pill border px-3.5 py-1.5 text-sm font-semibold transition",
+        active
+          ? "border-brand-600 bg-brand-600 text-white"
+          : "border-ink-200 bg-surface text-ink-600 hover:border-ink-300",
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+function RankRow({ row, isMe, metric }: { row: RTBRow; isMe: boolean; metric: Metric }) {
+  const medal = row.rank === 1 ? "🥇" : row.rank === 2 ? "🥈" : row.rank === 3 ? "🥉" : null;
+  const aproveitamento = row.jogos > 0 ? Math.round((row.pontos / (row.jogos * 3)) * 100) : 0;
   return (
     <div
       className={cn(
@@ -166,15 +174,27 @@ function RankRow({ row, isMe }: { row: RTBRow; isMe: boolean }) {
             </Badge>
           )}
         </p>
-        <p className="text-xs text-ink-500">
-          <span className="font-medium">{row.cravadas}</span> cravadas ·{" "}
-          <span className="font-medium">{row.jogos}</span>{" "}
-          {row.jogos === 1 ? "jogo" : "jogos"}
-        </p>
+        {metric === "detalhe" ? (
+          <p className="flex flex-wrap gap-x-2.5 text-xs tabular-nums text-ink-500">
+            <span><b className="text-gold-700">{row.cravadas}</b> crav</span>
+            <span><b className="text-grass-700">{row.saldos}</b> saldo</span>
+            <span><b className="text-aqua-700">{row.acertos}</b> acerto</span>
+            <span><b className="text-ink-700">{aproveitamento}%</b> aprov</span>
+          </p>
+        ) : (
+          <p className="text-xs text-ink-500">
+            <span className="font-medium">{row.cravadas}</span> cravadas ·{" "}
+            <span className="font-medium">{row.jogos}</span> {row.jogos === 1 ? "jogo" : "jogos"}
+          </p>
+        )}
       </div>
       <div className="text-right tabular-nums">
-        <p className="text-base font-extrabold text-ink-950">{row.pontos}</p>
-        <p className="text-[10px] uppercase tracking-wide text-ink-400">pts</p>
+        <p className="text-base font-extrabold text-ink-950">
+          {metric === "detalhe" ? `${aproveitamento}%` : row.pontos}
+        </p>
+        <p className="text-[10px] uppercase tracking-wide text-ink-400">
+          {metric === "detalhe" ? "aprov" : "pts"}
+        </p>
       </div>
     </div>
   );

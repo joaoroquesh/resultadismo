@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { Select } from "@/components/ui/Select";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
 import { useCompetitions, findWorldCupCompetition } from "@/features/matches/api";
@@ -102,13 +103,7 @@ export function CompeticoesTab({
         <Card key={c.id} className="flex items-center gap-2 p-3.5">
           <span className="min-w-0 flex-1 truncate font-semibold text-ink-900">{c.name}</span>
           <Badge tone="neutral">
-            {c.mode === "liga"
-              ? "Liga"
-              : c.mode === "cup"
-                ? "Copa"
-                : c.mode === "table"
-                  ? "Tabela"
-                  : "Pontos"}
+            {c.mode === "liga" ? "Liga" : c.mode === "cup" ? "Copa" : "Bolão"}
           </Badge>
           <Button
             size="icon"
@@ -128,19 +123,16 @@ export function CompeticoesTab({
         </p>
       ) : open ? (
         <Card className="space-y-3 p-4">
-          <select
-            aria-label="Competição"
+          <Select
+            ariaLabel="Competição"
             value={competitionId}
-            onChange={(e) => setCompetitionId(e.target.value)}
-            className="h-11 w-full rounded-md border border-ink-200 bg-surface px-3 outline-none focus:border-brand-500"
-          >
-            <option value="">Escolher competição…</option>
-            {competitions?.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+            onChange={setCompetitionId}
+            placeholder="Escolher campeonato…"
+            options={(competitions ?? []).map((c) => ({
+              value: c.id,
+              label: c.display_name ?? c.name,
+            }))}
+          />
           <div className="rounded-md bg-brand-500/8 px-3 py-2.5">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-700">
               Vai chamar
@@ -154,8 +146,8 @@ export function CompeticoesTab({
                 value={tipo}
                 onChange={setTipo}
                 options={[
-                  { value: "pontos", label: "Pontos" },
-                  { value: "confronto", label: "Confronto" },
+                  { value: "pontos", label: "Bolão" },
+                  { value: "confronto", label: "Confrontos" },
                 ]}
               />
               {tipo === "confronto" && (
