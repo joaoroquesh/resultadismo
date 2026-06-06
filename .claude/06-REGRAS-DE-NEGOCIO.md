@@ -69,6 +69,16 @@ Métricas exibidas: jogos, pontos, cravadas, saldos, **aproveitamento** (% de po
 possível) e **acertividade** (% de palpites que pontuaram). Detalhe da fórmula em
 [`05`](05-DADOS-E-AUTH.md) §6.
 
+### Resultadismo The Best (classificação geral) — recortes
+Ranking de **todos os Resultadistas, todas as competições** (3/2/1 × dobro; ignora jogos ocultos;
+opt-out por `show_in_global_ranking`). Na `/ranking`, o recorte é **por abas** (sem select, sem ano):
+- **Todos** — soma tudo (`get_global_standings`).
+- **Que eu jogo** — corta a pontuação de **todo mundo** ao **conjunto de campeonatos que você joga**
+  (competições dos seus grupos, `get_my_played_competition_ids`); comparação justa só no que é comum
+  (`get_global_standings_multi`). Só aparece se você joga algo.
+- **Cada campeonato** — recorta àquela competição.
+Alterna **pontos × detalhe** (cravadas/saldos/acertos/aproveitamento) na própria lista.
+
 ---
 
 ## 4. Grupos
@@ -81,8 +91,19 @@ possível) e **acertividade** (% de palpites que pontuaram). Detalhe da fórmula
 uma troca de significado proposital.
 
 - **Papéis:** `owner` (criador, protegido contra remoção/rebaixamento), `admin`, `member`.
-- **Visibilidade/entrada:** `visibility` (public/private) + `join_policy`
-  (invite/open/approval) + `join_code` (6 caracteres). Entrar por código respeita a política.
+- **Visibilidade ↔ entrada (modelo travado no banco, 2026-06-06):** a combinação é **enforçada por
+  CHECK** (`leagues_visibility_join_policy_ck`, migration `20260606000006`):
+  - **Privado ⇒ só convite** (`join_policy = 'invite'`). Não aparece pra ninguém de fora; entra só
+    com o `join_code` (6 caracteres).
+  - **Público ⇒ aberto OU por aprovação** (`open` | `approval`, nunca `invite`). Aparece na
+    **vitrine de grupos públicos** (`list_public_leagues`, só `status='active'`) pra qualquer
+    Resultadista achar e entrar (`join_public_league`: aberto → ativo na hora; aprovação → pendente).
+  - Grupos antigos foram **normalizados** na migration (privado→invite; público+invite→approval).
+- **/grupos (vitrine social, 2026-06-06):** prévia do **Resultadismo The Best** com **3 pessoas**
+  (você + vizinhos, `get_global_rank_window`; fallback no pódio se você ainda não pontuou) →
+  "Recebeu um convite?" → **Seus grupos** (cards ricos: flâmula, **posição no ranking do grupo** via
+  `get_my_league_positions`, escudos de membros sobrepostos, **WhatsApp** + lápis do admin) →
+  **Grupos públicos**.
 - **Criação → ativação:** depende do **modo de pagamento** global (ver §5). Todo grupo tem
   `status` (pending/active/rejected/archived) e `payment_status`.
 - **Revisão de nome:** grupo pago **ativa na hora**; só o **nome** entra em revisão do admin
@@ -236,6 +257,14 @@ Identidade visual de **perfis** e **grupos** por **máscara SVG**: o SVG recorta
   (descartado p/ 2026). Admin publica (`is_published`) e renomeia em PT-BR (`display_name`).
 - **Privacidade/LGPD:** contato único `resultadismoapp@gmail.com` (Controlador + DPO). Dados de
   cartão ficam **com o Mercado Pago**, nunca com o app. Termos §12 cobrem pagamento e arrependimento.
+- **Personalização (2026-06-06):** o **tour de boas-vindas** (modal, 1º acesso) continua; depois o
+  Resultadista de primeira viagem cai na **página de personalização** (`/perfil/personalizar`,
+  também editável pelo Perfil): time do coração, seleção que torce (Brasil pré-marcado), campeonatos
+  de interesse, **times de interesse** (acordeão por campeonato) e opt-in do Resultadismo The Best +
+  código de convite. **Tudo é pulável.** Preferências em `profiles` (`favorite_team_id`,
+  `national_team_id`, `followed_competition_ids[]`, `followed_team_ids[]`). Listas de clube vêm do
+  **sync ESPN** (competições seedadas como rascunho, `sync_enabled=true`, populam `teams`). Copy
+  **conversacional** (perguntas calorosas) → [`10`](10-UX-WRITING.md) §2.
 
 ---
 

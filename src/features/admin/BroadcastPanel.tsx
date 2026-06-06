@@ -3,6 +3,7 @@ import { Megaphone, Send, Users, Minus, Plus, History } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
@@ -178,23 +179,18 @@ export function BroadcastPanel() {
         {/* Alvo do segmento 'group' */}
         {segment === "group" && (
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="broadcast-league" className="text-sm font-medium text-ink-800">
-              Federação
-            </label>
-            <select
-              id="broadcast-league"
+            <span className="text-sm font-medium text-ink-800">Grupo</span>
+            <Select
+              ariaLabel="Grupo"
               value={leagueId}
-              onChange={(e) => setLeagueId(e.target.value)}
+              onChange={setLeagueId}
               disabled={targets.isLoading}
-              className="h-11 rounded-md border border-ink-200 bg-surface px-3.5 text-ink-950 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
-            >
-              <option value="">Escolha uma federação…</option>
-              {dedupeLeagues(targets.data ?? []).map((t) => (
-                <option key={t.league_id} value={t.league_id}>
-                  {t.league_name}
-                </option>
-              ))}
-            </select>
+              placeholder="Escolha um grupo…"
+              options={dedupeLeagues(targets.data ?? []).map((t) => ({
+                value: t.league_id,
+                label: t.league_name,
+              }))}
+            />
           </div>
         )}
 
@@ -202,23 +198,18 @@ export function BroadcastPanel() {
         {segment === "group_top" && (
           <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="broadcast-lc" className="text-sm font-medium text-ink-800">
-                Competição
-              </label>
-              <select
-                id="broadcast-lc"
+              <span className="text-sm font-medium text-ink-800">Competição</span>
+              <Select
+                ariaLabel="Competição"
                 value={lcId}
-                onChange={(e) => setLcId(e.target.value)}
+                onChange={setLcId}
                 disabled={targets.isLoading}
-                className="h-11 rounded-md border border-ink-200 bg-surface px-3.5 text-ink-950 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
-              >
-                <option value="">Escolha uma competição…</option>
-                {(targets.data ?? []).map((t) => (
-                  <option key={t.lc_id} value={t.lc_id}>
-                    {t.league_name} · {t.competition_name}
-                  </option>
-                ))}
-              </select>
+                placeholder="Escolha uma competição…"
+                options={(targets.data ?? []).map((t) => ({
+                  value: t.lc_id,
+                  label: `${t.league_name} · ${t.competition_name}`,
+                }))}
+              />
             </div>
             <div className="flex flex-col gap-1.5">
               <span className="text-sm font-medium text-ink-800">Quantos do topo</span>

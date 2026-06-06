@@ -1,10 +1,11 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Info, Ticket, Trophy } from "lucide-react";
+import { ArrowLeft, Info, Ticket, Trophy, Lock } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Coachmark } from "@/components/ui/Coachmark";
 import { useToast } from "@/components/ui/Toast";
@@ -177,16 +178,17 @@ export function NovaLigaPage() {
         </Card>
 
         <Coachmark
-          storageKey="resultadismo-coach-liga-acesso-v1"
+          storageKey="resultadismo-coach-liga-acesso-v2"
           title="Quem entra no grupo"
           placement="bottom"
           content={
             <>
-              <span className="font-bold text-ink-50">Privada</span> não aparece na busca;{" "}
-              <span className="font-bold text-ink-50">Pública</span> qualquer um acha. E o acesso pode
-              ser por <span className="font-bold text-ink-50">Convite</span> (só com link),{" "}
-              <span className="font-bold text-ink-50">Aprovação</span> (você libera cada pedido) ou{" "}
-              <span className="font-bold text-ink-50">Aberta</span> (entra direto).
+              <span className="font-bold text-ink-50">Privado</span> só entra com o código de
+              convite e ninguém de fora encontra.{" "}
+              <span className="font-bold text-ink-50">Público</span> aparece pra todo mundo na lista
+              de grupos — e você escolhe se a entrada é{" "}
+              <span className="font-bold text-ink-50">aberta</span> (entra na hora) ou{" "}
+              <span className="font-bold text-ink-50">por aprovação</span> (você libera cada pedido).
             </>
           }
         >
@@ -197,58 +199,63 @@ export function NovaLigaPage() {
                 value={visibility}
                 onChange={(v) => {
                   setVisibility(v);
+                  // Modelo: privado ⇒ só convite; público ⇒ aberto (default) ou aprovação.
                   setJoinPolicy(v === "public" ? "open" : "invite");
                 }}
                 options={[
-                  { value: "private", label: "Privada" },
-                  { value: "public", label: "Pública" },
+                  { value: "private", label: "Privado" },
+                  { value: "public", label: "Público" },
                 ]}
               />
               <p className="text-xs leading-snug text-ink-500">
                 {visibility === "private"
-                  ? "Só membros enxergam o grupo — ninguém de fora encontra."
-                  : "Qualquer pessoa pode encontrar e acompanhar o grupo. A entrada fica liberada para todos."}
+                  ? "Ninguém de fora encontra. Você chama a galera pelo código de convite."
+                  : "Aparece na lista de grupos públicos pra qualquer Resultadista achar e entrar."}
               </p>
             </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-ink-800">Quem pode entrar</label>
-              <SegmentedControl
-                value={joinPolicy}
-                onChange={setJoinPolicy}
-                options={[
-                  { value: "invite", label: "Convite" },
-                  { value: "approval", label: "Aprovação" },
-                  { value: "open", label: "Aberta" },
-                ]}
-              />
-              <p className="text-xs leading-snug text-ink-500">
-                {visibility === "public"
-                  ? "Grupos públicos são sempre abertas: quem quiser entra na hora."
-                  : joinPolicy === "invite"
-                    ? "Só entra quem recebe o código de convite do grupo."
-                    : joinPolicy === "approval"
-                      ? "Qualquer um pode pedir para entrar, mas um admin precisa aprovar."
-                      : "Entrada livre: quem quiser participar entra sem convite nem aprovação."}
-              </p>
-            </div>
+
+            {visibility === "public" ? (
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-ink-800">Como entram no grupo</label>
+                <SegmentedControl<"open" | "approval">
+                  value={joinPolicy === "approval" ? "approval" : "open"}
+                  onChange={setJoinPolicy}
+                  options={[
+                    { value: "open", label: "Aberto" },
+                    { value: "approval", label: "Por aprovação" },
+                  ]}
+                />
+                <p className="text-xs leading-snug text-ink-500">
+                  {joinPolicy === "approval"
+                    ? "Qualquer um pede pra entrar e um admin libera cada pedido."
+                    : "Entrada livre: quem quiser participar entra na hora."}
+                </p>
+              </div>
+            ) : (
+              <div className="flex items-start gap-2 rounded-md bg-ink-50 px-3 py-2.5 text-xs leading-snug text-ink-600">
+                <Lock className="mt-0.5 size-3.5 shrink-0 text-ink-400" />
+                <p>
+                  Grupo privado entra <span className="font-semibold text-ink-800">só com o
+                  código de convite</span>. Depois de criar, você compartilha o código no WhatsApp.
+                </p>
+              </div>
+            )}
           </Card>
         </Coachmark>
 
         <Card className="space-y-4 p-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-ink-800">Competição (bolão inicial)</label>
-            <select
-              aria-label="Competição (bolão inicial)"
+            <Select
+              ariaLabel="Competição (bolão inicial)"
               value={effectiveCompetitionId}
-              onChange={(e) => setCompetitionId(e.target.value)}
-              className="h-11 rounded-md border border-ink-200 bg-surface px-3 text-ink-950 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
-            >
-              {competitions?.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.display_name ?? c.name}
-                </option>
-              ))}
-            </select>
+              onChange={setCompetitionId}
+              placeholder="Escolher campeonato…"
+              options={(competitions ?? []).map((c) => ({
+                value: c.id,
+                label: c.display_name ?? c.name,
+              }))}
+            />
           </div>
 
           {isWorldCup ? (

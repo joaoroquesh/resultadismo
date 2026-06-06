@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { rpcCall } from "@/lib/rpc";
 import { track } from "@/lib/analytics";
 import { useAuth } from "@/features/auth/AuthProvider";
 import type {
@@ -206,6 +207,116 @@ export function useJoinByCode() {
     onSuccess: () => {
       track("join_group", { method: "code" });
       qc.invalidateQueries({ queryKey: ["my-leagues"] });
+    },
+  });
+}
+
+/**
+ * Prévia dos escudos de membros de vários grupos numa só query (pra empilhar
+ * nos cards de "Seus grupos"). Retorna mapa league_id → {avatars[], count}.
+ */
+export type MemberAvatar = { id: string; name: string | null; avatar_url: string | null };
+
+export function useLeaguesMembersPreview(leagueIds: string[]) {
+  const key = [...leagueIds].sort().join(",");
+  return useQuery({
+    enabled: leagueIds.length > 0,
+    queryKey: ["leagues-members-preview", key],
+    staleTime: 60_000,
+    queryFn: async (): Promise<Record<string, { avatars: MemberAvatar[]; count: number }>> => {
+      const { data, error } = await supabase
+        .from("league_members")
+        .select("league_id, joined_at, profile:profiles(id, display_name, avatar_url)")
+        .in("league_id", leagueIds)
+        .eq("status", "active")
+        .order("joined_at");
+      if (error) throw new Error(error.message);
+      const out: Record<string, { avatars: MemberAvatar[]; count: number }> = {};
+      for (const row of (data ?? []) as unknown as {
+        league_id: string;
+        profile: MemberAvatar | null;
+      }[]) {
+        const bucket = (out[row.league_id] ??= { avatars: [], count: 0 });
+        bucket.count += 1;
+        if (bucket.avatars.length < 6 && row.profile) bucket.avatars.push(row.profile);
+      }
+      return out;
+    },
+  });
+}
+
+/** Vitrine de grupos públicos (descobríveis por qualquer Resultadista). */
+export type PublicLeague = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  logo_url: string | null;
+  join_policy: "open" | "approval" | "invite";
+  member_count: number;
+  is_member: boolean;
+  created_at: string;
+};
+
+export function usePublicLeagues(search: string) {
+  const term = search.trim();
+  return useQuery({
+    queryKey: ["public-leagues", term],
+    staleTime: 30_000,
+    queryFn: async (): Promise<PublicLeague[]> => {
+      const { data, error } = await rpcCall<PublicLeague[]>("list_public_leagues", {
+        p_search: term || undefined,
+        p_limit: 30,
+        p_offset: 0,
+      });
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    },
+  });
+}
+
+/** Entrar num grupo público (aberto → ativo na hora; aprovação → fica pendente). */
+export function useJoinPublicLeague() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (leagueId: string) => {
+      const { data, error } = await supabase.rpc("join_public_league", {
+        p_league_id: leagueId,
+      });
+      if (error) throw new Error(error.message);
+      return data;
+    },
+    onSuccess: () => {
+      track("join_group", { method: "public" });
+      qc.invalidateQueries({ queryKey: ["my-leagues"] });
+      qc.invalidateQueries({ queryKey: ["public-leagues"] });
+    },
+  });
+}
+
+/**
+ * Minha posição em cada grupo (batch), exata porque o RPC delega ao
+ * get_league_standings. Retorna um mapa league_id → {rank, total, pontos}.
+ */
+export type LeaguePosition = { rank: number; total: number; pontos: number };
+
+export function useMyLeaguePositions(leagueIds: string[]) {
+  const { user } = useAuth();
+  const key = [...leagueIds].sort().join(",");
+  return useQuery({
+    enabled: !!user && leagueIds.length > 0,
+    queryKey: ["my-league-positions", user?.id, key],
+    staleTime: 30_000,
+    queryFn: async (): Promise<Record<string, LeaguePosition>> => {
+      const { data, error } = await rpcCall<
+        { league_id: string; rank: number; total: number; pontos: number }[]
+      >("get_my_league_positions", { p_league_ids: leagueIds });
+      if (error) throw new Error(error.message);
+      const out: Record<string, LeaguePosition> = {};
+      for (const r of data ?? []) {
+        out[r.league_id] = { rank: r.rank, total: r.total, pontos: r.pontos };
+      }
+      return out;
     },
   });
 }

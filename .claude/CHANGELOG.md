@@ -20,6 +20,56 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ---
 
+## [2.11.0] — 2026-06-06
+
+> Redesenho da área de **Grupos** + **personalização** (4 frentes). Componentes de seleção 100%
+> web (sem nativo do SO). Validado: build, `db reset` (3 migrations novas aplicam limpo), RPCs +
+> CHECK por SQL, e navegador (Playwright: /grupos, /ranking, /perfil/personalizar — console limpo).
+
+### Adicionado
+- **Select e Combobox custom (sem `<select>` nativo).** `components/ui/Select.tsx` (lista curta,
+  teclado, dark-mode) e `components/ui/Combobox.tsx` (lista grande **com busca**). Trocados todos os
+  selects nativos restantes (CompetiçõesTab, NovaLiga, BroadcastPanel, Feedback).
+- **Resultadismo The Best — recortes por aba.** Na `/ranking`: **Todos** · **Que eu jogo** (corta a
+  pontuação de todos ao conjunto de campeonatos que você joga — comparação justa) · **cada
+  campeonato**. Removidos o ano e o select nativo. Alterna **pontos × detalhe** (cravadas/saldos/
+  acertos/aproveitamento). Backend: `get_global_standings_multi`, `get_my_global_rank_multi`,
+  `get_my_played_competition_ids` (migration `20260606000007`).
+- **Prévia do RTB na `/grupos` com 3 pessoas.** Sempre você + vizinhos (1 acima / 1 abaixo; desloca
+  nas pontas pra encher), via `get_global_rank_window`; fallback no pódio (top-3) se você ainda não
+  pontuou. Expande pra **resumido × detalhado**.
+- **Cards de grupo ricos.** Flâmula + nome + **sua posição no ranking do grupo**
+  (`get_my_league_positions`, exata — delega ao `get_league_standings`), **escudos de membros
+  sobrepostos** (+N), **convidar pelo WhatsApp** e **lápis** (admin). Posição some em grupo pendente.
+- **Grupos públicos descobríveis.** Nova vitrine na `/grupos` com busca (`list_public_leagues`):
+  qualquer Resultadista acha e entra (`join_public_league`: aberto → na hora; aprovação → pendente).
+  Layout da `/grupos`: RTB → "Recebeu um convite?" → Seus grupos → Grupos públicos.
+- **Personalização como PÁGINA** (`/perfil/personalizar`, multi-tela, editável pelo Perfil): time do
+  coração (busca), seleção que torce (Brasil pré-marcado), campeonatos de interesse, **times de
+  interesse** (acordeão por campeonato, "selecionar todos"), opt-in do RTB + código de convite.
+  Tudo pulável; copy **conversacional** ("Qual é o seu time do coração?"). Após o tour, o 1º acesso
+  cai aqui (`PersonalizationGate`, só na entrada — não sequestra deep-link de convite). Substitui o
+  antigo modal. Colunas `profiles.followed_competition_ids[]` / `followed_team_ids[]` +
+  `set_personalization` unificado (migration `20260606000008`).
+- **Seed de campeonatos (rascunho) p/ a personalização.** Brasileirão A/B/C, Copa do Brasil,
+  Libertadores, Sul-Americana e top-5 europeu entram como **rascunho** (`is_published=false`, **não**
+  aparecem em Jogos) com `sync_enabled=true` — o sync ESPN popula os **times** (`teams.crest_url`).
+  RPCs `list_personalization_competitions` / `get_teams_by_competition`.
+
+### Alterado
+- **Modelo Público/Privado travado no banco** (`leagues_visibility_join_policy_ck`, migration
+  `20260606000006`): **privado ⇒ só convite**; **público ⇒ aberto ou por aprovação** (nunca convite).
+  NovaLiga deriva a política da visibilidade (sem combinação inválida). Grupos existentes
+  **normalizados** na migration (privado→invite; público+invite→approval).
+- **CompetiçõesTab** passa a usar **Bolão / Confrontos** com o Select custom.
+
+### Docs
+- [`06-REGRAS-DE-NEGOCIO.md`](06-REGRAS-DE-NEGOCIO.md) §3 (recortes do RTB), §4 (modelo
+  visibilidade↔entrada + vitrine), §9 (personalização). [`10-UX-WRITING.md`](10-UX-WRITING.md) §2
+  (técnica "dialogue com o Resultadista").
+
+---
+
 ## [2.10.1] — 2026-06-06
 
 ### Corrigido

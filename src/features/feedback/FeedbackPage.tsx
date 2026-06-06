@@ -5,6 +5,7 @@ import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -135,17 +136,12 @@ export function FeedbackPage() {
               <div className="space-y-2 rounded-md bg-ink-50 p-3">
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-ink-600">Em qual página?</label>
-                  <select
+                  <Select
+                    ariaLabel="Em qual página?"
                     value={page}
-                    onChange={(e) => setPage(e.target.value)}
-                    className="h-10 w-full rounded-md border border-ink-200 bg-surface px-3 text-sm outline-none focus:border-brand-500"
-                  >
-                    {PAGES.map((p) => (
-                      <option key={p} value={p}>
-                        {p}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setPage}
+                    options={PAGES.map((p) => ({ value: p, label: p }))}
+                  />
                 </div>
                 <p className="text-[11px] leading-snug text-ink-400">
                   Pra ajudar a achar o erro, anexamos automaticamente a <strong>versão do app</strong> e

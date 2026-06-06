@@ -1118,6 +1118,8 @@ export type Database = {
           favorite_group_id: string | null
           favorite_team: string | null
           favorite_team_id: string | null
+          followed_competition_ids: string[]
+          followed_team_ids: string[]
           id: string
           is_app_admin: boolean
           last_active_at: string | null
@@ -1136,6 +1138,8 @@ export type Database = {
           favorite_group_id?: string | null
           favorite_team?: string | null
           favorite_team_id?: string | null
+          followed_competition_ids?: string[]
+          followed_team_ids?: string[]
           id: string
           is_app_admin?: boolean
           last_active_at?: string | null
@@ -1154,6 +1158,8 @@ export type Database = {
           favorite_group_id?: string | null
           favorite_team?: string | null
           favorite_team_id?: string | null
+          followed_competition_ids?: string[]
+          followed_team_ids?: string[]
           id?: string
           is_app_admin?: boolean
           last_active_at?: string | null
@@ -1751,6 +1757,21 @@ export type Database = {
           winner: string
         }[]
       }
+      get_global_rank_window: {
+        Args: { p_competition_id?: string; p_radius?: number }
+        Returns: {
+          acertos: number
+          avatar_url: string
+          cravadas: number
+          display_name: string
+          is_me: boolean
+          jogos: number
+          pontos: number
+          rank: number
+          saldos: number
+          user_id: string
+        }[]
+      }
       get_global_standings: {
         Args: {
           p_competition_id?: string
@@ -1758,6 +1779,20 @@ export type Database = {
           p_team_id?: string
           p_year?: number
         }
+        Returns: {
+          acertos: number
+          avatar_url: string
+          cravadas: number
+          display_name: string
+          jogos: number
+          pontos: number
+          rank: number
+          saldos: number
+          user_id: string
+        }[]
+      }
+      get_global_standings_multi: {
+        Args: { p_competition_ids: string[]; p_limit?: number }
         Returns: {
           acertos: number
           avatar_url: string
@@ -1806,6 +1841,24 @@ export type Database = {
           total_resultadistas: number
         }[]
       }
+      get_my_global_rank_multi: {
+        Args: { p_competition_ids: string[] }
+        Returns: {
+          jogos: number
+          pontos: number
+          rank: number
+          total_resultadistas: number
+        }[]
+      }
+      get_my_league_positions: {
+        Args: { p_league_ids: string[] }
+        Returns: {
+          league_id: string
+          pontos: number
+          rank: number
+          total: number
+        }[]
+      }
       get_my_notifications: {
         Args: { p_limit?: number }
         Returns: {
@@ -1825,8 +1878,19 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_my_played_competition_ids: { Args: never; Returns: string[] }
       get_notification_prefs: { Args: never; Returns: Json }
       get_player_profile: { Args: { p_user_id: string }; Returns: Json }
+      get_teams_by_competition: {
+        Args: { p_competition_id: string }
+        Returns: {
+          crest_url: string
+          id: string
+          local_crest: string
+          name: string
+          short_name: string
+        }[]
+      }
       get_tie_detail: {
         Args: { p_tie_id: string }
         Returns: {
@@ -1889,6 +1953,31 @@ export type Database = {
         }
       }
       leave_league: { Args: { p_league_id: string }; Returns: undefined }
+      list_personalization_competitions: {
+        Args: never
+        Returns: {
+          area: string
+          display_name: string
+          id: string
+          name: string
+          provider_code: string
+          type: string
+        }[]
+      }
+      list_public_leagues: {
+        Args: { p_limit?: number; p_offset?: number; p_search?: string }
+        Returns: {
+          created_at: string
+          description: string
+          id: string
+          is_member: boolean
+          join_policy: Database["public"]["Enums"]["join_policy"]
+          logo_url: string
+          member_count: number
+          name: string
+          slug: string
+        }[]
+      }
       match_in_period: {
         Args: {
           m_kickoff: string
@@ -1973,7 +2062,10 @@ export type Database = {
           p_favorite_competition_id?: string
           p_favorite_group_id?: string
           p_favorite_team_id?: string
+          p_followed_competition_ids?: string[]
+          p_followed_team_ids?: string[]
           p_national_team_id?: string
+          p_show_in_ranking?: boolean
         }
         Returns: undefined
       }

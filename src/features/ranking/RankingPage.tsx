@@ -10,7 +10,13 @@ import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useCompetitions } from "@/features/matches/api";
-import { useGlobalStandings, useMyGlobalRank, type RTBRow } from "./api";
+import {
+  useGlobalStandings,
+  useMyGlobalRank,
+  useMyPlayedCompetitionIds,
+  type RTBRow,
+  type RTBFilter,
+} from "./api";
 
 type Metric = "pontos" | "detalhe";
 
@@ -20,12 +26,20 @@ export function RankingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data: competitions } = useCompetitions();
-  const [competitionId, setCompetitionId] = useState<string | null>(null);
+  // recorte: "todos" | "mine" (que eu jogo) | <competitionId>
+  const [recorte, setRecorte] = useState<string>("todos");
   const [metric, setMetric] = useState<Metric>("pontos");
+  const { data: playedIds } = useMyPlayedCompetitionIds();
+  const hasPlayed = (playedIds?.length ?? 0) > 0;
 
-  const filter = useMemo(() => ({ competitionId, year: null, teamId: null }), [competitionId]);
+  const filter = useMemo<RTBFilter>(() => {
+    if (recorte === "mine") return { competitionIds: playedIds ?? [] };
+    if (recorte === "todos") return {};
+    return { competitionId: recorte };
+  }, [recorte, playedIds]);
+
   const { data: rows, isLoading } = useGlobalStandings(filter, 50);
-  const { data: myRank } = useMyGlobalRank({ competitionId });
+  const { data: myRank } = useMyGlobalRank(filter);
 
   return (
     <Page
@@ -38,15 +52,16 @@ export function RankingPage() {
     >
       {/* Tabs de campeonato (recorte) */}
       <div className="no-scrollbar -mx-4 mb-4 flex gap-2 overflow-x-auto px-4">
-        <Tab active={competitionId === null} onClick={() => setCompetitionId(null)}>
+        <Tab active={recorte === "todos"} onClick={() => setRecorte("todos")}>
           Todos
         </Tab>
+        {hasPlayed && (
+          <Tab active={recorte === "mine"} onClick={() => setRecorte("mine")}>
+            Que eu jogo
+          </Tab>
+        )}
         {competitions?.map((c) => (
-          <Tab
-            key={c.id}
-            active={competitionId === c.id}
-            onClick={() => setCompetitionId(c.id)}
-          >
+          <Tab key={c.id} active={recorte === c.id} onClick={() => setRecorte(c.id)}>
             {c.display_name ?? c.name}
           </Tab>
         ))}

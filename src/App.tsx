@@ -14,6 +14,7 @@ const LigasPage = lazy(() => import("@/features/leagues/LigasPage").then((m) => 
 const NovaLigaPage = lazy(() => import("@/features/leagues/NovaLigaPage").then((m) => ({ default: m.NovaLigaPage })));
 const LigaDetailPage = lazy(() => import("@/features/leagues/LigaDetailPage").then((m) => ({ default: m.LigaDetailPage })));
 const EditarPerfilPage = lazy(() => import("@/features/profile/EditarPerfilPage").then((m) => ({ default: m.EditarPerfilPage })));
+const PersonalizationPage = lazy(() => import("@/features/onboarding/PersonalizationPage").then((m) => ({ default: m.PersonalizationPage })));
 const AdminPage = lazy(() => import("@/features/admin/AdminPage").then((m) => ({ default: m.AdminPage })));
 const AdminCompMatchesPage = lazy(() => import("@/features/admin/AdminCompMatchesPage").then((m) => ({ default: m.AdminCompMatchesPage })));
 const PlayerProfilePage = lazy(() => import("@/features/players/PlayerProfilePage").then((m) => ({ default: m.PlayerProfilePage })));
@@ -75,6 +76,7 @@ export default function App() {
               <Route path="/ranking" element={<RankingPage />} />
               <Route path="/perfil" element={<PerfilPage />} />
               <Route path="/perfil/editar" element={<EditarPerfilPage />} />
+              <Route path="/perfil/personalizar" element={<PersonalizationPage />} />
               <Route path="/construa" element={<FeedbackPage />} />
               <Route path="/simulador" element={<SimuladorPage />} />
               <Route path="/jogador/:id" element={<PlayerProfilePage />} />

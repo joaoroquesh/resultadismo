@@ -8,7 +8,7 @@
 > microcopy, voz/tom, acessibilidade, benchmarks). **Fonte de identidade:** [`PRODUCT.md`](../PRODUCT.md)
 > (marca e voz) e [`DESIGN.md`](../DESIGN.md) (visual). Este guia une as duas para o Resultadismo.
 >
-> v1 — 2026-06-04.
+> v1 — 2026-06-04 · v2 — 2026-06-06 (técnica "dialogue com o Resultadista").
 
 ---
 
@@ -105,6 +105,16 @@ linguagem de aposta/odds/risco. Ver a **linguagem proibida** (seção 4).
 - ✅ "Mudou de ideia? Você pode cancelar e receber de volta em até 7 dias."
 - ❌ "Aposte agora e ganhe!" / "Última chance!" / "Suas odds de cravar."
 - ❌ Esconder o custo ou criar falsa urgência.
+
+### Técnica — dialogue com o Resultadista (pergunte, não comande)
+Nos fluxos pessoais (**personalização**, onboarding, perfil), **fale COM a pessoa**, não com um
+formulário. Prefira **perguntas calorosas** a rótulos secos, chame de **Resultadista** nos momentos
+sociais e dê sempre a saída leve ("Pode pular", "Muda quando quiser"). Conversa > comando.
+
+- ✅ "Qual é o seu time do coração?" (em vez de "Time favorito")
+- ✅ "Pra que seleção você torce?" · "E os times pra ficar de olho?" · "Bora pro ranking geral?"
+- ✅ "Tudo pronto, Resultadista! 🎉" + "Pode mudar quando quiser."
+- ❌ "Selecione seu time." · "Configurações de preferência." · "Preencha os campos obrigatórios."
 
 ---
 
