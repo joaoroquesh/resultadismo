@@ -8,7 +8,6 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
 import { useCompetitions, findWorldCupCompetition } from "@/features/matches/api";
 import { useAddLeagueCompetition, useDeleteLeagueCompetition } from "../api";
-import { useNamePrefixes, requiredPrefix, NAME_PREFIX_DEFAULTS } from "../naming";
 import type { LeagueMode } from "@/lib/types";
 
 // Limite inicial: 1 competição por grupo. Quando a base de usuários crescer e
@@ -31,7 +30,6 @@ export function CompeticoesTab({
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [competitionId, setCompetitionId] = useState("");
-  const [name, setName] = useState("");
   const [toDelete, setToDelete] = useState<{ id: string; name: string } | null>(null);
 
   // Grupo comum: modo fixo em "points" (Liga/Copa ficam como "em breve").
@@ -43,30 +41,34 @@ export function CompeticoesTab({
   const mode: LeagueMode = !confrontoEnabled || tipo === "pontos" ? "points" : formato;
   const isConfrontoNew = mode === "liga" || mode === "cup";
 
-  // Prefixo do tipo (Bolão/Liga/Copa) entra como badge fixa — a pessoa digita só o resto.
-  const { data: prefixesData } = useNamePrefixes();
-  const prefixes = prefixesData ?? NAME_PREFIX_DEFAULTS;
-  const prefix = requiredPrefix(mode, prefixes);
-
-  // Pré-preenche um complemento sugerido ao abrir (o prefixo é a badge).
-  // Ajuste no render (sem efeito): com o painel aberto e sem competição escolhida,
-  // crava a Copa como sugestão — "you might not need an effect".
+  // Pré-preenche Copa do Mundo como sugestão ao abrir.
   const wcSuggestion = competitions?.length ? findWorldCupCompetition(competitions) : undefined;
   if (open && wcSuggestion && !competitionId) {
     setCompetitionId(wcSuggestion.id);
-    setName((cur) => cur || "da Copa do Mundo 2026");
   }
+
+  // Nome canônico que será gravado (preview pro user, server-side trigger garante).
+  const previewName = (() => {
+    if (mode === "points") {
+      const comp = competitions?.find((c) => c.id === competitionId);
+      return comp?.display_name ?? comp?.name ?? "Escolha um campeonato";
+    }
+    if (mode === "liga") return `Próxima Liga do grupo`;
+    return `Próxima Copa do grupo`;
+  })();
 
   // Grupos habilitadas (teste de Confronto) não têm limite de competições.
   const reachedLimit = !confrontoEnabled && comps.length >= MAX_COMPETITIONS_PER_LEAGUE;
 
   async function handleAdd() {
-    if (!competitionId || !name.trim()) return;
+    if (!competitionId) return;
     try {
+      // O nome é definido pelo trigger no banco (regra canônica).
+      // Mandamos uma string qualquer; o trigger sobrescreve.
       await add.mutateAsync({
         leagueId,
         competitionId,
-        name: `${prefix} ${name.trim()}`.trim(),
+        name: previewName,
         mode,
         participantMode: isConfrontoNew ? participantMode : undefined,
       });
@@ -77,7 +79,6 @@ export function CompeticoesTab({
         "success",
       );
       setOpen(false);
-      setName("");
       setCompetitionId("");
     } catch (err) {
       toast(err instanceof Error ? err.message : "Erro ao adicionar.", "error");
@@ -140,21 +141,12 @@ export function CompeticoesTab({
               </option>
             ))}
           </select>
-          <div className="flex items-stretch overflow-hidden rounded-md border border-ink-200 bg-surface focus-within:border-brand-500">
-            <span className="flex shrink-0 items-center bg-ink-100 px-3 text-sm font-bold text-ink-600">
-              {prefix}
-            </span>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="dos amigos"
-              className="h-11 min-w-0 flex-1 bg-transparent px-3 outline-none"
-            />
+          <div className="rounded-md bg-brand-500/8 px-3 py-2.5">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-700">
+              Vai chamar
+            </p>
+            <p className="mt-0.5 truncate font-bold text-ink-950">{previewName}</p>
           </div>
-          <p className="-mt-1.5 text-xs text-ink-400">
-            O tipo (<span className="font-semibold text-ink-600">{prefix}</span>) já entra no nome — é
-            só completar.
-          </p>
           {confrontoEnabled ? (
             <div className="space-y-2">
               <label className="text-sm font-medium text-ink-800">Tipo de disputa</label>
