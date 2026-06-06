@@ -20,6 +20,20 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ---
 
+## [2.8.3] — 2026-06-06
+
+### Corrigido
+- **Sync ao vivo de fato voltou (e ficou observável): timeout do `pg_net` 5s → 30s.** Depois do
+  fix de auth (2.8.2 + `CRON_SECRET`), o cron passou a chegar na função e sincronizar — mas a chamada
+  `net.http_post` usava o timeout padrão do `pg_net` (5s) e a função leva ~5s (ESPN + football_data +
+  gravação), então o `pg_net` registrava "Timeout of 5000 ms" / `status_code NULL` **apesar de o sync
+  concluir** (`last_synced_at` atualizava, `last_sync_ok=true`). Subi `timeout_milliseconds := 30000`
+  em `run_football_sync` (migration `20260606000001`) pra (1) o `pg_net` capturar o **200** (logs
+  legíveis — é por `net._http_response` que se diagnostica o sync) e (2) dar folga em dias de muito
+  jogo. **Confirmado em produção:** `last_synced_at` atualizando a cada minuto, `last_sync_ok=true`.
+
+---
+
 ## [2.8.2] — 2026-06-06
 
 ### Corrigido
