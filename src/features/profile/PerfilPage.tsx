@@ -35,6 +35,9 @@ import { useInstallState, promptInstall, isIOS } from "@/lib/pwa";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { usePlayerStats } from "./stats";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
+import { useSetGlobalRankingVisibility } from "@/features/ranking/api";
 
 function Stat({ value, label, accent }: { value: string | number; label: string; accent?: string }) {
   return (
@@ -288,6 +291,9 @@ export function PerfilPage() {
           {push?.subscribed && <NotifPrefsCard />}
         </div>
 
+        {/* Privacidade: aparecer ou não no Resultadismo The Best */}
+        <GlobalRankingPrefCard />
+
         <Button variant="outline" fullWidth onClick={signOut}>
           <LogOut className="size-4" /> Sair
         </Button>
@@ -306,5 +312,66 @@ export function PerfilPage() {
         </p>
       </div>
     </Page>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Aparecer no Resultadismo The Best — opt-out por Resultadista             */
+/* ────────────────────────────────────────────────────────────────────────── */
+function GlobalRankingPrefCard() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const set = useSetGlobalRankingVisibility();
+
+  const { data: visible, isLoading } = useQuery({
+    enabled: !!user,
+    queryKey: ["profile-me-rtb-pref", user?.id],
+    staleTime: 60_000,
+    queryFn: async (): Promise<boolean> => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("show_in_global_ranking")
+        .eq("id", user!.id)
+        .single();
+      if (error) throw error;
+      return data?.show_in_global_ranking ?? true;
+    },
+  });
+
+  const toggle = () => {
+    const next = !(visible ?? true);
+    set.mutate(next, {
+      onSuccess: () => qc.invalidateQueries({ queryKey: ["profile-me-rtb-pref", user?.id] }),
+    });
+  };
+
+  return (
+    <Card className="flex items-center justify-between gap-3 p-4">
+      <div className="min-w-0">
+        <p className="font-medium text-ink-900">Aparecer no Resultadismo The Best</p>
+        <p className="text-xs text-ink-500">
+          {visible === false
+            ? "Você não está aparecendo na classificação geral pública."
+            : "Sua posição aparece pra outros Resultadistas. Desligue se preferir privacidade."}
+        </p>
+      </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={visible ?? true}
+        aria-label="Aparecer no Resultadismo The Best"
+        disabled={isLoading || set.isPending}
+        onClick={toggle}
+        className={`relative h-6 w-11 shrink-0 rounded-full transition-colors disabled:opacity-50 ${
+          (visible ?? true) ? "bg-brand-600" : "bg-ink-300"
+        }`}
+      >
+        <span
+          className={`absolute top-0.5 size-5 rounded-full bg-white shadow-sm transition-transform ${
+            (visible ?? true) ? "translate-x-5" : "translate-x-0.5"
+          }`}
+        />
+      </button>
+    </Card>
   );
 }

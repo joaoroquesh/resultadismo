@@ -1056,6 +1056,7 @@ export type Database = {
           is_app_admin: boolean
           last_active_at: string | null
           notif_prefs: Json
+          show_in_global_ranking: boolean
           updated_at: string
           usage_seconds: number
         }
@@ -1068,6 +1069,7 @@ export type Database = {
           is_app_admin?: boolean
           last_active_at?: string | null
           notif_prefs?: Json
+          show_in_global_ranking?: boolean
           updated_at?: string
           usage_seconds?: number
         }
@@ -1080,6 +1082,7 @@ export type Database = {
           is_app_admin?: boolean
           last_active_at?: string | null
           notif_prefs?: Json
+          show_in_global_ranking?: boolean
           updated_at?: string
           usage_seconds?: number
         }
@@ -1610,6 +1613,25 @@ export type Database = {
           winner: string
         }[]
       }
+      get_global_standings: {
+        Args: {
+          p_competition_id?: string
+          p_limit?: number
+          p_team_id?: string
+          p_year?: number
+        }
+        Returns: {
+          acertos: number
+          avatar_url: string
+          cravadas: number
+          display_name: string
+          jogos: number
+          pontos: number
+          rank: number
+          saldos: number
+          user_id: string
+        }[]
+      }
       get_league_standings: {
         Args: { p_lc_id: string }
         Returns: {
@@ -1635,6 +1657,15 @@ export type Database = {
           league_id: string
           predicted: boolean
           user_id: string
+        }[]
+      }
+      get_my_global_rank: {
+        Args: { p_competition_id?: string; p_year?: number }
+        Returns: {
+          jogos: number
+          pontos: number
+          rank: number
+          total_resultadistas: number
         }[]
       }
       get_my_notifications: {
@@ -1790,6 +1821,10 @@ export type Database = {
       set_app_admin: {
         Args: { p_user_id: string; p_value: boolean }
         Returns: undefined
+      }
+      set_global_ranking_visibility: {
+        Args: { p_value: boolean }
+        Returns: boolean
       }
       set_notification_pref: {
         Args: { p_enabled: boolean; p_type: string }
