@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
@@ -20,13 +20,15 @@ export function NameRulesCard() {
   const [liga, setLiga] = useState("");
   const [points, setPoints] = useState("");
 
-  useEffect(() => {
-    if (data) {
-      setCup(data.cup);
-      setLiga(data.liga);
-      setPoints(data.points);
-    }
-  }, [data]);
+  // popula o form quando os dados chegam/mudam — guarda a referência anterior e
+  // ressincroniza no render, sem efeito ("you might not need an effect").
+  const [prevData, setPrevData] = useState(data);
+  if (data && data !== prevData) {
+    setPrevData(data);
+    setCup(data.cup);
+    setLiga(data.liga);
+    setPoints(data.points);
+  }
 
   return (
     <Card className="space-y-3 p-4">

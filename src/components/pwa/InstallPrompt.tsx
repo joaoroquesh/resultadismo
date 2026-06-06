@@ -36,11 +36,6 @@ export function InstallPrompt() {
     return () => clearTimeout(t);
   }, [state, onProfile]);
 
-  // Some se instalar enquanto estiver aberto.
-  useEffect(() => {
-    if (state === "installed") setShow(false);
-  }, [state]);
-
   if (!show || onProfile || (state !== "installable" && state !== "ios")) return null;
 
   const onInstall = async () => {

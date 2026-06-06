@@ -66,9 +66,17 @@ export function PerfilPage() {
   const [push, setPush] = useState<PushState | null>(null);
   const [pushBusy, setPushBusy] = useState(false);
   const refreshPush = useCallback(async () => setPush(await getPushState()), []);
+  // Carrega o estado inicial do push (leitura assíncrona do service worker). O setState
+  // fica no callback da promise — não é setState síncrono em efeito.
   useEffect(() => {
-    void refreshPush();
-  }, [refreshPush]);
+    let alive = true;
+    void getPushState().then((s) => {
+      if (alive) setPush(s);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   async function enablePush() {
     if (!user) return;

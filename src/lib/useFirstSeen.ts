@@ -1,25 +1,24 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 /**
  * Marca "o usuário já viu X" usando localStorage (sem banco de dados).
  *
  * Retorna [aindaNaoViu, marcarComoVisto]:
- *  - `aindaNaoViu` é `false` na 1ª renderização (evita flash em quem já viu)
- *    e vira `true` num efeito caso a chave ainda não exista.
+ *  - `aindaNaoViu` já vem certo na 1ª renderização (lazy init): `true` se a chave
+ *    ainda não existe, `false` se já existe (evita flash em quem já viu).
  *  - `marcarComoVisto()` grava a chave e esconde o conteúdo.
  *
  * Útil para onboarding e dicas de primeiro acesso.
  */
 export function useFirstSeen(key: string): [boolean, () => void] {
-  const [pending, setPending] = useState(false);
-
-  useEffect(() => {
+  const [pending, setPending] = useState(() => {
     try {
-      if (localStorage.getItem(key) == null) setPending(true);
+      return localStorage.getItem(key) == null;
     } catch {
       // localStorage indisponível (modo privado/SSR): não mostra a dica.
+      return false;
     }
-  }, [key]);
+  });
 
   const markSeen = useCallback(() => {
     setPending(false);

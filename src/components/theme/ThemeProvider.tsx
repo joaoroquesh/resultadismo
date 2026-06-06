@@ -33,26 +33,25 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(
     () => (localStorage.getItem(STORAGE_KEY) as Theme) || "system",
   );
-  const [resolved, setResolved] = useState<"light" | "dark">(() =>
-    theme === "system" ? systemTheme() : theme,
-  );
+  // Preferência do SO acompanhada por estado próprio; o listener roda em callback
+  // (fora de efeito) — assim o tema resolvido é derivado no render, sem setState em efeito.
+  const [systemDark, setSystemDark] = useState(() => systemTheme() === "dark");
 
+  // tema efetivo: derivado de `theme` + preferência do SO (quando "system").
+  const resolved: "light" | "dark" = theme === "system" ? (systemDark ? "dark" : "light") : theme;
+
+  // Acompanha a mudança de preferência do SO (callback, não setState síncrono em efeito).
   useEffect(() => {
-    const next = theme === "system" ? systemTheme() : theme;
-    setResolved(next);
-    apply(next);
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = () => setSystemDark(mq.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
-    if (theme === "system") {
-      const mq = window.matchMedia("(prefers-color-scheme: dark)");
-      const handler = () => {
-        const r = systemTheme();
-        setResolved(r);
-        apply(r);
-      };
-      mq.addEventListener("change", handler);
-      return () => mq.removeEventListener("change", handler);
-    }
-  }, [theme]);
+  // Aplica o tema resolvido no DOM (efeito só de efeito colateral, sem setState).
+  useEffect(() => {
+    apply(resolved);
+  }, [resolved]);
 
   const setTheme = (t: Theme) => {
     localStorage.setItem(STORAGE_KEY, t);

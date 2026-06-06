@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -49,14 +49,13 @@ export function CompeticoesTab({
   const prefix = requiredPrefix(mode, prefixes);
 
   // Pré-preenche um complemento sugerido ao abrir (o prefixo é a badge).
-  useEffect(() => {
-    if (!open || competitionId || !competitions?.length) return;
-    const wc = findWorldCupCompetition(competitions);
-    if (wc) {
-      setCompetitionId(wc.id);
-      setName((cur) => cur || "da Copa do Mundo 2026");
-    }
-  }, [open, competitions, competitionId]);
+  // Ajuste no render (sem efeito): com o painel aberto e sem competição escolhida,
+  // crava a Copa como sugestão — "you might not need an effect".
+  const wcSuggestion = competitions?.length ? findWorldCupCompetition(competitions) : undefined;
+  if (open && wcSuggestion && !competitionId) {
+    setCompetitionId(wcSuggestion.id);
+    setName((cur) => cur || "da Copa do Mundo 2026");
+  }
 
   // Grupos habilitadas (teste de Confronto) não têm limite de competições.
   const reachedLimit = !confrontoEnabled && comps.length >= MAX_COMPETITIONS_PER_LEAGUE;

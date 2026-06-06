@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Plus, Trash2, Ticket, ShieldCheck } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -83,18 +83,20 @@ function PaymentSettingsCard() {
   const [promoPriceReais, setPromoPriceReais] = useState("9,90");
   const [promoUntil, setPromoUntil] = useState(""); // yyyy-mm-dd
 
-  useEffect(() => {
-    if (settings) {
-      setMode(settings.payment_mode);
-      setPriceReais((settings.league_price_cents / 100).toFixed(2).replace(".", ","));
-      const hasPromo = settings.promo_price_cents != null;
-      setPromoOn(hasPromo);
-      if (hasPromo) {
-        setPromoPriceReais(((settings.promo_price_cents as number) / 100).toFixed(2).replace(".", ","));
-      }
-      setPromoUntil(settings.promo_until ? settings.promo_until.slice(0, 10) : "");
+  // popula o form quando as configs chegam/mudam — referência anterior + ressync no
+  // render, sem efeito ("you might not need an effect").
+  const [prevSettings, setPrevSettings] = useState(settings);
+  if (settings && settings !== prevSettings) {
+    setPrevSettings(settings);
+    setMode(settings.payment_mode);
+    setPriceReais((settings.league_price_cents / 100).toFixed(2).replace(".", ","));
+    const hasPromo = settings.promo_price_cents != null;
+    setPromoOn(hasPromo);
+    if (hasPromo) {
+      setPromoPriceReais(((settings.promo_price_cents as number) / 100).toFixed(2).replace(".", ","));
     }
-  }, [settings]);
+    setPromoUntil(settings.promo_until ? settings.promo_until.slice(0, 10) : "");
+  }
 
   if (isLoading) return <Skeleton className="h-44 w-full" />;
 

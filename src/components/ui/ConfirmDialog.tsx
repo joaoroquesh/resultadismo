@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AlertTriangle, Megaphone } from "lucide-react";
 import { Button } from "./Button";
 
@@ -30,9 +30,13 @@ export function ConfirmDialog({
 }) {
   const [step, setStep] = useState(1);
 
-  useEffect(() => {
+  // Reseta para o passo 1 sempre que o diálogo fecha — ajuste no render via prop
+  // anterior, sem efeito ("you might not need an effect").
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
     if (!open) setStep(1);
-  }, [open]);
+  }
 
   if (!open) return null;
 

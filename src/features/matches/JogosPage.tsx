@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { CalendarClock, Trophy, Zap, LayoutGrid } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -39,6 +39,14 @@ const weekKey = (iso: string | null) => {
   return d.subtract(dow, "day").format("YYYY-MM-DD");
 };
 
+// dia inicial sugerido: hoje, senão o próximo com jogos, senão o último (ou null se vazio)
+const pickDefaultDay = (days: string[]): string | null => {
+  if (days.length === 0) return null;
+  const today = dayjs().format("YYYY-MM-DD");
+  if (days.includes(today)) return today;
+  return days.find((d) => d >= today) ?? days[days.length - 1]!;
+};
+
 export function JogosPage() {
   const { session, user } = useAuth();
   const { open: openLogin } = useLoginModal();
@@ -61,13 +69,17 @@ export function JogosPage() {
 
   useMatchesRealtime(compId);
 
-  const [day, setDay] = useState<string | null>(null);
+  // dia escolhido pelo usuário (null = usa o default automático do escopo).
+  const [picked, setPicked] = useState<string | null>(null);
   const dayRowRef = useRef<HTMLDivElement>(null);
 
-  // troca de campeonato (ou "Todos") = contexto de dia novo → recalcula hoje/próximo
-  useEffect(() => {
-    setDay(null);
-  }, [scope]);
+  // troca de campeonato (ou "Todos") = contexto de dia novo → zera a escolha.
+  // Ajuste no render via valor anterior, sem efeito ("you might not need an effect").
+  const [prevScope, setPrevScope] = useState(scope);
+  if (scope !== prevScope) {
+    setPrevScope(scope);
+    setPicked(null);
+  }
 
   // dias únicos com jogos, ordenados
   const days = useMemo(() => {
@@ -77,20 +89,9 @@ export function JogosPage() {
     return Array.from(set).filter((d) => d !== "sem-data").sort();
   }, [matches]);
 
-  // auto-seleciona hoje (ou o próximo dia com jogos, ou o último)
-  useEffect(() => {
-    if (days.length === 0) {
-      setDay(null);
-      return;
-    }
-    setDay((cur) => {
-      if (cur && days.includes(cur)) return cur; // preserva escolha do usuário (dentro do escopo)
-      const today = dayjs().format("YYYY-MM-DD");
-      if (days.includes(today)) return today;
-      const future = days.find((d) => d >= today);
-      return future ?? days[days.length - 1]!;
-    });
-  }, [days]);
+  // dia efetivo (derivado): mantém a escolha do usuário se ainda existe no escopo;
+  // senão crava hoje (ou o próximo dia com jogos, ou o último). Sem efeito.
+  const day = picked && days.includes(picked) ? picked : pickDefaultDay(days);
 
   const dayMatches = useMemo(() => {
     if (!matches || !day) return [];
@@ -234,7 +235,7 @@ export function JogosPage() {
             return (
               <button
                 key={d}
-                onClick={() => setDay(d)}
+                onClick={() => setPicked(d)}
                 className={cn(
                   "relative flex shrink-0 flex-col items-center rounded-md border px-3 py-1.5 text-sm font-semibold leading-tight transition",
                   day === d

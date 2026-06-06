@@ -110,9 +110,13 @@ export function CrestEditor({
   const showColors = fill !== "photo";
 
   // ao trocar de estilo/nº de faixas, a divisão ativa volta pra primeira
-  useEffect(() => {
+  // (reset no render via chave anterior — "you might not need an effect")
+  const divKey = `${fill}-${stripeCount}`;
+  const [prevDivKey, setPrevDivKey] = useState(divKey);
+  if (divKey !== prevDivKey) {
+    setPrevDivKey(divKey);
     setActiveDiv(0);
-  }, [fill, stripeCount]);
+  }
 
   // monta a config atual e emite
   const current = buildCrest({

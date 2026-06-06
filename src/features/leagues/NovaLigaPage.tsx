@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Info, Ticket, Trophy } from "lucide-react";
 import { Page } from "@/components/layout/Page";
@@ -43,16 +43,15 @@ export function NovaLigaPage() {
   const [checkingDiscount, setCheckingDiscount] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
 
-  // Pré-seleção da Copa do Mundo (default da temporada) — assim que o catálogo chega.
-  useEffect(() => {
-    if (competitionId || !competitions?.length) return;
-    const wc = findWorldCupCompetition(competitions);
-    if (wc) setCompetitionId(wc.id);
-  }, [competitions, competitionId]);
+  // Pré-seleção da Copa do Mundo (default da temporada): derivada no render, sem efeito.
+  // `competitionId` guarda só a escolha explícita; enquanto vazio, o catálogo chegando
+  // faz a Copa virar o valor efetivo (o submit tem o mesmo fallback).
+  const worldCup = competitions?.length ? findWorldCupCompetition(competitions) : undefined;
+  const effectiveCompetitionId = competitionId || worldCup?.id || "";
 
   // Detecta se a competição escolhida é a Copa do Mundo (pra ajustar o copy/UI).
-  const selectedComp = competitions?.find((c) => c.id === competitionId);
-  const isWorldCup = !!selectedComp && selectedComp === findWorldCupCompetition(competitions);
+  const selectedComp = competitions?.find((c) => c.id === effectiveCompetitionId);
+  const isWorldCup = !!selectedComp && selectedComp === worldCup;
 
   const payMode = settings?.payment_mode ?? "disabled";
   const baseCents = settings?.league_price_cents ?? 990;
@@ -82,8 +81,8 @@ export function NovaLigaPage() {
     if (!name.trim() || redirecting) return;
     setRedirecting(true);
     try {
-      // Fallback robusto: se o catálogo chegou tarde e o useEffect não pré-selecionou
-      // a Copa, ainda assim cravamos ela no submit. Todo grupo nasce com competição.
+      // Fallback robusto: se o usuário não escolheu nada, cravamos a Copa no submit.
+      // Todo grupo nasce com competição.
       const finalCompId = competitionId || findWorldCupCompetition(competitions)?.id;
       const finalMode: LeagueMode =
         finalCompId && finalCompId === findWorldCupCompetition(competitions)?.id ? "points" : mode;
@@ -240,7 +239,7 @@ export function NovaLigaPage() {
             <label className="text-sm font-medium text-ink-800">Competição (bolão inicial)</label>
             <select
               aria-label="Competição (bolão inicial)"
-              value={competitionId}
+              value={effectiveCompetitionId}
               onChange={(e) => setCompetitionId(e.target.value)}
               className="h-11 rounded-md border border-ink-200 bg-surface px-3 text-ink-950 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
             >
@@ -262,7 +261,7 @@ export function NovaLigaPage() {
               </p>
             </div>
           ) : (
-            competitionId && (
+            effectiveCompetitionId && (
               <Coachmark
                 storageKey="resultadismo-coach-liga-modo-v1"
                 title="Modo de disputa"

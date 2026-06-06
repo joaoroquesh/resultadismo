@@ -20,6 +20,30 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ---
 
+## [2.8.1] — 2026-06-05
+
+### Alterado
+- **Regra de lint `react-hooks/set-state-in-effect` religada (`eslint .` exit 0 com a regra ativa).**
+  Concluído o "próximo passe" prometido na [2.7.5]: os **12 pontos** que a violavam (11 arquivos)
+  foram migrados para os padrões **"you might not need an effect"**, **sem mudança de comportamento**
+  — e removido o override `"off"` do `eslint.config.js`. Por arquivo: `useFirstSeen` (lazy-init no
+  `useState`, sem efeito); `InstallPrompt` (efeito redundante removido — a guarda de render já
+  esconde quando instalado); `ThemeProvider` (tema `resolved` **derivado** no render a partir de
+  `theme` + estado `systemDark`, com o `apply` no DOM num efeito só de `[resolved]`); `ConfirmDialog`
+  (reset do passo via prop anterior `prevOpen`, no render); `CrestEditor` (reset de `activeDiv` por
+  chave anterior `fill-stripeCount`); `NameRulesCard` e `PaymentAdmin` (form populado via referência
+  anterior dos dados/configs async, no render); `NovaLigaPage` (default da Copa **derivado** em
+  `effectiveCompetitionId`); `CompeticoesTab` (sugestão da Copa ao abrir, ajustada no render);
+  `JogosPage` (dia efetivo **derivado**; troca de campeonato zera a escolha via `prevScope`);
+  `PerfilPage` (estado do push lido no callback da promise, não síncrono no efeito). As demais regras
+  de hooks seguem ativas (rules-of-hooks, exhaustive-deps, **purity**).
+- **Validação:** `eslint .` exit 0 (regra ativa), `npm run build` ok, e no navegador (homologação
+  local) os core — **tema** (claro/escuro/sistema, em montagem e ao trocar ao vivo, + `meta
+  theme-color`), **ConfirmDialog** (2 passos + reset ao reabrir após fechar) e **JogosPage** (dia
+  padrão correto + troca de escopo reseta o dia) — todos OK, sem warnings de re-render no console.
+
+---
+
 ## [2.8.0] — 2026-06-05
 
 ### Adicionado
