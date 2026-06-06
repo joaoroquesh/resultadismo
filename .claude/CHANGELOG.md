@@ -20,6 +20,21 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ---
 
+## [2.8.2] — 2026-06-06
+
+### Corrigido
+- **Sync ao vivo travado em produção (403) — auth do cron à prova de rotação de chave.** A edge
+  function `sync-football` passou a rejeitar (**403**) toda chamada do cron porque o token enviado
+  (`private.sync_config.service_key`) deixou de bater com a `service_role` key (o Supabase
+  trocou/rotacionou a chave). O cron rodava a cada minuto, mas tudo era recusado → `last_synced_at`
+  congelava. **Fix:** `verify_jwt=false` para a `sync-football` (`supabase/config.toml`), habilitando
+  o caminho **`CRON_SECRET`** que a função já implementa — um segredo NOSSO, estável, imune à rotação
+  da service_role key. (A função continua fazendo a própria autorização: `timingSafeEqual` do segredo
+  ou JWT de app-admin.) Config do segredo é manual (painel + `sync_config`). Diagnóstico feito por
+  `cron.job_run_details` + `net._http_response` (status 403) em produção.
+
+---
+
 ## [2.8.1] — 2026-06-05
 
 ### Alterado

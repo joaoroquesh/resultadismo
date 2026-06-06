@@ -374,6 +374,13 @@ allow_dynamic_registration = false
 [functions.mercadopago-webhook]
 verify_jwt = false
 
+# sync-football faz a PRÓPRIA autorização (service_role key OU CRON_SECRET via
+# timingSafeEqual, ou JWT de app-admin). verify_jwt=false é necessário para o cron
+# autenticar com um segredo ESTÁVEL (CRON_SECRET) que não é um JWT — assim o sync
+# fica imune à rotação/troca de formato da service_role key pelo Supabase.
+[functions.sync-football]
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.
