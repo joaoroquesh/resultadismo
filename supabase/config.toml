@@ -381,6 +381,13 @@ verify_jwt = false
 [functions.sync-football]
 verify_jwt = false
 
+# send-push também faz a PRÓPRIA auth (service_role key OU CRON_SECRET via
+# timingSafeEqual). verify_jwt=false deixa o trigger notifications_push autenticar
+# com o CRON_SECRET (que não é JWT) — senão o gateway barra com 401 e NENHUMA Web
+# Push é enviada (in-app funciona, mas a notificação no celular/PC não chega).
+[functions.send-push]
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.

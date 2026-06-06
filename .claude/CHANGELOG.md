@@ -20,6 +20,21 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ---
 
+## [2.10.1] — 2026-06-06
+
+### Corrigido
+- **Web Push voltou a sair (notificação no celular/PC): `verify_jwt=false` na `send-push`.** As
+  notificações in-app funcionavam, mas o **push** nunca chegava: o trigger `notifications_push`
+  chama a edge function `send-push` com o token de `sync_config.service_key`, e a `send-push` (ao
+  contrário da `sync-football`) ainda exigia JWT no gateway. Depois que o `sync_config.service_key`
+  virou o **`CRON_SECRET`** (estável, não-JWT, fix do sync 2.8.x), o gateway passou a barrar a chamada
+  com **401** antes de a função rodar → nenhuma push. `verify_jwt=false` (`supabase/config.toml`)
+  deixa o `CRON_SECRET` chegar à checagem própria da função (`timingSafeEqual`). Mesmo padrão da
+  `sync-football`/`mercadopago-webhook`. (Pré-requisito p/ entregar: secrets `VAPID_*` no painel +
+  `VITE_VAPID_PUBLIC_KEY` do client = par da privada. iOS exige PWA instalado, 16.4+.)
+
+---
+
 ## [2.10.0] — 2026-06-06
 
 ### Adicionado
