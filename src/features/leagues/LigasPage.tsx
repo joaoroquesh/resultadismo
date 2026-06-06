@@ -55,7 +55,7 @@ export function LigasPage() {
       </form>
 
       {isLoading ? (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {Array.from({ length: 3 }).map((_, i) => (
             <Skeleton key={i} className="h-20 w-full" />
           ))}
@@ -74,7 +74,7 @@ export function LigasPage() {
           }
         />
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {leagues.map((l) => (
             <Link key={l.id} to={`/grupos/${l.slug}`}>
               <Card className="flex items-center gap-3 p-4 transition active:scale-[0.99]">

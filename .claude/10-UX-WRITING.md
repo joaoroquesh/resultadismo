@@ -124,17 +124,20 @@ Regra de ouro: **quanto mais sério o momento (dinheiro, perda, erro), menos zoe
 ### Termos oficiais (use exatamente estes)
 | Use | Não use | Observação |
 |---|---|---|
-| **grupo** | federação, liga, bolão* | o espaço social (antes "Federação"). (*Bolão/Liga/Copa são **prefixos**, não sinônimos) |
+| **grupo** | federação, liga, bolão* | o espaço social (antes "Federação"). |
+| **Resultadista** | usuário, jogador, fulano | como **chamamos** quem joga, em momentos sociais/de conquista ("Você é o 27º Resultadista", "Vamos, Resultadista!"). Não usar em copy puramente operacional/técnica. |
+| **Bolão** (modo) | Pontos, Tabela | um dos **2 modos** de disputa. Bolão = corrida de pontos sobre os jogos de um campeonato. Banco mantém `points` (não muda). **Nome** do bolão é sempre o do campeonato (ex.: "Copa do Mundo 2026"). |
+| **Confrontos** (modo) | duelos, mata-mata* | o **2º modo** — duelo A×B entre membros. Inclui **Liga** (pontos corridos 3/1/0) e **Copa** (mata-mata). Gated por federação (`confronto_enabled`); só aparece quando está ligado. |
+| **Liga / Copa** (dentro de Confrontos) | — | **formatos** dentro de Confrontos. Nome auto: **"Nª Liga {Grupo}"** / **"Nª Copa {Grupo}"** (ex.: "7ª Liga Clubistash"). |
 | **palpite** / **palpitar** | aposta, chute, previsão | a ação central |
 | **cravar** / **cravada** | acertar em cheio | placar exato (+3) |
 | **saldo** | — | vencedor + diferença de gols (+2) |
 | **acerto** | — | só o vencedor (+1) |
 | **dobro (2×)** | **joker** (anglicismo), multiplicador | rótulo: **"Dobro (2×)"**. Metáfora de carta? use **"coringa"** (PT), nunca "joker". |
-| **confronto** | duelo, mata-mata* | duelo A×B (*mata-mata = a Copa) |
-| **Liga / Copa** | — | modos de confronto (Liga = pontos corridos; Copa = mata-mata) |
 | **classificação** | tabela | "ranking" é aceitável se for mais claro no contexto |
+| **Resultadismo The Best** | "ranking global", "leaderboard" | **nome da classificação geral** (todos os Resultadistas, todas as competições). |
 | **cutucar** | nudge, alertar | lembrar quem não palpitou |
-| **escudo** | avatar, brasão | identidade visual de perfil/grupo |
+| **escudo** | avatar, brasão | identidade visual de perfil/grupo (no grupo é uma **flâmula** estilo bandeira de país). |
 | **jogo** | partida, match | |
 
 ### ⛔ Linguagem PROIBIDA (regra de negócio 3 — "não é casa de apostas")
