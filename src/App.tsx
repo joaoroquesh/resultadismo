@@ -22,6 +22,7 @@ const PrivacidadePage = lazy(() => import("@/features/legal/PrivacidadePage").th
 const TermosPage = lazy(() => import("@/features/legal/TermosPage").then((m) => ({ default: m.TermosPage })));
 const SimuladorPage = lazy(() => import("@/features/confronto/SimuladorPage").then((m) => ({ default: m.SimuladorPage })));
 const RankingPage = lazy(() => import("@/features/ranking/RankingPage").then((m) => ({ default: m.RankingPage })));
+const ConfrontosPage = lazy(() => import("@/features/confronto/ConfrontosPage").then((m) => ({ default: m.ConfrontosPage })));
 
 // Redireciona links antigos /ligas/:slug para /grupos/:slug (rename Liga -> Grupo)
 function FederacaoSlugRedirect() {
@@ -68,6 +69,7 @@ export default function App() {
               <Route path="/grupos" element={<LigasPage />} />
               <Route path="/grupos/nova" element={<NovaLigaPage />} />
               <Route path="/grupos/:slug" element={<LigaDetailPage />} />
+              <Route path="/grupos/:slug/confrontos" element={<ConfrontosPage />} />
               <Route path="/classificacao" element={<Navigate to="/grupos" replace />} />
               <Route path="/ranking" element={<RankingPage />} />
               <Route path="/perfil" element={<PerfilPage />} />

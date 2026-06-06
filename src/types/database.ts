@@ -1051,11 +1051,16 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           display_name: string
+          favorite_competition_id: string | null
+          favorite_group_id: string | null
           favorite_team: string | null
+          favorite_team_id: string | null
           id: string
           is_app_admin: boolean
           last_active_at: string | null
+          national_team_id: string | null
           notif_prefs: Json
+          personalization_done: boolean
           show_in_global_ranking: boolean
           updated_at: string
           usage_seconds: number
@@ -1064,11 +1069,16 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string
+          favorite_competition_id?: string | null
+          favorite_group_id?: string | null
           favorite_team?: string | null
+          favorite_team_id?: string | null
           id: string
           is_app_admin?: boolean
           last_active_at?: string | null
+          national_team_id?: string | null
           notif_prefs?: Json
+          personalization_done?: boolean
           show_in_global_ranking?: boolean
           updated_at?: string
           usage_seconds?: number
@@ -1077,16 +1087,50 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string
+          favorite_competition_id?: string | null
+          favorite_group_id?: string | null
           favorite_team?: string | null
+          favorite_team_id?: string | null
           id?: string
           is_app_admin?: boolean
           last_active_at?: string | null
+          national_team_id?: string | null
           notif_prefs?: Json
+          personalization_done?: boolean
           show_in_global_ranking?: boolean
           updated_at?: string
           usage_seconds?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_favorite_competition_id_fkey"
+            columns: ["favorite_competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_favorite_group_id_fkey"
+            columns: ["favorite_group_id"]
+            isOneToOne: false
+            referencedRelation: "leagues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_favorite_team_id_fkey"
+            columns: ["favorite_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_national_team_id_fkey"
+            columns: ["national_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       push_subscriptions: {
         Row: {
@@ -1564,6 +1608,14 @@ export type Database = {
         Returns: undefined
       }
       gen_join_code: { Args: never; Returns: string }
+      generate_disputa_name: {
+        Args: {
+          p_competition_id?: string
+          p_league_id: string
+          p_mode: Database["public"]["Enums"]["league_mode"]
+        }
+        Returns: string
+      }
       get_competition_periods: {
         Args: { p_competition_id: string; p_kind: string }
         Returns: {
@@ -1830,6 +1882,15 @@ export type Database = {
         Args: { p_enabled: boolean; p_type: string }
         Returns: Json
       }
+      set_personalization: {
+        Args: {
+          p_favorite_competition_id?: string
+          p_favorite_group_id?: string
+          p_favorite_team_id?: string
+          p_national_team_id?: string
+        }
+        Returns: undefined
+      }
       should_sync_scores: { Args: never; Returns: boolean }
       simulate_league_payment: {
         Args: { p_discount_code?: string; p_league_id: string }
@@ -1862,6 +1923,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      skip_personalization: { Args: never; Returns: undefined }
       toggle_confronto_optin: { Args: { p_lc_id: string }; Returns: boolean }
       touch_presence: { Args: never; Returns: undefined }
       undo_confronto_draw: { Args: { p_lc_id: string }; Returns: undefined }

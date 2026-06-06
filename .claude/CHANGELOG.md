@@ -20,6 +20,56 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ---
 
+## [2.9.0] — 2026-06-06
+
+**Reestruturação da área de Grupos — F1 a F5 + F7.** Crítica de design + estudo de UX (rankings + troféus) → execução em fases. F6 (sala de troféus stub) fica para a próxima leva.
+
+### Adicionado
+- **Resultadismo The Best** — classificação global de todos os Resultadistas. Rota `/ranking`
+  (filtros por campeonato e ano). Hero adaptativo na `/grupos` mostra **sua posição global**
+  ("Você é o Nº Resultadista"); sem grupos = top 3 mundial inline + CTA. Opt-out no `/perfil`
+  (`profiles.show_in_global_ranking`, default true). Backend: RPCs `get_global_standings`,
+  `get_my_global_rank`, `set_global_ranking_visibility` (migration `20260606000002`).
+- **Confrontos em rota separada** — `/grupos/:slug/confrontos` agora é uma página dedicada para
+  Liga/Copa. `ClassificacaoTab` foca em Bolão e mostra um CTA pra essa rota quando o grupo tem
+  Confronto ativo. Reduz carga visual no detalhe; 2 modos = 2 lugares.
+- **Onboarding de personalização** — modal aparece UMA VEZ na entrada (`personalization_done`
+  default false). Pergunta: time do coração, seleção (default Brasil quando existe nos teams),
+  código de convite (opcional — entra direto no grupo). Tudo pulável; pode editar depois no perfil.
+  Migration `20260606000004`: colunas em profiles (`favorite_team_id`, `national_team_id`,
+  `favorite_competition_id`, `favorite_group_id`, `personalization_done`) + RPCs `set_personalization`
+  / `skip_personalization`.
+
+### Alterado
+- **Naming automático das disputas** (migration `20260606000003`): Bolão passa a se chamar
+  **nome do campeonato** (ex.: "Copa do Mundo FIFA 2026"); Liga/Copa passam a ser **"Nª Liga {Grupo}"**
+  / **"Nª Copa {Grupo}"** auto-numeradas. Trigger BEFORE INSERT em `league_competitions` sobrescreve
+  o `name` com a regra canônica; função `generate_disputa_name(p_league_id, p_mode, p_competition_id)`
+  expõe a regra. **Renomeia disputas existentes**. UI de criar disputa não pede mais nome — só
+  escolhe campeonato + tipo; preview "Vai chamar: …" deixa claro o nome final.
+- **Glossário (`10-UX-WRITING.md`):** **Bolão** e **Confrontos** canonizados como **modos** (Pontos/
+  Tabela saem). Liga e Copa = formatos dentro de Confrontos. **Resultadista** = como chamamos o
+  usuário em momentos sociais ("Você é o 27º Resultadista"). **Resultadismo The Best** = nome da
+  classificação geral.
+- **Bug do escudo redondo no detalhe do grupo corrigido.** O glob de flâmulas apontava para
+  `../assets/grupos` (após o rename Federação→Grupo) mas os arquivos estavam em
+  `../assets/federacoes`. Catálogo vazio → `CrestMask` caía no fallback de círculo. Movido
+  `src/assets/federacoes` → `src/assets/grupos`.
+- **`LigasPage`** com hero RTB sempre visível, ritmo das listas (`space-y-3` → `space-y-4`),
+  empty state que ensina ("Aqui ficam seus grupos") e form de código posicionado conforme estado.
+- **`10-UX-WRITING.md` ganhou a regra "textos curtos, decisão rápida"** — limites duros para
+  título/descrição/botão/toast/push. Texto de 3+ linhas é pulado pela maioria; corte e reformule.
+
+### Decisões
+- **Sala de troféus (F6)** fica para a próxima leva — motor de cálculo (mensal/anual/badges)
+  merece sessão dedicada. Vai aparecer como **vitrine na /grupos** (top 3 do user) + lista completa
+  no /perfil.
+- **Personalização avançada** (lista grande de times Série A/B/C/D + Libertadores + Sul-Americana +
+  top-5 europeu, times de interesse, campeonatos de interesse) fica como **F7 ampliado** — depende
+  de seed de teams. O onboarding atual usa apenas teams já no banco (vindos dos sync).
+
+---
+
 ## [2.8.3] — 2026-06-06
 
 ### Corrigido

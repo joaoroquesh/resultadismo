@@ -400,8 +400,7 @@ Código: ${league.join_code}
           loading={loadingStandings}
           currentUserId={user?.id}
           isAdmin={isAdmin}
-          leagueId={league.id}
-          memberCount={(members ?? []).filter((m) => m.status === "active").length}
+          confrontoEnabled={league.confronto_enabled ?? false}
         />
       )}
 

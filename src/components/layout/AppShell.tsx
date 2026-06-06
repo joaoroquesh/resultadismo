@@ -8,6 +8,7 @@ import { MaintenanceBanner } from "./MaintenanceBanner";
 import { AccessGate } from "@/features/access/AccessGate";
 import { PresenceTracker } from "@/features/presence/PresenceTracker";
 import { ConsentBanner } from "@/features/consent/ConsentBanner";
+import { PersonalizationModal } from "@/features/onboarding/PersonalizationModal";
 import { useAuth } from "@/features/auth/AuthProvider";
 
 // DevPanel de homologação — SÓ em dev. Lazy + gate garantem que não entra no
@@ -48,6 +49,7 @@ export function AppShell() {
           <BottomNav />
           <InstallPrompt />
         </div>
+        <PersonalizationModal />
       </AccessGate>
     );
   }

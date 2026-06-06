@@ -1,12 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
+import { Swords, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { Card } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
 import { StandingsTable } from "@/features/standings/StandingsTable";
-import { ConfrontoSection } from "@/features/confronto/ConfrontoSection";
 import { useStandings } from "../api";
 
+// Esta tab agora mostra APENAS Bolões (modo points/table). Confrontos (Liga/
+// Copa) viraram página dedicada em /grupos/:slug/confrontos. Quando o grupo
+// tem confronto_enabled e há alguma Liga/Copa, mostra um CTA pra navegar.
 export function ClassificacaoTab({
   comps,
   activeLcId,
@@ -15,8 +19,7 @@ export function ClassificacaoTab({
   loading,
   currentUserId,
   isAdmin,
-  leagueId,
-  memberCount,
+  confrontoEnabled,
 }: {
   comps: {
     id: string;
@@ -24,9 +27,6 @@ export function ClassificacaoTab({
     mode: string;
     competition_id: string;
     confronto_state?: string;
-    participant_mode?: string;
-    liga_format?: string;
-    scheduled_draw_at?: string | null;
   }[];
   activeLcId?: string;
   onSelect: (id: string) => void;
@@ -34,107 +34,74 @@ export function ClassificacaoTab({
   loading: boolean;
   currentUserId?: string;
   isAdmin: boolean;
-  leagueId: string;
-  memberCount: number;
+  confrontoEnabled: boolean;
 }) {
-  // Separa as disputas por tipo: Pontos (corrida por campeonato) e Confronto (Liga/Copa).
+  const { slug } = useParams<{ slug: string }>();
   const isConfronto = (m: string) => m === "liga" || m === "cup";
-  const pontos = comps.filter((c) => !isConfronto(c.mode));
-  // Rascunho (em configuração) só aparece pro admin; pros demais, só quando liberado.
-  const confronto = comps.filter(
+  const boloes = comps.filter((c) => !isConfronto(c.mode));
+  const temConfronto = comps.some(
     (c) => isConfronto(c.mode) && (isAdmin || c.confronto_state !== "draft"),
   );
-  const hasBoth = pontos.length > 0 && confronto.length > 0;
-  const activeComp = comps.find((c) => c.id === activeLcId);
-  const [view, setView] = useState<"pontos" | "confronto">(
-    activeComp && isConfronto(activeComp.mode)
-      ? "confronto"
-      : pontos.length === 0 && confronto.length > 0
-        ? "confronto"
-        : "pontos",
-  );
+  const active = boloes.find((c) => c.id === activeLcId) ?? boloes[0];
 
-  const group: "pontos" | "confronto" = hasBoth
-    ? view
-    : confronto.length > 0
-      ? "confronto"
-      : "pontos";
-  const list = group === "confronto" ? confronto : pontos;
-  const active = list.find((c) => c.id === activeLcId) ?? list[0];
-
-  // Mantém a seleção do pai (e a query de classificação) em sincronia com a aba visível.
+  // Sincroniza seleção do pai com o primeiro Bolão visível.
   useEffect(() => {
     if (active && active.id !== activeLcId) onSelect(active.id);
   }, [active, activeLcId, onSelect]);
 
-  if (comps.length === 0) {
+  if (boloes.length === 0) {
     return (
       <EmptyState
-        title="Sem competições"
-        description="Um administrador precisa vincular uma competição a este grupo."
+        title="Sem bolão neste grupo"
+        description={
+          isAdmin
+            ? "Adicione um campeonato em Competições."
+            : "Um administrador precisa vincular um campeonato."
+        }
       />
     );
   }
 
   return (
-    <div className="space-y-3">
-      {hasBoth && (
-        <>
-          <SegmentedControl<"pontos" | "confronto">
-            value={view}
-            onChange={setView}
-            options={[
-              { value: "pontos", label: "Pontos" },
-              { value: "confronto", label: "Confronto" },
-            ]}
-          />
-          <p className="px-1 text-xs leading-relaxed text-ink-500">
-            {group === "pontos"
-              ? "Corrida de pontos por campeonato — quem somou mais lidera."
-              : "Duelos diretos: Liga (tabela 3/1/0) e Copa (mata-mata)."}
-          </p>
-        </>
+    <div className="space-y-4">
+      {/* CTA pra Confrontos — só se o grupo tem confronto ativo */}
+      {confrontoEnabled && temConfronto && (
+        <Link to={`/grupos/${slug}/confrontos`}>
+          <Card className="flex items-center gap-3 p-3.5 transition active:scale-[0.99]">
+            <span className="grid size-9 shrink-0 place-items-center rounded-md bg-brand-500/10 text-brand-600">
+              <Swords className="size-4.5" strokeWidth={2.4} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-bold text-ink-900">Confrontos</p>
+              <p className="text-xs text-ink-500">Liga e Copa do grupo</p>
+            </div>
+            <ChevronRight className="size-5 text-ink-300" />
+          </Card>
+        </Link>
       )}
 
-      {list.length > 1 && (
+      {/* Seletor de bolão (se >1) */}
+      {boloes.length > 1 && (
         <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
-          {list.map((c) => (
+          {boloes.map((c) => (
             <button
               key={c.id}
               onClick={() => onSelect(c.id)}
               className={cn(
-                "inline-flex shrink-0 items-center gap-1.5 rounded-pill border px-3 py-1.5 text-sm font-semibold transition",
+                "inline-flex shrink-0 items-center rounded-pill border px-3 py-1.5 text-sm font-semibold transition",
                 active?.id === c.id
                   ? "border-brand-600 bg-brand-50 text-brand-700"
                   : "border-ink-200 bg-surface text-ink-600",
               )}
             >
               {c.name}
-              {isConfronto(c.mode) && (
-                <span className="rounded-pill bg-ink-100 px-1.5 text-[10px] font-bold uppercase tracking-wide text-ink-500">
-                  {c.mode === "cup" ? "Copa" : "Liga"}
-                </span>
-              )}
             </button>
           ))}
         </div>
       )}
 
-      {active && isConfronto(active.mode) ? (
-        <ConfrontoSection
-          lcId={active.id}
-          leagueId={leagueId}
-          competitionId={active.competition_id}
-          mode={active.mode}
-          state={active.confronto_state ?? "draft"}
-          memberCount={memberCount}
-          isAdmin={isAdmin}
-          currentUserId={currentUserId}
-          participantMode={active.participant_mode ?? "admin"}
-          ligaFormat={active.liga_format ?? "partial"}
-          scheduledDrawAt={active.scheduled_draw_at ?? null}
-        />
-      ) : loading ? (
+      {/* Tabela do bolão ativo */}
+      {loading ? (
         <Skeleton className="h-64 w-full" />
       ) : standings && standings.length > 0 ? (
         <StandingsTable rows={standings} currentUserId={currentUserId} />

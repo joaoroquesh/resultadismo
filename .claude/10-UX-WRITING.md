@@ -24,6 +24,24 @@ de bolão de palpites — precisa entender **rápido** o que está acontecendo, 
 - **Próximo e agradável**, com um toque **boleiro** (futebol) — *desde que a clareza nunca pague o
   preço.* Na dúvida entre a piada e a clareza, **escolha a clareza**.
 
+### Regra prática — "textos curtos, decisão rápida"
+- **Título**: o destaque que diz **o que é**. Pode ter algumas palavras a mais — o usuário lê o
+  título e decide se segue.
+- **Descrição** (subtítulo / corpo): **curtíssima**, idealmente **1 linha**, no máximo 2.
+  Texto de 3+ linhas é **pulado** pela maioria — não cumpre o trabalho. Se precisa de mais, é sinal
+  de que está fazendo a coisa errada.
+- **Botões e ações**: verbo no infinitivo, 1–3 palavras. ("Salvar", "Pular", "Criar grupo grátis").
+- **Mensagens** (toast, push, push): **menos de 12 palavras**. A pessoa decide em 1 segundo.
+- **Destaque o que decide a ação** (negrito ou cor de marca), nunca o boilerplate.
+- **Corte ruído**: palavras de introdução ("Para começar, …"), ("Por favor, …"), ("Note que …") só
+  são desperdício. Vá direto.
+- **Teste**: leia em voz alta. Se travou ou demorou pra entender, refaz.
+
+> *Exemplos:*
+> - ❌ "Para criar um grupo, você precisará informar um nome e um escudo, e depois convidar os
+>   participantes através de um link compartilhado."
+> - ✅ "Crie seu grupo. Convide a galera pelo WhatsApp."
+
 > Este princípio rege **tudo** aqui — e vale também para o **design** (regra central 13 do
 > [`MESTRE.md`](MESTRE.md), [`02-CODIGO.md`](02-CODIGO.md) §1, [`DESIGN.md`](../DESIGN.md)).
 
