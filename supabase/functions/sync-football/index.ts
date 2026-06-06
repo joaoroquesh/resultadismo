@@ -4,7 +4,7 @@
 //
 // DUAS MODALIDADES (decididas pelo `mode` no body):
 //   • scores  — só ATUALIZA placar/status de jogos JÁ existentes. Não insere,
-//               não alerta. É o sync frequente (cron */5, guardado no banco por
+//               não alerta. É o sync frequente (cron */1, guardado no banco por
 //               should_sync_scores()).
 //   • catalog — reconcilia o calendário. 1ª vez (catalog_seeded=false) insere
 //               tudo; depois, jogo novo → ALERTA pro admin (não insere cego),
@@ -13,7 +13,10 @@
 //   • (sem mode / "full") = manual do admin: trata como catalog.
 //
 // Chamada manual (admin): supabase.functions.invoke("sync-football", { body: { competitionId, mode } })
-// Chamada agendada (cron): POST com a service_role key + { mode }.
+// Chamada agendada (cron): POST com { mode } + Authorization: Bearer = CRON_SECRET
+//   (segredo estável no env da função; imune à rotação da service_role) OU a
+//   service_role key. Requer verify_jwt=false (supabase/config.toml) p/ o gateway
+//   deixar o CRON_SECRET (não-JWT) chegar até a checagem própria da função.
 
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders, timingSafeEqual } from "../_shared/security.ts";
