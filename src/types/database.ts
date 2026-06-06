@@ -510,6 +510,69 @@ export type Database = {
           },
         ]
       }
+      feedback: {
+        Row: {
+          admin_reply: string | null
+          app_version: string | null
+          body: string
+          created_at: string
+          id: string
+          kind: string
+          page: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          title: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          admin_reply?: string | null
+          app_version?: string | null
+          body: string
+          created_at?: string
+          id?: string
+          kind: string
+          page?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          title: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          admin_reply?: string | null
+          app_version?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          page?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          title?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       league_competitions: {
         Row: {
           competition_id: string
@@ -1368,6 +1431,25 @@ export type Database = {
           slug: string
         }[]
       }
+      admin_list_feedback: {
+        Args: never
+        Returns: {
+          admin_reply: string
+          app_version: string
+          author_email: string
+          author_name: string
+          body: string
+          created_at: string
+          id: string
+          kind: string
+          page: string
+          resolved_at: string
+          status: string
+          title: string
+          user_agent: string
+          user_id: string
+        }[]
+      }
       admin_list_group_targets: {
         Args: never
         Returns: {
@@ -1504,6 +1586,10 @@ export type Database = {
       admin_system_health: { Args: never; Returns: Json }
       admin_update_access: {
         Args: { p_enabled: boolean; p_max_active: number }
+        Returns: undefined
+      }
+      admin_update_feedback: {
+        Args: { p_id: string; p_reply?: string; p_status: string }
         Returns: undefined
       }
       admin_update_payment_settings: {
@@ -1924,6 +2010,37 @@ export type Database = {
         }
       }
       skip_personalization: { Args: never; Returns: undefined }
+      submit_feedback: {
+        Args: {
+          p_app_version?: string
+          p_body: string
+          p_kind: string
+          p_page?: string
+          p_title: string
+          p_user_agent?: string
+        }
+        Returns: {
+          admin_reply: string | null
+          app_version: string | null
+          body: string
+          created_at: string
+          id: string
+          kind: string
+          page: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          title: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "feedback"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       toggle_confronto_optin: { Args: { p_lc_id: string }; Returns: boolean }
       touch_presence: { Args: never; Returns: undefined }
       undo_confronto_draw: { Args: { p_lc_id: string }; Returns: undefined }

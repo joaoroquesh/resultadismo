@@ -13,6 +13,7 @@ import {
   Share,
   SquarePlus,
   HelpCircle,
+  Hammer,
   Sparkles,
   Swords,
 } from "lucide-react";
@@ -214,6 +215,11 @@ export function PerfilPage() {
           >
             <HelpCircle className="size-5 text-brand-600" />
             <span className="flex-1 font-medium text-ink-900">Como funciona</span>
+            <ChevronRight className="size-4 text-ink-400" />
+          </Link>
+          <Link to="/construa" className="flex items-center gap-3 p-4 transition hover:bg-ink-50">
+            <Hammer className="size-5 text-brand-600" />
+            <span className="flex-1 font-medium text-ink-900">Construa com a gente</span>
             <ChevronRight className="size-4 text-ink-400" />
           </Link>
         </Card>

@@ -20,6 +20,28 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ---
 
+## [2.10.0] — 2026-06-06
+
+### Adicionado
+- **"Construa o Resultadismo com a gente!" — espaço de feedback (erros + sugestões).** Nova página
+  **`/construa`** (link no Perfil): o usuário escolhe **🐞 Reportar erro** ou **💡 Sugerir melhoria**,
+  com título + texto curto (estilo tweet, **300 caracteres** com contador). Em **erro**, captura
+  automaticamente o **contexto** — página (seletor, sem precisar mandar print), **versão do app** e
+  **navegador/aparelho** (sem PII); em **melhoria**, sem esse contexto. O usuário acompanha os
+  próprios envios com **status** e a **resposta do time** ("Meus envios").
+- **Gestão no admin (`Admin → Construa`).** Lista com filtro por status (Novos/Backlog/Resolvidos/
+  Arquivados), contexto do erro em chips, autor (link pro perfil) + **e-mail** pra contato. Ciclo:
+  **Arquivar** (ignora) · **Backlog** (desenvolvimento) · **Resolver** (responde e **notifica o
+  autor** in-app + push) · **Reabrir**.
+- **Integração com notificações:** novo report → `fan_notify_admins` avisa os app-admins (badge no
+  sino); resolver → notificação `feedback_reply` pro autor com a resposta. Backend: tabela `feedback`
+  (RLS — usuário só vê os próprios), RPCs `submit_feedback` / `admin_list_feedback` /
+  `admin_update_feedback`, trigger `notify_admins_new_feedback`. Migration `20260606000005`. Evento
+  GA `feedback_submit`. Validado de ponta a ponta (psql + navegador): enviar → admin notificado →
+  resolver → autor notificado.
+
+---
+
 ## [2.9.0] — 2026-06-06
 
 **Reestruturação da área de Grupos — F1 a F5 + F7.** Crítica de design + estudo de UX (rankings + troféus) → execução em fases. F6 (sala de troféus stub) fica para a próxima leva.

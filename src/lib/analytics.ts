@@ -24,6 +24,7 @@ export type AnalyticsEvent =
   | "share" // { method, content_type } — recomendado GA4
   | "copy_invite" // { content_type: "group_invite" }
   | "nudge_sent" // {}
+  | "feedback_submit" // { kind: "bug" | "idea" }
   | "consent_set"; // { choice: "granted" | "denied" }
 
 /** Dispara um evento no GA4. No-op se o gtag ainda não carregou (ou foi bloqueado). */

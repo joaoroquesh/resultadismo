@@ -24,7 +24,7 @@
 
 **Dashboard-first**, navegação por **abas na URL** (`?t=`) — rolável (não espreme no mobile);
 voltar de "ver jogos" cai na aba certa. Abas: **Visão · Alertas · Grupos · Competições · Usuários ·
-Pagamento · Avisos**. Todas as ações chamam RPCs que **revalidam `is_app_admin()` no banco** — o guard de UI
+Pagamento · Avisos · Construa**. Todas as ações chamam RPCs que **revalidam `is_app_admin()` no banco** — o guard de UI
 é conveniência, não segurança.
 
 ### Aba **Visão** (`AdminDashboard`) — saúde do sistema
@@ -91,6 +91,19 @@ Pagamento · Avisos**. Todas as ações chamam RPCs que **revalidam `is_app_admi
 - **Histórico** (`admin_list_broadcasts`): o que já foi enviado, com segmento, alcance e autor.
 - O envio insere 1 notificação por destinatário (o trigger `notifications_send_push` empurra o push
   de cada uma) e **audita** em `admin_audit_log` (`broadcast_send`).
+
+### Aba **Construa** (`FeedbackAdmin`) — "Construa o Resultadismo com a gente!"
+- Reportes de **erro** (🐞) e **sugestões** (💡) que os usuários enviam em **`/construa`**. Filtros por
+  status (**Novos** / Backlog / Resolvidos / Arquivados / Todos) com contagem; novos primeiro.
+- Cada item: texto + (só em **erro**) **contexto auto-capturado** — página, **versão do app** e
+  navegador/aparelho (resumido); **melhoria não captura** esse contexto. Mostra o autor (link pro
+  perfil) e o **e-mail** (`mailto:`, contato direto).
+- Ciclo: **Arquivar** (ignora) · **Backlog** (pro desenvolvimento) · **Resolver** (abre uma resposta
+  que **notifica o autor** — in-app + push). **Reabrir** volta resolvido/arquivado pra "novo".
+- Backend: tabela `feedback` (RLS — usuário só enxerga os próprios), RPCs `submit_feedback` /
+  `admin_list_feedback` / `admin_update_feedback`; novo report → trigger chama `fan_notify_admins`
+  (avisa os app-admins); resolver → insere 1 `notification` (`feedback_reply`) pro autor. Migration
+  `20260606000005`.
 
 ### Tela de jogos por competição (`/admin/competicoes/:id/jogos` — `AdminCompMatchesPage`)
 - Curadoria por jogo: ocultar/mostrar (`matches.hidden`, RPC/`useSetMatchHidden`) e **override
