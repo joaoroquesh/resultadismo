@@ -35,6 +35,13 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   enviadas (cutucada/aviso) usam o **mesmo caminho e payload**; o aviso genérico "Toque para copiar o
   URL" visto antes é **do próprio Chrome** (SW antigo / push pela aba em vez do app instalado), não do
   nosso código.
+- **Switch on/off canônico** (`src/components/ui/Switch.tsx`) — primitivo único e acessível (`inline-flex`
+  + classes padrão). Corrige o toggle **"Aparecer no Resultadismo The Best"** no Perfil, que repetia o
+  bug do thumb que não animava (translate sobre `absolute`); agora com update **otimista** (não "treme").
+  Toggles hand-rolled antigos (AdminDashboard, NotifPrefs) ficam a migrar pra este primitivo.
+- **Aba Changelog em accordion + sem scroll lateral.** Cada versão abre/fecha ao toque (a mais recente
+  já aberta); conteúdo com `break-words`/`min-w-0` — fim do overflow horizontal que arrastava os menus
+  de topo e base.
 
 ---
 

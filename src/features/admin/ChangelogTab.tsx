@@ -1,8 +1,11 @@
-import { type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import changelogRaw from "../../../.claude/CHANGELOG.md?raw";
 
-// Render leve do subconjunto de markdown usado no CHANGELOG.md (sem dependência):
-// ## versão · ### seção · - bullets · > nota · --- divisória · **negrito** · `código` · [txt](url)→txt.
+// Render leve do subconjunto de markdown do CHANGELOG.md (sem dependência):
+// cada "## versão" vira um accordion; dentro: ### seção · - bullets · > nota ·
+// --- divisória · **negrito** · `código` · [txt](url)→txt.
 
 function inline(text: string): ReactNode[] {
   const s = text.replace(/\[([^\]]+)\]\([^)]*\)/g, "$1"); // [texto](url) -> texto
@@ -21,7 +24,10 @@ function inline(text: string): ReactNode[] {
       );
     } else {
       out.push(
-        <code key={k++} className="rounded bg-ink-100 px-1 py-0.5 text-[0.85em] text-ink-700">
+        <code
+          key={k++}
+          className="break-all rounded bg-ink-100 px-1 py-0.5 text-[0.85em] text-ink-700"
+        >
           {m[2]}
         </code>,
       );
@@ -32,18 +38,8 @@ function inline(text: string): ReactNode[] {
   return out;
 }
 
-function parse(md: string): ReactNode[] {
-  // tira comentários HTML (gabarito) e junta linhas quebradas (continuação indentada com 2+ espaços)
-  const noComments = md.replace(/<!--[\s\S]*?-->/g, "");
-  const lines: string[] = [];
-  for (const r of noComments.split("\n")) {
-    if (/^ {2,}\S/.test(r) && lines.length && lines[lines.length - 1].trim() !== "") {
-      lines[lines.length - 1] = lines[lines.length - 1].replace(/\s+$/, "") + " " + r.trim();
-    } else {
-      lines.push(r);
-    }
-  }
-
+// Renderiza as linhas internas de uma versão (bullets/notas/sub-seções/parágrafos).
+function renderBody(lines: string[]): ReactNode[] {
   const nodes: ReactNode[] = [];
   let bullets: ReactNode[] | null = null;
   let quote: ReactNode[] | null = null;
@@ -81,7 +77,7 @@ function parse(md: string): ReactNode[] {
     if (line.startsWith("- ")) {
       flushQuote();
       (bullets ??= []).push(
-        <li key={k++} className="text-sm text-ink-600">
+        <li key={k++} className="break-words text-sm text-ink-600">
           {inline(line.slice(2))}
         </li>,
       );
@@ -89,34 +85,32 @@ function parse(md: string): ReactNode[] {
     }
     if (line.startsWith("> ")) {
       flushBullets();
-      (quote ??= []).push(<p key={k++}>{inline(line.slice(2))}</p>);
+      (quote ??= []).push(
+        <p key={k++} className="break-words">
+          {inline(line.slice(2))}
+        </p>,
+      );
       continue;
     }
     flush();
     if (line.trim() === "") continue;
     if (line === "---") {
-      nodes.push(<hr key={k++} className="my-5 border-border" />);
-      continue;
-    }
-    if (line.startsWith("# ")) continue; // título do arquivo (já temos o cabeçalho da aba)
-    if (line.startsWith("## ")) {
-      nodes.push(
-        <h3 key={k++} className="mb-1 mt-6 text-[15px] font-bold text-brand-700">
-          {inline(line.slice(3))}
-        </h3>,
-      );
+      nodes.push(<hr key={k++} className="my-4 border-border" />);
       continue;
     }
     if (line.startsWith("### ")) {
       nodes.push(
-        <h4 key={k++} className="mb-1 mt-3 text-[11px] font-bold uppercase tracking-wide text-ink-500">
+        <h4
+          key={k++}
+          className="mb-1 mt-3 text-[11px] font-bold uppercase tracking-wide text-ink-500"
+        >
           {inline(line.slice(4))}
         </h4>,
       );
       continue;
     }
     nodes.push(
-      <p key={k++} className="my-1.5 text-sm text-ink-600">
+      <p key={k++} className="my-1.5 break-words text-sm text-ink-600">
         {inline(line)}
       </p>,
     );
@@ -125,16 +119,83 @@ function parse(md: string): ReactNode[] {
   return nodes;
 }
 
-// O conteúdo é estático (inlined no build), então parseia uma vez só.
-const CONTENT = parse(changelogRaw);
+type Block = { ver: string; date: string | null; body: string[] };
+
+// Quebra o markdown em blocos por versão ("## "), juntando linhas quebradas
+// (continuação indentada com 2+ espaços) e tirando o comentário-gabarito.
+function toBlocks(md: string): Block[] {
+  const noComments = md.replace(/<!--[\s\S]*?-->/g, "");
+  const lines: string[] = [];
+  for (const r of noComments.split("\n")) {
+    if (/^ {2,}\S/.test(r) && lines.length && lines[lines.length - 1].trim() !== "") {
+      lines[lines.length - 1] = lines[lines.length - 1].replace(/\s+$/, "") + " " + r.trim();
+    } else {
+      lines.push(r);
+    }
+  }
+  const blocks: Block[] = [];
+  let cur: Block | null = null;
+  for (const line of lines) {
+    if (line.startsWith("## ")) {
+      const title = line.slice(3).trim();
+      const m = title.match(/^\[([^\]]+)\]\s*(?:—\s*(.+))?$/);
+      cur = { ver: m ? m[1] : title, date: m?.[2] ?? null, body: [] };
+      blocks.push(cur);
+      continue;
+    }
+    if (line.startsWith("# ")) continue; // título do arquivo
+    if (cur) cur.body.push(line);
+  }
+  return blocks;
+}
+
+const BLOCKS = toBlocks(changelogRaw);
 
 export function ChangelogTab() {
+  // Primeira versão (mais recente) já aberta; resto fechado.
+  const [open, setOpen] = useState<Set<number>>(() => new Set([0]));
+  const toggle = (i: number) =>
+    setOpen((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
+      return next;
+    });
+
   return (
-    <div>
+    <div className="min-w-0 max-w-full">
       <p className="mb-3 text-sm text-ink-500">
-        O que mudou em cada versão — do mais recente ao mais antigo.
+        O que mudou em cada versão — toque para abrir. Do mais recente ao mais antigo.
       </p>
-      <div className="rounded-lg border border-border bg-surface p-4 sm:p-5">{CONTENT}</div>
+      <div className="overflow-hidden rounded-lg border border-border bg-surface">
+        {BLOCKS.map((b, i) => {
+          const isOpen = open.has(i);
+          return (
+            <div key={i} className="border-b border-border last:border-b-0">
+              <button
+                type="button"
+                onClick={() => toggle(i)}
+                aria-expanded={isOpen}
+                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-ink-50"
+              >
+                <span className="flex min-w-0 items-baseline gap-2">
+                  <span className="font-bold text-brand-700">{b.ver}</span>
+                  {b.date && (
+                    <span className="truncate text-xs font-normal text-ink-400">{b.date}</span>
+                  )}
+                </span>
+                <ChevronDown
+                  className={cn(
+                    "size-4 shrink-0 text-ink-400 transition-transform",
+                    isOpen && "rotate-180",
+                  )}
+                />
+              </button>
+              {isOpen && <div className="min-w-0 px-4 pb-4 pt-0">{renderBody(b.body)}</div>}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

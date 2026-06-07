@@ -41,6 +41,7 @@ import { usePlayerStats } from "./stats";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useSetGlobalRankingVisibility } from "@/features/ranking/api";
+import { Switch } from "@/components/ui/Switch";
 
 function Stat({ value, label, accent }: { value: string | number; label: string; accent?: string }) {
   return (
@@ -354,10 +355,13 @@ function GlobalRankingPrefCard() {
     },
   });
 
-  const toggle = () => {
-    const next = !(visible ?? true);
+  const apply = (next: boolean) => {
+    if (set.isPending) return;
+    // otimista: o switch responde na hora e não "treme" esperando o refetch
+    qc.setQueryData(["profile-me-rtb-pref", user?.id], next);
     set.mutate(next, {
-      onSuccess: () => qc.invalidateQueries({ queryKey: ["profile-me-rtb-pref", user?.id] }),
+      onError: () => qc.setQueryData(["profile-me-rtb-pref", user?.id], !next),
+      onSettled: () => qc.invalidateQueries({ queryKey: ["profile-me-rtb-pref", user?.id] }),
     });
   };
 
@@ -371,23 +375,12 @@ function GlobalRankingPrefCard() {
             : "Sua posição aparece pra outros Resultadistas. Desligue se preferir privacidade."}
         </p>
       </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={visible ?? true}
-        aria-label="Aparecer no Resultadismo The Best"
-        disabled={isLoading || set.isPending}
-        onClick={toggle}
-        className={`relative h-6 w-11 shrink-0 rounded-full transition-colors disabled:opacity-50 ${
-          (visible ?? true) ? "bg-brand-600" : "bg-ink-300"
-        }`}
-      >
-        <span
-          className={`absolute top-0.5 size-5 rounded-full bg-white shadow-sm transition-transform ${
-            (visible ?? true) ? "translate-x-5" : "translate-x-0.5"
-          }`}
-        />
-      </button>
+      <Switch
+        checked={visible ?? true}
+        onChange={apply}
+        label="Aparecer no Resultadismo The Best"
+        disabled={isLoading}
+      />
     </Card>
   );
 }
