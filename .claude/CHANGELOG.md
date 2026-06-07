@@ -36,6 +36,14 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   via manifest. Estudo em [`decisions/0004`](decisions/0004-ingestao-dados-de-jogos.md). 4 migrations
   `20260607*`, **aditivas e não-destrutivas** (nenhum jogo existente alterado além de placar).
 
+### Alterado
+- **Toggles unificados no primitivo `Switch`.** `AdminDashboard` (Sala de espera, Sync automático,
+  Modo manutenção) e `NotifPrefsCard` (Lembretes/Cutucadas/Avisos) agora usam o primitivo único
+  `src/components/ui/Switch.tsx` em vez de toggles hand-rolled próprios — fecha a migração prevista na
+  nota do "Switch on/off canônico" abaixo. Sem mudança de comportamento; o switch do AdminDashboard era
+  visualmente idêntico ao primitivo. (`DadosAdmin` mantém um toggle menor, h-5/w-9, por ser uma variante
+  de tamanho que o primitivo ainda não cobre.)
+
 ### Segurança
 - Tabelas internas `match_sources`/`competition_sources` com RLS ligado **sem policy** (acesso só via
   RPC). RPCs de admin `SECURITY DEFINER` + `search_path=''` + gate `is_app_admin()`;

@@ -15,6 +15,7 @@ import {
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { Switch } from "@/components/ui/Switch";
 import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/lib/utils";
 import { fromNow } from "@/lib/format";
@@ -30,44 +31,6 @@ import {
   type CompHealth,
   type AuditEntry,
 } from "./sync";
-
-// Switch acessível simples (o projeto não tem um primitivo de toggle).
-function Switch({
-  on,
-  onChange,
-  label,
-  disabled,
-}: {
-  on: boolean;
-  onChange: (v: boolean) => void;
-  label: string;
-  disabled?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={on}
-      aria-label={label}
-      disabled={disabled}
-      onClick={() => onChange(!on)}
-      className={cn(
-        // inline-flex + items-center = posicionamento à prova de falha (sem
-        // valor arbitrário de translate que pode não compilar). Thumb à esq.
-        // quando off, à dir. quando on, usando classes padrão translate-x-*.
-        "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full px-0.5 transition-colors disabled:opacity-50",
-        on ? "bg-brand-600" : "bg-ink-300",
-      )}
-    >
-      <span
-        className={cn(
-          "size-5 rounded-full bg-white shadow transition-transform duration-200",
-          on ? "translate-x-5" : "translate-x-0",
-        )}
-      />
-    </button>
-  );
-}
 
 function Stat({
   icon,
@@ -342,7 +305,7 @@ function ConfigCard({
           hint={accessEnabled ? "Ligada: segura novos acessos no pico." : "Desligada: ninguém entra na fila."}
         >
           <Switch
-            on={accessEnabled}
+            checked={accessEnabled}
             disabled={updateAccess.isPending}
             label="Sala de espera"
             onChange={(v) =>
@@ -420,7 +383,7 @@ function SyncRow({ comp }: { comp: CompHealth }) {
         <RefreshCw className="size-4" />
       </Button>
       <Switch
-        on={comp.sync_enabled}
+        checked={comp.sync_enabled}
         disabled={setSync.isPending}
         label={`Sync automático de ${comp.name}`}
         onChange={(v) =>
@@ -452,7 +415,7 @@ function MaintenanceCard({ on }: { on: boolean }) {
             </p>
           </div>
           <Switch
-            on={on}
+            checked={on}
             disabled={setMaint.isPending}
             label="Modo manutenção"
             onChange={(v) =>

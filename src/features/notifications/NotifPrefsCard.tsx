@@ -1,6 +1,6 @@
 import { CalendarClock, Hand, Megaphone } from "lucide-react";
 import { Card } from "@/components/ui/Card";
-import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/Switch";
 import {
   useNotificationPrefs,
   useSetNotificationPref,
@@ -28,42 +28,6 @@ const ITEMS: { key: NotifPrefKey; label: string; help: string; icon: typeof Cale
   },
 ];
 
-function Toggle({
-  checked,
-  onChange,
-  label,
-  disabled,
-}: {
-  checked: boolean;
-  onChange: (v: boolean) => void;
-  label: string;
-  disabled?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-label={label}
-      disabled={disabled}
-      onClick={() => onChange(!checked)}
-      className={cn(
-        "relative inline-flex h-6 w-11 shrink-0 items-center rounded-pill transition-colors",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
-        "disabled:opacity-50",
-        checked ? "bg-brand-600" : "bg-ink-200",
-      )}
-    >
-      <span
-        className={cn(
-          "inline-block size-5 rounded-full bg-white shadow-sm transition-transform",
-          checked ? "translate-x-[22px]" : "translate-x-0.5",
-        )}
-      />
-    </button>
-  );
-}
-
 /**
  * Toggles de tipo de notificação. Só aparece quando o push já está inscrito
  * (entra no card de Notificações do Perfil). As preferências valem pra conta
@@ -89,7 +53,7 @@ export function NotifPrefsCard() {
                 <p className="text-sm font-medium text-ink-900">{label}</p>
                 <p className="text-xs text-ink-500">{help}</p>
               </div>
-              <Toggle
+              <Switch
                 checked={checked}
                 disabled={isPending || setPref.isPending}
                 label={label}
