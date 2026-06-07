@@ -10,6 +10,7 @@ import { UsuariosAdmin } from "./UsuariosAdmin";
 import { AdminDashboard } from "./AdminDashboard";
 import { SyncAlertsPanel } from "./SyncAlertsPanel";
 import { BroadcastPanel } from "./BroadcastPanel";
+import { DadosAdmin } from "./DadosAdmin";
 import { FeedbackAdmin } from "@/features/feedback/FeedbackAdmin";
 import { ChangelogTab } from "./ChangelogTab";
 import { useSystemHealth } from "./sync";
@@ -21,6 +22,7 @@ const NAV = [
   { key: "construa", label: "Construa" },
   { key: "grupos", label: "Grupos" },
   { key: "competicoes", label: "Competições" },
+  { key: "dados", label: "Dados" },
   { key: "usuarios", label: "Usuários" },
   { key: "pagamento", label: "Pagamento" },
   { key: "changelog", label: "Changelog" },
@@ -89,6 +91,7 @@ export function AdminPage() {
       {tab === "construa" && <FeedbackAdmin />}
       {tab === "grupos" && <LigasAdmin />}
       {tab === "competicoes" && <CompeticoesAdmin />}
+      {tab === "dados" && <DadosAdmin />}
       {tab === "usuarios" && <UsuariosAdmin />}
       {tab === "pagamento" && <PaymentAdmin />}
       {tab === "changelog" && <ChangelogTab />}
