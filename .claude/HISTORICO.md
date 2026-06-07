@@ -1,6 +1,6 @@
 # HISTÓRICO — como o Resultadismo chegou até aqui
 
-> **Visão única** da evolução do projeto até o **2.0.0** (03/06/2026). Este arquivo **consolida** os
+> **Visão única** da evolução do projeto até o **1.0.0** (03/06/2026). Este arquivo **consolida** os
 > registros de sessão que existiram em `docs/` (o diário de bordo dos chats) — esses registros foram
 > a matéria-prima desta documentação e, uma vez consolidados aqui, foram removidos. O que importava
 > deles está incorporado abaixo e nos documentos de regras (01–09).
@@ -9,9 +9,9 @@
 > oficial daqui pra frente, ver [`CHANGELOG.md`](CHANGELOG.md). O design original dos confrontos,
 > preservado como referência, está em [`../docs/planning/`](../docs/planning/).
 
-> ⚠️ **Numeração corrigida (2026-06-06, ADR 0003):** o que aparece abaixo como **2.0–2.11** foi a
-> fase de **desenvolvimento do 1.0** (numeração antiga, inflada — 28 bumps em 3 dias). Correto:
-> legado = **v0**, soft-launch = **1.0.0**, lançamento da Copa = **2.0.0**.
+> ⚠️ **Numeração corrigida (2026-06-06, ADR 0003):** as versões abaixo foram **relabel de 2.x → 1.x**
+> (só o dígito MAJOR — o detalhe foi **preservado**, não colapsado). Numeração: legado = **v0**,
+> soft-launch = **1.x** (atual: **1.11.0**), lançamento da Copa = **2.0**.
 
 ---
 
@@ -19,21 +19,21 @@
 
 | Quando | Marco | Versão reconstruída |
 |---|---|---|
-| até 2026 | Site estático v1 (HTML/CSS/JS + Firebase/planilhas), em GitHub Pages | **v1.x (legacy)** |
-| 2026-05-26 | Reescrita v2: fundação React + Supabase | v2.0.0-dev.1 |
-| 2026-05-27 | Segurança (PII), fila de acesso, escala, auto-deploy de functions | v2.0.0-dev.2 |
-| 2026-05-31 → 06-02 | Pagamento de federações + rebrand Liga→Federação | v2.0.0-dev.3 |
-| 2026-06-01 → 06-03 | Confrontos Liga/Copa (gated) | v2.0.0-dev.4 |
-| 2026-06-03 | Escudos por máscara, ESPN, admin de jogos, tela de jogos | v2.0.0-dev.5 |
-| 2026-06-03 | Promo da Copa + reembolso self-service | v2.0.0-dev.6 |
-| **2026-06-03** | **Consolidação + sistema de documentação `.claude/`** | **v2.0.0** |
-| 2026-06-04 | Ultra code review (7 revisores): endurecimento de segurança (RLS de confronto, estado terminal do pagamento, CSS injection do escudo, `cup_ties` só-RPC, webhook), correções de confronto (avanço da Copa, sorteio aleatório, bye=vitória, semana BRT), performance (lazy routes), **god-split** dos componentes grandes. Regularizado retroativamente na doc. | **v2.1.0** |
-| 2026-06-04 | Renome **Federação → Grupo** (UI, rotas, SEO) + **pagamento desligado**: criar grupos passa a ser **grátis** (modo `disabled`, ADR 0002 — conflita com a regra central 3; infra de pagamento preservada e reversível) | **v2.4.0** |
-| **2026-06-05** | **Admin v2** — overhaul do painel: Visão+ (decisões rápidas, "Hoje", pico de online, grupos pendentes), **config editável no painel** (limiar de online + sala de espera), ordenação/filtros em Grupos e Usuários, **moderação de usuário em 3 níveis** (suspender / excluir / excluir + bloquear e-mail, dupla verificação), **tempo de uso** por heartbeat, acordeão de jogos por data; correções (toggle, "jogo oculto" fora do ao-vivo, catálogo ESPN no cliente) | **v2.7.0** |
+| até 2026 | Site estático **v0** (HTML/CSS/JS + Firebase/planilhas), em GitHub Pages | **v0 (legacy)** |
+| 2026-05-26 | Reescrita: fundação React + Supabase | v1.0.0-dev.1 |
+| 2026-05-27 | Segurança (PII), fila de acesso, escala, auto-deploy de functions | v1.0.0-dev.2 |
+| 2026-05-31 → 06-02 | Pagamento de federações + rebrand Liga→Federação | v1.0.0-dev.3 |
+| 2026-06-01 → 06-03 | Confrontos Liga/Copa (gated) | v1.0.0-dev.4 |
+| 2026-06-03 | Escudos por máscara, ESPN, admin de jogos, tela de jogos | v1.0.0-dev.5 |
+| 2026-06-03 | Promo da Copa + reembolso self-service | v1.0.0-dev.6 |
+| **2026-06-03** | **Consolidação + sistema de documentação `.claude/`** | **v1.0.0** |
+| 2026-06-04 | Ultra code review (7 revisores): endurecimento de segurança (RLS de confronto, estado terminal do pagamento, CSS injection do escudo, `cup_ties` só-RPC, webhook), correções de confronto (avanço da Copa, sorteio aleatório, bye=vitória, semana BRT), performance (lazy routes), **god-split** dos componentes grandes. Regularizado retroativamente na doc. | **v1.1.0** |
+| 2026-06-04 | Renome **Federação → Grupo** (UI, rotas, SEO) + **pagamento desligado**: criar grupos passa a ser **grátis** (modo `disabled`, ADR 0002 — conflita com a regra central 3; infra de pagamento preservada e reversível) | **v1.4.0** |
+| **2026-06-05** | **Admin v2** — overhaul do painel: Visão+ (decisões rápidas, "Hoje", pico de online, grupos pendentes), **config editável no painel** (limiar de online + sala de espera), ordenação/filtros em Grupos e Usuários, **moderação de usuário em 3 níveis** (suspender / excluir / excluir + bloquear e-mail, dupla verificação), **tempo de uso** por heartbeat, acordeão de jogos por data; correções (toggle, "jogo oculto" fora do ao-vivo, catálogo ESPN no cliente) | **v1.7.0** |
 
 ---
 
-## v1 — o jogo original (legacy)
+## v0 — o jogo original (legacy)
 
 O Resultadismo nasceu como **site estático** (HTML/CSS/JS) com dados em **Google Sheets/Firebase**,
 hospedado no **GitHub Pages** (domínio resultadismo.com). Já tinha o **conceito sagrado**: palpitar
@@ -45,7 +45,7 @@ impossível na arquitetura de planilhas.
 
 ---
 
-## v2.0.0-dev.1 — Fundação da reescrita (2026-05-26)
+## v1.0.0-dev.1 — Fundação da reescrita (2026-05-26)
 
 Reconstrução como **SPA Vite + React + TS + Tailwind v4** com **Supabase** (Postgres, Auth Google,
 RLS, Edge Functions, pg_cron), deploy Vercel. As migrations `…0001`–`…0008` montaram o esqueleto:
@@ -60,7 +60,7 @@ RLS, Edge Functions, pg_cron), deploy Vercel. As migrations `…0001`–`…0008
 
 ---
 
-## v2.0.0-dev.2 — Segurança, fila de acesso, escala, auto-deploy (2026-05-27)
+## v1.0.0-dev.2 — Segurança, fila de acesso, escala, auto-deploy (2026-05-27)
 
 - **Segurança:** a coluna `email` em `profiles` vazava PII (qualquer logado lia o e-mail de todos).
   **Removida** a coluna (e-mail vive em `auth.users`); criada RPC `admin_list_users()` (só app-admin)
@@ -77,7 +77,7 @@ RLS, Edge Functions, pg_cron), deploy Vercel. As migrations `…0001`–`…0008
 
 ---
 
-## v2.0.0-dev.3 — Pagamento de federações + rebrand Liga→Federação (2026-05-31 → 06-02)
+## v1.0.0-dev.3 — Pagamento de federações + rebrand Liga→Federação (2026-05-31 → 06-02)
 
 - **Decisão de produto:** cobrar **taxa única** pela **criação de Federação** (não é aposta).
   Mercado Pago Checkout Pro + webhook. Alvo: Copa 2026, escala pequena (<200 usuários).
@@ -97,7 +97,7 @@ RLS, Edge Functions, pg_cron), deploy Vercel. As migrations `…0001`–`…0008
 
 ---
 
-## v2.0.0-dev.4 — Confrontos Liga/Copa, gated (2026-06-01 → 06-03)
+## v1.0.0-dev.4 — Confrontos Liga/Copa, gated (2026-06-01 → 06-03)
 
 Design original preservado em [`../docs/planning/confrontos-e-federacoes.md`](../docs/planning/confrontos-e-federacoes.md)
 e [`../docs/planning/confrontos-v2.md`](../docs/planning/confrontos-v2.md).
@@ -116,7 +116,7 @@ e [`../docs/planning/confrontos-v2.md`](../docs/planning/confrontos-v2.md).
 
 ---
 
-## v2.0.0-dev.5 — Escudos, ESPN, admin de jogos, tela de jogos (2026-06-03)
+## v1.0.0-dev.5 — Escudos, ESPN, admin de jogos, tela de jogos (2026-06-03)
 
 - **Adicionado — escudos por máscara SVG:** identidade visual de perfis e federações reescrita (o
   SVG recorta um fundo de cor/foto); catálogo automático via `import.meta.glob`; **todo perfil tem
@@ -131,7 +131,7 @@ e [`../docs/planning/confrontos-v2.md`](../docs/planning/confrontos-v2.md).
 
 ---
 
-## v2.0.0-dev.6 — Promo da Copa + reembolso self-service (2026-06-03)
+## v1.0.0-dev.6 — Promo da Copa + reembolso self-service (2026-06-03)
 
 - **Alterado — preços:** base **R$ 19,90**, **promo R$ 9,90 até 20/07/2026** (fim da Copa), com
   preço efetivo decidido **no servidor**; admin edita/desliga a promo (`admin_set_promo`).
@@ -144,10 +144,10 @@ e [`../docs/planning/confrontos-v2.md`](../docs/planning/confrontos-v2.md).
 
 ---
 
-## v2.0.0 — Consolidação + documentação (2026-06-03)
+## v1.0.0 — Consolidação + documentação (2026-06-03)
 
 Tudo acima está **em produção** (`main`), e o projeto passou a ser **versionado formalmente a partir
-do 2.0.0**. Criado o sistema de documentação **`.claude/`** (MESTRE + 01–09 + CHANGELOG + este
+do 1.0.0**. Criado o sistema de documentação **`.claude/`** (MESTRE + 01–09 + CHANGELOG + este
 HISTORICO) com o **protocolo de mudança** que governa as próximas alterações, e os registros de
 sessão de `docs/` foram consolidados aqui.
 

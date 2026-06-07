@@ -36,14 +36,14 @@
 | `confronto_optins` | Inscrições (modo opt-in) | `league_competition_id`,`user_id` (válidas só em `draft`) |
 | `notifications` | Notificações in-app | `user_id`, `type` (nudge/deadline/**broadcast**/**admin_alert**/result/…), `title`/`body`/`data`, `read_at` |
 | `push_subscriptions` | Inscrições de Web Push | `user_id`, `endpoint` (único), `p256dh`, `auth` |
-| `notification_broadcasts` | Histórico dos avisos em massa do admin — **2.8.0** | `title`/`body`/`url`, `segment`, `segment_league_id`/`segment_lc_id`/`segment_top_n`, `sent_count`, `created_by`. **RLS ligado sem policy** — acesso só via `admin_list_broadcasts`. |
+| `notification_broadcasts` | Histórico dos avisos em massa do admin — **1.8.0** | `title`/`body`/`url`, `segment`, `segment_league_id`/`segment_lc_id`/`segment_top_n`, `sent_count`, `created_by`. **RLS ligado sem policy** — acesso só via `admin_list_broadcasts`. |
 | `app_settings` | **Singleton (id=1)** de config global | `payment_mode`, `league_price_cents`, `promo_price_cents`/`promo_until`, prefixos de nome, **`maintenance_mode`/`maintenance_message`** |
-| `sync_alerts` | Fila de decisões do admin sobre o catálogo — **2.5.0** | `competition_id`, `match_id`, `provider_ref`, `kind` (new_match/cancelled/api_error = acionável; team_resolved/kickoff_changed = informativo), `status` (pending/approved/rejected/applied), `payload`. Sem acesso de cliente; só RPCs `admin_*`. |
-| `admin_audit_log` | Histórico de ações sync/admin — **2.5.0** | `actor` (null = sistema/cron), `action`, `entity_type`/`entity_id`, `detail` |
+| `sync_alerts` | Fila de decisões do admin sobre o catálogo — **1.5.0** | `competition_id`, `match_id`, `provider_ref`, `kind` (new_match/cancelled/api_error = acionável; team_resolved/kickoff_changed = informativo), `status` (pending/approved/rejected/applied), `payload`. Sem acesso de cliente; só RPCs `admin_*`. |
+| `admin_audit_log` | Histórico de ações sync/admin — **1.5.0** | `actor` (null = sistema/cron), `action`, `entity_type`/`entity_id`, `detail` |
 | `discount_codes` | Cupons | `code`, `percent_off` **ou** `amount_off_cents`, `max_uses`/`used_count`, `active`, `expires_at` |
 | `league_payments` | Trilha de pagamentos (auditoria/idempotência) | `league_id`,`user_id`, `provider` (mercadopago/comp/test), `payment_id` (único), `status`, `amount_cents`, `discount_code` |
 | `access_control` / `access_sessions` | Sala de espera (fila FIFO) | config singleton + 1 linha por aba (`state` active/waiting) |
-| `rate_limits` | Rate limit das Edge Functions (janela fixa por bucket) — **2.1.0** | `bucket` (pk), `window_start`, `count`. Sem acesso de cliente; só `service_role`/`rate_limit_hit`. |
+| `rate_limits` | Rate limit das Edge Functions (janela fixa por bucket) — **1.1.0** | `bucket` (pk), `window_start`, `count`. Sem acesso de cliente; só `service_role`/`rate_limit_hit`. |
 | `private.sync_config` | Config server-side do sync (URL das functions + service_key) | schema **`private`** — não exposto na API |
 
 ## 3. RLS — regras de acesso (resumo)
@@ -63,7 +63,7 @@ Padrão geral: **app-admin sempre pode**; o resto depende de propriedade/papel/v
   protegido** (`protect_league_owner`).
 - **`league_competitions` / `cup_ties` / `confronto_*`**: visíveis a quem vê o grupo; escrita
   **só via RPC** `SECURITY DEFINER` — a policy de escrita direta em `cup_ties` foi **removida em
-  2.1.0** (não há mais `INSERT/UPDATE/DELETE` direto via PostgREST; tudo passa por `draw_confronto`/
+  1.1.0** (não há mais `INSERT/UPDATE/DELETE` direto via PostgREST; tudo passa por `draw_confronto`/
   `append_confronto_ties`/`advance_confronto_cup`/`leave_league`).
 - **`league_payments`**: dono lê os seus; escrita só `service_role` (webhook).
 - **`app_settings`**: todos leem (modo/preço); escrita só via RPC de admin. **`discount_codes`**:
@@ -77,7 +77,7 @@ Padrão geral: **app-admin sempre pode**; o resto depende de propriedade/papel/v
 - `get_league_standings(lc_id)` → classificação com o **desempate fixo** (ver §6). `SECURITY
   DEFINER`, com guarda de acesso (membro/público/admin).
 - `get_confronto_standings` / `get_confronto_ties` / `get_tie_detail` / `get_competition_periods` —
-  confronto por período. **Guarda de visibilidade desde 2.1.0** (membro/público/admin — não vazam
+  confronto por período. **Guarda de visibilidade desde 1.1.0** (membro/público/admin — não vazam
   liga privada p/ anon); `ties`/`tie_detail` retornam vazio enquanto o sorteio está `scheduled`. →
   [`06`](06-REGRAS-DE-NEGOCIO.md).
 - `advance_confronto_cup(lc_id)` — Copa: promove o vencedor de cada chave p/ a fase seguinte
@@ -89,9 +89,9 @@ Padrão geral: **app-admin sempre pode**; o resto depende de propriedade/papel/v
 - `draw_confronto` / `undo_confronto_draw` / `toggle_confronto_optin` / `leave_league` — confronto.
 
 **Pagamento** (detalhe em [`06`](06-REGRAS-DE-NEGOCIO.md))
-- `confirm_league_payment` (webhook, idempotente; `paid`→ativa, `refunded`→arquiva). **2.1.0:**
+- `confirm_league_payment` (webhook, idempotente; `paid`→ativa, `refunded`→arquiva). **1.1.0:**
   trava a liga (`for update`) e tem **guarda de estado terminal** (`refunded` não volta a `paid`).
-- `simulate_league_payment` (modo teste — **só app-admin** desde 2.1.0), `refund_league` (reembolso
+- `simulate_league_payment` (modo teste — **só app-admin** desde 1.1.0), `refund_league` (reembolso
   atômico, `for update`, só `service_role`), `rate_limit_hit` (janela fixa por bucket, só
   `service_role`), `validate_discount_code`, `admin_*` de pagamento.
 
@@ -101,7 +101,7 @@ Padrão geral: **app-admin sempre pode**; o resto depende de propriedade/papel/v
 **Acesso/notificação**: `request_access`/`heartbeat_access`/`release_access` (fila, **só RPC, nunca
 Realtime**); `nudge_member` (cutucar, anti-spam 30 min).
 
-**Notificações (2.8.0)**
+**Notificações (1.8.0)**
 - `get_notification_prefs()` / `set_notification_pref(type, enabled)` — preferências por usuário
   (`deadline`/`nudge`/`broadcast`), self via `auth.uid()`. `get_unread_count()` — badge do sininho.
 - `admin_broadcast_preview(segment, arg)` / `admin_send_broadcast(title, body, url, segment, arg)` /
@@ -123,11 +123,11 @@ Realtime**); `nudge_member` (cutucar, anti-spam 30 min).
 - `leagues_before_insert` (gera `join_code`, força status/payment conforme modo/papel) +
   `leagues_after_insert` (adiciona o dono como membro).
 - Guards: `leagues_guard_status`, `protect_league_owner`, `leagues_guard_confronto_enabled`,
-  `profiles_guard`, `enforce_joker_limit` (com `pg_advisory_xact_lock` desde 2.1.0 — sem corrida no
+  `profiles_guard`, `enforce_joker_limit` (com `pg_advisory_xact_lock` desde 1.1.0 — sem corrida no
   limite 2/semana), `league_payments_count_discount` (conta o cupom de forma **atômica**, não estoura
   `max_uses`).
 
-- **Alertas pro admin (2.8.0)**: `notify_admins_sync_alert` (AFTER INSERT em `sync_alerts` `pending`)
+- **Alertas pro admin (1.8.0)**: `notify_admins_sync_alert` (AFTER INSERT em `sync_alerts` `pending`)
   e `notify_admins_name_review` (AFTER INSERT/UPDATE de `name_approved` em `leagues`, dispara só com
   `name_approved=false AND status='active'` — não em `pending`, senão spammaria todo grupo recém-
   criado). Ambos chamam `fan_notify_admins` e são **fail-safe** (`exception when others then return
@@ -137,7 +137,7 @@ Realtime**); `nudge_member` (cutucar, anti-spam 30 min).
   push no celular.
 
 **Cron (pg_cron)**
-- `run_football_sync(mode)` — dispara a Edge Function `sync-football`. **2.5.0**: `scores` a cada
+- `run_football_sync(mode)` — dispara a Edge Function `sync-football`. **1.5.0**: `scores` a cada
   `*/5` (mas só chama a API se `should_sync_scores()` = há jogo ao vivo/prestes/recém) e `catalog`
   diário 09:00 UTC. Só dispara de fato com `private.sync_config` populado (URL + service_key).
   RPCs de admin: `admin_list_sync_alerts`, `admin_resolve_sync_alert`, `admin_set_competition_sync`,

@@ -1,4 +1,4 @@
-# ADR 0003 — Versionamento: reset para 1.0.0 + cadência por release
+# ADR 0003 — Versionamento: relabel 2→1 (mantendo histórico) + cadência por release
 
 > **Status:** ✅ Aprovada (2026-06-06, decisão do João).
 
@@ -12,21 +12,24 @@ O versionamento disparou: **2.0.0 → 2.11.0 em ~3 dias** (28 bumps; vários MIN
 Começar a reescrita em **2.0** também foi erro: o site antigo era **protótipo (v0)**, nunca 1.0.
 
 ## Decisão
-1. **Marcos:** v0 = legado; **1.0.0 = reescrita soft-launched** (estado atual, pré-Copa); **2.0.0 =
-   lançamento oficial da Copa** (o João corta quando estiver "pronto"). Ajuste pré-Copa = v1.x.
-2. **Reset:** `package.json` 2.11.0 → **1.0.0**. As entradas 2.0–2.11 do CHANGELOG viram **Arquivo —
-   desenvolvimento do 1.0**; detalhe granular no HISTORICO.
+1. **Marcos:** v0 = legado; **1.x = reescrita soft-launched** (estado atual); **2.0 = lançamento
+   oficial da Copa** (o João corta quando estiver "pronto").
+2. **Relabel 2→1 (não colapso):** troca só o dígito MAJOR — `package.json` 2.11.0 → **1.11.0**, e
+   **todas** as entradas do CHANGELOG 2.x → 1.x, **preservando o detalhe** (não se perde o que foi
+   documentado). Feito **uma vez na `main`**; sessões com trabalho em 2.12 **rebaseiam** e só ajustam
+   a entrada delas (→ 1.12 ou mover p/ `[Não lançado]`).
 3. **Cadência:** acumular em `[Não lançado]`; **versão só sobe em release deliberado** (João decide;
    **um** dono faz o bump). Nunca por commit/sessão. → 09-PARALELISMO.
 4. **Critérios:** MAJOR = marco de produto (Copa)/overhaul; MINOR = recurso perceptível; PATCH =
    correção/refino.
 
 ## Consequências
-- ✅ O número volta a significar algo (1.0 = soft-launch; 2.0 = Copa) e para de inflar.
+- ✅ Histórico **preservado** (relabel, não colapso); o número volta a significar (1.x = soft-launch;
+   2.0 = Copa) e para de inflar.
 - ✅ Sessões paralelas não brigam pelo número (só editam `[Não lançado]`).
-- ⚖️ Salto pra trás 2.11 → 1.0 (incomum), mas a versão só aparece no rodapé do Perfil + metadado de
-  feedback, e o app é pré-lançamento — risco baixo, feito **uma única vez**.
-- Versão passa a ser **exibida no rodapé do Perfil**; tela de Changelog no admin (em seguida).
+- ⚖️ Salto 2.x → 1.x é incomum, mas a versão só aparece no rodapé do Perfil + metadado de feedback,
+   e o app é pré-lançamento — risco baixo, feito **uma única vez** e **centralizado na main**.
+- Versão **exibida no rodapé do Perfil**; tela de Changelog no admin (lendo `CHANGELOG.md`).
 
 ## Regras vivas
 [`../MESTRE.md`](../MESTRE.md) §6 · [`../09-PARALELISMO.md`](../09-PARALELISMO.md) · [`../CHANGELOG.md`](../CHANGELOG.md)

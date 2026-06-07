@@ -9,8 +9,9 @@ Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 > **Como usar:** toda mudança que sobe ganha uma entrada (passo 7 do protocolo em
 > [`MESTRE.md`](MESTRE.md) §5 / [`08-PROCESSO.md`](08-PROCESSO.md)). Acumule em **[Não lançado]**
 > enquanto desenvolve; ao subir, mova para uma versão datada e atualize o `package.json`.
-> A evolução **anterior** está em [`HISTORICO.md`](HISTORICO.md). **Numeração** (ADR 0003): v0 = legado,
-> **1.0 = soft-launch atual**, 2.0 = Copa. A versão **só sobe em release deliberado**, não a cada commit.
+> Numeração (ADR 0003): legado = **v0**, **1.x = soft-launch** (atual: 1.11.0), **2.0 = Copa**. As
+> versões abaixo foram **relabel 2.x → 1.x** (só o dígito MAJOR; detalhe preservado). A versão **só
+> sobe em release deliberado**, não a cada commit. Evolução anterior em [`HISTORICO.md`](HISTORICO.md).
 
 Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **Segurança**,
 **Depreciado**.
@@ -19,38 +20,9 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
-_(Ajustes da v1 (pré-Copa) acumulam aqui até o próximo release deliberado.)_
-
 ---
 
-## [1.0.0] — 2026-06-03 · soft-launch (reescrita React + Supabase)
-
-Primeira versão real, lançada para um grupo pequeno (pré-Copa). Resumo do que está no ar; o detalhe
-granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
-
-### Adicionado
-- **Jogo de palpites completo:** cravada/saldo/acerto (3/2/1), pontuação e classificação no banco,
-  dobro (2×) por semana, desempate fixo.
-- **Grupos** (antes "Federação"): criação, papéis, visibilidade/entrada, código, escudo; modos
-  **Bolão** (pontos) e **Confronto** Liga/Copa (gated). Criar grupo é **grátis** (pagamento desligado
-  — ADR 0002; infra MP preservada).
-- **Dados** via ESPN/football-data/TheSportsDB; **admin v2** (visão, competições, jogos, usuários,
-  moderação, pagamento, broadcast). **Login** só pelo bottom-sheet. **Resultadismo The Best** (ranking
-  global), notificações (push/cutucada), PWA, sala de espera, escudos por máscara, onboarding.
-
-### Segurança & Infra
-- RLS + RPCs `SECURITY DEFINER`; e-mail fora de `profiles`; webhook MP endurecido; CSP/headers/CORS.
-- Deploy por push na `main` (Vercel + Supabase + Action). GA4 + consentimento LGPD.
-
----
-
-## Arquivo — desenvolvimento do 1.0 (numeração antiga 2.0–2.11, descontinuada)
-
-> Estas entradas foram cortadas como "2.x" durante o desenvolvimento do 1.0, **antes** da cadência
-> atual (versão só em release). Ficam como detalhe histórico. Numeração correta: legado = **v0**,
-> soft-launch = **1.0**, Copa = **2.0** ([`MESTRE.md`](MESTRE.md) §6).
-
-## [2.11.0] — 2026-06-06
+## [1.11.0] — 2026-06-06
 
 > Redesenho da área de **Grupos** + **personalização** (4 frentes). Componentes de seleção 100%
 > web (sem nativo do SO). Validado: build, `db reset` (3 migrations novas aplicam limpo), RPCs +
@@ -100,7 +72,7 @@ granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
 
 ---
 
-## [2.10.1] — 2026-06-06
+## [1.10.1] — 2026-06-06
 
 ### Corrigido
 - **Web Push voltou a sair (notificação no celular/PC): `verify_jwt=false` na `send-push`.** As
@@ -115,7 +87,7 @@ granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
 
 ---
 
-## [2.10.0] — 2026-06-06
+## [1.10.0] — 2026-06-06
 
 ### Adicionado
 - **"Construa o Resultadismo com a gente!" — espaço de feedback (erros + sugestões).** Nova página
@@ -137,7 +109,7 @@ granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
 
 ---
 
-## [2.9.0] — 2026-06-06
+## [1.9.0] — 2026-06-06
 
 **Reestruturação da área de Grupos — F1 a F5 + F7.** Crítica de design + estudo de UX (rankings + troféus) → execução em fases. F6 (sala de troféus stub) fica para a próxima leva.
 
@@ -187,11 +159,11 @@ granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
 
 ---
 
-## [2.8.3] — 2026-06-06
+## [1.8.3] — 2026-06-06
 
 ### Corrigido
 - **Sync ao vivo de fato voltou (e ficou observável): timeout do `pg_net` 5s → 30s.** Depois do
-  fix de auth (2.8.2 + `CRON_SECRET`), o cron passou a chegar na função e sincronizar — mas a chamada
+  fix de auth (1.8.2 + `CRON_SECRET`), o cron passou a chegar na função e sincronizar — mas a chamada
   `net.http_post` usava o timeout padrão do `pg_net` (5s) e a função leva ~5s (ESPN + football_data +
   gravação), então o `pg_net` registrava "Timeout of 5000 ms" / `status_code NULL` **apesar de o sync
   concluir** (`last_synced_at` atualizava, `last_sync_ok=true`). Subi `timeout_milliseconds := 30000`
@@ -201,7 +173,7 @@ granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
 
 ---
 
-## [2.8.2] — 2026-06-06
+## [1.8.2] — 2026-06-06
 
 ### Corrigido
 - **Sync ao vivo travado em produção (403) — auth do cron à prova de rotação de chave.** A edge
@@ -216,11 +188,11 @@ granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
 
 ---
 
-## [2.8.1] — 2026-06-05
+## [1.8.1] — 2026-06-05
 
 ### Alterado
 - **Regra de lint `react-hooks/set-state-in-effect` religada (`eslint .` exit 0 com a regra ativa).**
-  Concluído o "próximo passe" prometido na [2.7.5]: os **12 pontos** que a violavam (11 arquivos)
+  Concluído o "próximo passe" prometido na [1.7.5]: os **12 pontos** que a violavam (11 arquivos)
   foram migrados para os padrões **"you might not need an effect"**, **sem mudança de comportamento**
   — e removido o override `"off"` do `eslint.config.js`. Por arquivo: `useFirstSeen` (lazy-init no
   `useState`, sem efeito); `InstallPrompt` (efeito redundante removido — a guarda de render já
@@ -240,7 +212,7 @@ granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
 
 ---
 
-## [2.8.0] — 2026-06-05
+## [1.8.0] — 2026-06-05
 
 ### Adicionado
 - **Central de avisos do admin (`Admin → Avisos`).** Disparo de notificação (in-app + push) por
@@ -286,7 +258,7 @@ granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
 
 ---
 
-## [2.7.5] — 2026-06-05
+## [1.7.5] — 2026-06-05
 
 ### Alterado
 - **Lint do repo 100% limpo (`eslint .` exit 0).** Corrigidos **em código**: `Date.now()` no render
@@ -301,7 +273,7 @@ granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
 
 ---
 
-## [2.7.4] — 2026-06-05
+## [1.7.4] — 2026-06-05
 
 ### Corrigido
 - **Lint do React Compiler no `MatchCard` e em `predictions` (sem mudança de comportamento).**
@@ -313,7 +285,7 @@ granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
 
 ---
 
-## [2.7.3] — 2026-06-05
+## [1.7.3] — 2026-06-05
 
 ### Adicionado
 - **Tagueamento de eventos no Google Analytics (funil).** Novo helper `track()`
@@ -330,7 +302,7 @@ granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
 
 ---
 
-## [2.7.2] — 2026-06-05
+## [1.7.2] — 2026-06-05
 
 ### Alterado
 - **Ordenação do admin refeita (Usuários e Grupos) — campo + direção explícitos.** Novo
@@ -347,11 +319,11 @@ granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
 
 ---
 
-## [2.7.1] — 2026-06-05
+## [1.7.1] — 2026-06-05
 
 ### Corrigido
 - **Card ao vivo na primeira dobra não tem mais a borda cortada.** O teto de 2 linhas do teaser
-  deslogado (2.7.0) passou a limitar a **quantidade** de cards renderizados, em vez de
+  deslogado (1.7.0) passou a limitar a **quantidade** de cards renderizados, em vez de
   `overflow-hidden` — que clipava o anel (`ring`) dos jogos AO VIVO. Mesma regra (máx 2 linhas, sem
   espaço vazio), agora sem corte. (`FirstFold` + `JogosPage`)
 - **"Online" e tempo de uso desacoplados da sala de espera.** Antes, a presença (quem está online,
@@ -377,7 +349,7 @@ granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
 
 ---
 
-## [2.7.0] — 2026-06-05
+## [1.7.0] — 2026-06-05
 
 ### Alterado
 - **Primeira dobra da home: no máximo 2 linhas de jogos.** O teaser deslogado deixa de usar a altura
@@ -413,7 +385,7 @@ granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
 
 ---
 
-## [2.6.2] — 2026-06-05
+## [1.6.2] — 2026-06-05
 
 ### Corrigido
 - **Jogo oculto também não notifica.** Complementa a ...028: o admin ocultar um jogo agora cobre
@@ -427,7 +399,7 @@ granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
 
 ---
 
-## [2.6.1] — 2026-06-05
+## [1.6.1] — 2026-06-05
 
 ### Corrigido
 - **Jogo oculto não conta mais para a pontuação.** Quando o admin oculta um jogo (`matches.hidden`),
@@ -447,7 +419,7 @@ granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
 
 ---
 
-## [2.6.0] — 2026-06-05
+## [1.6.0] — 2026-06-05
 
 ### Adicionado
 - **Editar grupo (nome + descrição + escudo) pelo dono/admin.** No detalhe do grupo, o botão
@@ -463,7 +435,7 @@ granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
 
 ---
 
-## [2.5.0] — 2026-06-05
+## [1.5.0] — 2026-06-05
 
 **Sincronização inteligente de jogos + saúde da API + Admin redesenhado.** O sync deixa de ser
 manual: placares entram sozinhos, a API é monitorada (a ESPN é não-oficial e pode quebrar), e o
@@ -507,7 +479,7 @@ com a service key — fora do código)._
 
 ---
 
-## [2.4.1] — 2026-06-04
+## [1.4.1] — 2026-06-04
 
 ### Corrigido
 - **Reembolso não aparece mais com a cobrança desligada.** O botão self-service "Cancelar e
@@ -522,7 +494,7 @@ com a service key — fora do código)._
 
 ---
 
-## [2.4.0] — 2026-06-04
+## [1.4.0] — 2026-06-04
 
 ### Alterado
 - **Pagamento desligado: criar grupos é 100% grátis** (`payment_mode = disabled`; ADR
@@ -566,7 +538,7 @@ com a service key — fora do código)._
 
 ---
 
-## [2.3.1] — 2026-06-04
+## [1.3.1] — 2026-06-04
 
 ### Corrigido
 - **`ConsentDialog` (centro de privacidade)** estava com layout quebrado: título
@@ -581,7 +553,7 @@ com a service key — fora do código)._
 
 ---
 
-## [2.3.0] — 2026-06-04
+## [1.3.0] — 2026-06-04
 
 **Centro de controle de privacidade.** O usuário ganha um lugar pra revisar e
 alternar o consentimento do GA a qualquer momento — exigência da LGPD (art.
@@ -610,7 +582,7 @@ inércia/timer, que a ANPD desaconselha no Guia de Cookies de 2023).
 
 ---
 
-## [2.2.2] — 2026-06-04
+## [1.2.2] — 2026-06-04
 
 **Ambiente de homologação local + DevPanel.** Tudo **só de desenvolvimento** — gateado por
 `import.meta.env.DEV`; **não entra no bundle de produção** (confirmado: ausente em `dist/`) e não
@@ -632,7 +604,7 @@ muda nada do app em produção.
 
 ---
 
-## [2.2.1] — 2026-06-04
+## [1.2.1] — 2026-06-04
 
 ### Alterado
 - **Banner de consentimento (UI):** "Recusar" virou link discreto (texto cinza
@@ -642,7 +614,7 @@ muda nada do app em produção.
 
 ---
 
-## [2.2.0] — 2026-06-04
+## [1.2.0] — 2026-06-04
 
 **Google Analytics + consentimento LGPD.** Liga o GA4 à property `resultadismo-site`
 (`G-P86V27WXK2`) com **Consent Mode v2**: por padrão tudo entra como `denied` (sem cookies, sem ID),
@@ -665,7 +637,7 @@ permanentemente `denied`).
 
 ---
 
-## [2.1.0] — 2026-06-04
+## [1.1.0] — 2026-06-04
 
 **Ultra code review (7 revisores) + endurecimento de segurança + refactor.** Conjunto que entrou em
 produção pelos PRs **#4–#7**. ⚠️ _Nota de processo: estes PRs subiram **sem** seguir o protocolo do
@@ -751,7 +723,7 @@ admin, cupom atômico, `amount_cents`), escrita de confronto (remoção da polic
 
 ---
 
-## [2.0.0] — 2026-06-03
+## [1.0.0] — 2026-06-03
 
 **Marco de lançamento.** Linha de base da reescrita **React + Supabase**, no ar em
 **www.resultadismo.com** e cobrando de verdade (Mercado Pago). Consolida tudo que foi construído
@@ -788,7 +760,7 @@ entre 26/05 e 03/06/2026 (detalhe e cronologia em [`HISTORICO.md`](HISTORICO.md)
 <!--
 GABARITO para a próxima entrada (copie e preencha):
 
-## [2.0.1] — AAAA-MM-DD
+## [1.0.1] — AAAA-MM-DD
 ### Corrigido
 - … (o que mudou, e por quê; cite arquivos/migrations se ajudar)
 ### Documentação
