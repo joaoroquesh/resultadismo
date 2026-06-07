@@ -203,6 +203,59 @@ export type Database = {
           },
         ]
       }
+      competition_sources: {
+        Row: {
+          competition_id: string
+          created_at: string
+          enabled: boolean
+          id: string
+          last_sync_checked_at: string | null
+          last_sync_error: string | null
+          last_sync_ok: boolean | null
+          priority: number
+          provider: Database["public"]["Enums"]["data_provider"]
+          provider_code: string | null
+          provider_season: string | null
+          role: string
+        }
+        Insert: {
+          competition_id: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          last_sync_checked_at?: string | null
+          last_sync_error?: string | null
+          last_sync_ok?: boolean | null
+          priority?: number
+          provider: Database["public"]["Enums"]["data_provider"]
+          provider_code?: string | null
+          provider_season?: string | null
+          role?: string
+        }
+        Update: {
+          competition_id?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          last_sync_checked_at?: string | null
+          last_sync_error?: string | null
+          last_sync_ok?: boolean | null
+          priority?: number
+          provider?: Database["public"]["Enums"]["data_provider"]
+          provider_code?: string | null
+          provider_season?: string | null
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competition_sources_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       competitions: {
         Row: {
           area: string | null
@@ -212,6 +265,7 @@ export type Database = {
           display_name: string | null
           emblem_url: string | null
           id: string
+          in_personalization: boolean
           is_featured: boolean
           is_published: boolean
           jokers_per_week: number
@@ -241,6 +295,7 @@ export type Database = {
           display_name?: string | null
           emblem_url?: string | null
           id?: string
+          in_personalization?: boolean
           is_featured?: boolean
           is_published?: boolean
           jokers_per_week?: number
@@ -270,6 +325,7 @@ export type Database = {
           display_name?: string | null
           emblem_url?: string | null
           id?: string
+          in_personalization?: boolean
           is_featured?: boolean
           is_published?: boolean
           jokers_per_week?: number
@@ -847,6 +903,56 @@ export type Database = {
           },
         ]
       }
+      match_sources: {
+        Row: {
+          away_pen: number | null
+          away_score: number | null
+          fetched_at: string
+          home_pen: number | null
+          home_score: number | null
+          id: string
+          kickoff_at: string | null
+          match_id: string
+          provider: Database["public"]["Enums"]["data_provider"]
+          provider_ref: string | null
+          status: string | null
+        }
+        Insert: {
+          away_pen?: number | null
+          away_score?: number | null
+          fetched_at?: string
+          home_pen?: number | null
+          home_score?: number | null
+          id?: string
+          kickoff_at?: string | null
+          match_id: string
+          provider: Database["public"]["Enums"]["data_provider"]
+          provider_ref?: string | null
+          status?: string | null
+        }
+        Update: {
+          away_pen?: number | null
+          away_score?: number | null
+          fetched_at?: string
+          home_pen?: number | null
+          home_score?: number | null
+          id?: string
+          kickoff_at?: string | null
+          match_id?: string
+          provider?: Database["public"]["Enums"]["data_provider"]
+          provider_ref?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_sources_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matches: {
         Row: {
           away_pen: number | null
@@ -855,6 +961,8 @@ export type Database = {
           away_team_name: string | null
           competition_id: string
           created_at: string
+          frozen: boolean
+          frozen_at: string | null
           group_name: string | null
           hidden: boolean
           home_pen: number | null
@@ -864,10 +972,15 @@ export type Database = {
           id: string
           kickoff_at: string | null
           last_synced_at: string | null
+          manual_lock: boolean
+          manually_edited_at: string | null
+          manually_edited_by: string | null
           matchday: number | null
           provider: Database["public"]["Enums"]["data_provider"]
           provider_ref: string | null
           round: string | null
+          score_conflict: boolean
+          score_sources_count: number
           stage: string | null
           status: Database["public"]["Enums"]["match_status"]
           updated_at: string
@@ -880,6 +993,8 @@ export type Database = {
           away_team_name?: string | null
           competition_id: string
           created_at?: string
+          frozen?: boolean
+          frozen_at?: string | null
           group_name?: string | null
           hidden?: boolean
           home_pen?: number | null
@@ -889,10 +1004,15 @@ export type Database = {
           id?: string
           kickoff_at?: string | null
           last_synced_at?: string | null
+          manual_lock?: boolean
+          manually_edited_at?: string | null
+          manually_edited_by?: string | null
           matchday?: number | null
           provider?: Database["public"]["Enums"]["data_provider"]
           provider_ref?: string | null
           round?: string | null
+          score_conflict?: boolean
+          score_sources_count?: number
           stage?: string | null
           status?: Database["public"]["Enums"]["match_status"]
           updated_at?: string
@@ -905,6 +1025,8 @@ export type Database = {
           away_team_name?: string | null
           competition_id?: string
           created_at?: string
+          frozen?: boolean
+          frozen_at?: string | null
           group_name?: string | null
           hidden?: boolean
           home_pen?: number | null
@@ -914,10 +1036,15 @@ export type Database = {
           id?: string
           kickoff_at?: string | null
           last_synced_at?: string | null
+          manual_lock?: boolean
+          manually_edited_at?: string | null
+          manually_edited_by?: string | null
           matchday?: number | null
           provider?: Database["public"]["Enums"]["data_provider"]
           provider_ref?: string | null
           round?: string | null
+          score_conflict?: boolean
+          score_sources_count?: number
           stage?: string | null
           status?: Database["public"]["Enums"]["match_status"]
           updated_at?: string
@@ -943,6 +1070,13 @@ export type Database = {
             columns: ["home_team_id"]
             isOneToOne: false
             referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_manually_edited_by_fkey"
+            columns: ["manually_edited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1427,6 +1561,21 @@ export type Database = {
           url: string
         }[]
       }
+      admin_list_competition_sources: {
+        Args: { p_competition_id: string }
+        Returns: {
+          enabled: boolean
+          id: string
+          last_sync_checked_at: string
+          last_sync_error: string
+          last_sync_ok: boolean
+          priority: number
+          provider: Database["public"]["Enums"]["data_provider"]
+          provider_code: string
+          provider_season: string
+          role: string
+        }[]
+      }
       admin_list_deleted_leagues: {
         Args: never
         Returns: {
@@ -1465,6 +1614,24 @@ export type Database = {
           league_name: string
         }[]
       }
+      admin_list_match_conflicts: {
+        Args: { p_limit?: number }
+        Returns: {
+          away_score: number
+          away_team_name: string
+          competition: string
+          frozen: boolean
+          home_score: number
+          home_team_name: string
+          id: string
+          kickoff_at: string
+          manual_lock: boolean
+          score_conflict: boolean
+          score_sources_count: number
+          sources: Json
+          status: Database["public"]["Enums"]["match_status"]
+        }[]
+      }
       admin_list_sync_alerts: {
         Args: { p_limit?: number }
         Returns: {
@@ -1495,6 +1662,16 @@ export type Database = {
           usage_seconds: number
         }[]
       }
+      admin_override_match: {
+        Args: {
+          p_away_score: number
+          p_home_score: number
+          p_lock?: boolean
+          p_match_id: string
+          p_status?: string
+        }
+        Returns: undefined
+      }
       admin_recent_audit: {
         Args: { p_limit?: number }
         Returns: {
@@ -1507,6 +1684,10 @@ export type Database = {
           entity_type: string
           id: string
         }[]
+      }
+      admin_remove_competition_source: {
+        Args: { p_id: string }
+        Returns: undefined
       }
       admin_rename_competition: {
         Args: { p_display_name: string; p_id: string }
@@ -1538,6 +1719,10 @@ export type Database = {
         Args: { p_id: string; p_value: boolean }
         Returns: undefined
       }
+      admin_set_competition_source_enabled: {
+        Args: { p_enabled: boolean; p_id: string }
+        Returns: undefined
+      }
       admin_set_competition_sync: {
         Args: { p_id: string; p_value: boolean }
         Returns: undefined
@@ -1548,6 +1733,10 @@ export type Database = {
       }
       admin_set_maintenance: {
         Args: { p_message?: string; p_on: boolean }
+        Returns: undefined
+      }
+      admin_set_match_lock: {
+        Args: { p_locked: boolean; p_match_id: string }
         Returns: undefined
       }
       admin_set_name_prefixes: {
@@ -1590,6 +1779,7 @@ export type Database = {
         Returns: undefined
       }
       admin_system_health: { Args: never; Returns: Json }
+      admin_unfreeze_match: { Args: { p_match_id: string }; Returns: undefined }
       admin_update_access: {
         Args: { p_enabled: boolean; p_max_active: number }
         Returns: undefined
@@ -1623,6 +1813,17 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      admin_upsert_competition_source: {
+        Args: {
+          p_competition_id: string
+          p_priority?: number
+          p_provider: string
+          p_provider_code: string
+          p_provider_season?: string
+          p_role?: string
+        }
+        Returns: string
       }
       admin_user_moderation: { Args: { p_user_id: string }; Returns: Json }
       advance_confronto_cup: { Args: { p_lc_id: string }; Returns: number }
@@ -2034,6 +2235,10 @@ export type Database = {
       release_confronto_if_due: { Args: { p_lc_id: string }; Returns: boolean }
       release_scheduled_confrontos: { Args: never; Returns: number }
       request_access: { Args: { p_token?: string }; Returns: Json }
+      resolve_match_golden: {
+        Args: { p_match_ids?: string[] }
+        Returns: number
+      }
       run_football_sync:
         | { Args: never; Returns: undefined }
         | { Args: { p_mode?: string }; Returns: undefined }
