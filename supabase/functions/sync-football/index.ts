@@ -84,6 +84,8 @@ interface MatchRow {
 
 const HOUR_MS = 3_600_000;
 const SECONDARY_THROTTLE_MS = 10 * 60_000; // secundárias no modo scores: no máx 1x/10min
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+let lastFootballDataFetchAt = 0; // espaça chamadas football-data (limite free 10/min)
 
 // Normaliza nome de time pra casar entre fontes (sem acento, minúsculo, sem ruído).
 function normName(s: string | null | undefined): string {
@@ -182,11 +184,11 @@ async function reconcilePrimary(
         continue;
       }
       const patch: Record<string, unknown> = { status: row.status, last_synced_at: ts };
-      // score entra aqui só como ponto de partida; o golden decide no fim.
-      patch.home_score = row.home_score;
-      patch.away_score = row.away_score;
-      if (row.home_pen !== undefined) patch.home_pen = row.home_pen;
-      if (row.away_pen !== undefined) patch.away_pen = row.away_pen;
+      // score: nunca REGRIDE um placar existente pra null (golden decide o final).
+      if (row.home_score != null) patch.home_score = row.home_score;
+      if (row.away_score != null) patch.away_score = row.away_score;
+      if (row.home_pen != null) patch.home_pen = row.home_pen;
+      if (row.away_pen != null) patch.away_pen = row.away_pen;
 
       if (mode === "catalog") {
         const wasPlaceholder = cur.home_team_name === "A definir" || cur.away_team_name === "A definir" || !cur.home_team_id || !cur.away_team_id;
@@ -424,7 +426,9 @@ const COUNTRY_EN_PT: Record<string, { name: string; short?: string }> = {
   Netherlands: { name: "Holanda" }, Belgium: { name: "Bélgica" }, Croatia: { name: "Croácia" }, Switzerland: { name: "Suíça" },
   Scotland: { name: "Escócia" }, Wales: { name: "País de Gales", short: "Gales" }, Poland: { name: "Polônia" },
   Denmark: { name: "Dinamarca" }, Sweden: { name: "Suécia" }, Norway: { name: "Noruega" }, Austria: { name: "Áustria" },
-  Serbia: { name: "Sérvia" }, Turkey: { name: "Turquia" }, "Türkiye": { name: "Turquia" }, Ukraine: { name: "Ucrânia" },
+  Serbia: { name: "Sérvia" }, "Bosnia and Herzegovina": { name: "Bósnia e Herzegovina", short: "Bósnia" },
+  "Bosnia & Herzegovina": { name: "Bósnia e Herzegovina", short: "Bósnia" }, Bosnia: { name: "Bósnia e Herzegovina", short: "Bósnia" },
+  Turkey: { name: "Turquia" }, "Türkiye": { name: "Turquia" }, Ukraine: { name: "Ucrânia" },
   "Czech Republic": { name: "Tchéquia" }, Czechia: { name: "Tchéquia" }, Hungary: { name: "Hungria" }, Romania: { name: "Romênia" },
   Greece: { name: "Grécia" }, Ireland: { name: "Irlanda" }, "Republic of Ireland": { name: "Irlanda" },
   "Northern Ireland": { name: "Irlanda do Norte", short: "Irl. Norte" }, Russia: { name: "Rússia" }, Albania: { name: "Albânia" },
@@ -561,6 +565,11 @@ async function fetchSource(
 ): Promise<MatchRow[]> {
   if (src.provider === "football_data") {
     if (!secrets.footballDataToken) throw new Error("FOOTBALL_DATA_TOKEN não configurado");
+    // Espaça ~1s entre chamadas football-data (limite free 10/min) — mesmo no
+    // catalog, onde várias secundárias football-data disparam na mesma execução.
+    const wait = 1000 - (Date.now() - lastFootballDataFetchAt);
+    if (wait > 0) await sleep(wait);
+    lastFootballDataFetchAt = Date.now();
     return await syncFootballData(admin, ctx, secrets.footballDataToken, writeTeams);
   }
   if (src.provider === "thesportsdb") return await syncTheSportsDb(ctx, secrets.theSportsDbKey);

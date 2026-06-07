@@ -58,8 +58,11 @@ from (values
   ('Liga MX',                 'Liga MX',              'liga-mx',              'mex.1',             'LEAGUE', 'México',         false)
 ) as v(name, display_name, slug, provider_code, type, area, in_perso)
 where not exists (
+  -- pula se já existe por provider_code OU por slug (slug tem unique global —
+  -- sem este OR, um slug pré-existente abortaria a migration no deploy)
   select 1 from public.competitions c
-  where c.provider = 'espn'::data_provider and c.provider_code = v.provider_code
+  where (c.provider = 'espn'::data_provider and c.provider_code = v.provider_code)
+     or c.slug = v.slug
 );
 
 -- ---------------------------------------------------------------------------

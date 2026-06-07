@@ -52,9 +52,11 @@ begin
         away_score = r.away_score,
         score_sources_count = r.c,
         score_conflict = (r.distinct_scores > 1),
-        frozen = (m.status = 'finished' and r.c >= 2 and now() - m.kickoff_at > interval '1 hour'),
+        -- congela só com CONSENSO real: >=2 fontes e SEM divergência (distinct=1).
+        -- Se as fontes discordam, não congela — vai pra fila de conflito do admin.
+        frozen = (m.status = 'finished' and r.c >= 2 and r.distinct_scores = 1 and now() - m.kickoff_at > interval '1 hour'),
         frozen_at = case
-                      when (m.status = 'finished' and r.c >= 2 and now() - m.kickoff_at > interval '1 hour')
+                      when (m.status = 'finished' and r.c >= 2 and r.distinct_scores = 1 and now() - m.kickoff_at > interval '1 hour')
                       then now() else m.frozen_at
                     end
   from ranked r
