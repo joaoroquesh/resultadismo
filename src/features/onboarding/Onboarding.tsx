@@ -3,6 +3,7 @@ import { Trophy, Target, Zap, Users, ChevronRight, ChevronLeft } from "lucide-re
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useFirstSeen } from "@/lib/useFirstSeen";
+import { useMaintenance } from "@/components/layout/maintenance";
 
 export const ONBOARDING_KEY = "resultadismo-onboarding-v1";
 
@@ -132,7 +133,8 @@ const SLIDES: Slide[] = [
  * Gate por localStorage (ONBOARDING_KEY); some após "Começar" ou "Pular".
  */
 export function Onboarding() {
-  const { user, loading } = useAuth();
+  const { user, loading, isAppAdmin } = useAuth();
+  const { data: maint } = useMaintenance();
   const [pending, markSeen] = useFirstSeen(ONBOARDING_KEY);
   const [index, setIndex] = useState(0);
   const [forced, setForced] = useState(false);
@@ -147,8 +149,10 @@ export function Onboarding() {
     return () => window.removeEventListener(REPLAY_EVENT, onReplay);
   }, []);
 
+  // Em manutenção, não-admin só vê a tela de manutenção — nada de tour por cima.
+  const underMaintenance = !!maint?.maintenance_mode && !isAppAdmin;
   // Aparece no 1º acesso (pending) ou quando reaberto manualmente (forced).
-  const visible = !loading && !!user && (pending || forced);
+  const visible = !loading && !!user && (pending || forced) && !underMaintenance;
 
   // Trava o scroll do body enquanto o overlay está visível.
   useEffect(() => {

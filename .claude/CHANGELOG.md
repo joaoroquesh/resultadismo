@@ -58,6 +58,10 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 - **Aba Changelog em accordion + sem scroll lateral.** Cada versão abre/fecha ao toque (a mais recente
   já aberta); conteúdo com `break-words`/`min-w-0` — fim do overflow horizontal que arrastava os menus
   de topo e base.
+- **Modo manutenção agora BLOQUEIA de verdade** (antes só mostrava uma tarja). Logado não-admin vê uma
+  **tela cheia turquesa** (`MaintenanceScreen`) com logo estática + mensagem editável do admin; o admin
+  segue usando o app e vê só a faixa de lembrete; deslogado continua na landing. Gate em `AppShell`
+  (`useMaintenance` + `isAppAdmin`); tour de onboarding suprimido na manutenção. (`src/components/layout/`)
 
 ---
 

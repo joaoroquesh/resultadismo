@@ -34,8 +34,11 @@ Pagamento · Avisos · Construa · Dados · Changelog**. Todas as ações chamam
   última sync, **Sincronizar** (manual = modo `catalog`) e **ligar/pausar** sync
   (`admin_set_competition_sync`). "Sincronizar tudo".
 - **Banners de alerta** (Nielsen #1): sync com problema (flame) e pendências (gold) → levam a Alertas.
-- **Modo manutenção** (`admin_set_maintenance` → banner global `MaintenanceBanner`), **Atividade
-  recente** (`admin_recent_audit`).
+- **Modo manutenção** (`admin_set_maintenance`): quando ligado, **bloqueia o app** para logados
+  não-admin — eles veem a `MaintenanceScreen` (tela cheia turquesa, logo estática, `maintenance_message`
+  editável ou texto padrão). O **admin continua usando o app** e vê só a faixa `MaintenanceBanner`
+  (lembrete). Visitante **deslogado** segue na landing (o flag só é legível por logado; gate em
+  `AppShell`; tour de onboarding suprimido na manutenção). **Atividade recente** (`admin_recent_audit`).
 
 ### Aba **Alertas** (`SyncAlertsPanel`)
 - **Precisam de você** (pendentes): jogo novo (`new_match`→inserir), cancelamento (`cancelled`),

@@ -5,6 +5,8 @@ import { Sidebar } from "./Sidebar";
 import { PublicShell } from "./PublicShell";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { MaintenanceBanner } from "./MaintenanceBanner";
+import { MaintenanceScreen } from "./MaintenanceScreen";
+import { useMaintenance } from "./maintenance";
 import { AccessGate } from "@/features/access/AccessGate";
 import { PresenceTracker } from "@/features/presence/PresenceTracker";
 import { ConsentBanner } from "@/features/consent/ConsentBanner";
@@ -18,7 +20,8 @@ const DevPanel = import.meta.env.DEV
   : null;
 
 export function AppShell() {
-  const { session, loading } = useAuth();
+  const { session, loading, isAppAdmin } = useAuth();
+  const { data: maint } = useMaintenance();
 
   let content: ReactNode;
 
@@ -37,6 +40,10 @@ export function AppShell() {
         <Outlet />
       </PublicShell>
     );
+  } else if (maint?.maintenance_mode && !isAppAdmin) {
+    // Manutenção ligada: logado não-admin não acessa o app — vê a tela cheia.
+    // (Visitante deslogado cai no ramo acima e segue na landing pública.)
+    content = <MaintenanceScreen message={maint?.maintenance_message} />;
   } else {
     content = (
       <AccessGate>
