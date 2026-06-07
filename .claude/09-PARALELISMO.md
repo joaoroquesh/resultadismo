@@ -79,6 +79,8 @@ enum `'espn'` que não entrou).
   sessão por engano — recuperado via `reflog`; ver [`HISTORICO.md`](HISTORICO.md)).
 - ❌ `git checkout`/`switch` que descarte mudanças não-commitadas que não são suas.
 - ❌ Criar migration com número já usado por outra sessão.
+- ❌ **Subir a versão** (`package.json` / header do CHANGELOG) por conta própria — só em **release
+  deliberado** (1 dono); sessões apenas **acumulam em `[Não lançado]`** (ADR 0003 / [`MESTRE.md`](MESTRE.md) §6).
 - ❌ `supabase db push`/`link` (CLI desta máquina aponta para outro projeto). → [`07`](07-BUILD-E-DEPLOY.md) §4.
 
 ## 7. Coordenação por área (quem mexe onde)

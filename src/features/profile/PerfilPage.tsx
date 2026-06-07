@@ -1,6 +1,7 @@
 import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ConsentLink } from "@/features/consent/ConsentDialog";
+import { version as APP_VERSION } from "../../../package.json";
 import {
   LogOut,
   ShieldCheck,
@@ -323,7 +324,7 @@ export function PerfilPage() {
           <ConsentLink />
         </div>
         <p className="text-center text-xs text-ink-400">
-          Resultadismo © {new Date().getFullYear()}
+          Resultadismo © {new Date().getFullYear()} · v{APP_VERSION}
         </p>
       </div>
     </Page>

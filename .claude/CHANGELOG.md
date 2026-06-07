@@ -9,7 +9,8 @@ Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 > **Como usar:** toda mudança que sobe ganha uma entrada (passo 7 do protocolo em
 > [`MESTRE.md`](MESTRE.md) §5 / [`08-PROCESSO.md`](08-PROCESSO.md)). Acumule em **[Não lançado]**
 > enquanto desenvolve; ao subir, mova para uma versão datada e atualize o `package.json`.
-> A evolução **anterior** ao 2.0.0 (site v1 e a construção do v2) está em [`HISTORICO.md`](HISTORICO.md).
+> A evolução **anterior** está em [`HISTORICO.md`](HISTORICO.md). **Numeração** (ADR 0003): v0 = legado,
+> **1.0 = soft-launch atual**, 2.0 = Copa. A versão **só sobe em release deliberado**, não a cada commit.
 
 Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **Segurança**,
 **Depreciado**.
@@ -18,7 +19,36 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+_(Ajustes da v1 (pré-Copa) acumulam aqui até o próximo release deliberado.)_
+
 ---
+
+## [1.0.0] — 2026-06-03 · soft-launch (reescrita React + Supabase)
+
+Primeira versão real, lançada para um grupo pequeno (pré-Copa). Resumo do que está no ar; o detalhe
+granular está no [`HISTORICO.md`](HISTORICO.md) e no Arquivo abaixo.
+
+### Adicionado
+- **Jogo de palpites completo:** cravada/saldo/acerto (3/2/1), pontuação e classificação no banco,
+  dobro (2×) por semana, desempate fixo.
+- **Grupos** (antes "Federação"): criação, papéis, visibilidade/entrada, código, escudo; modos
+  **Bolão** (pontos) e **Confronto** Liga/Copa (gated). Criar grupo é **grátis** (pagamento desligado
+  — ADR 0002; infra MP preservada).
+- **Dados** via ESPN/football-data/TheSportsDB; **admin v2** (visão, competições, jogos, usuários,
+  moderação, pagamento, broadcast). **Login** só pelo bottom-sheet. **Resultadismo The Best** (ranking
+  global), notificações (push/cutucada), PWA, sala de espera, escudos por máscara, onboarding.
+
+### Segurança & Infra
+- RLS + RPCs `SECURITY DEFINER`; e-mail fora de `profiles`; webhook MP endurecido; CSP/headers/CORS.
+- Deploy por push na `main` (Vercel + Supabase + Action). GA4 + consentimento LGPD.
+
+---
+
+## Arquivo — desenvolvimento do 1.0 (numeração antiga 2.0–2.11, descontinuada)
+
+> Estas entradas foram cortadas como "2.x" durante o desenvolvimento do 1.0, **antes** da cadência
+> atual (versão só em release). Ficam como detalhe histórico. Numeração correta: legado = **v0**,
+> soft-launch = **1.0**, Copa = **2.0** ([`MESTRE.md`](MESTRE.md) §6).
 
 ## [2.11.0] — 2026-06-06
 

@@ -198,18 +198,25 @@ de docs + changelog (seção 5). Cada uma tem dono num doc específico.
 
 ## 6. Versionamento e changelog
 
-- O projeto está sendo versionado a partir de **2.0.0** (a reescrita React+Supabase, no ar hoje).
-  O histórico anterior (site estático v1 e a evolução até aqui) está consolidado em
-  [`HISTORICO.md`](HISTORICO.md).
-- A partir de agora, **toda mudança que sobe ganha uma entrada no [`CHANGELOG.md`](CHANGELOG.md)** e
-  um número de versão, no padrão **MAJOR.MINOR.PATCH**:
-  - **PATCH** (2.0.x) — correção de bug, ajuste de copy, refino de UI, sem mudar regra de negócio.
-  - **MINOR** (2.x.0) — recurso novo ou mudança de comportamento compatível (nova tela, novo modo,
-    novo controle de admin).
-  - **MAJOR** (x.0.0) — mudança estrutural/incompatível ou reescrita de um pilar.
-- O número fonte de verdade fica no [`package.json`](../package.json) (`"version"`). Mantê-lo em
-  sincronia com a entrada mais recente do CHANGELOG.
-- Em caso de dúvida entre MINOR e PATCH, **mudou regra de negócio? → MINOR.**
+> **Decisão (ADR [`0003`](decisions/0003-versionamento.md)):** numeração corrigida + cadência por
+> **release**, não por commit (foi o que disparou de 2.0 a 2.11 em 3 dias).
+
+**Marcos:** **v0** = site legado (protótipo). **v1.0.0** = reescrita React+Supabase **soft-launched**
+pra um grupo pequeno (estado atual; todo ajuste pré-Copa é **v1.x**). **v2.0.0** = **lançamento
+oficial da Copa** (cortado quando o João disser "pronto").
+
+**Critérios** (é um app de deploy contínuo, não uma lib — o eixo é "marco de produto", não "API"):
+- **MAJOR** (x.0.0) — **marco de produto** (ex.: Copa = 2.0) ou overhaul que redefine o app.
+- **MINOR** (1.x.0) — **recurso perceptível** ao usuário (nova tela, novo modo, novo controle).
+- **PATCH** (1.0.x) — **correção/refino** sem recurso novo.
+
+**Cadência (conserta o "rápido demais"):**
+- Mudanças **acumulam em `[Não lançado]`** do [`CHANGELOG.md`](CHANGELOG.md). A versão **NÃO sobe a
+  cada commit nem por sessão**.
+- O número só sobe num **release deliberado** — o **João decide** quando cortar; **um** dono faz o
+  bump (`package.json` + move `[Não lançado]` → versão datada). Coordenação: [`09`](09-PARALELISMO.md).
+- Fonte de verdade: [`package.json`](../package.json) (`"version"`), **exibido no rodapé do Perfil** e
+  anexado aos reports de bug.
 
 ---
 

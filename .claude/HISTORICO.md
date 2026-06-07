@@ -9,6 +9,10 @@
 > oficial daqui pra frente, ver [`CHANGELOG.md`](CHANGELOG.md). O design original dos confrontos,
 > preservado como referência, está em [`../docs/planning/`](../docs/planning/).
 
+> ⚠️ **Numeração corrigida (2026-06-06, ADR 0003):** o que aparece abaixo como **2.0–2.11** foi a
+> fase de **desenvolvimento do 1.0** (numeração antiga, inflada — 28 bumps em 3 dias). Correto:
+> legado = **v0**, soft-launch = **1.0.0**, lançamento da Copa = **2.0.0**.
+
 ---
 
 ## Linha do tempo (resumo)
