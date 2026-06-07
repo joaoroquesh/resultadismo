@@ -257,14 +257,16 @@ Identidade visual de **perfis** e **grupos** por **máscara SVG**: o SVG recorta
   (descartado p/ 2026). Admin publica (`is_published`) e renomeia em PT-BR (`display_name`).
 - **Privacidade/LGPD:** contato único `resultadismoapp@gmail.com` (Controlador + DPO). Dados de
   cartão ficam **com o Mercado Pago**, nunca com o app. Termos §12 cobrem pagamento e arrependimento.
-- **Personalização (2026-06-06):** o **tour de boas-vindas** (modal, 1º acesso) continua; depois o
-  Resultadista de primeira viagem cai na **página de personalização** (`/perfil/personalizar`,
-  também editável pelo Perfil): time do coração, seleção que torce (Brasil pré-marcado), campeonatos
-  de interesse, **times de interesse** (acordeão por campeonato) e opt-in do Resultadismo The Best +
-  código de convite. **Tudo é pulável.** Preferências em `profiles` (`favorite_team_id`,
-  `national_team_id`, `followed_competition_ids[]`, `followed_team_ids[]`). Listas de clube vêm do
-  **sync ESPN** (competições seedadas como rascunho, `sync_enabled=true`, populam `teams`). Copy
-  **conversacional** (perguntas calorosas) → [`10`](10-UX-WRITING.md) §2.
+- **Personalização (2026-06-06 · reforma 2026-06-07):** o **tour de boas-vindas** (modal, 1º acesso)
+  continua; depois o Resultadista cai na **página de personalização** (`/perfil/personalizar`, fluxo
+  focado, também editável pelo Perfil). Telas: **time do coração** (só clubes, busca + lista, escolha
+  única) · **seleção que torce** (Brasil 1º, depois alfabética) · **uma tela** "times e campeonatos"
+  (campeonato inteiro **ou** times avulsos, com estado parcial) · **RTB** + código. **Tudo é pulável**
+  (mas "Próximo" só habilita ao escolher). Preferências em `profiles`: `favorite_team_id`,
+  `national_team_id`, `followed_competition_ids[]` (campeonato inteiro) e **`followed_teams jsonb`**
+  (`{competition_id: [team_id]}` — follow de time **por campeonato**: dá pra seguir um time numa liga
+  e não numa copa). Catálogo vem de `list_personalization_competitions` (flag `in_personalization`);
+  times via **sync ESPN**. Copy **conversacional** → [`10`](10-UX-WRITING.md) §2.
 
 ---
 

@@ -8,7 +8,8 @@ export type PersonalizationState = {
   national_team_id: string | null;
   favorite_competition_id: string | null;
   followed_competition_ids: string[];
-  followed_team_ids: string[];
+  /** follow de time POR campeonato: { [competition_id]: team_id[] } */
+  followed_teams: Record<string, string[]>;
   personalization_done: boolean;
   show_in_global_ranking: boolean;
 };
@@ -20,6 +21,8 @@ export type TeamLite = {
   crest_url: string | null;
   local_crest: string | null;
   country?: string | null;
+  /** campeonatos da personalização em que o time aparece (get_teams_by_competition) */
+  in_competitions?: string[] | null;
 };
 
 export type PersoComp = {
@@ -43,7 +46,7 @@ export function usePersonalizationState() {
       const { data, error } = await supabase
         .from("profiles")
         .select(
-          "favorite_team_id, national_team_id, favorite_competition_id, followed_competition_ids, followed_team_ids, personalization_done, show_in_global_ranking",
+          "favorite_team_id, national_team_id, favorite_competition_id, followed_competition_ids, followed_teams, personalization_done, show_in_global_ranking",
         )
         .eq("id", user!.id)
         .single();
@@ -53,7 +56,7 @@ export function usePersonalizationState() {
         national_team_id: data.national_team_id,
         favorite_competition_id: data.favorite_competition_id,
         followed_competition_ids: data.followed_competition_ids ?? [],
-        followed_team_ids: data.followed_team_ids ?? [],
+        followed_teams: (data.followed_teams as Record<string, string[]>) ?? {},
         personalization_done: data.personalization_done ?? false,
         show_in_global_ranking: data.show_in_global_ranking ?? true,
       };
@@ -111,7 +114,8 @@ export type PersonalizationPatch = {
   nationalTeamId?: string | null;
   favoriteCompetitionId?: string | null;
   followedCompetitionIds?: string[] | null;
-  followedTeamIds?: string[] | null;
+  /** follow de time por campeonato: { [competition_id]: team_id[] } */
+  followedTeams?: Record<string, string[]> | null;
   showInRanking?: boolean | null;
 };
 
@@ -125,7 +129,7 @@ export function useSetPersonalization() {
         p_national_team_id: patch.nationalTeamId ?? undefined,
         p_favorite_competition_id: patch.favoriteCompetitionId ?? undefined,
         p_followed_competition_ids: patch.followedCompetitionIds ?? undefined,
-        p_followed_team_ids: patch.followedTeamIds ?? undefined,
+        p_followed_teams: patch.followedTeams ?? undefined,
         p_show_in_ranking: patch.showInRanking ?? undefined,
       });
       if (error) throw new Error(error.message);

@@ -1254,6 +1254,7 @@ export type Database = {
           favorite_team_id: string | null
           followed_competition_ids: string[]
           followed_team_ids: string[]
+          followed_teams: Json
           id: string
           is_app_admin: boolean
           last_active_at: string | null
@@ -1274,6 +1275,7 @@ export type Database = {
           favorite_team_id?: string | null
           followed_competition_ids?: string[]
           followed_team_ids?: string[]
+          followed_teams?: Json
           id: string
           is_app_admin?: boolean
           last_active_at?: string | null
@@ -1294,6 +1296,7 @@ export type Database = {
           favorite_team_id?: string | null
           followed_competition_ids?: string[]
           followed_team_ids?: string[]
+          followed_teams?: Json
           id?: string
           is_app_admin?: boolean
           last_active_at?: string | null
@@ -2087,6 +2090,7 @@ export type Database = {
         Returns: {
           crest_url: string
           id: string
+          in_competitions: string[]
           local_crest: string
           name: string
           short_name: string
@@ -2269,6 +2273,7 @@ export type Database = {
           p_favorite_team_id?: string
           p_followed_competition_ids?: string[]
           p_followed_team_ids?: string[]
+          p_followed_teams?: Json
           p_national_team_id?: string
           p_show_in_ranking?: boolean
         }

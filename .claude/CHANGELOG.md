@@ -35,8 +35,20 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   (conflitos + override + fontes por competição). Escudos do repo (`public/teams`) como fonte primária
   via manifest. Estudo em [`decisions/0004`](decisions/0004-ingestao-dados-de-jogos.md). 4 migrations
   `20260607*`, **aditivas e não-destrutivas** (nenhum jogo existente alterado além de placar).
+- **Personalização — seguir time POR campeonato** (`profiles.followed_teams jsonb`) + escolha **"só
+  neste" / "em todos (N)"** quando o time joga em 2+ campeonatos (`get_teams_by_competition` devolve
+  `in_competitions`). Migrations `20260607000005` / `20260607000007`.
+- **Personalização — +campeonatos:** Eurocopa, Nations League, **Eliminatórias** (5 confederações),
+  Copa Africana, e o grupo **Alternativos** (Saudi, MLS, Liga MX, Portugal, Holanda, Turquia,
+  Bélgica, Escócia, Grécia, Conference) + **Amistosos**. Codes ESPN verificados. Migration
+  `20260607000006`.
 
 ### Alterado
+- **Página de personalização reformada:** fluxo focado (nav colada embaixo, conteúdo rola, listas
+  com busca + seleção única que só habilita o "Próximo" ao escolher); **uma tela** "times e
+  campeonatos" com **grupos colapsáveis e selecionáveis inteiros** (Seleções · Ligas e estaduais ·
+  Copas · Alternativos) e checkbox redondo pai/filho com estado parcial. Time do coração mostra só
+  clubes; seleção com **Brasil primeiro**.
 - **Toggles unificados no primitivo `Switch`.** `AdminDashboard` (Sala de espera, Sync automático,
   Modo manutenção) e `NotifPrefsCard` (Lembretes/Cutucadas/Avisos) agora usam o primitivo único
   `src/components/ui/Switch.tsx` em vez de toggles hand-rolled próprios — fecha a migração prevista na
