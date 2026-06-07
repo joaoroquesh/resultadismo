@@ -74,6 +74,12 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   usada por grupos, EXCLUIR — ou DESPUBLICAR — só prossegue passando `p_confirm_name` = nome exato;
   senão a RPC recusa. Nova RPC `admin_competition_usage` (palpites/grupos/matches). Defesa no banco
   (`SECURITY DEFINER`), então protege mesmo se a UI falhar. Migration `20260607000008`.
+- **Fim da exclusão em CASCATA destrutiva (FK RESTRICT).** Causa-raiz da perda dos palpites. Agora
+  `predictions → matches` e `league_competitions → competitions` são **RESTRICT**: o **banco RECUSA**
+  apagar uma competição que tem palpites ou é usada por grupo (não importa a UI). `matches →
+  competitions` segue CASCADE (jogo é descartável/re-sincronizável). Para excluir uma competição em
+  uso, o admin **limpa os vínculos no Supabase primeiro** (palpites/uso em grupo). `admin_delete_competition`
+  dá mensagem clara orientando isso. Migration `20260607000009`.
 
 ### Corrigido
 - **Push sempre com identidade (escudo + título + corpo).** O service worker (`src/sw.ts`) nunca mais
