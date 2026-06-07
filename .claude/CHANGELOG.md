@@ -20,6 +20,12 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+### Adicionado
+- **Changelog no admin.** Nova aba **Changelog** no `/admin` (só app-admin) que renderiza este
+  `CHANGELOG.md` (importado cru no build), do mais recente ao mais antigo — render de markdown leve,
+  sem dependência nova.
+- **Versão no rodapé do Perfil** (`v{APP_VERSION}`, de `package.json`).
+
 ---
 
 ## [1.11.0] — 2026-06-06

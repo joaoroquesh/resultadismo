@@ -11,6 +11,7 @@ import { AdminDashboard } from "./AdminDashboard";
 import { SyncAlertsPanel } from "./SyncAlertsPanel";
 import { BroadcastPanel } from "./BroadcastPanel";
 import { FeedbackAdmin } from "@/features/feedback/FeedbackAdmin";
+import { ChangelogTab } from "./ChangelogTab";
 import { useSystemHealth } from "./sync";
 
 const NAV = [
@@ -22,6 +23,7 @@ const NAV = [
   { key: "competicoes", label: "Competições" },
   { key: "usuarios", label: "Usuários" },
   { key: "pagamento", label: "Pagamento" },
+  { key: "changelog", label: "Changelog" },
 ] as const;
 
 type TabKey = (typeof NAV)[number]["key"];
@@ -89,6 +91,7 @@ export function AdminPage() {
       {tab === "competicoes" && <CompeticoesAdmin />}
       {tab === "usuarios" && <UsuariosAdmin />}
       {tab === "pagamento" && <PaymentAdmin />}
+      {tab === "changelog" && <ChangelogTab />}
     </Page>
   );
 }

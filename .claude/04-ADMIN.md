@@ -24,7 +24,7 @@
 
 **Dashboard-first**, navegação por **abas na URL** (`?t=`) — rolável (não espreme no mobile);
 voltar de "ver jogos" cai na aba certa. Abas: **Visão · Alertas · Grupos · Competições · Usuários ·
-Pagamento · Avisos · Construa**. Todas as ações chamam RPCs que **revalidam `is_app_admin()` no banco** — o guard de UI
+Pagamento · Avisos · Construa · Changelog**. Todas as ações chamam RPCs que **revalidam `is_app_admin()` no banco** — o guard de UI
 é conveniência, não segurança.
 
 ### Aba **Visão** (`AdminDashboard`) — saúde do sistema
