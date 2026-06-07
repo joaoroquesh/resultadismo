@@ -26,6 +26,16 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   sem dependência nova.
 - **Versão no rodapé do Perfil** (`v{APP_VERSION}`, de `package.json`).
 
+### Corrigido
+- **Push sempre com identidade (escudo + título + corpo).** O service worker (`src/sw.ts`) nunca mais
+  exibe uma notificação "vazia": sem corpo, usa um texto da marca — garante que toda push nossa
+  apareça com o escudo verde e nunca caia no aviso genérico do navegador. Adicionados `lang: "pt-BR"`
+  e suporte a `tag` (base p/ agrupar por entidade no futuro). Verificação completa do pipeline
+  (trigger `notifications_push` → `send-push` → SW) confirmou: automáticas (lembrete/alerta) e
+  enviadas (cutucada/aviso) usam o **mesmo caminho e payload**; o aviso genérico "Toque para copiar o
+  URL" visto antes é **do próprio Chrome** (SW antigo / push pela aba em vez do app instalado), não do
+  nosso código.
+
 ---
 
 ## [1.11.0] — 2026-06-06

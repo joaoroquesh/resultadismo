@@ -17,18 +17,26 @@ self.addEventListener("activate", (event) => {
 
 // Web Push: exibe a notificação recebida
 self.addEventListener("push", (event) => {
-  let payload: { title?: string; body?: string; data?: { url?: string } } = {};
+  let payload: { title?: string; body?: string; data?: { url?: string; tag?: string } } = {};
   try {
     payload = event.data?.json() ?? {};
   } catch {
     payload = { body: event.data?.text() };
   }
   const title = payload.title ?? "Resultadismo";
+  // Nunca exibe uma notificação "vazia": sem corpo, usa um texto da marca. Garante
+  // que toda push NOSSA apareça com identidade (escudo + título + corpo) e nunca
+  // caia no aviso genérico do navegador ("Toque para copiar o URL…").
+  const body =
+    payload.body && payload.body.trim() ? payload.body : "Você tem novidades no Resultadismo ⚽";
   event.waitUntil(
     self.registration.showNotification(title, {
-      body: payload.body ?? "",
+      body,
       icon: "/favicon/android-chrome-192x192.png",
       badge: "/favicon/favicon-32x32.png",
+      lang: "pt-BR",
+      // Agrupa por entidade quando o backend enviar data.tag (hoje undefined = sem agrupar).
+      tag: payload.data?.tag,
       data: payload.data ?? {},
     }),
   );
