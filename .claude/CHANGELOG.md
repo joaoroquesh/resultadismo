@@ -42,6 +42,13 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   Copa Africana, e o grupo **Alternativos** (Saudi, MLS, Liga MX, Portugal, Holanda, Turquia,
   Bélgica, Escócia, Grécia, Conference) + **Amistosos**. Codes ESPN verificados. Migration
   `20260607000006`.
+- **Catálogo de times da personalização (`src/data/teams-catalog.json`, ~292: 226 clubes + 66
+  seleções).** As listas (time do coração, seleção, times por campeonato) viram **client-side** a
+  partir do catálogo curado, **desacopladas da tabela `teams`** (sync/jogos) — populam mesmo fora de
+  temporada, com **escudos** (`public/teams` via manifest `teamCrests`). O `competitions` por time
+  alimenta o "**seguir em todos**". Lógica em `teamsCatalog.ts`. Como **encorpar**: editar o JSON +
+  rodar `scripts/fetch-crests.mjs` / `gen-team-crests.mjs` (doc em [`06`](06-REGRAS-DE-NEGOCIO.md) §9).
+  Pendente: escudos de Costa do Marfim e Suécia (Wikimedia quebrado).
 
 ### Alterado
 - **Página de personalização reformada:** fluxo focado (nav colada embaixo, conteúdo rola, listas

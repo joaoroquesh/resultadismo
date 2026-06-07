@@ -264,9 +264,22 @@ Identidade visual de **perfis** e **grupos** por **máscara SVG**: o SVG recorta
   (campeonato inteiro **ou** times avulsos, com estado parcial) · **RTB** + código. **Tudo é pulável**
   (mas "Próximo" só habilita ao escolher). Preferências em `profiles`: `favorite_team_id`,
   `national_team_id`, `followed_competition_ids[]` (campeonato inteiro) e **`followed_teams jsonb`**
-  (`{competition_id: [team_id]}` — follow de time **por campeonato**: dá pra seguir um time numa liga
-  e não numa copa). Catálogo vem de `list_personalization_competitions` (flag `in_personalization`);
-  times via **sync ESPN**. Copy **conversacional** → [`10`](10-UX-WRITING.md) §2.
+  (`{competition_id: [team_slug]}` — follow de time **por campeonato**: dá pra seguir um time numa
+  liga e não numa copa). Campeonatos vêm de `list_personalization_competitions` (flag
+  `in_personalization`). Copy **conversacional** → [`10`](10-UX-WRITING.md) §2.
+- **Catálogo de times (fonte das listas) — `src/data/teams-catalog.json` (2026-06-07):** as listas
+  de clube/seleção/time-por-campeonato são **client-side**, do catálogo curado (~292: clubes +
+  seleções), **desacopladas da tabela `teams`** (que é do sync/jogos) — funciona fora de temporada.
+  Cada time tem `slug`, `name_pt`, `kind` (club|national), `competitions` (provider_codes), `aliases`.
+  Escudos: `public/teams/<arquivo>` resolvidos pelo manifest `src/lib/teamCrests.ts` (fonte primária,
+  CDN custo zero). O `competitions` por time alimenta o "**seguir em todos** os campeonatos". Lógica
+  em `src/features/onboarding/teamsCatalog.ts`.
+  - **Como encorpar (adicionar clubes/seleções/campeonatos):** edite `src/data/teams-catalog.json`
+    (slug + name_pt + kind + competitions + aliases). Para escudo novo: ponha o arquivo em
+    `public/teams/<slug>.png|svg` (ou rode `scripts/fetch-crests.mjs` p/ baixar do `crest_source`) e
+    rode `scripts/gen-team-crests.mjs` (regenera o manifest). Builder do catálogo:
+    `scripts/gen-teams-catalog.mjs`. Faltam só escudos de **Costa do Marfim** e **Suécia** (Wikimedia
+    quebrado p/ esses 2).
 
 ---
 

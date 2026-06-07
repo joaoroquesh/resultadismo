@@ -1,0 +1,5006 @@
+[
+  {
+    "slug": "abc",
+    "name_pt": "ABC",
+    "short_pt": "ABC",
+    "tla": "ABC",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.3",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "ABC",
+      "ABC FC",
+      "ABC Natal"
+    ],
+    "crest_file": "abc.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "africadosul",
+    "name_pt": "África do Sul",
+    "short_pt": "Á. do Sul",
+    "tla": "RSA",
+    "country": "África do Sul",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "South Africa"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20South%20Africa.svg"
+  },
+  {
+    "slug": "aguasanta",
+    "name_pt": "Água Santa",
+    "short_pt": "Água Santa",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.camp.paulista",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Agua Santa",
+      "EC Água Santa"
+    ],
+    "crest_file": "aguasanta.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "aguiademaraba",
+    "name_pt": "Águia de Marabá",
+    "short_pt": "Águia de Marabá",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Aguia de Maraba"
+    ],
+    "crest_file": "aguiademaraba.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "ajax",
+    "name_pt": "Ajax",
+    "short_pt": "Ajax",
+    "tla": "AJA",
+    "country": "Holanda",
+    "kind": "club",
+    "competitions": [
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Ajax",
+      "AFC Ajax",
+      "Ajax Amsterdam"
+    ],
+    "crest_file": "ajax.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "alahli",
+    "name_pt": "Al Ahli",
+    "short_pt": "Al Ahli",
+    "tla": null,
+    "country": "Arábia Saudita",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Al Ahli",
+      "Al-Ahli Saudi",
+      "Al Ahli SFC"
+    ],
+    "crest_file": "alahli.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "alahly",
+    "name_pt": "Al Ahly",
+    "short_pt": "Al Ahly",
+    "tla": null,
+    "country": "Egito",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Al Ahly",
+      "Al Ahly SC"
+    ],
+    "crest_file": "alahly.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "alain",
+    "name_pt": "Al Ain",
+    "short_pt": "Al Ain",
+    "tla": null,
+    "country": "Emirados Árabes Unidos",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Al Ain",
+      "Al Ain FC"
+    ],
+    "crest_file": "alain.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "alaves",
+    "name_pt": "Alavés",
+    "short_pt": "Alavés",
+    "tla": "ALA",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1"
+    ],
+    "aliases": [
+      "Alaves",
+      "Deportivo Alavés"
+    ],
+    "crest_file": "alaves.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "albania",
+    "name_pt": "Albânia",
+    "short_pt": "Albânia",
+    "tla": "ALB",
+    "country": "Albânia",
+    "kind": "national",
+    "competitions": [],
+    "aliases": [
+      "Albania"
+    ],
+    "crest_file": "albania.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "alemanha",
+    "name_pt": "Alemanha",
+    "short_pt": "Alemanha",
+    "tla": "GER",
+    "country": "Alemanha",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Germany",
+      "Deutschland"
+    ],
+    "crest_file": "alemanha.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "alhilal",
+    "name_pt": "Al Hilal",
+    "short_pt": "Al Hilal",
+    "tla": null,
+    "country": "Arábia Saudita",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Al Hilal",
+      "Al-Hilal"
+    ],
+    "crest_file": "alhilal.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "alianzalima",
+    "name_pt": "Alianza Lima",
+    "short_pt": "Alianza Lima",
+    "tla": null,
+    "country": "Peru",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores",
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Alianza Lima"
+    ],
+    "crest_file": "alianzalima.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "alittihad",
+    "name_pt": "Al Ittihad",
+    "short_pt": "Al Ittihad",
+    "tla": null,
+    "country": "Arábia Saudita",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Al Ittihad",
+      "Al-Ittihad Club"
+    ],
+    "crest_file": "alittihad.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "alnassr",
+    "name_pt": "Al Nassr",
+    "short_pt": "Al Nassr",
+    "tla": null,
+    "country": "Arábia Saudita",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Al Nassr",
+      "Al-Nassr"
+    ],
+    "crest_file": "alnassr.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "alqadsiah",
+    "name_pt": "Al Qadsiah",
+    "short_pt": "Al Qadsiah",
+    "tla": null,
+    "country": "Arábia Saudita",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Al Qadsiah",
+      "Al-Qadsiah"
+    ],
+    "crest_file": "alqadsiah.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "altos",
+    "name_pt": "Altos",
+    "short_pt": "Altos",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Altos",
+      "Atlético Altos"
+    ],
+    "crest_file": "altos.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "amazonas",
+    "name_pt": "Amazonas",
+    "short_pt": "Amazonas",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.2",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Amazonas FC"
+    ],
+    "crest_file": "amazonas.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "americacali",
+    "name_pt": "América de Cali",
+    "short_pt": "América de Cali",
+    "tla": null,
+    "country": "Colômbia",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores",
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "America de Cali"
+    ],
+    "crest_file": "americacali.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "americamexico",
+    "name_pt": "Club América",
+    "short_pt": "América (MEX)",
+    "tla": null,
+    "country": "México",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Club America",
+      "America",
+      "Club América (MEX)"
+    ],
+    "crest_file": "americamexico.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "americamg",
+    "name_pt": "América-MG",
+    "short_pt": "América-MG",
+    "tla": "AME",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.2",
+      "bra.camp.mineiro",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "America Mineiro",
+      "America-MG",
+      "América Mineiro"
+    ],
+    "crest_file": "americamg.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "americarn",
+    "name_pt": "América-RN",
+    "short_pt": "América-RN",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.3",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "America-RN",
+      "America RN"
+    ],
+    "crest_file": "americarn.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "andorra",
+    "name_pt": "Andorra",
+    "short_pt": "Andorra",
+    "tla": "AND",
+    "country": "Andorra",
+    "kind": "national",
+    "competitions": [],
+    "aliases": [
+      "Andorra"
+    ],
+    "crest_file": "andorra.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "aparecidense",
+    "name_pt": "Aparecidense",
+    "short_pt": "Aparecidense",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.3",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Aparecidense",
+      "Grêmio Aparecidense"
+    ],
+    "crest_file": "aparecidense.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "arabiasaudita",
+    "name_pt": "Arábia Saudita",
+    "short_pt": "Arábia S.",
+    "tla": "KSA",
+    "country": "Arábia Saudita",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Saudi Arabia"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Saudi%20Arabia.svg"
+  },
+  {
+    "slug": "argelia",
+    "name_pt": "Argélia",
+    "short_pt": "Argélia",
+    "tla": "ALG",
+    "country": "Argélia",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Algeria"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Algeria.svg"
+  },
+  {
+    "slug": "argentina",
+    "name_pt": "Argentina",
+    "short_pt": "Argentina",
+    "tla": "ARG",
+    "country": "Argentina",
+    "kind": "national",
+    "competitions": [
+      "fifa.world",
+      "conmebol.america"
+    ],
+    "aliases": [
+      "Argentina"
+    ],
+    "crest_file": "argentina.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "arsenal",
+    "name_pt": "Arsenal",
+    "short_pt": "Arsenal",
+    "tla": "ARS",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Arsenal",
+      "Arsenal FC"
+    ],
+    "crest_file": "arsenal.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "astonvilla",
+    "name_pt": "Aston Villa",
+    "short_pt": "Aston Villa",
+    "tla": "AVL",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Aston Villa"
+    ],
+    "crest_file": "astonvilla.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "atalanta",
+    "name_pt": "Atalanta",
+    "short_pt": "Atalanta",
+    "tla": "ATA",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Atalanta",
+      "Atalanta BC"
+    ],
+    "crest_file": "atalanta.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "athleticbilbao",
+    "name_pt": "Athletic Bilbao",
+    "short_pt": "Athletic",
+    "tla": "ATH",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Athletic Club",
+      "Athletic Bilbao"
+    ],
+    "crest_file": "athleticbilbao.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "athleticopr",
+    "name_pt": "Athletico-PR",
+    "short_pt": "Athletico-PR",
+    "tla": "CAP",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.2",
+      "bra.copa_do_brazil",
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Athletico Paranaense",
+      "Athletico-PR",
+      "Atletico Paranaense"
+    ],
+    "crest_file": "athleticopr.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "atleticogo",
+    "name_pt": "Atlético-GO",
+    "short_pt": "Atlético-GO",
+    "tla": "ACG",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.2",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Atletico Goianiense",
+      "Atletico-GO"
+    ],
+    "crest_file": "atleticogo.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "atleticograu",
+    "name_pt": "Atlético Grau",
+    "short_pt": "Atlético Grau",
+    "tla": null,
+    "country": "Peru",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Atletico Grau"
+    ],
+    "crest_file": "atleticograu.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "atleticomadrid",
+    "name_pt": "Atlético de Madrid",
+    "short_pt": "Atlético",
+    "tla": "ATM",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Atletico Madrid",
+      "Atlético de Madrid",
+      "Atleti"
+    ],
+    "crest_file": "atleticomadrid.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "atleticomg",
+    "name_pt": "Atlético-MG",
+    "short_pt": "Atlético-MG",
+    "tla": "CAM",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.camp.mineiro",
+      "bra.copa_do_brazil",
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Atletico Mineiro",
+      "Atletico-MG",
+      "Atlético Mineiro"
+    ],
+    "crest_file": "atleticomg.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "atleticonacional",
+    "name_pt": "Atlético Nacional",
+    "short_pt": "Atl. Nacional",
+    "tla": null,
+    "country": "Colômbia",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Atletico Nacional",
+      "Atlético Nacional (COL)"
+    ],
+    "crest_file": "atleticonacional.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "aucklandcity",
+    "name_pt": "Auckland City",
+    "short_pt": "Auckland City",
+    "tla": null,
+    "country": "Nova Zelândia",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Auckland City FC"
+    ],
+    "crest_file": "aucklandcity.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "augsburg",
+    "name_pt": "Augsburg",
+    "short_pt": "Augsburg",
+    "tla": "FCA",
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1"
+    ],
+    "aliases": [
+      "FC Augsburg",
+      "Augsburg"
+    ],
+    "crest_file": "augsburg.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "australia",
+    "name_pt": "Austrália",
+    "short_pt": "Austrália",
+    "tla": "AUS",
+    "country": "Austrália",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Australia",
+      "Socceroos"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Australia.svg"
+  },
+  {
+    "slug": "austria",
+    "name_pt": "Áustria",
+    "short_pt": "Áustria",
+    "tla": "AUT",
+    "country": "Áustria",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Austria",
+      "Österreich"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Austria.svg"
+  },
+  {
+    "slug": "avai",
+    "name_pt": "Avaí",
+    "short_pt": "Avaí",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.2",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Avai",
+      "Avaí FC"
+    ],
+    "crest_file": "avai.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "bahia",
+    "name_pt": "Bahia",
+    "short_pt": "Bahia",
+    "tla": "BAH",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.copa_do_brazil",
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Bahia",
+      "EC Bahia"
+    ],
+    "crest_file": "bahia.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "banfield",
+    "name_pt": "Banfield",
+    "short_pt": "Banfield",
+    "tla": null,
+    "country": "Argentina",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Banfield",
+      "CA Banfield"
+    ],
+    "crest_file": "banfield.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "barcelona",
+    "name_pt": "Barcelona",
+    "short_pt": "Barcelona",
+    "tla": "BAR",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Barcelona",
+      "FC Barcelona",
+      "Barça"
+    ],
+    "crest_file": "barcelona.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "barcelonaeqd",
+    "name_pt": "Barcelona de Guayaquil",
+    "short_pt": "Barcelona SC",
+    "tla": null,
+    "country": "Equador",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Barcelona SC",
+      "Barcelona Guayaquil",
+      "Barcelona (ECU)"
+    ],
+    "crest_file": "barcelonaeqd.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "bayern",
+    "name_pt": "Bayern de Munique",
+    "short_pt": "Bayern",
+    "tla": "FCB",
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Bayern Munich",
+      "Bayern München",
+      "Bayern"
+    ],
+    "crest_file": "bayern.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "belgica",
+    "name_pt": "Bélgica",
+    "short_pt": "Bélgica",
+    "tla": "BEL",
+    "country": "Bélgica",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Belgium"
+    ],
+    "crest_file": "belgica.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "benfica",
+    "name_pt": "Benfica",
+    "short_pt": "Benfica",
+    "tla": "SLB",
+    "country": "Portugal",
+    "kind": "club",
+    "competitions": [
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Benfica",
+      "SL Benfica"
+    ],
+    "crest_file": "benfica.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "bielefeld",
+    "name_pt": "Arminia Bielefeld",
+    "short_pt": "Bielefeld",
+    "tla": null,
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1"
+    ],
+    "aliases": [
+      "Arminia Bielefeld",
+      "Bielefeld"
+    ],
+    "crest_file": "bielefeld.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "bocajuniors",
+    "name_pt": "Boca Juniors",
+    "short_pt": "Boca",
+    "tla": "BOC",
+    "country": "Argentina",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Boca Juniors",
+      "CA Boca Juniors"
+    ],
+    "crest_file": "bocajuniors.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "bochum",
+    "name_pt": "Bochum",
+    "short_pt": "Bochum",
+    "tla": "BOC",
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1"
+    ],
+    "aliases": [
+      "VfL Bochum",
+      "Bochum"
+    ],
+    "crest_file": "bochum.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "bodglimt",
+    "name_pt": "Bodø/Glimt",
+    "short_pt": "Bodø/Glimt",
+    "tla": null,
+    "country": "Noruega",
+    "kind": "club",
+    "competitions": [
+      "uefa.champions",
+      "uefa.europa"
+    ],
+    "aliases": [
+      "Bodo/Glimt",
+      "FK Bodø/Glimt"
+    ],
+    "crest_file": "bodglimt.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "bolivar",
+    "name_pt": "Bolívar",
+    "short_pt": "Bolívar",
+    "tla": null,
+    "country": "Bolívia",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Bolivar",
+      "Club Bolívar"
+    ],
+    "crest_file": "bolivar.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "bolivia",
+    "name_pt": "Bolívia",
+    "short_pt": "Bolívia",
+    "tla": "BOL",
+    "country": "Bolívia",
+    "kind": "national",
+    "competitions": [
+      "conmebol.america"
+    ],
+    "aliases": [
+      "Bolivia"
+    ],
+    "crest_file": "bolivia.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "bologna",
+    "name_pt": "Bologna",
+    "short_pt": "Bologna",
+    "tla": "BOL",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Bologna",
+      "Bologna FC"
+    ],
+    "crest_file": "bologna.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "bosniaeherzegovina",
+    "name_pt": "Bósnia e Herzegovina",
+    "short_pt": "Bósnia",
+    "tla": "BIH",
+    "country": "Bósnia e Herzegovina",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Bosnia and Herzegovina",
+      "Bosnia & Herzegovina",
+      "Bosnia"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Bosnia%20and%20Herzegovina.svg"
+  },
+  {
+    "slug": "botafogo",
+    "name_pt": "Botafogo",
+    "short_pt": "Botafogo",
+    "tla": "BOT",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.camp.carioca",
+      "bra.copa_do_brazil",
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Botafogo",
+      "Botafogo RJ",
+      "Botafogo-RJ",
+      "Botafogo de Futebol e Regatas"
+    ],
+    "crest_file": "botafogo.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "botafogopb",
+    "name_pt": "Botafogo-PB",
+    "short_pt": "Botafogo-PB",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.3",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Botafogo-PB",
+      "Botafogo PB"
+    ],
+    "crest_file": "botafogopb.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "botafogosp",
+    "name_pt": "Botafogo-SP",
+    "short_pt": "Botafogo-SP",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.2",
+      "bra.camp.paulista",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Botafogo-SP",
+      "Botafogo SP"
+    ],
+    "crest_file": "botafogosp.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "bournemouth",
+    "name_pt": "Bournemouth",
+    "short_pt": "Bournemouth",
+    "tla": "BOU",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1"
+    ],
+    "aliases": [
+      "Bournemouth",
+      "AFC Bournemouth"
+    ],
+    "crest_file": "bournemouth.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "braga",
+    "name_pt": "Braga",
+    "short_pt": "Braga",
+    "tla": "SCB",
+    "country": "Portugal",
+    "kind": "club",
+    "competitions": [
+      "uefa.europa"
+    ],
+    "aliases": [
+      "SC Braga",
+      "Braga",
+      "Sporting Braga"
+    ],
+    "crest_file": "braga.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "brasil",
+    "name_pt": "Brasil",
+    "short_pt": "Brasil",
+    "tla": "BRA",
+    "country": "Brasil",
+    "kind": "national",
+    "competitions": [
+      "fifa.world",
+      "conmebol.america"
+    ],
+    "aliases": [
+      "Brazil"
+    ],
+    "crest_file": "brasil.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "bremen",
+    "name_pt": "Werder Bremen",
+    "short_pt": "Bremen",
+    "tla": "SVW",
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1"
+    ],
+    "aliases": [
+      "Werder Bremen",
+      "Bremen"
+    ],
+    "crest_file": "bremen.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "brentford",
+    "name_pt": "Brentford",
+    "short_pt": "Brentford",
+    "tla": "BRE",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1"
+    ],
+    "aliases": [
+      "Brentford",
+      "Brentford FC"
+    ],
+    "crest_file": "brentford.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "brighton",
+    "name_pt": "Brighton",
+    "short_pt": "Brighton",
+    "tla": "BHA",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1"
+    ],
+    "aliases": [
+      "Brighton",
+      "Brighton & Hove Albion"
+    ],
+    "crest_file": "brighton.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "brusque",
+    "name_pt": "Brusque",
+    "short_pt": "Brusque",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.3",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Brusque",
+      "Brusque FC"
+    ],
+    "crest_file": "brusque.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "bucaramanga",
+    "name_pt": "Atlético Bucaramanga",
+    "short_pt": "Bucaramanga",
+    "tla": null,
+    "country": "Colômbia",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Atletico Bucaramanga",
+      "Bucaramanga"
+    ],
+    "crest_file": "bucaramanga.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "burnley",
+    "name_pt": "Burnley",
+    "short_pt": "Burnley",
+    "tla": "BUR",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1"
+    ],
+    "aliases": [
+      "Burnley",
+      "Burnley FC"
+    ],
+    "crest_file": "burnley.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "caboverde",
+    "name_pt": "Cabo Verde",
+    "short_pt": "Cabo Verde",
+    "tla": "CPV",
+    "country": "Cabo Verde",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Cape Verde",
+      "Cabo Verde"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Cape%20Verde.svg"
+  },
+  {
+    "slug": "cagliari",
+    "name_pt": "Cagliari",
+    "short_pt": "Cagliari",
+    "tla": "CAG",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1"
+    ],
+    "aliases": [
+      "Cagliari",
+      "Cagliari Calcio"
+    ],
+    "crest_file": "cagliari.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "canada",
+    "name_pt": "Canadá",
+    "short_pt": "Canadá",
+    "tla": "CAN",
+    "country": "Canadá",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Canada"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Canada%20(Pantone).svg"
+  },
+  {
+    "slug": "capital",
+    "name_pt": "Capital-DF",
+    "short_pt": "Capital",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Capital",
+      "Capital CF"
+    ],
+    "crest_file": "capital.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "carabobo",
+    "name_pt": "Carabobo",
+    "short_pt": "Carabobo",
+    "tla": null,
+    "country": "Venezuela",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Carabobo",
+      "Carabobo FC"
+    ],
+    "crest_file": "carabobo.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "caracas",
+    "name_pt": "Caracas",
+    "short_pt": "Caracas",
+    "tla": null,
+    "country": "Venezuela",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Caracas",
+      "Caracas FC"
+    ],
+    "crest_file": "caracas.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "catar",
+    "name_pt": "Catar",
+    "short_pt": "Catar",
+    "tla": "QAT",
+    "country": "Catar",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Qatar"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Qatar.svg"
+  },
+  {
+    "slug": "ceara",
+    "name_pt": "Ceará",
+    "short_pt": "Ceará",
+    "tla": "CEA",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Ceara",
+      "Ceará SC"
+    ],
+    "crest_file": "ceara.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "celta",
+    "name_pt": "Celta de Vigo",
+    "short_pt": "Celta",
+    "tla": "CEL",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1"
+    ],
+    "aliases": [
+      "Celta Vigo",
+      "Celta de Vigo"
+    ],
+    "crest_file": "celta.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "centralcordoba",
+    "name_pt": "Central Córdoba",
+    "short_pt": "Central Córdoba",
+    "tla": null,
+    "country": "Argentina",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Central Cordoba",
+      "Central Córdoba SdE"
+    ],
+    "crest_file": "centralcordoba.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "cerrolargo",
+    "name_pt": "Cerro Largo",
+    "short_pt": "Cerro Largo",
+    "tla": null,
+    "country": "Uruguai",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Cerro Largo",
+      "Cerro Largo FC"
+    ],
+    "crest_file": "cerrolargo.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "cerroporteo",
+    "name_pt": "Cerro Porteño",
+    "short_pt": "Cerro Porteño",
+    "tla": null,
+    "country": "Paraguai",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Cerro Porteno",
+      "Cerro Porteño"
+    ],
+    "crest_file": "cerroporteo.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "chapecoense",
+    "name_pt": "Chapecoense",
+    "short_pt": "Chapecoense",
+    "tla": "CHA",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.2",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Chapecoense",
+      "Chapecoense AF"
+    ],
+    "crest_file": "chapecoense.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "chelsea",
+    "name_pt": "Chelsea",
+    "short_pt": "Chelsea",
+    "tla": "CHE",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Chelsea",
+      "Chelsea FC"
+    ],
+    "crest_file": "chelsea.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "chile",
+    "name_pt": "Chile",
+    "short_pt": "Chile",
+    "tla": "CHI",
+    "country": "Chile",
+    "kind": "national",
+    "competitions": [
+      "conmebol.america"
+    ],
+    "aliases": [
+      "Chile"
+    ],
+    "crest_file": "chile.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "cienciano",
+    "name_pt": "Cienciano",
+    "short_pt": "Cienciano",
+    "tla": null,
+    "country": "Peru",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Cienciano"
+    ],
+    "crest_file": "cienciano.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "colocolo",
+    "name_pt": "Colo-Colo",
+    "short_pt": "Colo-Colo",
+    "tla": null,
+    "country": "Chile",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Colo Colo",
+      "Colo-Colo"
+    ],
+    "crest_file": "colocolo.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "colombia",
+    "name_pt": "Colômbia",
+    "short_pt": "Colômbia",
+    "tla": "COL",
+    "country": "Colômbia",
+    "kind": "national",
+    "competitions": [
+      "fifa.world",
+      "conmebol.america"
+    ],
+    "aliases": [
+      "Colombia"
+    ],
+    "crest_file": "colombia.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "como",
+    "name_pt": "Como",
+    "short_pt": "Como",
+    "tla": "COM",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1"
+    ],
+    "aliases": [
+      "Como",
+      "Como 1907"
+    ],
+    "crest_file": "como.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "confianca",
+    "name_pt": "Confiança",
+    "short_pt": "Confiança",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.3",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Confianca",
+      "AD Confiança"
+    ],
+    "crest_file": "confianca.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "congord",
+    "name_pt": "Congo (RD)",
+    "short_pt": "Congo RD",
+    "tla": "COD",
+    "country": "Congo (RD)",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "DR Congo",
+      "Congo DR",
+      "DRC",
+      "Democratic Republic of the Congo"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20the%20Democratic%20Republic%20of%20the%20Congo.svg"
+  },
+  {
+    "slug": "coreiadosul",
+    "name_pt": "Coreia do Sul",
+    "short_pt": "Coreia",
+    "tla": "KOR",
+    "country": "Coreia do Sul",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "South Korea",
+      "Korea Republic"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20South%20Korea.svg"
+  },
+  {
+    "slug": "corinthians",
+    "name_pt": "Corinthians",
+    "short_pt": "Corinthians",
+    "tla": "COR",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.camp.paulista",
+      "bra.copa_do_brazil",
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Corinthians",
+      "SC Corinthians"
+    ],
+    "crest_file": "corinthians.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "coritiba",
+    "name_pt": "Coritiba",
+    "short_pt": "Coritiba",
+    "tla": "CFC",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.2",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Coritiba",
+      "Coritiba FC"
+    ],
+    "crest_file": "coritiba.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "costadomarfim",
+    "name_pt": "Costa do Marfim",
+    "short_pt": "C. Marfim",
+    "tla": "CIV",
+    "country": "Costa do Marfim",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Ivory Coast",
+      "Cote d'Ivoire",
+      "Côte d'Ivoire"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Ivory%20Coast.svg"
+  },
+  {
+    "slug": "crb",
+    "name_pt": "CRB",
+    "short_pt": "CRB",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.2",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "CRB",
+      "Clube de Regatas Brasil"
+    ],
+    "crest_file": "crb.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "criciuma",
+    "name_pt": "Criciúma",
+    "short_pt": "Criciúma",
+    "tla": "CRI",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.2",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Criciuma",
+      "Criciúma EC"
+    ],
+    "crest_file": "criciuma.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "croacia",
+    "name_pt": "Croácia",
+    "short_pt": "Croácia",
+    "tla": "CRO",
+    "country": "Croácia",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Croatia",
+      "Hrvatska"
+    ],
+    "crest_file": "croacia.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "cruzazul",
+    "name_pt": "Cruz Azul",
+    "short_pt": "Cruz Azul",
+    "tla": null,
+    "country": "México",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Cruz Azul"
+    ],
+    "crest_file": "cruzazul.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "cruzeiro",
+    "name_pt": "Cruzeiro",
+    "short_pt": "Cruzeiro",
+    "tla": "CRU",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.camp.mineiro",
+      "bra.copa_do_brazil",
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Cruzeiro",
+      "Cruzeiro EC"
+    ],
+    "crest_file": "cruzeiro.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "crystalpalace",
+    "name_pt": "Crystal Palace",
+    "short_pt": "Crystal Palace",
+    "tla": "CRY",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1",
+      "uefa.europa"
+    ],
+    "aliases": [
+      "Crystal Palace"
+    ],
+    "crest_file": "crystalpalace.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "csa",
+    "name_pt": "CSA",
+    "short_pt": "CSA",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.3",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "CSA",
+      "Centro Sportivo Alagoano"
+    ],
+    "crest_file": "csa.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "cuiaba",
+    "name_pt": "Cuiabá",
+    "short_pt": "Cuiabá",
+    "tla": "CUI",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.2",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Cuiaba",
+      "Cuiabá EC"
+    ],
+    "crest_file": "cuiaba.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "curacao",
+    "name_pt": "Curaçao",
+    "short_pt": "Curaçao",
+    "tla": "CUW",
+    "country": "Curaçao",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Curacao",
+      "Curaçao",
+      "CUR"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Cura%C3%A7ao.svg"
+  },
+  {
+    "slug": "defensayjusticia",
+    "name_pt": "Defensa y Justicia",
+    "short_pt": "Defensa",
+    "tla": null,
+    "country": "Argentina",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Defensa y Justicia"
+    ],
+    "crest_file": "defensayjusticia.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "deptachira",
+    "name_pt": "Deportivo Táchira",
+    "short_pt": "Dep. Táchira",
+    "tla": null,
+    "country": "Venezuela",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores",
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Deportivo Tachira",
+      "Dep. Táchira"
+    ],
+    "crest_file": "deptachira.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "dinamarca",
+    "name_pt": "Dinamarca",
+    "short_pt": "Dinamarca",
+    "tla": "DEN",
+    "country": "Dinamarca",
+    "kind": "national",
+    "competitions": [],
+    "aliases": [
+      "Denmark",
+      "Danmark"
+    ],
+    "crest_file": "dinamarca.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "djurgarden",
+    "name_pt": "Djurgården",
+    "short_pt": "Djurgården",
+    "tla": null,
+    "country": "Suécia",
+    "kind": "club",
+    "competitions": [
+      "uefa.europa"
+    ],
+    "aliases": [
+      "Djurgarden",
+      "Djurgårdens IF"
+    ],
+    "crest_file": "djurgarden.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "dortmund",
+    "name_pt": "Borussia Dortmund",
+    "short_pt": "Dortmund",
+    "tla": "BVB",
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Borussia Dortmund",
+      "Dortmund",
+      "BVB"
+    ],
+    "crest_file": "dortmund.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "egito",
+    "name_pt": "Egito",
+    "short_pt": "Egito",
+    "tla": "EGY",
+    "country": "Egito",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Egypt"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Egypt.svg"
+  },
+  {
+    "slug": "empoli",
+    "name_pt": "Empoli",
+    "short_pt": "Empoli",
+    "tla": "EMP",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1"
+    ],
+    "aliases": [
+      "Empoli",
+      "Empoli FC"
+    ],
+    "crest_file": "empoli.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "equador",
+    "name_pt": "Equador",
+    "short_pt": "Equador",
+    "tla": "ECU",
+    "country": "Equador",
+    "kind": "national",
+    "competitions": [
+      "fifa.world",
+      "conmebol.america"
+    ],
+    "aliases": [
+      "Ecuador"
+    ],
+    "crest_file": "equador.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "escocia",
+    "name_pt": "Escócia",
+    "short_pt": "Escócia",
+    "tla": "SCO",
+    "country": "Escócia",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Scotland"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Scotland.svg"
+  },
+  {
+    "slug": "espanha",
+    "name_pt": "Espanha",
+    "short_pt": "Espanha",
+    "tla": "ESP",
+    "country": "Espanha",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Spain",
+      "España"
+    ],
+    "crest_file": "espanha.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "espanyol",
+    "name_pt": "Espanyol",
+    "short_pt": "Espanyol",
+    "tla": "ESP",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1"
+    ],
+    "aliases": [
+      "Espanyol",
+      "RCD Espanyol"
+    ],
+    "crest_file": "espanyol.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "esperance",
+    "name_pt": "Espérance",
+    "short_pt": "Espérance",
+    "tla": null,
+    "country": "Tunísia",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Esperance",
+      "Espérance de Tunis",
+      "ES Tunis"
+    ],
+    "crest_file": "esperance.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "estudiantes",
+    "name_pt": "Estudiantes",
+    "short_pt": "Estudiantes",
+    "tla": null,
+    "country": "Argentina",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Estudiantes",
+      "Estudiantes de La Plata"
+    ],
+    "crest_file": "estudiantes.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "eua",
+    "name_pt": "Estados Unidos",
+    "short_pt": "EUA",
+    "tla": "USA",
+    "country": "Estados Unidos",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "United States",
+      "USA",
+      "United States of America"
+    ],
+    "crest_file": "eua.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "everton",
+    "name_pt": "Everton",
+    "short_pt": "Everton",
+    "tla": "EVE",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1"
+    ],
+    "aliases": [
+      "Everton",
+      "Everton FC"
+    ],
+    "crest_file": "everton.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "ferroviaria",
+    "name_pt": "Ferroviária",
+    "short_pt": "Ferroviária",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.3",
+      "bra.camp.paulista",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Ferroviaria",
+      "Ferroviária",
+      "AFE"
+    ],
+    "crest_file": "ferroviaria.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "ferroviario",
+    "name_pt": "Ferroviário",
+    "short_pt": "Ferroviário",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.3",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Ferroviario",
+      "Ferroviário AC"
+    ],
+    "crest_file": "ferroviario.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "finlandia",
+    "name_pt": "Finlândia",
+    "short_pt": "Finlândia",
+    "tla": "FIN",
+    "country": "Finlândia",
+    "kind": "national",
+    "competitions": [],
+    "aliases": [
+      "Finland",
+      "Suomi"
+    ],
+    "crest_file": "finlandia.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "fiorentina",
+    "name_pt": "Fiorentina",
+    "short_pt": "Fiorentina",
+    "tla": "FIO",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1"
+    ],
+    "aliases": [
+      "Fiorentina",
+      "ACF Fiorentina"
+    ],
+    "crest_file": "fiorentina.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "flamengo",
+    "name_pt": "Flamengo",
+    "short_pt": "Flamengo",
+    "tla": "FLA",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.camp.carioca",
+      "bra.copa_do_brazil",
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Flamengo",
+      "CR Flamengo"
+    ],
+    "crest_file": "flamengo.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "fluminense",
+    "name_pt": "Fluminense",
+    "short_pt": "Fluminense",
+    "tla": "FLU",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.camp.carioca",
+      "bra.copa_do_brazil",
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Fluminense",
+      "Fluminense FC"
+    ],
+    "crest_file": "fluminense.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "forest",
+    "name_pt": "Nottingham Forest",
+    "short_pt": "Nottm Forest",
+    "tla": "NFO",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1",
+      "uefa.europa"
+    ],
+    "aliases": [
+      "Nottingham Forest",
+      "Nott'm Forest"
+    ],
+    "crest_file": "forest.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "fortaleza",
+    "name_pt": "Fortaleza",
+    "short_pt": "Fortaleza",
+    "tla": "FOR",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.copa_do_brazil",
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Fortaleza",
+      "Fortaleza EC"
+    ],
+    "crest_file": "fortaleza.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "franca",
+    "name_pt": "França",
+    "short_pt": "França",
+    "tla": "FRA",
+    "country": "França",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "France"
+    ],
+    "crest_file": "franca.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "frankfurt",
+    "name_pt": "Eintracht Frankfurt",
+    "short_pt": "Frankfurt",
+    "tla": "SGE",
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Eintracht Frankfurt",
+      "Frankfurt"
+    ],
+    "crest_file": "frankfurt.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "freiburg",
+    "name_pt": "Freiburg",
+    "short_pt": "Freiburg",
+    "tla": "SCF",
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1"
+    ],
+    "aliases": [
+      "SC Freiburg",
+      "Freiburg"
+    ],
+    "crest_file": "freiburg.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "fulham",
+    "name_pt": "Fulham",
+    "short_pt": "Fulham",
+    "tla": "FUL",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1"
+    ],
+    "aliases": [
+      "Fulham",
+      "Fulham FC"
+    ],
+    "crest_file": "fulham.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "gana",
+    "name_pt": "Gana",
+    "short_pt": "Gana",
+    "tla": "GHA",
+    "country": "Gana",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Ghana"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Ghana.svg"
+  },
+  {
+    "slug": "genoa",
+    "name_pt": "Genoa",
+    "short_pt": "Genoa",
+    "tla": "GEN",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1"
+    ],
+    "aliases": [
+      "Genoa",
+      "Genoa CFC"
+    ],
+    "crest_file": "genoa.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "getafe",
+    "name_pt": "Getafe",
+    "short_pt": "Getafe",
+    "tla": "GET",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1"
+    ],
+    "aliases": [
+      "Getafe",
+      "Getafe CF"
+    ],
+    "crest_file": "getafe.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "gibraltar",
+    "name_pt": "Gibraltar",
+    "short_pt": "Gibraltar",
+    "tla": "GIB",
+    "country": "Gibraltar",
+    "kind": "national",
+    "competitions": [],
+    "aliases": [
+      "Gibraltar"
+    ],
+    "crest_file": "gibraltar.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "girona",
+    "name_pt": "Girona",
+    "short_pt": "Girona",
+    "tla": "GIR",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1"
+    ],
+    "aliases": [
+      "Girona",
+      "Girona FC"
+    ],
+    "crest_file": "girona.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "godoycruz",
+    "name_pt": "Godoy Cruz",
+    "short_pt": "Godoy Cruz",
+    "tla": null,
+    "country": "Argentina",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Godoy Cruz"
+    ],
+    "crest_file": "godoycruz.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "goias",
+    "name_pt": "Goiás",
+    "short_pt": "Goiás",
+    "tla": "GOI",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.2",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Goias",
+      "Goiás EC"
+    ],
+    "crest_file": "goias.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "gremio",
+    "name_pt": "Grêmio",
+    "short_pt": "Grêmio",
+    "tla": "GRE",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.camp.gaucho",
+      "bra.copa_do_brazil",
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Gremio",
+      "Grêmio FBPA",
+      "Gremio Porto Alegre"
+    ],
+    "crest_file": "gremio.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "haiti",
+    "name_pt": "Haiti",
+    "short_pt": "Haiti",
+    "tla": "HAI",
+    "country": "Haiti",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Haiti"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Haiti.svg"
+  },
+  {
+    "slug": "heidenheim",
+    "name_pt": "Heidenheim",
+    "short_pt": "Heidenheim",
+    "tla": null,
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1"
+    ],
+    "aliases": [
+      "1. FC Heidenheim",
+      "Heidenheim"
+    ],
+    "crest_file": "heidenheim.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "hoffenheim",
+    "name_pt": "Hoffenheim",
+    "short_pt": "Hoffenheim",
+    "tla": "TSG",
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1"
+    ],
+    "aliases": [
+      "TSG Hoffenheim",
+      "Hoffenheim"
+    ],
+    "crest_file": "hoffenheim.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "holanda",
+    "name_pt": "Holanda",
+    "short_pt": "Holanda",
+    "tla": "NED",
+    "country": "Holanda",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Netherlands",
+      "Holland"
+    ],
+    "crest_file": "holanda.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "huracan",
+    "name_pt": "Huracán",
+    "short_pt": "Huracán",
+    "tla": null,
+    "country": "Argentina",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Huracan",
+      "CA Huracán"
+    ],
+    "crest_file": "huracan.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "inddelvalle",
+    "name_pt": "Independiente del Valle",
+    "short_pt": "Ind. del Valle",
+    "tla": null,
+    "country": "Equador",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores",
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Independiente del Valle"
+    ],
+    "crest_file": "inddelvalle.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "inglaterra",
+    "name_pt": "Inglaterra",
+    "short_pt": "Inglaterra",
+    "tla": "ENG",
+    "country": "Inglaterra",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "England"
+    ],
+    "crest_file": "inglaterra.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "inter",
+    "name_pt": "Inter de Milão",
+    "short_pt": "Inter",
+    "tla": "INT",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Inter Milan",
+      "Internazionale",
+      "Inter"
+    ],
+    "crest_file": "inter.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "intermiami",
+    "name_pt": "Inter Miami",
+    "short_pt": "Inter Miami",
+    "tla": null,
+    "country": "Estados Unidos",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Inter Miami",
+      "Inter Miami CF"
+    ],
+    "crest_file": "intermiami.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "internacional",
+    "name_pt": "Internacional",
+    "short_pt": "Internacional",
+    "tla": "INT",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.camp.gaucho",
+      "bra.copa_do_brazil",
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Internacional",
+      "SC Internacional",
+      "Inter Porto Alegre"
+    ],
+    "crest_file": "internacional.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "ipswich",
+    "name_pt": "Ipswich Town",
+    "short_pt": "Ipswich",
+    "tla": "IPS",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1"
+    ],
+    "aliases": [
+      "Ipswich Town",
+      "Ipswich"
+    ],
+    "crest_file": "ipswich.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "iquique",
+    "name_pt": "Deportes Iquique",
+    "short_pt": "Iquique",
+    "tla": null,
+    "country": "Chile",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Deportes Iquique"
+    ],
+    "crest_file": "iquique.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "ira",
+    "name_pt": "Irã",
+    "short_pt": "Irã",
+    "tla": "IRN",
+    "country": "Irã",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Iran",
+      "IR Iran"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Iran.svg"
+  },
+  {
+    "slug": "iraque",
+    "name_pt": "Iraque",
+    "short_pt": "Iraque",
+    "tla": "IRQ",
+    "country": "Iraque",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Iraq"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Iraq.svg"
+  },
+  {
+    "slug": "irlandadonorte",
+    "name_pt": "Irlanda do Norte",
+    "short_pt": "Irl. Norte",
+    "tla": "NIR",
+    "country": "Irlanda do Norte",
+    "kind": "national",
+    "competitions": [],
+    "aliases": [
+      "Northern Ireland"
+    ],
+    "crest_file": "irlandadonorte.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "italia",
+    "name_pt": "Itália",
+    "short_pt": "Itália",
+    "tla": "ITA",
+    "country": "Itália",
+    "kind": "national",
+    "competitions": [],
+    "aliases": [
+      "Italy",
+      "Italia"
+    ],
+    "crest_file": "italia.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "japao",
+    "name_pt": "Japão",
+    "short_pt": "Japão",
+    "tla": "JPN",
+    "country": "Japão",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Japan"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Japan.svg"
+  },
+  {
+    "slug": "jordania",
+    "name_pt": "Jordânia",
+    "short_pt": "Jordânia",
+    "tla": "JOR",
+    "country": "Jordânia",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Jordan"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Jordan.svg"
+  },
+  {
+    "slug": "juazeirense",
+    "name_pt": "Juazeirense",
+    "short_pt": "Juazeirense",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Juazeirense"
+    ],
+    "crest_file": "juazeirense.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "juventude",
+    "name_pt": "Juventude",
+    "short_pt": "Juventude",
+    "tla": "JUV",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.camp.gaucho",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Juventude",
+      "EC Juventude"
+    ],
+    "crest_file": "juventude.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "juventus",
+    "name_pt": "Juventus",
+    "short_pt": "Juventus",
+    "tla": "JUV",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Juventus",
+      "Juventus FC",
+      "Juve"
+    ],
+    "crest_file": "juventus.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "kawasaki",
+    "name_pt": "Kawasaki Frontale",
+    "short_pt": "Kawasaki",
+    "tla": null,
+    "country": "Japão",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Kawasaki Frontale"
+    ],
+    "crest_file": "kawasaki.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "kiel",
+    "name_pt": "Holstein Kiel",
+    "short_pt": "Kiel",
+    "tla": null,
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1"
+    ],
+    "aliases": [
+      "Holstein Kiel",
+      "Kiel"
+    ],
+    "crest_file": "kiel.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "lafc",
+    "name_pt": "Los Angeles FC",
+    "short_pt": "LAFC",
+    "tla": null,
+    "country": "Estados Unidos",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Los Angeles FC",
+      "LAFC"
+    ],
+    "crest_file": "lafc.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "lanus",
+    "name_pt": "Lanús",
+    "short_pt": "Lanús",
+    "tla": null,
+    "country": "Argentina",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Lanus",
+      "CA Lanús"
+    ],
+    "crest_file": "lanus.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "laspalmas",
+    "name_pt": "Las Palmas",
+    "short_pt": "Las Palmas",
+    "tla": "LPA",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1"
+    ],
+    "aliases": [
+      "Las Palmas",
+      "UD Las Palmas"
+    ],
+    "crest_file": "laspalmas.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "lazio",
+    "name_pt": "Lazio",
+    "short_pt": "Lazio",
+    "tla": "LAZ",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1"
+    ],
+    "aliases": [
+      "Lazio",
+      "SS Lazio"
+    ],
+    "crest_file": "lazio.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "ldu",
+    "name_pt": "LDU Quito",
+    "short_pt": "LDU",
+    "tla": null,
+    "country": "Equador",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "LDU Quito",
+      "Liga de Quito",
+      "Liga Deportiva Universitaria"
+    ],
+    "crest_file": "ldu.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "lecce",
+    "name_pt": "Lecce",
+    "short_pt": "Lecce",
+    "tla": "LEC",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1"
+    ],
+    "aliases": [
+      "Lecce",
+      "US Lecce"
+    ],
+    "crest_file": "lecce.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "leganes",
+    "name_pt": "Leganés",
+    "short_pt": "Leganés",
+    "tla": "LEG",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1"
+    ],
+    "aliases": [
+      "Leganes",
+      "CD Leganés"
+    ],
+    "crest_file": "leganes.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "leicester",
+    "name_pt": "Leicester City",
+    "short_pt": "Leicester",
+    "tla": "LEI",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1"
+    ],
+    "aliases": [
+      "Leicester City",
+      "Leicester"
+    ],
+    "crest_file": "leicester.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "levante",
+    "name_pt": "Levante",
+    "short_pt": "Levante",
+    "tla": "LEV",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1"
+    ],
+    "aliases": [
+      "Levante",
+      "Levante UD"
+    ],
+    "crest_file": "levante.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "leverkusen",
+    "name_pt": "Bayer Leverkusen",
+    "short_pt": "Leverkusen",
+    "tla": "B04",
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Bayer Leverkusen",
+      "Leverkusen"
+    ],
+    "crest_file": "leverkusen.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "libertad",
+    "name_pt": "Libertad",
+    "short_pt": "Libertad",
+    "tla": null,
+    "country": "Paraguai",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Libertad",
+      "Club Libertad"
+    ],
+    "crest_file": "libertad.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "lituania",
+    "name_pt": "Lituânia",
+    "short_pt": "Lituânia",
+    "tla": "LTU",
+    "country": "Lituânia",
+    "kind": "national",
+    "competitions": [],
+    "aliases": [
+      "Lithuania"
+    ],
+    "crest_file": "lituania.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "liverpool",
+    "name_pt": "Liverpool",
+    "short_pt": "Liverpool",
+    "tla": "LIV",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Liverpool",
+      "Liverpool FC"
+    ],
+    "crest_file": "liverpool.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "luqueno",
+    "name_pt": "Sportivo Luqueño",
+    "short_pt": "Luqueño",
+    "tla": null,
+    "country": "Paraguai",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Sportivo Luqueno",
+      "Luqueño"
+    ],
+    "crest_file": "luqueno.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "macedonia",
+    "name_pt": "Macedônia do Norte",
+    "short_pt": "Macedônia",
+    "tla": "MKD",
+    "country": "Macedônia do Norte",
+    "kind": "national",
+    "competitions": [],
+    "aliases": [
+      "North Macedonia",
+      "Macedonia"
+    ],
+    "crest_file": "macedonia.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "mainz",
+    "name_pt": "Mainz 05",
+    "short_pt": "Mainz",
+    "tla": "M05",
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1"
+    ],
+    "aliases": [
+      "Mainz 05",
+      "Mainz"
+    ],
+    "crest_file": "mainz.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "mallorca",
+    "name_pt": "Mallorca",
+    "short_pt": "Mallorca",
+    "tla": "MLL",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1"
+    ],
+    "aliases": [
+      "Mallorca",
+      "RCD Mallorca"
+    ],
+    "crest_file": "mallorca.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "malta",
+    "name_pt": "Malta",
+    "short_pt": "Malta",
+    "tla": "MLT",
+    "country": "Malta",
+    "kind": "national",
+    "competitions": [],
+    "aliases": [
+      "Malta"
+    ],
+    "crest_file": "malta.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "mamelodi",
+    "name_pt": "Mamelodi Sundowns",
+    "short_pt": "Sundowns",
+    "tla": null,
+    "country": "África do Sul",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Mamelodi Sundowns",
+      "Sundowns"
+    ],
+    "crest_file": "mamelodi.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "mancity",
+    "name_pt": "Manchester City",
+    "short_pt": "Man City",
+    "tla": "MCI",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Manchester City",
+      "Man City"
+    ],
+    "crest_file": "mancity.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "manunited",
+    "name_pt": "Manchester United",
+    "short_pt": "Man United",
+    "tla": "MUN",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1",
+      "uefa.europa"
+    ],
+    "aliases": [
+      "Manchester United",
+      "Man Utd",
+      "Man United"
+    ],
+    "crest_file": "manunited.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "maracana",
+    "name_pt": "Maracanã-CE",
+    "short_pt": "Maracanã",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Maracana",
+      "Maracanã EC"
+    ],
+    "crest_file": "maracana.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "maringa",
+    "name_pt": "Maringá",
+    "short_pt": "Maringá",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.3",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Maringa",
+      "Maringá FC"
+    ],
+    "crest_file": "maringa.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "marrocos",
+    "name_pt": "Marrocos",
+    "short_pt": "Marrocos",
+    "tla": "MAR",
+    "country": "Marrocos",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Morocco"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Morocco.svg"
+  },
+  {
+    "slug": "melgar",
+    "name_pt": "Melgar",
+    "short_pt": "Melgar",
+    "tla": null,
+    "country": "Peru",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Melgar",
+      "FBC Melgar"
+    ],
+    "crest_file": "melgar.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "mexico",
+    "name_pt": "México",
+    "short_pt": "México",
+    "tla": "MEX",
+    "country": "México",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Mexico"
+    ],
+    "crest_file": "mexico.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "mgladbach",
+    "name_pt": "Borussia M'gladbach",
+    "short_pt": "M'gladbach",
+    "tla": "BMG",
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1"
+    ],
+    "aliases": [
+      "Borussia Monchengladbach",
+      "Gladbach",
+      "M'gladbach"
+    ],
+    "crest_file": "mgladbach.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "milan",
+    "name_pt": "Milan",
+    "short_pt": "Milan",
+    "tla": "MIL",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1"
+    ],
+    "aliases": [
+      "AC Milan",
+      "Milan"
+    ],
+    "crest_file": "milan.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "mirassol",
+    "name_pt": "Mirassol",
+    "short_pt": "Mirassol",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.camp.paulista",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Mirassol",
+      "Mirassol FC"
+    ],
+    "crest_file": "mirassol.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "moldavia",
+    "name_pt": "Moldávia",
+    "short_pt": "Moldávia",
+    "tla": "MDA",
+    "country": "Moldávia",
+    "kind": "national",
+    "competitions": [],
+    "aliases": [
+      "Moldova"
+    ],
+    "crest_file": "moldavia.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "monterrey",
+    "name_pt": "Monterrey",
+    "short_pt": "Monterrey",
+    "tla": null,
+    "country": "México",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "CF Monterrey",
+      "Rayados",
+      "Monterrey"
+    ],
+    "crest_file": "monterrey.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "monza",
+    "name_pt": "Monza",
+    "short_pt": "Monza",
+    "tla": "MON",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1"
+    ],
+    "aliases": [
+      "Monza",
+      "AC Monza"
+    ],
+    "crest_file": "monza.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "mushucruna",
+    "name_pt": "Mushuc Runa",
+    "short_pt": "Mushuc Runa",
+    "tla": null,
+    "country": "Equador",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Mushuc Runa"
+    ],
+    "crest_file": "mushucruna.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "nacional",
+    "name_pt": "Nacional",
+    "short_pt": "Nacional",
+    "tla": null,
+    "country": "Uruguai",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Nacional",
+      "Club Nacional de Football",
+      "Nacional (URU)"
+    ],
+    "crest_file": "nacional.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "napoli",
+    "name_pt": "Napoli",
+    "short_pt": "Napoli",
+    "tla": "NAP",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Napoli",
+      "SSC Napoli"
+    ],
+    "crest_file": "napoli.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "nautico",
+    "name_pt": "Náutico",
+    "short_pt": "Náutico",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.3",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Nautico",
+      "Náutico Capibaribe"
+    ],
+    "crest_file": "nautico.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "newcastle",
+    "name_pt": "Newcastle",
+    "short_pt": "Newcastle",
+    "tla": "NEW",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Newcastle United",
+      "Newcastle"
+    ],
+    "crest_file": "newcastle.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "nice",
+    "name_pt": "Nice",
+    "short_pt": "Nice",
+    "tla": "NIC",
+    "country": "França",
+    "kind": "club",
+    "competitions": [
+      "fra.1",
+      "uefa.europa"
+    ],
+    "aliases": [
+      "OGC Nice",
+      "Nice"
+    ],
+    "crest_file": "nice.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "noruega",
+    "name_pt": "Noruega",
+    "short_pt": "Noruega",
+    "tla": "NOR",
+    "country": "Noruega",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Norway",
+      "Norge"
+    ],
+    "crest_file": "noruega.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "novazelandia",
+    "name_pt": "Nova Zelândia",
+    "short_pt": "N. Zelândia",
+    "tla": "NZL",
+    "country": "Nova Zelândia",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "New Zealand"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20New%20Zealand.svg"
+  },
+  {
+    "slug": "novorizontino",
+    "name_pt": "Novorizontino",
+    "short_pt": "Novorizontino",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.2",
+      "bra.camp.paulista",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Novorizontino",
+      "Grêmio Novorizontino"
+    ],
+    "crest_file": "novorizontino.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "olimpia",
+    "name_pt": "Olimpia",
+    "short_pt": "Olimpia",
+    "tla": null,
+    "country": "Paraguai",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Olimpia",
+      "Club Olimpia"
+    ],
+    "crest_file": "olimpia.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "olympiacos",
+    "name_pt": "Olympiacos",
+    "short_pt": "Olympiacos",
+    "tla": null,
+    "country": "Grécia",
+    "kind": "club",
+    "competitions": [
+      "uefa.champions",
+      "uefa.europa"
+    ],
+    "aliases": [
+      "Olympiacos",
+      "Olympiacos FC",
+      "Olympiakos"
+    ],
+    "crest_file": "olympiacos.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "oncecaldas",
+    "name_pt": "Once Caldas",
+    "short_pt": "Once Caldas",
+    "tla": null,
+    "country": "Colômbia",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Once Caldas"
+    ],
+    "crest_file": "oncecaldas.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "operario",
+    "name_pt": "Operário-PR",
+    "short_pt": "Operário",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.2",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Operario",
+      "Operário Ferroviário"
+    ],
+    "crest_file": "operario.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "osasuna",
+    "name_pt": "Osasuna",
+    "short_pt": "Osasuna",
+    "tla": "OSA",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1"
+    ],
+    "aliases": [
+      "Osasuna",
+      "CA Osasuna"
+    ],
+    "crest_file": "osasuna.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "pachuca",
+    "name_pt": "Pachuca",
+    "short_pt": "Pachuca",
+    "tla": null,
+    "country": "México",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "CF Pachuca",
+      "Pachuca"
+    ],
+    "crest_file": "pachuca.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "paisdegales",
+    "name_pt": "País de Gales",
+    "short_pt": "Gales",
+    "tla": "WAL",
+    "country": "País de Gales",
+    "kind": "national",
+    "competitions": [],
+    "aliases": [
+      "Wales"
+    ],
+    "crest_file": "paisdegales.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "palestino",
+    "name_pt": "Palestino",
+    "short_pt": "Palestino",
+    "tla": null,
+    "country": "Chile",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Palestino",
+      "CD Palestino"
+    ],
+    "crest_file": "palestino.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "palmeiras",
+    "name_pt": "Palmeiras",
+    "short_pt": "Palmeiras",
+    "tla": "PAL",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.camp.paulista",
+      "bra.copa_do_brazil",
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Palmeiras",
+      "SE Palmeiras"
+    ],
+    "crest_file": "palmeiras.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "panama",
+    "name_pt": "Panamá",
+    "short_pt": "Panamá",
+    "tla": "PAN",
+    "country": "Panamá",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Panama"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Panama.svg"
+  },
+  {
+    "slug": "paraguai",
+    "name_pt": "Paraguai",
+    "short_pt": "Paraguai",
+    "tla": "PAR",
+    "country": "Paraguai",
+    "kind": "national",
+    "competitions": [
+      "fifa.world",
+      "conmebol.america"
+    ],
+    "aliases": [
+      "Paraguay"
+    ],
+    "crest_file": "paraguai.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "parma",
+    "name_pt": "Parma",
+    "short_pt": "Parma",
+    "tla": "PAR",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1"
+    ],
+    "aliases": [
+      "Parma",
+      "Parma Calcio"
+    ],
+    "crest_file": "parma.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "paysandu",
+    "name_pt": "Paysandu",
+    "short_pt": "Paysandu",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.2",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Paysandu",
+      "Paysandu SC"
+    ],
+    "crest_file": "paysandu.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "penarol",
+    "name_pt": "Peñarol",
+    "short_pt": "Peñarol",
+    "tla": null,
+    "country": "Uruguai",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Penarol",
+      "CA Peñarol"
+    ],
+    "crest_file": "penarol.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "peru",
+    "name_pt": "Peru",
+    "short_pt": "Peru",
+    "tla": "PER",
+    "country": "Peru",
+    "kind": "national",
+    "competitions": [
+      "conmebol.america"
+    ],
+    "aliases": [
+      "Peru"
+    ],
+    "crest_file": "peru.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "polonia",
+    "name_pt": "Polônia",
+    "short_pt": "Polônia",
+    "tla": "POL",
+    "country": "Polônia",
+    "kind": "national",
+    "competitions": [],
+    "aliases": [
+      "Poland",
+      "Polska"
+    ],
+    "crest_file": "polonia.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "porto",
+    "name_pt": "Porto",
+    "short_pt": "Porto",
+    "tla": "FCP",
+    "country": "Portugal",
+    "kind": "club",
+    "competitions": [
+      "uefa.champions",
+      "uefa.europa"
+    ],
+    "aliases": [
+      "FC Porto",
+      "Porto"
+    ],
+    "crest_file": "porto.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "portugal",
+    "name_pt": "Portugal",
+    "short_pt": "Portugal",
+    "tla": "POR",
+    "country": "Portugal",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Portugal"
+    ],
+    "crest_file": "portugal.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "psg",
+    "name_pt": "Paris Saint-Germain",
+    "short_pt": "PSG",
+    "tla": "PSG",
+    "country": "França",
+    "kind": "club",
+    "competitions": [
+      "fra.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Paris Saint-Germain",
+      "PSG",
+      "Paris SG"
+    ],
+    "crest_file": "psg.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "puertocabello",
+    "name_pt": "Puerto Cabello",
+    "short_pt": "Puerto Cabello",
+    "tla": null,
+    "country": "Venezuela",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Academia Puerto Cabello",
+      "Puerto Cabello"
+    ],
+    "crest_file": "puertocabello.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "pyramids",
+    "name_pt": "Pyramids",
+    "short_pt": "Pyramids",
+    "tla": null,
+    "country": "Egito",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Pyramids FC"
+    ],
+    "crest_file": "pyramids.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "racing",
+    "name_pt": "Racing",
+    "short_pt": "Racing",
+    "tla": null,
+    "country": "Argentina",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Racing Club",
+      "Racing Avellaneda"
+    ],
+    "crest_file": "racing.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "racinguru",
+    "name_pt": "Racing (URU)",
+    "short_pt": "Racing Montevideo",
+    "tla": null,
+    "country": "Uruguai",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Racing Montevideo",
+      "Racing Club de Montevideo"
+    ],
+    "crest_file": "racinguru.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "rayovallecano",
+    "name_pt": "Rayo Vallecano",
+    "short_pt": "Rayo",
+    "tla": "RAY",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1"
+    ],
+    "aliases": [
+      "Rayo Vallecano"
+    ],
+    "crest_file": "rayovallecano.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "rbbragantino",
+    "name_pt": "Red Bull Bragantino",
+    "short_pt": "Bragantino",
+    "tla": "RBB",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.camp.paulista",
+      "bra.copa_do_brazil",
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Red Bull Bragantino",
+      "RB Bragantino",
+      "Bragantino"
+    ],
+    "crest_file": "rbbragantino.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "rbleipzig",
+    "name_pt": "RB Leipzig",
+    "short_pt": "RB Leipzig",
+    "tla": "RBL",
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "RB Leipzig",
+      "Leipzig"
+    ],
+    "crest_file": "rbleipzig.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "rbsalzburg",
+    "name_pt": "RB Salzburg",
+    "short_pt": "Salzburg",
+    "tla": null,
+    "country": "Áustria",
+    "kind": "club",
+    "competitions": [
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Red Bull Salzburg",
+      "RB Salzburg",
+      "Salzburg"
+    ],
+    "crest_file": "rbsalzburg.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "realbetis",
+    "name_pt": "Real Betis",
+    "short_pt": "Betis",
+    "tla": "BET",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1",
+      "uefa.europa"
+    ],
+    "aliases": [
+      "Real Betis",
+      "Betis"
+    ],
+    "crest_file": "realbetis.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "realmadrid",
+    "name_pt": "Real Madrid",
+    "short_pt": "Real Madrid",
+    "tla": "RMA",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Real Madrid",
+      "Real Madrid CF"
+    ],
+    "crest_file": "realmadrid.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "realoviedo",
+    "name_pt": "Real Oviedo",
+    "short_pt": "Oviedo",
+    "tla": null,
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1"
+    ],
+    "aliases": [
+      "Real Oviedo",
+      "Oviedo"
+    ],
+    "crest_file": "realoviedo.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "realsociedad",
+    "name_pt": "Real Sociedad",
+    "short_pt": "Real Sociedad",
+    "tla": "RSO",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1",
+      "uefa.europa"
+    ],
+    "aliases": [
+      "Real Sociedad",
+      "La Real"
+    ],
+    "crest_file": "realsociedad.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "remo",
+    "name_pt": "Remo",
+    "short_pt": "Remo",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.2",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Remo",
+      "Clube do Remo"
+    ],
+    "crest_file": "remo.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "retro",
+    "name_pt": "Retrô",
+    "short_pt": "Retrô",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.3",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Retro",
+      "Retrô FC"
+    ],
+    "crest_file": "retro.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "riverplate",
+    "name_pt": "River Plate",
+    "short_pt": "River",
+    "tla": "RIV",
+    "country": "Argentina",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "River Plate",
+      "CA River Plate"
+    ],
+    "crest_file": "riverplate.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "roma",
+    "name_pt": "Roma",
+    "short_pt": "Roma",
+    "tla": "ROM",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1",
+      "uefa.europa"
+    ],
+    "aliases": [
+      "AS Roma",
+      "Roma"
+    ],
+    "crest_file": "roma.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "sampaio",
+    "name_pt": "Sampaio Corrêa",
+    "short_pt": "Sampaio Corrêa",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.3",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Sampaio Correa",
+      "Sampaio Corrêa FC"
+    ],
+    "crest_file": "sampaio.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "sanjose",
+    "name_pt": "San José",
+    "short_pt": "San José",
+    "tla": null,
+    "country": "Bolívia",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "San Jose",
+      "Club San José",
+      "San José (BOL)"
+    ],
+    "crest_file": "sanjose.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "santafe",
+    "name_pt": "Independiente Santa Fe",
+    "short_pt": "Santa Fe",
+    "tla": null,
+    "country": "Colômbia",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores",
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Santa Fe",
+      "Independiente Santa Fe"
+    ],
+    "crest_file": "santafe.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "santos",
+    "name_pt": "Santos",
+    "short_pt": "Santos",
+    "tla": "SAN",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.camp.paulista",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Santos",
+      "Santos FC"
+    ],
+    "crest_file": "santos.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "saojosers",
+    "name_pt": "São José-RS",
+    "short_pt": "São José-RS",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.camp.gaucho",
+      "bra.3"
+    ],
+    "aliases": [
+      "Sao Jose-RS",
+      "São José EC"
+    ],
+    "crest_file": "saojosers.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "saopaulo",
+    "name_pt": "São Paulo",
+    "short_pt": "São Paulo",
+    "tla": "SAO",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.camp.paulista",
+      "bra.copa_do_brazil",
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Sao Paulo",
+      "São Paulo FC"
+    ],
+    "crest_file": "saopaulo.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "seattlesounders",
+    "name_pt": "Seattle Sounders",
+    "short_pt": "Seattle",
+    "tla": null,
+    "country": "Estados Unidos",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Seattle Sounders",
+      "Seattle Sounders FC"
+    ],
+    "crest_file": "seattlesounders.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "senegal",
+    "name_pt": "Senegal",
+    "short_pt": "Senegal",
+    "tla": "SEN",
+    "country": "Senegal",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Senegal"
+    ],
+    "crest_file": "senegal.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "servia",
+    "name_pt": "Sérvia",
+    "short_pt": "Sérvia",
+    "tla": "SRB",
+    "country": "Sérvia",
+    "kind": "national",
+    "competitions": [],
+    "aliases": [
+      "Serbia",
+      "Srbija"
+    ],
+    "crest_file": "servia.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "sevilla",
+    "name_pt": "Sevilla",
+    "short_pt": "Sevilla",
+    "tla": "SEV",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1"
+    ],
+    "aliases": [
+      "Sevilla",
+      "Sevilla FC"
+    ],
+    "crest_file": "sevilla.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "sheffieldunited",
+    "name_pt": "Sheffield United",
+    "short_pt": "Sheffield Utd",
+    "tla": "SHU",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1"
+    ],
+    "aliases": [
+      "Sheffield United",
+      "Sheffield Utd"
+    ],
+    "crest_file": "sheffieldunited.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "southampton",
+    "name_pt": "Southampton",
+    "short_pt": "Southampton",
+    "tla": "SOU",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1"
+    ],
+    "aliases": [
+      "Southampton",
+      "Southampton FC"
+    ],
+    "crest_file": "southampton.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "sport",
+    "name_pt": "Sport",
+    "short_pt": "Sport",
+    "tla": "SPT",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Sport Recife",
+      "Sport Club do Recife"
+    ],
+    "crest_file": "sport.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "sporting",
+    "name_pt": "Sporting",
+    "short_pt": "Sporting",
+    "tla": "SCP",
+    "country": "Portugal",
+    "kind": "club",
+    "competitions": [
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Sporting CP",
+      "Sporting Lisbon",
+      "Sporting"
+    ],
+    "crest_file": "sporting.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "sptcristal",
+    "name_pt": "Sporting Cristal",
+    "short_pt": "Sporting Cristal",
+    "tla": null,
+    "country": "Peru",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores",
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Sporting Cristal"
+    ],
+    "crest_file": "sptcristal.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "stadedereims",
+    "name_pt": "Reims",
+    "short_pt": "Reims",
+    "tla": "REI",
+    "country": "França",
+    "kind": "club",
+    "competitions": [
+      "fra.1"
+    ],
+    "aliases": [
+      "Stade de Reims",
+      "Reims"
+    ],
+    "crest_file": "stadedereims.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "stpauli",
+    "name_pt": "St. Pauli",
+    "short_pt": "St. Pauli",
+    "tla": null,
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1"
+    ],
+    "aliases": [
+      "FC St. Pauli",
+      "St Pauli"
+    ],
+    "crest_file": "stpauli.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "stuttgart",
+    "name_pt": "Stuttgart",
+    "short_pt": "Stuttgart",
+    "tla": "VFB",
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "VfB Stuttgart",
+      "Stuttgart"
+    ],
+    "crest_file": "stuttgart.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "suecia",
+    "name_pt": "Suécia",
+    "short_pt": "Suécia",
+    "tla": "SWE",
+    "country": "Suécia",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Sweden",
+      "Sverige"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Sweden.svg"
+  },
+  {
+    "slug": "suica",
+    "name_pt": "Suíça",
+    "short_pt": "Suíça",
+    "tla": "SUI",
+    "country": "Suíça",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Switzerland",
+      "Schweiz"
+    ],
+    "crest_file": "suica.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "sunderland",
+    "name_pt": "Sunderland",
+    "short_pt": "Sunderland",
+    "tla": "SUN",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1"
+    ],
+    "aliases": [
+      "Sunderland",
+      "Sunderland AFC"
+    ],
+    "crest_file": "sunderland.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "talleres",
+    "name_pt": "Talleres",
+    "short_pt": "Talleres",
+    "tla": null,
+    "country": "Argentina",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Talleres",
+      "Talleres de Córdoba"
+    ],
+    "crest_file": "talleres.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "tchequia",
+    "name_pt": "Tchéquia",
+    "short_pt": "Tchéquia",
+    "tla": "CZE",
+    "country": "Tchéquia",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Czechia",
+      "Czech Republic"
+    ],
+    "crest_file": "tchequia.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "torino",
+    "name_pt": "Torino",
+    "short_pt": "Torino",
+    "tla": "TOR",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1"
+    ],
+    "aliases": [
+      "Torino",
+      "Torino FC"
+    ],
+    "crest_file": "torino.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "tottenham",
+    "name_pt": "Tottenham",
+    "short_pt": "Tottenham",
+    "tla": "TOT",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Tottenham Hotspur",
+      "Tottenham",
+      "Spurs"
+    ],
+    "crest_file": "tottenham.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "tunisia",
+    "name_pt": "Tunísia",
+    "short_pt": "Tunísia",
+    "tla": "TUN",
+    "country": "Tunísia",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Tunisia"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Tunisia.svg"
+  },
+  {
+    "slug": "turquia",
+    "name_pt": "Turquia",
+    "short_pt": "Turquia",
+    "tla": "TUR",
+    "country": "Turquia",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Turkey",
+      "Türkiye",
+      "Turkiye"
+    ],
+    "crest_file": "turquia.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "udinese",
+    "name_pt": "Udinese",
+    "short_pt": "Udinese",
+    "tla": "UDI",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1"
+    ],
+    "aliases": [
+      "Udinese",
+      "Udinese Calcio"
+    ],
+    "crest_file": "udinese.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "ulsan",
+    "name_pt": "Ulsan HD",
+    "short_pt": "Ulsan",
+    "tla": null,
+    "country": "Coreia do Sul",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Ulsan HD",
+      "Ulsan Hyundai"
+    ],
+    "crest_file": "ulsan.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "union",
+    "name_pt": "Unión Santa Fe",
+    "short_pt": "Unión",
+    "tla": null,
+    "country": "Argentina",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Union Santa Fe",
+      "Unión de Santa Fe",
+      "CA Unión"
+    ],
+    "crest_file": "union.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "unionberlin",
+    "name_pt": "Union Berlin",
+    "short_pt": "Union Berlin",
+    "tla": "FCU",
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1"
+    ],
+    "aliases": [
+      "Union Berlin",
+      "1. FC Union Berlin"
+    ],
+    "crest_file": "unionberlin.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "unionespanola",
+    "name_pt": "Unión Española",
+    "short_pt": "Unión Española",
+    "tla": null,
+    "country": "Chile",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Union Espanola",
+      "Unión Española"
+    ],
+    "crest_file": "unionespanola.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "univcatolicaeqd",
+    "name_pt": "Universidad Católica (EQU)",
+    "short_pt": "U. Católica",
+    "tla": null,
+    "country": "Equador",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Universidad Catolica",
+      "U. Católica (ECU)"
+    ],
+    "crest_file": "univcatolicaeqd.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "univdechile",
+    "name_pt": "Universidad de Chile",
+    "short_pt": "U. de Chile",
+    "tla": null,
+    "country": "Chile",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores",
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Universidad de Chile",
+      "U de Chile",
+      "Universidad de Chile (CHI)"
+    ],
+    "crest_file": "univdechile.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "universitario",
+    "name_pt": "Universitario",
+    "short_pt": "Universitario",
+    "tla": null,
+    "country": "Peru",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Universitario",
+      "Universitario de Deportes"
+    ],
+    "crest_file": "universitario.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "urawareds",
+    "name_pt": "Urawa Red Diamonds",
+    "short_pt": "Urawa Reds",
+    "tla": null,
+    "country": "Japão",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Urawa Red Diamonds",
+      "Urawa Reds"
+    ],
+    "crest_file": "urawareds.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "uruguai",
+    "name_pt": "Uruguai",
+    "short_pt": "Uruguai",
+    "tla": "URU",
+    "country": "Uruguai",
+    "kind": "national",
+    "competitions": [
+      "fifa.world",
+      "conmebol.america"
+    ],
+    "aliases": [
+      "Uruguay"
+    ],
+    "crest_file": "uruguai.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "uzbequistao",
+    "name_pt": "Uzbequistão",
+    "short_pt": "Uzbequistão",
+    "tla": "UZB",
+    "country": "Uzbequistão",
+    "kind": "national",
+    "competitions": [
+      "fifa.world"
+    ],
+    "aliases": [
+      "Uzbekistan"
+    ],
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Uzbekistan.svg"
+  },
+  {
+    "slug": "valencia",
+    "name_pt": "Valencia",
+    "short_pt": "Valencia",
+    "tla": "VAL",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1"
+    ],
+    "aliases": [
+      "Valencia",
+      "Valencia CF"
+    ],
+    "crest_file": "valencia.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "valladolid",
+    "name_pt": "Valladolid",
+    "short_pt": "Valladolid",
+    "tla": "VLL",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1"
+    ],
+    "aliases": [
+      "Real Valladolid",
+      "Valladolid"
+    ],
+    "crest_file": "valladolid.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "vancouver",
+    "name_pt": "Vancouver Whitecaps",
+    "short_pt": "Vancouver",
+    "tla": null,
+    "country": "Canadá",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Vancouver Whitecaps",
+      "Whitecaps"
+    ],
+    "crest_file": "vancouver.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "vasco",
+    "name_pt": "Vasco da Gama",
+    "short_pt": "Vasco",
+    "tla": "VAS",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.camp.carioca",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Vasco da Gama",
+      "Vasco",
+      "CR Vasco da Gama"
+    ],
+    "crest_file": "vasco.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "velezsarsfield",
+    "name_pt": "Vélez Sarsfield",
+    "short_pt": "Vélez",
+    "tla": null,
+    "country": "Argentina",
+    "kind": "club",
+    "competitions": [
+      "conmebol.libertadores"
+    ],
+    "aliases": [
+      "Velez Sarsfield",
+      "Vélez"
+    ],
+    "crest_file": "velezsarsfield.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "venezia",
+    "name_pt": "Venezia",
+    "short_pt": "Venezia",
+    "tla": "VEN",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1"
+    ],
+    "aliases": [
+      "Venezia",
+      "Venezia FC"
+    ],
+    "crest_file": "venezia.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "venezuela",
+    "name_pt": "Venezuela",
+    "short_pt": "Venezuela",
+    "tla": "VEN",
+    "country": "Venezuela",
+    "kind": "national",
+    "competitions": [
+      "conmebol.america"
+    ],
+    "aliases": [
+      "Venezuela"
+    ],
+    "crest_file": "venezuela.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "verona",
+    "name_pt": "Hellas Verona",
+    "short_pt": "Verona",
+    "tla": "VER",
+    "country": "Itália",
+    "kind": "club",
+    "competitions": [
+      "ita.1"
+    ],
+    "aliases": [
+      "Hellas Verona",
+      "Verona"
+    ],
+    "crest_file": "verona.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "vilanova",
+    "name_pt": "Vila Nova",
+    "short_pt": "Vila Nova",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.2",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Vila Nova",
+      "Vila Nova FC"
+    ],
+    "crest_file": "vilanova.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "villarreal",
+    "name_pt": "Villarreal",
+    "short_pt": "Villarreal",
+    "tla": "VIL",
+    "country": "Espanha",
+    "kind": "club",
+    "competitions": [
+      "esp.1",
+      "uefa.champions"
+    ],
+    "aliases": [
+      "Villarreal",
+      "Villarreal CF"
+    ],
+    "crest_file": "villarreal.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "vitoria",
+    "name_pt": "Vitória",
+    "short_pt": "Vitória",
+    "tla": "VIT",
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.1",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Vitoria",
+      "EC Vitória"
+    ],
+    "crest_file": "vitoria.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "voltaredonda",
+    "name_pt": "Volta Redonda",
+    "short_pt": "Volta Redonda",
+    "tla": null,
+    "country": "Brasil",
+    "kind": "club",
+    "competitions": [
+      "bra.camp.carioca",
+      "bra.3",
+      "bra.copa_do_brazil"
+    ],
+    "aliases": [
+      "Volta Redonda",
+      "Volta Redonda FC"
+    ],
+    "crest_file": "voltaredonda.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "wanderers",
+    "name_pt": "Montevideo Wanderers",
+    "short_pt": "Wanderers",
+    "tla": null,
+    "country": "Uruguai",
+    "kind": "club",
+    "competitions": [
+      "conmebol.sudamericana"
+    ],
+    "aliases": [
+      "Montevideo Wanderers",
+      "Wanderers"
+    ],
+    "crest_file": "wanderers.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "westham",
+    "name_pt": "West Ham",
+    "short_pt": "West Ham",
+    "tla": "WHU",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1"
+    ],
+    "aliases": [
+      "West Ham United",
+      "West Ham"
+    ],
+    "crest_file": "westham.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "wolfsburg",
+    "name_pt": "Wolfsburg",
+    "short_pt": "Wolfsburg",
+    "tla": "WOB",
+    "country": "Alemanha",
+    "kind": "club",
+    "competitions": [
+      "ger.1"
+    ],
+    "aliases": [
+      "VfL Wolfsburg",
+      "Wolfsburg"
+    ],
+    "crest_file": "wolfsburg.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "wolves",
+    "name_pt": "Wolverhampton",
+    "short_pt": "Wolves",
+    "tla": "WOL",
+    "country": "Inglaterra",
+    "kind": "club",
+    "competitions": [
+      "eng.1"
+    ],
+    "aliases": [
+      "Wolverhampton Wanderers",
+      "Wolves"
+    ],
+    "crest_file": "wolves.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "wydadcasab",
+    "name_pt": "Wydad Casablanca",
+    "short_pt": "Wydad",
+    "tla": null,
+    "country": "Marrocos",
+    "kind": "club",
+    "competitions": [],
+    "aliases": [
+      "Wydad Casablanca",
+      "Wydad AC",
+      "WAC"
+    ],
+    "crest_file": "wydadcasab.png",
+    "crest_source": "repo (public/teams)"
+  }
+]

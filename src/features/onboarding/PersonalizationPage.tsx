@@ -23,18 +23,16 @@ import { cn } from "@/lib/utils";
 import { useJoinByCode } from "@/features/leagues/api";
 import {
   usePersonalizationState,
-  useAllTeams,
   usePersonalizationCompetitions,
-  useTeamsByCompetition,
   useSetPersonalization,
   useSkipPersonalization,
   type TeamLite,
   type PersoComp,
 } from "./personalizationApi";
+import { catalogClubs, catalogNations, teamsForCompetition } from "./teamsCatalog";
 
 const STEP_COUNT = 4;
 const WC_CODES = ["WC", "fifa.world"];
-const FRIENDLY_CODE = "fifa.friendly";
 
 // Grupos colapsáveis da tela "times e campeonatos".
 const GROUPS = ["Seleções", "Ligas e estaduais", "Copas", "Alternativos"] as const;
@@ -119,35 +117,22 @@ export function PersonalizationPage() {
   const [params] = useSearchParams();
 
   const { data: state } = usePersonalizationState();
-  const { data: allTeams } = useAllTeams();
   const { data: comps } = usePersonalizationCompetitions();
   const setPerso = useSetPersonalization();
   const skip = useSkipPersonalization();
   const join = useJoinByCode();
 
-  const wc = comps?.find((c) => WC_CODES.includes(c.provider_code ?? ""));
-  const { data: nationalTeams } = useTeamsByCompetition(wc?.id ?? null);
-  const nationalIds = useMemo(() => new Set((nationalTeams ?? []).map((t) => t.id)), [nationalTeams]);
-
-  // Time do coração = clubes (tudo menos seleções), ordenado por nome.
-  const clubs = useMemo(
-    () =>
-      (allTeams ?? [])
-        .filter((t) => !nationalIds.has(t.id))
-        .sort((a, b) => a.name.localeCompare(b.name, "pt-BR")),
-    [allTeams, nationalIds],
-  );
-  // Seleções: Brasil primeiro, resto em ordem alfabética.
-  const nationals = useMemo(() => {
-    const arr = [...(nationalTeams ?? [])];
-    arr.sort((a, b) => {
-      const ab = /bra[sz]il/i.test(a.name) ? 0 : 1;
-      const bb = /bra[sz]il/i.test(b.name) ? 0 : 1;
-      if (ab !== bb) return ab - bb;
-      return a.name.localeCompare(b.name, "pt-BR");
+  // Listas vêm do catálogo curado (client-side), desacopladas da tabela `teams`.
+  const clubs = useMemo(() => catalogClubs(), []);
+  const nationals = useMemo(() => catalogNations(), []);
+  // provider_code → id real da competição (pra resolver "seguir em todos").
+  const codeToId = useMemo(() => {
+    const m = new Map<string, string>();
+    (comps ?? []).forEach((c) => {
+      if (c.provider_code) m.set(c.provider_code, c.id);
     });
-    return arr;
-  }, [nationalTeams]);
+    return m;
+  }, [comps]);
 
   // Campeonatos ordenados (Seleções → Ligas → Copas).
   const orderedComps = useMemo(
@@ -388,7 +373,7 @@ export function PersonalizationPage() {
                       key={g}
                       title={g}
                       comps={groupComps}
-                      wcId={wc?.id}
+                      codeToId={codeToId}
                       followedComps={followedComps}
                       followedTeams={followedTeams}
                       defaultOpen={g === "Seleções"}
@@ -577,7 +562,7 @@ function TeamPickerList({
 function GroupSection({
   title,
   comps,
-  wcId,
+  codeToId,
   followedComps,
   followedTeams,
   defaultOpen,
@@ -588,7 +573,7 @@ function GroupSection({
 }: {
   title: string;
   comps: PersoComp[];
-  wcId: string | undefined;
+  codeToId: Map<string, string>;
   followedComps: string[];
   followedTeams: Record<string, string[]>;
   defaultOpen: boolean;
@@ -637,21 +622,19 @@ function GroupSection({
       </div>
       {open && (
         <div className="space-y-2 bg-surface-2 p-2">
-          {comps.map((c) => {
-            const teamsSourceId = c.provider_code === FRIENDLY_CODE ? wcId ?? c.id : c.id;
-            return (
-              <CompetitionItem
-                key={c.id}
-                label={compLabel(c)}
-                teamsSourceId={teamsSourceId}
-                whole={followedComps.includes(c.id)}
-                selectedTeamIds={followedTeams[c.id] ?? []}
-                onToggleWhole={() => onToggleWhole(c.id)}
-                onToggleTeam={(teamId, allIds) => onToggleTeam(c.id, teamId, allIds)}
-                onFollowEverywhere={onFollowEverywhere}
-              />
-            );
-          })}
+          {comps.map((c) => (
+            <CompetitionItem
+              key={c.id}
+              label={compLabel(c)}
+              providerCode={c.provider_code ?? ""}
+              codeToId={codeToId}
+              whole={followedComps.includes(c.id)}
+              selectedTeamIds={followedTeams[c.id] ?? []}
+              onToggleWhole={() => onToggleWhole(c.id)}
+              onToggleTeam={(teamId, allIds) => onToggleTeam(c.id, teamId, allIds)}
+              onFollowEverywhere={onFollowEverywhere}
+            />
+          ))}
         </div>
       )}
     </div>
@@ -662,7 +645,8 @@ function GroupSection({
 // parcial). Abre pra escolher times individuais (checkbox redondo cada).
 function CompetitionItem({
   label,
-  teamsSourceId,
+  providerCode,
+  codeToId,
   whole,
   selectedTeamIds,
   onToggleWhole,
@@ -670,7 +654,8 @@ function CompetitionItem({
   onFollowEverywhere,
 }: {
   label: string;
-  teamsSourceId: string;
+  providerCode: string;
+  codeToId: Map<string, string>;
   whole: boolean;
   selectedTeamIds: string[];
   onToggleWhole: () => void;
@@ -679,8 +664,11 @@ function CompetitionItem({
 }) {
   const [open, setOpen] = useState(false);
   const [choosing, setChoosing] = useState<string | null>(null);
-  const { data: teams, isLoading } = useTeamsByCompetition(open ? teamsSourceId : null);
-  const allIds = useMemo(() => (teams ?? []).map((t) => t.id), [teams]);
+  const teams = useMemo(
+    () => (open ? teamsForCompetition(providerCode, codeToId) : []),
+    [open, providerCode, codeToId],
+  );
+  const allIds = useMemo(() => teams.map((t) => t.id), [teams]);
   const parentState: "empty" | "checked" | "partial" = whole
     ? "checked"
     : selectedTeamIds.length > 0
@@ -718,19 +706,13 @@ function CompetitionItem({
 
       {open && (
         <div className="border-t border-border bg-surface-2 p-2">
-          {isLoading ? (
-            <div className="space-y-1.5 p-1">
-              {[0, 1, 2].map((i) => (
-                <Skeleton key={i} className="h-9 w-full" />
-              ))}
-            </div>
-          ) : (teams ?? []).length === 0 ? (
+          {teams.length === 0 ? (
             <p className="px-2 py-4 text-center text-xs text-ink-500">
-              Os times deste campeonato entram quando a temporada começar.
+              Os times deste campeonato entram quando a lista for preenchida.
             </p>
           ) : (
             <ul className="space-y-0.5">
-              {teams!.map((t) => {
+              {teams.map((t) => {
                 const on = whole || selectedTeamIds.includes(t.id);
                 const nComps = t.in_competitions?.length ?? 0;
                 const multi = nComps > 1;
