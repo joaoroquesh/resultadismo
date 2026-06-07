@@ -1,0 +1,192 @@
+import { useEffect, useState } from "react";
+import { AlertTriangle, EyeOff, ShieldAlert, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { useToast } from "@/components/ui/Toast";
+import {
+  useCompetitionUsage,
+  useDeleteCompetition,
+  useSetCompetitionPublished,
+} from "./competitions";
+
+export type CompetitionDanger = { id: string; name: string; action: "delete" | "unpublish" };
+
+/**
+ * Diálogo de ação perigosa em competição (excluir / despublicar). Lê o uso real
+ * (admin_competition_usage):
+ *  - EXCLUIR competição EM USO (palpites/grupos) → BLOQUEADO (a cascata destrutiva
+ *    foi desligada — FK RESTRICT). Orienta limpar os vínculos no Supabase.
+ *  - EXCLUIR com só jogos sincronizados → exige digitar o nome exato (3ª confirmação).
+ *  - DESPUBLICAR em uso → exige digitar o nome exato. Sem uso → confirmação simples.
+ */
+export function CompetitionDangerDialog({
+  danger,
+  onClose,
+}: {
+  danger: CompetitionDanger | null;
+  onClose: () => void;
+}) {
+  const usage = useCompetitionUsage(danger?.id ?? null);
+  const del = useDeleteCompetition();
+  const setPub = useSetCompetitionPublished();
+  const { toast } = useToast();
+  const [typed, setTyped] = useState("");
+
+  useEffect(() => {
+    setTyped("");
+  }, [danger?.id, danger?.action]);
+
+  if (!danger) return null;
+
+  const isDelete = danger.action === "delete";
+  const u = usage.data;
+  const loading = usage.isLoading;
+  const inUse = !!u && (u.predictions > 0 || u.groups > 0);
+  // Excluir em uso é IMPOSSÍVEL (banco recusa) → bloqueia com orientação.
+  const blocked = isDelete && inUse;
+  // Pede o nome: excluir com jogos (sem palpite/grupo) OU despublicar em uso.
+  const needsName = !blocked && (isDelete ? !!u && u.matches > 0 : inUse);
+  const pending = del.isPending || setPub.isPending;
+  const canConfirm =
+    !loading && !blocked && (!needsName || typed.trim() === danger.name.trim());
+
+  function confirm() {
+    const d = danger;
+    if (!d) return;
+    const confirmName = needsName ? typed.trim() : undefined;
+    const onError = (e: unknown) =>
+      toast(e instanceof Error ? e.message : "Não rolou.", "error");
+    if (isDelete) {
+      del.mutate(
+        { id: d.id, confirmName },
+        {
+          onSuccess: () => {
+            toast(`"${d.name}" excluída.`, "success");
+            onClose();
+          },
+          onError,
+        },
+      );
+    } else {
+      setPub.mutate(
+        { id: d.id, value: false, confirmName },
+        {
+          onSuccess: () => {
+            toast(`"${d.name}" voltou para rascunho.`, "success");
+            onClose();
+          },
+          onError,
+        },
+      );
+    }
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-[80] flex items-end justify-center bg-ink-950/50 p-4 sm:items-center"
+      role="dialog"
+      aria-modal="true"
+      aria-label={isDelete ? "Excluir competição" : "Despublicar competição"}
+      onClick={onClose}
+    >
+      <div
+        className="animate-rise w-full max-w-sm rounded-lg bg-surface p-5 shadow-[var(--shadow-pop)] ring-1 ring-border"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-3 flex items-start gap-3">
+          <div
+            className={
+              blocked
+                ? "grid size-10 shrink-0 place-items-center rounded-md bg-flame-500/10 text-flame-600"
+                : isDelete
+                  ? "grid size-10 shrink-0 place-items-center rounded-md bg-flame-500/10 text-flame-600"
+                  : "grid size-10 shrink-0 place-items-center rounded-md bg-brand-500/10 text-brand-600"
+            }
+          >
+            {blocked ? (
+              <ShieldAlert className="size-5" />
+            ) : isDelete ? (
+              <Trash2 className="size-5" />
+            ) : (
+              <EyeOff className="size-5" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-base font-bold text-ink-900">
+              {isDelete ? "Excluir competição" : "Despublicar competição"}
+            </h3>
+            <p className="mt-0.5 truncate text-sm text-ink-500">{danger.name}</p>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="h-16 animate-pulse rounded-md bg-ink-100" />
+        ) : blocked ? (
+          <div className="space-y-3">
+            <div className="rounded-md bg-flame-500/10 p-3 text-sm text-ink-800">
+              <p className="flex items-center gap-1.5 font-semibold text-flame-700">
+                <AlertTriangle className="size-4" /> Em uso — não dá pra excluir aqui
+              </p>
+              <p className="mt-1 text-ink-600">
+                {u?.predictions ?? 0} palpite(s) e {u?.groups ?? 0} grupo(s) dependem dela. A exclusão
+                em cascata foi <strong>desligada</strong> de propósito, pra nunca mais apagar palpites
+                sem querer.
+              </p>
+              <p className="mt-2 text-ink-600">
+                Para excluir mesmo assim: vá ao <strong>Supabase</strong>, remova a competição do(s)
+                grupo(s) e apague os palpites vinculados — aí ela some daqui.
+              </p>
+            </div>
+            <div className="flex justify-end">
+              <Button variant="secondary" size="sm" onClick={onClose}>
+                Entendi
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <p className="text-sm text-ink-600">
+              {isDelete
+                ? u && u.matches > 0
+                  ? `Vai remover ${u.matches} jogo(s) sincronizado(s) (sem palpites/grupos). Os jogos saem junto. Não dá pra desfazer.`
+                  : "Esta competição não tem jogos, palpites nem grupos. Pode excluir."
+                : inUse
+                  ? `Despublicar tira do ar pros usuários (não apaga nada). Ela tem ${u?.predictions ?? 0} palpite(s) / ${u?.groups ?? 0} grupo(s).`
+                  : "Despublicar tira do ar pros usuários (volta a rascunho). Não apaga nada."}
+            </p>
+
+            {needsName && (
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="comp-confirm" className="text-xs font-medium text-ink-700">
+                  Digite o nome exato para confirmar: <span className="font-semibold">{danger.name}</span>
+                </label>
+                <Input
+                  id="comp-confirm"
+                  value={typed}
+                  onChange={(e) => setTyped(e.target.value)}
+                  placeholder={danger.name}
+                  autoComplete="off"
+                />
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-2">
+              <Button variant="ghost" size="sm" onClick={onClose} disabled={pending}>
+                Cancelar
+              </Button>
+              <Button
+                variant={isDelete ? "danger" : "primary"}
+                size="sm"
+                loading={pending}
+                disabled={!canConfirm}
+                onClick={confirm}
+              >
+                {isDelete ? "Excluir" : "Despublicar"}
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

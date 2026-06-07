@@ -91,6 +91,11 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   competitions` segue CASCADE (jogo é descartável/re-sincronizável). Para excluir uma competição em
   uso, o admin **limpa os vínculos no Supabase primeiro** (palpites/uso em grupo). `admin_delete_competition`
   dá mensagem clara orientando isso. Migration `20260607000009`.
+- **UI de exclusão segura no admin** (`CompetitionDangerDialog`). Ao excluir/despublicar uma
+  competição, o diálogo mostra o **uso real** (`admin_competition_usage`: jogos/palpites/grupos):
+  exclusão de competição **em uso é bloqueada** com orientação ("limpe os vínculos no Supabase");
+  exclusão de competição só-com-jogos e despublicação em-uso **exigem digitar o nome exato**;
+  competição vazia exclui com confirmação simples.
 
 ### Corrigido
 - **Push sempre com identidade (escudo + título + corpo).** O service worker (`src/sw.ts`) nunca mais

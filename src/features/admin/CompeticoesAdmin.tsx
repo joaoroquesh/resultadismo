@@ -1,10 +1,9 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Check, X, RefreshCw, Plus, Trash2, Eye, EyeOff, Pencil, AlertTriangle } from "lucide-react";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { CompetitionDangerDialog, type CompetitionDanger } from "./CompetitionDangerDialog";
 import { useProviderCompetitions, type ProviderCompetition, type ProviderName } from "./providers";
 import {
-  useDeleteCompetition,
   useSetCompetitionPublished,
   useRenameCompetition,
 } from "./competitions";
@@ -38,7 +37,6 @@ export function CompeticoesAdmin() {
   const { data: comps, isLoading } = useAdminCompetitions();
   const create = useCreateCompetition();
   const sync = useSyncFootball();
-  const del = useDeleteCompetition();
   const setPub = useSetCompetitionPublished();
   const rename = useRenameCompetition();
   const { toast } = useToast();
@@ -48,7 +46,7 @@ export function CompeticoesAdmin() {
     useProviderCompetitions(provider);
 
   // estado da UI de gestão
-  const [toDelete, setToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [danger, setDanger] = useState<CompetitionDanger | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
 
@@ -142,16 +140,6 @@ export function CompeticoesAdmin() {
       toast(e instanceof Error ? e.message : "Erro.", "error");
     }
   }
-  async function confirmDelete() {
-    if (!toDelete) return;
-    try {
-      await del.mutateAsync(toDelete.id);
-      toast(`${toDelete.name} excluída.`, "success");
-      setToDelete(null);
-    } catch (e) {
-      toast(e instanceof Error ? e.message : "Erro ao excluir.", "error");
-    }
-  }
 
   if (isLoading) return <Skeleton className="h-40 w-full" />;
 
@@ -214,7 +202,11 @@ export function CompeticoesAdmin() {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => togglePublish(c.id, !published)}
+                    onClick={() =>
+                      published
+                        ? setDanger({ id: c.id, name: shown, action: "unpublish" })
+                        : togglePublish(c.id, true)
+                    }
                     loading={setPub.isPending}
                   >
                     {published ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -238,7 +230,7 @@ export function CompeticoesAdmin() {
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => setToDelete({ id: c.id, name: shown })}
+                    onClick={() => setDanger({ id: c.id, name: shown, action: "delete" })}
                     aria-label="Excluir competição"
                   >
                     <Trash2 className="size-4 text-flame-500" />
@@ -338,16 +330,7 @@ export function CompeticoesAdmin() {
         </p>
       </Card>
 
-      <ConfirmDialog
-        open={!!toDelete}
-        title="Excluir competição"
-        message={`Excluir "${toDelete?.name ?? ""}"? Os jogos, times e palpites desta competição também somem. Não dá pra desfazer.`}
-        step2Message="Confirmação final: excluir essa competição e tudo dentro dela?"
-        confirmLabel="Excluir competição"
-        loading={del.isPending}
-        onConfirm={confirmDelete}
-        onCancel={() => setToDelete(null)}
-      />
+      <CompetitionDangerDialog danger={danger} onClose={() => setDanger(null)} />
     </div>
   );
 }
