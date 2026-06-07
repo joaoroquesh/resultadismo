@@ -21,6 +21,8 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
+- **AGENTS.md na raiz.** Novo ponto de entrada para sessões Codex/IA, espelhando o `CLAUDE.md` e
+  apontando para a documentação viva em `.claude/` (`MESTRE`, processo, paralelismo e regras centrais).
 - **Changelog no admin.** Nova aba **Changelog** no `/admin` (só app-admin) que renderiza este
   `CHANGELOG.md` (importado cru no build), do mais recente ao mais antigo — render de markdown leve,
   sem dependência nova.
