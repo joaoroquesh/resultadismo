@@ -112,6 +112,21 @@ Realtime**); `nudge_member` (cutucar, anti-spam 30 min).
   arg)` (cada segmento já filtra quem desligou avisos), `fan_notify_admins(...)` (alerta pros
   app-admins com dedupe 6h). `create_deadline_reminders` e `nudge_for_match` respeitam a preferência.
 
+**Dados de jogos multi-fonte (2.12.0)**
+- Tabelas: **`competition_sources`** (várias fontes por competição: 1 `primary` dona do calendário +
+  N `secondary` que só validam placar; cadeia de fallback) e **`match_sources`** (1 observação por
+  `(jogo, fonte)` — base do voto e da detecção de divergência). Ambas RLS-on **sem policy** (só via
+  RPC). `competitions.in_personalization` (flag) e colunas em `matches`: `frozen`/`frozen_at`,
+  `manual_lock`/`manually_edited_*`, `score_sources_count`, `score_conflict`.
+- `resolve_match_golden(p_match_ids[])` (interna, grant só `service_role`; **cron a cada 10 min**):
+  placar golden = voto da maioria das fontes (empate → mais recente); marca `score_conflict`; e
+  **congela** (decisão #3) finalizado + ≥2 fontes + >1h. **Nunca** toca `manual_lock`/`frozen`.
+- RPCs de admin (gate `is_app_admin()`): `admin_override_match` (placar/status + lock, decisão #8),
+  `admin_set_match_lock`, `admin_unfreeze_match`, `admin_list_match_conflicts`,
+  `admin_{list,upsert,set_enabled,remove}_competition_source`. → [`04`](04-ADMIN.md) aba Dados.
+- O sync (`sync-football`) ficou multi-fonte: primária reconcilia a estrutura; secundárias casam por
+  dia+nomes e só gravam observação (nunca inserem); respeita freeze/lock; degrada com graça.
+
 ## 5. Triggers e cron
 
 **Triggers-chave**

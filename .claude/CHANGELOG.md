@@ -25,6 +25,22 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   `CHANGELOG.md` (importado cru no build), do mais recente ao mais antigo — render de markdown leve,
   sem dependência nova.
 - **Versão no rodapé do Perfil** (`v{APP_VERSION}`, de `package.json`).
+- **Ingestão multi-fonte de jogos (robustez + qualidade dos dados).** Cada competição tem 1 fonte
+  **primária** (dona do calendário) + N **secundárias** (só validam placar; nunca inserem), com
+  fallback e degradação graciosa. **Golden record** por voto da maioria (`match_sources`,
+  `resolve_match_golden`, cron 10 min), detecção de conflito, e **freeze** de finalizados confirmados
+  por ≥2 fontes (>1h) — resultado final travado no banco. **Override manual com lock** (admin corrige
+  placar; a API não sobrescreve). +10 competições no catálogo (estaduais, Champions/Europa, Copa
+  América, MLS, Liga MX) + personalização por flag `in_personalization`. Aba **Admin → Dados**
+  (conflitos + override + fontes por competição). Escudos do repo (`public/teams`) como fonte primária
+  via manifest. Estudo em [`decisions/0004`](decisions/0004-ingestao-dados-de-jogos.md). 4 migrations
+  `20260607*`, **aditivas e não-destrutivas** (nenhum jogo existente alterado além de placar).
+
+### Segurança
+- Tabelas internas `match_sources`/`competition_sources` com RLS ligado **sem policy** (acesso só via
+  RPC). RPCs de admin `SECURITY DEFINER` + `search_path=''` + gate `is_app_admin()`;
+  `resolve_match_golden` interna (grant só `service_role`). Dado bruto da API nunca é servido ao
+  cliente (sempre do banco); ingestão só via Edge (service_role/`CRON_SECRET`).
 
 ### Corrigido
 - **Push sempre com identidade (escudo + título + corpo).** O service worker (`src/sw.ts`) nunca mais

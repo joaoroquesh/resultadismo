@@ -24,7 +24,7 @@
 
 **Dashboard-first**, navegação por **abas na URL** (`?t=`) — rolável (não espreme no mobile);
 voltar de "ver jogos" cai na aba certa. Abas: **Visão · Alertas · Grupos · Competições · Usuários ·
-Pagamento · Avisos · Construa · Changelog**. Todas as ações chamam RPCs que **revalidam `is_app_admin()` no banco** — o guard de UI
+Pagamento · Avisos · Construa · Dados · Changelog**. Todas as ações chamam RPCs que **revalidam `is_app_admin()` no banco** — o guard de UI
 é conveniência, não segurança.
 
 ### Aba **Visão** (`AdminDashboard`) — saúde do sistema
@@ -104,6 +104,19 @@ Pagamento · Avisos · Construa · Changelog**. Todas as ações chamam RPCs que
   `admin_list_feedback` / `admin_update_feedback`; novo report → trigger chama `fan_notify_admins`
   (avisa os app-admins); resolver → insere 1 `notification` (`feedback_reply`) pro autor. Migration
   `20260606000005`.
+
+### Aba **Dados** (`DadosAdmin`) — qualidade dos dados de jogos (multi-fonte) — **2.12.0**
+- **Conflitos e jogos travados** (`admin_list_match_conflicts`): jogos onde as fontes **divergem** no
+  placar (`score_conflict`) ou que estão sob edição manual. Mostra **o que cada fonte reporta**
+  (`match_sources`), badges (divergente/congelado/manual/Nº fontes) e ações: **override manual** de
+  placar/status que **trava contra a API** (`admin_override_match`, decisão #8), **travar/destravar**
+  (`admin_set_match_lock`) e **descongelar** (`admin_unfreeze_match`).
+- **Fontes por competição** (`admin_list_competition_sources`): cada competição tem 1 fonte
+  **primária** (dona do calendário) + N **secundárias** (só validam placar). Liga/desliga
+  (`admin_set_competition_source_enabled`), adiciona secundária (`admin_upsert_competition_source`) e
+  remove secundária (`admin_remove_competition_source`; a primária é protegida).
+- Pano de fundo: o placar oficial é o **voto da maioria** das fontes (`resolve_match_golden`, cron a
+  cada 10 min); finalizado + ≥2 fontes + >1h → **congelado** (decisão #3). → [`05`](05-DADOS-E-AUTH.md).
 
 ### Tela de jogos por competição (`/admin/competicoes/:id/jogos` — `AdminCompMatchesPage`)
 - Curadoria por jogo: ocultar/mostrar (`matches.hidden`, RPC/`useSetMatchHidden`) e **override
