@@ -68,6 +68,12 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   RPC). RPCs de admin `SECURITY DEFINER` + `search_path=''` + gate `is_app_admin()`;
   `resolve_match_golden` interna (grant só `service_role`). Dado bruto da API nunca é servido ao
   cliente (sempre do banco); ingestão só via Edge (service_role/`CRON_SECRET`).
+- **Exclusão/despublicação de competição EM USO exige confirmar o nome exato (3ª confirmação).**
+  Causa-raiz de um incidente: `admin_delete_competition` apagava em cascata matches → palpites →
+  pontos → o link do grupo (irreversível sem backup). Agora, se a competição tem palpites e/ou é
+  usada por grupos, EXCLUIR — ou DESPUBLICAR — só prossegue passando `p_confirm_name` = nome exato;
+  senão a RPC recusa. Nova RPC `admin_competition_usage` (palpites/grupos/matches). Defesa no banco
+  (`SECURITY DEFINER`), então protege mesmo se a UI falhar. Migration `20260607000008`.
 
 ### Corrigido
 - **Push sempre com identidade (escudo + título + corpo).** O service worker (`src/sw.ts`) nunca mais
