@@ -284,9 +284,11 @@ Identidade visual de **perfis** e **grupos** por **máscara SVG**: o SVG recorta
 ---
 
 ### Quando uma mudança toca uma regra de negócio
-Antes de implementar, confronte-a com a regra acima (passo 1 do protocolo no
-[`MESTRE.md`](MESTRE.md)). Se a mudança **altera** a regra:
-1. **Confirme com o João** (especialmente se fere uma regra central).
+**Todo** código já passa pelo portão geral (regra **16**, Portão A): plano validado pelo João antes de
+implementar. Esta seção é o **cuidado extra** quando a mudança encosta numa regra de negócio: confronte-a
+com a regra acima (passo 1 do protocolo no [`MESTRE.md`](MESTRE.md)). Se a mudança **altera** a regra:
+1. **Confirme com o João** com atenção redobrada (especialmente se fere uma regra central) — o OK do PO
+   aqui não é só o do Portão A, é a aprovação consciente de mexer numa regra.
 2. **Atualize TODOS os pontos de contato do site** que falam sobre ela — muitas destas regras
    (pontuação, preço, desempate, "não é casa de apostas") aparecem em **vários lugares**: home,
    "Como funciona", onboarding, landing, copy de UI, **Termos** e **Privacidade**. O site inteiro

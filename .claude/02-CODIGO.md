@@ -120,6 +120,10 @@ Regras:
 
 ## 7. Validação antes de subir
 
+> Isto é o **Portão B** (homologação antes do deploy). Pressupõe que o **Portão A** já aconteceu: o
+> plano foi validado pelo João **antes** de você escrever este código (regra 16). →
+> [`11`](11-EQUIPE-E-PAPEIS.md) §3.
+
 - `npm run typecheck` (ou `npm run build`) **verde**.
 - **Teste o fluxo no navegador** (Playwright/preview) — não só typecheck. (preferência do João).
 - Mudança de banco: `supabase db reset` local aplica todas as migrations + seed sem erro.

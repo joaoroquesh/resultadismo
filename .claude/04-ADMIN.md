@@ -170,4 +170,8 @@ Quem é `owner`/`admin` de um grupo pode:
 - **Não executar estornos** no painel do Mercado Pago. O reembolso self-service é código do app;
   testá-lo de verdade = estorno real → quem testa é o João.
 - **Não subir mudança de alto impacto** (pagamento, prod ao vivo, dado destrutivo) **sem
-  autorização explícita** do João. → [`08`](08-PROCESSO.md), [`MESTRE.md`](MESTRE.md) §3.
+  autorização explícita** do João. Este é o **gate adicional de alto impacto** (regra central 8 /
+  [`08`](08-PROCESSO.md) §8); ele **não substitui** o **Portão A** (plano, regra 16) nem o **Portão B**
+  (homologação local, regra 14). E o **Portão A vale para qualquer alteração de código** no
+  admin/produção, mesmo simples: já precisa de **plano validado pelo João antes de codar**. →
+  [`08`](08-PROCESSO.md), [`11`](11-EQUIPE-E-PAPEIS.md) §3, [`MESTRE.md`](MESTRE.md) §3.

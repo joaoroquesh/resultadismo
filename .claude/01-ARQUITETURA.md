@@ -3,6 +3,7 @@
 > Visão técnica de alto nível: stack, estrutura de pastas, fluxo de dados, integrações externas e
 > modelo de deploy. Para regras de código → [`02-CODIGO.md`](02-CODIGO.md). Para banco/auth →
 > [`05-DADOS-E-AUTH.md`](05-DADOS-E-AUTH.md). Para build/secrets → [`07-BUILD-E-DEPLOY.md`](07-BUILD-E-DEPLOY.md).
+> Para **quem a IA é ao trabalhar** (papéis sobre esta stack) e o **PO** → [`11-EQUIPE-E-PAPEIS.md`](11-EQUIPE-E-PAPEIS.md).
 
 ## 1. Stack
 
@@ -28,7 +29,7 @@
 
 ```
 resultadismo/
-├── .claude/              ESTA documentação (MESTRE + 01–09 + CHANGELOG/HISTORICO)
+├── .claude/              ESTA documentação (MESTRE + 01–11 + CHANGELOG/HISTORICO)
 ├── docs/                 Diário de bordo das sessões + planning + doc de pagamentos
 ├── public/              Favicons, ícones PWA, estáticos servidos como estão
 ├── src/

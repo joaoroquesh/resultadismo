@@ -9,12 +9,12 @@
 ```
 0. Entender o pedido
 1. Questionar criticamente contra as regras (negócio 06, arquitetura 01/02/05, processo 07/08, design)
-2. Decidir/aprovar (alto impacto ou contra regra → confirmar com o João; decisão contra regra → registrar no HISTORICO)
-3. Planejar (arquivos + pontos de contato do site + DOCS afetadas)
+2. Decidir/aprovar (TODO código exige plano validado pelo João — regra 16; alto impacto/contra regra → confirmação redobrada; decisão contra regra → registrar no HISTORICO)
+3. Planejar e APRESENTAR ao PO em duas camadas (técnica + leiga) + aguardar OK antes de implementar — Portão A, regra 16 (arquivos + pontos de contato + DOCS afetadas)
 4. Implementar (padrões do 02; isolar conforme 09; migration aditiva se mexer no banco)
 5. Validar de verdade (typecheck/build + navegador + db reset)
 6. Propagar para TODOS os pontos de contato do site que falam daquilo (coerência)
-7. Atualizar a documentação .claude/ afetada (01–09)
+7. Atualizar a documentação .claude/ afetada (01–11)
 8. Registrar no CHANGELOG + versionar (+ HISTORICO se decisão/marco)
 9. Homologar com o João: abrir local (npm run dev) + aval explícito antes de subir — sobretudo UI/UX (MESTRE §3 regra 14)
 10. Subir com segurança (push conforme 09 = deploy em produção)
@@ -40,6 +40,25 @@ Toda mudança passa por estas perguntas **antes** de virar código:
 - É de **alto impacto** (pagamento, prod ao vivo, dado destrutivo, login)? → confirmar com o João.
 
 Se conflita com uma regra central → **pare e leve ao João**. Não suba.
+
+## 3.1 Apresentar o plano ao PO (Portão A — regra 16)
+
+> O João é o **PO**; a IA atua como **equipe** (papéis em [`11-EQUIPE-E-PAPEIS.md`](11-EQUIPE-E-PAPEIS.md)).
+> **Nenhuma alteração de código começa sem este portão.**
+
+Depois de questionar e antes de implementar, **monte o plano e apresente ao João**:
+- **Avalie o impacto no projeto inteiro** (não só no arquivo óbvio): regras 06, arquitetura/segurança
+  01/02/05, processo 07/08, identidade DESIGN.md/10. Vista os papéis da área tocada (doc 11 §4).
+- **Apresente em duas camadas:** **técnica** (arquivos/tabelas, riscos, trade-offs, rollback se
+  sensível) **+ leiga** (a solução em 1-2 frases, para o PO que nem sempre domina o técnico).
+- **Aguarde o OK explícito.** Só então implemente.
+- **Proporcional:** trivial = uma linha de plano; grande = plano completo. Mas **sempre** há plano + OK.
+- **Escopo = código** (`src/`, `supabase/migrations`, `supabase/functions`, config de runtime).
+  Mudança **só de documentação** segue o fluxo leve (registrada, sem este portão).
+
+Este é o **Portão A**. Não confundir com o **B** (homologação local antes do push, regra 14, §7) nem
+com o **C** (release/versão, ADR [`0003`](decisions/0003-versionamento.md), [`MESTRE.md`](MESTRE.md)
+§6). Os três coexistem. O **gate de alto impacto** (§8) é **adicional** a esses, não um quarto portão.
 
 ## 4. Implementar
 
@@ -73,7 +92,7 @@ coisa — **nunca** um ponto novo e outro velho.
 
 **Depois, a documentação:**
 - Para **cada** regra/tela/dado que mudou, atualize o documento correspondente em `.claude/`
-  (01–09). Ex.: novo modo de confronto → 06 (+ 03 se nova tela, + 05 se nova tabela/RPC).
+  (01–11). Ex.: novo modo de confronto → 06 (+ 03 se nova tela, + 05 se nova tabela/RPC).
 - Adicione a entrada no [`CHANGELOG.md`](CHANGELOG.md) e **suba a versão** ([`MESTRE.md`](MESTRE.md)
   §6) + `package.json`. Decisão de mudar uma regra ou marco grande → nota em
   [`HISTORICO.md`](HISTORICO.md).

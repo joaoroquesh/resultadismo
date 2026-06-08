@@ -6,16 +6,17 @@
 > **[`.claude/MESTRE.md`](.claude/MESTRE.md)** é o **contrato**: índice + regras centrais + o
 > **protocolo de mudança**. **Toda** sessão de IA que for ler, responder, planejar, mexer em código/
 > dados ou subir qualquer coisa neste repo **obedece** ao MESTRE e ao documento de área relevante
-> (`.claude/01`–`09`). Isto não é opcional.
+> (`.claude/01`–`11`). Isto não é opcional.
 
 ## O que fazer no início de toda sessão
 
 1. **Ler [`.claude/MESTRE.md`](.claude/MESTRE.md)** (seções 1–3 sempre; 4–6 + o doc de área se for
    alterar código/dados).
 2. **Seguir o protocolo de mudança** do MESTRE §5 / [`.claude/08-PROCESSO.md`](.claude/08-PROCESSO.md):
-   questionar contra as regras → validar de verdade (build + navegador + `db reset`) → **propagar a
-   coerência em todos os pontos de contato** → **atualizar a doc `.claude/` afetada** → **registrar no
-   [`.claude/CHANGELOG.md`](.claude/CHANGELOG.md) + subir a versão** (e [`HISTORICO.md`](.claude/HISTORICO.md)
+   questionar contra as regras → **planejar e apresentar ao João (PO) técnico + leigo e aguardar o OK
+   antes de codar (Portão A, regra 16)** → validar de verdade (build + navegador + `db reset`) →
+   **propagar a coerência em todos os pontos de contato** → **atualizar a doc `.claude/` afetada** →
+   **registrar no [`.claude/CHANGELOG.md`](.claude/CHANGELOG.md) + subir a versão** (e [`HISTORICO.md`](.claude/HISTORICO.md)
    se for decisão/marco).
 3. Antes de qualquer `git`, ler [`.claude/09-PARALELISMO.md`](.claude/09-PARALELISMO.md) (o repo é
    editado em paralelo): `git fetch`, conferir branch/status, **nunca `git add -A`**, nunca resetar
@@ -28,6 +29,10 @@ Termine **toda** resposta neste repositório com a última linha, exatamente: **
 
 ## Não-negociáveis (resumo — a versão completa é o MESTRE §3)
 
+- **Você é o PO; a IA é um time.** Todo pedido vira **plano** (técnico + leigo) e só vira **código**
+  depois do seu **OK** (regra 16, Portão A) — **sempre**, proporcional ao tamanho; não só o alto
+  impacto. A IA atua como **equipe multidisciplinar** (papéis em
+  [`.claude/11-EQUIPE-E-PAPEIS.md`](.claude/11-EQUIPE-E-PAPEIS.md)).
 - **Deploy = push na `main`** (aplica migrations em produção + Vercel + Edge Functions). O site está
   **ao vivo e cobrando** — nada de surpresa em produção; mudança de pagamento/login/dado destrutivo
   exige OK explícito do João.

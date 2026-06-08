@@ -14,8 +14,8 @@
 > É a prova de que a IA leu e está obedecendo as regras do `.claude/`. Se a frase **não** aparecer,
 > presuma que estas regras não foram lidas/seguidas.
 
-Versão atual do projeto: **1.9.0** · App em produção: **https://www.resultadismo.com** ·
-Última revisão desta doc: **2026-06-05**.
+Versão atual do projeto: **1.11.0** · App em produção: **https://www.resultadismo.com** ·
+Última revisão desta doc: **2026-06-08**.
 
 ---
 
@@ -56,6 +56,7 @@ daquele assunto.
 | 08 | [`08-PROCESSO.md`](08-PROCESSO.md) | **Como subir uma mudança** do começo ao fim (detalha o protocolo da seção 5). |
 | 09 | [`09-PARALELISMO.md`](09-PARALELISMO.md) | **Vários chats/sessões no mesmo repo.** Regras anti-colisão. Ler antes de qualquer `git`. |
 | 10 | [`10-UX-WRITING.md`](10-UX-WRITING.md) | Escrever textos do app (microcopy): clareza/simplicidade, voz, tom, glossário, padrões de erro/vazio/sucesso. |
+| 11 | [`11-EQUIPE-E-PAPEIS.md`](11-EQUIPE-E-PAPEIS.md) | **Quem a IA é ao trabalhar.** A IA como equipe (papéis + cenários), o João como **PO**, os 3 portões e o gate plano-antes-de-codar (regras 15-16). |
 | — | [`CHANGELOG.md`](CHANGELOG.md) | O que mudou em cada versão. **Atualizar a cada mudança que sobe.** |
 | — | [`HISTORICO.md`](HISTORICO.md) | Narrativa de como o projeto evoluiu até aqui (consolida `docs/`). Contexto, não regra. |
 
@@ -117,6 +118,20 @@ de docs + changelog (seção 5). Cada uma tem dono num doc específico.
    qualquer alteração de UI/UX**, que ele precisa **ver no navegador** antes de subir. Sem o OK do
    João, **não há push/merge na `main`**. → §5 passo 9, [`07`](07-BUILD-E-DEPLOY.md),
    [`08`](08-PROCESSO.md).
+15. **O João é o PO; a IA atua como equipe.** O João é o **Product Owner**: descreve o problema/desejo;
+   a IA decide o "como". A IA **não é executora cega** — atua como uma **equipe multidisciplinar**
+   (vários papéis especializados numa só sessão) e avalia o impacto no **projeto inteiro** antes de
+   mexer. Todo pedido recebe um plano apresentado em **duas camadas: técnica + leiga** (o João sabe um
+   pouco de código, mas nem sempre conhece as implicações). → [`11`](11-EQUIPE-E-PAPEIS.md), ADR
+   [`0005`](decisions/0005-equipe-po-e-plano.md).
+16. **Plano validado pelo PO antes de qualquer alteração de código (Portão A).** Nenhuma mudança de
+   **código** começa sem um plano sólido **validado pelo João antes**, por mais simples que pareça:
+   avaliar impactos → planejar → apresentar (técnico + leigo) → **aguardar OK** → implementar →
+   validar → **documentar**. O plano é **proporcional** (trivial = uma linha; grande = plano
+   completo). Vale para **código** (`src/`, `supabase/migrations`, `supabase/functions`, config de
+   runtime); mudança **só de documentação** segue o fluxo leve da doc. Este é o **Portão A**, distinto
+   do **B** (homologação pré-deploy, regra 14) e do **C** (release, §6). → [`11`](11-EQUIPE-E-PAPEIS.md)
+   §3, [`08`](08-PROCESSO.md).
 
 ---
 
@@ -127,7 +142,9 @@ de docs + changelog (seção 5). Cada uma tem dono num doc específico.
    e `git status` — sei se a `main` andou e se há trabalho não-commitado de outra sessão.
 3. Entendi a **regra de negócio** envolvida (doc 06) — a mudança não fere nenhuma regra central
    (seção 3) sem decisão explícita.
-4. Tenho um plano. Se a mudança é grande, planejei antes de executar (preferência do João).
+4. Tenho um plano **e apresentei ao João (PO) técnico + leigo, com o OK explícito antes de tocar no
+   código** (regra 16, Portão A) — sempre, proporcional ao tamanho. Atuo como equipe, vestindo os
+   papéis da área tocada (regra 15). → [`11`](11-EQUIPE-E-PAPEIS.md).
 
 ---
 
@@ -149,14 +166,18 @@ de docs + changelog (seção 5). Cada uma tem dono num doc específico.
    Se ela **conflita** com uma regra (central — seção 3 — ou de negócio), **pare e confirme com o
    João** — não suba por conta própria.
 
-**2. Decidir / aprovar.** Se faz sentido, seguir. Se é alto impacto (mexe em pagamento, prod ao
-   vivo, dado destrutivo, login), **confirmar com o João** antes. Trazer trade-offs. Se a mudança
-   vai **contra uma regra do projeto** e o João decidir fazê-la mesmo assim, **registre a decisão e
-   o motivo** no [`HISTORICO.md`](HISTORICO.md) e atualize as regras afetadas (esta doc + o documento
-   da área).
+**2. Decidir / aprovar.** Se faz sentido, seguir. **Todo** código exige plano validado pelo João
+   antes (passo 3, regra 16, Portão A) — não só o alto impacto. Se é **alto impacto** (mexe em
+   pagamento, prod ao vivo, dado destrutivo, login), o plano traz **trade-offs e rollback** e a
+   confirmação é redobrada. Se a mudança vai **contra uma regra do projeto** e o João decidir fazê-la
+   mesmo assim, **registre a decisão e o motivo** no [`HISTORICO.md`](HISTORICO.md) e atualize as
+   regras afetadas (esta doc + o documento da área).
 
-**3. Planejar.** Liste os arquivos que vai tocar **e os documentos que a mudança afeta** (já nesta
-   etapa — não deixe a doc pro fim e esqueça).
+**3. Planejar e apresentar ao PO (Portão A — regra 16).** Liste os arquivos que vai tocar **e os
+   documentos que a mudança afeta** (já nesta etapa). **Apresente o plano ao João em duas camadas
+   (técnica + leiga) e aguarde o OK explícito antes de implementar** — sempre, proporcional ao
+   tamanho (trivial = uma linha; grande = plano completo). Vale para código; doc-só segue o fluxo
+   leve. → [`11`](11-EQUIPE-E-PAPEIS.md) §2-3.
 
 **4. Implementar** seguindo os padrões do doc 02, isolado conforme o doc 09 (worktree se houver
    sessão concorrente). Mudanças de banco = **migration aditiva** numerada corretamente (doc 05/09).
@@ -173,7 +194,7 @@ de docs + changelog (seção 5). Cada uma tem dono num doc específico.
    velho.
 
 **7. Atualizar a documentação `.claude/` afetada.** Para **cada** regra/comportamento alterado,
-   atualize o(s) documento(s) correspondente(s) (01–09). Documentação desatualizada é pior que
+   atualize o(s) documento(s) correspondente(s) (01–11). Documentação desatualizada é pior que
    nenhuma.
 
 **8. Registrar no CHANGELOG e versionar.** Entrada em [`CHANGELOG.md`](CHANGELOG.md) + **suba a
@@ -227,6 +248,7 @@ Copa** (cortado quando o João disser "pronto").
 |---|---|
 | Stack, pastas, integrações, deploy | [`01-ARQUITETURA.md`](01-ARQUITETURA.md) · [`07-BUILD-E-DEPLOY.md`](07-BUILD-E-DEPLOY.md) |
 | Como escrever código aqui | [`02-CODIGO.md`](02-CODIGO.md) |
+| Quem a IA é (papéis), tratar o João como PO, plano-antes-de-codar | [`11-EQUIPE-E-PAPEIS.md`](11-EQUIPE-E-PAPEIS.md) |
 | Que telas existem e em que rota | [`03-PAGINAS.md`](03-PAGINAS.md) |
 | Regras de admin | [`04-ADMIN.md`](04-ADMIN.md) |
 | Tabelas, RLS, login/logout | [`05-DADOS-E-AUTH.md`](05-DADOS-E-AUTH.md) |

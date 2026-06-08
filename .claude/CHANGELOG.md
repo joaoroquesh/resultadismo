@@ -21,6 +21,15 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
+- **Modelo de trabalho: João é o PO, a IA é uma equipe, e nenhum código sobe sem plano validado
+  antes.** Novo doc [`11-EQUIPE-E-PAPEIS.md`](11-EQUIPE-E-PAPEIS.md): a IA atua como **equipe
+  multidisciplinar** (11 papéis com responsabilidades e cenários), o João é o **Product Owner**, e
+  ficam nomeados os **3 portões** (A plano-antes-de-codar / B homologação pré-deploy / C release).
+  Regras centrais **15** (PO + equipe) e **16** (plano validado antes de qualquer código, proporcional,
+  escopo = código) adicionadas ao [`MESTRE.md`](MESTRE.md); §5 passo 3 reforçado + gate Portão A no
+  [`08-PROCESSO.md`](08-PROCESSO.md). Coerência propagada em 01/02/04/06/07/08/09/10 e nos ponteiros
+  `CLAUDE.md`/`AGENTS.md`. Decisão registrada em [`decisions/0005`](decisions/0005-equipe-po-e-plano.md).
+  **Só documentação** (nenhum código de runtime tocado).
 - **AGENTS.md na raiz.** Novo ponto de entrada para sessões Codex/IA, espelhando o `CLAUDE.md` e
   apontando para a documentação viva em `.claude/` (`MESTRE`, processo, paralelismo e regras centrais).
 - **Changelog no admin.** Nova aba **Changelog** no `/admin` (só app-admin) que renderiza este

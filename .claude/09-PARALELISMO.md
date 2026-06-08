@@ -26,6 +26,10 @@ git log --oneline -8          # a main andou? quem commitou o quê?
 
 ## 2. Isolar a sua frente
 
+> **Atenção (regra 16):** o limiar "não-trivial" abaixo decide **só o isolamento em worktree**. O
+> dever de **planejar e validar com o PO antes de codar** (Portão A) vale para **toda** mudança de
+> código, inclusive a trivial. → [`11`](11-EQUIPE-E-PAPEIS.md) §3.
+
 Para qualquer mudança não-trivial quando há concorrência:
 
 1. **Trabalhe em branch/worktree próprio**, criado a partir do **`origin/main` atual**:
@@ -36,7 +40,9 @@ Para qualquer mudança não-trivial quando há concorrência:
    - Symlink/copie `node_modules` e copie `.env.local` para o worktree.
    - O worktree não encosta na árvore principal (que pode ter trabalho não-commitado de outra sessão).
 2. **Multi-frente** (vários assuntos independentes no mesmo pedido): **um agente/branch por frente**,
-   em worktrees isolados. Passe a cada um a lista de **arquivos "não tocar"** + setup.
+   em worktrees isolados. Passe a cada um a lista de **arquivos "não tocar"** + setup. (Isto é
+   **sessão/branch paralela** — não confundir com o "chapéu/papel" que a IA veste **dentro** de uma
+   sessão, doc [`11`](11-EQUIPE-E-PAPEIS.md).)
 3. **Integre depois** num worktree próprio a partir do `main` atual, resolvendo conflitos **sem**
    mexer na árvore principal; entregue o branch integrado para o João mesclar quando quiser.
 

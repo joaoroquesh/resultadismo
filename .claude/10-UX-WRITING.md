@@ -8,6 +8,10 @@
 > microcopy, voz/tom, acessibilidade, benchmarks). **Fonte de identidade:** [`PRODUCT.md`](../PRODUCT.md)
 > (marca e voz) e [`DESIGN.md`](../DESIGN.md) (visual). Este guia une as duas para o Resultadismo.
 >
+> O **chapéu** que aplica este guia é o **UX Writer/Copywriter** ([`11`](11-EQUIPE-E-PAPEIS.md) §4.6).
+> O checklist de qualidade de copy (§8) é um **filtro da própria equipe** durante a implementação, e
+> roda **depois** do plano validado pelo João (Portão A, regra 16), não no lugar dele.
+>
 > v1 — 2026-06-04 · v2 — 2026-06-06 (técnica "dialogue com o Resultadista").
 
 ---

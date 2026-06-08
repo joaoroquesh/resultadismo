@@ -131,6 +131,8 @@ seta uma).
 testar fluxos); staging project é mais infra/custo. Local + snapshot é **grátis**, mais real (você
 escreve à vontade na cópia) e **zero risco a produção**.
 
-**Fluxo:** desenvolve local (seed p/ rapidez, snapshot p/ realismo) → valida (build + navegador) →
-sobe p/ prod por **push na main** (§3). O DevPanel/seed/snapshot são puramente de dev — não afetam o
+**Fluxo:** plano validado pelo João **antes de codar** (Portão A, regra 16, [`11`](11-EQUIPE-E-PAPEIS.md) §3)
+→ desenvolve local (seed p/ rapidez, snapshot p/ realismo) → valida (build + navegador) → **homologa
+com o João** (Portão B) → sobe p/ prod por **push na main** (§3). O DevPanel/seed/snapshot são
+puramente de dev — não afetam o
 app em produção.
