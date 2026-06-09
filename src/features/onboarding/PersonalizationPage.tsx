@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Heart,
   Flag,
@@ -13,26 +14,42 @@ import {
   ChevronRight,
   Search,
   X,
+  User as UserIcon,
+  Bell,
+  Download,
+  Share,
+  SquarePlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Switch } from "@/components/ui/Switch";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
+import { CrestEditor } from "@/components/ui/CrestEditor";
 import { cn } from "@/lib/utils";
+import { ESCUDO_SHAPES, legacyToCrest } from "@/lib/crest";
+import { getStoredInvite, clearStoredInvite } from "@/lib/invite";
+import { getPushState, subscribePush, unsubscribePush } from "@/features/notifications/push";
+import { useInstallState, promptInstall, isIOS } from "@/lib/pwa";
+import { useAuth } from "@/features/auth/AuthProvider";
 import { useJoinByCode } from "@/features/leagues/api";
 import {
   usePersonalizationState,
   usePersonalizationCompetitions,
   useSetPersonalization,
   useSkipPersonalization,
+  useSaveProfileBasics,
   type TeamLite,
   type PersoComp,
 } from "./personalizationApi";
 import { catalogClubs, catalogNations, teamsForCompetition } from "./teamsCatalog";
 
-const STEP_COUNT = 4;
+const STEP_COUNT = 6;
 const WC_CODES = ["WC", "fifa.world"];
+const UFS = [
+  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG",
+  "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO",
+];
 
 // Grupos colapsáveis da tela "times e campeonatos".
 const GROUPS = ["Seleções", "Ligas e estaduais", "Copas", "Alternativos"] as const;
@@ -111,21 +128,170 @@ function RoundCheck({ state }: { state: "empty" | "checked" | "partial" }) {
   );
 }
 
+// Cabeçalho de etapa: ÍCONE e TÍTULO lado a lado; descrição abaixo, alinhada à esquerda.
+function StepHeader({
+  icon,
+  tone,
+  title,
+  subtitle,
+}: {
+  icon: React.ReactNode;
+  tone: string;
+  title: string;
+  subtitle?: string;
+}) {
+  return (
+    <div>
+      <div className="flex items-center gap-3">
+        <span className={cn("grid size-11 shrink-0 place-items-center rounded-full", tone)}>{icon}</span>
+        <h2 className="min-w-0 text-xl font-extrabold leading-tight tracking-tight text-ink-950">
+          {title}
+        </h2>
+      </div>
+      {subtitle && <p className="mt-2 text-sm leading-relaxed text-ink-500">{subtitle}</p>}
+    </div>
+  );
+}
+
+// Tela rolável simples (perfil, ranking+convite, notificações+instalar).
+function FormScreen({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="h-full overflow-y-auto">
+      <div className="mx-auto max-w-xl px-4 py-5">{children}</div>
+    </div>
+  );
+}
+
+// Meia-tela com ícone+título+descrição (telas divididas).
+function SplitSection({
+  icon,
+  tone,
+  title,
+  desc,
+  children,
+}: {
+  icon: React.ReactNode;
+  tone: string;
+  title: string;
+  desc: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <div className="flex items-center gap-3">
+        <span className={cn("grid size-11 shrink-0 place-items-center rounded-full", tone)}>{icon}</span>
+        <h3 className="min-w-0 text-base font-bold text-ink-900">{title}</h3>
+      </div>
+      <p className="mt-1.5 text-sm leading-relaxed text-ink-500">{desc}</p>
+      <div className="mt-3">{children}</div>
+    </div>
+  );
+}
+
+// Tela de escolha de time: CABEÇALHO + BUSCA fixos; só a LISTA (ul) rola.
+function PickerScreen({
+  icon,
+  tone,
+  title,
+  subtitle,
+  teams,
+  value,
+  onChange,
+  searchPlaceholder,
+  emptyText,
+}: {
+  icon: React.ReactNode;
+  tone: string;
+  title: string;
+  subtitle: string;
+  teams: TeamLite[];
+  value: string;
+  onChange: (id: string) => void;
+  searchPlaceholder: string;
+  emptyText: string;
+}) {
+  const [q, setQ] = useState("");
+  const filtered = useMemo(() => {
+    const t = q.trim().toLowerCase();
+    if (!t) return teams;
+    return teams.filter(
+      (x) => x.name.toLowerCase().includes(t) || (x.country ?? "").toLowerCase().includes(t),
+    );
+  }, [teams, q]);
+
+  return (
+    <div className="flex h-full flex-col">
+      <div className="mx-auto w-full max-w-xl shrink-0 px-4 pt-5">
+        <StepHeader icon={icon} tone={tone} title={title} subtitle={subtitle} />
+        <div className="mt-4 flex items-center gap-2 rounded-md border border-ink-200 bg-surface px-3">
+          <Search className="size-4 shrink-0 text-ink-400" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder={searchPlaceholder}
+            className="h-11 w-full bg-transparent text-sm outline-none placeholder:text-ink-400"
+          />
+          {q && (
+            <button
+              type="button"
+              aria-label="Limpar busca"
+              onClick={() => setQ("")}
+              className="grid size-6 shrink-0 place-items-center rounded text-ink-400 hover:bg-ink-100 hover:text-ink-700"
+            >
+              <X className="size-3.5" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      <ul className="mx-auto w-full max-w-xl flex-1 space-y-0.5 overflow-y-auto px-4 pb-5 pt-2">
+        {teams.length === 0 ? (
+          <li className="rounded-md bg-ink-50 px-3 py-6 text-center text-sm text-ink-500">{emptyText}</li>
+        ) : filtered.length === 0 ? (
+          <li className="px-3 py-6 text-center text-sm text-ink-400">Nada encontrado.</li>
+        ) : (
+          filtered.map((t) => {
+            const sel = t.id === value;
+            return (
+              <li key={t.id}>
+                <button
+                  type="button"
+                  onClick={() => onChange(t.id)}
+                  className={cn(
+                    "flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-sm transition",
+                    sel
+                      ? "bg-surface font-semibold text-ink-950 ring-2 ring-inset ring-brand-600"
+                      : "text-ink-700 hover:bg-ink-100",
+                  )}
+                >
+                  <TeamCrest team={t} />
+                  <span className="min-w-0 flex-1 truncate">{t.name}</span>
+                  {sel && <Check className="size-4 shrink-0 text-brand-600" />}
+                </button>
+              </li>
+            );
+          })
+        )}
+      </ul>
+    </div>
+  );
+}
+
 export function PersonalizationPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [params] = useSearchParams();
+  const { user, profile } = useAuth();
 
   const { data: state } = usePersonalizationState();
   const { data: comps } = usePersonalizationCompetitions();
   const setPerso = useSetPersonalization();
+  const saveProfile = useSaveProfileBasics();
   const skip = useSkipPersonalization();
   const join = useJoinByCode();
 
-  // Listas vêm do catálogo curado (client-side), desacopladas da tabela `teams`.
   const clubs = useMemo(() => catalogClubs(), []);
   const nationals = useMemo(() => catalogNations(), []);
-  // provider_code → id real da competição (pra resolver "seguir em todos").
   const codeToId = useMemo(() => {
     const m = new Map<string, string>();
     (comps ?? []).forEach((c) => {
@@ -133,8 +299,6 @@ export function PersonalizationPage() {
     });
     return m;
   }, [comps]);
-
-  // Campeonatos ordenados (Seleções → Ligas → Copas).
   const orderedComps = useMemo(
     () => [...(comps ?? [])].sort((a, b) => orderIdx(a.provider_code) - orderIdx(b.provider_code)),
     [comps],
@@ -145,18 +309,37 @@ export function PersonalizationPage() {
   const [hydrated, setHydrated] = useState(false);
   const [wasEditing, setWasEditing] = useState(false);
 
+  // Perfil (tela 0)
+  const [name, setName] = useState("");
+  const [uf, setUf] = useState("");
+  const [crest, setCrest] = useState<string>("");
+  // Preferências
   const [favoriteTeamId, setFavoriteTeamId] = useState<string>("");
   const [nationalId, setNationalId] = useState<string>("");
   const [followedComps, setFollowedComps] = useState<string[]>([]);
   const [followedTeams, setFollowedTeams] = useState<Record<string, string[]>>({});
   const [participateRtb, setParticipateRtb] = useState(true);
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState<string>(() => getStoredInvite());
 
-  // Hidrata o formulário a partir do estado salvo, UMA vez (quando os dados
-  // chegam). Padrão "ajustar estado no render" (sem efeito) — evita render em
-  // cascata (react-hooks/set-state-in-effect). O guard `!hydrated` garante 1x só.
+  // Foto do Google (pra opção "Foto" no escudo) — igual ao Editar Perfil.
+  const metaPhoto =
+    (user?.user_metadata?.avatar_url as string | undefined) ||
+    (user?.user_metadata?.picture as string | undefined) ||
+    null;
+  const savedAvatar = profile?.avatar_url ?? null;
+  const googlePhoto =
+    metaPhoto ||
+    (savedAvatar && !savedAvatar.startsWith("gen:") && !savedAvatar.startsWith("crest:")
+      ? savedAvatar
+      : null);
+  const editorInitial = useMemo(() => legacyToCrest(savedAvatar), [savedAvatar]);
+
+  // Hidrata UMA vez quando os dados chegam (padrão sem efeito, evita cascata).
   if (state && !hydrated) {
     setHydrated(true);
+    setName(profile?.display_name ?? "");
+    setUf(profile?.uf ?? "");
+    setCrest(editorInitial ?? "");
     setFavoriteTeamId(state.favorite_team_id ?? "");
     setNationalId(state.national_team_id ?? "");
     setFollowedComps(state.followed_competition_ids ?? []);
@@ -173,6 +356,9 @@ export function PersonalizationPage() {
       followedTeams,
       showInRanking: participateRtb,
     });
+    if (name.trim()) {
+      saveProfile.mutate({ display_name: name.trim(), avatar_url: crest || null, uf: uf || null });
+    }
   }
   function leave() {
     navigate(wasEditing ? "/perfil" : "/");
@@ -182,6 +368,7 @@ export function PersonalizationPage() {
     if (code.trim()) {
       try {
         await join.mutateAsync(code.trim());
+        clearStoredInvite();
         toast("Você entrou no grupo!", "success");
       } catch (err) {
         toast(err instanceof Error ? err.message : "Código inválido.", "error");
@@ -225,8 +412,8 @@ export function PersonalizationPage() {
   function toggleTeam(compId: string, teamId: string, allIds: string[]) {
     const isWhole = followedComps.includes(compId);
     const base = isWhole ? allIds : followedTeams[compId] ?? [];
-    const next = base.includes(teamId) ? base.filter((x) => x !== teamId) : [...base, teamId];
-    const becomesWhole = allIds.length > 0 && next.length === allIds.length;
+    const nextSel = base.includes(teamId) ? base.filter((x) => x !== teamId) : [...base, teamId];
+    const becomesWhole = allIds.length > 0 && nextSel.length === allIds.length;
 
     setFollowedComps((p) => {
       const without = p.filter((x) => x !== compId);
@@ -234,13 +421,11 @@ export function PersonalizationPage() {
     });
     setFollowedTeams((p) => {
       const n = { ...p };
-      if (next.length === 0 || becomesWhole) delete n[compId];
-      else n[compId] = next;
+      if (nextSel.length === 0 || becomesWhole) delete n[compId];
+      else n[compId] = nextSel;
       return n;
     });
   }
-  // Segue o time em TODOS os campeonatos em que ele aparece (pula os que já
-  // estão marcados inteiros — lá ele já está incluído).
   function followTeamEverywhere(teamId: string, compIds: string[]) {
     setFollowedTeams((p) => {
       const n = { ...p };
@@ -266,11 +451,8 @@ export function PersonalizationPage() {
       setFollowedTeams({});
     }
   }
-  // Seleciona / limpa um grupo inteiro (Seleções, Ligas, Copas, Alternativos).
   function selectGroup(ids: string[], whole: boolean) {
-    setFollowedComps((p) =>
-      whole ? [...new Set([...p, ...ids])] : p.filter((x) => !ids.includes(x)),
-    );
+    setFollowedComps((p) => (whole ? [...new Set([...p, ...ids])] : p.filter((x) => !ids.includes(x))));
     setFollowedTeams((p) => {
       const n = { ...p };
       ids.forEach((id) => delete n[id]);
@@ -278,9 +460,17 @@ export function PersonalizationPage() {
     });
   }
 
-  // gating do "Próximo" por tela
+  // gating do "Próximo" por tela: 0 perfil(nome) · 1 coração · 2 seleção · 3 acompanhar · 4/5 livres
   const canNext =
-    step === 0 ? !!favoriteTeamId : step === 1 ? !!nationalId : step === 2 ? anyFollow : true;
+    step === 0
+      ? !!name.trim()
+      : step === 1
+        ? !!favoriteTeamId
+        : step === 2
+          ? !!nationalId
+          : step === 3
+            ? anyFollow
+            : true;
 
   const loadingBase = !state || !comps;
 
@@ -310,55 +500,100 @@ export function PersonalizationPage() {
         </div>
       </div>
 
-      {/* meio: rola */}
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-xl px-4 py-5">
-          {loadingBase ? (
-            <div className="space-y-3">
-              <Skeleton className="h-7 w-2/3" />
-              <Skeleton className="h-11 w-full" />
-              <Skeleton className="h-40 w-full" />
+      {/* meio: cada tela controla o próprio scroll */}
+      <div className="min-h-0 flex-1 overflow-hidden">
+        {loadingBase ? (
+          <div className="mx-auto max-w-xl space-y-3 px-4 py-5">
+            <Skeleton className="h-7 w-2/3" />
+            <Skeleton className="h-11 w-full" />
+            <Skeleton className="h-40 w-full" />
+          </div>
+        ) : step === 0 ? (
+          <FormScreen>
+            <StepHeader
+              icon={<UserIcon className="size-5" />}
+              tone="bg-surface-2 text-brand-600"
+              title="Seu perfil"
+              subtitle="Seu nome, estado e escudo — é como a galera te vê no Resultadismo."
+            />
+            <div className="mt-5 space-y-4">
+              <div className="rounded-lg border border-border bg-surface p-4">
+                <CrestEditor
+                  key={hydrated ? "ready" : "loading"}
+                  kind="escudo"
+                  name={name}
+                  initial={editorInitial}
+                  shapes={ESCUDO_SHAPES}
+                  allowPhoto
+                  photoUrl={googlePhoto}
+                  onChange={setCrest}
+                />
+              </div>
+              <Input
+                label="Nome"
+                icon={<UserIcon className="size-4" />}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                maxLength={40}
+                required
+              />
+              <div>
+                <label className="mb-1 block text-sm font-medium text-ink-700" htmlFor="uf">
+                  Estado (UF)
+                </label>
+                <select
+                  id="uf"
+                  value={uf}
+                  onChange={(e) => setUf(e.target.value)}
+                  className="h-11 w-full rounded-md border border-ink-200 bg-surface px-3 text-sm text-ink-900 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40"
+                >
+                  <option value="">Prefiro não dizer</option>
+                  {UFS.map((u) => (
+                    <option key={u} value={u}>
+                      {u}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-          ) : step === 0 ? (
-            <ScreenShell
-              icon={<Heart className="size-6" />}
-              tone="bg-surface-2 text-flame-600"
-              title="Qual é o seu time do coração?"
-              subtitle="Escolha um. Pra deixar o Resultadismo com a sua cara — muda quando quiser."
-            >
-              <TeamPickerList
-                key="pick-clubs"
-                teams={clubs}
-                value={favoriteTeamId}
-                onChange={setFavoriteTeamId}
-                searchPlaceholder="Buscar time…"
-                emptyText="Os clubes entram quando os campeonatos começarem. Você escolhe depois."
+          </FormScreen>
+        ) : step === 1 ? (
+          <PickerScreen
+            key="pick-clubs"
+            icon={<Heart className="size-5" />}
+            tone="bg-surface-2 text-flame-600"
+            title="Qual é o seu time do coração?"
+            subtitle="Escolha um. Pra deixar o Resultadismo com a sua cara — muda quando quiser."
+            teams={clubs}
+            value={favoriteTeamId}
+            onChange={setFavoriteTeamId}
+            searchPlaceholder="Buscar time…"
+            emptyText="Os clubes entram quando os campeonatos começarem. Você escolhe depois."
+          />
+        ) : step === 2 ? (
+          <PickerScreen
+            key="pick-nationals"
+            icon={<Flag className="size-5" />}
+            tone="bg-surface-2 text-grass-700"
+            title="Pra que seleção você torce?"
+            subtitle="É Copa do Mundo! Escolha a sua — o Brasil abre a lista."
+            teams={nationals}
+            value={nationalId}
+            onChange={setNationalId}
+            searchPlaceholder="Buscar seleção…"
+            emptyText="As seleções entram quando a Copa for sincronizada."
+          />
+        ) : step === 3 ? (
+          <div className="flex h-full flex-col">
+            <div className="mx-auto w-full max-w-xl shrink-0 px-4 pb-2 pt-5">
+              <StepHeader
+                icon={<ShieldHalf className="size-5" />}
+                tone="bg-surface-2 text-aqua-700"
+                title="Quais times e campeonatos você quer acompanhar?"
+                subtitle="Marque o campeonato inteiro ou abra pra escolher só alguns times. Dá pra seguir um time numa liga e não numa copa."
               />
-            </ScreenShell>
-          ) : step === 1 ? (
-            <ScreenShell
-              icon={<Flag className="size-6" />}
-              tone="bg-surface-2 text-grass-700"
-              title="Pra que seleção você torce?"
-              subtitle="É Copa do Mundo! Escolha a sua — o Brasil abre a lista."
-            >
-              <TeamPickerList
-                key="pick-nationals"
-                teams={nationals}
-                value={nationalId}
-                onChange={setNationalId}
-                searchPlaceholder="Buscar seleção…"
-                emptyText="As seleções entram quando a Copa for sincronizada."
-              />
-            </ScreenShell>
-          ) : step === 2 ? (
-            <ScreenShell
-              icon={<ShieldHalf className="size-6" />}
-              tone="bg-surface-2 text-aqua-700"
-              title="Quais times e campeonatos você quer acompanhar?"
-              subtitle="Marque o campeonato inteiro ou abra pra escolher só alguns times. Dá pra seguir um time numa liga e não numa copa."
-            >
-              {/* selecionar todos */}
+            </div>
+            <div className="mx-auto w-full max-w-xl flex-1 overflow-y-auto px-4 pb-5">
               <button
                 type="button"
                 onClick={toggleAll}
@@ -367,7 +602,6 @@ export function PersonalizationPage() {
                 <span className="flex-1 text-sm font-bold text-ink-900">Selecionar todos</span>
                 <RoundCheck state={allWhole ? "checked" : anyFollow ? "partial" : "empty"} />
               </button>
-
               <div className="space-y-2">
                 {GROUPS.map((g) => {
                   const groupComps = orderedComps.filter((c) => groupOf(c) === g);
@@ -389,13 +623,15 @@ export function PersonalizationPage() {
                   );
                 })}
               </div>
-            </ScreenShell>
-          ) : (
-            <ScreenShell
-              icon={<Globe2 className="size-6" />}
+            </div>
+          </div>
+        ) : step === 4 ? (
+          <FormScreen>
+            <SplitSection
+              icon={<Globe2 className="size-5" />}
               tone="bg-surface-2 text-brand-600"
               title="Bora pro ranking geral?"
-              subtitle="O Resultadismo The Best junta todo mundo numa classificação só."
+              desc="O Resultadismo The Best junta todo mundo numa classificação só."
             >
               <div className="flex w-full items-center justify-between gap-3 rounded-md border border-ink-200 bg-surface p-4">
                 <div className="min-w-0">
@@ -412,20 +648,32 @@ export function PersonalizationPage() {
                   label="Participar do Resultadismo The Best"
                 />
               </div>
+            </SplitSection>
 
-              <div className="mt-4">
-                <Input
-                  label="Tem código de convite?"
-                  placeholder="Ex.: CRAQUE"
-                  icon={<Ticket className="size-4" />}
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.toUpperCase())}
-                />
-                <p className="mt-1 text-xs text-ink-500">Já entra no grupo de quem te chamou.</p>
-              </div>
-            </ScreenShell>
-          )}
-        </div>
+            <hr className="my-6 border-border" />
+
+            <SplitSection
+              icon={<Ticket className="size-5" />}
+              tone="bg-surface-2 text-gold-600"
+              title="Recebeu o código de convite de alguém?"
+              desc="Coloque aqui pra já entrar no grupo de quem te chamou."
+            >
+              <Input
+                label="Código de convite"
+                placeholder="Ex.: CRAQUE"
+                icon={<Ticket className="size-4" />}
+                value={code}
+                onChange={(e) => setCode(e.target.value.toUpperCase())}
+              />
+            </SplitSection>
+          </FormScreen>
+        ) : (
+          <FormScreen>
+            <NotifSection userId={user?.id ?? null} onToast={toast} />
+            <hr className="my-6 border-border" />
+            <InstallSection />
+          </FormScreen>
+        )}
       </div>
 
       {/* baixo: nav colada */}
@@ -460,104 +708,90 @@ export function PersonalizationPage() {
   );
 }
 
-function ScreenShell({
-  icon,
-  tone,
-  title,
-  subtitle,
-  children,
+// ── tela final: notificações ────────────────────────────────────────────────
+function NotifSection({
+  userId,
+  onToast,
 }: {
-  icon: React.ReactNode;
-  tone: string;
-  title: string;
-  subtitle: string;
-  children: React.ReactNode;
+  userId: string | null;
+  onToast: (msg: string, kind?: "success" | "error" | "info") => void;
 }) {
+  const qc = useQueryClient();
+  const { data: push } = useQuery({
+    queryKey: ["onboarding-push"],
+    queryFn: getPushState,
+    staleTime: 10_000,
+  });
+  const [busy, setBusy] = useState(false);
+  const on = !!push?.subscribed;
+
+  async function toggle(next: boolean) {
+    if (!userId) return;
+    setBusy(true);
+    const res = next ? await subscribePush(userId) : await unsubscribePush();
+    setBusy(false);
+    if (!res.ok) onToast(res.error ?? "Não foi possível agora.", "error");
+    else onToast(next ? "Notificações ativadas!" : "Notificações desativadas.", "info");
+    qc.invalidateQueries({ queryKey: ["onboarding-push"] });
+  }
+
   return (
-    <div>
-      <span className={cn("mb-4 grid size-12 place-items-center rounded-full", tone)}>{icon}</span>
-      <h2 className="text-xl font-extrabold tracking-tight text-ink-950">{title}</h2>
-      <p className="mb-5 mt-1 text-sm leading-relaxed text-ink-500">{subtitle}</p>
-      {children}
-    </div>
+    <SplitSection
+      icon={<Bell className="size-5" />}
+      tone="bg-surface-2 text-brand-600"
+      title="Ative as notificações"
+      desc="Pra não esquecer de palpitar — a gente te lembra antes dos jogos."
+    >
+      {push?.supported ? (
+        <div className="flex w-full items-center justify-between gap-3 rounded-md border border-ink-200 bg-surface p-4">
+          <span className="min-w-0 text-sm font-bold text-ink-900">Receber lembretes e avisos</span>
+          <Switch checked={on} onChange={toggle} disabled={busy} label="Ativar notificações" />
+        </div>
+      ) : (
+        <p className="rounded-md border border-ink-200 bg-surface p-4 text-sm leading-relaxed text-ink-500">
+          {isIOS()
+            ? "No iPhone, instale o app na tela inicial primeiro (abaixo) — aí as notificações funcionam."
+            : "Seu navegador não suporta notificações por aqui. Tente pelo Chrome do celular."}
+        </p>
+      )}
+    </SplitSection>
   );
 }
 
-// Lista com busca SEMPRE visível, seleção ÚNICA (clube ou seleção).
-function TeamPickerList({
-  teams,
-  value,
-  onChange,
-  searchPlaceholder,
-  emptyText,
-}: {
-  teams: TeamLite[];
-  value: string;
-  onChange: (id: string) => void;
-  searchPlaceholder: string;
-  emptyText: string;
-}) {
-  const [q, setQ] = useState("");
-  const filtered = useMemo(() => {
-    const t = q.trim().toLowerCase();
-    if (!t) return teams;
-    return teams.filter(
-      (x) => x.name.toLowerCase().includes(t) || (x.country ?? "").toLowerCase().includes(t),
-    );
-  }, [teams, q]);
-
+// ── tela final: instalar o app ──────────────────────────────────────────────
+function InstallSection() {
+  const state = useInstallState();
   return (
-    <div>
-      <div className="sticky top-0 z-10 flex items-center gap-2 rounded-md border border-ink-200 bg-surface px-3">
-        <Search className="size-4 shrink-0 text-ink-400" />
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder={searchPlaceholder}
-          className="h-11 w-full bg-transparent text-sm outline-none placeholder:text-ink-400"
-        />
-        {q && (
-          <button
-            type="button"
-            aria-label="Limpar busca"
-            onClick={() => setQ("")}
-            className="grid size-6 shrink-0 place-items-center rounded text-ink-400 hover:bg-ink-100 hover:text-ink-700"
-          >
-            <X className="size-3.5" />
-          </button>
-        )}
-      </div>
-
-      <ul className="mt-2 space-y-0.5">
-        {teams.length === 0 ? (
-          <li className="rounded-md bg-ink-50 px-3 py-6 text-center text-sm text-ink-500">
-            {emptyText}
-          </li>
-        ) : filtered.length === 0 ? (
-          <li className="px-3 py-6 text-center text-sm text-ink-400">Nada encontrado.</li>
-        ) : (
-          filtered.map((t) => {
-            const sel = t.id === value;
-            return (
-              <li key={t.id}>
-                <button
-                  type="button"
-                  onClick={() => onChange(t.id)}
-                  className={cn(
-                    "flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-sm transition",
-                    sel ? "bg-surface ring-2 ring-inset ring-brand-600 font-semibold text-ink-950" : "text-ink-700 hover:bg-ink-100",
-                  )}
-                >
-                  <TeamCrest team={t} />
-                  <span className="min-w-0 flex-1 truncate">{t.name}</span>
-                  {sel && <Check className="size-4 shrink-0 text-brand-600" />}
-                </button>
-              </li>
-            );
-          })
-        )}
-      </ul>
-    </div>
+    <SplitSection
+      icon={<Download className="size-5" />}
+      tone="bg-surface-2 text-grass-700"
+      title="Instale o app"
+      desc="Abre num toque na tela inicial e garante os lembretes dos seus palpites."
+    >
+      {state === "installable" ? (
+        <Button onClick={() => void promptInstall()}>
+          <Download className="size-4" /> Instalar app
+        </Button>
+      ) : state === "installed" ? (
+        <p className="rounded-md border border-brand-600 bg-surface p-4 text-sm font-semibold text-brand-700">
+          App já instalado ✓
+        </p>
+      ) : state === "ios" ? (
+        <p className="rounded-md border border-ink-200 bg-surface p-4 text-sm leading-relaxed text-ink-600">
+          Toque em
+          <Share className="mx-1 inline size-3.5 -translate-y-px text-brand-600" aria-label="Compartilhar" />
+          <span className="font-semibold">Compartilhar</span> e depois em{" "}
+          <span className="inline-flex translate-y-px items-center gap-0.5 font-semibold">
+            <SquarePlus className="size-3.5" /> Adicionar à Tela de Início
+          </span>
+          .
+        </p>
+      ) : (
+        <p className="rounded-md border border-ink-200 bg-surface p-4 text-sm leading-relaxed text-ink-500">
+          Abra no Chrome (Android) ou no Safari (iPhone) do celular pra instalar.
+        </p>
+      )}
+    </SplitSection>
   );
 }
 
@@ -737,7 +971,9 @@ function CompetitionItem({
                       onClick={handleTap}
                       className={cn(
                         "flex w-full items-center gap-2.5 rounded px-2.5 py-2 text-left text-sm transition",
-                        on ? "bg-surface ring-2 ring-inset ring-brand-600 text-ink-950" : "text-ink-700 hover:bg-ink-100",
+                        on
+                          ? "bg-surface text-ink-950 ring-2 ring-inset ring-brand-600"
+                          : "text-ink-700 hover:bg-ink-100",
                       )}
                     >
                       <TeamCrest team={t} size={22} />

@@ -1262,6 +1262,7 @@ export type Database = {
           notif_prefs: Json
           personalization_done: boolean
           show_in_global_ranking: boolean
+          uf: string | null
           updated_at: string
           usage_seconds: number
         }
@@ -1283,6 +1284,7 @@ export type Database = {
           notif_prefs?: Json
           personalization_done?: boolean
           show_in_global_ranking?: boolean
+          uf?: string | null
           updated_at?: string
           usage_seconds?: number
         }
@@ -1304,6 +1306,7 @@ export type Database = {
           notif_prefs?: Json
           personalization_done?: boolean
           show_in_global_ranking?: boolean
+          uf?: string | null
           updated_at?: string
           usage_seconds?: number
         }
@@ -1548,7 +1551,20 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      admin_delete_competition: { Args: { p_id: string }; Returns: undefined }
+      admin_competition_usage: {
+        Args: { p_id: string }
+        Returns: {
+          groups: number
+          in_use: boolean
+          matches: number
+          name: string
+          predictions: number
+        }[]
+      }
+      admin_delete_competition: {
+        Args: { p_confirm_name?: string; p_id: string }
+        Returns: undefined
+      }
       admin_delete_user: { Args: { p_user_id: string }; Returns: undefined }
       admin_list_broadcasts: {
         Args: { p_limit?: number }
@@ -1719,7 +1735,7 @@ export type Database = {
         Returns: number
       }
       admin_set_competition_published: {
-        Args: { p_id: string; p_value: boolean }
+        Args: { p_confirm_name?: string; p_id: string; p_value: boolean }
         Returns: undefined
       }
       admin_set_competition_source_enabled: {
