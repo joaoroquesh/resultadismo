@@ -129,6 +129,24 @@ Regras:
 - Mudança de banco: `supabase db reset` local aplica todas as migrations + seed sem erro.
 - Detalhe operacional completo em [`08-PROCESSO.md`](08-PROCESSO.md).
 
+### Portões de qualidade de código (obrigatórios para código novo)
+
+Dois pontos de avaliação fixos no projeto. Valem **para todo código novo**; o código existente que
+ainda não passa é **backlog de otimização** (refatorar aos poucos, sem quebrar o que funciona).
+
+1. **Complexidade ciclomática.** Regra `complexity: ["warn", 20]` no `eslint.config.js`. **Avisa**
+   (não quebra o build) quando uma função passa de 20 — sinal de que está fazendo coisa demais e
+   pede quebra em funções/componentes menores. Conta `&&`, `??` e ternários, então componente React
+   infla naturalmente: prefira extrair subcomponentes/hooks a empilhar condicional no JSX.
+2. **Estrutura de dependências (camadas).** `npm run check:arch`
+   (`scripts/check-architecture.mjs`). Camada interna **não importa** camada externa. Direção:
+   `kernel` (lib/types/data) → `ui` (components/ui) → `components` → `feature` (features/*) →
+   `chrome` (components/layout, ponte) → `app` (raiz). `auth` é **transversal** (importável por
+   todos). **Violação dura** (núcleo vazando, ex.: `components/ui` importando `features/*`) **reprova**
+   (exit 1); **acoplamento lateral** entre features e leitura de metadado fora do `src` são **avisos**
+   (não bloqueiam) — o backlog a reduzir. Detalhe do modelo no topo do próprio script e em
+   [`11-EQUIPE-E-PAPEIS.md`](11-EQUIPE-E-PAPEIS.md) §3.
+
 ## 8. Scripts (`package.json`)
 
 | Script | O quê |

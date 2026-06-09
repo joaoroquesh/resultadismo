@@ -59,9 +59,11 @@ diferentes:
 | **C — Release** | **ao versionar** | O João decide **quando a versão sobe**; um dono faz o bump. Mudanças acumulam em `[Não lançado]`. | ADR [`0003`](decisions/0003-versionamento.md), [`MESTRE.md`](MESTRE.md) §6 |
 
 Além desses, há **checklists de qualidade por área** (não são portões com o PO, são filtros da
-própria equipe): a skill **`impeccable`** + heurísticas de Nielsen para UI/UX (regra 13), e o
-**checklist de copy** do [`10`](10-UX-WRITING.md) §8 para texto. Eles rodam **dentro** da
-implementação, depois do Portão A e antes do Portão B.
+própria equipe): a skill **`impeccable`** + heurísticas de Nielsen para UI/UX (regra 13); o
+**checklist de copy** do [`10`](10-UX-WRITING.md) §8 para texto; e os **portões de qualidade de
+código** ([`02`](02-CODIGO.md) §7) — **complexidade ciclomática** (`complexity` ≤ 20, dona: Dev/QA)
+e **estrutura de dependências** (`npm run check:arch` sem violação dura, dona: Arquiteto/Tech Lead).
+Eles rodam **dentro** da implementação, depois do Portão A e antes do Portão B.
 
 ### Calibragem do Portão A (decisão do PO)
 

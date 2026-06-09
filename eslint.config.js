@@ -22,5 +22,11 @@ export default tseslint.config(
       ecmaVersion: 2022,
       globals: globals.browser,
     },
+    rules: {
+      // Complexidade ciclomática: AVISA (não quebra o build) acima de 20.
+      // É ponto de avaliação para todo código novo. Ver .claude/02-CODIGO.md
+      // "Portões de qualidade de código" e .claude/11-EQUIPE-E-PAPEIS.md.
+      complexity: ["warn", 20],
+    },
   },
 );

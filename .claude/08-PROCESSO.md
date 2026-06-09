@@ -75,6 +75,8 @@ com o **C** (release/versão, ADR [`0003`](decisions/0003-versionamento.md), [`M
 | Camada | Como |
 |---|---|
 | Tipos/build | `npm run typecheck` (ou `npm run build`) **verde** |
+| Complexidade | `npm run lint` — regra `complexity` **avisa** acima de 20; evite introduzir função nova acima disso (doc 02 §7) |
+| Dependências | `npm run check:arch` **APROVADO** (sem violação dura de camada); avisos de acoplamento lateral são backlog (doc 02 §7) |
 | Banco | `npm run db:reset` aplica todas as migrations + seed **sem erro**; testar a regra via `psql`/Studio |
 | Fluxo real | **Testar no navegador** (Playwright/preview) — o João pediu validação real, não só typecheck |
 | Concorrência | `npm run build` na árvore inteira como gate de coerência **mas** revisar o diff cirurgicamente (não validar trabalho alheio como seu) |

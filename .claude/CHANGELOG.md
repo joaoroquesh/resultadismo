@@ -30,6 +30,15 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   [`08-PROCESSO.md`](08-PROCESSO.md). Coerência propagada em 01/02/04/06/07/08/09/10 e nos ponteiros
   `CLAUDE.md`/`AGENTS.md`. Decisão registrada em [`decisions/0005`](decisions/0005-equipe-po-e-plano.md).
   **Só documentação** (nenhum código de runtime tocado).
+- **Portões de qualidade de código (obrigatórios para código novo).** (1) **Complexidade ciclomática**:
+  regra `complexity: ["warn", 20]` no `eslint.config.js` (avisa, não quebra o build). (2) **Estrutura
+  de dependências**: `npm run check:arch` (`scripts/check-architecture.mjs`) garante que camada interna
+  não importa externa (`kernel → ui → components → feature → chrome → app`; `auth` transversal) —
+  violação dura reprova, acoplamento lateral é aviso/backlog. Documentado em
+  [`02-CODIGO.md`](02-CODIGO.md) §7, [`08-PROCESSO.md`](08-PROCESSO.md) §5 e
+  [`11-EQUIPE-E-PAPEIS.md`](11-EQUIPE-E-PAPEIS.md) §3. Hoje: `check:arch` **APROVADO** (0 violações
+  duras); 17 funções acima de 20 de complexidade e 27 avisos de acoplamento ficam como **backlog de
+  otimização** (sem quebrar o que funciona).
 - **AGENTS.md na raiz.** Novo ponto de entrada para sessões Codex/IA, espelhando o `CLAUDE.md` e
   apontando para a documentação viva em `.claude/` (`MESTRE`, processo, paralelismo e regras centrais).
 - **Changelog no admin.** Nova aba **Changelog** no `/admin` (só app-admin) que renderiza este
