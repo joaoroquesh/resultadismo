@@ -43,6 +43,10 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   gerador re-resolve escudos pelo manifesto e escreve `data/` **e** `src/data/` (fim da divergência).
   Escudos **265→290/292** (seleções `.svg` que estavam com `crest_file` null), dups/typo removidos.
   `npm run gen:crests | gen:teams | gen:all`. Guia em [`13-TIMES-E-ESCUDOS.md`](13-TIMES-E-ESCUDOS.md).
+- **Palpitar o placar sem teclado** — o input numérico (que abria o teclado) virou **stepper +/−**
+  (teto **19** por lado). Enquanto não palpita, o placar fica **“– ×–”** (não palpitado, ≠ de um 0×0
+  real); **clicar no card** liga o +/− e já vale **0×0** (o autosave salva sozinho, mesmo sem tocar).
+  **Nunca um lado vazio** (mexer num time fixa o outro em 0). `×` e layout do card intactos.
 - **Modelo de trabalho: João é o PO, a IA é uma equipe, e nenhum código sobe sem plano validado
   antes.** Novo doc [`11-EQUIPE-E-PAPEIS.md`](11-EQUIPE-E-PAPEIS.md): a IA atua como **equipe
   multidisciplinar** (11 papéis com responsabilidades e cenários), o João é o **Product Owner**, e

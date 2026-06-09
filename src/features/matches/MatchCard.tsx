@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { track } from "@/lib/analytics";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
-import { Check, Loader2, Lock, ChevronDown, Users, Zap, Hand } from "lucide-react";
+import { Check, Loader2, Lock, ChevronDown, Users, Zap, Hand, Plus, Minus } from "lucide-react";
 import { TeamCrest } from "@/components/TeamCrest";
 import { ScorePill } from "@/components/ScorePill";
 import { Avatar } from "@/components/ui/Avatar";
@@ -102,6 +102,27 @@ export function MatchCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [home, away]);
 
+  // Stepper: mexer num placar inicializa o outro em "0" (palpite começa 0×0).
+  const setHomeScore = (v: string) => {
+    setHome(v);
+    setAway((a) => (a === "" ? "0" : a));
+  };
+  const setAwayScore = (v: string) => {
+    setAway(v);
+    setHome((h) => (h === "" ? "0" : h));
+  };
+
+  // "Em edição": já tem palpite OU clicou no card pra fazer um. Antes disso o
+  // placar fica "– ×–" (NÃO palpitado, ≠ de um 0×0 real). Clicar no card já vale
+  // 0×0 (o autosave salva sozinho, mesmo sem tocar no +/−). Nunca um lado vazio.
+  const [active, setActive] = useState(!!prediction);
+  function startPredicting() {
+    if (!canEdit || active) return;
+    setActive(true);
+    setHome("0");
+    setAway("0");
+  }
+
   const scoreType = finished ? prediction?.score_type ?? null : null;
 
   return (
@@ -153,9 +174,24 @@ export function MatchCard({
       <div className="flex items-center justify-center gap-1.5 px-2 py-2.5">
         <TeamSide name={match.home_team?.short_name ?? match.home_team_name} team={match.home_team} align="right" />
         <div className="flex items-center gap-1.5">
-          <ScoreBox value={home} onChange={setHome} editable={canEdit} scoreType={scoreType} live={live} />
-          <span className="text-sm font-bold text-ink-300">×</span>
-          <ScoreBox value={away} onChange={setAway} editable={canEdit} scoreType={scoreType} live={live} />
+          {canEdit && !active ? (
+            <button
+              type="button"
+              onClick={startPredicting}
+              aria-label="Fazer palpite"
+              className="flex items-center gap-1.5 rounded-md px-1 py-0.5 transition hover:bg-ink-50"
+            >
+              <ScoreBox value="" onChange={() => {}} editable={false} scoreType={null} live={false} />
+              <span className="text-sm font-bold text-ink-300">×</span>
+              <ScoreBox value="" onChange={() => {}} editable={false} scoreType={null} live={false} />
+            </button>
+          ) : (
+            <>
+              <ScoreBox value={home} onChange={setHomeScore} editable={canEdit && active} scoreType={scoreType} live={live} />
+              <span className="text-sm font-bold text-ink-300">×</span>
+              <ScoreBox value={away} onChange={setAwayScore} editable={canEdit && active} scoreType={scoreType} live={live} />
+            </>
+          )}
         </div>
         <TeamSide name={match.away_team?.short_name ?? match.away_team_name} team={match.away_team} align="left" />
       </div>
@@ -298,23 +334,30 @@ function ScoreBox({
     "relative flex size-10 items-center justify-center rounded-md border text-center text-xl font-bold leading-none tabular-nums";
 
   if (editable) {
+    const MAX = 19;
     const empty = value === "";
+    const n = empty ? 0 : Math.min(MAX, Math.max(0, parseInt(value, 10) || 0));
+    const set = (next: number) => onChange(String(Math.min(MAX, Math.max(0, next))));
+    const btn =
+      "grid size-7 place-items-center rounded-md text-ink-500 transition hover:bg-ink-100 hover:text-brand-700 active:scale-90 disabled:pointer-events-none disabled:opacity-30";
     return (
-      <input
-        type="number"
-        inputMode="numeric"
-        min={0}
-        max={99}
-        aria-label="Placar"
-        value={value}
-        onChange={(e) => onChange(e.target.value.replace(/[^0-9]/g, "").slice(0, 2))}
-        placeholder="–"
-        className={cn(
-          base,
-          "appearance-none bg-surface p-0 text-ink-950 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20",
-          empty ? "border-border" : "border-brand-500",
-        )}
-      />
+      <div className="flex flex-col items-center gap-0.5">
+        <button type="button" aria-label="Aumentar placar" onClick={() => set(n + 1)} disabled={n >= MAX} className={btn}>
+          <Plus className="size-4" strokeWidth={3} />
+        </button>
+        <span
+          className={cn(
+            base,
+            "select-none bg-surface",
+            empty ? "border-border text-ink-400" : "border-brand-500 text-ink-950",
+          )}
+        >
+          {n}
+        </span>
+        <button type="button" aria-label="Diminuir placar" onClick={() => set(n - 1)} disabled={n <= 0} className={btn}>
+          <Minus className="size-4" strokeWidth={3} />
+        </button>
+      </div>
     );
   }
 
