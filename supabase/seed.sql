@@ -72,8 +72,8 @@ begin
   u_dona := public.seed_user('dona@teste.com', 'Dona Federação', 'resultadismo123');
 
   -- Competição: Copa do Mundo 2026
-  insert into public.competitions (id, name, slug, short_name, area, type, provider, provider_code, provider_season, season_start, season_end, status, is_featured, in_personalization)
-  values (c_wc, 'Copa do Mundo FIFA 2026', 'copa-do-mundo-2026', 'Copa 2026', 'Mundo', 'CUP', 'manual', 'WC', '2026', '2026-06-11', '2026-07-19', 'active', true, true);
+  insert into public.competitions (id, name, slug, short_name, area, type, provider, provider_code, provider_season, season_start, season_end, status, is_featured, in_personalization, is_published, group_eligible)
+  values (c_wc, 'Copa do Mundo FIFA 2026', 'copa-do-mundo-2026', 'Copa 2026', 'Mundo', 'CUP', 'manual', 'WC', '2026', '2026-06-11', '2026-07-19', 'active', true, true, true, true);
 
   -- Seleções
   insert into public.teams (id, name, short_name, tla, local_crest, country) values
