@@ -1,0 +1,309 @@
+[
+  {
+    "code": "WC",
+    "aliases": [
+      "fifa.world"
+    ],
+    "name": "Copa do Mundo FIFA 2026",
+    "group": "Seleções",
+    "type": "CUP",
+    "area": "Mundo",
+    "in_personalization": true
+  },
+  {
+    "code": "fifa.friendly",
+    "name": "Amistosos",
+    "group": "Seleções",
+    "type": "CUP",
+    "area": "Mundo",
+    "in_personalization": true
+  },
+  {
+    "code": "conmebol.america",
+    "name": "Copa América",
+    "group": "Seleções",
+    "type": "CUP",
+    "area": "América do Sul",
+    "in_personalization": true
+  },
+  {
+    "code": "uefa.euro",
+    "name": "Eurocopa",
+    "group": "Seleções",
+    "type": "CUP",
+    "area": "Europa",
+    "in_personalization": true
+  },
+  {
+    "code": "uefa.nations",
+    "name": "Nations League",
+    "group": "Seleções",
+    "type": "CUP",
+    "area": "Europa",
+    "in_personalization": true
+  },
+  {
+    "code": "fifa.worldq.conmebol",
+    "name": "Eliminatórias (Am. do Sul)",
+    "group": "Seleções",
+    "type": "CUP",
+    "area": "América do Sul",
+    "in_personalization": true
+  },
+  {
+    "code": "fifa.worldq.uefa",
+    "name": "Eliminatórias (Europa)",
+    "group": "Seleções",
+    "type": "CUP",
+    "area": "Europa",
+    "in_personalization": true
+  },
+  {
+    "code": "fifa.worldq.concacaf",
+    "name": "Eliminatórias (Concacaf)",
+    "group": "Seleções",
+    "type": "CUP",
+    "area": "América do Norte",
+    "in_personalization": true
+  },
+  {
+    "code": "fifa.worldq.afc",
+    "name": "Eliminatórias (Ásia)",
+    "group": "Seleções",
+    "type": "CUP",
+    "area": "Ásia",
+    "in_personalization": true
+  },
+  {
+    "code": "fifa.worldq.caf",
+    "name": "Eliminatórias (África)",
+    "group": "Seleções",
+    "type": "CUP",
+    "area": "África",
+    "in_personalization": true
+  },
+  {
+    "code": "caf.nations",
+    "name": "Copa Africana de Nações",
+    "group": "Seleções",
+    "type": "CUP",
+    "area": "África",
+    "in_personalization": true
+  },
+  {
+    "code": "bra.1",
+    "name": "Brasileirão Série A",
+    "group": "Ligas e estaduais",
+    "type": "LEAGUE",
+    "area": "Brasil",
+    "in_personalization": true
+  },
+  {
+    "code": "bra.2",
+    "name": "Brasileirão Série B",
+    "group": "Ligas e estaduais",
+    "type": "LEAGUE",
+    "area": "Brasil",
+    "in_personalization": true
+  },
+  {
+    "code": "bra.3",
+    "name": "Brasileirão Série C",
+    "group": "Ligas e estaduais",
+    "type": "LEAGUE",
+    "area": "Brasil",
+    "in_personalization": true
+  },
+  {
+    "code": "bra.camp.paulista",
+    "name": "Paulistão",
+    "group": "Ligas e estaduais",
+    "type": "LEAGUE",
+    "area": "Brasil",
+    "in_personalization": true
+  },
+  {
+    "code": "bra.camp.carioca",
+    "name": "Carioca",
+    "group": "Ligas e estaduais",
+    "type": "LEAGUE",
+    "area": "Brasil",
+    "in_personalization": true
+  },
+  {
+    "code": "bra.camp.mineiro",
+    "name": "Mineiro",
+    "group": "Ligas e estaduais",
+    "type": "LEAGUE",
+    "area": "Brasil",
+    "in_personalization": true
+  },
+  {
+    "code": "bra.camp.gaucho",
+    "name": "Gauchão",
+    "group": "Ligas e estaduais",
+    "type": "LEAGUE",
+    "area": "Brasil",
+    "in_personalization": true
+  },
+  {
+    "code": "eng.1",
+    "name": "Premier League",
+    "group": "Ligas e estaduais",
+    "type": "LEAGUE",
+    "area": "Inglaterra",
+    "in_personalization": true
+  },
+  {
+    "code": "esp.1",
+    "name": "La Liga",
+    "group": "Ligas e estaduais",
+    "type": "LEAGUE",
+    "area": "Espanha",
+    "in_personalization": true
+  },
+  {
+    "code": "ita.1",
+    "name": "Serie A (Itália)",
+    "group": "Ligas e estaduais",
+    "type": "LEAGUE",
+    "area": "Itália",
+    "in_personalization": true
+  },
+  {
+    "code": "ger.1",
+    "name": "Bundesliga",
+    "group": "Ligas e estaduais",
+    "type": "LEAGUE",
+    "area": "Alemanha",
+    "in_personalization": true
+  },
+  {
+    "code": "fra.1",
+    "name": "Ligue 1",
+    "group": "Ligas e estaduais",
+    "type": "LEAGUE",
+    "area": "França",
+    "in_personalization": true
+  },
+  {
+    "code": "bra.copa_do_brazil",
+    "name": "Copa do Brasil",
+    "group": "Copas",
+    "type": "CUP",
+    "area": "Brasil",
+    "in_personalization": true
+  },
+  {
+    "code": "conmebol.libertadores",
+    "name": "Libertadores",
+    "group": "Copas",
+    "type": "CUP",
+    "area": "América do Sul",
+    "in_personalization": true
+  },
+  {
+    "code": "conmebol.sudamericana",
+    "name": "Sul-Americana",
+    "group": "Copas",
+    "type": "CUP",
+    "area": "América do Sul",
+    "in_personalization": true
+  },
+  {
+    "code": "uefa.champions",
+    "name": "Champions League",
+    "group": "Copas",
+    "type": "CUP",
+    "area": "Europa",
+    "in_personalization": true
+  },
+  {
+    "code": "uefa.europa",
+    "name": "Europa League",
+    "group": "Copas",
+    "type": "CUP",
+    "area": "Europa",
+    "in_personalization": true
+  },
+  {
+    "code": "uefa.europa.conf",
+    "name": "Conference League",
+    "group": "Copas",
+    "type": "CUP",
+    "area": "Europa",
+    "in_personalization": true
+  },
+  {
+    "code": "usa.1",
+    "name": "MLS",
+    "group": "Alternativos",
+    "type": "LEAGUE",
+    "area": "Estados Unidos",
+    "in_personalization": true
+  },
+  {
+    "code": "mex.1",
+    "name": "Liga MX",
+    "group": "Alternativos",
+    "type": "LEAGUE",
+    "area": "México",
+    "in_personalization": true
+  },
+  {
+    "code": "ksa.1",
+    "name": "Saudi Pro League",
+    "group": "Alternativos",
+    "type": "LEAGUE",
+    "area": "Arábia Saudita",
+    "in_personalization": true
+  },
+  {
+    "code": "por.1",
+    "name": "Primeira Liga",
+    "group": "Alternativos",
+    "type": "LEAGUE",
+    "area": "Portugal",
+    "in_personalization": true
+  },
+  {
+    "code": "ned.1",
+    "name": "Eredivisie",
+    "group": "Alternativos",
+    "type": "LEAGUE",
+    "area": "Holanda",
+    "in_personalization": true
+  },
+  {
+    "code": "tur.1",
+    "name": "Süper Lig",
+    "group": "Alternativos",
+    "type": "LEAGUE",
+    "area": "Turquia",
+    "in_personalization": true
+  },
+  {
+    "code": "bel.1",
+    "name": "Pro League",
+    "group": "Alternativos",
+    "type": "LEAGUE",
+    "area": "Bélgica",
+    "in_personalization": true
+  },
+  {
+    "code": "sco.1",
+    "name": "Premiership",
+    "group": "Alternativos",
+    "type": "LEAGUE",
+    "area": "Escócia",
+    "in_personalization": true
+  },
+  {
+    "code": "gre.1",
+    "name": "Super League (GR)",
+    "group": "Alternativos",
+    "type": "LEAGUE",
+    "area": "Grécia",
+    "in_personalization": true
+  }
+]

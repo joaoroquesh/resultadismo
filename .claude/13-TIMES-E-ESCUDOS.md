@@ -1,4 +1,4 @@
-# 13 — TIMES E ESCUDOS (editar à mão)
+# 13 — TIMES, ESCUDOS E COMPETIÇÕES (editar à mão)
 
 > Fonte ÚNICA e editável dos times do Resultadismo. Sem UI de admin — você edita
 > arquivo + roda um comando. Feito pra fazer 1 ou muitos (inclusive em lote com IA).
@@ -45,3 +45,17 @@ Edite várias entradas no `data/teams-registry.json` (é só JSON), solte os PNG
 - **Nunca** edite `src/lib/teamCrests.ts` nem `data/teams-catalog.json` à mão (são gerados).
 - O app importa `@/data/teams-catalog.json` (= `src/data/`); o gerador mantém as duas cópias iguais.
 - Arquivos dup/typo em `public/teams/` não viram time (sem entrada no registro) — remova-os.
+
+## Competições (curadoria editável)
+**`data/competitions-registry.json`** — uma entrada por campeonato:
+```json
+{ "code": "bra.1", "name": "Brasileirão Série A", "group": "Ligas e estaduais",
+  "type": "LEAGUE", "area": "Brasil", "in_personalization": true }
+```
+- **Ordem do array = ordem de exibição** na personalização; `group` define o acordeão
+  (Seleções · Ligas e estaduais · Copas · Alternativos).
+- Critério de curadoria: só campeonato com **≥1 time relevante/conhecido**; os incomuns vão em
+  **Alternativos** (decisão do PO).
+- Edite e rode **`npm run gen:comps`** (ou `gen:all`): sincroniza `src/data/` (o front lê grupo/ordem
+  de lá) e gera **`data/competitions-upsert.sql`** — ao mudar a lista, cole esse SQL numa **migration
+  nova** pra refletir no banco (o banco continua dono dos ids; o registro é a curadoria).
