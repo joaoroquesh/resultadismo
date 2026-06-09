@@ -156,6 +156,19 @@ sessão de `docs/` foram consolidados aqui.
 
 ---
 
+## v2.0.0 — Lançamento da Copa (2026-06-09)
+
+O marco que o ADR 0003 reservava: **o João cortou a v2.0** para o lançamento da Copa do Mundo 2026.
+A release consolida o trabalho de 3 frentes paralelas integradas numa branch única (`integration`):
+**personalização repaginada** (hub de 6 telas, UF, time/seleção por slug, ADR 0006), **placar com
+stepper**, **temporada só-Copa nos grupos** (Copa travada como competição única, enforço no banco,
+ADR 0007), ingestão multi-fonte consolidada e os **portões de qualidade** (complexidade,
+arquitetura de camadas, anti-`<select>`) agora cobrados por **CI** (`quality.yml`). Também o marco
+de governança: **João formalizado como PO e a IA como equipe** (regras 15/16, doc 11, ADR 0005).
+Quem já tinha personalização **refaz** (decisão consciente do João: o fluxo mudou).
+
+---
+
 ## Pendências e dívidas conhecidas (herdadas)
 
 Itens em aberto trazidos dos registros consolidados. **Confirme o estado atual no código antes de

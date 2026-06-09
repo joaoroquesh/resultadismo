@@ -20,7 +20,30 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+_(vazio — próximas mudanças acumulam aqui)_
+
+## [2.0.0] — 2026-06-09
+
+> **🏆 O marco da Copa (ADR [`0003`](decisions/0003-versionamento.md)): v2.0 = lançamento oficial.**
+> Cortada pelo João em 2026-06-09. Consolida personalização repaginada, placar com stepper,
+> temporada só-Copa nos grupos, ingestão multi-fonte e os portões de qualidade.
+
 ### Adicionado
+- **Temporada da Copa: grupos só com a Copa do Mundo, travada** (ADR
+  [`0007`](decisions/0007-temporada-copa-so-copa-em-grupos.md)). Todo grupo nasce com a **Copa em
+  modo Pontos** e não dá para removê-la nem trocá-la; **só ela** pode ser competição de grupo.
+  Enforçado **no banco** (flag `competitions.group_eligible` + triggers de INSERT/DELETE em
+  `league_competitions`, migration `20260609000010`) e espelhado no front (criação de grupo com a
+  competição **fixa** + copy "depois da Copa chegam outros campeonatos"; aba Competições sem
+  remover no bolão). **Amistosos** seguem publicados para palpitar na aba Jogos, mas **não entram
+  em grupo**; demais campeonatos **despublicados** (reversível). Disputas de **Confronto**
+  continuam removíveis. → [`06`](06-REGRAS-DE-NEGOCIO.md) §4.
+- **CI de qualidade (`.github/workflows/quality.yml`).** `typecheck + lint + check:arch + build`
+  rodam em **todo push/PR** e reprovam se falhar — nenhuma sessão mescla código que viole os
+  portões sem o robô acusar. Docs reforçadas: portões valem **também ao integrar branches**
+  ([`02`](02-CODIGO.md) §7, [`09`](09-PARALELISMO.md) §5, [`07`](07-BUILD-E-DEPLOY.md)).
+- **Regra de design system: nunca `<select>` nativo** (erro de lint via `no-restricted-syntax`).
+  Sempre `<Select>`/`<Combobox>` de `@/components/ui`. → [`02`](02-CODIGO.md) §7.
 - **Time/seleção do coração agora SALVAM** (bug pré-existente). As colunas `favorite_team_id`/
   `national_team_id` eram **uuid (FK→teams)**, mas o catálogo de personalização é **slug** — o slug
   não cabia e a escolha nunca persistia. Viraram **text (slug)** (`set_personalization` text). Agora
@@ -133,6 +156,11 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   competição vazia exclui com confirmação simples.
 
 ### Corrigido
+- **Portões de qualidade zerados na integração da v2.** A integração das branches da personalização
+  havia entrado com 2 erros de lint (`react-hooks/preserve-manual-memoization` no
+  `PlayerProfilePage`, memo manual removido) e 2 violações de camada (`NotifPrompt` movido de
+  `components/pwa` → `features/notifications`). `npm run lint` 0 erros e `check:arch` APROVADO; o
+  novo CI passa a impedir regressão.
 - **Push sempre com identidade (escudo + título + corpo).** O service worker (`src/sw.ts`) nunca mais
   exibe uma notificação "vazia": sem corpo, usa um texto da marca — garante que toda push nossa
   apareça com o escudo verde e nunca caia no aviso genérico do navegador. Adicionados `lang: "pt-BR"`

@@ -75,7 +75,12 @@ enum `'espn'` que não entrou).
   (resolva conflitos no seu lado).
 - Prefira **fast-forward direto** (`git push origin minha-frente:main`) quando a main não andou.
 - Push na `main` **aplica migrations em produção** e sobe Vercel + functions → confira os checks
-  verdes. → [`07`](07-BUILD-E-DEPLOY.md).
+  verdes (incluindo o **Quality gates**). → [`07`](07-BUILD-E-DEPLOY.md).
+- **Ao integrar/mesclar branches** (sua ou de outra sessão): rode os **portões de qualidade** na
+  árvore integrada **antes** de subir — `npm run typecheck` + `npm run lint` (0 erros) +
+  `npm run check:arch` + build. Branch criada **antes** de um portão existir pode violá-lo sem
+  ninguém notar (já aconteceu); o CI [`quality.yml`](../.github/workflows/quality.yml) reprova, mas
+  o certo é pegar **antes** do push. → [`02`](02-CODIGO.md) §7.
 - **Alto impacto** (pagamento, destrutivo, login) → confirmar com o João **antes**. → [`08`](08-PROCESSO.md).
 
 ## 6. Nunca faça
