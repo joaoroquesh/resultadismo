@@ -64,6 +64,11 @@ create or replace function public.protect_mandatory_group_competition()
 returns trigger language plpgsql security definer set search_path = '' as $$
 declare v_mandatory boolean; v_active boolean;
 begin
+  -- Protege só o BOLÃO base (mode points/table). Disputas de Confronto
+  -- (mode liga/cup) também apontam pra Copa e continuam removíveis.
+  if old.mode not in ('points', 'table') then
+    return old;
+  end if;
   select group_eligible into v_mandatory from public.competitions where id = old.competition_id;
   select (deleted_at is null) into v_active from public.leagues where id = old.league_id;
   if coalesce(v_mandatory, false) and coalesce(v_active, false) then
