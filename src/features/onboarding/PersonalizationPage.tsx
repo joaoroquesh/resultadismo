@@ -304,7 +304,13 @@ export function PersonalizationPage() {
     [comps],
   );
 
-  const initialStep = Math.min(Math.max(Number(params.get("step") ?? 0) || 0, 0), STEP_COUNT - 1);
+  // Modo "editar um item só" (vindo do hub de perfil): renderiza UMA tela com Salvar.
+  const only = params.get("only");
+  const ONLY_STEP: Record<string, number> = { coracao: 1, selecao: 2, campeonatos: 3 };
+  const editOnly = only != null && only in ONLY_STEP;
+  const initialStep = editOnly
+    ? ONLY_STEP[only as string]
+    : Math.min(Math.max(Number(params.get("step") ?? 0) || 0, 0), STEP_COUNT - 1);
   const [step, setStep] = useState(initialStep);
   const [hydrated, setHydrated] = useState(false);
   const [wasEditing, setWasEditing] = useState(false);
@@ -376,6 +382,11 @@ export function PersonalizationPage() {
     }
     toast("Tudo pronto, Resultadista! 🎉", "success");
     leave();
+  }
+  function saveOnly() {
+    persist();
+    toast("Salvo!", "success");
+    navigate("/perfil/editar");
   }
   function next() {
     persist();
@@ -479,6 +490,9 @@ export function PersonalizationPage() {
       {/* topo: progresso + sair */}
       <div className="shrink-0 border-b border-border px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <div className="mx-auto flex max-w-xl items-center gap-3">
+          {editOnly && <span className="flex-1 text-sm font-bold text-ink-900">Editar</span>}
+          {!editOnly && (
+          <>
           <div className="flex flex-1 items-center gap-1.5">
             {Array.from({ length: STEP_COUNT }).map((_, i) => (
               <span
@@ -497,6 +511,8 @@ export function PersonalizationPage() {
           >
             {wasEditing ? "Fechar" : "Pular tudo"}
           </button>
+          </>
+          )}
         </div>
       </div>
 
@@ -689,6 +705,18 @@ export function PersonalizationPage() {
       {/* baixo: nav colada */}
       <div className="shrink-0 border-t border-border bg-surface px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
         <div className="mx-auto flex max-w-xl items-center gap-2">
+          {editOnly ? (
+            <>
+              <Button variant="ghost" onClick={() => navigate("/perfil/editar")}>
+                Cancelar
+              </Button>
+              <span className="flex-1" />
+              <Button onClick={saveOnly} loading={setPerso.isPending}>
+                Salvar
+              </Button>
+            </>
+          ) : (
+          <>
           {step > 0 ? (
             <Button variant="ghost" onClick={() => setStep((s) => s - 1)}>
               <ChevronLeft className="size-4" /> Voltar
@@ -712,6 +740,8 @@ export function PersonalizationPage() {
             {step === STEP_COUNT - 1 ? "Concluir" : "Próximo"}
             {step < STEP_COUNT - 1 && <ChevronRight className="size-4" />}
           </Button>
+          </>
+          )}
         </div>
       </div>
     </div>
