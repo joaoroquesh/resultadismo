@@ -31,8 +31,8 @@
     "aliases": [
       "South Africa"
     ],
-    "crest_file": "africadosul.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20South%20Africa.svg"
   },
   {
     "slug": "aguasanta",
@@ -407,8 +407,8 @@
     "aliases": [
       "Saudi Arabia"
     ],
-    "crest_file": "arabiasaudita.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Saudi%20Arabia.svg"
   },
   {
     "slug": "argelia",
@@ -423,8 +423,8 @@
     "aliases": [
       "Algeria"
     ],
-    "crest_file": "argelia.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Algeria.svg"
   },
   {
     "slug": "argentina",
@@ -670,8 +670,8 @@
       "Australia",
       "Socceroos"
     ],
-    "crest_file": "australia.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Australia.svg"
   },
   {
     "slug": "austria",
@@ -687,8 +687,8 @@
       "Austria",
       "Österreich"
     ],
-    "crest_file": "austria.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Austria.svg"
   },
   {
     "slug": "avai",
@@ -966,8 +966,8 @@
       "Bosnia & Herzegovina",
       "Bosnia"
     ],
-    "crest_file": "bosniaeherzegovina.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Bosnia%20and%20Herzegovina.svg"
   },
   {
     "slug": "botafogo",
@@ -1197,8 +1197,8 @@
       "Cape Verde",
       "Cabo Verde"
     ],
-    "crest_file": "caboverde.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Cape%20Verde.svg"
   },
   {
     "slug": "cagliari",
@@ -1230,8 +1230,8 @@
     "aliases": [
       "Canada"
     ],
-    "crest_file": "canada.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Canada%20(Pantone).svg"
   },
   {
     "slug": "capital",
@@ -1297,8 +1297,8 @@
     "aliases": [
       "Qatar"
     ],
-    "crest_file": "catar.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Qatar.svg"
   },
   {
     "slug": "ceara",
@@ -1539,8 +1539,8 @@
       "DRC",
       "Democratic Republic of the Congo"
     ],
-    "crest_file": "congord.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20the%20Democratic%20Republic%20of%20the%20Congo.svg"
   },
   {
     "slug": "coreiadosul",
@@ -1556,8 +1556,8 @@
       "South Korea",
       "Korea Republic"
     ],
-    "crest_file": "coreiadosul.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20South%20Korea.svg"
   },
   {
     "slug": "corinthians",
@@ -1770,8 +1770,8 @@
       "Curaçao",
       "CUR"
     ],
-    "crest_file": "curacao.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Cura%C3%A7ao.svg"
   },
   {
     "slug": "defensayjusticia",
@@ -1871,8 +1871,8 @@
     "aliases": [
       "Egypt"
     ],
-    "crest_file": "egito.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Egypt.svg"
   },
   {
     "slug": "empoli",
@@ -1921,8 +1921,8 @@
     "aliases": [
       "Scotland"
     ],
-    "crest_file": "escocia.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Scotland.svg"
   },
   {
     "slug": "espanha",
@@ -2254,8 +2254,8 @@
     "aliases": [
       "Ghana"
     ],
-    "crest_file": "gana.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Ghana.svg"
   },
   {
     "slug": "genoa",
@@ -2390,8 +2390,8 @@
     "aliases": [
       "Haiti"
     ],
-    "crest_file": "haiti.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Haiti.svg"
   },
   {
     "slug": "heidenheim",
@@ -2596,8 +2596,8 @@
       "Iran",
       "IR Iran"
     ],
-    "crest_file": "ira.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Iran.svg"
   },
   {
     "slug": "iraque",
@@ -2612,8 +2612,8 @@
     "aliases": [
       "Iraq"
     ],
-    "crest_file": "iraque.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Iraq.svg"
   },
   {
     "slug": "irlandadonorte",
@@ -2657,8 +2657,8 @@
     "aliases": [
       "Japan"
     ],
-    "crest_file": "japao.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Japan.svg"
   },
   {
     "slug": "jordania",
@@ -2673,8 +2673,8 @@
     "aliases": [
       "Jordan"
     ],
-    "crest_file": "jordania.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Jordan.svg"
   },
   {
     "slug": "juazeirense",
@@ -3160,8 +3160,8 @@
     "aliases": [
       "Morocco"
     ],
-    "crest_file": "marrocos.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Morocco.svg"
   },
   {
     "slug": "melgar",
@@ -3433,8 +3433,8 @@
     "aliases": [
       "New Zealand"
     ],
-    "crest_file": "novazelandia.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20New%20Zealand.svg"
   },
   {
     "slug": "novorizontino",
@@ -3621,8 +3621,8 @@
     "aliases": [
       "Panama"
     ],
-    "crest_file": "panama.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Panama.svg"
   },
   {
     "slug": "paraguai",
@@ -4504,8 +4504,8 @@
     "aliases": [
       "Tunisia"
     ],
-    "crest_file": "tunisia.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Tunisia.svg"
   },
   {
     "slug": "turquia",
@@ -4707,8 +4707,8 @@
     "aliases": [
       "Uzbekistan"
     ],
-    "crest_file": "uzbequistao.svg",
-    "crest_source": "repo (public/teams)"
+    "crest_file": null,
+    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Uzbekistan.svg"
   },
   {
     "slug": "valencia",

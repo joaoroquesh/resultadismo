@@ -21,6 +21,28 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
+- **Time/seleção do coração agora SALVAM** (bug pré-existente). As colunas `favorite_team_id`/
+  `national_team_id` eram **uuid (FK→teams)**, mas o catálogo de personalização é **slug** — o slug
+  não cabia e a escolha nunca persistia. Viraram **text (slug)** (`set_personalization` text). Agora
+  o time/seleção aparecem no **hub** (preview) e no **perfil público** do jogador. Tela 0 do
+  onboarding no layout do hub (escudo à esquerda, nome à direita, email abaixo); **UF em chips**; o
+  **tour de boas-vindas** só aparece na página de jogos (nunca sobre a personalização). Migrations
+  `20260609000002/000003` (aditivas; `db reset` verde).
+- **Personalização repaginada (1º acesso) + base de times/escudos.** Fluxo de 6 telas: **(0) Seu
+  perfil** (escudo + nome + **UF** em chips horizontais — coluna nova `profiles.uf`), (1) time do
+  coração, (2) seleção, (3) campeonatos e times (4 grupos: Seleções/Ligas/Copas/Alternativos), (4)
+  **The Best + convite** (dividida; "Recebeu o código de convite de alguém?"), (5) **notificações +
+  instalar o app** (dividida; pede a permissão real + instala/instruções iOS). Cabeçalho com **ícone
+  e título lado a lado**; nas listas, **cabeçalho e busca fixos e só a lista rola**; **X** da busca
+  limpa o texto e some quando vazio; estado da busca não vaza entre telas. **Destaque sem "tom
+  lavado"** (regra nova em [`12-DESIGN.md`](12-DESIGN.md)): seleção com contorno sólido `ring-brand`,
+  chips/badges sólidos. **Convite por link** (`?convite=`) capturado no boot → `localStorage` →
+  **preenche o campo sozinho**. O **tour de boas-vindas** (Onboarding) agora vem **depois** da
+  personalização (fluxos independentes; pular o tour não pula a personalização).
+- **Registro único de times/escudos, editável à mão.** `data/teams-registry.json` é a fonte; o
+  gerador re-resolve escudos pelo manifesto e escreve `data/` **e** `src/data/` (fim da divergência).
+  Escudos **265→290/292** (seleções `.svg` que estavam com `crest_file` null), dups/typo removidos.
+  `npm run gen:crests | gen:teams | gen:all`. Guia em [`13-TIMES-E-ESCUDOS.md`](13-TIMES-E-ESCUDOS.md).
 - **Modelo de trabalho: João é o PO, a IA é uma equipe, e nenhum código sobe sem plano validado
   antes.** Novo doc [`11-EQUIPE-E-PAPEIS.md`](11-EQUIPE-E-PAPEIS.md): a IA atua como **equipe
   multidisciplinar** (11 papéis com responsabilidades e cenários), o João é o **Product Owner**, e

@@ -79,7 +79,13 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
 - **`PerfilPage`** (`/perfil`): avatar/escudo, stats globais, menu (Admin/Simulador/tour se
   app-admin; grupos; como funciona), Aparência (tema), Instalar app (PWA), Notificações
   (push), Sair.
-- **`EditarPerfilPage`** (`/perfil/editar`): editor de escudo (`CrestEditor`), nome, time do coração.
+- **`EditarPerfilPage`** (`/perfil/editar`): **HUB** do perfil — escudo (`CrestEditor`) + nome + email
+  + UF (chips); linhas de preferência (time do coração / seleção / campeonatos) com **preview** que
+  abrem o editor focado (`/perfil/personalizar?only=…`, com Salvar); **The Best** no fim. Sem convite.
+- **`PersonalizationPage`** (`/perfil/personalizar`): no **1º acesso**, wizard de 6 telas (perfil →
+  coração → seleção → campeonatos → The Best+convite → notificações+instalar); com `?only=coracao|
+  selecao|campeonatos`, edita **um item só** (Salvar → volta ao hub). Convite por link (`?convite=`)
+  é capturado no boot e preenche o campo. O tour de boas-vindas (`Onboarding`) vem **depois**.
 - **`PlayerProfilePage`** (`/jogador/:id`): perfil público de outro jogador (stats + grupos
   visíveis).
 
