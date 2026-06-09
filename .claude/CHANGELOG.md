@@ -21,6 +21,18 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
+- **Planejamento do mini-jogo de placares históricos da Copa (Portão A — só documentação).** Plano
+  completo e comentável em [`docs/planning/minijogo-historico/plano-v1.html`](../docs/planning/minijogo-historico/plano-v1.html)
+  (decisões D1–D17 + perguntas Q1–Q5; fluxo de comentários no
+  [`LEIA-ME`](../docs/planning/minijogo-historico/LEIA-ME.md)). Embasado em pesquisa multi-agente:
+  análise jogada do 7a0.com.br, fontes de dados das 22 Copas (964 jogos; openfootball CC0 +
+  validação Fjelstul), infra (mesmo projeto Supabase — auth não compartilha entre projetos; rota
+  `/retro` antes de subdomínio; tracking first-party p/ anônimos), naming (recomendação
+  "Resultadismo Retrô") e crítica de game design (Copa do Dia + Treino, timer decrescente,
+  anti-cheat server-side). Aguarda OK do João. Publicado para validação em
+  `https://www.resultadismo.com/planos/minijogo-historico-v1.html` (cópia em `public/planos/`,
+  `noindex`, excluída do precache do PWA via `injectManifest.globIgnores` no `vite.config.ts` —
+  única mudança de config; nenhum código de runtime do app tocado).
 - **Modelo de trabalho: João é o PO, a IA é uma equipe, e nenhum código sobe sem plano validado
   antes.** Novo doc [`11-EQUIPE-E-PAPEIS.md`](11-EQUIPE-E-PAPEIS.md): a IA atua como **equipe
   multidisciplinar** (11 papéis com responsabilidades e cenários), o João é o **Product Owner**, e

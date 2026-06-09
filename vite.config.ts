@@ -15,6 +15,9 @@ export default defineConfig({
       registerType: "autoUpdate",
       injectRegister: "auto",
       devOptions: { enabled: false, type: "module" },
+      // planos/ = documentos estáticos de planejamento (ex.: plano do mini-jogo);
+      // fora do precache p/ não baixar no SW de todo usuário do PWA.
+      injectManifest: { globIgnores: ["**/node_modules/**/*", "planos/**"] },
       manifest: {
         name: "Resultadismo",
         short_name: "Resultadismo",
