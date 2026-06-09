@@ -1,0 +1,31 @@
+# Portões de qualidade do Resultadismo (MESTRE §3 regra 13 + 02-CODIGO §7).
+# Rodam a CADA push/PR e BLOQUEIAM o merge/deploy lógico se falharem:
+#   typecheck → lint (0 erros; warnings passam) → check:arch (camadas) → build.
+# Motivo: os portões existiam só como comando local e uma integração subiu
+# violando-os sem ninguém notar. Agora o robô cobra de toda sessão, sempre.
+name: Quality gates
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Instalar dependências
+        run: npm ci
+      - name: Typecheck (tsc)
+        run: npm run typecheck
+      - name: Lint (0 erros; complexity é warning)
+        run: npm run lint
+      - name: Arquitetura (camadas — check:arch)
+        run: npm run check:arch
+      - name: Build
+        run: npm run build

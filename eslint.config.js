@@ -27,6 +27,17 @@ export default tseslint.config(
       // É ponto de avaliação para todo código novo. Ver .claude/02-CODIGO.md
       // "Portões de qualidade de código" e .claude/11-EQUIPE-E-PAPEIS.md.
       complexity: ["warn", 20],
+      // NUNCA <select> nativo (UI do SO destoa do tema/dark-mode). Sempre os
+      // componentes do design system: <Select> (listas curtas) ou <Combobox>
+      // (listas grandes com busca), de @/components/ui. ERRO de lint.
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "JSXOpeningElement[name.name='select']",
+          message:
+            "Não use <select> nativo. Use <Select> ou <Combobox> de @/components/ui (design system).",
+        },
+      ],
     },
   },
 );

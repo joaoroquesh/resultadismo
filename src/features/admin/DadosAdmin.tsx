@@ -3,6 +3,7 @@ import { AlertTriangle, Lock, LockOpen, Snowflake, Database, Plus, Trash2 } from
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/lib/utils";
@@ -20,9 +21,6 @@ const PROVIDERS = [
   { v: "football_data", label: "football-data" },
   { v: "thesportsdb", label: "TheSportsDB" },
 ];
-const selectCls =
-  "h-10 rounded-md border border-ink-200 bg-surface px-2.5 text-sm text-ink-950 outline-none focus:border-brand-500";
-
 export function DadosAdmin() {
   return (
     <div className="space-y-6">
@@ -156,14 +154,16 @@ function ConflictRow({ m }: { m: MatchConflict }) {
             aria-label="Placar visitante"
           />
         </label>
-        <label className="flex flex-col gap-1 text-[11px] font-medium text-ink-600">
+        <div className="flex flex-col gap-1 text-[11px] font-medium text-ink-600">
           Status
-          <select value={status} onChange={(e) => setStatus(e.target.value)} className={selectCls} aria-label="Status">
-            {STATUSES.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
-        </label>
+          <Select
+            ariaLabel="Status"
+            value={status}
+            onChange={setStatus}
+            options={STATUSES.map((s) => ({ value: s, label: s }))}
+            className="w-36"
+          />
+        </div>
         <Button size="sm" onClick={save} loading={override.isPending}>
           Salvar e travar
         </Button>
@@ -239,12 +239,13 @@ function SourcesSection() {
       </p>
 
       <Card className="space-y-4 p-4">
-        <select value={compId} onChange={(e) => setCompId(e.target.value)} className={cn(selectCls, "w-full")}>
-          <option value="">Escolha uma competição…</option>
-          {(comps ?? []).map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
+        <Select
+          ariaLabel="Competição"
+          value={compId}
+          onChange={setCompId}
+          placeholder="Escolha uma competição…"
+          options={(comps ?? []).map((c) => ({ value: c.id, label: c.name }))}
+        />
 
         {!compId ? null : isLoading ? (
           <div className="h-16 animate-pulse rounded-md bg-ink-100" />
@@ -309,14 +310,16 @@ function SourcesSection() {
 
             {/* adicionar secundária */}
             <div className="flex flex-wrap items-end gap-2 border-t border-border pt-3">
-              <label className="flex flex-col gap-1 text-[11px] font-medium text-ink-600">
+              <div className="flex flex-col gap-1 text-[11px] font-medium text-ink-600">
                 Provedor
-                <select value={provider} onChange={(e) => setProvider(e.target.value)} className={selectCls}>
-                  {PROVIDERS.map((p) => (
-                    <option key={p.v} value={p.v}>{p.label}</option>
-                  ))}
-                </select>
-              </label>
+                <Select
+                  ariaLabel="Provedor"
+                  value={provider}
+                  onChange={setProvider}
+                  options={PROVIDERS.map((p) => ({ value: p.v, label: p.label }))}
+                  className="w-44"
+                />
+              </div>
               <label className="flex flex-1 flex-col gap-1 text-[11px] font-medium text-ink-600">
                 Código (ex.: BSA, PL, fifa.world)
                 <Input value={code} onChange={(e) => setCode(e.target.value)} className="h-10" placeholder="código da liga no provedor" />
