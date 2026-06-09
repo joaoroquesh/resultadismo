@@ -14,7 +14,6 @@ import {
   ChevronRight,
   Search,
   X,
-  User as UserIcon,
   Bell,
   Download,
   Share,
@@ -22,6 +21,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Avatar } from "@/components/ui/Avatar";
 import { Switch } from "@/components/ui/Switch";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
@@ -526,14 +526,30 @@ export function PersonalizationPage() {
           </div>
         ) : step === 0 ? (
           <FormScreen>
-            <StepHeader
-              icon={<UserIcon className="size-5" />}
-              tone="bg-surface-2 text-brand-600"
-              title="Seu perfil"
-              subtitle="Seu nome, estado e escudo — é como a galera te vê no Resultadismo."
-            />
-            <div className="mt-5 space-y-4">
-              <div className="rounded-lg border border-border bg-surface p-4">
+            {/* topo: escudo editado + nome ao lado + email abaixo (igual ao hub) */}
+            <div className="flex items-center gap-4 rounded-lg border border-border bg-surface p-4">
+              <Avatar src={crest || null} name={name} size="xl" />
+              <div className="min-w-0 flex-1 space-y-1">
+                <Input
+                  label="Nome"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  maxLength={40}
+                  required
+                />
+                <p className="truncate text-xs text-ink-500">{user?.email}</p>
+              </div>
+            </div>
+
+            <div className="mt-4 space-y-4">
+              <div className="space-y-4 rounded-lg border border-border bg-surface p-4">
+                <div>
+                  <p className="text-sm font-semibold text-ink-800">Seu escudo</p>
+                  <p className="text-xs text-ink-500">
+                    Escolha a forma e preencha com cores ou com a sua foto. Sem foto, entra a inicial
+                    do seu nome.
+                  </p>
+                </div>
                 <CrestEditor
                   key={hydrated ? "ready" : "loading"}
                   kind="escudo"
@@ -545,14 +561,6 @@ export function PersonalizationPage() {
                   onChange={setCrest}
                 />
               </div>
-              <Input
-                label="Nome"
-                icon={<UserIcon className="size-4" />}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                maxLength={40}
-                required
-              />
               <div>
                 <label className="mb-2 block text-sm font-medium text-ink-700">
                   Seu estado <span className="font-normal text-ink-400">· opcional</span>

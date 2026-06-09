@@ -1325,20 +1325,6 @@ export type Database = {
             referencedRelation: "leagues"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "profiles_favorite_team_id_fkey"
-            columns: ["favorite_team_id"]
-            isOneToOne: false
-            referencedRelation: "teams"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "profiles_national_team_id_fkey"
-            columns: ["national_team_id"]
-            isOneToOne: false
-            referencedRelation: "teams"
-            referencedColumns: ["id"]
-          },
         ]
       }
       push_subscriptions: {

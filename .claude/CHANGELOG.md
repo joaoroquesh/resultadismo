@@ -21,6 +21,13 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
+- **Time/seleção do coração agora SALVAM** (bug pré-existente). As colunas `favorite_team_id`/
+  `national_team_id` eram **uuid (FK→teams)**, mas o catálogo de personalização é **slug** — o slug
+  não cabia e a escolha nunca persistia. Viraram **text (slug)** (`set_personalization` text). Agora
+  o time/seleção aparecem no **hub** (preview) e no **perfil público** do jogador. Tela 0 do
+  onboarding no layout do hub (escudo à esquerda, nome à direita, email abaixo); **UF em chips**; o
+  **tour de boas-vindas** só aparece na página de jogos (nunca sobre a personalização). Migrations
+  `20260609000002/000003` (aditivas; `db reset` verde).
 - **Personalização repaginada (1º acesso) + base de times/escudos.** Fluxo de 6 telas: **(0) Seu
   perfil** (escudo + nome + **UF** em chips horizontais — coluna nova `profiles.uf`), (1) time do
   coração, (2) seleção, (3) campeonatos e times (4 grupos: Seleções/Ligas/Copas/Alternativos), (4)
