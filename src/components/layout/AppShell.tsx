@@ -4,6 +4,7 @@ import { BottomNav } from "./BottomNav";
 import { Sidebar } from "./Sidebar";
 import { PublicShell } from "./PublicShell";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
+import { NotifPrompt } from "@/features/notifications/NotifPrompt";
 import { MaintenanceBanner } from "./MaintenanceBanner";
 import { MaintenanceScreen } from "./MaintenanceScreen";
 import { useMaintenance } from "./maintenance";
@@ -55,6 +56,7 @@ export function AppShell() {
           </div>
           <BottomNav />
           <InstallPrompt />
+            <NotifPrompt />
         </div>
         <PersonalizationGate />
       </AccessGate>

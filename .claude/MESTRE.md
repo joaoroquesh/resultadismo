@@ -14,8 +14,8 @@
 > É a prova de que a IA leu e está obedecendo as regras do `.claude/`. Se a frase **não** aparecer,
 > presuma que estas regras não foram lidas/seguidas.
 
-Versão atual do projeto: **1.11.0** · App em produção: **https://www.resultadismo.com** ·
-Última revisão desta doc: **2026-06-08**.
+Versão atual do projeto: **2.0.0 (lançamento da Copa)** · App em produção:
+**https://www.resultadismo.com** · Última revisão desta doc: **2026-06-09**.
 
 ---
 
@@ -223,9 +223,9 @@ de docs + changelog (seção 5). Cada uma tem dono num doc específico.
 > **release**, não por commit (foi o que disparou de 2.0 a 2.11 em 3 dias).
 
 **Marcos:** **v0** = site legado (protótipo). **v1.x** = reescrita React+Supabase **soft-launched**
-pra um grupo pequeno — é o **estado atual** (o histórico que fora cortado como 2.0–2.11 foi **relabel
-para 1.0–1.11**, preservando todo o detalhe; hoje em **1.11.0**). **v2.0** = **lançamento oficial da
-Copa** (cortado quando o João disser "pronto").
+pra um grupo pequeno (o histórico que fora cortado como 2.0–2.11 foi **relabel para 1.0–1.11**,
+preservando todo o detalhe). **v2.0** = **lançamento oficial da Copa** — **cortado pelo João em
+2026-06-09**; é o **estado atual**.
 
 **Critérios** (é um app de deploy contínuo, não uma lib — o eixo é "marco de produto", não "API"):
 - **MAJOR** (x.0.0) — **marco de produto** (ex.: Copa = 2.0) ou overhaul que redefine o app.

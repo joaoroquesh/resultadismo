@@ -112,6 +112,19 @@ uma troca de significado proposital.
   **Copa** — configurável no admin (`app_settings`). O usuário digita só o complemento.
 - **Escopo V1:** na prática, **1 competição por grupo** e foco no modo Tabela/Pontos (Copa do
   Mundo é o padrão na criação). Liga/Copa (confronto) ficam atrás de gate (§6).
+- **Temporada da Copa (v2.0, 2026-06-09 — decisão do João):** por enquanto **só a Copa do Mundo
+  pode ser competição de grupo**, e ela é **travada**: todo grupo nasce com a Copa em modo
+  **Pontos** e **não dá para removê-la nem trocá-la**. Enforçado **no banco** (flag
+  `competitions.group_eligible` + triggers `trg_lc_group_eligible` no INSERT e
+  `trg_lc_protect_mandatory` no DELETE, migration `20260609000010`); o front espelha (criação de
+  grupo com a competição fixa; aba Competições sem o botão de remover no bolão). A proteção vale
+  só para o **bolão** base (modes `points`/`table`): disputas de **Confronto** (modes
+  `liga`/`cup`, que também apontam pra Copa) continuam removíveis. **Amistosos Internacionais**
+  seguem **publicados** (todo mundo palpita na aba Jogos) mas **não entram em grupo**; os demais
+  campeonatos voltaram a **rascunho** (despublicados, reversível — para liberar um campeonato
+  para grupos no futuro: `group_eligible = true` + republicar). A **personalização continua
+  listando** campeonatos em rascunho de propósito (o usuário já segue o Brasileirão pro futuro;
+  o feed só mostra o publicado).
 
 ---
 

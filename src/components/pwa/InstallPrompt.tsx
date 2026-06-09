@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { promptInstall, useInstallState } from "@/lib/pwa";
 
-// Aparece uma única vez por dispositivo. Depois, a instalação fica disponível no Perfil.
-const SEEN_KEY = "rsd:pwa-prompt-seen";
+// Aparece nos primeiros acessos (2x) se ainda não instalou; o 1º acesso já é coberto
+// pela tela final do onboarding. Depois, a instalação fica no Perfil.
+const COUNT_KEY = "rsd:pwa-prompt-count";
+const MAX_SHOWS = 2;
 
 export function InstallPrompt() {
   const state = useInstallState();
@@ -18,17 +20,17 @@ export function InstallPrompt() {
   useEffect(() => {
     if (onProfile) return;
     if (state !== "installable" && state !== "ios") return;
-    let seen = false;
+    let count = 0;
     try {
-      seen = localStorage.getItem(SEEN_KEY) === "1";
+      count = Number(localStorage.getItem(COUNT_KEY) ?? "0");
     } catch {
       /* ignore */
     }
-    if (seen) return;
+    if (count >= MAX_SHOWS) return;
     const t = window.setTimeout(() => {
       setShow(true);
       try {
-        localStorage.setItem(SEEN_KEY, "1");
+        localStorage.setItem(COUNT_KEY, String(count + 1));
       } catch {
         /* ignore */
       }

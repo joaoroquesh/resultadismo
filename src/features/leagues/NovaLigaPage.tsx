@@ -5,7 +5,6 @@ import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Coachmark } from "@/components/ui/Coachmark";
 import { useToast } from "@/components/ui/Toast";
@@ -21,7 +20,6 @@ import {
   type DiscountInfo,
 } from "@/features/payments/api";
 import { formatBRL } from "@/lib/pricing";
-import type { LeagueMode } from "@/lib/types";
 
 export function NovaLigaPage() {
   const navigate = useNavigate();
@@ -35,24 +33,14 @@ export function NovaLigaPage() {
   const [description, setDescription] = useState("");
   const [visibility, setVisibility] = useState<"private" | "public">("private");
   const [joinPolicy, setJoinPolicy] = useState<"invite" | "approval" | "open">("invite");
-  const [competitionId, setCompetitionId] = useState<string>("");
-  // Pontos é o default da temporada de Copa: corrida individual por palpite.
-  // Tabela continua disponível (campeonatos por pontos corridos).
-  const [mode, setMode] = useState<LeagueMode>("points");
   const [discountCode, setDiscountCode] = useState("");
   const [discount, setDiscount] = useState<DiscountInfo | null>(null);
   const [checkingDiscount, setCheckingDiscount] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
 
-  // Pré-seleção da Copa do Mundo (default da temporada): derivada no render, sem efeito.
-  // `competitionId` guarda só a escolha explícita; enquanto vazio, o catálogo chegando
-  // faz a Copa virar o valor efetivo (o submit tem o mesmo fallback).
+  // Temporada da Copa: todo grupo nasce com a Copa do Mundo (modo Pontos), travada.
+  // O banco também enforça (trigger group_eligible). Outros campeonatos chegam depois.
   const worldCup = competitions?.length ? findWorldCupCompetition(competitions) : undefined;
-  const effectiveCompetitionId = competitionId || worldCup?.id || "";
-
-  // Detecta se a competição escolhida é a Copa do Mundo (pra ajustar o copy/UI).
-  const selectedComp = competitions?.find((c) => c.id === effectiveCompetitionId);
-  const isWorldCup = !!selectedComp && selectedComp === worldCup;
 
   const payMode = settings?.payment_mode ?? "disabled";
   const baseCents = settings?.league_price_cents ?? 990;
@@ -79,21 +67,18 @@ export function NovaLigaPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     // Clique único: ignora cliques repetidos enquanto cria/abre o pagamento.
-    if (!name.trim() || redirecting) return;
+    if (!name.trim() || redirecting || !worldCup) return;
     setRedirecting(true);
     try {
-      // Fallback robusto: se o usuário não escolheu nada, cravamos a Copa no submit.
-      // Todo grupo nasce com competição.
-      const finalCompId = competitionId || findWorldCupCompetition(competitions)?.id;
-      const finalMode: LeagueMode =
-        finalCompId && finalCompId === findWorldCupCompetition(competitions)?.id ? "points" : mode;
+      // Todo grupo nasce com a Copa do Mundo em modo Pontos (o submit fica
+      // desabilitado até o catálogo carregar; o banco também enforça).
       const league = await create.mutateAsync({
         name: name.trim(),
         description: description.trim() || undefined,
         visibility,
         joinPolicy,
-        competitionId: finalCompId || undefined,
-        mode: finalMode,
+        competitionId: worldCup.id,
+        mode: "points",
       });
       const slug = league.slug;
 
@@ -245,62 +230,29 @@ export function NovaLigaPage() {
 
         <Card className="space-y-4 p-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-ink-800">Competição (bolão inicial)</label>
-            <Select
-              ariaLabel="Competição (bolão inicial)"
-              value={effectiveCompetitionId}
-              onChange={setCompetitionId}
-              placeholder="Escolher campeonato…"
-              options={(competitions ?? []).map((c) => ({
-                value: c.id,
-                label: c.display_name ?? c.name,
-              }))}
-            />
+            <label className="text-sm font-medium text-ink-800">Competição da temporada</label>
+            {/* Travada na Copa: nesta temporada todo grupo joga a Copa do Mundo. */}
+            <div className="flex h-11 items-center justify-between gap-2 rounded-md border border-ink-200 bg-surface-2 px-3 text-sm">
+              <span className="flex min-w-0 items-center gap-2">
+                <Trophy className="size-4 shrink-0 text-brand-600" />
+                <span className="truncate font-semibold text-ink-900">
+                  {worldCup ? (worldCup.display_name ?? worldCup.name) : "Copa do Mundo 2026"}
+                </span>
+              </span>
+              <Lock className="size-3.5 shrink-0 text-ink-400" aria-label="Competição fixa" />
+            </div>
           </div>
 
-          {isWorldCup ? (
-            <div className="flex items-start gap-2 rounded-md bg-grass-50 p-3 text-xs text-grass-800 ring-1 ring-grass-200/60">
-              <Trophy className="mt-0.5 size-4 shrink-0" />
-              <p>
-                <strong>Copa do Mundo 2026 — modo Pontos</strong> vem ativa por padrão. É a
-                disputa da temporada: cada palpite vale pontos e quem somar mais lidera.
-                Você pode trocar a competição depois, lá na página do grupo.
-              </p>
-            </div>
-          ) : (
-            effectiveCompetitionId && (
-              <Coachmark
-                storageKey="resultadismo-coach-liga-modo-v1"
-                title="Modo de disputa"
-                placement="top"
-                content={
-                  <>
-                    <span className="font-bold text-ink-50">Tabela</span>: o grupo acompanha
-                    um campeonato e quem somar mais pontos nos jogos lidera.{" "}
-                    <span className="font-bold text-ink-50">Pontos</span>: disputa corrida,
-                    valendo o total de pontos que cada um faz.
-                  </>
-                }
-              >
-                <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-ink-800">Modo de disputa</label>
-                  <SegmentedControl
-                    value={mode}
-                    onChange={setMode}
-                    options={[
-                      { value: "points", label: "Pontos" },
-                      { value: "table", label: "Tabela" },
-                    ]}
-                  />
-                  <p className="text-xs leading-snug text-ink-500">
-                    {mode === "table"
-                      ? "Vale o campeonato inteiro: os pontos somam rodada após rodada numa classificação única."
-                      : "Corrida por pontos: foco em acumular pontos nos jogos — quem somou mais, lidera."}
-                  </p>
-                </div>
-              </Coachmark>
-            )
-          )}
+          <div className="flex items-start gap-2 rounded-md bg-grass-50 p-3 text-xs text-grass-800 ring-1 ring-grass-200/60">
+            <Trophy className="mt-0.5 size-4 shrink-0" />
+            <p>
+              <strong>É a temporada da Copa!</strong> Todo grupo joga a{" "}
+              <strong>Copa do Mundo 2026 em modo Pontos</strong>: cada palpite vale pontos e quem
+              somar mais lidera. Depois da Copa, outros campeonatos chegam para os grupos
+              (Brasileirão, Libertadores e mais). Os <strong>amistosos</strong> ficam abertos para
+              palpitar na aba Jogos, mas não valem pontos no grupo.
+            </p>
+          </div>
         </Card>
 
         {isPaid && (
@@ -374,16 +326,16 @@ export function NovaLigaPage() {
 
         <div className="rounded-md border border-border bg-surface p-3 text-xs leading-relaxed text-ink-500">
           <strong className="text-ink-700">O que é um grupo?</strong> É o espaço onde você e seus
-          amigos jogam. Hoje ela roda o <strong>bolão da Copa</strong> (modo Tabela — quem soma mais
-          pontos lidera). Depois da Copa, dará para adicionar ligas de vários campeonatos: Brasileirão,
-          top 5 da Europa, Série B, Libertadores e Copa do Brasil.
+          amigos jogam. Nesta temporada ele roda o <strong>bolão da Copa</strong> (modo Pontos: quem
+          soma mais pontos lidera). Depois da Copa, dará para adicionar outros campeonatos:
+          Brasileirão, top 5 da Europa, Série B, Libertadores e Copa do Brasil.
         </div>
 
         <Button
           type="submit"
           fullWidth
           loading={submitting || redirecting}
-          disabled={!name.trim() || redirecting}
+          disabled={!name.trim() || redirecting || !worldCup}
         >
           {redirecting
             ? payMode === "live"

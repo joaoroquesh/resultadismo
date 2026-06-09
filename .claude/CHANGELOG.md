@@ -20,6 +20,14 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+_(vazio — próximas mudanças acumulam aqui)_
+
+## [2.0.0] — 2026-06-09
+
+> **🏆 O marco da Copa (ADR [`0003`](decisions/0003-versionamento.md)): v2.0 = lançamento oficial.**
+> Cortada pelo João em 2026-06-09. Consolida personalização repaginada, placar com stepper,
+> temporada só-Copa nos grupos, ingestão multi-fonte e os portões de qualidade.
+
 ### Adicionado
 - **Planejamento do mini-jogo de placares históricos da Copa (Portão A — só documentação).** Plano
   completo e comentável em [`docs/planning/minijogo-historico/plano-v1.html`](../docs/planning/minijogo-historico/plano-v1.html)
@@ -33,6 +41,47 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   `https://www.resultadismo.com/planos/minijogo-historico-v1.html` (cópia em `public/planos/`,
   `noindex`, excluída do precache do PWA via `injectManifest.globIgnores` no `vite.config.ts` —
   única mudança de config; nenhum código de runtime do app tocado).
+- **Temporada da Copa: grupos só com a Copa do Mundo, travada** (ADR
+  [`0007`](decisions/0007-temporada-copa-so-copa-em-grupos.md)). Todo grupo nasce com a **Copa em
+  modo Pontos** e não dá para removê-la nem trocá-la; **só ela** pode ser competição de grupo.
+  Enforçado **no banco** (flag `competitions.group_eligible` + triggers de INSERT/DELETE em
+  `league_competitions`, migration `20260609000010`) e espelhado no front (criação de grupo com a
+  competição **fixa** + copy "depois da Copa chegam outros campeonatos"; aba Competições sem
+  remover no bolão). **Amistosos** seguem publicados para palpitar na aba Jogos, mas **não entram
+  em grupo**; demais campeonatos **despublicados** (reversível). Disputas de **Confronto**
+  continuam removíveis. → [`06`](06-REGRAS-DE-NEGOCIO.md) §4.
+- **CI de qualidade (`.github/workflows/quality.yml`).** `typecheck + lint + check:arch + build`
+  rodam em **todo push/PR** e reprovam se falhar — nenhuma sessão mescla código que viole os
+  portões sem o robô acusar. Docs reforçadas: portões valem **também ao integrar branches**
+  ([`02`](02-CODIGO.md) §7, [`09`](09-PARALELISMO.md) §5, [`07`](07-BUILD-E-DEPLOY.md)).
+- **Regra de design system: nunca `<select>` nativo** (erro de lint via `no-restricted-syntax`).
+  Sempre `<Select>`/`<Combobox>` de `@/components/ui`. → [`02`](02-CODIGO.md) §7.
+- **Time/seleção do coração agora SALVAM** (bug pré-existente). As colunas `favorite_team_id`/
+  `national_team_id` eram **uuid (FK→teams)**, mas o catálogo de personalização é **slug** — o slug
+  não cabia e a escolha nunca persistia. Viraram **text (slug)** (`set_personalization` text). Agora
+  o time/seleção aparecem no **hub** (preview) e no **perfil público** do jogador. Tela 0 do
+  onboarding no layout do hub (escudo à esquerda, nome à direita, email abaixo); **UF em chips**; o
+  **tour de boas-vindas** só aparece na página de jogos (nunca sobre a personalização). Migrations
+  `20260609000002/000003` (aditivas; `db reset` verde).
+- **Personalização repaginada (1º acesso) + base de times/escudos.** Fluxo de 6 telas: **(0) Seu
+  perfil** (escudo + nome + **UF** em chips horizontais — coluna nova `profiles.uf`), (1) time do
+  coração, (2) seleção, (3) campeonatos e times (4 grupos: Seleções/Ligas/Copas/Alternativos), (4)
+  **The Best + convite** (dividida; "Recebeu o código de convite de alguém?"), (5) **notificações +
+  instalar o app** (dividida; pede a permissão real + instala/instruções iOS). Cabeçalho com **ícone
+  e título lado a lado**; nas listas, **cabeçalho e busca fixos e só a lista rola**; **X** da busca
+  limpa o texto e some quando vazio; estado da busca não vaza entre telas. **Destaque sem "tom
+  lavado"** (regra nova em [`12-DESIGN.md`](12-DESIGN.md)): seleção com contorno sólido `ring-brand`,
+  chips/badges sólidos. **Convite por link** (`?convite=`) capturado no boot → `localStorage` →
+  **preenche o campo sozinho**. O **tour de boas-vindas** (Onboarding) agora vem **depois** da
+  personalização (fluxos independentes; pular o tour não pula a personalização).
+- **Registro único de times/escudos, editável à mão.** `data/teams-registry.json` é a fonte; o
+  gerador re-resolve escudos pelo manifesto e escreve `data/` **e** `src/data/` (fim da divergência).
+  Escudos **265→290/292** (seleções `.svg` que estavam com `crest_file` null), dups/typo removidos.
+  `npm run gen:crests | gen:teams | gen:all`. Guia em [`13-TIMES-E-ESCUDOS.md`](13-TIMES-E-ESCUDOS.md).
+- **Palpitar o placar sem teclado** — o input numérico (que abria o teclado) virou **stepper +/−**
+  (teto **19** por lado). Enquanto não palpita, o placar fica **“– ×–”** (não palpitado, ≠ de um 0×0
+  real); **clicar no card** liga o +/− e já vale **0×0** (o autosave salva sozinho, mesmo sem tocar).
+  **Nunca um lado vazio** (mexer num time fixa o outro em 0). `×` e layout do card intactos.
 - **Modelo de trabalho: João é o PO, a IA é uma equipe, e nenhum código sobe sem plano validado
   antes.** Novo doc [`11-EQUIPE-E-PAPEIS.md`](11-EQUIPE-E-PAPEIS.md): a IA atua como **equipe
   multidisciplinar** (11 papéis com responsabilidades e cenários), o João é o **Product Owner**, e
@@ -119,6 +168,11 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   competição vazia exclui com confirmação simples.
 
 ### Corrigido
+- **Portões de qualidade zerados na integração da v2.** A integração das branches da personalização
+  havia entrado com 2 erros de lint (`react-hooks/preserve-manual-memoization` no
+  `PlayerProfilePage`, memo manual removido) e 2 violações de camada (`NotifPrompt` movido de
+  `components/pwa` → `features/notifications`). `npm run lint` 0 erros e `check:arch` APROVADO; o
+  novo CI passa a impedir regressão.
 - **Push sempre com identidade (escudo + título + corpo).** O service worker (`src/sw.ts`) nunca mais
   exibe uma notificação "vazia": sem corpo, usa um texto da marca — garante que toda push nossa
   apareça com o escudo verde e nunca caia no aviso genérico do navegador. Adicionados `lang: "pt-BR"`

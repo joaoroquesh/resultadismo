@@ -10,6 +10,7 @@ import { dayjs } from "@/lib/format";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { UserModerationPanel } from "@/features/admin/UserModerationPanel";
 import { usePlayerProfile } from "./api";
+import { catalogClubs, catalogNations } from "@/features/onboarding/teamsCatalog";
 
 function Stat({ value, label, accent }: { value: string | number; label: string; accent?: string }) {
   return (
@@ -40,6 +41,14 @@ export function PlayerProfilePage() {
   const { user, isAppAdmin } = useAuth();
   const { data: player, isLoading } = usePlayerProfile(id);
   const canModerate = isAppAdmin && !!id && id !== user?.id;
+  // Cálculo barato (find num catálogo estático) — sem memo manual: o React
+  // Compiler memoiza sozinho (regra react-hooks/preserve-manual-memoization).
+  const favTeam = player?.favorite_team_id
+    ? catalogClubs().find((t) => t.id === player.favorite_team_id)
+    : undefined;
+  const natTeam = player?.national_team_id
+    ? catalogNations().find((t) => t.id === player.national_team_id)
+    : undefined;
 
   return (
     <Page
@@ -63,6 +72,26 @@ export function PlayerProfilePage() {
               <p className="text-sm text-ink-500">
                 no Resultadismo desde {dayjs(player.member_since).format("MMM [de] YYYY")}
               </p>
+              {(favTeam || natTeam) && (
+                <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-ink-600">
+                  {favTeam && (
+                    <span className="inline-flex items-center gap-1.5">
+                      {favTeam.local_crest && (
+                        <img src={favTeam.local_crest} alt="" className="size-4 rounded-sm object-contain" />
+                      )}
+                      {favTeam.name}
+                    </span>
+                  )}
+                  {natTeam && (
+                    <span className="inline-flex items-center gap-1.5">
+                      {natTeam.local_crest && (
+                        <img src={natTeam.local_crest} alt="" className="size-4 rounded-sm object-contain" />
+                      )}
+                      {natTeam.name}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           </Card>
 

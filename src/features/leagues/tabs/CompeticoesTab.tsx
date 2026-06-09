@@ -42,8 +42,10 @@ export function CompeticoesTab({
   const mode: LeagueMode = !confrontoEnabled || tipo === "pontos" ? "points" : formato;
   const isConfrontoNew = mode === "liga" || mode === "cup";
 
-  // Pré-preenche Copa do Mundo como sugestão ao abrir.
+  // Temporada da Copa: só a Copa do Mundo pode ser competição de grupo (o banco
+  // enforça via trigger group_eligible; aqui o seletor só oferece ela).
   const wcSuggestion = competitions?.length ? findWorldCupCompetition(competitions) : undefined;
+  const groupEligible = wcSuggestion ? [wcSuggestion] : [];
   if (open && wcSuggestion && !competitionId) {
     setCompetitionId(wcSuggestion.id);
   }
@@ -99,27 +101,34 @@ export function CompeticoesTab({
 
   return (
     <div className="space-y-3">
-      {comps.map((c) => (
-        <Card key={c.id} className="flex items-center gap-2 p-3.5">
-          <span className="min-w-0 flex-1 truncate font-semibold text-ink-900">{c.name}</span>
-          <Badge tone="neutral">
-            {c.mode === "liga" ? "Liga" : c.mode === "cup" ? "Copa" : "Bolão"}
-          </Badge>
-          <Button
-            size="icon"
-            variant="ghost"
-            aria-label="Remover competição"
-            onClick={() => setToDelete({ id: c.id, name: c.name })}
-          >
-            <Trash2 className="size-4 text-flame-500" />
-          </Button>
-        </Card>
-      ))}
+      {comps.map((c) => {
+        // O bolão (Pontos/Tabela) é a base do grupo nesta temporada: sem remover
+        // (o banco também recusa). Disputas de Confronto continuam removíveis.
+        const isBolaoBase = c.mode === "points" || c.mode === "table";
+        return (
+          <Card key={c.id} className="flex items-center gap-2 p-3.5">
+            <span className="min-w-0 flex-1 truncate font-semibold text-ink-900">{c.name}</span>
+            <Badge tone="neutral">
+              {c.mode === "liga" ? "Liga" : c.mode === "cup" ? "Copa" : "Bolão"}
+            </Badge>
+            {!isBolaoBase && (
+              <Button
+                size="icon"
+                variant="ghost"
+                aria-label="Remover competição"
+                onClick={() => setToDelete({ id: c.id, name: c.name })}
+              >
+                <Trash2 className="size-4 text-flame-500" />
+              </Button>
+            )}
+          </Card>
+        );
+      })}
 
       {reachedLimit ? (
         <p className="rounded-md bg-ink-50 px-3 py-2 text-xs text-ink-500">
-          Limite inicial de {MAX_COMPETITIONS_PER_LEAGUE} competição por grupo.
-          Remova a atual para trocar por outra.
+          Nesta temporada, a <strong>Copa do Mundo 2026</strong> é a competição do grupo. Depois da
+          Copa, outros campeonatos poderão ser adicionados aqui (Brasileirão, Libertadores e mais).
         </p>
       ) : open ? (
         <Card className="space-y-3 p-4">
@@ -128,7 +137,7 @@ export function CompeticoesTab({
             value={competitionId}
             onChange={setCompetitionId}
             placeholder="Escolher campeonato…"
-            options={(competitions ?? []).map((c) => ({
+            options={groupEligible.map((c) => ({
               value: c.id,
               label: c.display_name ?? c.name,
             }))}

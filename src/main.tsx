@@ -8,6 +8,7 @@ import { LoginModalProvider } from "@/features/auth/LoginModalProvider";
 import { ToastProvider } from "@/components/ui/Toast";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { applyStoredConsent } from "@/features/consent/consent";
+import { captureInviteFromUrl } from "@/lib/invite";
 import "./index.css";
 
 // Reaplica a escolha de consentimento do usuário (se já decidiu) assim que o
@@ -15,6 +16,9 @@ import "./index.css";
 // index.html) ficaria negado pra quem já aceitou em visitas anteriores até a
 // próxima interação com o banner.
 applyStoredConsent();
+
+// Captura ?convite= do link de acesso e guarda p/ preencher o campo depois.
+captureInviteFromUrl();
 
 // PWA: quando um novo service worker assume, recarrega 1x para aplicar a atualização
 // (sem isso, a página fica na versão antiga em cache mesmo após o SW trocar).

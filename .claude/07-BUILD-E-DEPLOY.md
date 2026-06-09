@@ -65,7 +65,8 @@ git push origin main
   --project-ref vblvfbjqvmunlkehpafj` no push que mexe em `supabase/functions/**` ou `config.toml`
   (autentica via secret de repo `SUPABASE_ACCESS_TOKEN`).
 - **Confirmar deploy:** checks verdes no commit — **Supabase Preview**, **Vercel**, **Deploy Edge
-  Functions**.
+  Functions** e **Quality gates** (`.github/workflows/quality.yml`: typecheck + lint + check:arch +
+  build em todo push/PR; reprova merge que viole os portões do [`02`](02-CODIGO.md) §7).
 
 ## 4. ⚠️ Regra crítica: NÃO rodar Supabase CLI contra produção desta máquina
 

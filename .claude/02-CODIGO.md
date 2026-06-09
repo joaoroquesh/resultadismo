@@ -131,8 +131,12 @@ Regras:
 
 ### Portões de qualidade de código (obrigatórios para código novo)
 
-Dois pontos de avaliação fixos no projeto. Valem **para todo código novo**; o código existente que
-ainda não passa é **backlog de otimização** (refatorar aos poucos, sem quebrar o que funciona).
+Pontos de avaliação fixos do projeto. Valem **para todo código novo** e **também ao integrar/mesclar
+branches** (quem mescla roda os portões na árvore integrada **antes** de subir — código de outra
+sessão pode ser anterior aos portões). O **CI cobra sozinho**: o workflow
+[`quality.yml`](../.github/workflows/quality.yml) roda `typecheck + lint + check:arch + build` em
+todo push/PR e **reprova** se falhar. O código existente que ainda não passa é **backlog de
+otimização** (refatorar aos poucos, sem quebrar o que funciona).
 
 1. **Complexidade ciclomática.** Regra `complexity: ["warn", 20]` no `eslint.config.js`. **Avisa**
    (não quebra o build) quando uma função passa de 20 — sinal de que está fazendo coisa demais e
@@ -146,6 +150,10 @@ ainda não passa é **backlog de otimização** (refatorar aos poucos, sem quebr
    (exit 1); **acoplamento lateral** entre features e leitura de metadado fora do `src` são **avisos**
    (não bloqueiam) — o backlog a reduzir. Detalhe do modelo no topo do próprio script e em
    [`11-EQUIPE-E-PAPEIS.md`](11-EQUIPE-E-PAPEIS.md) §3.
+3. **Nunca `<select>` nativo.** Regra `no-restricted-syntax` no `eslint.config.js` (**erro** de
+   lint). A UI do sistema operacional destoa do tema/dark-mode: use sempre os componentes do
+   design system — **`<Select>`** (`@/components/ui/Select`, listas curtas) ou **`<Combobox>`**
+   (`@/components/ui/Combobox`, listas grandes com busca).
 
 ## 8. Scripts (`package.json`)
 

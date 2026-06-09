@@ -6,6 +6,8 @@ export type PlayerProfile = {
   display_name: string;
   avatar_url: string | null;
   member_since: string;
+  favorite_team_id: string | null;
+  national_team_id: string | null;
   stats: {
     jogos: number;
     pontos: number;

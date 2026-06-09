@@ -154,3 +154,31 @@ export function useSkipPersonalization() {
     onSuccess: () => qc.invalidateQueries({ queryKey: [PERSO_KEY, user?.id] }),
   });
 }
+
+/** Salva nome / escudo / UF do perfil (self-update; cobre a tela 0 da personalização). */
+export function useSaveProfileBasics() {
+  const { user, refreshProfile } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (p: {
+      display_name?: string;
+      avatar_url?: string | null;
+      uf?: string | null;
+    }) => {
+      if (!user) return;
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          ...(p.display_name !== undefined && { display_name: p.display_name }),
+          ...(p.avatar_url !== undefined && { avatar_url: p.avatar_url }),
+          ...(p.uf !== undefined && { uf: p.uf }),
+        })
+        .eq("id", user.id);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      void refreshProfile();
+      qc.invalidateQueries({ queryKey: [PERSO_KEY, user?.id] });
+    },
+  });
+}
