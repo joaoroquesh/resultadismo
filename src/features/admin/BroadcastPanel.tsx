@@ -109,7 +109,7 @@ export function BroadcastPanel() {
     <div className="space-y-4">
       <Card className="space-y-4 p-4">
         <div className="flex items-center gap-2">
-          <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-100 text-brand-600">
+          <span className="grid size-8 shrink-0 place-items-center rounded-full bg-surface-2 text-brand-600">
             <Megaphone className="size-4" />
           </span>
           <div className="min-w-0">
@@ -363,7 +363,7 @@ function HistoryRow({ item }: { item: Broadcast }) {
   const target = item.segment_label ?? SEGMENT_LABEL[item.segment] ?? item.segment;
   return (
     <div className="flex items-start gap-3 px-3.5 py-3">
-      <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-700">
+      <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-surface-2 text-brand-700">
         <Megaphone className="size-4" />
       </span>
       <div className="min-w-0 flex-1">

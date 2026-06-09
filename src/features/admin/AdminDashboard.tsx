@@ -99,7 +99,7 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => vo
         <button
           type="button"
           onClick={() => onNavigate("alertas")}
-          className="flex w-full items-center gap-3 rounded-lg bg-flame-500/10 p-3.5 text-left ring-1 ring-flame-500/30 transition hover:bg-flame-500/15"
+          className="flex w-full items-center gap-3 rounded-lg bg-surface p-3.5 text-left ring-1 ring-flame-600 transition hover:bg-ink-50"
         >
           <AlertTriangle className="size-5 shrink-0 text-flame-600" />
           <div className="min-w-0 flex-1">
@@ -118,7 +118,7 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => vo
         <button
           type="button"
           onClick={() => onNavigate("alertas")}
-          className="flex w-full items-center gap-3 rounded-lg bg-gold-100 p-3.5 text-left ring-1 ring-gold-300/60 transition hover:bg-gold-200/70"
+          className="flex w-full items-center gap-3 rounded-lg bg-surface p-3.5 text-left ring-1 ring-gold-500 transition hover:bg-ink-50"
         >
           <BellRing className="size-5 shrink-0 text-gold-700" />
           <div className="min-w-0 flex-1">
@@ -135,7 +135,7 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => vo
         <button
           type="button"
           onClick={() => onNavigate("grupos")}
-          className="flex w-full items-center gap-3 rounded-lg bg-brand-50 p-3.5 text-left ring-1 ring-brand-200/60 transition hover:bg-brand-100/70"
+          className="flex w-full items-center gap-3 rounded-lg bg-surface p-3.5 text-left ring-1 ring-brand-600 transition hover:bg-ink-50"
         >
           <Inbox className="size-5 shrink-0 text-brand-700" />
           <div className="min-w-0 flex-1">
@@ -149,7 +149,7 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => vo
       )}
 
       {onlineSpike && (
-        <div className="flex w-full items-center gap-3 rounded-lg bg-flame-500/10 p-3.5 ring-1 ring-flame-500/30">
+        <div className="flex w-full items-center gap-3 rounded-lg bg-surface p-3.5 ring-1 ring-flame-600">
           <Users2 className="size-5 shrink-0 text-flame-600" />
           <div className="min-w-0 flex-1">
             <p className="text-sm font-bold text-flame-700">

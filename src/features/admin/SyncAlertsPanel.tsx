@@ -20,9 +20,9 @@ const KIND: Record<
 };
 
 const TONE_BG: Record<string, string> = {
-  gold: "bg-gold-100 text-gold-700",
-  flame: "bg-flame-500/12 text-flame-600",
-  brand: "bg-brand-50 text-brand-700",
+  gold: "bg-surface-2 text-gold-700",
+  flame: "bg-surface-2 text-flame-600",
+  brand: "bg-surface-2 text-brand-700",
   ink: "bg-ink-100 text-ink-500",
 };
 

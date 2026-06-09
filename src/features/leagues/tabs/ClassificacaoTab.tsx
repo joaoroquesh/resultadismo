@@ -68,7 +68,7 @@ export function ClassificacaoTab({
       {confrontoEnabled && temConfronto && (
         <Link to={`/grupos/${slug}/confrontos`}>
           <Card className="flex items-center gap-3 p-3.5 transition active:scale-[0.99]">
-            <span className="grid size-9 shrink-0 place-items-center rounded-md bg-brand-500/10 text-brand-600">
+            <span className="grid size-9 shrink-0 place-items-center rounded-md bg-surface-2 text-brand-600">
               <Swords className="size-4.5" strokeWidth={2.4} />
             </span>
             <div className="min-w-0 flex-1">
@@ -90,7 +90,7 @@ export function ClassificacaoTab({
               className={cn(
                 "inline-flex shrink-0 items-center rounded-pill border px-3 py-1.5 text-sm font-semibold transition",
                 active?.id === c.id
-                  ? "border-brand-600 bg-brand-50 text-brand-700"
+                  ? "border-brand-600 bg-surface text-brand-700"
                   : "border-ink-200 bg-surface text-ink-600",
               )}
             >

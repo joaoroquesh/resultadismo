@@ -175,7 +175,7 @@ export function Combobox({
                       onMouseEnter={() => setActive(i)}
                       className={cn(
                         "flex w-full items-center gap-2.5 rounded px-2.5 py-2 text-left text-sm transition-colors",
-                        i === active ? "bg-brand-500/10 text-ink-950" : "text-ink-700",
+                        i === active ? "bg-ink-100 text-ink-950" : "text-ink-700",
                         isSel && "font-semibold",
                       )}
                     >

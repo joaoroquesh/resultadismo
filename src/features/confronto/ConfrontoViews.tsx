@@ -31,7 +31,7 @@ export function LigaTable({ lcId, currentUserId }: { lcId: string; currentUserId
               key={row.user_id}
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5",
-                isMe && "bg-brand-500/10 ring-1 ring-inset ring-brand-500/30",
+                isMe && "bg-surface-2 ring-1 ring-inset ring-brand-600",
               )}
             >
               <span
@@ -139,7 +139,7 @@ export function TieRow({
         </span>
       ) : tie.walkover ? (
         <span
-          className="shrink-0 rounded-pill bg-flame-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-flame-700"
+          className="shrink-0 rounded-pill bg-flame-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white"
           title="Vitória por W.O. — o adversário saiu do grupo"
         >
           W.O.
@@ -392,7 +392,7 @@ function Palpite({
       <span
         className={cn(
           "rounded-pill px-1.5 text-[10px] font-bold tabular-nums",
-          (pts ?? 0) > 0 ? "bg-grass-100 text-grass-800" : "bg-ink-100 text-ink-400",
+          (pts ?? 0) > 0 ? "bg-grass-600 text-white" : "bg-ink-100 text-ink-400",
         )}
       >
         +{pts ?? 0}

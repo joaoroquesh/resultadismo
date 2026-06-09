@@ -100,7 +100,7 @@ function ConflictRow({ m }: { m: MatchConflict }) {
         </div>
         <div className="flex flex-wrap items-center gap-1.5">
           {m.score_conflict && (
-            <span className="rounded-pill bg-flame-500/10 px-2 py-0.5 text-[11px] font-semibold text-flame-600">
+            <span className="rounded-pill bg-flame-600 px-2 py-0.5 text-[11px] font-semibold text-white">
               divergente
             </span>
           )}
@@ -110,7 +110,7 @@ function ConflictRow({ m }: { m: MatchConflict }) {
             </span>
           )}
           {m.manual_lock && (
-            <span className="inline-flex items-center gap-1 rounded-pill bg-brand-500/10 px-2 py-0.5 text-[11px] font-semibold text-brand-600">
+            <span className="inline-flex items-center gap-1 rounded-pill bg-brand-600 px-2 py-0.5 text-[11px] font-semibold text-white">
               <Lock className="size-3" /> manual
             </span>
           )}
@@ -265,7 +265,7 @@ function SourcesSection() {
                   <span className="text-sm font-medium text-ink-900">{s.provider}</span>
                   <span className="text-xs text-ink-500">{s.provider_code ?? "—"}</span>
                   {s.last_sync_ok === false && (
-                    <span className="rounded-pill bg-flame-500/10 px-2 py-0.5 text-[10px] font-semibold text-flame-600">
+                    <span className="rounded-pill bg-flame-600 px-2 py-0.5 text-[10px] font-semibold text-white">
                       falhou
                     </span>
                   )}

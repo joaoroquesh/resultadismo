@@ -39,9 +39,9 @@ export function ConsentDialog({ open, onClose }: { open: boolean; onClose: () =>
         <div
           className={cn(
             "flex items-start gap-3 rounded-xl p-3.5 ring-1",
-            granted && "bg-grass-50 ring-grass-200/70",
+            granted && "bg-surface-2 ring-grass-600",
             denied && "bg-surface-2 ring-border",
-            undecided && "bg-brand-50 ring-brand-200/70",
+            undecided && "bg-surface-2 ring-brand-600",
           )}
         >
           <span

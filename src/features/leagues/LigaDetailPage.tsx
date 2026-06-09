@@ -179,7 +179,7 @@ Código: ${league.join_code}
       }
     >
       {league.status === "active" && league.name_approved === false && (
-          <div className="mb-4 flex items-start gap-2 rounded-md bg-brand-50 p-3 text-sm text-brand-800">
+          <div className="mb-4 flex items-start gap-2 rounded-md border-l-2 border-brand-600 bg-surface-2 p-3 text-sm text-brand-800">
             <Clock className="mt-0.5 size-4 shrink-0" />
             <p>
               Seu grupo está <strong>ativa</strong> e já dá pra jogar! Só o <strong>nome</strong>{" "}
@@ -189,7 +189,7 @@ Código: ${league.join_code}
         )}
 
       {league.payment_status === "pending" && league.status !== "active" ? (
-        <div className="mb-4 rounded-md bg-gold-100 p-3 text-sm text-gold-800">
+        <div className="mb-4 rounded-md border-l-2 border-gold-500 bg-surface-2 p-3 text-sm text-gold-800">
           <div className="flex items-start gap-2">
             <Clock className="mt-0.5 size-4 shrink-0" />
             <p>
@@ -251,7 +251,7 @@ Código: ${league.join_code}
           </div>
         </div>
       ) : league.status === "pending" ? (
-        <div className="mb-4 rounded-md bg-gold-100 p-3 text-sm text-gold-800">
+        <div className="mb-4 rounded-md border-l-2 border-gold-500 bg-surface-2 p-3 text-sm text-gold-800">
           <div className="flex items-start gap-2">
             <Clock className="mt-0.5 size-4 shrink-0" />
             <p>Este grupo aguarda aprovação de um administrador para ficar ativa.</p>
@@ -345,7 +345,7 @@ Código: ${league.join_code}
       )}
 
       {isAppAdmin && (
-        <Card className="mb-4 border border-brand-200 bg-brand-500/5 p-4">
+        <Card className="mb-4 border border-border bg-surface-2 p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <p className="flex flex-wrap items-center gap-1.5 text-sm font-bold text-ink-900">

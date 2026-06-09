@@ -86,7 +86,7 @@ export function FeedbackPage() {
     >
       <div className="space-y-4">
         {/* Convite */}
-        <Card className="bg-brand-50 p-4 ring-1 ring-brand-200/60">
+        <Card className="bg-surface-2 p-4 ring-1 ring-border">
           <h2 className="text-base font-extrabold text-brand-800">Construa o Resultadismo com a gente! 🛠️⚽</h2>
           <p className="mt-1 text-sm text-brand-900/80">
             Achou um erro ou tem uma ideia pra melhorar? Conta pra gente — a gente lê tudo, e te
@@ -207,7 +207,7 @@ function MyFeedbackRow({ f }: { f: MyFeedback }) {
         </Badge>
       </div>
       {f.admin_reply && (
-        <div className="mt-2 rounded-md bg-grass-50 p-2.5 text-xs text-grass-800 ring-1 ring-grass-200/60">
+        <div className="mt-2 rounded-md border-l-2 border-grass-600 bg-surface-2 p-2.5 text-xs text-grass-800">
           <span className="font-semibold">Resposta do time:</span> {f.admin_reply}
         </div>
       )}

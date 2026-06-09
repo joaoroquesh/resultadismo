@@ -40,7 +40,7 @@ export function WaitingRoom({ info }: { info: AccessResult | null }) {
         Não precisa atualizar a página.
       </p>
       {position != null && (
-        <div className="mt-5 inline-flex items-center gap-2 rounded-pill bg-brand-50 px-4 py-1.5 text-sm font-bold text-brand-700">
+        <div className="mt-5 inline-flex items-center gap-2 rounded-pill bg-brand-600 px-4 py-1.5 text-sm font-bold text-white">
           Sua posição na fila: {position}
         </div>
       )}

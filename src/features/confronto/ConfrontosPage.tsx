@@ -128,7 +128,7 @@ export function ConfrontosPage() {
                   className={cn(
                     "inline-flex shrink-0 items-center gap-1.5 rounded-pill border px-3 py-1.5 text-sm font-semibold transition",
                     active?.id === c.id
-                      ? "border-brand-600 bg-brand-50 text-brand-700"
+                      ? "border-brand-600 bg-surface text-brand-700"
                       : "border-ink-200 bg-surface text-ink-600",
                   )}
                 >

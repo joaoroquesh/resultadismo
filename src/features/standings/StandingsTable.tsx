@@ -25,7 +25,7 @@ export function StandingsTable({
           type="button"
           onClick={() => setExpanded((v) => !v)}
           aria-expanded={expanded}
-          className="inline-flex items-center gap-1 rounded-pill px-2 py-1 text-[11px] font-semibold text-brand-600 transition-colors hover:bg-brand-500/10"
+          className="inline-flex items-center gap-1 rounded-pill px-2 py-1 text-[11px] font-semibold text-brand-600 transition-colors hover:bg-ink-100"
         >
           {expanded ? "Resumo" : "Detalhes"}
           <ChevronDown
@@ -69,7 +69,7 @@ export function StandingsTable({
                   key={row.user_id}
                   className={cn(
                     "px-3 py-2.5",
-                    isMe && "bg-brand-500/10 ring-1 ring-inset ring-brand-500/30",
+                    isMe && "bg-surface-2 ring-1 ring-inset ring-brand-600",
                   )}
                 >
                   <Link

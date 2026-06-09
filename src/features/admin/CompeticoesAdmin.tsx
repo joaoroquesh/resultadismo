@@ -217,7 +217,7 @@ export function CompeticoesAdmin() {
                   </Button>
                   <Link
                     to={`/admin/competicoes/${c.id}/jogos`}
-                    className="inline-flex items-center gap-1 rounded-pill px-2 py-1 text-xs font-semibold text-brand-600 hover:bg-brand-500/10"
+                    className="inline-flex items-center gap-1 rounded-pill px-2 py-1 text-xs font-semibold text-brand-600 hover:bg-ink-100"
                     title="Ver e gerenciar os jogos desta competição"
                   >
                     <Eye className="size-3.5" /> Ver jogos

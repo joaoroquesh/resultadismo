@@ -36,7 +36,7 @@ export function FormatViabilityCard({
   return (
     <div className="rounded-lg bg-surface p-4 shadow-[var(--shadow-soft)] ring-1 ring-border">
       <div className="flex items-center gap-3">
-        <span className="grid size-11 shrink-0 place-items-center rounded-md bg-brand-500/10 text-brand-600">
+        <span className="grid size-11 shrink-0 place-items-center rounded-md bg-surface-2 text-brand-600">
           <Icon className="size-5" strokeWidth={2.2} />
         </span>
         <div className="min-w-0 flex-1">
@@ -52,7 +52,7 @@ export function FormatViabilityCard({
         <span
           className={cn(
             "inline-flex shrink-0 items-center gap-1 rounded-pill px-2.5 py-1 text-xs font-bold",
-            viavel ? "bg-grass-100 text-grass-800" : "bg-flame-100 text-flame-700",
+            viavel ? "bg-grass-600 text-white" : "bg-flame-600 text-white",
           )}
         >
           {viavel ? <Check className="size-3.5" /> : <TriangleAlert className="size-3.5" />}
@@ -103,14 +103,14 @@ export function FormatViabilityCard({
       )}
 
       {!viavel && P > 0 && (
-        <p className="mt-3 rounded-md bg-flame-50 px-3 py-2 text-xs leading-relaxed text-flame-700">
+        <p className="mt-3 rounded-md border-l-2 border-flame-600 bg-surface-2 px-3 py-2 text-xs leading-relaxed text-flame-700">
           {isLiga
             ? `Reduza as rodadas — a competição só tem ${P} períodos.`
             : `A Copa precisa de ${realRounds} fases e a competição só tem ${P} períodos. Use uma competição com mais rodadas.`}
         </p>
       )}
       {P === 0 && !loadingPeriods && (
-        <p className="mt-3 rounded-md bg-brand-500/10 px-3 py-2 text-xs text-brand-700">
+        <p className="mt-3 rounded-md border-l-2 border-brand-600 bg-surface-2 px-3 py-2 text-xs text-brand-700">
           A competição ainda não tem rodadas (matchdays) para o sorteio.
         </p>
       )}

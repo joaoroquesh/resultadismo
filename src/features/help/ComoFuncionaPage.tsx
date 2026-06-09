@@ -36,7 +36,7 @@ function Section({
   return (
     <section className="space-y-3">
       <h2 className="flex items-center gap-2 text-base font-extrabold tracking-tight text-ink-950">
-        <span className="grid size-7 shrink-0 place-items-center rounded-md bg-brand-500/10 text-brand-600">
+        <span className="grid size-7 shrink-0 place-items-center rounded-md bg-surface-2 text-brand-600">
           {icon}
         </span>
         {title}
@@ -119,7 +119,7 @@ export function ComoFuncionaPage() {
     >
       <div className="space-y-10">
         {/* Intro */}
-        <div className="rounded-lg bg-brand-500/10 p-4">
+        <div className="rounded-lg bg-surface-2 p-4">
           <p className="text-sm leading-relaxed text-ink-700">
             No <span className="font-bold text-brand-700">Resultadismo</span> você crava o placar dos
             jogos antes da bola rolar. Quanto mais perto do resultado real, mais pontos você ganha — e
@@ -187,7 +187,7 @@ export function ComoFuncionaPage() {
                 <span className="font-bold text-aqua-700">+2</span>.
               </p>
             </div>
-            <p className="rounded-md bg-brand-500/10 px-3 py-2 text-xs font-medium text-brand-700">
+            <p className="rounded-md border-l-2 border-brand-600 bg-surface-2 px-3 py-2 text-xs font-medium text-brand-700">
               Atenção: você tem no máximo{" "}
               <span className="font-bold">2 dobros por semana</span> (de segunda a domingo). Use com
               estratégia — e cuidado, se errar o jogo dobrado você não perde pontos, mas perde a
@@ -245,7 +245,7 @@ export function ComoFuncionaPage() {
             </Card>
           </div>
           <Card className="flex items-start gap-3 p-4">
-            <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-md bg-brand-500/10 text-brand-600">
+            <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-md bg-surface-2 text-brand-600">
               <Trophy className="size-4" strokeWidth={2.4} />
             </span>
             <div className="space-y-2">
@@ -340,7 +340,7 @@ export function ComoFuncionaPage() {
             </Card>
           </div>
 
-          <div className="flex items-start gap-2 rounded-md bg-brand-500/10 p-3 text-xs leading-relaxed text-brand-800">
+          <div className="flex items-start gap-2 rounded-md border-l-2 border-brand-600 bg-surface-2 p-3 text-xs leading-relaxed text-brand-800">
             <ShieldCheck className="mt-0.5 size-4 shrink-0" />
             <p>
               Seu grupo fica <span className="font-semibold">ativo na hora</span>. Só o{" "}

@@ -455,7 +455,7 @@ function PredictStatus({ matchId }: { matchId: string }) {
                     },
                   )
                 }
-                className="flex items-center gap-1 rounded-pill px-2 py-0.5 text-[11px] font-semibold text-gold-700 transition-colors hover:bg-gold-100 disabled:opacity-50"
+                className="flex items-center gap-1 rounded-pill px-2 py-0.5 text-[11px] font-semibold text-gold-700 transition-colors hover:bg-ink-100 disabled:opacity-50"
               >
                 <Hand className="size-3.5" /> cutucar
               </button>
