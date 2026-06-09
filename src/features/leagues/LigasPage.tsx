@@ -7,7 +7,6 @@ import {
   ChevronRight,
   Ticket,
   Clock,
-  Trophy,
   Globe2,
   Lock,
   Pencil,

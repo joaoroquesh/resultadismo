@@ -67,17 +67,13 @@ export function Combobox({
     return () => document.removeEventListener("mousedown", onDown);
   }, [open]);
 
+  // Foco no campo de busca ao abrir (efeito de DOM puro, sem setState). O reset de
+  // query/active ao abrir e ao digitar vive nos handlers (botão e input).
   useEffect(() => {
-    if (open) {
-      setQuery("");
-      setActive(0);
-      // foco no campo de busca ao abrir
-      const t = setTimeout(() => inputRef.current?.focus(), 10);
-      return () => clearTimeout(t);
-    }
+    if (!open) return;
+    const t = setTimeout(() => inputRef.current?.focus(), 10);
+    return () => clearTimeout(t);
   }, [open]);
-
-  useEffect(() => setActive(0), [query]);
 
   function choose(v: string) {
     onChange(v);
@@ -107,7 +103,15 @@ export function Combobox({
         aria-label={ariaLabel}
         aria-haspopup="listbox"
         aria-expanded={open}
-        onClick={() => !disabled && setOpen((v) => !v)}
+        onClick={() => {
+          if (disabled) return;
+          const next = !open;
+          setOpen(next);
+          if (next) {
+            setQuery("");
+            setActive(0);
+          }
+        }}
         className={cn(
           "flex h-12 w-full items-center justify-between gap-2 rounded-md border bg-surface px-3 text-left text-sm transition-colors",
           open ? "border-brand-500 ring-2 ring-brand-500/20" : "border-ink-200 hover:border-ink-300",
@@ -148,7 +152,10 @@ export function Combobox({
             <input
               ref={inputRef}
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setActive(0);
+              }}
               onKeyDown={onKeyDown}
               placeholder={searchPlaceholder}
               className="h-11 w-full bg-transparent text-sm outline-none placeholder:text-ink-400"

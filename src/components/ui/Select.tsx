@@ -47,10 +47,12 @@ export function Select({
     return () => document.removeEventListener("mousedown", onDown);
   }, [open]);
 
-  // Ao abrir, ativa a opção selecionada.
-  useEffect(() => {
-    if (open) setActive(options.findIndex((o) => o.value === value));
-  }, [open, value, options]);
+  // Abre o menu já com a opção selecionada em destaque. Sem useEffect (evita
+  // render em cascata): o ajuste do active acontece no ato de abrir.
+  function openMenu() {
+    setActive(options.findIndex((o) => o.value === value));
+    setOpen(true);
+  }
 
   function choose(v: string) {
     onChange(v);
@@ -62,7 +64,7 @@ export function Select({
     if (!open) {
       if (e.key === "Enter" || e.key === " " || e.key === "ArrowDown") {
         e.preventDefault();
-        setOpen(true);
+        openMenu();
       }
       return;
     }
@@ -88,7 +90,11 @@ export function Select({
         aria-label={ariaLabel}
         aria-haspopup="listbox"
         aria-expanded={open}
-        onClick={() => !disabled && setOpen((v) => !v)}
+        onClick={() => {
+          if (disabled) return;
+          if (open) setOpen(false);
+          else openMenu();
+        }}
         onKeyDown={onKeyDown}
         className={cn(
           "flex h-11 w-full items-center justify-between gap-2 rounded-md border bg-surface px-3 text-left text-sm transition-colors",

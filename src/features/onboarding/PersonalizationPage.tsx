@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Heart,
@@ -152,16 +152,18 @@ export function PersonalizationPage() {
   const [participateRtb, setParticipateRtb] = useState(true);
   const [code, setCode] = useState("");
 
-  useEffect(() => {
-    if (hydrated || !state) return;
+  // Hidrata o formulário a partir do estado salvo, UMA vez (quando os dados
+  // chegam). Padrão "ajustar estado no render" (sem efeito) — evita render em
+  // cascata (react-hooks/set-state-in-effect). O guard `!hydrated` garante 1x só.
+  if (state && !hydrated) {
+    setHydrated(true);
     setFavoriteTeamId(state.favorite_team_id ?? "");
     setNationalId(state.national_team_id ?? "");
     setFollowedComps(state.followed_competition_ids ?? []);
     setFollowedTeams(state.followed_teams ?? {});
     setParticipateRtb(state.show_in_global_ranking);
     setWasEditing(state.personalization_done);
-    setHydrated(true);
-  }, [hydrated, state]);
+  }
 
   function persist() {
     setPerso.mutate({

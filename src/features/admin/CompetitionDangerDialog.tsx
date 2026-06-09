@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AlertTriangle, EyeOff, ShieldAlert, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -31,10 +31,14 @@ export function CompetitionDangerDialog({
   const setPub = useSetCompetitionPublished();
   const { toast } = useToast();
   const [typed, setTyped] = useState("");
-
-  useEffect(() => {
+  // Reseta o campo quando muda a competição/ação alvo. Padrão "ajustar estado no
+  // render" (sem efeito) — evita render em cascata (react-hooks/set-state-in-effect).
+  const dkey = danger ? `${danger.id}:${danger.action}` : "";
+  const [seenKey, setSeenKey] = useState(dkey);
+  if (dkey !== seenKey) {
+    setSeenKey(dkey);
     setTyped("");
-  }, [danger?.id, danger?.action]);
+  }
 
   if (!danger) return null;
 
