@@ -264,6 +264,7 @@ export type Database = {
           current_round: string | null
           display_name: string | null
           emblem_url: string | null
+          group_eligible: boolean
           id: string
           in_personalization: boolean
           is_featured: boolean
@@ -294,6 +295,7 @@ export type Database = {
           current_round?: string | null
           display_name?: string | null
           emblem_url?: string | null
+          group_eligible?: boolean
           id?: string
           in_personalization?: boolean
           is_featured?: boolean
@@ -324,6 +326,7 @@ export type Database = {
           current_round?: string | null
           display_name?: string | null
           emblem_url?: string | null
+          group_eligible?: boolean
           id?: string
           in_personalization?: boolean
           is_featured?: boolean
@@ -1488,6 +1491,39 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      user_favorites: {
+        Row: {
+          created_at: string
+          fav_user_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          fav_user_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          fav_user_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorites_fav_user_id_fkey"
+            columns: ["fav_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
