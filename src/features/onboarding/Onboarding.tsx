@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useFirstSeen } from "@/lib/useFirstSeen";
 import { useMaintenance } from "@/components/layout/maintenance";
+import { usePersonalizationState } from "./personalizationApi";
 
 export const ONBOARDING_KEY = "resultadismo-onboarding-v1";
 
@@ -135,6 +136,7 @@ const SLIDES: Slide[] = [
 export function Onboarding() {
   const { user, loading, isAppAdmin } = useAuth();
   const { data: maint } = useMaintenance();
+  const { data: persoState } = usePersonalizationState();
   const [pending, markSeen] = useFirstSeen(ONBOARDING_KEY);
   const [index, setIndex] = useState(0);
   const [forced, setForced] = useState(false);
@@ -151,8 +153,11 @@ export function Onboarding() {
 
   // Em manutenção, não-admin só vê a tela de manutenção — nada de tour por cima.
   const underMaintenance = !!maint?.maintenance_mode && !isAppAdmin;
-  // Aparece no 1º acesso (pending) ou quando reaberto manualmente (forced).
-  const visible = !loading && !!user && (pending || forced) && !underMaintenance;
+  // O tour vem DEPOIS da personalização (são coisas diferentes): só aparece quando
+  // a personalização já foi concluída/pulada (personalization_done) — ou via replay.
+  const personalizationDone = !!persoState?.personalization_done;
+  const visible =
+    !loading && !!user && !underMaintenance && (forced || (pending && personalizationDone));
 
   // Trava o scroll do body enquanto o overlay está visível.
   useEffect(() => {

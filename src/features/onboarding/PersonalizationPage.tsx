@@ -538,22 +538,32 @@ export function PersonalizationPage() {
                 required
               />
               <div>
-                <label className="mb-1 block text-sm font-medium text-ink-700" htmlFor="uf">
-                  Estado (UF)
+                <label className="mb-2 block text-sm font-medium text-ink-700">
+                  Seu estado <span className="font-normal text-ink-400">· opcional</span>
                 </label>
-                <select
-                  id="uf"
-                  value={uf}
-                  onChange={(e) => setUf(e.target.value)}
-                  className="h-11 w-full rounded-md border border-ink-200 bg-surface px-3 text-sm text-ink-900 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40"
-                >
-                  <option value="">Prefiro não dizer</option>
-                  {UFS.map((u) => (
-                    <option key={u} value={u}>
-                      {u}
-                    </option>
-                  ))}
-                </select>
+                <div className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  <div className="flex gap-2 pb-1">
+                    {UFS.map((u) => {
+                      const on = uf === u;
+                      return (
+                        <button
+                          key={u}
+                          type="button"
+                          onClick={() => setUf(on ? "" : u)}
+                          aria-pressed={on}
+                          className={cn(
+                            "shrink-0 rounded-pill border px-3.5 py-2 text-sm font-bold transition",
+                            on
+                              ? "border-brand-600 bg-brand-600 text-white"
+                              : "border-ink-200 bg-surface text-ink-700 hover:border-ink-300",
+                          )}
+                        >
+                          {u}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
           </FormScreen>
