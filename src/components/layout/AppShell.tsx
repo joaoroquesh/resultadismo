@@ -4,7 +4,7 @@ import { BottomNav } from "./BottomNav";
 import { Sidebar } from "./Sidebar";
 import { PublicShell } from "./PublicShell";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
-import { NotifPrompt } from "@/components/pwa/NotifPrompt";
+import { NotifPrompt } from "@/features/notifications/NotifPrompt";
 import { MaintenanceBanner } from "./MaintenanceBanner";
 import { MaintenanceScreen } from "./MaintenanceScreen";
 import { useMaintenance } from "./maintenance";

@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ChevronRight, Lock, Shield, Trophy } from "lucide-react";
 import { Page } from "@/components/layout/Page";
@@ -42,14 +41,14 @@ export function PlayerProfilePage() {
   const { user, isAppAdmin } = useAuth();
   const { data: player, isLoading } = usePlayerProfile(id);
   const canModerate = isAppAdmin && !!id && id !== user?.id;
-  const favTeam = useMemo(
-    () => (player?.favorite_team_id ? catalogClubs().find((t) => t.id === player.favorite_team_id) : undefined),
-    [player?.favorite_team_id],
-  );
-  const natTeam = useMemo(
-    () => (player?.national_team_id ? catalogNations().find((t) => t.id === player.national_team_id) : undefined),
-    [player?.national_team_id],
-  );
+  // Cálculo barato (find num catálogo estático) — sem memo manual: o React
+  // Compiler memoiza sozinho (regra react-hooks/preserve-manual-memoization).
+  const favTeam = player?.favorite_team_id
+    ? catalogClubs().find((t) => t.id === player.favorite_team_id)
+    : undefined;
+  const natTeam = player?.national_team_id
+    ? catalogNations().find((t) => t.id === player.national_team_id)
+    : undefined;
 
   return (
     <Page
