@@ -112,6 +112,17 @@ export function MatchCard({
     setHome((h) => (h === "" ? "0" : h));
   };
 
+  // "Em edição": já tem palpite OU clicou no card pra fazer um. Antes disso o
+  // placar fica "– ×–" (NÃO palpitado, ≠ de um 0×0 real). Clicar no card já vale
+  // 0×0 (o autosave salva sozinho, mesmo sem tocar no +/−). Nunca um lado vazio.
+  const [active, setActive] = useState(!!prediction);
+  function startPredicting() {
+    if (!canEdit || active) return;
+    setActive(true);
+    setHome("0");
+    setAway("0");
+  }
+
   const scoreType = finished ? prediction?.score_type ?? null : null;
 
   return (
@@ -163,9 +174,24 @@ export function MatchCard({
       <div className="flex items-center justify-center gap-1.5 px-2 py-2.5">
         <TeamSide name={match.home_team?.short_name ?? match.home_team_name} team={match.home_team} align="right" />
         <div className="flex items-center gap-1.5">
-          <ScoreBox value={home} onChange={setHomeScore} editable={canEdit} scoreType={scoreType} live={live} />
-          <span className="text-sm font-bold text-ink-300">×</span>
-          <ScoreBox value={away} onChange={setAwayScore} editable={canEdit} scoreType={scoreType} live={live} />
+          {canEdit && !active ? (
+            <button
+              type="button"
+              onClick={startPredicting}
+              aria-label="Fazer palpite"
+              className="flex items-center gap-1.5 rounded-md px-1 py-0.5 transition hover:bg-ink-50"
+            >
+              <ScoreBox value="" onChange={() => {}} editable={false} scoreType={null} live={false} />
+              <span className="text-sm font-bold text-ink-300">×</span>
+              <ScoreBox value="" onChange={() => {}} editable={false} scoreType={null} live={false} />
+            </button>
+          ) : (
+            <>
+              <ScoreBox value={home} onChange={setHomeScore} editable={canEdit && active} scoreType={scoreType} live={live} />
+              <span className="text-sm font-bold text-ink-300">×</span>
+              <ScoreBox value={away} onChange={setAwayScore} editable={canEdit && active} scoreType={scoreType} live={live} />
+            </>
+          )}
         </div>
         <TeamSide name={match.away_team?.short_name ?? match.away_team_name} team={match.away_team} align="left" />
       </div>

@@ -21,9 +21,10 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
-- **Palpitar o placar sem teclado** — o input numérico (que abria o teclado do celular) virou um
-  **stepper +/−** por placar (começa em 0, teto de **19** gols por lado, segura o `×` e o resto do
-  card). Mexer num lado já fixa o outro em 0 (palpite começa 0×0). Autosave igual.
+- **Palpitar o placar sem teclado** — o input numérico (que abria o teclado) virou **stepper +/−**
+  (teto **19** por lado). Enquanto não palpita, o placar fica **“– ×–”** (não palpitado, ≠ de um 0×0
+  real); **clicar no card** liga o +/− e já vale **0×0** (o autosave salva sozinho, mesmo sem tocar).
+  **Nunca um lado vazio** (mexer num time fixa o outro em 0). `×` e layout do card intactos.
 - **Modelo de trabalho: João é o PO, a IA é uma equipe, e nenhum código sobe sem plano validado
   antes.** Novo doc [`11-EQUIPE-E-PAPEIS.md`](11-EQUIPE-E-PAPEIS.md): a IA atua como **equipe
   multidisciplinar** (11 papéis com responsabilidades e cenários), o João é o **Product Owner**, e
