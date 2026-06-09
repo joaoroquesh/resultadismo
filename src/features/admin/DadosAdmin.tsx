@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/Input";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/Switch";
 import { fromNow } from "@/lib/format";
 import {
   useMatchConflicts, useOverrideMatch, useSetMatchLock, useUnfreezeMatch,
@@ -269,24 +270,11 @@ function SourcesSection() {
                     </span>
                   )}
                   <span className="ml-auto flex items-center gap-2">
-                    <button
-                      type="button"
-                      role="switch"
-                      aria-checked={s.enabled}
-                      onClick={() => setEnabled.mutate({ id: s.id, enabled: !s.enabled })}
-                      className={cn(
-                        "relative h-5 w-9 rounded-full transition",
-                        s.enabled ? "bg-brand-600" : "bg-ink-300",
-                      )}
-                      aria-label={s.enabled ? "Desativar fonte" : "Ativar fonte"}
-                    >
-                      <span
-                        className={cn(
-                          "absolute top-0.5 size-4 rounded-full bg-white transition",
-                          s.enabled ? "left-[18px]" : "left-0.5",
-                        )}
-                      />
-                    </button>
+                    <Switch
+                      checked={s.enabled}
+                      onChange={(v) => setEnabled.mutate({ id: s.id, enabled: v })}
+                      label={s.enabled ? "Desativar fonte" : "Ativar fonte"}
+                    />
                     {s.role !== "primary" && (
                       <button
                         type="button"
