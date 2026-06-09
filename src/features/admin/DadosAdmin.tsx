@@ -11,8 +11,8 @@ import { fromNow } from "@/lib/format";
 import {
   useMatchConflicts, useOverrideMatch, useSetMatchLock, useUnfreezeMatch,
   useCompetitionsLite, useCompetitionSources, useUpsertCompetitionSource,
-  useSetSourceEnabled, useRemoveCompetitionSource,
-  type MatchConflict,
+  useSetSourceEnabled, useRemoveCompetitionSource, useUnmappedTeams,
+  useResolveUnmapped, type MatchConflict,
 } from "./dataSources";
 
 const STATUSES = ["scheduled", "live", "finished", "postponed", "cancelled"];
@@ -27,9 +27,94 @@ const selectCls =
 export function DadosAdmin() {
   return (
     <div className="space-y-6">
+      <UnmappedSection />
       <ConflictsSection />
       <SourcesSection />
     </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Times que a API entregou e NÃO estão no registro canônico (data/teams-registry).
+// "Aceitar como veio" para de alertar (fica com nome/escudo da API); "copiar
+// JSON" gera o trecho pra colar no registro (e rodar npm run gen:all).
+function UnmappedSection() {
+  const { data, isLoading } = useUnmappedTeams();
+  const resolve = useResolveUnmapped();
+  const { toast } = useToast();
+
+  if (isLoading || !data || data.length === 0) return null;
+
+  const slugOf = (s: string) =>
+    s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const copySnippet = (u: (typeof data)[number]) => {
+    const snippet = JSON.stringify(
+      {
+        slug: slugOf(u.name),
+        name_pt: u.name,
+        short_pt: u.short_name ?? u.name,
+        tla: u.tla,
+        country: null,
+        kind: "club",
+        competitions: [],
+        aliases: [u.name, ...(u.short_name && u.short_name !== u.name ? [u.short_name] : [])],
+      },
+      null,
+      2,
+    );
+    void navigator.clipboard.writeText(snippet);
+    toast("JSON copiado — cole no data/teams-registry.json e rode npm run gen:all.", "info");
+  };
+
+  return (
+    <section className="space-y-2">
+      <div className="flex items-center gap-2">
+        <AlertTriangle className="size-4 text-gold-600" />
+        <h2 className="text-base font-bold text-ink-950">Times fora do registro</h2>
+        <span className="rounded-pill bg-gold-500 px-2 py-0.5 text-xs font-bold text-gold-950">
+          {data.length}
+        </span>
+      </div>
+      <p className="text-xs text-ink-500">
+        A API entregou estes times e eles não estão no registro canônico. Aceite como veio (fica com
+        o nome/escudo da API) ou copie o JSON pra incluir no registro.
+      </p>
+      <Card className="divide-y divide-border">
+        {data.map((u) => (
+          <div key={u.id} className="flex items-center gap-3 px-3 py-2.5">
+            {u.crest_url ? (
+              <img src={u.crest_url} alt="" className="size-6 shrink-0 rounded-sm object-contain" />
+            ) : (
+              <span className="grid size-6 shrink-0 place-items-center rounded-sm bg-ink-100 text-[10px] font-bold text-ink-500">
+                {u.name[0]?.toUpperCase()}
+              </span>
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-ink-900">{u.name}</p>
+              <p className="text-[11px] text-ink-500">
+                {u.provider} · visto {u.seen_count}× {u.tla ? `· ${u.tla}` : ""}
+              </p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => copySnippet(u)}>
+              Copiar JSON
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              loading={resolve.isPending}
+              onClick={() =>
+                resolve.mutate(u.id, {
+                  onSuccess: () => toast("Aceito como veio da API.", "success"),
+                  onError: (e) => toast(e instanceof Error ? e.message : "Erro", "error"),
+                })
+              }
+            >
+              Aceitar como veio
+            </Button>
+          </div>
+        ))}
+      </Card>
+    </section>
   );
 }
 

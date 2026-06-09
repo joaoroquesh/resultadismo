@@ -26,6 +26,7 @@
 
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders, timingSafeEqual } from "../_shared/security.ts";
+import canonical from "../_shared/teams-canonical.json" with { type: "json" };
 
 type MatchStatus = "scheduled" | "live" | "finished" | "postponed" | "cancelled";
 type Provider = "manual" | "football_data" | "thesportsdb" | "espn";
@@ -88,6 +89,36 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 let lastFootballDataFetchAt = 0; // espaça chamadas football-data (limite free 10/min)
 
 // Normaliza nome de time pra casar entre fontes (sem acento, minúsculo, sem ruído).
+// ---- registro canônico de times (data/teams-registry.json → gen:teams) ----
+// O REGISTRO é a fonte da UI: traduz nome/short e aponta o escudo do repo
+// (local_crest). exact = slug completo; loose = normName (ambíguas excluídas).
+type CanonEntry = { name: string; short: string; crest: string | null };
+const CANON_EXACT = (canonical as { exact: Record<string, CanonEntry> }).exact;
+const CANON_LOOSE = (canonical as { loose: Record<string, CanonEntry> }).loose;
+function exactSlug(s: string | null | undefined): string {
+  return (s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+function canonTeam(...names: (string | null | undefined)[]): CanonEntry | null {
+  for (const n of names) {
+    const k = exactSlug(n);
+    if (k && CANON_EXACT[k]) return CANON_EXACT[k];
+  }
+  for (const n of names) {
+    const k = normName(n);
+    if (k && CANON_LOOSE[k]) return CANON_LOOSE[k];
+  }
+  return null;
+}
+// melhor-esforço: registra times fora do registro pro admin decidir (importar).
+async function logUnmapped(supabase: SupabaseClient, provider: string, rows: { name: string; short_name?: string | null; tla?: string | null; crest_url?: string | null }[]) {
+  if (!rows.length) return;
+  try {
+    await supabase.rpc("log_unmapped_teams", { p_provider: provider, p_rows: rows });
+  } catch {
+    /* não derruba o sync */
+  }
+}
+
 function normName(s: string | null | undefined): string {
   return (s ?? "")
     .normalize("NFD")
@@ -326,6 +357,8 @@ const TEAM_PT: Record<string, { name: string; short?: string }> = {
   UZB: { name: "Uzbequistão" },
 };
 function ptTeam(t: any): { name: string; short: string } {
+  const c = canonTeam(t?.name, t?.shortName, t?.tla);
+  if (c) return { name: c.name, short: c.short };
   const tla: string | undefined = t?.tla ?? undefined;
   const pt = tla ? TEAM_PT[tla] : undefined;
   if (pt) return { name: pt.name, short: pt.short ?? pt.name };
@@ -349,14 +382,18 @@ async function syncFootballData(supabase: SupabaseClient, ctx: SourceCtx, token:
       if (m.homeTeam?.id) teamsSeen.set(m.homeTeam.id, m.homeTeam);
       if (m.awayTeam?.id) teamsSeen.set(m.awayTeam.id, m.awayTeam);
     }
+    const misses: { name: string; short_name?: string | null; tla?: string | null; crest_url?: string | null }[] = [];
     const teamRows = [...teamsSeen].map(([pid, t]) => {
       const pt = ptTeam(t);
-      return { provider: "football_data" as const, provider_ref: String(pid), name: pt.name, short_name: pt.short, tla: t.tla ?? null, crest_url: t.crest ?? null };
+      const c = canonTeam(t?.name, t?.shortName, t?.tla);
+      if (!c) misses.push({ name: t?.name ?? pt.name, short_name: t?.shortName ?? null, tla: t?.tla ?? null, crest_url: t?.crest ?? null });
+      return { provider: "football_data" as const, provider_ref: String(pid), name: pt.name, short_name: pt.short, tla: t.tla ?? null, crest_url: t.crest ?? null, local_crest: c?.crest ?? null };
     });
     if (teamRows.length) {
       const { data: up, error } = await supabase.from("teams").upsert(teamRows, { onConflict: "provider,provider_ref" }).select("id, provider_ref");
       if (error) throw error;
       for (const r of up ?? []) teamMap.set(Number(r.provider_ref), r.id);
+      await logUnmapped(supabase, "football_data", misses);
     }
   }
 
@@ -448,6 +485,8 @@ const COUNTRY_EN_PT: Record<string, { name: string; short?: string }> = {
   India: { name: "Índia" },
 };
 function ptEspnTeam(team: any): { name: string; short: string } {
+  const c = canonTeam(team?.displayName, team?.shortDisplayName, team?.name, team?.abbreviation);
+  if (c) return { name: c.name, short: c.short };
   const abbr = String(team?.abbreviation ?? "").toUpperCase();
   const byAbbr = abbr ? TEAM_PT[abbr] : undefined;
   if (byAbbr) return { name: byAbbr.name, short: byAbbr.short ?? byAbbr.name };
@@ -494,14 +533,18 @@ async function syncEspn(supabase: SupabaseClient, ctx: SourceCtx, writeTeams: bo
   if (writeTeams) {
     const teamSeen = new Map<string, any>();
     for (const e of events) for (const c of e?.competitions?.[0]?.competitors ?? []) if (c?.team?.id) teamSeen.set(String(c.team.id), c.team);
+    const misses: { name: string; short_name?: string | null; tla?: string | null; crest_url?: string | null }[] = [];
     const teamRows = [...teamSeen].map(([pid, t]) => {
       const pt = ptEspnTeam(t);
-      return { provider: "espn" as const, provider_ref: String(pid), name: pt.name, short_name: pt.short, tla: t.abbreviation ?? null, crest_url: t.logo ?? null };
+      const c = canonTeam(t?.displayName, t?.shortDisplayName, t?.name, t?.abbreviation);
+      if (!c) misses.push({ name: t?.displayName ?? pt.name, short_name: t?.shortDisplayName ?? null, tla: t?.abbreviation ?? null, crest_url: t?.logo ?? null });
+      return { provider: "espn" as const, provider_ref: String(pid), name: pt.name, short_name: pt.short, tla: t.abbreviation ?? null, crest_url: t.logo ?? null, local_crest: c?.crest ?? null };
     });
     if (teamRows.length) {
       const { data: up, error } = await supabase.from("teams").upsert(teamRows, { onConflict: "provider,provider_ref" }).select("id, provider_ref");
       if (error) throw error;
       for (const r of up ?? []) teamMap.set(String(r.provider_ref), r.id);
+      await logUnmapped(supabase, "espn", misses);
     }
   }
 

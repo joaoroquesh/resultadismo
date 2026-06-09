@@ -77,6 +77,32 @@ for (const out of OUTS) {
   writeFileSync(out, json);
 }
 
+// ---- mapa canônico p/ o SYNC (Edge Function) -------------------------------
+// exact: slug completo (sem remoção de sufixo) → tradução; loose: normName (com
+// remoção de fc/ec/atletico…, igual ao sync) — chaves ambíguas ficam FORA do
+// loose (reportadas) pra nunca traduzir errado.
+const syncNorm = (s) =>
+  (s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+    .replace(/\b(fc|ec|sc|cf|ac|afc|cd|clube|futebol|esporte|atletico)\b/g, "")
+    .replace(/[^a-z0-9]+/g, "").trim();
+const exact = {}; const looseRaw = new Map(); const ambiguous = new Set();
+for (const t of catalog) {
+  const entry = { name: t.name_pt, short: t.short_pt ?? t.name_pt, crest: t.crest_file ? "/teams/" + t.crest_file : null };
+  for (const cand of [t.slug, t.name_pt, t.short_pt, t.tla, ...(t.aliases ?? [])]) {
+    const ke = slug(cand); if (ke && !(ke in exact)) exact[ke] = entry;
+    const kl = syncNorm(cand);
+    if (!kl) continue;
+    const prev = looseRaw.get(kl);
+    if (prev && prev.name !== entry.name) ambiguous.add(kl);
+    else looseRaw.set(kl, entry);
+  }
+}
+const loose = {}; for (const [k, v] of looseRaw) if (!ambiguous.has(k)) loose[k] = v;
+const CANON_OUT = join(ROOT, "supabase", "functions", "_shared", "teams-canonical.json");
+writeFileSync(CANON_OUT, JSON.stringify({ exact, loose }, null, 1) + "\n");
+console.log(`canônico p/ sync: ${Object.keys(exact).length} exact / ${Object.keys(loose).length} loose` +
+  (ambiguous.size ? ` | ambíguas fora do loose: ${[...ambiguous].join(", ")}` : ""));
+
 console.log("== teams-catalog.json gerado (data/ + src/data/) ==");
 console.log(`times: ${catalog.length} | clubes: ${catalog.filter((t) => t.kind === "club").length} | seleções: ${catalog.filter((t) => t.kind === "national").length}`);
 console.log(`com escudo: ${catalog.length - noCrest.length} | SEM escudo: ${noCrest.length}`);

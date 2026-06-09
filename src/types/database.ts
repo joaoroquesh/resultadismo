@@ -1450,6 +1450,48 @@ export type Database = {
           },
         ]
       }
+      sync_unmapped: {
+        Row: {
+          crest_url: string | null
+          first_seen: string
+          id: string
+          kind: string
+          last_seen: string
+          name: string
+          provider: string
+          seen_count: number
+          short_name: string | null
+          status: string
+          tla: string | null
+        }
+        Insert: {
+          crest_url?: string | null
+          first_seen?: string
+          id?: string
+          kind?: string
+          last_seen?: string
+          name: string
+          provider: string
+          seen_count?: number
+          short_name?: string | null
+          status?: string
+          tla?: string | null
+        }
+        Update: {
+          crest_url?: string | null
+          first_seen?: string
+          id?: string
+          kind?: string
+          last_seen?: string
+          name?: string
+          provider?: string
+          seen_count?: number
+          short_name?: string | null
+          status?: string
+          tla?: string | null
+        }
+        Relationships: []
+      }
       teams: {
         Row: {
           country: string | null
@@ -1689,6 +1731,28 @@ export type Database = {
           status: string
         }[]
       }
+      admin_list_unmapped: {
+        Args: never
+        Returns: {
+          crest_url: string | null
+          first_seen: string
+          id: string
+          kind: string
+          last_seen: string
+          name: string
+          provider: string
+          seen_count: number
+          short_name: string | null
+          status: string
+          tla: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "sync_unmapped"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       admin_list_users: {
         Args: never
         Returns: {
@@ -1742,6 +1806,7 @@ export type Database = {
         Args: { p_action: string; p_id: string }
         Returns: undefined
       }
+      admin_resolve_unmapped: { Args: { p_id: string }; Returns: undefined }
       admin_restore_league: {
         Args: { p_league_id: string }
         Returns: undefined
@@ -2220,6 +2285,10 @@ export type Database = {
           name: string
           slug: string
         }[]
+      }
+      log_unmapped_teams: {
+        Args: { p_provider: string; p_rows: Json }
+        Returns: undefined
       }
       match_in_period: {
         Args: {

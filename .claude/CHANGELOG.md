@@ -21,6 +21,24 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
+- **"Quem já palpitou" por GRUPO + favoritos.** Com 2+ grupos, chips (scroll lateral) filtram as
+  listas por grupo; estrela no chip define o **grupo favorito** (abre por padrão); estrela na linha
+  **favorita o Resultadista** (fixa no topo; tabela `user_favorites`, RLS self).
+- **Sync canônico (Fase C) + alerta de não-mapeados.** O registro de times agora dirige o sync:
+  tradução nome/short via mapa gerado (`teams-canonical.json`, exact/loose com ambíguas excluídas),
+  `teams.local_crest` apontando pro escudo do repo, e times fora do registro caem em `sync_unmapped`
+  → seção **"Times fora do registro"** no Admin → Dados (aceitar como veio / copiar JSON pro
+  registro). [`decisions/0007`](decisions/0007-sync-canonico.md)
+- **Curadoria de competições editável** (`data/competitions-registry.json`): grupo (Seleções/Ligas/
+  Copas/Alternativos) e ordem vêm do registro (`gen:comps` sincroniza o front e emite SQL de upsert
+  pra migration). Guia no [`13`](13-TIMES-E-ESCUDOS.md).
+- **Convite fecha o ciclo:** links compartilhados embutem `?convite=CODIGO` e o campo de `/grupos`
+  abre pré-preenchido (limpa ao entrar).
+- **Escudos 292/292** (Costa do Marfim + Suécia) e **todos os toggles** no `ui/Switch`.
+
+### Mudado
+- **Varredura completa do "tom lavado"** (92 substituições, incl. o primitivo `Badge` → sólidos) —
+  regra do [`12-DESIGN`](12-DESIGN.md) agora vale no app inteiro.
 - **Time/seleção do coração agora SALVAM** (bug pré-existente). As colunas `favorite_team_id`/
   `national_team_id` eram **uuid (FK→teams)**, mas o catálogo de personalização é **slug** — o slug
   não cabia e a escolha nunca persistia. Viraram **text (slug)** (`set_personalization` text). Agora
