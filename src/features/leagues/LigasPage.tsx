@@ -25,6 +25,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { Avatar } from "@/components/ui/Avatar";
 import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/lib/utils";
+import { getStoredInvite, clearStoredInvite } from "@/lib/invite";
 import {
   useMyLeagues,
   useJoinByCode,
@@ -48,7 +49,8 @@ export function LigasPage() {
   const { data: leagues, isLoading } = useMyLeagues();
   const join = useJoinByCode();
   const { toast } = useToast();
-  const [code, setCode] = useState("");
+  // Pré-preenche com o código capturado do link de convite (?convite=), se houver.
+  const [code, setCode] = useState<string>(() => getStoredInvite());
 
   const leagueIds = useMemo(() => (leagues ?? []).map((l) => l.id), [leagues]);
   const { data: positions } = useMyLeaguePositions(leagueIds);
@@ -59,6 +61,7 @@ export function LigasPage() {
     if (!code.trim()) return;
     try {
       await join.mutateAsync(code.trim());
+      clearStoredInvite();
       toast("Você entrou no grupo!", "success");
       setCode("");
     } catch (err) {
@@ -283,7 +286,7 @@ function GroupCard({
     const code = league.join_code;
     const text = isPublic
       ? `🏆 Entra no meu grupo "${league.name}" no Resultadismo!\n\nPalpita nos jogos e me enfrenta no ranking ao vivo. ⚽\n\n👉 https://www.resultadismo.com/grupos`
-      : `🏆 Entra no meu grupo "${league.name}" no Resultadismo!\n\nPalpita nos jogos e me enfrenta no ranking ao vivo. ⚽\n\nCódigo de convite: ${code ?? ""}\n👉 https://www.resultadismo.com`;
+      : `🏆 Entra no meu grupo "${league.name}" no Resultadismo!\n\nPalpita nos jogos e me enfrenta no ranking ao vivo. ⚽\n\nCódigo de convite: ${code ?? ""}\n👉 https://www.resultadismo.com/?convite=${encodeURIComponent(code ?? "")}`;
     const fallback = () =>
       window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
     if (typeof navigator !== "undefined" && typeof navigator.share === "function") {

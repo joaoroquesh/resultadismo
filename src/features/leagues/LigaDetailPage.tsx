@@ -141,7 +141,7 @@ No Resultadismo você:
 
 Bora jogar junto? Entra na meu grupo:
 Código: ${league.join_code}
-👉 https://www.resultadismo.com`;
+👉 https://www.resultadismo.com/?convite=${encodeURIComponent(league.join_code)}`;
 
     const fallback = () =>
       window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
