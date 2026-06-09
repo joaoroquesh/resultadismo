@@ -322,11 +322,12 @@ export function PersonalizationPage() {
           ) : step === 0 ? (
             <ScreenShell
               icon={<Heart className="size-6" />}
-              tone="bg-flame-500/12 text-flame-600"
+              tone="bg-surface-2 text-flame-600"
               title="Qual é o seu time do coração?"
               subtitle="Escolha um. Pra deixar o Resultadismo com a sua cara — muda quando quiser."
             >
               <TeamPickerList
+                key="pick-clubs"
                 teams={clubs}
                 value={favoriteTeamId}
                 onChange={setFavoriteTeamId}
@@ -337,11 +338,12 @@ export function PersonalizationPage() {
           ) : step === 1 ? (
             <ScreenShell
               icon={<Flag className="size-6" />}
-              tone="bg-grass-500/12 text-grass-700"
+              tone="bg-surface-2 text-grass-700"
               title="Pra que seleção você torce?"
               subtitle="É Copa do Mundo! Escolha a sua — o Brasil abre a lista."
             >
               <TeamPickerList
+                key="pick-nationals"
                 teams={nationals}
                 value={nationalId}
                 onChange={setNationalId}
@@ -352,7 +354,7 @@ export function PersonalizationPage() {
           ) : step === 2 ? (
             <ScreenShell
               icon={<ShieldHalf className="size-6" />}
-              tone="bg-aqua-500/12 text-aqua-700"
+              tone="bg-surface-2 text-aqua-700"
               title="Quais times e campeonatos você quer acompanhar?"
               subtitle="Marque o campeonato inteiro ou abra pra escolher só alguns times. Dá pra seguir um time numa liga e não numa copa."
             >
@@ -391,7 +393,7 @@ export function PersonalizationPage() {
           ) : (
             <ScreenShell
               icon={<Globe2 className="size-6" />}
-              tone="bg-brand-500/12 text-brand-600"
+              tone="bg-surface-2 text-brand-600"
               title="Bora pro ranking geral?"
               subtitle="O Resultadismo The Best junta todo mundo numa classificação só."
             >
@@ -506,7 +508,7 @@ function TeamPickerList({
 
   return (
     <div>
-      <div className="flex items-center gap-2 rounded-md border border-ink-200 bg-surface px-3">
+      <div className="sticky top-0 z-10 flex items-center gap-2 rounded-md border border-ink-200 bg-surface px-3">
         <Search className="size-4 shrink-0 text-ink-400" />
         <input
           value={q}
@@ -514,11 +516,11 @@ function TeamPickerList({
           placeholder={searchPlaceholder}
           className="h-11 w-full bg-transparent text-sm outline-none placeholder:text-ink-400"
         />
-        {value && (
+        {q && (
           <button
             type="button"
-            aria-label="Limpar escolha"
-            onClick={() => onChange("")}
+            aria-label="Limpar busca"
+            onClick={() => setQ("")}
             className="grid size-6 shrink-0 place-items-center rounded text-ink-400 hover:bg-ink-100 hover:text-ink-700"
           >
             <X className="size-3.5" />
@@ -543,7 +545,7 @@ function TeamPickerList({
                   onClick={() => onChange(t.id)}
                   className={cn(
                     "flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-sm transition",
-                    sel ? "bg-brand-500/10 font-semibold text-ink-950" : "text-ink-700 hover:bg-ink-100",
+                    sel ? "bg-surface ring-2 ring-inset ring-brand-600 font-semibold text-ink-950" : "text-ink-700 hover:bg-ink-100",
                   )}
                 >
                   <TeamCrest team={t} />
@@ -608,7 +610,7 @@ function GroupSection({
             {title}
           </span>
           {selCount > 0 && (
-            <span className="rounded-pill bg-brand-500/15 px-2 py-0.5 text-xs font-bold text-brand-700">
+            <span className="rounded-pill bg-brand-600 px-2 py-0.5 text-xs font-bold text-white">
               {selCount}
             </span>
           )}
@@ -691,7 +693,7 @@ function CompetitionItem({
           />
           <span className="min-w-0 flex-1 truncate font-semibold text-ink-900">{label}</span>
           {countLabel && (
-            <span className="rounded-pill bg-brand-500/12 px-2 py-0.5 text-xs font-bold text-brand-700">
+            <span className="rounded-pill bg-brand-600 px-2 py-0.5 text-xs font-bold text-white">
               {countLabel}
             </span>
           )}
@@ -735,7 +737,7 @@ function CompetitionItem({
                       onClick={handleTap}
                       className={cn(
                         "flex w-full items-center gap-2.5 rounded px-2.5 py-2 text-left text-sm transition",
-                        on ? "bg-brand-500/8 text-ink-950" : "text-ink-700 hover:bg-ink-100",
+                        on ? "bg-surface ring-2 ring-inset ring-brand-600 text-ink-950" : "text-ink-700 hover:bg-ink-100",
                       )}
                     >
                       <TeamCrest team={t} size={22} />
