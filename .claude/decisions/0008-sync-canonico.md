@@ -1,4 +1,4 @@
-# ADR 0007 — Registro canônico no sync + alerta de times não-mapeados (Fase C)
+# ADR 0008 — Registro canônico no sync + alerta de times não-mapeados (Fase C)
 
 **Status:** aceito · **Data:** 2026-06-09 · **PO:** João
 
