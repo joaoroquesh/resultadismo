@@ -5,11 +5,11 @@ type Tone = "neutral" | "brand" | "gold" | "grass" | "aqua" | "flame" | "outline
 
 const tones: Record<Tone, string> = {
   neutral: "bg-ink-100 text-ink-700",
-  brand: "bg-brand-100 text-brand-800",
-  gold: "bg-gold-100 text-gold-800",
-  grass: "bg-grass-100 text-grass-800",
-  aqua: "bg-aqua-100 text-aqua-800",
-  flame: "bg-flame-100 text-flame-700",
+  brand: "bg-brand-600 text-white",
+  gold: "bg-gold-500 text-gold-950",
+  grass: "bg-grass-600 text-white",
+  aqua: "bg-aqua-700 text-white",
+  flame: "bg-flame-600 text-white",
   outline: "border border-ink-200 text-ink-600",
 };
 

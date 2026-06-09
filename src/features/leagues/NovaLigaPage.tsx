@@ -243,7 +243,7 @@ export function NovaLigaPage() {
             </div>
           </div>
 
-          <div className="flex items-start gap-2 rounded-md bg-grass-50 p-3 text-xs text-grass-800 ring-1 ring-grass-200/60">
+          <div className="flex items-start gap-2 rounded-md border-l-2 border-grass-600 bg-surface-2 p-3 text-xs text-grass-800">
             <Trophy className="mt-0.5 size-4 shrink-0" />
             <p>
               <strong>É a temporada da Copa!</strong> Todo grupo joga a{" "}
@@ -289,7 +289,7 @@ export function NovaLigaPage() {
           </Card>
         )}
 
-        <div className="flex items-start gap-2 rounded-md bg-brand-50 p-3 text-xs text-brand-800">
+        <div className="flex items-start gap-2 rounded-md border-l-2 border-brand-600 bg-surface-2 p-3 text-xs text-brand-800">
           <Info className="mt-0.5 size-4 shrink-0" />
           <p>
             {payMode === "disabled" ? (

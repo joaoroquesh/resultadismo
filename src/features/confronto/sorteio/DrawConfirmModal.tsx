@@ -82,7 +82,7 @@ export function DrawConfirmModal({
             />
           )}
           {drawWhen !== "now" && (
-            <p className="rounded-md bg-brand-500/10 px-3 py-2 text-xs text-brand-700">
+            <p className="rounded-md border-l-2 border-brand-600 bg-surface-2 px-3 py-2 text-xs text-brand-700">
               A disputa aparece como <span className="font-semibold">"sorteio agendado"</span> e é
               revelada automaticamente no horário.
             </p>

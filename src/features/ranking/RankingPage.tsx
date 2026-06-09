@@ -70,7 +70,7 @@ export function RankingPage() {
       {/* Sua posição */}
       <Card className="mb-4 p-4">
         <div className="flex items-start gap-3">
-          <span className="grid size-10 shrink-0 place-items-center rounded-md bg-brand-500/10 text-brand-600">
+          <span className="grid size-10 shrink-0 place-items-center rounded-md bg-surface-2 text-brand-600">
             <Globe2 className="size-5" strokeWidth={2.2} />
           </span>
           <div className="min-w-0 flex-1">
@@ -173,7 +173,7 @@ function RankRow({ row, isMe, metric }: { row: RTBRow; isMe: boolean; metric: Me
     <div
       className={cn(
         "flex items-center gap-3 rounded-lg bg-surface p-3 ring-1 ring-border transition-colors",
-        isMe && "bg-brand-500/8 ring-brand-300",
+        isMe && "bg-surface-2 ring-brand-600",
       )}
     >
       <span className="grid size-8 shrink-0 place-items-center text-sm font-bold tabular-nums text-ink-700">

@@ -43,6 +43,7 @@ import {
   type PersoComp,
 } from "./personalizationApi";
 import { catalogClubs, catalogNations, teamsForCompetition } from "./teamsCatalog";
+import compsRegistry from "@/data/competitions-registry.json";
 
 const STEP_COUNT = 6;
 const WC_CODES = ["WC", "fifa.world"];
@@ -51,39 +52,35 @@ const UFS = [
   "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO",
 ];
 
-// Grupos colapsáveis da tela "times e campeonatos".
+// Grupos colapsáveis da tela "times e campeonatos". A curadoria (grupo + ordem)
+// vem do REGISTRO editável data/competitions-registry.json (ordem = posição no
+// array; ver 13-TIMES-E-ESCUDOS §competições). Código fora do registro cai no
+// fallback por tipo (LEAGUE → Ligas, senão Copas).
 const GROUPS = ["Seleções", "Ligas e estaduais", "Copas", "Alternativos"] as const;
 type Group = (typeof GROUPS)[number];
 
-const SELECOES_CODES = new Set([
-  "WC", "fifa.world", "fifa.friendly", "conmebol.america", "uefa.euro", "uefa.nations",
-  "fifa.worldq.conmebol", "fifa.worldq.uefa", "fifa.worldq.concacaf", "fifa.worldq.afc",
-  "fifa.worldq.caf", "caf.nations",
-]);
-const ALTERNATIVOS_CODES = new Set([
-  "usa.1", "mex.1", "ksa.1", "por.1", "ned.1", "tur.1", "bel.1", "sco.1", "gre.1",
-]);
+type CompRegistryEntry = {
+  code: string;
+  aliases?: string[];
+  name: string;
+  group: Group;
+  type: string;
+  area: string;
+  in_personalization: boolean;
+};
+const COMP_REGISTRY = compsRegistry as CompRegistryEntry[];
+const COMP_INFO = new Map<string, { group: Group; order: number }>();
+COMP_REGISTRY.forEach((c, i) => {
+  COMP_INFO.set(c.code, { group: c.group, order: i });
+  (c.aliases ?? []).forEach((a) => COMP_INFO.set(a, { group: c.group, order: i }));
+});
 
-const ORDER: string[] = [
-  "WC", "fifa.world", "fifa.friendly",
-  "conmebol.america", "uefa.euro", "uefa.nations",
-  "fifa.worldq.conmebol", "fifa.worldq.uefa", "fifa.worldq.concacaf", "fifa.worldq.afc", "fifa.worldq.caf",
-  "caf.nations",
-  "bra.1", "bra.2", "bra.3",
-  "bra.camp.paulista", "bra.camp.carioca", "bra.camp.mineiro", "bra.camp.gaucho",
-  "eng.1", "esp.1", "ita.1", "ger.1", "fra.1",
-  "bra.copa_do_brazil", "conmebol.libertadores", "conmebol.sudamericana",
-  "uefa.champions", "uefa.europa", "uefa.europa.conf",
-  "usa.1", "mex.1", "ksa.1", "por.1", "ned.1", "tur.1", "bel.1", "sco.1", "gre.1",
-];
 function orderIdx(code: string | null) {
-  const i = ORDER.indexOf(code ?? "");
-  return i === -1 ? 999 : i;
+  return COMP_INFO.get(code ?? "")?.order ?? 999;
 }
 function groupOf(c: PersoComp): Group {
-  const code = c.provider_code ?? "";
-  if (SELECOES_CODES.has(code)) return "Seleções";
-  if (ALTERNATIVOS_CODES.has(code)) return "Alternativos";
+  const info = COMP_INFO.get(c.provider_code ?? "");
+  if (info) return info.group;
   return c.type === "LEAGUE" ? "Ligas e estaduais" : "Copas";
 }
 function compLabel(c: PersoComp) {

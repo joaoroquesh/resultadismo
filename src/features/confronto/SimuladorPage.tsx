@@ -112,7 +112,7 @@ export function SimuladorPage() {
         {/* Resultado */}
         <Card className="space-y-4 p-4">
           <div className="flex items-center gap-3">
-            <span className="grid size-11 shrink-0 place-items-center rounded-md bg-brand-500/10 text-brand-600">
+            <span className="grid size-11 shrink-0 place-items-center rounded-md bg-surface-2 text-brand-600">
               {mode === "liga" ? (
                 <Swords className="size-5" strokeWidth={2.2} />
               ) : (
@@ -129,8 +129,8 @@ export function SimuladorPage() {
               className={cn(
                 "inline-flex shrink-0 items-center gap-1 rounded-pill px-2.5 py-1 text-xs font-bold",
                 result.viavel
-                  ? "bg-grass-100 text-grass-800"
-                  : "bg-flame-100 text-flame-700",
+                  ? "bg-grass-600 text-white"
+                  : "bg-flame-600 text-white",
               )}
             >
               {result.viavel ? <Check className="size-3.5" /> : <TriangleAlert className="size-3.5" />}
@@ -157,7 +157,7 @@ export function SimuladorPage() {
             <p
               className={cn(
                 "rounded-md px-3 py-2 text-xs leading-relaxed",
-                result.viavel ? "bg-brand-500/10 text-brand-700" : "bg-flame-100 text-flame-700",
+                result.viavel ? "border-l-2 border-brand-600 bg-surface-2 text-brand-700" : "border-l-2 border-flame-600 bg-surface-2 text-flame-700",
               )}
             >
               {result.aviso}

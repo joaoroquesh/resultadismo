@@ -116,7 +116,7 @@ export function UserModerationPanel({
         </div>
 
         {mod?.suspended && (
-          <div className="rounded-md bg-flame-500/10 px-3 py-2 text-sm font-medium text-flame-700 ring-1 ring-flame-500/20">
+          <div className="rounded-md bg-surface-2 px-3 py-2 text-sm font-medium text-flame-700 ring-1 ring-flame-600">
             Conta suspensa — login bloqueado.
           </div>
         )}

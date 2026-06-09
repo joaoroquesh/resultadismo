@@ -196,7 +196,7 @@ function DaySection({ list, defaultOpen }: { list: AdminMatch[]; defaultOpen: bo
         </span>
         <span className="text-xs text-ink-400">· {list.length} jogo{list.length === 1 ? "" : "s"}</span>
         {liveCount > 0 && (
-          <span className="ml-auto inline-flex items-center gap-1 rounded-pill bg-flame-500/12 px-2 py-0.5 text-[11px] font-bold text-flame-600">
+          <span className="ml-auto inline-flex items-center gap-1 rounded-pill bg-flame-600 px-2 py-0.5 text-[11px] font-bold text-white">
             <span className="size-1.5 animate-pulse rounded-full bg-flame-500" /> {liveCount} ao vivo
           </span>
         )}

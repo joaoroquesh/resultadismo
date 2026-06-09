@@ -1612,8 +1612,8 @@
       "Cote d'Ivoire",
       "Côte d'Ivoire"
     ],
-    "crest_file": null,
-    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Ivory%20Coast.svg"
+    "crest_file": "costadomarfim.svg",
+    "crest_source": "repo (public/teams)"
   },
   {
     "slug": "crb",
@@ -4384,8 +4384,8 @@
       "Sweden",
       "Sverige"
     ],
-    "crest_file": null,
-    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Sweden.svg"
+    "crest_file": "suecia.svg",
+    "crest_source": "repo (public/teams)"
   },
   {
     "slug": "suica",

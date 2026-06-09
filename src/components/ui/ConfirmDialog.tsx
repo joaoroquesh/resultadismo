@@ -56,8 +56,8 @@ export function ConfirmDialog({
           <div
             className={
               tone === "warn"
-                ? "grid size-10 shrink-0 place-items-center rounded-md bg-brand-500/10 text-brand-600"
-                : "grid size-10 shrink-0 place-items-center rounded-md bg-flame-500/10 text-flame-600"
+                ? "grid size-10 shrink-0 place-items-center rounded-md bg-surface-2 text-brand-600"
+                : "grid size-10 shrink-0 place-items-center rounded-md bg-surface-2 text-flame-600"
             }
           >
             {tone === "warn" ? <Megaphone className="size-5" /> : <AlertTriangle className="size-5" />}

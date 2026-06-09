@@ -25,6 +25,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { Avatar } from "@/components/ui/Avatar";
 import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/lib/utils";
+import { getStoredInvite, clearStoredInvite } from "@/lib/invite";
 import {
   useMyLeagues,
   useJoinByCode,
@@ -48,7 +49,8 @@ export function LigasPage() {
   const { data: leagues, isLoading } = useMyLeagues();
   const join = useJoinByCode();
   const { toast } = useToast();
-  const [code, setCode] = useState("");
+  // Pré-preenche com o código capturado do link de convite (?convite=), se houver.
+  const [code, setCode] = useState<string>(() => getStoredInvite());
 
   const leagueIds = useMemo(() => (leagues ?? []).map((l) => l.id), [leagues]);
   const { data: positions } = useMyLeaguePositions(leagueIds);
@@ -59,6 +61,7 @@ export function LigasPage() {
     if (!code.trim()) return;
     try {
       await join.mutateAsync(code.trim());
+      clearStoredInvite();
       toast("Você entrou no grupo!", "success");
       setCode("");
     } catch (err) {
@@ -109,7 +112,7 @@ export function LigasPage() {
           </div>
         ) : !hasGroups ? (
           <Card className="space-y-4 p-5 text-center">
-            <span className="mx-auto grid size-12 place-items-center rounded-full bg-brand-500/10 text-brand-600">
+            <span className="mx-auto grid size-12 place-items-center rounded-full bg-surface-2 text-brand-600">
               <Shield className="size-6" strokeWidth={2.2} />
             </span>
             <div>
@@ -233,7 +236,7 @@ function RankRowMini({ row, isMe, detailed }: { row: RTBRow; isMe: boolean; deta
     <li
       className={cn(
         "flex items-center gap-3 px-4 py-2.5 transition-colors",
-        isMe && "bg-brand-500/8",
+        isMe && "bg-surface-2 ring-1 ring-inset ring-brand-600",
       )}
     >
       <span className="w-6 text-center text-sm font-bold tabular-nums text-ink-600">
@@ -283,7 +286,7 @@ function GroupCard({
     const code = league.join_code;
     const text = isPublic
       ? `🏆 Entra no meu grupo "${league.name}" no Resultadismo!\n\nPalpita nos jogos e me enfrenta no ranking ao vivo. ⚽\n\n👉 https://www.resultadismo.com/grupos`
-      : `🏆 Entra no meu grupo "${league.name}" no Resultadismo!\n\nPalpita nos jogos e me enfrenta no ranking ao vivo. ⚽\n\nCódigo de convite: ${code ?? ""}\n👉 https://www.resultadismo.com`;
+      : `🏆 Entra no meu grupo "${league.name}" no Resultadismo!\n\nPalpita nos jogos e me enfrenta no ranking ao vivo. ⚽\n\nCódigo de convite: ${code ?? ""}\n👉 https://www.resultadismo.com/?convite=${encodeURIComponent(code ?? "")}`;
     const fallback = () =>
       window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
     if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
@@ -329,11 +332,11 @@ function GroupCard({
           </p>
         </div>
         {position && !pending && (
-          <div className="shrink-0 rounded-md bg-brand-500/10 px-2 py-1 text-right leading-none">
-            <span className="text-base font-extrabold tabular-nums text-brand-700">
+          <div className="shrink-0 rounded-md bg-brand-600 px-2 py-1 text-right leading-none">
+            <span className="text-base font-extrabold tabular-nums text-white">
               {position.rank}º
             </span>
-            <span className="ml-0.5 text-[10px] text-brand-700/70">/{position.total}</span>
+            <span className="ml-0.5 text-[10px] text-white/70">/{position.total}</span>
           </div>
         )}
       </Link>
@@ -345,7 +348,7 @@ function GroupCard({
             type="button"
             onClick={share}
             aria-label="Convidar pelo WhatsApp"
-            className="grid size-9 place-items-center rounded-md text-ink-400 transition hover:bg-grass-500/10 hover:text-grass-600"
+            className="grid size-9 place-items-center rounded-md text-ink-400 transition hover:bg-ink-100 hover:text-grass-600"
           >
             <Share2 className="size-4" />
           </button>

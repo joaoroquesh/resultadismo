@@ -212,7 +212,7 @@ export function JogosPage() {
                 className={cn(
                   "flex shrink-0 items-center gap-2 rounded-pill border px-3 py-1.5 text-sm font-semibold transition",
                   scope === c.id
-                    ? "border-brand-600 bg-brand-50 text-brand-700"
+                    ? "border-brand-600 bg-surface text-brand-700"
                     : "border-ink-200 bg-surface text-ink-600",
                 )}
               >
@@ -280,7 +280,7 @@ export function JogosPage() {
               }
               defaultOpen={user ? undefined : false}
             >
-              <span className="inline-flex items-center gap-1 rounded-pill bg-brand-500/15 px-2 py-0.5 font-semibold text-brand-700">
+              <span className="inline-flex items-center gap-1 rounded-pill bg-brand-600 px-2 py-0.5 font-semibold text-white">
                 <Zap className="size-3 fill-brand-600" /> {jokersUsedThisWeek}/{maxJokers} dobros
                 nesta semana
               </span>

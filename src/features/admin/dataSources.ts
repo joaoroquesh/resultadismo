@@ -175,3 +175,42 @@ export function useRemoveCompetitionSource(competitionId: string | null) {
     onSuccess: invalidate,
   });
 }
+
+/* ── Times fora do registro canônico (sync_unmapped) ─────────────────────── */
+
+export type UnmappedTeam = {
+  id: string;
+  kind: string;
+  provider: string;
+  name: string;
+  short_name: string | null;
+  tla: string | null;
+  crest_url: string | null;
+  status: string;
+  seen_count: number;
+  first_seen: string;
+  last_seen: string;
+};
+
+export function useUnmappedTeams() {
+  return useQuery({
+    queryKey: ["admin-unmapped-teams"],
+    staleTime: 30_000,
+    queryFn: async (): Promise<UnmappedTeam[]> => {
+      const { data, error } = await rpcCall<UnmappedTeam[]>("admin_list_unmapped");
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    },
+  });
+}
+
+export function useResolveUnmapped() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await rpcCall("admin_resolve_unmapped", { p_id: id });
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-unmapped-teams"] }),
+  });
+}

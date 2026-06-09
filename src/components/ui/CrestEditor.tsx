@@ -209,7 +209,7 @@ export function CrestEditor({
                 onClick={() => setShape(sh)}
                 className={cn(
                   "flex items-center justify-center rounded-md p-1.5 ring-2 transition",
-                  active ? "bg-brand-500/10 ring-brand-600" : "ring-transparent hover:bg-ink-100",
+                  active ? "bg-surface-2 ring-brand-600" : "ring-transparent hover:bg-ink-100",
                 )}
               >
                 <CrestMask src={thumb} name={name} px={36} defaultKind={kind} />

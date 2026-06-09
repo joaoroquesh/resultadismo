@@ -170,7 +170,7 @@ function UserRow({
           <div className="flex items-center gap-1.5">
             <p className="truncate font-semibold text-ink-900">{p.display_name}</p>
             {p.is_online && (
-              <span className="shrink-0 rounded-pill bg-grass-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-grass-700">
+              <span className="shrink-0 rounded-pill bg-grass-600 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
                 online
               </span>
             )}

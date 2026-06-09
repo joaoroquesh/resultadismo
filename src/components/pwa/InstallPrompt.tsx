@@ -65,7 +65,7 @@ export function InstallPrompt() {
       </button>
 
       <div className="flex items-start gap-3 pr-6">
-        <div className="grid size-10 shrink-0 place-items-center rounded-md bg-brand-50 text-brand-600">
+        <div className="grid size-10 shrink-0 place-items-center rounded-md bg-surface-2 text-brand-600">
           <Download className="size-5" />
         </div>
         <div className="min-w-0">

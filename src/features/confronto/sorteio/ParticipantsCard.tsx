@@ -48,7 +48,7 @@ export function ParticipantsCard({
               .map((p) => (
                 <li
                   key={p.id}
-                  className="rounded-pill bg-brand-500/10 px-2.5 py-1 text-xs font-semibold text-brand-700"
+                  className="rounded-pill bg-brand-600 px-2.5 py-1 text-xs font-semibold text-white"
                 >
                   {p.name}
                 </li>

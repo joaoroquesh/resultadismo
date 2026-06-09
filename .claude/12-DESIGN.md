@@ -30,5 +30,6 @@ deve ser **substituído e evitado** em telas novas/tocadas.
 `ink` (neutros) · `surface`/`surface-2`/`background`. Elevação: `shadow-brand`.
 
 ## Migração
-Telas novas/tocadas **já nascem** sem tom lavado. As telas legadas (≈70 ocorrências em ≈29
-arquivos no início desta regra) serão varridas aos poucos — **não introduzir novas ocorrências**.
+**Concluída (2026-06-09):** varredura completa — 92 substituições (54 com alpha `bg-cor/NN` +
+38 sólidas `bg-cor-50/100`), incluindo o primitivo `Badge` (variantes agora sólidas). Restam 0
+ocorrências em código de produto (DevPanel, dev-only, fora do escopo). **Não introduzir novas.**

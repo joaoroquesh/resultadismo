@@ -38,7 +38,7 @@ export function ScheduledView({
 
   return (
     <div className="rounded-lg bg-surface p-5 text-center shadow-[var(--shadow-soft)] ring-1 ring-border">
-      <span className="mx-auto mb-3 grid size-12 place-items-center rounded-full bg-brand-500/10 text-brand-600">
+      <span className="mx-auto mb-3 grid size-12 place-items-center rounded-full bg-surface-2 text-brand-600">
         <Clock className="size-6" />
       </span>
       <p className="font-bold text-ink-950">Sorteio agendado</p>

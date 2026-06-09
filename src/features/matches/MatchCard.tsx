@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { track } from "@/lib/analytics";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
-import { Check, Loader2, Lock, ChevronDown, Users, Zap, Hand, Plus, Minus } from "lucide-react";
+import { Check, Loader2, Lock, ChevronDown, Users, Zap, Hand, Plus, Minus, Star } from "lucide-react";
 import { TeamCrest } from "@/components/TeamCrest";
 import { ScorePill } from "@/components/ScorePill";
 import { Avatar } from "@/components/ui/Avatar";
@@ -11,6 +11,9 @@ import { useAuth } from "@/features/auth/AuthProvider";
 import { useToast } from "@/components/ui/Toast";
 import { useSavePrediction, useSetJoker, useMatchPredictions, useMatchPredictStatus } from "./api";
 import { useNudge } from "@/features/notifications/api";
+import { useMyLeagues, useLeagueMembers } from "@/features/leagues/api";
+import { useMyFavorites, useToggleFavorite } from "@/features/players/api";
+import { supabase } from "@/lib/supabase";
 import type { MatchWithTeams, Prediction, ScoreType } from "@/lib/types";
 
 type SaveState = "idle" | "saving" | "saved" | "error";
@@ -283,12 +286,7 @@ export function MatchCard({
             <Users className="size-3.5" /> {locked ? "Palpites da galera" : "Quem já palpitou"}
             <ChevronDown className={cn("size-3.5 transition-transform", showGalera && "rotate-180")} />
           </button>
-          {showGalera &&
-            (locked ? (
-              <Galera matchId={match.id} finished={finished} />
-            ) : (
-              <PredictStatus matchId={match.id} />
-            ))}
+          {showGalera && <GaleraArea matchId={match.id} locked={locked} finished={finished} />}
         </>
       )}
     </div>
@@ -378,21 +376,171 @@ function ScoreBox({
   );
 }
 
-function Galera({ matchId, finished }: { matchId: string; finished: boolean }) {
+/**
+ * Área "quem já palpitou / palpites da galera": com mais de um grupo, chips
+ * (scroll lateral) filtram a lista POR GRUPO — o grupo favorito (estrela ao lado
+ * do chip ativo; profiles.favorite_group_id) abre por padrão. Resultadistas
+ * favoritados (estrela na linha) fixam no topo.
+ */
+function GaleraArea({
+  matchId,
+  locked,
+  finished,
+}: {
+  matchId: string;
+  locked: boolean;
+  finished: boolean;
+}) {
+  const { session, user, profile, refreshProfile } = useAuth();
+  const { data: leagues } = useMyLeagues();
+  const myLeagues = useMemo(
+    () => (leagues ?? []).filter((l) => l.my_status === "active"),
+    [leagues],
+  );
+  const favGroup = profile?.favorite_group_id ?? null;
+  // undefined = ainda sem escolha manual → segue o grupo favorito.
+  const [selManual, setSelManual] = useState<string | null | undefined>(undefined);
+  const selRaw = selManual === undefined ? favGroup : selManual;
+  const sel = selRaw && myLeagues.some((l) => l.id === selRaw) ? selRaw : null;
+
+  const { data: members } = useLeagueMembers(sel ?? undefined);
+  const memberIds = useMemo(() => {
+    if (!sel || !members) return null;
+    return new Set(members.map((m) => m.profile?.id).filter(Boolean) as string[]);
+  }, [sel, members]);
+
+  const { data: favs } = useMyFavorites(!!session);
+  const toggleFav = useToggleFavorite();
+  const isFav = (id: string) => !!favs?.has(id);
+  const star = (id: string) => toggleFav.mutate({ userId: id, next: !isFav(id) });
+
+  async function setFavoriteGroup(id: string | null) {
+    if (!user) return;
+    await supabase.from("profiles").update({ favorite_group_id: id }).eq("id", user.id);
+    void refreshProfile();
+  }
+
+  return (
+    <div>
+      {myLeagues.length > 1 && (
+        <div className="flex items-center gap-1.5 overflow-x-auto border-t border-border px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <GroupChip active={sel === null} onClick={() => setSelManual(null)}>
+            Todos
+          </GroupChip>
+          {myLeagues.map((l) => (
+            <GroupChip key={l.id} active={sel === l.id} onClick={() => setSelManual(l.id)}>
+              {l.name}
+            </GroupChip>
+          ))}
+          {sel && (
+            <button
+              type="button"
+              aria-label={favGroup === sel ? "Remover grupo favorito" : "Marcar como grupo favorito"}
+              aria-pressed={favGroup === sel}
+              title="Grupo favorito abre primeiro"
+              onClick={() => void setFavoriteGroup(favGroup === sel ? null : sel)}
+              className="grid size-7 shrink-0 place-items-center rounded-pill text-gold-600 transition hover:bg-ink-100"
+            >
+              <Star className={cn("size-4", favGroup === sel && "fill-gold-500 text-gold-500")} />
+            </button>
+          )}
+        </div>
+      )}
+      {locked ? (
+        <Galera
+          matchId={matchId}
+          finished={finished}
+          memberIds={memberIds}
+          isFav={isFav}
+          onStar={session ? star : undefined}
+          myId={user?.id ?? null}
+        />
+      ) : (
+        <PredictStatus matchId={matchId} memberIds={memberIds} isFav={isFav} onStar={star} />
+      )}
+    </div>
+  );
+}
+
+function GroupChip({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={cn(
+        "max-w-36 shrink-0 truncate rounded-pill border px-2.5 py-1 text-[11px] font-semibold transition",
+        active
+          ? "border-brand-600 bg-brand-600 text-white"
+          : "border-ink-200 bg-surface text-ink-600 hover:border-ink-300",
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+function FavStar({ on, onClick }: { on: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      aria-label={on ? "Remover dos favoritos" : "Favoritar Resultadista"}
+      aria-pressed={on}
+      onClick={onClick}
+      className="grid size-6 shrink-0 place-items-center rounded text-ink-300 transition hover:bg-ink-100 hover:text-gold-600"
+    >
+      <Star className={cn("size-3.5", on && "fill-gold-500 text-gold-500")} />
+    </button>
+  );
+}
+
+function Galera({
+  matchId,
+  finished,
+  memberIds,
+  isFav,
+  onStar,
+  myId,
+}: {
+  matchId: string;
+  finished: boolean;
+  memberIds: Set<string> | null;
+  isFav: (id: string) => boolean;
+  onStar?: (id: string) => void;
+  myId: string | null;
+}) {
   const { data, isLoading } = useMatchPredictions(matchId, true);
 
   if (isLoading) return <div className="px-3 py-3 text-center text-xs text-ink-400">carregando…</div>;
-  if (!data || data.length === 0)
+  const filtered = (data ?? []).filter(
+    (p) => !memberIds || (p.user?.id && memberIds.has(p.user.id)),
+  );
+  if (filtered.length === 0)
     return <div className="px-3 py-3 text-center text-xs text-ink-400">ninguém palpitou ainda</div>;
+  // favoritos primeiro (ordem original preservada dentro de cada bloco)
+  const rows = filtered
+    .map((p, i) => ({ p, i }))
+    .sort((a, b) => Number(isFav(b.p.user?.id ?? "")) - Number(isFav(a.p.user?.id ?? "")) || a.i - b.i);
 
   return (
-    <ul className="divide-y divide-border bg-surface/60 px-1 py-1">
-      {data.map((p, i) => (
+    <ul className="divide-y divide-border border-t border-border bg-surface/60 px-1 py-1">
+      {rows.map(({ p, i }) => (
         <li key={p.user?.id ?? i} className="flex items-center gap-2 px-2.5 py-1.5">
           <Avatar src={p.user?.avatar_url} name={p.user?.display_name} size="xs" />
           <span className="min-w-0 flex-1 truncate text-xs font-medium text-ink-800">
             {p.user?.display_name ?? "—"}
           </span>
+          {onStar && p.user?.id && p.user.id !== myId && (
+            <FavStar on={isFav(p.user.id)} onClick={() => onStar(p.user!.id)} />
+          )}
           <span className="text-xs font-bold tabular-nums text-ink-600">
             {p.home_pred} × {p.away_pred}
           </span>
@@ -404,7 +552,17 @@ function Galera({ matchId, finished }: { matchId: string; finished: boolean }) {
 }
 
 /** Antes do kickoff: membros do grupo e quem já palpitou (sem revelar o placar). */
-function PredictStatus({ matchId }: { matchId: string }) {
+function PredictStatus({
+  matchId,
+  memberIds,
+  isFav,
+  onStar,
+}: {
+  matchId: string;
+  memberIds: Set<string> | null;
+  isFav: (id: string) => boolean;
+  onStar: (id: string) => void;
+}) {
   const { user } = useAuth();
   const { toast } = useToast();
   const nudge = useNudge();
@@ -412,31 +570,38 @@ function PredictStatus({ matchId }: { matchId: string }) {
 
   if (isLoading)
     return <div className="px-3 py-3 text-center text-xs text-ink-400">carregando…</div>;
-  if (!data || data.length === 0)
+  const filtered = (data ?? []).filter((m) => !memberIds || memberIds.has(m.user_id));
+  if (filtered.length === 0)
     return (
       <div className="px-3 py-3 text-center text-xs text-ink-400">
         Entre num grupo para ver quem já palpitou.
       </div>
     );
 
-  const done = data.filter((d) => d.predicted).length;
+  const done = filtered.filter((d) => d.predicted).length;
+  const rows = filtered
+    .map((m, i) => ({ m, i }))
+    .sort((a, b) => Number(isFav(b.m.user_id)) - Number(isFav(a.m.user_id)) || a.i - b.i);
 
   return (
-    <div className="bg-surface/60">
+    <div className="border-t border-border bg-surface/60">
       <p className="px-3 pt-2 text-center text-[11px] font-medium text-ink-500">
         <span className="font-bold text-ink-700">
-          {done} de {data.length}
+          {done} de {filtered.length}
         </span>{" "}
         já palpitaram
       </p>
       <ul className="divide-y divide-border px-1 py-1">
-        {data.map((m) => (
+        {rows.map(({ m }) => (
           <li key={m.user_id} className="flex items-center gap-2 px-2.5 py-1.5">
             <Avatar src={m.avatar_url} name={m.display_name} size="xs" />
             <span className="min-w-0 flex-1 truncate text-xs font-medium text-ink-800">
               {m.display_name}
               {m.user_id === user?.id && <span className="text-ink-400"> (você)</span>}
             </span>
+            {m.user_id !== user?.id && (
+              <FavStar on={isFav(m.user_id)} onClick={() => onStar(m.user_id)} />
+            )}
             {m.predicted ? (
               <span className="flex items-center gap-1 text-[11px] font-semibold text-grass-600">
                 <Check className="size-3.5" /> palpitou
@@ -455,7 +620,7 @@ function PredictStatus({ matchId }: { matchId: string }) {
                     },
                   )
                 }
-                className="flex items-center gap-1 rounded-pill px-2 py-0.5 text-[11px] font-semibold text-gold-700 transition-colors hover:bg-gold-100 disabled:opacity-50"
+                className="flex items-center gap-1 rounded-pill px-2 py-0.5 text-[11px] font-semibold text-gold-700 transition-colors hover:bg-ink-100 disabled:opacity-50"
               >
                 <Hand className="size-3.5" /> cutucar
               </button>

@@ -88,7 +88,7 @@ function FeatureRow({
 }) {
   return (
     <div className="flex h-full gap-3.5 rounded-lg bg-surface p-4 shadow-[var(--shadow-soft)] ring-1 ring-border transition-all duration-200 [transition-timing-function:var(--ease-out-quart)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-pop)] hover:ring-brand-200">
-      <span className="grid size-11 shrink-0 place-items-center rounded-md bg-brand-500/10 text-brand-600">
+      <span className="grid size-11 shrink-0 place-items-center rounded-md bg-surface-2 text-brand-600">
         <Icon className="size-5.5" strokeWidth={2.2} />
       </span>
       <div className="min-w-0">
@@ -117,15 +117,15 @@ function ScoreRow({
 }) {
   const styles = {
     gold: {
-      chip: "bg-gold-100 text-gold-800 ring-gold-300/60",
+      chip: "bg-gold-500 text-gold-950 ring-gold-500",
       pts: "text-gold-700",
     },
     grass: {
-      chip: "bg-grass-100 text-grass-800 ring-grass-300/60",
+      chip: "bg-grass-600 text-white ring-grass-600",
       pts: "text-grass-700",
     },
     aqua: {
-      chip: "bg-aqua-100 text-aqua-800 ring-aqua-300/60",
+      chip: "bg-aqua-700 text-white ring-aqua-700",
       pts: "text-aqua-700",
     },
   }[tone];
@@ -175,7 +175,7 @@ function CompetitionPill({
       className={cn(
         "flex items-center justify-between gap-2 rounded-pill border px-4 py-2.5 text-sm font-semibold transition-all duration-200 [transition-timing-function:var(--ease-out-quart)] hover:-translate-y-0.5",
         live
-          ? "border-brand-300 bg-brand-500/10 text-brand-800 hover:shadow-[var(--shadow-soft)]"
+          ? "border-brand-600 bg-surface text-brand-800 hover:shadow-[var(--shadow-soft)]"
           : "border-dashed border-ink-200 bg-surface text-ink-400",
       )}
     >
@@ -362,7 +362,7 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
       {/* ---- PREÇO ---- */}
       <section>
         <Reveal className="rounded-xl bg-surface-2 px-6 py-8 text-center ring-1 ring-border">
-          <span className="inline-flex items-center gap-1.5 rounded-pill bg-grass-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-grass-800">
+          <span className="inline-flex items-center gap-1.5 rounded-pill bg-grass-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
             <Gift className="size-3.5" /> 100% grátis
           </span>
           <h2 className="mx-auto mt-4 max-w-md text-2xl font-extrabold tracking-tight text-ink-950">

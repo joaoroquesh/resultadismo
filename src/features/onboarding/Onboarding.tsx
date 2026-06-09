@@ -63,7 +63,7 @@ function PointRow({
 const SLIDES: Slide[] = [
   {
     icon: <Trophy className="size-9" />,
-    iconWrap: "bg-brand-500/15 text-brand-600",
+    iconWrap: "bg-surface-2 text-brand-600",
     title: "Bem-vindo ao Resultadismo!",
     body: (
       <p className="text-sm leading-relaxed text-ink-600">
@@ -74,7 +74,7 @@ const SLIDES: Slide[] = [
   },
   {
     icon: <Target className="size-9" />,
-    iconWrap: "bg-gold-500/15 text-gold-700",
+    iconWrap: "bg-surface-2 text-gold-700",
     title: "Como você pontua",
     body: (
       <div className="space-y-2">
@@ -104,7 +104,7 @@ const SLIDES: Slide[] = [
   },
   {
     icon: <Zap className="size-9 fill-current" />,
-    iconWrap: "bg-brand-500/15 text-brand-600",
+    iconWrap: "bg-surface-2 text-brand-600",
     title: "Dobro de Pontos",
     body: (
       <p className="text-sm leading-relaxed text-ink-600">
@@ -119,7 +119,7 @@ const SLIDES: Slide[] = [
   },
   {
     icon: <Users className="size-9" />,
-    iconWrap: "bg-brand-500/15 text-brand-600",
+    iconWrap: "bg-surface-2 text-brand-600",
     title: "Dispute em grupos",
     body: (
       <p className="text-sm leading-relaxed text-ink-600">
