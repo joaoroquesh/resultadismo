@@ -30,6 +30,13 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   da torcida" seguem com as 66** (a Itália joga amistosos e pode ser a seleção do coração).
 
 ### Adicionado
+- **Aba "Grupos" na página de jogos: os palpites que valem ponto nunca somem.** Quem personalizou
+  "só Brasil" mas está num grupo que conta outras seleções vê os jogos do grupo numa aba própria.
+  Ordem das abas: **Interesses** (encurtada; só personalização) → **Grupos** (união dos recortes dos
+  meus grupos, inclusive pendentes de aprovação; é o **padrão** quando a pessoa tem grupo) →
+  **Todos** → competições. **Coachmark** na 1ª visita explica a aba. As fileiras de abas e de dias
+  usam o novo **`ScrollRow`** (componente de UI): **degradê nas bordas** quando há mais conteúdo pra
+  arrastar, sumindo no fim do scroll. → [`03`](03-PAGINAS.md).
 - **Recorte de seleções do grupo editável até a Copa começar.** Quem criou o grupo sem reparar no
   recorte ("Todas" × "Só o Brasil" × escolhidas) agora pode **ajustar na aba Competições** (card
   "Seleções que valem ponto", só admin) enquanto **nenhum jogo da Copa tiver começado** — depois

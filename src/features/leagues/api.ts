@@ -422,6 +422,44 @@ export function useDeleteLeagueCompetition() {
   });
 }
 
+/** Recortes dos bolões dos MEUS grupos ativos (pra aba "Grupos" da página de
+ * jogos): por competição, quais seleções valem ponto (null = todas). */
+export function useMyGroupScopes() {
+  const { user } = useAuth();
+  return useQuery({
+    enabled: !!user,
+    queryKey: ["my-group-scopes", user?.id],
+    queryFn: async (): Promise<{ competition_id: string; followed_team_slugs: string[] | null }[]> => {
+      const { data: memberships, error: e1 } = await supabase
+        .from("league_members")
+        .select("league_id, status, league:leagues(status, deleted_at)")
+        .eq("user_id", user!.id)
+        .eq("status", "active");
+      if (e1) throw new Error(e1.message);
+      const leagueIds = (memberships ?? [])
+        .filter((m) => {
+          const l = m.league as { status: string; deleted_at: string | null } | null;
+          // pending conta: o grupo recém-criado aguarda aprovação, mas a pessoa
+          // já está nele e os palpites valem quando ele ativar.
+          return l && (l.status === "active" || l.status === "pending") && !l.deleted_at;
+        })
+        .map((m) => m.league_id as string);
+      if (leagueIds.length === 0) return [];
+      const { data, error } = await supabase
+        .from("league_competitions")
+        .select("competition_id, followed_team_slugs, mode, status")
+        .in("league_id", leagueIds)
+        .eq("status", "active")
+        .in("mode", ["points", "table"]);
+      if (error) throw new Error(error.message);
+      return (data ?? []).map((r) => ({
+        competition_id: r.competition_id as string,
+        followed_team_slugs: (r.followed_team_slugs as string[] | null) ?? null,
+      }));
+    },
+  });
+}
+
 /** Janela de edição do recorte de seleções: aberta até o 1º jogo da competição
  * começar (RPC team_scope_window; o trigger no banco é quem manda). */
 export function useTeamScopeWindow(lcId: string | undefined) {

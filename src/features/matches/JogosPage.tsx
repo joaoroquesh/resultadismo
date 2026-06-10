@@ -1,6 +1,7 @@
-import { useMemo, useRef, useState } from "react";
-import { CalendarClock, Trophy, Zap, LayoutGrid, Sparkles } from "lucide-react";
+import { useMemo, useState } from "react";
+import { CalendarClock, Trophy, Zap, LayoutGrid, Sparkles, Users } from "lucide-react";
 import { Page } from "@/components/layout/Page";
+import { ScrollRow } from "@/components/ui/ScrollRow";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
@@ -21,6 +22,7 @@ import {
   useMatchesRealtime,
 } from "./api";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
+import { useMyGroupScopes } from "@/features/leagues/api";
 import { LandingSections } from "@/features/landing/LandingSections";
 import { FirstFold } from "@/features/landing/FirstFold";
 
@@ -71,14 +73,29 @@ export function JogosPage() {
   );
   const hasInterests = !!interestSlugs || followedCompIds.size > 0;
 
-  // "Meus interesses" é o padrão quando a pessoa personalizou; senão "Todos".
+  // Recortes dos MEUS grupos → aba "Grupos": os jogos que valem ponto pra mim,
+  // mesmo fora dos interesses (pedido do João, 2026-06-10: interesse "só Brasil"
+  // não pode esconder os jogos que o grupo conta).
+  const { data: groupScopes } = useMyGroupScopes();
+  const hasGroups = (groupScopes?.length ?? 0) > 0;
+  const groupSlugSets = useMemo(() => {
+    if (!groupScopes) return [];
+    return groupScopes.map((s) => ({
+      compId: s.competition_id,
+      slugs: s.followed_team_slugs ? new Set(s.followed_team_slugs) : null,
+    }));
+  }, [groupScopes]);
+
+  // Padrão: "Grupos" (o que vale ponto) > "Interesses" > "Todos".
   const MINE = "__mine__";
+  const GROUPS = "__groups__";
   const [scopeManual, setScopeManual] = useState<Scope | null>(null);
-  const scope: Scope = scopeManual ?? (hasInterests ? MINE : ALL);
+  const scope: Scope = scopeManual ?? (hasGroups ? GROUPS : hasInterests ? MINE : ALL);
   const setScope = (s: Scope) => setScopeManual(s);
   const isMine = scope === MINE;
-  const isAll = scope === ALL || isMine; // MINE usa a carga de "todos" e filtra
-  const compId = scope === ALL || isMine ? undefined : scope;
+  const isGroups = scope === GROUPS;
+  const isAll = scope === ALL || isMine || isGroups; // filtros usam a carga de "todos"
+  const compId = isAll ? undefined : scope;
 
   // dados por escopo (um hook só fica ativo por vez via `enabled`)
   const single = useMatches(compId);
@@ -88,7 +105,24 @@ export function JogosPage() {
   // no jogo (vale em qualquer campeonato — Copa e amistosos). Interesse
   // indisponível é simplesmente ignorado.
   const matches = useMemo(() => {
-    if (!isMine || !matchesRaw) return matchesRaw;
+    if (!matchesRaw) return matchesRaw;
+    // "Grupos": jogo da competição de um bolão meu, dentro do recorte do grupo
+    // (null = competição inteira). União entre todos os meus grupos.
+    if (isGroups) {
+      return matchesRaw.filter((m) =>
+        groupSlugSets.some(({ compId: cid, slugs }) => {
+          if (m.competition_id !== cid) return false;
+          if (!slugs) return true;
+          return (
+            teamNameMatches(slugs, m.home_team?.short_name ?? m.home_team_name) ||
+            teamNameMatches(slugs, m.home_team?.name ?? null) ||
+            teamNameMatches(slugs, m.away_team?.short_name ?? m.away_team_name) ||
+            teamNameMatches(slugs, m.away_team?.name ?? null)
+          );
+        }),
+      );
+    }
+    if (!isMine) return matchesRaw;
     return matchesRaw.filter((m) => {
       if (m.competition_id && followedCompIds.has(m.competition_id)) return true;
       if (!interestSlugs) return false;
@@ -99,7 +133,7 @@ export function JogosPage() {
         teamNameMatches(interestSlugs, m.away_team?.name ?? null)
       );
     });
-  }, [isMine, matchesRaw, interestSlugs, followedCompIds]);
+  }, [isMine, isGroups, matchesRaw, interestSlugs, followedCompIds, groupSlugSets]);
   const loadingMatches = isAll ? all.isLoading : single.isLoading;
 
   const singlePred = useMyPredictions(compId);
@@ -110,7 +144,6 @@ export function JogosPage() {
 
   // dia escolhido pelo usuário (null = usa o default automático do escopo).
   const [picked, setPicked] = useState<string | null>(null);
-  const dayRowRef = useRef<HTMLDivElement>(null);
 
   // troca de campeonato (ou "Todos") = contexto de dia novo → zera a escolha.
   // Ajuste no render via valor anterior, sem efeito ("you might not need an effect").
@@ -229,57 +262,94 @@ export function JogosPage() {
       {loadingComps ? (
         <Skeleton className="mb-3 h-9 w-full" />
       ) : (
-        hasComps && (
-          <div className="no-scrollbar -mx-4 mb-3 flex gap-2 overflow-x-auto px-4">
-            {session && hasInterests && (
+        hasComps &&
+        (() => {
+          const scopeRow = (
+            <ScrollRow className="-mx-4 mb-3" innerClassName="px-4">
+              {session && hasInterests && (
+                <button
+                  onClick={() => setScope(MINE)}
+                  aria-pressed={isMine}
+                  className={cn(
+                    "flex shrink-0 items-center gap-1.5 rounded-pill border px-3 py-1.5 text-sm font-semibold transition",
+                    isMine
+                      ? "border-brand-600 bg-brand-600 text-white"
+                      : "border-ink-200 bg-surface text-ink-600",
+                  )}
+                >
+                  <Sparkles className="size-3.5" /> Interesses
+                </button>
+              )}
+              {session && hasGroups && (
+                <button
+                  onClick={() => setScope(GROUPS)}
+                  aria-pressed={isGroups}
+                  className={cn(
+                    "flex shrink-0 items-center gap-1.5 rounded-pill border px-3 py-1.5 text-sm font-semibold transition",
+                    isGroups
+                      ? "border-brand-600 bg-brand-600 text-white"
+                      : "border-ink-200 bg-surface text-ink-600",
+                  )}
+                >
+                  <Users className="size-3.5" /> Grupos
+                </button>
+              )}
               <button
-                onClick={() => setScope(MINE)}
-                aria-pressed={isMine}
+                onClick={() => setScope(ALL)}
+                aria-pressed={scope === ALL}
                 className={cn(
                   "flex shrink-0 items-center gap-1.5 rounded-pill border px-3 py-1.5 text-sm font-semibold transition",
-                  isMine
+                  scope === ALL
                     ? "border-brand-600 bg-brand-600 text-white"
                     : "border-ink-200 bg-surface text-ink-600",
                 )}
               >
-                <Sparkles className="size-3.5" /> Meus interesses
+                <LayoutGrid className="size-3.5" /> Todos
               </button>
-            )}
-            <button
-              onClick={() => setScope(ALL)}
-              aria-pressed={scope === ALL}
-              className={cn(
-                "flex shrink-0 items-center gap-1.5 rounded-pill border px-3 py-1.5 text-sm font-semibold transition",
-                scope === ALL
-                  ? "border-brand-600 bg-brand-600 text-white"
-                  : "border-ink-200 bg-surface text-ink-600",
-              )}
+              {competitions!.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => setScope(c.id)}
+                  aria-pressed={scope === c.id}
+                  className={cn(
+                    "flex shrink-0 items-center gap-2 rounded-pill border px-3 py-1.5 text-sm font-semibold transition",
+                    scope === c.id
+                      ? "border-brand-600 bg-surface text-brand-700"
+                      : "border-ink-200 bg-surface text-ink-600",
+                  )}
+                >
+                  {c.emblem_url && <TeamCrest src={c.emblem_url} name={c.name} size={18} />}
+                  {c.short_name ?? c.name}
+                </button>
+              ))}
+            </ScrollRow>
+          );
+          // O coachmark da aba Grupos só pra quem TEM a aba (logado + em grupo).
+          return session && hasGroups ? (
+            <Coachmark
+              storageKey="resultadismo-coach-jogos-grupos-v1"
+              title="Os jogos dos seus grupos"
+              placement="bottom"
+              content={
+                <>
+                  A aba <span className="font-bold text-ink-50">Grupos</span> mostra{" "}
+                  <span className="font-bold text-ink-50">todos os jogos que valem ponto</span> nos
+                  grupos em que você está, mesmo os que ficam fora dos seus interesses. Palpite por
+                  aqui pra não perder nenhum!
+                </>
+              }
             >
-              <LayoutGrid className="size-3.5" /> Todos
-            </button>
-            {competitions!.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => setScope(c.id)}
-                aria-pressed={scope === c.id}
-                className={cn(
-                  "flex shrink-0 items-center gap-2 rounded-pill border px-3 py-1.5 text-sm font-semibold transition",
-                  scope === c.id
-                    ? "border-brand-600 bg-surface text-brand-700"
-                    : "border-ink-200 bg-surface text-ink-600",
-                )}
-              >
-                {c.emblem_url && <TeamCrest src={c.emblem_url} name={c.name} size={18} />}
-                {c.short_name ?? c.name}
-              </button>
-            ))}
-          </div>
-        )
+              {scopeRow}
+            </Coachmark>
+          ) : (
+            scopeRow
+          );
+        })()
       )}
 
       {/* tabs de dia */}
       {!loadingMatches && days.length > 0 && (
-        <div ref={dayRowRef} className="no-scrollbar -mx-4 mb-4 flex gap-2 overflow-x-auto px-4">
+        <ScrollRow className="-mx-4 mb-4" innerClassName="px-4">
           {days.map((d) => {
             const isToday = d === dayjs().format("YYYY-MM-DD");
             const hasLive = matches?.some(
@@ -306,7 +376,7 @@ export function JogosPage() {
               </button>
             );
           })}
-        </div>
+        </ScrollRow>
       )}
 
       {/* resumo: pontos DO DIA selecionado (escopo atual) + dobros da semana */}
