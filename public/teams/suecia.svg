@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 100 100" data-rd-circle="1">
 <defs><clipPath id="rd-c-sueciasvg"><circle cx="50" cy="50" r="50"/></clipPath></defs>
 <g clip-path="url(#rd-c-sueciasvg)">
-<svg viewBox="0 0 8 5" width="100" height="100" preserveAspectRatio="xMidYMid slice"><path fill="#005293" d="M0,0H8V5H0Z"/><path stroke="#fecb00" d="M0,2.5h8M3,0v5"/></svg>
+<svg viewBox="0 0 8 5" width="100" height="100" preserveAspectRatio="xMidYMid slice" ><path fill="#005293" d="M0,0H8V5H0Z"/><path stroke="#fecb00" d="M0,2.5h8M3,0v5"/></svg>
 </g>
 </svg>

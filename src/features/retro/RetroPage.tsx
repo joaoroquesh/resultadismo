@@ -278,6 +278,7 @@ export function RetroPage() {
           onLogin={openLogin}
           onStart={start}
           onGoMain={() => navigate("/")}
+          onFeedback={() => navigate("/retro/feedback")}
         />
       )}
       {phase === "play" && run?.current && (
@@ -288,6 +289,7 @@ export function RetroPage() {
           <RunView
             key={run.current.match_id}
             current={run.current}
+            mode={run.mode}
             points={run.points}
             rerolls={run.rerolls}
             slots={run.slots}
@@ -351,6 +353,7 @@ function Home({
   onLogin,
   onStart,
   onGoMain,
+  onFeedback,
 }: {
   mode: RetroMode;
   pace: RetroPace;
@@ -369,6 +372,7 @@ function Home({
   onLogin: () => void;
   onStart: (daily: boolean) => void;
   onGoMain: () => void;
+  onFeedback: () => void;
 }) {
   return (
     <div className="mx-auto w-full max-w-md space-y-4">
@@ -400,7 +404,7 @@ function Home({
       <Card className="space-y-3 p-4">
         {/* empilhado (label em cima, controle largura cheia): nada de texto quebrando */}
         <div className="space-y-1.5">
-          <span className="text-xs font-bold uppercase tracking-wide text-ink-500">Modo</span>
+          <span className="text-xs font-bold uppercase tracking-wide text-ink-500">Modo · o quanto precisa acertar</span>
           <SegmentedControl<RetroMode>
             className="w-full whitespace-nowrap"
             options={[
@@ -412,13 +416,13 @@ function Home({
           />
           <p className="text-xs text-ink-500">
             {mode === "acerto"
-              ? "Qualquer ponto avança — mas a semi pede SALDO e a final, CRAVADA."
-              : "Acerto simples não vale: saldo/cravada sempre — e a final, CRAVADA."}
+              ? "Qualquer ponto avança; só a semi e a final pedem saldo ou cravada."
+              : "Mais difícil: precisa de saldo ou cravada em todos os jogos."}
           </p>
         </div>
 
         <div className="space-y-1.5">
-          <span className="text-xs font-bold uppercase tracking-wide text-ink-500">Ritmo</span>
+          <span className="text-xs font-bold uppercase tracking-wide text-ink-500">Ritmo · com ou sem tempo</span>
           <SegmentedControl<RetroPace>
             className="w-full whitespace-nowrap"
             options={[
@@ -433,7 +437,7 @@ function Home({
 
         <div className="space-y-1.5">
           <span className="text-xs font-bold uppercase tracking-wide text-ink-500">
-            Dificuldade do Treino
+            Dificuldade · o nível dos jogos (só Treino)
           </span>
           <SegmentedControl<RetroLevel>
             className="w-full whitespace-nowrap"
@@ -446,8 +450,8 @@ function Home({
             onChange={setLevel}
           />
           <p className="text-xs text-ink-500">
-            Vale só no Treino (e o ranking de Treino compara o Padrão). A Copa do Dia tem
-            dificuldade própria: do fácil ao difícil.
+            Fácil = jogos mais conhecidos · Difícil = mais obscuros. No ranking, quem joga mais
+            difícil fica na frente.
           </p>
         </div>
 
@@ -503,15 +507,16 @@ function Home({
       <Card className="space-y-2 p-4 text-sm">
         <h3 className="font-bold">Como funciona</h3>
         <ol className="list-decimal space-y-1 pl-5 text-ink-700">
-          <li>Aparece um jogo real de alguma Copa — você tem segundos para cravar o placar.</li>
+          <li>Aparece um jogo real de Copa — você tem segundos pra cravar o placar.</li>
           <li>
-            <b className="text-gold-700">Cravada</b> vale 3, <b className="text-grass-600">saldo</b>{" "}
-            vale 2, <b className="text-aqua-700">acerto</b> vale 1 — pontuou, avançou.
+            <b className="text-gold-700">Cravada +3</b> · <b className="text-grass-600">saldo +2</b>{" "}
+            · <b className="text-aqua-700">acerto +1</b>.
           </li>
-          <li>Grupos: passe em 2 de 3. Mata-mata: errou, caiu. Sobreviveu aos 7? Campeão! 🏆</li>
+          <li>Grupos: pontue em 2 de 3. Mata-mata: errou, caiu. Semi e final: saldo ou cravada.</li>
+          <li>Chegou aos 7? Campeão! 🏆 (máximo: 21 pts)</li>
         </ol>
         <p className="text-xs text-ink-500">
-          Vale o placar final com prorrogação; pênaltis não contam. Máximo da run: 21 pontos.
+          Vale o placar final com prorrogação; pênaltis não contam.
         </p>
       </Card>
 
@@ -528,6 +533,16 @@ function Home({
           Bora pro bolão da Copa →
         </Button>
       </Card>
+
+      {isLogged && (
+        <button
+          type="button"
+          onClick={onFeedback}
+          className="mx-auto block py-1 text-xs font-semibold text-ink-500 underline-offset-2 hover:underline"
+        >
+          💬 Achou um bug ou tem uma ideia pro Retrô?
+        </button>
+      )}
     </div>
   );
 }

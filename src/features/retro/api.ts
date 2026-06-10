@@ -103,6 +103,7 @@ export type RetroBoardRow = {
   stage_reached: string;
   points: number;
   total_ms: number;
+  level?: RetroLevel;
   is_me: boolean;
 };
 

@@ -76,30 +76,18 @@ begin
   end if;
 end $$;
 
--- ============ T4: modo acerto — 1pt passa até as quartas; SEMI pede saldo (rodada 5) ============
+-- ============ T4: barras por modo/fase (rodada 8: semi e FINAL = saldo/cravada) ============
 do $$
-declare v_token uuid := gen_random_uuid(); v_start jsonb; v_run uuid; v_ans jsonb;
-  v_i int := 0; v_gh int; v_ga int; v_slot int; v_h int; v_a int;
 begin
-  v_start := public.retro_start_run('acerto', 'sempressa', false, v_token, '{}');
-  v_run := (v_start->>'run_id')::uuid;
-  loop
-    v_i := v_i + 1; if v_i > 10 then raise exception 'loop'; end if;
-    select rm.slot, m.home_score, m.away_score into v_slot, v_h, v_a
-      from public.retro_run_matches rm join public.retro_matches m on m.id = rm.match_id
-     where rm.run_id = v_run and rm.answered_at is null;
-    -- SEMPRE só o vencedor (1 pt): com a regra nova, deve chegar ao TÍTULO
-    if v_h > v_a then v_gh := v_h + 5; v_ga := v_a;
-    elsif v_h < v_a then v_gh := v_h; v_ga := v_a + 5;
-    else v_gh := v_h; v_ga := v_a; end if; -- empate real: crava (1 pt não existe p/ empate)
-    v_ans := public.retro_answer(v_run, v_gh, v_ga, v_token, '{}');
-    exit when v_ans->'run'->>'status' <> 'playing';
-    perform public.retro_next(v_run, v_token, '{}');
-  end loop;
-  if v_ans->'run'->>'status' = 'eliminated' and v_ans->'run'->>'stage_reached' = 'Semifinal' then
-    raise notice 'T4 barras rodada 5: OK (acerto simples cai na semi)';
+  if public.retro_pass_need('acerto', 1) = 1
+     and public.retro_pass_need('acerto', 5) = 1   -- quartas: ≥1
+     and public.retro_pass_need('acerto', 6) = 2   -- semi: saldo
+     and public.retro_pass_need('acerto', 7) = 2   -- FINAL: saldo (não só cravada)
+     and public.retro_pass_need('cravada', 1) = 2  -- Vale Saldo: ≥2 sempre
+     and public.retro_pass_need('cravada', 7) = 2 then
+    raise notice 'T4 barras rodada 8: OK (acerto: quartas ≥1, semi/final ≥2; cravada: ≥2 sempre)';
   else
-    raise exception 'T4 FALHOU: % / %', v_ans->'run'->>'status', v_ans->'run'->>'stage_reached';
+    raise exception 'T4 FALHOU: pass_need inesperado';
   end if;
 end $$;
 
@@ -178,9 +166,8 @@ begin
     exit when v_ans->'run'->>'status' <> 'playing';
     perform public.retro_next(v_run, v_token, '{}');
   end loop;
-  if v_ans->'run'->>'status' = 'eliminated' and v_ans->'run'->>'stage_reached' = 'Vice-campeão'
-     and (v_ans->'run'->>'points')::int = 14 then
-    raise notice 'T6 Na Crava rodada 5: OK (saldos levam à final, mas o título só sai com CRAVADA → vice com 14)';
+  if v_ans->'run'->>'status' = 'champion' and (v_ans->'run'->>'points')::int = 14 then
+    raise notice 'T6 Vale Saldo rodada 8: OK (7 saldos = 14 pts = campeão; final aceita saldo)';
   else raise exception 'T6 FALHOU: %', v_ans->'run'; end if;
 end $$;
 

@@ -66,7 +66,14 @@ export function RetroLeaderboard() {
               )}
             >
               <span className="w-6 text-right font-bold tabular-nums text-ink-500">{r.pos}º</span>
-              <span className="min-w-0 flex-1 truncate">{r.display_name}</span>
+              <span className="min-w-0 flex-1 truncate">
+                {r.display_name}
+                {board === "treino" && r.level && r.level !== "padrao" && (
+                  <span className="ml-1 rounded-pill bg-ink-100 px-1.5 text-[10px] font-bold text-ink-500">
+                    {r.level === "dificil" ? "Difícil" : "Fácil"}
+                  </span>
+                )}
+              </span>
               <span className="hidden text-xs text-ink-500 sm:block">{r.stage_reached}</span>
               <span className="font-bold tabular-nums">{r.points} pts</span>
               <span className="w-12 text-right text-xs tabular-nums text-ink-500">{fmtMs(r.total_ms)}</span>
@@ -75,6 +82,11 @@ export function RetroLeaderboard() {
         </ol>
       )}
 
+      {board === "treino" && data && data.rows.length > 0 && (
+        <p className="text-center text-[11px] text-ink-400">
+          Quem joga mais difícil fica na frente, mesmo com menos pontos.
+        </p>
+      )}
       {data?.me && !data.rows.some((r) => r.is_me) && (
         <p className="text-center text-xs text-ink-500">
           Você: {data.me.pos}º · {data.me.stage_reached} · {data.me.points} pts

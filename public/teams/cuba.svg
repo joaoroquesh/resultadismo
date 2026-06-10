@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 100 100" data-rd-circle="1">
 <defs><clipPath id="rd-c-cubasvg"><circle cx="50" cy="50" r="50"/></clipPath></defs>
 <g clip-path="url(#rd-c-cubasvg)">
-<svg viewBox="0 0 30 15" width="100" height="100" preserveAspectRatio="xMidYMid slice">
+<svg viewBox="0 0 30 15" width="100" height="100" preserveAspectRatio="xMidYMid slice" fill="#fff">
 	<title>Flag of Cuba</title>
 	<path fill="#002a8f"  d="m0 0h30v15H0z"/>
 	<path d="m3 3h27v3H9v3h21v3H3z"/>

@@ -68,6 +68,9 @@ export default function App() {
           <Route element={<RetroShell />}>
             <Route path="/retro" element={<RetroPage />} />
             <Route path="/retro/r/:code" element={<RetroSharePage />} />
+            <Route element={<RequireAuth />}>
+              <Route path="/retro/feedback" element={<FeedbackPage product="retro" />} />
+            </Route>
           </Route>
 
           <Route element={<AppShell />}>

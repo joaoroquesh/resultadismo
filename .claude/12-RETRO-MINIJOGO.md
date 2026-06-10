@@ -18,8 +18,8 @@ fallback: copia a IMAGEM pro clipboard + wa.me → texto) + grade de emojis **se
 página pública `/retro/r/:code`.
 
 - **Modos e barras (rodada 5 do PO, migration `20260610150007` — `retro_pass_need`):**
-  `acerto` = ≥1 até as quartas · **semi pede saldo (≥2)** · **FINAL só com CRAVADA**;
-  `cravada` ("Na Crava") = ≥2 sempre · **FINAL só com CRAVADA**.
+  `acerto` (rótulo **Vale Ponto**) = ≥1 até as quartas · **semi e FINAL = saldo ou cravada (≥2)**;
+  `cravada` (rótulo **Vale Saldo**) = ≥2 sempre. (rodada 8: a final deixou de exigir cravada.)
 - **🎲 Fichas de troca:** cada CRAVADA dá 1 ficha; o jogador pode trocar o jogo atual da run
   (RPC `retro_reroll` — re-sorteia, cronômetro renasce; vale na Copa do Dia, ganho por mérito).
 - **Treinos ranqueados:** runs de LOGADO são todas persistentes; ranking de Treino = melhor
@@ -67,7 +67,7 @@ página pública `/retro/r/:code`.
   `retroLocal.ts` = token anônimo + anti-repetição local). Rotas públicas `/retro` e `/retro/r/:code`
   no `App.tsx`; entradas na Sidebar/BottomNav/PublicShell. Vitrine de animações: `/retro?demo=1`
   (**só DEV**).
-- **Banco (migrations `20260610150000–150009`; 150008 RESETOU runs/ranking; 150009 = abandono/W.O.):** seed dos **964 jogos** (fonte openfootball CC0,
+- **Banco (migrations `20260610150000–150010`; 150008 RESET; 150009 abandono; 150010 final-aceita-saldo + ranking-por-dificuldade + feedback.product):** seed dos **964 jogos** (fonte openfootball CC0,
   importador `scripts/gen-retro-seed.mjs` com portões de qualidade; dificuldade 1–7 com 34
   jogos-lenda) + motor (RPCs `retro_start_run`, `retro_next` — serve **sob demanda**, o cronômetro
   nasce no clique —, `retro_answer`, `retro_run_summary`, `retro_leaderboard`, `retro_my_stats`,
@@ -82,6 +82,12 @@ página pública `/retro/r/:code`.
   **círculo** por `scripts/gen-flag-circles.mjs` — idempotente).
 - **Analytics:** eventos `retro_run_start`/`retro_guess`/`retro_run_end`/`retro_share` na union de
   `src/lib/analytics.ts` (sem PII).
+- **Feedback do Retrô:** `/retro/feedback` (só logado) reusa a `FeedbackPage` com `product="retro"`
+  (coluna `feedback.product` classico|retro; `submit_feedback` ganhou `p_product`). Páginas
+  Retrô-específicas no seletor de bug. Link discreto na home do Retrô.
+- **Bandeiras (fix rodada 8):** o circularizador `gen-flag-circles.mjs` agora preserva
+  `fill`/`stroke`/`style` da raiz do SVG — sem isso, bandeiras que definem a cor no `<svg>` raiz
+  (Honduras etc.) renderizavam em preto. Re-baixadas e auditadas por COR (não só decode): 60/60 ok.
 
 ## 5. Backlog conhecido (fase 2 do Retrô)
 

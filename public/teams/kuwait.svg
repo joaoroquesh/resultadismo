@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 100 100" data-rd-circle="1">
 <defs><clipPath id="rd-c-kuwaitsvg"><circle cx="50" cy="50" r="50"/></clipPath></defs>
 <g clip-path="url(#rd-c-kuwaitsvg)">
-<svg viewBox="0 0 12 6" width="100" height="100" preserveAspectRatio="xMidYMid slice">
+<svg viewBox="0 0 12 6" width="100" height="100" preserveAspectRatio="xMidYMid slice" >
 <rect width="12" height="6" fill="#007a3d"/>
 <rect width="12" height="4" y="2" fill="#fff"/>
 <rect width="12" height="2" y="4" fill="#ce1126"/>

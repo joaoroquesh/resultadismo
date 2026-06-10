@@ -195,6 +195,15 @@ Dois eixos independentes, escolhidos antes da run:
   independente** do botão da Copa do Dia; (4) aba "Copa do Dia" do ranking sem quebra de linha;
   (5) **estratégia de funil "bolão"**: CTAs do Retrô levam ao Resultadismo posicionado como
   **bolão da Copa que está acontecendo** (card na home do Retrô + card na página pública de share).
+- **Rodada 8 (10/06, decisões do PO):** (1) **FINAL aceita saldo** (semi e final = saldo/cravada;
+  reverteu o "final só cravada" da r5 — migration `20260610150010`, teste T4 unitário + T6);
+  (2) **ranking de Treino por dificuldade** — quem joga mais difícil fica na frente, mesmo com
+  desempenho pior (badge Fácil/Difícil na lista + nota); (3) **bug das bandeiras P&B** corrigido na
+  raiz (o circularizador descartava o `fill` do `<svg>` raiz → Honduras etc. ficavam pretas;
+  re-baixadas + auditoria de COR 60/60); (4) **textos por fase** no jogo (acima do card: grupos =
+  "pontue em 2 de 3", mata-mata, "reta final = saldo/cravada"); (5) **home mais clara** — cada
+  seletor diz o que controla (Modo/Ritmo/Dificuldade), textos curtos; (6) **feedback do Retrô**
+  (`/retro/feedback`, só logado, `feedback.product=retro`, reusa FeedbackPage).
 - **Backlog (fase 2 do Retrô)** — eventos GA4 (union do `analytics.ts`) ✓feito, entrada na navegação/Como Funciona/
   landing (pontos de contato), docs `.claude/05` §2 + `12-RETRO-MINIJOGO.md` → **Fase 5**:
   homologação com o João (Portão B), integração do worktree na main e deploy.

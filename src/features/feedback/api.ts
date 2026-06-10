@@ -31,6 +31,7 @@ export function useSubmitFeedback() {
       title: string;
       body: string;
       page?: string | null;
+      product?: "classico" | "retro";
     }) => {
       // Contexto (página/versão/device) só faz sentido — e só é enviado — em erro.
       const args =
@@ -42,8 +43,9 @@ export function useSubmitFeedback() {
               p_page: input.page ?? undefined,
               p_app_version: APP_VERSION,
               p_user_agent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+              p_product: input.product ?? "classico",
             }
-          : { p_kind: input.kind, p_title: input.title, p_body: input.body };
+          : { p_kind: input.kind, p_title: input.title, p_body: input.body, p_product: input.product ?? "classico" };
       const { error } = await supabase.rpc("submit_feedback", args);
       if (error) throw new Error(error.message);
       track("feedback_submit", { kind: input.kind });
@@ -52,16 +54,17 @@ export function useSubmitFeedback() {
   });
 }
 
-export function useMyFeedback() {
+export function useMyFeedback(product: "classico" | "retro" = "classico") {
   const { user } = useAuth();
   return useQuery({
     enabled: !!user,
-    queryKey: ["my-feedback", user?.id],
+    queryKey: ["my-feedback", product, user?.id],
     queryFn: async (): Promise<MyFeedback[]> => {
       // RLS: o usuário só enxerga os próprios reports (feedback_select_own_or_admin).
       const { data, error } = await supabase
         .from("feedback")
         .select("id,kind,title,body,page,status,admin_reply,created_at,resolved_at")
+        .eq("product", product)
         .order("created_at", { ascending: false });
       if (error) throw new Error(error.message);
       return (data ?? []) as unknown as MyFeedback[];

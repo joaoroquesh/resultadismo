@@ -7,6 +7,13 @@ import { RetroTimer } from "./RetroTimer";
 import { ScoreWheels } from "./ScoreWheels";
 import type { RetroCurrent } from "./api";
 
+// Texto curto da regra da fase atual (ocupa o espaço acima do card — pedido do PO)
+function phaseHint(slot: number, mode: "acerto" | "cravada"): string {
+  if (slot <= 3) return "Fase de grupos · pontue em 2 dos 3 pra avançar";
+  if (slot <= 5) return mode === "cravada" ? "Mata-mata · saldo ou cravada pra passar" : "Mata-mata · pontuou, avança";
+  return "Reta final · só saldo ou cravada salva";
+}
+
 function TeamSide({ slug, name }: { slug: string; name: string }) {
   return (
     <div className="flex min-w-0 flex-1 flex-col items-center gap-1">
@@ -20,6 +27,7 @@ function TeamSide({ slug, name }: { slug: string; name: string }) {
 // bem grandes embaixo (dois polegares — pedido do PO).
 export function RunView({
   current,
+  mode,
   points,
   rerolls,
   slots,
@@ -30,6 +38,7 @@ export function RunView({
   onExit,
 }: {
   current: RetroCurrent;
+  mode: "acerto" | "cravada";
   points: number;
   rerolls: number;
   slots: TrailSlot[];
@@ -66,6 +75,7 @@ export function RunView({
 
       {/* bloco do jogo CENTRADO no espaço restante (sem vãos esticados em telas altas) */}
       <div className="flex flex-1 flex-col justify-center gap-3">
+        <p className="text-center text-xs font-semibold text-ink-500">{phaseHint(current.slot, mode)}</p>
 
       <Card className={decisao ? "space-y-2 border-2 border-gold-500 p-3 shadow-brand" : "space-y-2 p-3"}>
         <div className="text-center">

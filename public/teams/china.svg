@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" data-rd-circle="1">
 <defs><clipPath id="rd-c-chinasvg"><circle cx="50" cy="50" r="50"/></clipPath></defs>
 <g clip-path="url(#rd-c-chinasvg)">
-<svg viewBox="0 0 900 600" width="100" height="100" preserveAspectRatio="xMidYMid slice">
+<svg viewBox="0 0 900 600" width="100" height="100" preserveAspectRatio="xMidYMid slice" >
   <path fill="#EE1C25" d="M0 0h900v600H0"/>
   <g transform="matrix(3 0 0 3 150 150)">
     <path id="a" d="m0-30 17.634 54.27-46.166-33.54h57.064l-46.166 33.54Z" fill="#FF0"/>

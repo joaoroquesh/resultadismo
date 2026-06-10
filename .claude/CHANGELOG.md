@@ -53,8 +53,12 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   card no topo do Perfil. **Rodada 7 (decisões do PO):** sair encerra a run (Copa do Dia confirma e
   vira W.O. sem retomada — `retro_abandon`, migration `20260610150009`); layout da run centrado
   (cabe em telas baixas), "Treino livre" em 1 linha com loading independente, aba "Copa do Dia"
-  sem quebra; CTAs de funil posicionando o Resultadismo como **bolão da Copa**. Histórico completo
-  da construção: Comentários
+  sem quebra; CTAs de funil posicionando o Resultadismo como **bolão da Copa**. **Rodada 8 (decisões do PO):** final aceita saldo (semi e
+  final = saldo/cravada; migration `20260610150010`); ranking de Treino ordenado por dificuldade
+  (difícil na frente); correção do bug das bandeiras P&B (circularizador preservava o `fill` da
+  raiz; auditoria de cor 60/60); textos curtos por fase no jogo; home mais clara (cada seletor
+  diz o que controla); feedback do Retrô em `/retro/feedback` (só logado, `feedback.product`).
+  Histórico completo da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do
