@@ -43,9 +43,12 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
 ## 3. Catálogo de páginas (por feature)
 
 ### Jogos & palpites — `features/matches`
-- **`JogosPage`** (`/`): home. Seletor de competição (**"Todos os campeonatos"** é o padrão) +
-  seletor de dia (hoje → próximo com jogos), resumo do dia (pontos + dobros usados na semana), lista
-  de `MatchCard`. Deslogado → mostra as seções de landing.
+- **`JogosPage`** (`/`): home. Abas de escopo na ordem **Interesses** (personalização) →
+  **Grupos** (jogos que valem ponto nos meus grupos, respeitando o recorte de seleções de cada um;
+  padrão quando a pessoa tem grupo — inclusive pendente de aprovação) → **Todos** → competições.
+  Coachmark na 1ª vez explica a aba Grupos. Seletor de dia (hoje → próximo com jogos), resumo do
+  dia (pontos + dobros usados na semana), lista de `MatchCard`. As fileiras de abas/dias usam
+  `ScrollRow` (degradê nas bordas indicando que dá pra arrastar). Deslogado → seções de landing.
 - **`MatchCard`**: card do jogo — times/escudos, status (horário/ao vivo/encerrado), inputs do
   palpite (auto-save com debounce), botão **2×** (dobro), resultado + tipo de pontuação colorido,
   "Galera" (quem palpitou). Trava ao chegar o `kickoff_at`.
