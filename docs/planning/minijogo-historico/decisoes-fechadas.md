@@ -121,7 +121,19 @@ Dois eixos independentes, escolhidos antes da run:
   nº 000011 entre worktrees!); rodar `db reset` limpo de uma árvore atualizada; atualizar
   `.claude/05` §2 (tabelas `retro_*`) e criar `.claude/12-RETRO-MINIJOGO.md`; revisão AppSec do
   rate-limit das RPCs anônimas (hardening listado na pesquisa D14); homologação final (Portão B).
-- **Próximo: Fase 3 (UI)** — feature slice `src/features/retro/` (landing, tela da run com timer
-  decrescente + milésimos nos 3s finais + input gigante embaixo, reveal animado, campanha, share,
-  página pública `/retro/r/:code`), em **worktree próprio** (sessão concorrente ativa na árvore
-  principal). Depois Fase 4 (eventos GA4 + propagação de copy) → Fase 5 (homologação + deploy).
+- **Fase 3 (UI) — CONCLUÍDA E VALIDADA E2E (09/06/2026)**, no worktree `feat/retro-minijogo`
+  (`../resultadismo-retro`, base = main local pós-2.0). Feature slice `src/features/retro/`:
+  `RetroPage` (landing + máquina de estados home→play→reveal→done, seletor Modo/Ritmo, streak +
+  melhor campanha), `RunView` + `ScoreWheels` (roletas de rolagem grandes, "–" = sem palpite) +
+  `RetroTimer` (barra + milésimos/cor nos 3s finais + auto-submit no estouro), `RevealCard`
+  (carimbo CRAVADA/SALDO/ACERTO/FORA + flip do placar + confete na cravada), `ResultView`
+  (campanha + share WhatsApp com grade de emojis sem spoiler), `RetroSharePage` (/retro/r/:code),
+  `RetroLeaderboard`, heartbeat anônimo. Rotas públicas em `App.tsx`; keyframes "fliperama" no
+  `index.css` (cobertos pelo kill-switch global de reduced-motion). Migration extra
+  `20260610000003_retro_ui_support.sql` (payload com match_id/difficulty + RPC `retro_my_stats`).
+  **Validação real**: typecheck + lint zerado (complexidade ≤20) + `check:arch` aprovado + **E2E
+  Playwright em Chrome real** (run anônima completa de Treino, timer tenso + timeout auto-submit,
+  reveal com flip visível, tela final, share-page 404, zero erros de console).
+- **Próximo: Fase 4** — eventos GA4 (union do `analytics.ts`), entrada na navegação/Como Funciona/
+  landing (pontos de contato), docs `.claude/05` §2 + `12-RETRO-MINIJOGO.md` → **Fase 5**:
+  homologação com o João (Portão B), integração do worktree na main e deploy.
