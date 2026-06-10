@@ -215,6 +215,15 @@ _(vazio — próximas mudanças acumulam aqui)_
   aqua/flame) agora clareiam no tema escuro (tokens em `index.css`, mesmo padrão do brand-600/700)
   — corrige textos quase ilegíveis (ex.: hero do "Construa com a gente", notas com barra lateral).
   `-500/-600` (fundos sólidos) e `gold-950` ficam como estão.
+- **Ícone do Resultadismo na barra de status do Android (era um quadrado branco).** O `badge` da
+  notificação apontava pro favicon **colorido** de 32px; o Android achata bitmap colorido numa
+  silhueta — daí o quadrado. Agora existe `public/favicon/badge-96.png` (silhueta **sólida do
+  escudo**, branca com transparência, gerada do ícone 192) e o service worker usa ele. Vale a
+  partir da próxima visita (o SW atualiza sozinho) para notificações novas.
+- **Segurança: `create_deadline_reminders` só roda pelo cron.** A função do lembrete de palpite
+  nunca recebeu `revoke` (default do Postgres: EXECUTE para todos) e podia ser invocada por
+  qualquer cliente via REST. Revogada de `public/anon/authenticated` (migration
+  `20260609000013`); o pg_cron não é afetado.
 - **Portões de qualidade zerados na integração da v2.** A integração das branches da personalização
   havia entrado com 2 erros de lint (`react-hooks/preserve-manual-memoization` no
   `PlayerProfilePage`, memo manual removido) e 2 violações de camada (`NotifPrompt` movido de
