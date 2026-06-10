@@ -211,6 +211,10 @@ _(vazio — próximas mudanças acumulam aqui)_
   competição vazia exclui com confirmação simples.
 
 ### Corrigido
+- **Contraste no modo escuro.** Tons de texto dos accents (`-700/-800/-900` de brand/gold/grass/
+  aqua/flame) agora clareiam no tema escuro (tokens em `index.css`, mesmo padrão do brand-600/700)
+  — corrige textos quase ilegíveis (ex.: hero do "Construa com a gente", notas com barra lateral).
+  `-500/-600` (fundos sólidos) e `gold-950` ficam como estão.
 - **Portões de qualidade zerados na integração da v2.** A integração das branches da personalização
   havia entrado com 2 erros de lint (`react-hooks/preserve-manual-memoization` no
   `PlayerProfilePage`, memo manual removido) e 2 violações de camada (`NotifPrompt` movido de
