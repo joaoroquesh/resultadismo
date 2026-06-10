@@ -316,15 +316,15 @@ function Home({
             className="w-full whitespace-nowrap"
             options={[
               { value: "acerto", label: "Acerto" },
-              { value: "cravada", label: "Só Cravada" },
+              { value: "cravada", label: "Na Crava" },
             ]}
             value={mode}
             onChange={setMode}
           />
           <p className="text-xs text-ink-500">
             {mode === "acerto"
-              ? "Pontuou, avançou (na semi e na final só saldo ou cravada salvam)."
-              : "Só o placar EXATO te leva adiante. Para quem não treme."}
+              ? "Pontuou, avançou — qualquer acerto vale, até na final."
+              : "Aqui acerto simples não vale: só SALDO ou CRAVADA te levam adiante."}
           </p>
         </div>
 

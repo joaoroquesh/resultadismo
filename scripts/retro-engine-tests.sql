@@ -76,7 +76,7 @@ begin
   end if;
 end $$;
 
--- ============ T4: barra ≥2 na semi (acerto de 1 pt na semi NÃO passa) ============
+-- ============ T4: modo acerto — 1 pt avança em TODAS as fases (decisão PO 10/06) ============
 do $$
 declare v_token uuid := gen_random_uuid(); v_start jsonb; v_run uuid; v_ans jsonb;
   v_i int := 0; v_gh int; v_ga int; v_slot int; v_h int; v_a int;
@@ -88,20 +88,16 @@ begin
     select rm.slot, m.home_score, m.away_score into v_slot, v_h, v_a
       from public.retro_run_matches rm join public.retro_matches m on m.id = rm.match_id
      where rm.run_id = v_run and rm.answered_at is null;
-    if v_slot < 6 then
-      v_gh := v_h; v_ga := v_a; -- crava até as quartas
-    else
-      -- na SEMI: acerta só o vencedor com saldo errado = 1 pt (acerto) → deve eliminar
-      if v_h > v_a then v_gh := v_h + 5; v_ga := v_a;
-      elsif v_h < v_a then v_gh := v_h; v_ga := v_a + 5;
-      else v_gh := 9; v_ga := 0; end if; -- empate real: palpite errado de propósito
-    end if;
+    -- SEMPRE só o vencedor (1 pt): com a regra nova, deve chegar ao TÍTULO
+    if v_h > v_a then v_gh := v_h + 5; v_ga := v_a;
+    elsif v_h < v_a then v_gh := v_h; v_ga := v_a + 5;
+    else v_gh := v_h; v_ga := v_a; end if; -- empate real: crava (1 pt não existe p/ empate)
     v_ans := public.retro_answer(v_run, v_gh, v_ga, v_token, '{}');
     exit when v_ans->'run'->>'status' <> 'playing';
     perform public.retro_next(v_run, v_token, '{}');
   end loop;
-  if v_ans->'run'->>'status' = 'eliminated' and v_ans->'run'->>'stage_reached' = 'Semifinal' then
-    raise notice 'T4 barra da semi: OK (1 pt não passa na semi; caiu na Semifinal)';
+  if v_ans->'run'->>'status' = 'champion' then
+    raise notice 'T4 modo acerto: OK (1 pt avança em todas as fases até o título)';
   else
     raise exception 'T4 FALHOU: % / %', v_ans->'run'->>'status', v_ans->'run'->>'stage_reached';
   end if;
@@ -165,14 +161,14 @@ begin
   else raise exception 'T5f FALHOU'; end if;
 end $$;
 
--- ============ T6: modo Só Cravada — saldo no grupo NÃO conta como "passou" ============
+-- ============ T6: modo Na Crava — saldo (≥2) AVANÇA em todas as fases (decisão PO 10/06) ============
 do $$
 declare v_token uuid := gen_random_uuid(); v_start jsonb; v_run uuid; v_m record; v_ans jsonb; v_i int := 0;
 begin
   v_start := public.retro_start_run('cravada', 'sempressa', false, v_token, '{}');
   v_run := (v_start->>'run_id')::uuid;
   loop
-    v_i := v_i + 1; if v_i > 5 then exit; end if;
+    v_i := v_i + 1; if v_i > 10 then exit; end if;
     select m.home_score, m.away_score into v_m
       from public.retro_run_matches rm join public.retro_matches m on m.id = rm.match_id
      where rm.run_id = v_run and rm.answered_at is null;
@@ -182,9 +178,8 @@ begin
     exit when v_ans->'run'->>'status' <> 'playing';
     perform public.retro_next(v_run, v_token, '{}');
   end loop;
-  if v_ans->'run'->>'status' = 'eliminated' and v_ans->'run'->>'stage_reached' = 'Fase de grupos'
-     and (v_ans->'run'->>'points')::int = 6 then
-    raise notice 'T6 Só Cravada: OK (3 saldos = 6 pts, mas eliminado nos grupos)';
+  if v_ans->'run'->>'status' = 'champion' and (v_ans->'run'->>'points')::int = 14 then
+    raise notice 'T6 Na Crava: OK (7 saldos = 14 pts = campeão; acerto simples não valeria)';
   else raise exception 'T6 FALHOU: %', v_ans->'run'; end if;
 end $$;
 

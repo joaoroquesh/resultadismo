@@ -20,7 +20,7 @@ export function RetroLeaderboard() {
         <SegmentedControl<RetroMode>
           options={[
             { value: "acerto", label: "Acerto" },
-            { value: "cravada", label: "Só Cravada" },
+            { value: "cravada", label: "Na Crava" },
           ]}
           value={mode}
           onChange={setMode}

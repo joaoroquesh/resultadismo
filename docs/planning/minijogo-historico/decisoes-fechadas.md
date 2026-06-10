@@ -162,6 +162,13 @@ Dois eixos independentes, escolhidos antes da run:
   das roletas; (4) semi/final mais justas: janelas do sorteio desceram um degrau (SF 4-6→3-5,
   F 5-7→4-6) + mata-mata pesa 40/35/25 pro fácil — a barra ≥2 pts da semi/final (D3) fica, é o
   mecanismo de raridade do título; se seguir difícil, o próximo botão é ela.
+- **Rodada 4 (10/06, decisão do PO):** modos rebalanceados — `acerto` aceita **qualquer
+  pontuação (≥1) em todas as fases** (caiu a barra ≥2 da semi/final, decisão explícita do PO
+  sobre a recomendação da equipe) e o modo difícil virou **"Na Crava"** (≥2: saldo ou cravada em
+  todas as fases; "só cravada" era impossível) — migration `20260610150006`, testes T4/T6
+  reescritos. **Share como imagem**: card PNG 1080×1350 via canvas (identidade do placar
+  eletrônico, trilha colorida, CTA-desafio), Web Share API nível 2 com fallback texto/wa.me +
+  botão "Baixar a imagem".
 - **Backlog (fase 2 do Retrô)** — eventos GA4 (union do `analytics.ts`) ✓feito, entrada na navegação/Como Funciona/
   landing (pontos de contato), docs `.claude/05` §2 + `12-RETRO-MINIJOGO.md` → **Fase 5**:
   homologação com o João (Portão B), integração do worktree na main e deploy.

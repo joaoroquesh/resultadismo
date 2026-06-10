@@ -35,7 +35,7 @@ export function RetroSharePage() {
                 {data.mode === "cravada" && (
                   <>
                     {" "}
-                    no modo <b>Só Cravada</b>
+                    no modo <b>Na Crava</b>
                   </>
                 )}
               </p>

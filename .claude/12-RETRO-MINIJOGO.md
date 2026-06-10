@@ -12,11 +12,13 @@ Em produção desde **2026-06-10** em **`/retro`** (jogável sem login). Subdom�
 
 Mini-jogo viral-irmão: o jogador encara **a própria Copa** — **7 jogos reais de Copas do Mundo
 (1930–2022)** — com poucos segundos para cravar cada placar. Grupos: passa pontuando em 2 de 3
-(o 3º jogo sempre acontece, "jogo de honra"). Mata-mata: errou, caiu; na semi e na final só
-**saldo ou cravada** salvam. Sobreviveu aos 7 = **Campeão** (máx. 21 pts). Share de WhatsApp com
-grade de emojis **sem spoiler** + página pública `/retro/r/:code`.
+(o 3º jogo sempre acontece, "jogo de honra"). Mata-mata: não atingiu a barra do modo, caiu.
+Sobreviveu aos 7 = **Campeão** (máx. 21 pts). Share com **card-imagem PNG** (canvas, Web Share
+API com fallback de download) + grade de emojis **sem spoiler** + página pública `/retro/r/:code`.
 
-- **Modos:** `acerto` (pontuou, avançou) · `cravada` ("Só Cravada": só placar exato avança).
+- **Modos (rebalanceados pelo PO em 10/06, migration `20260610150006`):** `acerto` (**≥1 pt**
+  avança em TODAS as fases) · `cravada`, rótulo **"Na Crava"** (**≥2 pts** — saldo ou cravada —
+  em todas as fases; era só placar exato, "impossível").
 - **Ritmos:** `resultadista` (10/8/7s — o único que **ranqueia**) · `classico` (14/12/10s) ·
   `sempressa` (sem timer). Cronômetro mostra **milésimos + cor nos 3s finais**.
 - **Copa do Dia:** mesmos 7 jogos para todos (sorteados lazy à meia-noite BRT), **1 tentativa por
@@ -49,7 +51,7 @@ grade de emojis **sem spoiler** + página pública `/retro/r/:code`.
   `retroLocal.ts` = token anônimo + anti-repetição local). Rotas públicas `/retro` e `/retro/r/:code`
   no `App.tsx`; entradas na Sidebar/BottomNav/PublicShell. Vitrine de animações: `/retro?demo=1`
   (**só DEV**).
-- **Banco (migrations `20260610150000–150005`):** seed dos **964 jogos** (fonte openfootball CC0,
+- **Banco (migrations `20260610150000–150006`):** seed dos **964 jogos** (fonte openfootball CC0,
   importador `scripts/gen-retro-seed.mjs` com portões de qualidade; dificuldade 1–7 com 34
   jogos-lenda) + motor (RPCs `retro_start_run`, `retro_next` — serve **sob demanda**, o cronômetro
   nasce no clique —, `retro_answer`, `retro_run_summary`, `retro_leaderboard`, `retro_my_stats`,

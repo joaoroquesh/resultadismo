@@ -30,8 +30,10 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   novo doc [`12-RETRO-MINIJOGO.md`](12-RETRO-MINIJOGO.md) + linha no MESTRE §2 + tabelas/RPCs no
   doc 05. **Rodada 3 (feedback dos amigos):** ano/fase em destaque no card, 85 bandeiras
   pré-aquecidas + respiro "Valendo…" (deadline +1,5s, migration `20260610150005`), botões +/− nas
-  roletas, semi/final recalibradas (janelas SF 3-5 · F 4-6, pesos 40/35/25). Histórico completo
-  da construção: Comentários
+  roletas, semi/final recalibradas (janelas SF 3-5 · F 4-6, pesos 40/35/25). **Rodada 4 (decisão do PO):**
+  modos rebalanceados — acerto ≥1 em todas as fases; modo difícil vira "Na Crava" (≥2, saldo ou
+  cravada; migration `20260610150006`) — e **share como imagem** (card PNG via canvas + Web Share
+  API, fallback download/texto). Histórico completo da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do
