@@ -11,13 +11,25 @@ import { fmtMs } from "./share";
 // logado no ritmo Resultadista — a comparação de tempo precisa ser justa.
 export function RetroLeaderboard() {
   const [mode, setMode] = useState<RetroMode>("acerto");
-  const { data, isLoading } = useRetroLeaderboard(mode);
+  const [board, setBoard] = useState<"daily" | "treino">("daily");
+  const { data, isLoading } = useRetroLeaderboard(mode, board);
 
   return (
     <Card className="space-y-3 p-4">
-      <div className="flex items-center justify-between gap-2">
-        <h3 className="text-base font-bold">Ranking da Copa do Dia</h3>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-base font-bold">Ranking</h3>
+          <SegmentedControl<"daily" | "treino">
+            options={[
+              { value: "daily", label: "Copa do Dia" },
+              { value: "treino", label: "Treino" },
+            ]}
+            value={board}
+            onChange={setBoard}
+          />
+        </div>
         <SegmentedControl<RetroMode>
+          className="w-full"
           options={[
             { value: "acerto", label: "Acerto" },
             { value: "cravada", label: "Na Crava" },
@@ -36,7 +48,11 @@ export function RetroLeaderboard() {
       ) : !data || data.rows.length === 0 ? (
         <EmptyState
           title="Ninguém no ranking ainda"
-          description="A Copa do Dia ranqueia quem joga logado no ritmo Resultadista. Seja a primeira pessoa!"
+          description={
+            board === "daily"
+              ? "A Copa do Dia ranqueia quem joga logado no ritmo Resultadista. Seja a primeira pessoa!"
+              : "O Treino ranqueia a MELHOR campanha de cada um (logado, ritmo Resultadista). Bora abrir o placar!"
+          }
         />
       ) : (
         <ol className="divide-y divide-border">

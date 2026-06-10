@@ -1549,6 +1549,7 @@ export type Database = {
           persistent: boolean
           points: number
           ranked: boolean
+          rerolls: number
           share_code: string
           stage_rank: number | null
           stage_reached: string | null
@@ -1569,6 +1570,7 @@ export type Database = {
           persistent?: boolean
           points?: number
           ranked?: boolean
+          rerolls?: number
           share_code?: string
           stage_rank?: number | null
           stage_reached?: string | null
@@ -1589,6 +1591,7 @@ export type Database = {
           persistent?: boolean
           points?: number
           ranked?: boolean
+          rerolls?: number
           share_code?: string
           stage_rank?: number | null
           stage_reached?: string | null
@@ -2603,7 +2606,12 @@ export type Database = {
         Returns: Json
       }
       retro_leaderboard: {
-        Args: { p_daily_date?: string; p_limit?: number; p_mode?: string }
+        Args: {
+          p_board?: string
+          p_daily_date?: string
+          p_limit?: number
+          p_mode?: string
+        }
         Returns: Json
       }
       retro_make_daily: { Args: { p_date: string }; Returns: string[] }
@@ -2619,11 +2627,19 @@ export type Database = {
         Args: { p_anon_token?: string; p_run_id: string; p_seen?: string[] }
         Returns: Json
       }
+      retro_pass_need: {
+        Args: { p_mode: string; p_slot: number }
+        Returns: number
+      }
       retro_pick_match: {
         Args: { p_exclude: string[]; p_slot: number }
         Returns: string
       }
       retro_purge_ephemeral: { Args: never; Returns: number }
+      retro_reroll: {
+        Args: { p_anon_token?: string; p_run_id: string; p_seen?: string[] }
+        Returns: Json
+      }
       retro_run_owned: {
         Args: {
           p_anon_token: string
@@ -2687,6 +2703,7 @@ export type Database = {
           p_followed_competition_ids?: string[]
           p_followed_team_ids?: string[]
           p_followed_teams?: Json
+          p_mark_done?: boolean
           p_national_team_id?: string
           p_show_in_ranking?: boolean
         }

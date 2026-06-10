@@ -27,12 +27,6 @@ export function PublicShell({ children }: { children: ReactNode }) {
           </Link>
           <nav className="flex items-center gap-2">
             <Link
-              to="/retro"
-              className="rounded-pill px-3 py-2 text-sm font-semibold text-ink-600 transition-colors hover:bg-ink-100 hover:text-ink-900"
-            >
-              Retrô 🕹️
-            </Link>
-            <Link
               to="/como-funciona"
               className="rounded-pill px-3 py-2 text-sm font-semibold text-ink-600 transition-colors hover:bg-ink-100 hover:text-ink-900"
             >

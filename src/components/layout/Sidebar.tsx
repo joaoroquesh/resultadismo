@@ -1,5 +1,5 @@
 import { NavLink, Link } from "react-router-dom";
-import { Goal, Trophy, User, ShieldCheck, LogIn, HelpCircle, Gamepad2 } from "lucide-react";
+import { Goal, Trophy, User, ShieldCheck, LogIn, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
@@ -21,7 +21,6 @@ export function Sidebar() {
           ...(isAppAdmin ? [{ to: "/admin", label: "Admin", icon: ShieldCheck, end: false }] : []),
         ]
       : []),
-    { to: "/retro", label: "Retrô", icon: Gamepad2, end: false },
     { to: "/como-funciona", label: "Como funciona", icon: HelpCircle, end: false },
   ];
 

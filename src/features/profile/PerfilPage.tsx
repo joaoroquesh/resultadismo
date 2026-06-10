@@ -18,6 +18,7 @@ import {
   Sparkles,
   Swords,
   SlidersHorizontal,
+  Gamepad2,
 } from "lucide-react";
 import { replayOnboarding } from "@/features/onboarding/Onboarding";
 import { Page } from "@/components/layout/Page";
@@ -226,6 +227,16 @@ export function PerfilPage() {
           >
             <HelpCircle className="size-5 text-brand-600" />
             <span className="flex-1 font-medium text-ink-900">Como funciona</span>
+            <ChevronRight className="size-4 text-ink-400" />
+          </Link>
+          <Link to="/retro" className="flex items-center gap-3 p-4 transition hover:bg-ink-50">
+            <Gamepad2 className="size-5 text-brand-600" />
+            <span className="flex-1 font-medium text-ink-900">
+              Resultadismo Retrô
+              <span className="block text-xs font-normal text-ink-500">
+                Nosso outro jogo: crave placares históricos das Copas
+              </span>
+            </span>
             <ChevronRight className="size-4 text-ink-400" />
           </Link>
           <Link to="/construa" className="flex items-center gap-3 p-4 transition hover:bg-ink-50">

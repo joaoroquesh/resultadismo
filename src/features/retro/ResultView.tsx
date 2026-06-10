@@ -8,7 +8,7 @@ import { track } from "@/lib/analytics";
 import { CampaignTrail, type TrailSlot } from "./CampaignTrail";
 import { Confetti } from "./RetroFx";
 import { fmtMs, type FinishedRun } from "./share";
-import { downloadShareImage, shareCampaign } from "./shareImage";
+import { shareCampaign } from "./shareImage";
 
 // Tela final da campanha: o veredito, a grade compartilhável e o loop de recomeço.
 export function ResultView({
@@ -62,16 +62,7 @@ export function ResultView({
       >
         Compartilhar 📲
       </Button>
-      <button
-        type="button"
-        className="mx-auto block text-xs font-semibold text-brand-700 underline"
-        onClick={() => {
-          track("retro_share", { status: run.status });
-          void downloadShareImage(run, streak);
-        }}
-      >
-        Baixar a imagem da campanha 🖼️
-      </button>
+
 
       {!user && (
         <Card className="p-4 text-center">

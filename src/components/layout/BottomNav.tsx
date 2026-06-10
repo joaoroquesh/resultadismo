@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Goal, Trophy, User, LogIn, Gamepad2 } from "lucide-react";
+import { Goal, Trophy, User, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
@@ -10,7 +10,6 @@ export function BottomNav() {
 
   const items = [
     { to: "/", label: "Jogos", icon: Goal, end: true },
-    { to: "/retro", label: "Retrô", icon: Gamepad2, end: false },
     ...(session
       ? [
           { to: "/grupos", label: "Grupos", icon: Trophy, end: false },

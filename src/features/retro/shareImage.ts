@@ -126,7 +126,19 @@ export async function shareCampaign(
     }
   } catch (e) {
     if ((e as DOMException)?.name === "AbortError") return; // usuário cancelou
-    /* sem imagem? segue pro texto */
+    /* sem imagem? segue pros fallbacks */
+  }
+  // desktop sem share de arquivos: copia a IMAGEM pro clipboard (cola direto no WhatsApp Web)
+  try {
+    const blob = await buildShareImage(run, streak);
+    if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+      toast("Imagem copiada! É só colar (Ctrl+V) na conversa 😉");
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+      return;
+    }
+  } catch {
+    /* clipboard de imagem indisponível — segue */
   }
   try {
     if (navigator.share) {

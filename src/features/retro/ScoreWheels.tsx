@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 // Maior número EM CIMA: rolar a coluna PARA CIMA = mais gols (pedido do PO).
 const VALUES = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
-const ITEM_H = 56;
+const ITEM_H = 48;
 
 // Roleta de placar estilo placar de estádio: rolagem grande, dois polegares, sem
 // teclado nativo. Já começa em 0×0 — palpite válido desde o primeiro segundo.
@@ -41,21 +41,21 @@ function Wheel({
         type="button"
         aria-label={`Mais um gol: ${label}`}
         onClick={() => bump(1)}
-        className="grid size-9 place-items-center rounded-full bg-ink-100 text-lg font-bold text-ink-700 active:scale-95"
+        className="grid size-8 place-items-center rounded-full bg-ink-100 text-base font-bold text-ink-700 active:scale-95"
       >
         +
       </button>
       <div className="relative">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-1/2 z-10 h-[56px] -translate-y-1/2 rounded-md border-2 border-[var(--retro-board-ring)]"
+          className="pointer-events-none absolute inset-x-0 top-1/2 z-10 h-[48px] -translate-y-1/2 rounded-md border-2 border-[var(--retro-board-ring)]"
         />
         <div
           ref={ref}
           onScroll={onScroll}
           role="listbox"
           aria-label={`Gols: ${label}`}
-          className="no-scrollbar h-[168px] w-[88px] snap-y snap-mandatory overflow-y-scroll overscroll-contain rounded-lg bg-[var(--retro-board)] py-[56px] shadow-soft"
+          className="no-scrollbar h-[144px] w-[84px] snap-y snap-mandatory overflow-y-scroll overscroll-contain rounded-lg bg-[var(--retro-board)] py-[48px] shadow-soft"
         >
           {VALUES.map((v) => (
             <button
@@ -65,7 +65,7 @@ function Wheel({
               aria-selected={v === value}
               onClick={() => onChange(v)}
               className={cn(
-                "flex h-[56px] w-full snap-center items-center justify-center text-4xl font-bold tabular-nums transition-colors",
+                "flex h-[48px] w-full snap-center items-center justify-center text-3xl font-bold tabular-nums transition-colors",
                 v === value ? "text-[var(--retro-board-digit)]" : "text-[var(--retro-board-dim)]",
               )}
             >
@@ -78,7 +78,7 @@ function Wheel({
         type="button"
         aria-label={`Menos um gol: ${label}`}
         onClick={() => bump(-1)}
-        className="grid size-9 place-items-center rounded-full bg-ink-100 text-lg font-bold text-ink-700 active:scale-95"
+        className="grid size-8 place-items-center rounded-full bg-ink-100 text-base font-bold text-ink-700 active:scale-95"
       >
         −
       </button>

@@ -19,6 +19,7 @@ function fakeAnswer(scoreType: ScoreType, points: number): RetroAnswerResult {
       points,
       timeout: false,
       passed: points > 0,
+      reroll_earned: scoreType === "cravada",
     },
     run: {
       id: "demo",
@@ -29,6 +30,7 @@ function fakeAnswer(scoreType: ScoreType, points: number): RetroAnswerResult {
       total_ms: null,
       share_code: "demo",
       slot: 5,
+      rerolls: 1,
     },
     next: null,
   };

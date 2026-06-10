@@ -169,6 +169,15 @@ Dois eixos independentes, escolhidos antes da run:
   reescritos. **Share como imagem**: card PNG 1080×1350 via canvas (identidade do placar
   eletrônico, trilha colorida, CTA-desafio), Web Share API nível 2 com fallback texto/wa.me +
   botão "Baixar a imagem".
+- **Rodada 5 (10/06, decisões do PO):** (1) barras de volta e mais duras — acerto: semi pede
+  SALDO e **final só com CRAVADA**; Na Crava: ≥2 sempre + final só cravada (migration
+  `20260610150007`, `retro_pass_need`); (2) **🎲 cada cravada dá 1 ficha de troca de jogo**
+  (RPC `retro_reroll`, T9 na bateria); (3) **treinos ranqueados** (runs de logado persistem;
+  board Treino = melhor campanha por pessoa; melhor campanha geral no perfil); (4) run em
+  **overlay tela-cheia** (cabe até em iPhone SE 375×667, validado por E2E); (5) share prioriza
+  COMPARTILHAR: arquivos via Web Share → imagem no clipboard + wa.me → texto (sem botão de
+  download); (6) **navegação separada**: Retrô sai da Sidebar/BottomNav/header e entra como
+  sugestão no Perfil; voltar pro Resultadismo pela home do jogo e pós-run.
 - **Backlog (fase 2 do Retrô)** — eventos GA4 (union do `analytics.ts`) ✓feito, entrada na navegação/Como Funciona/
   landing (pontos de contato), docs `.claude/05` §2 + `12-RETRO-MINIJOGO.md` → **Fase 5**:
   homologação com o João (Portão B), integração do worktree na main e deploy.

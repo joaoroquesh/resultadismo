@@ -76,7 +76,7 @@ begin
   end if;
 end $$;
 
--- ============ T4: modo acerto — 1 pt avança em TODAS as fases (decisão PO 10/06) ============
+-- ============ T4: modo acerto — 1pt passa até as quartas; SEMI pede saldo (rodada 5) ============
 do $$
 declare v_token uuid := gen_random_uuid(); v_start jsonb; v_run uuid; v_ans jsonb;
   v_i int := 0; v_gh int; v_ga int; v_slot int; v_h int; v_a int;
@@ -96,8 +96,8 @@ begin
     exit when v_ans->'run'->>'status' <> 'playing';
     perform public.retro_next(v_run, v_token, '{}');
   end loop;
-  if v_ans->'run'->>'status' = 'champion' then
-    raise notice 'T4 modo acerto: OK (1 pt avança em todas as fases até o título)';
+  if v_ans->'run'->>'status' = 'eliminated' and v_ans->'run'->>'stage_reached' = 'Semifinal' then
+    raise notice 'T4 barras rodada 5: OK (acerto simples cai na semi)';
   else
     raise exception 'T4 FALHOU: % / %', v_ans->'run'->>'status', v_ans->'run'->>'stage_reached';
   end if;
@@ -178,8 +178,9 @@ begin
     exit when v_ans->'run'->>'status' <> 'playing';
     perform public.retro_next(v_run, v_token, '{}');
   end loop;
-  if v_ans->'run'->>'status' = 'champion' and (v_ans->'run'->>'points')::int = 14 then
-    raise notice 'T6 Na Crava: OK (7 saldos = 14 pts = campeão; acerto simples não valeria)';
+  if v_ans->'run'->>'status' = 'eliminated' and v_ans->'run'->>'stage_reached' = 'Vice-campeão'
+     and (v_ans->'run'->>'points')::int = 14 then
+    raise notice 'T6 Na Crava rodada 5: OK (saldos levam à final, mas o título só sai com CRAVADA → vice com 14)';
   else raise exception 'T6 FALHOU: %', v_ans->'run'; end if;
 end $$;
 
@@ -212,5 +213,38 @@ reset role;
 set role authenticated;
 select 'T8c logado lê retro_run_matches: ' || count(*) || ' linhas (espera 0)' from public.retro_run_matches;
 reset role;
+
+-- ============ T9: 🎲 cravada dá ficha de troca; reroll troca o jogo e desconta ============
+do $$
+declare v_token uuid := gen_random_uuid(); v_start jsonb; v_run uuid; v_h int; v_a int;
+  v_ans jsonb; v_old uuid; v_new jsonb;
+begin
+  v_start := public.retro_start_run('acerto', 'sempressa', false, v_token, '{}');
+  v_run := (v_start->>'run_id')::uuid;
+  -- sem ficha: reroll deve falhar
+  begin
+    perform public.retro_reroll(v_run, v_token, '{}');
+    raise exception 'T9a FALHOU: reroll sem ficha passou';
+  exception when others then
+    if sqlerrm like '%sem fichas%' then raise notice 'T9a sem ficha bloqueado: OK';
+    else raise; end if;
+  end;
+  -- crava o jogo 1 → ganha 1 ficha
+  select m.home_score, m.away_score into v_h, v_a
+    from public.retro_run_matches rm join public.retro_matches m on m.id = rm.match_id
+   where rm.run_id = v_run and rm.slot = 1;
+  v_ans := public.retro_answer(v_run, v_h, v_a, v_token, '{}');
+  if (v_ans->'run'->>'rerolls')::int = 1 and (v_ans->'result'->>'reroll_earned')::boolean then
+    raise notice 'T9b cravada deu a ficha: OK';
+  else raise exception 'T9b FALHOU: %', v_ans->'run'; end if;
+  -- serve o jogo 2 e TROCA com a ficha
+  perform public.retro_next(v_run, v_token, '{}');
+  select match_id into v_old from public.retro_run_matches where run_id = v_run and slot = 2;
+  v_new := public.retro_reroll(v_run, v_token, '{}');
+  if (v_new->>'rerolls')::int = 0
+     and (select match_id from public.retro_run_matches where run_id = v_run and slot = 2) <> v_old then
+    raise notice 'T9c reroll trocou o jogo e descontou a ficha: OK';
+  else raise exception 'T9c FALHOU'; end if;
+end $$;
 
 select '=== TODOS OS TESTES PASSARAM ===';

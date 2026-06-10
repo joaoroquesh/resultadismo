@@ -33,7 +33,12 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   roletas, semi/final recalibradas (janelas SF 3-5 · F 4-6, pesos 40/35/25). **Rodada 4 (decisão do PO):**
   modos rebalanceados — acerto ≥1 em todas as fases; modo difícil vira "Na Crava" (≥2, saldo ou
   cravada; migration `20260610150006`) — e **share como imagem** (card PNG via canvas + Web Share
-  API, fallback download/texto). Histórico completo da construção: Comentários
+  API, fallback download/texto). **Rodada 5 (decisões do PO):** barras novas (acerto: semi=saldo,
+  final=CRAVADA; Na Crava: ≥2 + final=CRAVADA), 🎲 cravada dá ficha de troca de jogo
+  (`retro_reroll`), treinos ranqueados (melhor campanha por pessoa, board próprio), run em overlay
+  tela-cheia (cabe no iPhone SE), share prioriza compartilhar (clipboard de imagem no desktop) e
+  navegação separada (Retrô no Perfil, fora dos menus principais) — migration
+  `20260610150007`. Histórico completo da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do

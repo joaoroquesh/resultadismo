@@ -17,6 +17,7 @@ import {
   useRetroAnswer,
   useRetroMyStats,
   useRetroNext,
+  useRetroReroll,
   useRetroStart,
   type RetroAnswerResult,
   type RetroCurrent,
@@ -43,11 +44,20 @@ type ActiveRun = {
   pace: RetroPace;
   isDaily: boolean;
   points: number;
+  rerolls: number;
   slots: (TrailSlot & { scoreType: ScoreType })[];
   current: RetroCurrent | null;
   lastAnswer: RetroAnswerResult | null;
   lastGuess: { home: number | null; away: number | null };
 };
+
+function viewStats(d: ReturnType<typeof useRetroMyStats>["data"]) {
+  return {
+    playedToday: d?.played_today ?? false,
+    streak: d?.streak ?? 0,
+    best: d?.best ?? null,
+  };
+}
 
 function toFinishedRun(run: ActiveRun | null): FinishedRun | null {
   const ans = run?.lastAnswer;
@@ -84,6 +94,7 @@ export function RetroPage() {
   const startMut = useRetroStart();
   const answerMut = useRetroAnswer();
   const nextMut = useRetroNext();
+  const rerollMut = useRetroReroll();
   const myStats = useRetroMyStats();
   useRetroAnonHeartbeat();
   useEffect(() => warmRetroFlags(teamCrestPath), []);
@@ -104,6 +115,7 @@ export function RetroPage() {
             pace: s.pace,
             isDaily: daily,
             points: s.points,
+            rerolls: s.rerolls ?? 0,
             slots: [],
             current: s.current,
             lastAnswer: null,
@@ -156,6 +168,7 @@ export function RetroPage() {
               ? {
                   ...r,
                   points: ans.run.points,
+                  rerolls: ans.run.rerolls,
                   slots: [...r.slots, { slot: r.current.slot, scoreType: ans.result.score_type }],
                   lastAnswer: ans,
                   lastGuess: { home, away },
@@ -189,12 +202,28 @@ export function RetroPage() {
     );
   }
 
+  function rerollCurrent() {
+    if (!run?.current || rerollMut.isPending || run.rerolls < 1) return;
+    rerollMut.mutate(
+      { runId: run.runId },
+      {
+        onSuccess: (cur) => {
+          retroMarkSeen(cur.match_id);
+          setRun({ ...run, current: cur, rerolls: cur.rerolls });
+          toast("Jogo trocado! 🎲", "info");
+        },
+        onError: (e) => toast(e.message, "error"),
+      },
+    );
+  }
+
   function backHome() {
     setRun(null);
     setPhase("home");
   }
 
   const finished = toFinishedRun(run);
+  const stats = viewStats(myStats.data);
 
   if (import.meta.env.DEV && new URLSearchParams(window.location.search).has("demo")) {
     return (
@@ -205,7 +234,7 @@ export function RetroPage() {
   }
 
   return (
-    <Page title="Resultadismo Retrô">
+    <Page title={phase === "play" ? undefined : "Resultadismo Retrô"}>
       {phase === "home" && (
         <Home
           mode={mode}
@@ -213,9 +242,9 @@ export function RetroPage() {
           setMode={setMode}
           setPace={setPace}
           starting={startMut.isPending}
-          playedToday={myStats.data?.played_today ?? false}
-          streak={myStats.data?.streak ?? 0}
-          best={myStats.data?.best ?? null}
+          playedToday={stats.playedToday}
+          streak={stats.streak}
+          best={stats.best}
           isLogged={!!user}
           onLogin={openLogin}
           onStart={start}
@@ -223,26 +252,43 @@ export function RetroPage() {
         />
       )}
       {phase === "play" && run?.current && (
-        <RunView
-          key={run.current.match_id}
-          current={run.current}
-          points={run.points}
-          slots={run.slots}
-          answering={answerMut.isPending}
-          onSubmit={submitGuess}
-        />
+        <div
+          data-retro-play
+          className="fixed inset-0 z-40 flex flex-col bg-[var(--color-background)] px-3 pb-3 pt-2"
+        >
+          <button
+            type="button"
+            onClick={backHome}
+            className="self-end pb-1 text-[11px] font-semibold text-ink-400"
+          >
+            sair ✕
+          </button>
+          <RunView
+            key={run.current.match_id}
+            current={run.current}
+            points={run.points}
+            rerolls={run.rerolls}
+            slots={run.slots}
+            answering={answerMut.isPending}
+            rerolling={rerollMut.isPending}
+            onSubmit={submitGuess}
+            onReroll={rerollCurrent}
+          />
+        </div>
       )}
       {phase === "reveal" && run?.lastAnswer && (
-        <div className="mx-auto w-full max-w-md">
-          <Card className="p-5">
-            <RevealCard answer={run.lastAnswer} guess={run.lastGuess} onNext={advanceFromReveal} />
-          </Card>
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-[var(--color-background)] p-4">
+          <div className="w-full max-w-md">
+            <Card className="p-5">
+              <RevealCard answer={run.lastAnswer} guess={run.lastGuess} onNext={advanceFromReveal} />
+            </Card>
+          </div>
         </div>
       )}
       {phase === "done" && finished && (
         <ResultView
           run={finished}
-          streak={user ? myStats.data?.streak : undefined}
+          streak={user ? stats.streak : undefined}
           onPlayTraining={() => {
             setRun(null);
             start(false);
@@ -323,8 +369,8 @@ function Home({
           />
           <p className="text-xs text-ink-500">
             {mode === "acerto"
-              ? "Pontuou, avançou — qualquer acerto vale, até na final."
-              : "Aqui acerto simples não vale: só SALDO ou CRAVADA te levam adiante."}
+              ? "Pontuou, avançou — mas a semi pede SALDO e a final só sai com CRAVADA."
+              : "Acerto simples não vale: saldo/cravada sempre — e a final só com CRAVADA."}
           </p>
         </div>
 

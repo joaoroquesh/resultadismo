@@ -9,9 +9,9 @@ import type { RetroCurrent } from "./api";
 
 function TeamSide({ slug, name }: { slug: string; name: string }) {
   return (
-    <div className="flex min-w-0 flex-1 flex-col items-center gap-2">
-      <RetroCrest slug={slug} name={name} size={64} />
-      <span className="max-w-full truncate text-center text-base font-bold">{name}</span>
+    <div className="flex min-w-0 flex-1 flex-col items-center gap-1">
+      <RetroCrest slug={slug} name={name} size={52} />
+      <span className="max-w-full truncate text-center text-sm font-bold">{name}</span>
     </div>
   );
 }
@@ -21,15 +21,21 @@ function TeamSide({ slug, name }: { slug: string; name: string }) {
 export function RunView({
   current,
   points,
+  rerolls,
   slots,
   answering,
+  rerolling,
   onSubmit,
+  onReroll,
 }: {
   current: RetroCurrent;
   points: number;
+  rerolls: number;
   slots: TrailSlot[];
   answering: boolean;
+  rerolling: boolean;
   onSubmit: (home: number, away: number) => void;
+  onReroll: () => void;
 }) {
   // o pai remonta este componente por jogo (key=match_id): nasce 0×0 (palpite válido)
   const [home, setHome] = useState(0);
@@ -46,13 +52,13 @@ export function RunView({
   const decisao = current.slot >= 6; // semi e final ganham clima de decisão
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-col gap-4">
+    <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-between gap-2 overflow-hidden px-1">
       <div className="flex items-center justify-between gap-2">
         <CampaignTrail slots={slots} currentSlot={current.slot} />
-        <span className="rounded-pill bg-ink-100 px-3 py-1 text-sm font-bold tabular-nums">{points} pts</span>
+        <span className="rounded-pill bg-ink-100 px-2.5 py-0.5 text-xs font-bold tabular-nums">{points} pts</span>
       </div>
 
-      <Card className={decisao ? "space-y-4 border-2 border-gold-500 p-4 shadow-brand" : "space-y-4 p-4"}>
+      <Card className={decisao ? "space-y-2 border-2 border-gold-500 p-3 shadow-brand" : "space-y-2 p-3"}>
         <div className="text-center">
           <p
             className={
@@ -64,10 +70,10 @@ export function RunView({
             {decisao ? `⚡ ${current.slot_label} ⚡` : current.slot_label}
           </p>
           {/* leitura rápida do jogo (feedback dos amigos): ANO gigante + fase em selo */}
-          <p className="mt-1 text-3xl font-bold leading-none tracking-tight">
+          <p className="mt-0.5 text-2xl font-bold leading-none tracking-tight">
             Copa de {m.wc_year}
           </p>
-          <p className="mt-1.5 flex items-center justify-center gap-1.5 text-xs text-ink-500">
+          <p className="mt-1 flex items-center justify-center gap-1.5 text-[11px] text-ink-500">
             <span>{m.wc_host}</span>
             <span aria-hidden>·</span>
             <span className="rounded-pill bg-brand-500/10 px-2 py-0.5 font-bold text-brand-700">
@@ -78,11 +84,22 @@ export function RunView({
           </p>
         </div>
 
-        <div className="flex items-start justify-center gap-3">
+        <div className="flex items-start justify-center gap-2">
           <TeamSide slug={m.home_slug} name={m.home_name_pt} />
-          <span className="pt-5 text-2xl font-bold text-ink-300">×</span>
+          <span className="pt-4 text-xl font-bold text-ink-300">×</span>
           <TeamSide slug={m.away_slug} name={m.away_name_pt} />
         </div>
+
+        {rerolls > 0 && (
+          <button
+            type="button"
+            disabled={rerolling}
+            onClick={onReroll}
+            className="mx-auto block rounded-pill bg-gold-100 px-3 py-1 text-xs font-bold text-gold-800 ring-1 ring-gold-400 active:scale-95"
+          >
+            🎲 Trocar este jogo ({rerolls} ficha{rerolls > 1 ? "s" : ""})
+          </button>
+        )}
 
         {valendo ? (
           <RetroTimer totalSeconds={current.timer_seconds} onExpire={() => onSubmit(home, away)} />
@@ -93,7 +110,7 @@ export function RunView({
         )}
       </Card>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         <ScoreWheels
           home={home}
           away={away}
@@ -103,7 +120,7 @@ export function RunView({
           onAway={setAway}
         />
         <Button
-          size="lg"
+          size="md"
           className="w-full text-base font-bold tracking-wide"
           disabled={answering}
           loading={answering}
@@ -111,7 +128,7 @@ export function RunView({
         >
           CRAVAR ⚽
         </Button>
-        <p className="text-center text-[11px] text-ink-500">
+        <p className="text-center text-[10px] leading-tight text-ink-500">
           {m.is_knockout
             ? "Vale o placar final (com prorrogação) — pênaltis não contam. Mata-mata pode terminar empatado!"
             : "Vale o placar final do jogo."}

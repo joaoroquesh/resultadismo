@@ -63,6 +63,11 @@ export function RevealCard({
           </span>
           <ScorePill type={r.score_type} withLabel />
         </div>
+        {r.reroll_earned && (
+          <p className="animate-retro-stamp text-sm font-bold text-gold-700">
+            +1 🎲 ficha de troca de jogo — guarde para a hora certa!
+          </p>
+        )}
 
         {finished ? (
           <Button onClick={onNext} className="w-full" size="lg">
