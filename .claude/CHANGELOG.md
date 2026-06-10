@@ -20,6 +20,15 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+### Corrigido
+- **Listagens da Copa só com as 48 classificadas (Itália fora).** O recorte do grupo e a lista de
+  times da Copa na personalização mostravam o catálogo inteiro de seleções (66) — incluindo quem
+  não se classificou (Itália etc.). Agora há `WC2026_SLUGS` no `teamsCatalog` com as **48
+  classificadas**, extraídas dos **próprios jogos da Copa em produção** (104 partidas, 48/48
+  mapeadas pros slugs do catálogo, fonte: o banco): `catalogWcNations()` no seletor do recorte e
+  `teamsForCompetition` filtrando os códigos da Copa (`WC`/`fifa.world`). **Amistosos e a "seleção
+  da torcida" seguem com as 66** (a Itália joga amistosos e pode ser a seleção do coração).
+
 ### Adicionado
 - **Recorte de seleções do grupo editável até a Copa começar.** Quem criou o grupo sem reparar no
   recorte ("Todas" × "Só o Brasil" × escolhidas) agora pode **ajustar na aba Competições** (card

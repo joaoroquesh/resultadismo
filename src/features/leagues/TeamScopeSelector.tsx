@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { catalogNations } from "@/features/onboarding/teamsCatalog";
+import { catalogWcNations } from "@/features/onboarding/teamsCatalog";
 
 export type TeamScopeValue = "all" | "brasil" | "custom";
 
@@ -25,7 +25,8 @@ export function TeamScopeSelector({
   sel: Set<string>;
   onToggle: (slug: string) => void;
 }) {
-  const nations = useMemo(() => catalogNations(), []);
+  // Só as 48 classificadas pra Copa 2026 (Itália etc. ficam de fora).
+  const nations = useMemo(() => catalogWcNations(), []);
   return (
     <div className="space-y-2">
       <SegmentedControl<TeamScopeValue>

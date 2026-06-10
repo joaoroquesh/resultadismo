@@ -3,7 +3,7 @@ import { Lock, Target } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
-import { catalogNations, expandTeamSlugs } from "@/features/onboarding/teamsCatalog";
+import { catalogWcNations, expandTeamSlugs } from "@/features/onboarding/teamsCatalog";
 import { TeamScopeSelector, type TeamScopeValue } from "../TeamScopeSelector";
 import { useTeamScopeWindow, useUpdateTeamScope } from "../api";
 
@@ -33,7 +33,7 @@ export function TeamScopeCard({
     const brasilOnly = expandTeamSlugs(["brasil"]);
     const isBrasil = saved.size === brasilOnly.size && [...brasilOnly].every((s) => saved.has(s));
     if (isBrasil) return { scope: "brasil" as TeamScopeValue, sel: new Set<string>(["brasil"]) };
-    const sel = new Set(catalogNations().filter((n) => saved.has(n.id)).map((n) => n.id));
+    const sel = new Set(catalogWcNations().filter((n) => saved.has(n.id)).map((n) => n.id));
     return { scope: "custom" as TeamScopeValue, sel: sel.size ? sel : new Set<string>(["brasil"]) };
   });
   const [scope, setScope] = useState<TeamScopeValue>(initial.scope);
