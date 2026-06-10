@@ -11,9 +11,9 @@ import { useCompetitions, findWorldCupCompetition } from "@/features/matches/api
 import { useAddLeagueCompetition, useDeleteLeagueCompetition } from "../api";
 import type { LeagueMode } from "@/lib/types";
 
-// Limite inicial: 1 competição por grupo. Quando a base de usuários crescer e
-// os modos extras (Liga / Copa) estiverem prontos, soltamos o limite e habilitamos
-// os outros modos de disputa.
+// Temporada da Copa (ADR 0007): 1 competição por grupo — a Copa do Mundo, fixa
+// (o banco enforça via group_eligible + triggers). Depois da Copa, soltamos o
+// limite e habilitamos outros campeonatos e modos de disputa.
 const MAX_COMPETITIONS_PER_LEAGUE = 1;
 
 export function CompeticoesTab({

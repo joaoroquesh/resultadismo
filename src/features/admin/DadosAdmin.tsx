@@ -188,7 +188,7 @@ function ConflictRow({ m }: { m: MatchConflict }) {
             </span>
           )}
           {m.frozen && (
-            <span className="inline-flex items-center gap-1 rounded-pill bg-sky-500/10 px-2 py-0.5 text-[11px] font-semibold text-sky-600">
+            <span className="inline-flex items-center gap-1 rounded-pill bg-aqua-700 px-2 py-0.5 text-[11px] font-semibold text-white">
               <Snowflake className="size-3" /> congelado
             </span>
           )}

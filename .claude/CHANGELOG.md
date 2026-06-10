@@ -9,7 +9,7 @@ Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 > **Como usar:** toda mudança que sobe ganha uma entrada (passo 7 do protocolo em
 > [`MESTRE.md`](MESTRE.md) §5 / [`08-PROCESSO.md`](08-PROCESSO.md)). Acumule em **[Não lançado]**
 > enquanto desenvolve; ao subir, mova para uma versão datada e atualize o `package.json`.
-> Numeração (ADR 0003): legado = **v0**, **1.x = soft-launch** (atual: 1.11.0), **2.0 = Copa**. As
+> Numeração (ADR 0003): legado = **v0**, **1.x = soft-launch** (última: 1.11.0), **2.0 = Copa** (atual: 2.0.0). As
 > versões abaixo foram **relabel 2.x → 1.x** (só o dígito MAJOR; detalhe preservado). A versão **só
 > sobe em release deliberado**, não a cada commit. Evolução anterior em [`HISTORICO.md`](HISTORICO.md).
 
@@ -63,7 +63,7 @@ _(vazio — próximas mudanças acumulam aqui)_
   tradução nome/short via mapa gerado (`teams-canonical.json`, exact/loose com ambíguas excluídas),
   `teams.local_crest` apontando pro escudo do repo, e times fora do registro caem em `sync_unmapped`
   → seção **"Times fora do registro"** no Admin → Dados (aceitar como veio / copiar JSON pro
-  registro). [`decisions/0007`](decisions/0007-sync-canonico.md)
+  registro). [`decisions/0008`](decisions/0008-sync-canonico.md)
 - **Curadoria de competições editável** (`data/competitions-registry.json`): grupo (Seleções/Ligas/
   Copas/Alternativos) e ordem vêm do registro (`gen:comps` sincroniza o front e emite SQL de upsert
   pra migration). Guia no [`13`](13-TIMES-E-ESCUDOS.md).

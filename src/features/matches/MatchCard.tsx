@@ -368,7 +368,7 @@ function ScoreBox({
           ? scoreBoxByType[scoreType]
           : live
             ? "border-ink-300 bg-transparent text-ink-500"
-            : "border-border bg-ink-200/40 text-ink-500",
+            : "border-border bg-ink-100 text-ink-500",
       )}
     >
       {display}

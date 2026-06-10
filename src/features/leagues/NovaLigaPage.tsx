@@ -95,7 +95,7 @@ export function NovaLigaPage() {
           await simulate.mutateAsync({ leagueId: league.id, code: appliedCode });
           toast("Pagamento simulado aprovado — grupo ativo!", "success");
         } catch {
-          toast("Grupo criado. Conclua o pagamento de teste na página dela.", "info");
+          toast("Grupo criado. Conclua o pagamento de teste na página dele.", "info");
         }
         navigate(`/grupos/${slug}`);
         return;
@@ -295,7 +295,7 @@ export function NovaLigaPage() {
             {payMode === "disabled" ? (
               <>
                 Para evitar abusos, novos grupos passam por uma aprovação rápida de um administrador
-                antes de ficarem ativas.
+                antes de ficarem ativos.
               </>
             ) : payMode === "test" ? (
               <>
