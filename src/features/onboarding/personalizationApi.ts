@@ -137,6 +137,15 @@ export function useSetPersonalization() {
       });
       if (error) throw new Error(error.message);
     },
+    // Concluir navega na hora: marca done no CACHE antes da resposta, senão o
+    // gate lê o estado velho (done=false) e joga de volta pro wizard.
+    onMutate: async (patch) => {
+      if (!patch.markDone) return;
+      await qc.cancelQueries({ queryKey: [PERSO_KEY, user?.id] });
+      qc.setQueryData<PersonalizationState | null>([PERSO_KEY, user?.id], (old) =>
+        old ? { ...old, personalization_done: true } : old,
+      );
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: [PERSO_KEY, user?.id] });
       qc.invalidateQueries({ queryKey: ["profile-me"] });
@@ -153,6 +162,13 @@ export function useSkipPersonalization() {
     mutationFn: async () => {
       const { error } = await supabase.rpc("skip_personalization");
       if (error) throw new Error(error.message);
+    },
+    // mesmo motivo do markDone: o "Pular tudo" também navega na hora
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: [PERSO_KEY, user?.id] });
+      qc.setQueryData<PersonalizationState | null>([PERSO_KEY, user?.id], (old) =>
+        old ? { ...old, personalization_done: true } : old,
+      );
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: [PERSO_KEY, user?.id] }),
   });

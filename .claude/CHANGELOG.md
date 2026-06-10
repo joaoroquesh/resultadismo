@@ -21,6 +21,11 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Corrigido
+- **Onboarding: dois bugs do fluxo.** (1) O campo de convite aparecia com um **UUID aleatório** —
+  era o `?code=` do **callback do OAuth do Google** sendo capturado como convite; agora só `?convite=`
+  conta, com formato validado (`A–Z0–9`, 3–12) e auto-limpeza do lixo já salvo no aparelho.
+  (2) **Concluir voltava pra primeira tela**: corrida entre o navegar e o `done=true` chegar — o
+  cache agora é marcado otimisticamente no Concluir/Pular tudo, o gate nunca mais lê estado velho.
 - **Listagens da Copa só com as 48 classificadas (Itália fora).** O recorte do grupo e a lista de
   times da Copa na personalização mostravam o catálogo inteiro de seleções (66) — incluindo quem
   não se classificou (Itália etc.). Agora há `WC2026_SLUGS` no `teamsCatalog` com as **48
