@@ -31,8 +31,8 @@ export function RetroLeaderboard() {
         <SegmentedControl<RetroMode>
           className="w-full"
           options={[
-            { value: "acerto", label: "Acerto" },
-            { value: "cravada", label: "Na Crava" },
+            { value: "acerto", label: "Vale Ponto" },
+            { value: "cravada", label: "Vale Saldo" },
           ]}
           value={mode}
           onChange={setMode}

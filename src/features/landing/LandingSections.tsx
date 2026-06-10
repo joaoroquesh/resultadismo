@@ -297,21 +297,49 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
             </FeatureRow>
           </Reveal>
           <Reveal delay={120}>
-            <FeatureRow icon={Gamepad2} title="Resultadismo Retrô (novo!)">
-              Mini-jogo de placares históricos: 7 jogos de Copas antigas, segundos pra cravar cada
-              um. Jogue de graça, sem conta —{" "}
-              <Link to="/retro" className="font-bold text-brand-700 underline">
-                jogar a Copa Retrô de hoje
-              </Link>
-              .
-            </FeatureRow>
-          </Reveal>
-          <Reveal>
             <FeatureRow icon={Swords} title="Enfrentar os amigos">
               Classificação que mexe a cada jogo. No fim, só sobra um pra contar vantagem no grupo.
             </FeatureRow>
           </Reveal>
         </div>
+      </section>
+
+      {/* ---- RETRÔ (banner do outro jogo) ---- */}
+      <section>
+        <Reveal>
+          <div className="relative overflow-hidden rounded-2xl bg-ink-950 p-5 text-white shadow-pop">
+            <div
+              aria-hidden
+              className="absolute inset-x-0 top-0 h-1.5"
+              style={{
+                background:
+                  "linear-gradient(90deg, var(--color-gold-500) 0 25%, var(--color-grass-600) 0 50%, var(--color-aqua-700) 0 75%, var(--color-brand-400) 0)",
+              }}
+            />
+            <div className="flex items-center gap-4">
+              <span className="grid size-12 flex-none place-items-center rounded-xl bg-white/10 text-2xl">
+                🕹️
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-bold uppercase tracking-widest text-gold-400">
+                  Novo · nosso outro jogo
+                </p>
+                <h3 className="text-lg font-bold leading-tight">Resultadismo Retrô</h3>
+                <p className="text-sm text-white/80">
+                  Você lembra desse placar? 7 jogos históricos das Copas, segundos pra cravar cada
+                  um. De graça, sem conta.
+                </p>
+              </div>
+            </div>
+            <Link
+              to="/retro"
+              onClick={() => track("cta_click", { location: "landing_retro" })}
+              className="mt-3 block rounded-pill bg-brand-500 py-2.5 text-center text-sm font-bold text-white"
+            >
+              Jogar a Copa Retrô de hoje →
+            </Link>
+          </div>
+        </Reveal>
       </section>
 
       {/* ---- PONTUAÇÃO ---- */}

@@ -14,7 +14,7 @@ Mini-jogo viral-irmão: o jogador encara **a própria Copa** — **7 jogos reais
 (1930–2022)** — com poucos segundos para cravar cada placar. Grupos: passa pontuando em 2 de 3
 (o 3º jogo sempre acontece, "jogo de honra"). Mata-mata: não atingiu a barra do modo, caiu.
 Sobreviveu aos 7 = **Campeão** (máx. 21 pts). Share com **card-imagem PNG** (canvas; Web Share API nível 2 →
-fallback: copia a IMAGEM pro clipboard + wa.me → texto) + grade de emojis **sem spoiler** +
+fallback: copia a IMAGEM pro clipboard + wa.me → texto) + grade de emojis **sem spoiler** (🟨 cravada · 🟩 saldo · 🟦 acerto — cores do app) +
 página pública `/retro/r/:code`.
 
 - **Modos e barras (rodada 5 do PO, migration `20260610150007` — `retro_pass_need`):**
@@ -25,14 +25,20 @@ página pública `/retro/r/:code`.
 - **Treinos ranqueados:** runs de LOGADO são todas persistentes; ranking de Treino = melhor
   campanha de cada um (`retro_leaderboard(p_board=>'treino')`); melhor campanha do perfil
   considera tudo. Anônimo segue efêmero (purga diária).
-- **Run em tela cheia:** o play roda num overlay imersivo (cabe em qualquer altura, até iPhone SE;
-  "sair ✕" discreto). **Navegação separada do app-mãe (rodada 5):** Retrô fora da
-  Sidebar/BottomNav/header público — entrada fica no **Perfil** ("nosso outro jogo"), na landing e
-  no Como Funciona; o jogo tem "← Voltar pro Resultadismo".
+- **Run em tela cheia:** o play roda num overlay imersivo z-[70] (cabe em qualquer altura, até
+  iPhone SE; "sair ✕" discreto). **Separação total (rodada 6):** as rotas `/retro*` vivem num
+  **`RetroShell` próprio** (mini-header com "ir pro Resultadismo →" + ConsentBanner) — fora do
+  AppShell: nada de Sidebar/BottomNav/header do app-mãe. Entradas: **card próprio no topo do menu
+  do Perfil**, **banner na landing** e seção no Como Funciona.
 - **Ritmos:** `resultadista` (10/8/7s — o único que **ranqueia**) · `classico` (14/12/10s) ·
   `sempressa` (sem timer). Cronômetro mostra **milésimos + cor nos 3s finais**.
-- **Copa do Dia:** mesmos 7 jogos para todos (sorteados lazy à meia-noite BRT), **1 tentativa por
-  conta/dia**, com retomada; ranking fase → pontos → tempo. **Treino:** infinito, sem ranking.
+- **Copa do Dia TEMÁTICA (rodada 6):** cada dia é a Copa de **uma seleção** (rotação determinística
+  entre as 58 com ≥7 jogos; dia 0 = 10/06 = Brasil; RPC `retro_today` mostra o tema), com os 7
+  jogos **ordenados do mais fácil ao mais difícil**; 1 tentativa por conta/dia, com retomada.
+  **Treino:** infinito, com **dificuldade Fácil/Padrão/Difícil** (janelas do sorteio ±1; board de
+  Treino = melhor campanha por pessoa, só no Padrão). **Ritmos:** Sem Pressa · Resultadista (o
+  Clássico foi aposentado na UI; valor segue válido no banco). Rótulos dos modos: **Vale Ponto**
+  (`acerto`) e **Vale Saldo** (`cravada`). Seletores sempre do fácil (esquerda) ao difícil (direita).
 - **Placar canônico:** final com prorrogação, **sem pênaltis** (informativos) — regra central nº 1
   preservada; empate real em mata-mata pontua como empate.
 
@@ -61,7 +67,7 @@ página pública `/retro/r/:code`.
   `retroLocal.ts` = token anônimo + anti-repetição local). Rotas públicas `/retro` e `/retro/r/:code`
   no `App.tsx`; entradas na Sidebar/BottomNav/PublicShell. Vitrine de animações: `/retro?demo=1`
   (**só DEV**).
-- **Banco (migrations `20260610150000–150007`):** seed dos **964 jogos** (fonte openfootball CC0,
+- **Banco (migrations `20260610150000–150008`; a 150008 RESETOU runs/ranking por ordem do PO):** seed dos **964 jogos** (fonte openfootball CC0,
   importador `scripts/gen-retro-seed.mjs` com portões de qualidade; dificuldade 1–7 com 34
   jogos-lenda) + motor (RPCs `retro_start_run`, `retro_next` — serve **sob demanda**, o cronômetro
   nasce no clique —, `retro_answer`, `retro_run_summary`, `retro_leaderboard`, `retro_my_stats`,

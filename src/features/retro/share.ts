@@ -2,9 +2,10 @@
 import type { ScoreType } from "@/lib/types";
 import type { RetroMode, RetroPace } from "./api";
 
+// Emojis casados com as cores do app: cravada=dourado 🟨 · saldo=verde 🟩 · acerto=azul 🟦
 export const SCORE_EMOJI: Record<ScoreType, string> = {
-  cravada: "🟩",
-  saldo: "🟨",
+  cravada: "🟨",
+  saldo: "🟩",
   acerto: "🟦",
   erro: "🟥",
 };
@@ -41,7 +42,7 @@ export function buildShareText(run: FinishedRun, streak: number | undefined): st
   const headline =
     run.status === "champion" ? "CAMPEÃO da minha Copa Retrô! 🏆" : `Caí: ${run.stageReached} 😭`;
   return [
-    `⚽ Resultadismo Retrô — ${run.isDaily ? "Copa do Dia" : "Treino"}${run.mode === "cravada" ? " · Na Crava" : ""}`,
+    `⚽ Resultadismo Retrô — ${run.isDaily ? "Copa do Dia" : "Treino"}${run.mode === "cravada" ? " · Vale Saldo" : ""}`,
     `Grupos ${groups}${ko ? ` · ${ko}` : ""}`,
     `${headline} · ${run.points} pts · ${fmtMs(run.totalMs)}${streak ? ` · 🔥 ${streak} dia${streak > 1 ? "s" : ""}` : ""}`,
     `Acha que faz melhor? 👉 https://www.resultadismo.com/retro/r/${run.shareCode}`,

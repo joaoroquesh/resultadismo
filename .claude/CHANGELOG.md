@@ -38,7 +38,12 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   (`retro_reroll`), treinos ranqueados (melhor campanha por pessoa, board próprio), run em overlay
   tela-cheia (cabe no iPhone SE), share prioriza compartilhar (clipboard de imagem no desktop) e
   navegação separada (Retrô no Perfil, fora dos menus principais) — migration
-  `20260610150007`. Histórico completo da construção: Comentários
+  `20260610150007`. **Rodada 6 (decisões do PO):** reset de ranking/Copa do Dia e novo formato
+  **temático por seleção** (rotação diária entre 58 seleções, jogos do fácil ao difícil, RPC
+  `retro_today` — migration `20260610150008`); emojis do share nas cores do app; ritmos só Sem
+  Pressa/Resultadista; modos renomeados Vale Ponto/Vale Saldo; Dificuldade do Treino
+  (Fácil/Padrão/Difícil); `RetroShell` próprio (separação total do app-mãe), banner na landing e
+  card no topo do Perfil. Histórico completo da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do

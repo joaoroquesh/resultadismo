@@ -129,10 +129,8 @@ export function RunView({
           CRAVAR ⚽
         </Button>
         <p className="text-center text-[10px] leading-tight text-ink-500">
-          {m.is_knockout
-            ? "Vale o placar final (com prorrogação) — pênaltis não contam. Mata-mata pode terminar empatado!"
-            : "Vale o placar final do jogo."}
-          {current.timer_seconds != null && " Role pra cima pra subir o placar — no fim do tempo, vale o que estiver marcado."}
+          {m.is_knockout ? "Vale o placar final, sem pênaltis — pode dar empate!" : "Vale o placar final."}
+          {current.timer_seconds != null && " Tempo esgotado? Vale o que estiver marcado."}
         </p>
       </div>
     </div>

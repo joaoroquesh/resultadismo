@@ -180,6 +180,59 @@ export function PerfilPage() {
           </div>
         )}
 
+        {/* Retrô: nosso outro jogo — primeiro, em card próprio (rodada 6) */}
+
+        <Link to="/retro" className="block">
+
+          <Card className="relative overflow-hidden bg-ink-950 p-4 text-white transition hover:opacity-95">
+
+            <div
+
+              aria-hidden
+
+              className="absolute inset-x-0 top-0 h-1"
+
+              style={{
+
+                background:
+
+                  "linear-gradient(90deg, var(--color-gold-500) 0 25%, var(--color-grass-600) 0 50%, var(--color-aqua-700) 0 75%, var(--color-brand-400) 0)",
+
+              }}
+
+            />
+
+            <div className="flex items-center gap-3">
+
+              <span className="grid size-10 flex-none place-items-center rounded-lg bg-white/10 text-xl">🕹️</span>
+
+              <span className="min-w-0 flex-1">
+
+                <span className="block text-[10px] font-bold uppercase tracking-widest text-gold-400">
+
+                  Nosso outro jogo
+
+                </span>
+
+                <span className="block font-bold">Resultadismo Retrô</span>
+
+                <span className="block truncate text-xs text-white/70">
+
+                  Crave placares históricos das Copas
+
+                </span>
+
+              </span>
+
+              <Gamepad2 className="size-5 flex-none text-white/70" />
+
+            </div>
+
+          </Card>
+
+        </Link>
+
+
         <Card className="divide-y divide-border">
           {isAppAdmin && (
             <Link to="/admin" className="flex items-center gap-3 p-4 transition hover:bg-ink-50">

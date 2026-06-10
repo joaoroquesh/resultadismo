@@ -53,7 +53,7 @@ export async function buildShareImage(run: FinishedRun, streak?: number): Promis
   ctx.fillText("RESULTADISMO RETRÔ", W / 2, 130);
   ctx.fillStyle = "rgba(255,255,255,0.65)";
   ctx.font = font(34, 500);
-  const sub = `${run.isDaily ? "Copa do Dia" : "Treino"}${run.mode === "cravada" ? " · Na Crava" : ""}`;
+  const sub = `${run.isDaily ? "Copa do Dia" : "Treino"}${run.mode === "cravada" ? " · Vale Saldo" : ""}`;
   ctx.fillText(sub, W / 2, 190);
 
   // veredito

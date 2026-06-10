@@ -9,6 +9,9 @@ import { retroAnonToken, retroSeen } from "./retroLocal";
 
 export type RetroMode = "acerto" | "cravada";
 export type RetroPace = "resultadista" | "classico" | "sempressa";
+export type RetroLevel = "facil" | "padrao" | "dificil";
+
+export type RetroToday = { daily_date: string; team_slug: string; team_name_pt: string };
 
 export type RetroMatchInfo = {
   wc_year: number;
@@ -131,13 +134,14 @@ function anonTokenFor(userId: string | undefined): string | undefined {
 export function useRetroStart() {
   const { user } = useAuth();
   return useMutation({
-    mutationFn: async (input: { mode: RetroMode; pace: RetroPace; daily: boolean }) => {
+    mutationFn: async (input: { mode: RetroMode; pace: RetroPace; daily: boolean; level: RetroLevel }) => {
       const { data, error } = await supabase.rpc("retro_start_run", {
         p_mode: input.mode,
         p_pace: input.pace,
         p_daily: input.daily,
         p_anon_token: anonTokenFor(user?.id),
         p_seen: input.daily ? [] : retroSeen(),
+        p_level: input.level,
       });
       if (error) throw new Error(error.message);
       return data as unknown as RetroStart;
@@ -213,6 +217,18 @@ export function useRetroLeaderboard(mode: RetroMode, board: "daily" | "treino" =
       });
       if (error) throw new Error(error.message);
       return data as unknown as RetroBoard;
+    },
+  });
+}
+
+// A Copa do Dia de hoje é de qual seleção?
+export function useRetroToday() {
+  return useQuery({
+    queryKey: ["retro-today"],
+    queryFn: async (): Promise<RetroToday> => {
+      const { data, error } = await supabase.rpc("retro_today");
+      if (error) throw new Error(error.message);
+      return data as unknown as RetroToday;
     },
   });
 }

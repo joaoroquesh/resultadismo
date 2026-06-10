@@ -178,6 +178,15 @@ Dois eixos independentes, escolhidos antes da run:
   COMPARTILHAR: arquivos via Web Share → imagem no clipboard + wa.me → texto (sem botão de
   download); (6) **navegação separada**: Retrô sai da Sidebar/BottomNav/header e entra como
   sugestão no Perfil; voltar pro Resultadismo pela home do jogo e pós-run.
+- **Rodada 6 (10/06, decisões do PO):** (1) emojis do share nas cores do app (🟨 cravada · 🟩
+  saldo · 🟦 acerto); (2) **RESET de ranking + Copa do Dia** e novo formato **temático por
+  seleção** (dia 0 = Brasil; rotação entre 58 seleções com ≥7 jogos; 7 jogos ordenados do fácil ao
+  difícil; RPC `retro_today` — migration `20260610150008`); (3) ritmo Clássico aposentado (ficam
+  Sem Pressa ← e Resultadista →; fácil sempre à esquerda); modos renomeados **Vale Ponto / Vale
+  Saldo**; (4) **Dificuldade do Treino** Fácil/Padrão/Difícil (janelas ±1; ranking de Treino só no
+  Padrão); (5) tela: `/retro*` ganhou **RetroShell próprio** (sem BottomNav/header do app),
+  overlay z-[70], microcopy enxuta; (6) **banner do Retrô na landing** deslogada e **card próprio
+  no topo do menu do Perfil** (saiu o item de lista).
 - **Backlog (fase 2 do Retrô)** — eventos GA4 (union do `analytics.ts`) ✓feito, entrada na navegação/Como Funciona/
   landing (pontos de contato), docs `.claude/05` §2 + `12-RETRO-MINIJOGO.md` → **Fase 5**:
   homologação com o João (Portão B), integração do worktree na main e deploy.

@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { track } from "@/lib/analytics";
 import { useEffect } from "react";
 import { teamCrestPath } from "@/lib/teamCrests";
-import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -13,12 +12,14 @@ import { useAuth } from "@/features/auth/AuthProvider";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import type { ScoreType } from "@/lib/types";
 import {
+  type RetroLevel,
   useRetroAnonHeartbeat,
   useRetroAnswer,
   useRetroMyStats,
   useRetroNext,
   useRetroReroll,
   useRetroStart,
+  useRetroToday,
   type RetroAnswerResult,
   type RetroCurrent,
   type RetroMode,
@@ -26,6 +27,7 @@ import {
   type RetroStart,
 } from "./api";
 import { retroMarkSeen, warmRetroFlags } from "./retroLocal";
+import { RetroCrest } from "./RetroCrest";
 import { RunView } from "./RunView";
 import { RevealCard } from "./RevealCard";
 import { ResultView } from "./ResultView";
@@ -76,9 +78,9 @@ function toFinishedRun(run: ActiveRun | null): FinishedRun | null {
 }
 
 const PACE_HINT: Record<RetroPace, string> = {
-  resultadista: "10s → 8s → 7s por jogo. O único ritmo que vale ranking.",
-  classico: "14s → 12s → 10s por jogo. Mais folga, sem ranking.",
   sempressa: "Sem cronômetro. Pensa à vontade, sem ranking.",
+  resultadista: "10s → 8s → 7s por jogo. O ritmo que vale ranking.",
+  classico: "", // aposentado na rodada 6 (valor segue válido p/ runs antigas)
 };
 
 // /retro — a casa do mini-jogo: landing + Copa do Dia + Treino + a run em si.
@@ -90,19 +92,21 @@ export function RetroPage() {
   const [phase, setPhase] = useState<Phase>("home");
   const [mode, setMode] = useState<RetroMode>("acerto");
   const [pace, setPace] = useState<RetroPace>("resultadista");
+  const [level, setLevel] = useState<RetroLevel>("padrao");
   const [run, setRun] = useState<ActiveRun | null>(null);
   const startMut = useRetroStart();
   const answerMut = useRetroAnswer();
   const nextMut = useRetroNext();
   const rerollMut = useRetroReroll();
   const myStats = useRetroMyStats();
+  const today = useRetroToday();
   useRetroAnonHeartbeat();
   useEffect(() => warmRetroFlags(teamCrestPath), []);
 
   function start(daily: boolean) {
     if (startMut.isPending) return;
     startMut.mutate(
-      { mode, pace, daily },
+      { mode, pace, daily, level },
       {
         onSuccess: (s: RetroStart) => {
           track("retro_run_start", { mode: s.mode, pace: s.pace, daily });
@@ -226,21 +230,20 @@ export function RetroPage() {
   const stats = viewStats(myStats.data);
 
   if (import.meta.env.DEV && new URLSearchParams(window.location.search).has("demo")) {
-    return (
-      <Page title="Resultadismo Retrô · demo">
-        <RetroDemo />
-      </Page>
-    );
+    return <RetroDemo />;
   }
 
   return (
-    <Page title={phase === "play" ? undefined : "Resultadismo Retrô"}>
+    <div>
       {phase === "home" && (
         <Home
           mode={mode}
           pace={pace}
+          level={level}
           setMode={setMode}
           setPace={setPace}
+          setLevel={setLevel}
+          todayTeam={today.data ?? null}
           starting={startMut.isPending}
           playedToday={stats.playedToday}
           streak={stats.streak}
@@ -254,7 +257,7 @@ export function RetroPage() {
       {phase === "play" && run?.current && (
         <div
           data-retro-play
-          className="fixed inset-0 z-40 flex flex-col bg-[var(--color-background)] px-3 pb-3 pt-2"
+          className="fixed inset-0 z-[70] flex flex-col bg-[var(--color-background)] px-3 pb-3 pt-2"
         >
           <button
             type="button"
@@ -277,7 +280,7 @@ export function RetroPage() {
         </div>
       )}
       {phase === "reveal" && run?.lastAnswer && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-[var(--color-background)] p-4">
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-[var(--color-background)] p-4">
           <div className="w-full max-w-md">
             <Card className="p-5">
               <RevealCard answer={run.lastAnswer} guess={run.lastGuess} onNext={advanceFromReveal} />
@@ -296,15 +299,18 @@ export function RetroPage() {
           onBackHome={backHome}
         />
       )}
-    </Page>
+    </div>
   );
 }
 
 function Home({
   mode,
   pace,
+  level,
   setMode,
   setPace,
+  setLevel,
+  todayTeam,
   starting,
   playedToday,
   streak,
@@ -316,8 +322,11 @@ function Home({
 }: {
   mode: RetroMode;
   pace: RetroPace;
+  level: RetroLevel;
   setMode: (m: RetroMode) => void;
   setPace: (p: RetroPace) => void;
+  setLevel: (l: RetroLevel) => void;
+  todayTeam: { team_slug: string; team_name_pt: string } | null;
   starting: boolean;
   playedToday: boolean;
   streak: number;
@@ -361,16 +370,16 @@ function Home({
           <SegmentedControl<RetroMode>
             className="w-full whitespace-nowrap"
             options={[
-              { value: "acerto", label: "Acerto" },
-              { value: "cravada", label: "Na Crava" },
+              { value: "acerto", label: "Vale Ponto" },
+              { value: "cravada", label: "Vale Saldo" },
             ]}
             value={mode}
             onChange={setMode}
           />
           <p className="text-xs text-ink-500">
             {mode === "acerto"
-              ? "Pontuou, avançou — mas a semi pede SALDO e a final só sai com CRAVADA."
-              : "Acerto simples não vale: saldo/cravada sempre — e a final só com CRAVADA."}
+              ? "Qualquer ponto avança — mas a semi pede SALDO e a final, CRAVADA."
+              : "Acerto simples não vale: saldo/cravada sempre — e a final, CRAVADA."}
           </p>
         </div>
 
@@ -379,9 +388,8 @@ function Home({
           <SegmentedControl<RetroPace>
             className="w-full whitespace-nowrap"
             options={[
-              { value: "resultadista", label: "Resultadista" },
-              { value: "classico", label: "Clássico" },
               { value: "sempressa", label: "Sem Pressa" },
+              { value: "resultadista", label: "Resultadista" },
             ]}
             value={pace}
             onChange={setPace}
@@ -389,6 +397,37 @@ function Home({
           <p className="text-xs text-ink-500">{PACE_HINT[pace]}</p>
         </div>
 
+        <div className="space-y-1.5">
+          <span className="text-xs font-bold uppercase tracking-wide text-ink-500">
+            Dificuldade do Treino
+          </span>
+          <SegmentedControl<RetroLevel>
+            className="w-full whitespace-nowrap"
+            options={[
+              { value: "facil", label: "Fácil" },
+              { value: "padrao", label: "Padrão" },
+              { value: "dificil", label: "Difícil" },
+            ]}
+            value={level}
+            onChange={setLevel}
+          />
+          <p className="text-xs text-ink-500">
+            Vale só no Treino (e o ranking de Treino compara o Padrão). A Copa do Dia tem
+            dificuldade própria: do fácil ao difícil.
+          </p>
+        </div>
+
+        {todayTeam && (
+          <div className="flex items-center justify-center gap-2 rounded-lg bg-brand-500/10 px-3 py-2">
+            <RetroCrest slug={todayTeam.team_slug} name={todayTeam.team_name_pt} size={28} />
+            <p className="text-sm font-bold text-brand-800">
+              Hoje: a Copa de <span className="uppercase">{todayTeam.team_name_pt}</span>
+              <span className="block text-[11px] font-medium text-ink-500">
+                7 jogos da seleção, do mais fácil ao mais difícil
+              </span>
+            </p>
+          </div>
+        )}
         {playedToday ? (
           <div className="rounded-lg bg-ink-100 p-3 text-center text-sm">
             ✅ Você já jogou a Copa do Dia. <b>Volte amanhã</b> — ou treine à vontade.

@@ -1391,16 +1391,22 @@ export type Database = {
           created_at: string
           daily_date: string
           match_ids: string[]
+          team_name_pt: string | null
+          team_slug: string | null
         }
         Insert: {
           created_at?: string
           daily_date: string
           match_ids: string[]
+          team_name_pt?: string | null
+          team_slug?: string | null
         }
         Update: {
           created_at?: string
           daily_date?: string
           match_ids?: string[]
+          team_name_pt?: string | null
+          team_slug?: string | null
         }
         Relationships: []
       }
@@ -1544,6 +1550,7 @@ export type Database = {
           finished_at: string | null
           id: string
           is_daily: boolean
+          level: string
           mode: string
           pace: string
           persistent: boolean
@@ -1565,6 +1572,7 @@ export type Database = {
           finished_at?: string | null
           id?: string
           is_daily?: boolean
+          level?: string
           mode: string
           pace: string
           persistent?: boolean
@@ -1586,6 +1594,7 @@ export type Database = {
           finished_at?: string | null
           id?: string
           is_daily?: boolean
+          level?: string
           mode?: string
           pace?: string
           persistent?: boolean
@@ -2632,7 +2641,7 @@ export type Database = {
         Returns: number
       }
       retro_pick_match: {
-        Args: { p_exclude: string[]; p_slot: number }
+        Args: { p_exclude: string[]; p_level?: string; p_slot: number }
         Returns: string
       }
       retro_purge_ephemeral: { Args: never; Returns: number }
@@ -2661,6 +2670,7 @@ export type Database = {
         Args: {
           p_anon_token?: string
           p_daily?: boolean
+          p_level?: string
           p_mode?: string
           p_pace?: string
           p_seen?: string[]
@@ -2671,6 +2681,7 @@ export type Database = {
         Args: { p_pace: string; p_slot: number }
         Returns: number
       }
+      retro_today: { Args: never; Returns: Json }
       retro_touch_anon: { Args: { p_seconds: number }; Returns: undefined }
       run_football_sync:
         | { Args: never; Returns: undefined }
