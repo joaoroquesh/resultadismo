@@ -85,7 +85,8 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
 - **`PersonalizationPage`** (`/perfil/personalizar`): no **1º acesso**, wizard de 6 telas (perfil →
   coração → seleção → campeonatos → The Best+convite → notificações+instalar); com `?only=coracao|
   selecao|campeonatos`, edita **um item só** (Salvar → volta ao hub). Convite por link (`?convite=`)
-  é capturado no boot e preenche o campo. O tour de boas-vindas (`Onboarding`) vem **depois**.
+  é capturado no boot e preenche o campo. Depois vêm, nesta ordem: o **carrossel de boas-vindas**
+  (`Onboarding`, 3 slides de conceito) e o **tour guiado** (`GuidedTour`, coach-marks na UI real).
 - **`PlayerProfilePage`** (`/jogador/:id`): perfil público de outro jogador (stats + grupos
   visíveis).
 
@@ -99,7 +100,15 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
   desempate, promoção).
 - **`landing/LandingSections`**: hero + features para visitantes (dentro da JogosPage deslogada).
 - **`legal/PrivacidadePage` / `TermosPage`**: páginas legais (LGPD, pagamento §12, arrependimento).
-- **`onboarding/Onboarding`**: tour de primeiro acesso (montado no `App` root; refazível pelo admin).
+- **`onboarding/Onboarding`**: **carrossel de boas-vindas** do 1º acesso — 3 slides de conceito
+  (bem-vindo · pontuação · 2×). Montado no `App` root; refazível pelo admin (Perfil → "Rever tour").
+  Ao fechar, dispara o evento `resultadismo:onboarding-done` → o `GuidedTour`.
+- **`onboarding/GuidedTour`**: **tour guiado em coach-marks** que apontam elementos **reais** da UI
+  (via `data-tour`), em sequência: barra de filtros de **Jogos** → aba **Grupos** (cria grupo + "The
+  Best") → aba **Perfil**. Roda inteiro em `/` (os 3 alvos estão à vista: filtro na página + nav
+  fixa). Vem **depois** do carrossel; gate por `personalization_done` + `localStorage`
+  (`resultadismo-onboarding-v1` visto + `resultadismo-tour-v1` não visto) + estar em `/`. Mede o
+  alvo visível (mobile×desktop) e reusa a linguagem do `Coachmark` (anel turquesa + balão escuro).
 - **`auth/*`**: `LoginModal` (bottom-sheet — **único** login do app), `AuthCallback`, `AuthProvider`, guards.
 - **`notifications/NotificationsBell`**: sino + lista de notificações.
 - **`access/AccessGate` + `WaitingRoom`**: sala de espera (fila FIFO em pico). → [`05`](05-DADOS-E-AUTH.md).
@@ -117,7 +126,7 @@ Tema: `theme/ThemeProvider` + `ThemeToggle`. PWA: `pwa/InstallPrompt`.
 ## 5. Fluxos principais (telas que participam)
 
 - **Login**: `/` (deslogado) → botão "Entrar" abre o **`LoginModal`** (bottom-sheet) → Google → `/auth/callback` → `AuthProvider`
-  cria/carrega profile → `Onboarding` no 1º acesso.
+  cria/carrega profile → no 1º acesso: personalização → `Onboarding` (carrossel) → `GuidedTour` (tour guiado).
 - **Palpitar**: `JogosPage` → escolhe competição/dia → `MatchCard` (inputs auto-save) → opcional 2×
   → resultado pontua sozinho ao encerrar o jogo.
 - **Criar/entrar grupo**: `NovaLigaPage` (cria → checkout/ativação) **ou** `LigasPage` (entrar

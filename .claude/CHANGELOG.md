@@ -30,6 +30,16 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   da torcida" seguem com as 66** (a Itália joga amistosos e pode ser a seleção do coração).
 
 ### Adicionado
+- **Tour guiado de 1º acesso (coach-marks na UI real).** Depois da personalização **e** do carrossel
+  de boas-vindas, um **tour guiado** (`GuidedTour`) acende, em sequência, os pontos reais da tela: a
+  **barra de filtros de Jogos** (Meus interesses × Todos), a aba **Grupos** (criar grupo + o
+  **Resultadismo The Best**, ranking de todo mundo) e a aba **Perfil**. Roda inteiro em `/`, mede o
+  alvo **visível** (mobile: nav de baixo → balão acima / desktop: sidebar → balão ao lado) e reusa a
+  linguagem do `Coachmark` (anel turquesa + balão escuro). Aparece **uma vez** (`localStorage`
+  `resultadismo-tour-v1`), refazível pelo admin (Perfil → "Rever tour"). De brinde, o **carrossel de
+  boas-vindas foi enxugado para 3 slides** (o slide "Dispute em grupos" virou o **passo 2 do tour**,
+  sem avisar de Grupos duas vezes). Alvos marcados com `data-tour` em
+  `JogosPage`/`BottomNav`/`Sidebar`; só frontend (sem migration). → [`03`](03-PAGINAS.md) §3.
 - **Recorte de seleções do grupo editável até a Copa começar.** Quem criou o grupo sem reparar no
   recorte ("Todas" × "Só o Brasil" × escolhidas) agora pode **ajustar na aba Competições** (card
   "Seleções que valem ponto", só admin) enquanto **nenhum jogo da Copa tiver começado** — depois

@@ -21,6 +21,7 @@ import {
   Gamepad2,
 } from "lucide-react";
 import { replayOnboarding } from "@/features/onboarding/Onboarding";
+import { replayTour } from "@/features/onboarding/GuidedTour";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -247,6 +248,7 @@ export function PerfilPage() {
               type="button"
               onClick={() => {
                 replayOnboarding();
+                replayTour();
                 toast("Tour reaberto 👋", "success");
               }}
               className="flex w-full items-center gap-3 p-4 text-left transition hover:bg-ink-50"

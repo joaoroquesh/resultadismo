@@ -1,5 +1,5 @@
 import { NavLink, Link } from "react-router-dom";
-import { Goal, Trophy, User, ShieldCheck, LogIn, HelpCircle } from "lucide-react";
+import { Goal, Trophy, User, ShieldCheck, LogIn, HelpCircle, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
@@ -12,12 +12,12 @@ export function Sidebar() {
   const { profile, user, isAppAdmin, session } = useAuth();
   const { open: openLogin } = useLoginModal();
 
-  const items = [
+  const items: { to: string; label: string; icon: LucideIcon; end: boolean; tour?: string }[] = [
     { to: "/", label: "Jogos", icon: Goal, end: true },
     ...(session
       ? [
-          { to: "/grupos", label: "Grupos", icon: Trophy, end: false },
-          { to: "/perfil", label: "Perfil", icon: User, end: false },
+          { to: "/grupos", label: "Grupos", icon: Trophy, end: false, tour: "nav-grupos" },
+          { to: "/perfil", label: "Perfil", icon: User, end: false, tour: "nav-perfil" },
           ...(isAppAdmin ? [{ to: "/admin", label: "Admin", icon: ShieldCheck, end: false }] : []),
         ]
       : []),
@@ -35,11 +35,12 @@ export function Sidebar() {
       </div>
 
       <nav className="flex flex-1 flex-col gap-1">
-        {items.map(({ to, label, icon: Icon, end }) => (
+        {items.map(({ to, label, icon: Icon, end, tour }) => (
           <NavLink
             key={to}
             to={to}
             end={end}
+            data-tour={tour}
             className={({ isActive }) =>
               cn(
                 "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-semibold transition-colors",

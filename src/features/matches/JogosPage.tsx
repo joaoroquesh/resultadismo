@@ -230,7 +230,10 @@ export function JogosPage() {
         <Skeleton className="mb-3 h-9 w-full" />
       ) : (
         hasComps && (
-          <div className="no-scrollbar -mx-4 mb-3 flex gap-2 overflow-x-auto px-4">
+          <div
+            data-tour="jogos-filtros"
+            className="no-scrollbar -mx-4 mb-3 flex gap-2 overflow-x-auto px-4"
+          >
             {session && hasInterests && (
               <button
                 onClick={() => setScope(MINE)}

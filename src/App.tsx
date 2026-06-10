@@ -5,6 +5,7 @@ import { AuthCallback } from "@/features/auth/AuthCallback";
 import { AppShell } from "@/components/layout/AppShell";
 import { JogosPage } from "@/features/matches/JogosPage";
 import { Onboarding } from "@/features/onboarding/Onboarding";
+import { GuidedTour } from "@/features/onboarding/GuidedTour";
 
 // Code-splitting: o primeiro paint (landing de Jogos + login) não baixa admin,
 // confronto/simulador, editor de perfil nem páginas secundárias — elas carregam
@@ -49,6 +50,7 @@ export default function App() {
   return (
     <>
       <Onboarding />
+      <GuidedTour />
       <Suspense fallback={<PageFallback />}>
         <Routes>
           <Route path="/auth/callback" element={<AuthCallback />} />

@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Trophy, Target, Zap, Users, ChevronRight, ChevronLeft } from "lucide-react";
+import { Trophy, Target, Zap, ChevronRight, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useFirstSeen } from "@/lib/useFirstSeen";
@@ -117,17 +117,6 @@ const SLIDES: Slide[] = [
       </p>
     ),
   },
-  {
-    icon: <Users className="size-9" />,
-    iconWrap: "bg-surface-2 text-brand-600",
-    title: "Dispute em grupos",
-    body: (
-      <p className="text-sm leading-relaxed text-ink-600">
-        Crie um grupo e chame os amigos, ou entre numa já existente. Cada grupo tem sua
-        classificação — é a sua disputa particular pra ver quem termina no topo. Bora palpitar!
-      </p>
-    ),
-  },
 ];
 
 /**
@@ -179,6 +168,9 @@ export function Onboarding() {
   const close = () => {
     markSeen();
     setForced(false);
+    // Avisa o tour guiado (coach-marks na UI real) que o carrossel terminou —
+    // ele vem logo em seguida, gated por este mesmo momento. → GuidedTour.tsx
+    window.dispatchEvent(new Event("resultadismo:onboarding-done"));
   };
   const next = () => (isLast ? close() : setIndex((i) => i + 1));
   const back = () => setIndex((i) => Math.max(0, i - 1));
