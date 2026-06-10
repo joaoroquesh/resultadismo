@@ -1,0 +1,1114 @@
+{
+  "teams": [
+    {
+      "name_en": "Algeria",
+      "name_pt": "Argélia",
+      "slug": "argelia",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Angola",
+      "name_pt": "Angola",
+      "slug": "angola",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Argentina",
+      "name_pt": "Argentina",
+      "slug": "argentina",
+      "tier": "A",
+      "extinct": false
+    },
+    {
+      "name_en": "Australia",
+      "name_pt": "Austrália",
+      "slug": "australia",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Austria",
+      "name_pt": "Áustria",
+      "slug": "austria",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Belgium",
+      "name_pt": "Bélgica",
+      "slug": "belgica",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Bolivia",
+      "name_pt": "Bolívia",
+      "slug": "bolivia",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Bosnia-Herzegovina",
+      "name_pt": "Bósnia e Herzegovina",
+      "slug": "bosniaeherzegovina",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Brazil",
+      "name_pt": "Brasil",
+      "slug": "brasil",
+      "tier": "A",
+      "extinct": false
+    },
+    {
+      "name_en": "Bulgaria",
+      "name_pt": "Bulgária",
+      "slug": "bulgaria",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Cameroon",
+      "name_pt": "Camarões",
+      "slug": "camaroes",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Canada",
+      "name_pt": "Canadá",
+      "slug": "canada",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Chile",
+      "name_pt": "Chile",
+      "slug": "chile",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "China",
+      "name_pt": "China",
+      "slug": "china",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Colombia",
+      "name_pt": "Colômbia",
+      "slug": "colombia",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Costa Rica",
+      "name_pt": "Costa Rica",
+      "slug": "costarica",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Croatia",
+      "name_pt": "Croácia",
+      "slug": "croacia",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Cuba",
+      "name_pt": "Cuba",
+      "slug": "cuba",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Czech Republic",
+      "name_pt": "Tchéquia",
+      "slug": "tchequia",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Czechoslovakia",
+      "name_pt": "Tchecoslováquia",
+      "slug": "tchecoslovaquia",
+      "tier": "B",
+      "extinct": true
+    },
+    {
+      "name_en": "Côte d'Ivoire",
+      "name_pt": "Costa do Marfim",
+      "slug": "costadomarfim",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Denmark",
+      "name_pt": "Dinamarca",
+      "slug": "dinamarca",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Dutch East Indies",
+      "name_pt": "Índias Orientais Holandesas",
+      "slug": "indiasorientais",
+      "tier": "C",
+      "extinct": true
+    },
+    {
+      "name_en": "East Germany",
+      "name_pt": "Alemanha Oriental",
+      "slug": "alemanhaoriental",
+      "tier": "C",
+      "extinct": true
+    },
+    {
+      "name_en": "Ecuador",
+      "name_pt": "Equador",
+      "slug": "equador",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Egypt",
+      "name_pt": "Egito",
+      "slug": "egito",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "El Salvador",
+      "name_pt": "El Salvador",
+      "slug": "elsalvador",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "England",
+      "name_pt": "Inglaterra",
+      "slug": "inglaterra",
+      "tier": "A",
+      "extinct": false
+    },
+    {
+      "name_en": "France",
+      "name_pt": "França",
+      "slug": "franca",
+      "tier": "A",
+      "extinct": false
+    },
+    {
+      "name_en": "Germany",
+      "name_pt": "Alemanha",
+      "slug": "alemanha",
+      "tier": "A",
+      "extinct": false
+    },
+    {
+      "name_en": "Ghana",
+      "name_pt": "Gana",
+      "slug": "gana",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Greece",
+      "name_pt": "Grécia",
+      "slug": "grecia",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Haiti",
+      "name_pt": "Haiti",
+      "slug": "haiti",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Honduras",
+      "name_pt": "Honduras",
+      "slug": "honduras",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Hungary",
+      "name_pt": "Hungria",
+      "slug": "hungria",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Iceland",
+      "name_pt": "Islândia",
+      "slug": "islandia",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Iran",
+      "name_pt": "Irã",
+      "slug": "ira",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Iraq",
+      "name_pt": "Iraque",
+      "slug": "iraque",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Ireland",
+      "name_pt": "Irlanda",
+      "slug": "irlanda",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Israel",
+      "name_pt": "Israel",
+      "slug": "israel",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Italy",
+      "name_pt": "Itália",
+      "slug": "italia",
+      "tier": "A",
+      "extinct": false
+    },
+    {
+      "name_en": "Jamaica",
+      "name_pt": "Jamaica",
+      "slug": "jamaica",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Japan",
+      "name_pt": "Japão",
+      "slug": "japao",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Kuwait",
+      "name_pt": "Kuwait",
+      "slug": "kuwait",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Mexico",
+      "name_pt": "México",
+      "slug": "mexico",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Morocco",
+      "name_pt": "Marrocos",
+      "slug": "marrocos",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Netherlands",
+      "name_pt": "Holanda",
+      "slug": "holanda",
+      "tier": "A",
+      "extinct": false
+    },
+    {
+      "name_en": "New Zealand",
+      "name_pt": "Nova Zelândia",
+      "slug": "novazelandia",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Nigeria",
+      "name_pt": "Nigéria",
+      "slug": "nigeria",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "North Korea",
+      "name_pt": "Coreia do Norte",
+      "slug": "coreiadonorte",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Northern Ireland",
+      "name_pt": "Irlanda do Norte",
+      "slug": "irlandadonorte",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Norway",
+      "name_pt": "Noruega",
+      "slug": "noruega",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Panama",
+      "name_pt": "Panamá",
+      "slug": "panama",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Paraguay",
+      "name_pt": "Paraguai",
+      "slug": "paraguai",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Peru",
+      "name_pt": "Peru",
+      "slug": "peru",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Poland",
+      "name_pt": "Polônia",
+      "slug": "polonia",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Portugal",
+      "name_pt": "Portugal",
+      "slug": "portugal",
+      "tier": "A",
+      "extinct": false
+    },
+    {
+      "name_en": "Qatar",
+      "name_pt": "Catar",
+      "slug": "catar",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Romania",
+      "name_pt": "Romênia",
+      "slug": "romenia",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Russia",
+      "name_pt": "Rússia",
+      "slug": "russia",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Saudi Arabia",
+      "name_pt": "Arábia Saudita",
+      "slug": "arabiasaudita",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Scotland",
+      "name_pt": "Escócia",
+      "slug": "escocia",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Senegal",
+      "name_pt": "Senegal",
+      "slug": "senegal",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Serbia",
+      "name_pt": "Sérvia",
+      "slug": "servia",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Serbia and Montenegro",
+      "name_pt": "Sérvia e Montenegro",
+      "slug": "serviaemontenegro",
+      "tier": "C",
+      "extinct": true
+    },
+    {
+      "name_en": "Slovakia",
+      "name_pt": "Eslováquia",
+      "slug": "eslovaquia",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Slovenia",
+      "name_pt": "Eslovênia",
+      "slug": "eslovenia",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "South Africa",
+      "name_pt": "África do Sul",
+      "slug": "africadosul",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "South Korea",
+      "name_pt": "Coreia do Sul",
+      "slug": "coreiadosul",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Soviet Union",
+      "name_pt": "União Soviética",
+      "slug": "urss",
+      "tier": "B",
+      "extinct": true
+    },
+    {
+      "name_en": "Spain",
+      "name_pt": "Espanha",
+      "slug": "espanha",
+      "tier": "A",
+      "extinct": false
+    },
+    {
+      "name_en": "Sweden",
+      "name_pt": "Suécia",
+      "slug": "suecia",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Switzerland",
+      "name_pt": "Suíça",
+      "slug": "suica",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Togo",
+      "name_pt": "Togo",
+      "slug": "togo",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Trinidad and Tobago",
+      "name_pt": "Trinidad e Tobago",
+      "slug": "trinidadetobago",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Tunisia",
+      "name_pt": "Tunísia",
+      "slug": "tunisia",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "Turkey",
+      "name_pt": "Turquia",
+      "slug": "turquia",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "USA",
+      "name_pt": "EUA",
+      "slug": "eua",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Ukraine",
+      "name_pt": "Ucrânia",
+      "slug": "ucrania",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "United Arab Emirates",
+      "name_pt": "Emirados Árabes Unidos",
+      "slug": "emiradosarabes",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "United States",
+      "name_pt": "EUA",
+      "slug": "eua",
+      "tier": "B",
+      "extinct": false
+    },
+    {
+      "name_en": "Uruguay",
+      "name_pt": "Uruguai",
+      "slug": "uruguai",
+      "tier": "A",
+      "extinct": false
+    },
+    {
+      "name_en": "Wales",
+      "name_pt": "País de Gales",
+      "slug": "paisdegales",
+      "tier": "C",
+      "extinct": false
+    },
+    {
+      "name_en": "West Germany",
+      "name_pt": "Alemanha Ocidental",
+      "slug": "alemanhaocidental",
+      "tier": "A",
+      "extinct": true
+    },
+    {
+      "name_en": "Yugoslavia",
+      "name_pt": "Iugoslávia",
+      "slug": "iugoslavia",
+      "tier": "B",
+      "extinct": true
+    },
+    {
+      "name_en": "Zaire",
+      "name_pt": "Zaire",
+      "slug": "zaire",
+      "tier": "C",
+      "extinct": true
+    }
+  ],
+  "legends": [
+    {
+      "year": 1930,
+      "team1_en": "Uruguay",
+      "team2_en": "Argentina",
+      "score": "4x2",
+      "difficulty": 2,
+      "motivo": "Primeira final de Copa da história"
+    },
+    {
+      "year": 1950,
+      "team1_en": "Uruguay",
+      "team2_en": "Brazil",
+      "score": "2x1",
+      "difficulty": 1,
+      "motivo": "Maracanazo, maior trauma do futebol brasileiro (jogo decisivo do quadrangular final)"
+    },
+    {
+      "year": 1950,
+      "team1_en": "Brazil",
+      "team2_en": "Sweden",
+      "score": "7x1",
+      "difficulty": 2,
+      "motivo": "O 'outro 7x1', goleada histórica do Brasil no quadrangular final"
+    },
+    {
+      "year": 1958,
+      "team1_en": "Sweden",
+      "team2_en": "Brazil",
+      "score": "2x5",
+      "difficulty": 1,
+      "motivo": "Final do primeiro título mundial do Brasil, Pelé menino"
+    },
+    {
+      "year": 1962,
+      "team1_en": "Brazil",
+      "team2_en": "Czechoslovakia",
+      "score": "3x1",
+      "difficulty": 2,
+      "motivo": "Final do bicampeonato, Copa de Garrincha"
+    },
+    {
+      "year": 1966,
+      "team1_en": "England",
+      "team2_en": "West Germany",
+      "score": "4x2",
+      "difficulty": 2,
+      "motivo": "Final em Wembley com o gol fantasma de Hurst (4x2 na prorrogação)"
+    },
+    {
+      "year": 1970,
+      "team1_en": "England",
+      "team2_en": "Brazil",
+      "score": "0x1",
+      "difficulty": 2,
+      "motivo": "Clássico de Guadalajara: defesa de Banks e duelo Pelé x Moore"
+    },
+    {
+      "year": 1970,
+      "team1_en": "Italy",
+      "team2_en": "West Germany",
+      "score": "4x3",
+      "difficulty": 2,
+      "motivo": "'Jogo do Século', semifinal épica decidida na prorrogação"
+    },
+    {
+      "year": 1970,
+      "team1_en": "Brazil",
+      "team2_en": "Italy",
+      "score": "4x1",
+      "difficulty": 1,
+      "motivo": "Final do tri, gol de Carlos Alberto, melhor seleção de todos os tempos"
+    },
+    {
+      "year": 1982,
+      "team1_en": "Italy",
+      "team2_en": "Brazil",
+      "score": "3x2",
+      "difficulty": 1,
+      "motivo": "Tragédia do Sarriá, três gols de Paolo Rossi eliminam o time de Zico e Sócrates"
+    },
+    {
+      "year": 1982,
+      "team1_en": "Italy",
+      "team2_en": "West Germany",
+      "score": "3x1",
+      "difficulty": 2,
+      "motivo": "Final do tri italiano, grito de Tardelli"
+    },
+    {
+      "year": 1986,
+      "team1_en": "Brazil",
+      "team2_en": "France",
+      "score": "1x1",
+      "difficulty": 2,
+      "motivo": "Tragédia de Guadalajara: pênalti perdido de Zico e queda nos pênaltis"
+    },
+    {
+      "year": 1986,
+      "team1_en": "Argentina",
+      "team2_en": "England",
+      "score": "2x1",
+      "difficulty": 1,
+      "motivo": "'Mano de Dios' e o gol do século de Maradona no mesmo jogo"
+    },
+    {
+      "year": 1986,
+      "team1_en": "Argentina",
+      "team2_en": "West Germany",
+      "score": "3x2",
+      "difficulty": 2,
+      "motivo": "Final da Copa de Maradona"
+    },
+    {
+      "year": 1990,
+      "team1_en": "Brazil",
+      "team2_en": "Argentina",
+      "score": "0x1",
+      "difficulty": 2,
+      "motivo": "Gol de Caniggia e a 'água benta' de Branco, trauma das oitavas"
+    },
+    {
+      "year": 1990,
+      "team1_en": "West Germany",
+      "team2_en": "Argentina",
+      "score": "1x0",
+      "difficulty": 2,
+      "motivo": "Final decidida em pênalti, revanche alemã sobre Maradona"
+    },
+    {
+      "year": 1994,
+      "team1_en": "Netherlands",
+      "team2_en": "Brazil",
+      "score": "2x3",
+      "difficulty": 2,
+      "motivo": "Golaço de falta do Branco nas quartas"
+    },
+    {
+      "year": 1994,
+      "team1_en": "Brazil",
+      "team2_en": "Italy",
+      "score": "0x0",
+      "difficulty": 1,
+      "motivo": "Final do tetra, 0x0 e pênalti de Baggio pra fora"
+    },
+    {
+      "year": 1998,
+      "team1_en": "Brazil",
+      "team2_en": "Netherlands",
+      "score": "1x1",
+      "difficulty": 2,
+      "motivo": "Semifinal com Taffarel herói nos pênaltis"
+    },
+    {
+      "year": 1998,
+      "team1_en": "Brazil",
+      "team2_en": "France",
+      "score": "0x3",
+      "difficulty": 1,
+      "motivo": "Final do 'apagão' do Ronaldo, dois gols de Zidane"
+    },
+    {
+      "year": 2002,
+      "team1_en": "England",
+      "team2_en": "Brazil",
+      "score": "1x2",
+      "difficulty": 2,
+      "motivo": "Gol de falta do Ronaldinho encobrindo Seaman"
+    },
+    {
+      "year": 2002,
+      "team1_en": "Brazil",
+      "team2_en": "Turkey",
+      "score": "1x0",
+      "difficulty": 2,
+      "motivo": "Semifinal do gol de bico do Ronaldo"
+    },
+    {
+      "year": 2002,
+      "team1_en": "Germany",
+      "team2_en": "Brazil",
+      "score": "0x2",
+      "difficulty": 1,
+      "motivo": "Final do penta, dois gols de Ronaldo em cima de Kahn"
+    },
+    {
+      "year": 2006,
+      "team1_en": "Brazil",
+      "team2_en": "France",
+      "score": "0x1",
+      "difficulty": 2,
+      "motivo": "Show de Zidane, gol de Henry e a meia do Roberto Carlos"
+    },
+    {
+      "year": 2006,
+      "team1_en": "Italy",
+      "team2_en": "France",
+      "score": "1x1",
+      "difficulty": 2,
+      "motivo": "Final da cabeçada de Zidane em Materazzi, decidida nos pênaltis"
+    },
+    {
+      "year": 2010,
+      "team1_en": "Netherlands",
+      "team2_en": "Brazil",
+      "score": "2x1",
+      "difficulty": 2,
+      "motivo": "Virada holandesa e expulsão de Felipe Melo nas quartas"
+    },
+    {
+      "year": 2010,
+      "team1_en": "Netherlands",
+      "team2_en": "Spain",
+      "score": "0x1",
+      "difficulty": 2,
+      "motivo": "Final do gol de Iniesta na prorrogação, primeiro título espanhol"
+    },
+    {
+      "year": 2014,
+      "team1_en": "Brazil",
+      "team2_en": "Germany",
+      "score": "1x7",
+      "difficulty": 1,
+      "motivo": "O 7x1, Mineirazo, maior vexame da história da seleção"
+    },
+    {
+      "year": 2014,
+      "team1_en": "Brazil",
+      "team2_en": "Netherlands",
+      "score": "0x3",
+      "difficulty": 2,
+      "motivo": "Terceiro lugar perdido logo após o 7x1, fim melancólico em casa"
+    },
+    {
+      "year": 2014,
+      "team1_en": "Germany",
+      "team2_en": "Argentina",
+      "score": "1x0",
+      "difficulty": 1,
+      "motivo": "Final no Maracanã, gol de Götze na prorrogação"
+    },
+    {
+      "year": 2018,
+      "team1_en": "Brazil",
+      "team2_en": "Belgium",
+      "score": "1x2",
+      "difficulty": 2,
+      "motivo": "Eliminação nas quartas, gol de Kevin De Bruyne"
+    },
+    {
+      "year": 2018,
+      "team1_en": "France",
+      "team2_en": "Croatia",
+      "score": "4x2",
+      "difficulty": 2,
+      "motivo": "Final do bi francês, Mbappé consagrado"
+    },
+    {
+      "year": 2022,
+      "team1_en": "Croatia",
+      "team2_en": "Brazil",
+      "score": "1x1",
+      "difficulty": 2,
+      "motivo": "Golaço de Neymar na prorrogação e eliminação nos pênaltis"
+    },
+    {
+      "year": 2022,
+      "team1_en": "Argentina",
+      "team2_en": "France",
+      "score": "3x3",
+      "difficulty": 1,
+      "motivo": "Considerada a maior final da história: Messi campeão, hat-trick de Mbappé, pênaltis"
+    }
+  ],
+  "flags": [
+    {
+      "slug": "urss",
+      "name_pt": "União Soviética",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Flag_of_the_Soviet_Union.svg",
+      "filename": "urss.svg",
+      "nota": "Versão 1955–1991: cobre todas as participações da URSS em Copas (1958–1990). Testada 200."
+    },
+    {
+      "slug": "iugoslavia",
+      "name_pt": "Iugoslávia",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/61/Flag_of_Yugoslavia_%281946-1992%29.svg",
+      "filename": "iugoslavia.svg",
+      "nota": "Bandeira socialista com estrela (1946–92), correta para Copas 1950–1990. Em 1930 era o Reino da Iugoslávia (tricolor sem estrela) e em 1998 a RF Iugoslávia usou tricolor sem estrela — igual ao asset de serviaemontenegro. Testada 200."
+    },
+    {
+      "slug": "tchecoslovaquia",
+      "name_pt": "Tchecoslováquia",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_Czech_Republic.svg",
+      "filename": "tchecoslovaquia.svg",
+      "nota": "Bandeira idêntica à da Tchéquia atual; no Commons 'Flag of Czechoslovakia.svg' redireciona para este arquivo. tchequia.png já existe, mas o slug tchecoslovaquia precisa de asset próprio. Testada 200."
+    },
+    {
+      "slug": "alemanhaocidental",
+      "name_pt": "Alemanha Ocidental",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/ba/Flag_of_Germany.svg",
+      "filename": "alemanhaocidental.svg",
+      "nota": "Idêntica à bandeira da Alemanha atual (preto-vermelho-dourado, 1949–). alemanha.png já existe, mas o slug alemanhaocidental precisa de asset próprio. Testada 200."
+    },
+    {
+      "slug": "alemanhaoriental",
+      "name_pt": "Alemanha Oriental (RDA)",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a1/Flag_of_East_Germany.svg",
+      "filename": "alemanhaoriental.svg",
+      "nota": "Copa 1974. Tricolor com emblema (martelo e compasso), 1959–1990. Testada 200."
+    },
+    {
+      "slug": "zaire",
+      "name_pt": "Zaire",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Flag_of_Zaire_%281971%E2%80%931997%29.svg",
+      "filename": "zaire.svg",
+      "nota": "Copa 1974. Bandeira do período 1971–1997 (verde com braço segurando tocha). Nome canônico no Commons: Flag_of_Zaire_(1971–1997).svg. Testada 200."
+    },
+    {
+      "slug": "indiasorientais",
+      "name_pt": "Índias Orientais Holandesas",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/2/20/Flag_of_the_Netherlands.svg",
+      "filename": "indiasorientais.svg",
+      "nota": "Copa 1938. A colônia jogou sob a tricolor holandesa. holanda.png já existe, mas o slug indiasorientais precisa de asset próprio. Testada 200."
+    },
+    {
+      "slug": "serviaemontenegro",
+      "name_pt": "Sérvia e Montenegro",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Flag_of_Serbia_and_Montenegro_%281992%E2%80%932006%29.svg",
+      "filename": "serviaemontenegro.svg",
+      "nota": "Copa 2006. Mesma tricolor da RF Iugoslávia (1992–2006) — serve também para a 'Iugoslávia' da Copa 1998 se o jogo quiser rigor histórico. Nome canônico: Flag_of_Serbia_and_Montenegro_(1992–2006).svg. Testada 200."
+    },
+    {
+      "slug": "russia",
+      "name_pt": "Rússia",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/f3/Flag_of_Russia.svg",
+      "filename": "russia.svg",
+      "nota": "Copas 1994–2018; a tricolor atual já valia em 1994 (mudança de tom foi em dez/1993). Testada 200."
+    },
+    {
+      "slug": "ucrania",
+      "name_pt": "Ucrânia",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/49/Flag_of_Ukraine.svg",
+      "filename": "ucrania.svg",
+      "nota": "Copa 2006. Testada 200."
+    },
+    {
+      "slug": "irlanda",
+      "name_pt": "Irlanda",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/45/Flag_of_Ireland.svg",
+      "filename": "irlanda.svg",
+      "nota": "Copas 1990, 1994, 2002 (República da Irlanda; irlandadonorte já existe à parte). Testada 200."
+    },
+    {
+      "slug": "hungria",
+      "name_pt": "Hungria",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Flag_of_Hungary.svg",
+      "filename": "hungria.svg",
+      "nota": "Tricolor simples — era a usada em contexto esportivo em todas as Copas húngaras (1934–1986). Testada 200."
+    },
+    {
+      "slug": "bulgaria",
+      "name_pt": "Bulgária",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Bulgaria.svg",
+      "filename": "bulgaria.svg",
+      "nota": "Tricolor atual (correta para 1994/98); nas Copas 1962–1986 a bandeira estatal trazia o emblema socialista no canto, mas a tricolor é a forma comum em uso esportivo. Testada 200."
+    },
+    {
+      "slug": "romenia",
+      "name_pt": "Romênia",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/73/Flag_of_Romania.svg",
+      "filename": "romenia.svg",
+      "nota": "Tricolor simples cobre 1930/34/38 e 1990–98; só em 1970 a estatal tinha brasão socialista. Testada 200."
+    },
+    {
+      "slug": "grecia",
+      "name_pt": "Grécia",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_Greece.svg",
+      "filename": "grecia.svg",
+      "nota": "Copas 1994, 2010, 2014 — bandeira atual (1978–) vale para todas. Testada 200."
+    },
+    {
+      "slug": "israel",
+      "name_pt": "Israel",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Flag_of_Israel.svg",
+      "filename": "israel.svg",
+      "nota": "Copa 1970. Testada 200."
+    },
+    {
+      "slug": "kuwait",
+      "name_pt": "Kuwait",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/aa/Flag_of_Kuwait.svg",
+      "filename": "kuwait.svg",
+      "nota": "Copa 1982. Testada 200."
+    },
+    {
+      "slug": "emiradosarabes",
+      "name_pt": "Emirados Árabes Unidos",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_United_Arab_Emirates.svg",
+      "filename": "emiradosarabes.svg",
+      "nota": "Copa 1990. Testada 200."
+    },
+    {
+      "slug": "trinidadetobago",
+      "name_pt": "Trinidad e Tobago",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/64/Flag_of_Trinidad_and_Tobago.svg",
+      "filename": "trinidadetobago.svg",
+      "nota": "Copa 2006. Testada 200."
+    },
+    {
+      "slug": "jamaica",
+      "name_pt": "Jamaica",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Jamaica.svg",
+      "filename": "jamaica.svg",
+      "nota": "Copa 1998. Testada 200."
+    },
+    {
+      "slug": "angola",
+      "name_pt": "Angola",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Flag_of_Angola.svg",
+      "filename": "angola.svg",
+      "nota": "Copa 2006. Testada 200."
+    },
+    {
+      "slug": "togo",
+      "name_pt": "Togo",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/68/Flag_of_Togo.svg",
+      "filename": "togo.svg",
+      "nota": "Copa 2006. Testada 200."
+    },
+    {
+      "slug": "honduras",
+      "name_pt": "Honduras",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/79/Flag_of_Honduras_%281949%E2%80%932022%2C_2026%E2%80%93present%29.svg",
+      "filename": "honduras.svg",
+      "nota": "Versão azul-escuro 1949–2022 — a correta para as Copas de Honduras (1982, 2010, 2014); a variante turquesa só vigorou 2022–25. Nome canônico no Commons: Flag_of_Honduras_(1949–2022,_2026–present).svg ('Flag of Honduras.svg' é redirect para ela). Testada 200."
+    },
+    {
+      "slug": "elsalvador",
+      "name_pt": "El Salvador",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/34/Flag_of_El_Salvador.svg",
+      "filename": "elsalvador.svg",
+      "nota": "Copas 1970 e 1982. Testada 200."
+    },
+    {
+      "slug": "cuba",
+      "name_pt": "Cuba",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Flag_of_Cuba.svg",
+      "filename": "cuba.svg",
+      "nota": "Copa 1938 — a bandeira é a mesma desde 1902. Testada 200."
+    },
+    {
+      "slug": "china",
+      "name_pt": "China",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg",
+      "filename": "china.svg",
+      "nota": "Copa 2002. URL contém apóstrofo codificado (%27). Testada 200."
+    },
+    {
+      "slug": "coreiadonorte",
+      "name_pt": "Coreia do Norte",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/51/Flag_of_North_Korea.svg",
+      "filename": "coreiadonorte.svg",
+      "nota": "Copas 1966 e 2010 — mesma bandeira desde 1948. Testada 200."
+    },
+    {
+      "slug": "islandia",
+      "name_pt": "Islândia",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Flag_of_Iceland.svg",
+      "filename": "islandia.svg",
+      "nota": "Copa 2018. Testada 200."
+    },
+    {
+      "slug": "eslovenia",
+      "name_pt": "Eslovênia",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Flag_of_Slovenia.svg",
+      "filename": "eslovenia.svg",
+      "nota": "Copas 2002 e 2010. Testada 200."
+    },
+    {
+      "slug": "eslovaquia",
+      "name_pt": "Eslováquia",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Flag_of_Slovakia.svg",
+      "filename": "eslovaquia.svg",
+      "nota": "Copa 2010. Testada 200."
+    },
+    {
+      "slug": "camaroes",
+      "name_pt": "Camarões",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Flag_of_Cameroon.svg",
+      "filename": "camaroes.svg",
+      "nota": "Copas 1982–2022; bandeira atual (1975–) vale para todas. Testada 200."
+    },
+    {
+      "slug": "nigeria",
+      "name_pt": "Nigéria",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/79/Flag_of_Nigeria.svg",
+      "filename": "nigeria.svg",
+      "nota": "Copas 1994–2018. Testada 200."
+    },
+    {
+      "slug": "costarica",
+      "name_pt": "Costa Rica",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Flag_of_Costa_Rica.svg",
+      "filename": "costarica.svg",
+      "nota": "Pavilhão civil (sem brasão), o padrão em uso esportivo; cobre Copas 1990–2022. Testada 200."
+    }
+  ],
+  "flags_nota": "Conferido manifest (src/lib/teamCrests.ts) e pasta (public/teams/): os dois \"gaps conhecidos\" JÁ estão fechados — costadomarfim.svg e suecia.svg existem em ambos. Também já presentes (não precisam de nada): africadosul, alemanha, arabiasaudita, argelia, argentina, australia, austria, belgica, bolivia, bosniaeherzegovina, brasil, canada, catar, chile, colombia, coreiadosul, croacia, dinamarca, egito, equador, escocia, espanha, eua, franca, gana, haiti, holanda, inglaterra, ira, iraque, irlandadonorte, italia, japao, marrocos, mexico, noruega, novazelandia, paisdegales, panama, paraguai, peru, polonia, portugal, senegal, servia, suica, tchequia, tunisia, turquia, uruguai. Cobertura 1930–2022 completa com os 33 novos da lista acima (todas as URLs verificadas com HTTP 200 via curl em upload.wikimedia.org). Observações: alemanhaocidental, tchecoslovaquia e indiasorientais usam bandeiras idênticas a assets existentes (alemanha, tchequia, holanda), mas ganham arquivo próprio para o slug resolver no manifest; iugoslavia entregue na versão socialista 1946–92 (Copas 1950–90) — para 1930 (Reino) e 1998 (RF Iugoslávia, igual a serviaemontenegro) seriam necessários slugs adicionais se o jogo distinguir épocas."
+}

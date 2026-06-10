@@ -1,14 +1,16 @@
 # Mini-jogo de placares históricos — pasta de planejamento
 
-> Status: **Portão A em andamento** (plano apresentado ao PO, aguardando comentários/OK).
-> Nenhum código do mini-jogo foi escrito.
+> Status: **Portão A CUMPRIDO** (09/06/2026) — comentários do João processados em
+> [`decisoes-fechadas.md`](decisoes-fechadas.md) (a especificação vigente). **Fase 1 (dados) em
+> andamento.** Comentários de convidados que chegarem depois: avaliar contra as decisões fechadas.
 
 ## Arquivos
 
 | Arquivo | O que é |
 |---|---|
 | [`plano-v1.html`](plano-v1.html) | O plano completo, **comentável** — abrir no navegador. Decisões D1–D17 + perguntas Q1–Q5, cada uma com botões ✅/✏️/❌ e campo de comentário (salvos em localStorage). |
-| `comentarios-plano-v1.md` | **Criado pelo João** via botão "Baixar comentários (.md)" do plano. Salvar/mover para esta pasta. |
+| [`comentarios-plano-v1.md`](comentarios-plano-v1.md) | Comentários do João (09/06/2026): 10 ✅ diretos, 6 ✏️ com instrução, "vamos seguir!". |
+| [`decisoes-fechadas.md`](decisoes-fechadas.md) | **A especificação vigente** — consolidação plano + comentários, com respostas a D17/Q4 e a matriz de modos. Implementar a partir daqui. |
 
 **Versão pública (para validar e mandar para terceiros):**
 `https://www.resultadismo.com/planos/minijogo-historico-v1.html` — cópia idêntica servida de

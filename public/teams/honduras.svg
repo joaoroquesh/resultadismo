@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" data-rd-circle="1">
+<defs><clipPath id="rd-c-hondurassvg"><circle cx="50" cy="50" r="50"/></clipPath></defs>
+<g clip-path="url(#rd-c-hondurassvg)">
+<svg viewBox="0 0 72 36" width="100" height="100" preserveAspectRatio="xMidYMid slice">
+	<title>Flag of Honduras</title>
+	<path fill="#fff" d="m0 0h72v36H0z"/>
+	<path d="m0 0h72v12H0zm0 24h72v12H0z"/>
+	<g id="g">
+		<path id="s" d="m26 13 1.1756 3.618-3.0777-2.236h3.8042l-3.0777 2.236z"/>
+		<use xlink:href="#s" y="6"/>
+	</g>
+	<use xlink:href="#s" x="10" y="3"/>
+	<use xlink:href="#g" x="20"/>
+</svg>
+</g>
+</svg>

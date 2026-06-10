@@ -20,13 +20,9 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
-_(vazio — próximas mudanças acumulam aqui)_
-
-## [Não lançado]
-
 ### Adicionado
-- **Mini-jogo Resultadismo Retrô — Portão A cumprido + Fase 1 (dados) concluída e validada
-  localmente** (ainda **não deployado**; sobe só após homologação do João — Portão B). Comentários
+- **Mini-jogo Resultadismo Retrô — Portão A cumprido + Fases 1 (dados) e 2 (motor) concluídas e
+  validadas localmente** (ainda **não deployado**; sobe só após homologação do João — Portão B). Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do
@@ -36,8 +32,17 @@ _(vazio — próximas mudanças acumulam aqui)_
   linhas); importador `scripts/gen-retro-seed.mjs` com portões de qualidade (pegou a prorrogação
   de grupo de 1954 e o duplo Brasil×Tchecoslováquia de 1962); **33 bandeiras históricas** (URSS,
   Iugoslávia, Zaire, Alemanha Oriental…) em `public/teams/` + manifest regenerado (325 escudos,
-  100% dos slugs do jogo resolvem). `db reset` + `db:types` + `typecheck` verdes. Ao subir:
-  atualizar `.claude/05` §2 e criar `.claude/12-RETRO-MINIJOGO.md`.
+  100% dos slugs do jogo resolvem). Ajustes do PO na homologação da Fase 1: sorteio pondera o
+  nível primeiro (grupos 45/35/20) e **todas as 60 bandeiras SVG padronizadas em círculo**
+  (`scripts/gen-flag-circles.mjs`, padrão Sofascore). Fase 2: migration
+  `20260610000002_retro_engine.sql` — tabelas `retro_daily`/`retro_runs`/`retro_run_matches`/
+  `retro_usage_daily` (RLS sem policy) + RPCs `retro_start_run` (Copa do Dia 1/dia com retomada) /
+  `retro_answer` (janela de tempo no servidor, pontuação por `compute_score_type`, progressão com
+  jogo de honra e barra ≥2 na semi/final, modo Só Cravada) / `retro_run_summary` (share sem spoiler)
+  / `retro_leaderboard` (fase→pontos→tempo) / `retro_touch_anon` (agregado diário) /
+  `retro_purge_ephemeral` + cron (runs permanentes só da Copa do Dia de logados — D17). **Bateria
+  de 8 testes verde** em `scripts/retro-engine-tests.sql`. `db reset` + `db:types` + `typecheck`
+  verdes. Ao subir: atualizar `.claude/05` §2 e criar `.claude/12-RETRO-MINIJOGO.md`.
 
 ## [2.0.0] — 2026-06-10
 

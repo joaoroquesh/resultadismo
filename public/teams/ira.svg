@@ -1,5 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="630" height="360">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" data-rd-circle="1">
+<defs><clipPath id="rd-c-irasvg"><circle cx="50" cy="50" r="50"/></clipPath></defs>
+<g clip-path="url(#rd-c-irasvg)">
+<svg viewBox="0 0 630 360" width="100" height="100" preserveAspectRatio="xMidYMid slice">
 <rect width="630" height="360" fill="#da0000"/>
 <rect width="630" height="240" fill="#fff"/>
 <rect width="630" height="120" fill="#239f40"/>
@@ -28,5 +30,7 @@
 <path d="M 0.11992727,-0.71445117 A 0.31475286,0.31475442 0 0 1 1.2855032e-6,-0.81025163 L -0.0506876,-0.01642556 1.2855032e-6,1.0001998 0.07882572,0.89166862 0.0891995,0.64144186 0.09996594,0.3809197 l 0.0014156,-0.0334002 4.7111e-4,-0.0124172 0.002279,-0.0541474 0.006758,-0.1640148 0.005501,-0.13242286 0.001571,-0.03827263 0.002042,-0.04872535 V -0.71445117 Z M 1.2855032e-6,-0.54965037 9.0174383e-5,-0.54949481 1.2855032e-6,-0.54933925 Z m 0,0.86447753 V 0.3145916 L 3.946188e-4,0.31468049 Z"/>
 </g>
 <use xlink:href="#emblem_half" transform="scale(-1,1)"/>
+</g>
+</svg>
 </g>
 </svg>

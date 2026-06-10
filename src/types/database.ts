@@ -1386,6 +1386,248 @@ export type Database = {
         }
         Relationships: []
       }
+      retro_daily: {
+        Row: {
+          created_at: string
+          daily_date: string
+          match_ids: string[]
+        }
+        Insert: {
+          created_at?: string
+          daily_date: string
+          match_ids: string[]
+        }
+        Update: {
+          created_at?: string
+          daily_date?: string
+          match_ids?: string[]
+        }
+        Relationships: []
+      }
+      retro_matches: {
+        Row: {
+          away_name_pt: string
+          away_score: number
+          away_slug: string
+          created_at: string
+          difficulty: number
+          fact_pt: string | null
+          home_name_pt: string
+          home_score: number
+          home_slug: string
+          id: string
+          is_knockout: boolean
+          is_replay: boolean
+          pens_away: number | null
+          pens_home: number | null
+          scored_count: number
+          shown_count: number
+          source: string
+          stage_code: string
+          stage_label_pt: string
+          wc_host: string
+          wc_year: number
+          went_extra_time: boolean
+        }
+        Insert: {
+          away_name_pt: string
+          away_score: number
+          away_slug: string
+          created_at?: string
+          difficulty: number
+          fact_pt?: string | null
+          home_name_pt: string
+          home_score: number
+          home_slug: string
+          id?: string
+          is_knockout?: boolean
+          is_replay?: boolean
+          pens_away?: number | null
+          pens_home?: number | null
+          scored_count?: number
+          shown_count?: number
+          source?: string
+          stage_code: string
+          stage_label_pt: string
+          wc_host: string
+          wc_year: number
+          went_extra_time?: boolean
+        }
+        Update: {
+          away_name_pt?: string
+          away_score?: number
+          away_slug?: string
+          created_at?: string
+          difficulty?: number
+          fact_pt?: string | null
+          home_name_pt?: string
+          home_score?: number
+          home_slug?: string
+          id?: string
+          is_knockout?: boolean
+          is_replay?: boolean
+          pens_away?: number | null
+          pens_home?: number | null
+          scored_count?: number
+          shown_count?: number
+          source?: string
+          stage_code?: string
+          stage_label_pt?: string
+          wc_host?: string
+          wc_year?: number
+          went_extra_time?: boolean
+        }
+        Relationships: []
+      }
+      retro_run_matches: {
+        Row: {
+          answered_at: string | null
+          deadline_at: string | null
+          guess_away: number | null
+          guess_home: number | null
+          is_timeout: boolean
+          match_id: string
+          points: number | null
+          run_id: string
+          score_type: Database["public"]["Enums"]["score_type"] | null
+          served_at: string
+          slot: number
+        }
+        Insert: {
+          answered_at?: string | null
+          deadline_at?: string | null
+          guess_away?: number | null
+          guess_home?: number | null
+          is_timeout?: boolean
+          match_id: string
+          points?: number | null
+          run_id: string
+          score_type?: Database["public"]["Enums"]["score_type"] | null
+          served_at?: string
+          slot: number
+        }
+        Update: {
+          answered_at?: string | null
+          deadline_at?: string | null
+          guess_away?: number | null
+          guess_home?: number | null
+          is_timeout?: boolean
+          match_id?: string
+          points?: number | null
+          run_id?: string
+          score_type?: Database["public"]["Enums"]["score_type"] | null
+          served_at?: string
+          slot?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "retro_run_matches_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "retro_matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "retro_run_matches_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "retro_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      retro_runs: {
+        Row: {
+          anon_token: string | null
+          current_slot: number
+          daily_date: string | null
+          finished_at: string | null
+          id: string
+          is_daily: boolean
+          mode: string
+          pace: string
+          persistent: boolean
+          points: number
+          ranked: boolean
+          share_code: string
+          stage_rank: number | null
+          stage_reached: string | null
+          started_at: string
+          status: string
+          total_ms: number | null
+          user_id: string | null
+        }
+        Insert: {
+          anon_token?: string | null
+          current_slot?: number
+          daily_date?: string | null
+          finished_at?: string | null
+          id?: string
+          is_daily?: boolean
+          mode: string
+          pace: string
+          persistent?: boolean
+          points?: number
+          ranked?: boolean
+          share_code?: string
+          stage_rank?: number | null
+          stage_reached?: string | null
+          started_at?: string
+          status?: string
+          total_ms?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          anon_token?: string | null
+          current_slot?: number
+          daily_date?: string | null
+          finished_at?: string | null
+          id?: string
+          is_daily?: boolean
+          mode?: string
+          pace?: string
+          persistent?: boolean
+          points?: number
+          ranked?: boolean
+          share_code?: string
+          stage_rank?: number | null
+          stage_reached?: string | null
+          started_at?: string
+          status?: string
+          total_ms?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "retro_runs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      retro_usage_daily: {
+        Row: {
+          anon_runs_finished: number
+          anon_runs_started: number
+          anon_seconds: number
+          day: string
+        }
+        Insert: {
+          anon_runs_finished?: number
+          anon_runs_started?: number
+          anon_seconds?: number
+          day: string
+        }
+        Update: {
+          anon_runs_finished?: number
+          anon_runs_started?: number
+          anon_seconds?: number
+          day?: string
+        }
+        Relationships: []
+      }
       sync_alerts: {
         Row: {
           competition_id: string | null
@@ -2350,6 +2592,66 @@ export type Database = {
         Args: { p_match_ids?: string[] }
         Returns: number
       }
+      retro_answer: {
+        Args: {
+          p_anon_token?: string
+          p_away?: number
+          p_home?: number
+          p_run_id: string
+          p_seen?: string[]
+        }
+        Returns: Json
+      }
+      retro_leaderboard: {
+        Args: { p_daily_date?: string; p_limit?: number; p_mode?: string }
+        Returns: Json
+      }
+      retro_make_daily: { Args: { p_date: string }; Returns: string[] }
+      retro_match_payload: {
+        Args: {
+          p_run: Database["public"]["Tables"]["retro_runs"]["Row"]
+          p_slot: number
+        }
+        Returns: Json
+      }
+      retro_my_stats: { Args: never; Returns: Json }
+      retro_pick_match: {
+        Args: { p_exclude: string[]; p_slot: number }
+        Returns: string
+      }
+      retro_purge_ephemeral: { Args: never; Returns: number }
+      retro_run_owned: {
+        Args: {
+          p_anon_token: string
+          p_run: Database["public"]["Tables"]["retro_runs"]["Row"]
+        }
+        Returns: boolean
+      }
+      retro_run_summary: { Args: { p_share_code: string }; Returns: Json }
+      retro_serve_slot: {
+        Args: {
+          p_run: Database["public"]["Tables"]["retro_runs"]["Row"]
+          p_seen: string[]
+          p_slot: number
+        }
+        Returns: undefined
+      }
+      retro_slot_label: { Args: { p_slot: number }; Returns: string }
+      retro_start_run: {
+        Args: {
+          p_anon_token?: string
+          p_daily?: boolean
+          p_mode?: string
+          p_pace?: string
+          p_seen?: string[]
+        }
+        Returns: Json
+      }
+      retro_timer_seconds: {
+        Args: { p_pace: string; p_slot: number }
+        Returns: number
+      }
+      retro_touch_anon: { Args: { p_seconds: number }; Returns: undefined }
       run_football_sync:
         | { Args: never; Returns: undefined }
         | { Args: { p_mode?: string }; Returns: undefined }

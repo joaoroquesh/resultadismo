@@ -1,5 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1280" height="640" viewBox="0 0 10080 5040">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" data-rd-circle="1">
+<defs><clipPath id="rd-c-australiasvg"><circle cx="50" cy="50" r="50"/></clipPath></defs>
+<g clip-path="url(#rd-c-australiasvg)">
+<svg viewBox="0 0 10080 5040" width="100" height="100" preserveAspectRatio="xMidYMid slice">
 <defs>
 <clipPath id="c1"><path d="M0,0H6V3H0z"/></clipPath>
 <clipPath id="c2"><path d="M0,0V1.5H6V3H6zM6,0H3V3H0V3z"/></clipPath>
@@ -20,5 +22,7 @@
 <use id="γCrucis" xlink:href="#Star7" x="7560" y="840"/>
 <use id="δCrucis" xlink:href="#Star7" x="8680" y="1869"/>
 <use id="εCrucis" xlink:href="#Star5" x="8064" y="2730"/>
+</g>
+</svg>
 </g>
 </svg>

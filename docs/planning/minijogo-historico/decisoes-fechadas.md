@@ -1,0 +1,127 @@
+# Decisões fechadas — Mini-jogo Resultadismo Retrô (Portão A cumprido)
+
+> Consolidação do [`plano-v1.html`](plano-v1.html) + [`comentarios-plano-v1.md`](comentarios-plano-v1.md)
+> do João (09/06/2026, "vamos seguir!"). **Esta é a especificação vigente** — sessões futuras
+> implementam a partir daqui. Ajustes do PO estão incorporados; nada pendente de validação
+> (o que depende de sentir no uso será calibrado na homologação, Portão B).
+
+## Decisões (D1–D17)
+
+| # | Decisão final | Origem |
+|---|---|---|
+| D1 | **Nome: Resultadismo Retrô** · `retro.resultadismo.com` (fase 2) · rota `/retro` | ✅ aprovado |
+| D2 | Modos de dificuldade: **“Acerto”** (qualquer pontuação avança) e **“Só Cravada”** (só placar exato avança) | ✏️ ajustado pelo PO (era "Vale Ponto") |
+| D3 | Run: 3 jogos de grupos (passa com 2/3; 3º jogo de honra) → oitavas/quartas (≥1 pt) → semi/final (≥2 pts) · máx. 21 pts | ✅ aprovado |
+| D4 | Placar canônico: final com prorrogação, **sem pênaltis**; empate real pontua normal; aviso na UI | ✅ aprovado |
+| D5 | **Timer em 3 ritmos**: **Sem Pressa** (sem timer, fora do ranking) · **Clássico** (folgado, ~12/10/8s) · **Resultadista** (apertado, ~10/8/7s). Decrescente por fase. Cronômetro mostra **milésimos + muda de cor nos 3s finais**. **Input próprio gigante na parte de baixo da tela** (rolagem/dois polegares; 1 jogo por vez na tela). Números exatos calibrados com o João no teste (Portão B). | ✏️ ajustado pelo PO |
+| D6 | **Copa do Dia** (1/dia por conta, ranqueada, mesmos 7 jogos p/ todos) + **Treino** (infinito, sem ranking). Ranking: fase → pontos → tempo (servidor). Streak + melhor campanha. | ✅ aprovado |
+| D7 | Share MVP: texto + grade de emojis sem spoiler + link p/ página pública `/retro/r/:code`; derrota também compartilha; card-imagem na fase 2 | ✅ aprovado |
+| D9 | Heurística de dificuldade 1–7 + janelas por fase + 10% fora da janela. **Fatores extras do PO: seleção extinta = mais difícil (+1 por extinta em campo) e decisão de 3º lugar = mais difícil (+1)**. Pesos calibráveis; auto-calibração futura por taxa real de acerto. | ✏️ ajustado pelo PO |
+| D10 | Fonte: **openfootball world-cup.json (CC0)** primária + validação cruzada (Fjelstul/Wikipedia em divergência). Seed one-off, 964 jogos. | ✅ aprovado |
+| D11 | Bandeiras históricas da Wikimedia p/ seleções extintas/faltantes; fallback sigla+cores | ✅ aprovado |
+| D12 | **Mesmo projeto Supabase** · tabelas `retro_*` · sorteio/gabarito/validação/tempo 100% no servidor (RPC `SECURITY DEFINER`; placar nunca desce ao client antes do palpite) | ✅ aprovado |
+| D13 | MVP na rota `/retro`; subdomínio na fase 2 como redirect 301 | ✅ aprovado |
+| D14 | Tempo de uso: `usage_seconds` (logados) + contador first-party agregado por dia (anônimos) + eventos GA4 novos; PostHog fase 2 | ✅ aprovado |
+| D15 | Mesmo design system + animação "fliperama" (CSS puro). **Pegada retrô na UI** (adaptação suave da identidade é permitida). CTA: **"Jogar a Copa Retrô de hoje"**. | ✏️ ajustado pelo PO |
+| D16 | MVP ganha **+ modo Só Cravada e + ritmo Sem Pressa** (saíram da fase 2). Resto do corte aprovado (curiosidades, card-imagem, subdomínio, PostHog = fase 2). | ✏️ ajustado pelo PO |
+| D17 | Persistência (resposta técnica ao questionamento do PO — ver abaixo): **banco permanente só guarda runs da Copa do Dia de LOGADOS** (ranking/streak). Treino e anônimos rodam pelas mesmas RPCs (o gabarito não pode descer ao client — senão a aba anônima entrega os jogos do dia), mas a run é **efêmera** (purgada por cron diário) e o progresso/anti-repetição fica no localStorage. Contadores agregados (uso/calibração) sempre atualizam. | ✏️ respondido e incorporado |
+
+### D17 — racional completo (pergunta do João: "anon só em localStorage faz sentido?")
+
+Faz sentido **pela metade**, e o meio-termo pega o melhor dos dois:
+
+- **Não dá** para o anônimo jogar 100% client-side: para pontuar localmente o navegador teria que
+  receber o placar real ANTES do palpite — e na Copa do Dia os jogos são os mesmos do ranking; uma
+  aba anônima viraria gabarito grátis (exploit nº 1 do plano). Por isso TODO mundo joga via RPC.
+- **Mas** o João está certo que run de treino/anônimo não precisa virar linha eterna no banco:
+  runs não-ranqueáveis são gravadas numa tabela efêmera (estado mínimo p/ validar timer/palpite)
+  e **purgadas por cron** (~24h). Permanente = só Copa do Dia de logado.
+- Anti-repetição de treino: lista local (localStorage) dos ~30 últimos jogos vistos, enviada como
+  parâmetro à RPC de sorteio. Se a pessoa limpar o storage, só perde o anti-repeat — sem impacto.
+
+## Perguntas (Q1–Q5)
+
+| # | Resposta do PO | Consequência |
+|---|---|---|
+| Q1 | Métrica norte: **B (aquisição/viral) > C (tempo de uso/mídia) > A (retenção)** | Share antes de CTA de login; CTA pós-run aponta pro Resultadismo; login wall só no ranking |
+| Q2 | **5–10% de campeões** confirmado | Calibração da dificuldade/barras mira esse alvo |
+| Q3 | Curiosidades: **fora do MVP**, entram na fase 2 | Campo `fact_pt` já nasce na tabela, vazio |
+| Q4 | Publicidade **discreta ou integrada**; perguntou sobre AdSense → ver abaixo | Registrar no doc 12 quando ele nascer |
+| Q5 | "Cobriu tudo, vamos seguir!" | Portão A cumprido |
+
+### Q4 — AdSense faz sentido? (resposta da equipe)
+
+**Tecnicamente sim, estrategicamente não (por ora).** Três motivos:
+1. **Rende pouco em tráfego pequeno** (display programático ≈ R$ 1–10 por mil visitas) — não paga o
+   custo de marca.
+2. **Controle imperfeito do que aparece**: AdSense pode servir anúncio de **casa de apostas** — choque
+   frontal com a regra central "não é aposta" (dá para bloquear categorias, mas a margem de erro
+   existe; o 7a0 com pop-under é o anti-exemplo).
+3. **Coerência**: a landing do Resultadismo promete **"Sem anúncios"** — qualquer ad no ecossistema
+   exige revisar essa promessa em todos os pontos de contato (regra central 9).
+
+**Recomendação registrada:** MVP sem anúncio; com tração, **patrocínio direto integrado** ("Copa
+Retrô de hoje oferecida por X" na tela de campanha/share) — discreto, controlável e com CPM melhor.
+AdSense só como experimento tardio, com bloqueio da categoria apostas e revisão da copy. Decisão
+final é do João quando chegar a hora (dinheiro = regra central 8).
+
+## Especificação consolidada de modos (D2 + D5 + D6 + D16)
+
+Dois eixos independentes, escolhidos antes da run:
+
+| Eixo | Opções (MVP) | Observação |
+|---|---|---|
+| **Dificuldade** | **Acerto** (≥1 pt avança; semi/final ≥2 — D3) · **Só Cravada** (só cravada avança, em todas as fases) | Cada um com ranking próprio na Copa do Dia |
+| **Ritmo** | **Resultadista** (apertado — o ritmo oficial do ranking) · **Clássico** (folgado) · **Sem Pressa** (sem timer) | **Só o ritmo Resultadista entra no ranking** (tempo comparável); Clássico/Sem Pressa = mesmas runs, sem ranking |
+
+- Copa do Dia: os MESMOS 7 jogos valem para os dois modos de dificuldade; rankings separados
+  (Acerto / Só Cravada). 1 tentativa por conta **por modo de dificuldade**? → **Não: 1 tentativa
+  total por dia**, o jogador escolhe em qual modo encara (mantém a escassez Wordle). _Calibrável na
+  homologação se parecer restritivo._
+- Tempos de partida (ponto de partida p/ playtest): Resultadista 10/8/7s · Clássico 14/12/10s.
+- Timer: barra encolhendo; aos **3s finais entra contagem com milésimos + mudança de cor** (pedido
+  do PO).
+
+## Status e próximos passos
+
+- **Fase 1 (dados) — CONCLUÍDA E VALIDADA LOCALMENTE (09/06/2026).** Entregues:
+  - `data/retro-sources/` — 22 JSONs do openfootball (CC0) + `curadoria.json` (86 seleções com
+    nome PT/slug/tier/extinta, 34 jogos-lenda verificados, 33 bandeiras).
+  - `scripts/gen-retro-seed.mjs` — importador com portões de qualidade; pegou 2 casos históricos
+    reais: prorrogação em jogo de GRUPO na Copa de 1954 (regra da edição) e o duplo
+    Brasil×Tchecoslováquia de 1962 (0x0 no grupo + 3x1 na final).
+  - `supabase/migrations/20260610000001_retro_matches.sql` — tabela + RLS ligado SEM policy
+    (anon e logado leem 0 linhas — gabarito protegido, verificado via `set role`) + 964 jogos.
+    Distribuição de dificuldade: 1:36 · 2:133 · 3:315 · 4:267 · 5:150 · 6:54 · 7:9.
+  - 33 bandeiras históricas em `public/teams/` (URSS, Iugoslávia, Zaire, Alemanha Oriental…)
+    + manifest regenerado (325 escudos; 100% dos slugs do jogo resolvem).
+  - `npm run db:reset` verde · `db:types` regenerado · `typecheck` verde.
+  - Conferências no Postgres: 964 jogos · 22 edições · 35 disputas de pênaltis · 73 prorrogações ·
+    4 replays · Maracanazo/7x1/final 2022 com dificuldade 1 e pênaltis como campo informativo.
+- **Ajustes do PO na homologação da Fase 1 (09/06, aprovada com 2 pedidos — ATENDIDOS):**
+  (a) **Sorteio pondera o nível primeiro** — grupos: nível 1 = 45% · 2 = 35% · 3 = 20% (corrige
+  "nível 3 domina por ter mais jogos"); demais fases ~uniforme por nível; 10% fora da janela mantido.
+  Implementado no visualizador E no motor (`retro_pick_match`).
+  (b) **Bandeiras padronizadas em CÍRCULO** (padrão Sofascore dos PNGs 150×150): todos os 60 SVGs
+  retangulares (33 novos + 27 pré-existentes) envelopados em clip circular com corte centralizado —
+  `scripts/gen-flag-circles.mjs` (idempotente, marcador `data-rd-circle`).
+- **Fase 2 (motor no banco) — CONCLUÍDA E TESTADA (09/06/2026).** Migration
+  `20260610000002_retro_engine.sql`: tabelas `retro_daily`/`retro_runs`/`retro_run_matches`/
+  `retro_usage_daily` (todas RLS sem policy) + RPCs `retro_start_run` (retomada do daily,
+  unicidade 1/dia por conta), `retro_answer` (janela de tempo NO servidor +2s, pontua com
+  `compute_score_type`/`score_points`, progressão D3 com jogo de honra e barra ≥2 na semi/final,
+  modo Só Cravada), `retro_run_summary` (share sem spoiler), `retro_leaderboard` (fase→pontos→tempo,
+  respeita `show_in_global_ranking`), `retro_touch_anon` (agregado diário, clamp 60s),
+  `retro_purge_ephemeral` + cron 03:40 UTC (D17: permanente só Copa do Dia de logado).
+  **Bateria de 8 testes verde** (`scripts/retro-engine-tests.sql`): campeão 21 pts, eliminação nos
+  grupos com jogo de honra, timeout de servidor, barra da semi, daily determinístico/retomável/único,
+  ranking, summary sem identidade de jogos, Só Cravada, clamp anônimo, purga, RLS = 0 linhas.
+- **⚠️ Pendências antes do PUSH (a sessão que subir cumpre):** re-conferir numeração das migrations
+  `20260610000001/2` vs `origin/main` (doc 09 §3 — hoje o bookkeeping local já pegou uma colisão de
+  nº 000011 entre worktrees!); rodar `db reset` limpo de uma árvore atualizada; atualizar
+  `.claude/05` §2 (tabelas `retro_*`) e criar `.claude/12-RETRO-MINIJOGO.md`; revisão AppSec do
+  rate-limit das RPCs anônimas (hardening listado na pesquisa D14); homologação final (Portão B).
+- **Próximo: Fase 3 (UI)** — feature slice `src/features/retro/` (landing, tela da run com timer
+  decrescente + milésimos nos 3s finais + input gigante embaixo, reveal animado, campanha, share,
+  página pública `/retro/r/:code`), em **worktree próprio** (sessão concorrente ativa na árvore
+  principal). Depois Fase 4 (eventos GA4 + propagação de copy) → Fase 5 (homologação + deploy).

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" data-rd-circle="1">
+<defs><clipPath id="rd-c-ucraniasvg"><circle cx="50" cy="50" r="50"/></clipPath></defs>
+<g clip-path="url(#rd-c-ucraniasvg)">
+<svg viewBox="0 0 1200 800" width="100" height="100" preserveAspectRatio="xMidYMid slice">
+<rect width="1200" height="800" fill="#0057B7"/>
+<rect width="1200" height="400" y="400" fill="#FFD700"/>
+</svg>
+</g>
+</svg>
