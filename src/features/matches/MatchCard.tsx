@@ -115,16 +115,25 @@ export function MatchCard({
     setHome((h) => (h === "" ? "0" : h));
   };
 
-  // "Em edição": já tem palpite OU clicou no card pra fazer um. Antes disso o
-  // placar fica "– ×–" (NÃO palpitado, ≠ de um 0×0 real). Clicar no card já vale
-  // 0×0 (o autosave salva sozinho, mesmo sem tocar no +/−). Nunca um lado vazio.
-  const [active, setActive] = useState(!!prediction);
+  // EDIÇÃO é temporária: o +/− só aparece enquanto a pessoa está editando.
+  // Sem palpite o placar fica "– ×–"; com palpite, mostra os números (tocáveis).
+  // Tocar abre o stepper (e, sem palpite, já vale 0×0 — o autosave salva).
+  // Após ~3,5s sem mexer (ou depois do "salvo"), o stepper some sozinho.
+  const [active, setActive] = useState(false);
   function startPredicting() {
     if (!canEdit || active) return;
     setActive(true);
-    setHome("0");
-    setAway("0");
+    if (home === "" || away === "") {
+      setHome("0");
+      setAway("0");
+    }
   }
+  useEffect(() => {
+    if (!active) return;
+    if (saveState === "saving") return; // espera o save terminar
+    const t = setTimeout(() => setActive(false), 3500);
+    return () => clearTimeout(t);
+  }, [active, home, away, saveState]);
 
   const scoreType = finished ? prediction?.score_type ?? null : null;
 
@@ -181,12 +190,12 @@ export function MatchCard({
             <button
               type="button"
               onClick={startPredicting}
-              aria-label="Fazer palpite"
+              aria-label={home === "" ? "Fazer palpite" : "Editar palpite"}
               className="flex items-center gap-1.5 rounded-md px-1 py-0.5 transition hover:bg-ink-50"
             >
-              <ScoreBox value="" onChange={() => {}} editable={false} scoreType={null} live={false} />
+              <ScoreBox value={home} onChange={() => {}} editable={false} scoreType={null} live={false} mine={home !== ""} />
               <span className="text-sm font-bold text-ink-300">×</span>
-              <ScoreBox value="" onChange={() => {}} editable={false} scoreType={null} live={false} />
+              <ScoreBox value={away} onChange={() => {}} editable={false} scoreType={null} live={false} mine={away !== ""} />
             </button>
           ) : (
             <>
@@ -321,12 +330,15 @@ function ScoreBox({
   editable,
   scoreType,
   live,
+  mine = false,
 }: {
   value: string;
   onChange: (v: string) => void;
   editable: boolean;
   scoreType: ScoreType | null;
   live: boolean;
+  /** palpite salvo (pré-jogo, fechado): números fortes + borda da marca. */
+  mine?: boolean;
 }) {
   const base =
     "relative flex size-10 items-center justify-center rounded-md border text-center text-xl font-bold leading-none tabular-nums";
@@ -366,9 +378,11 @@ function ScoreBox({
         base,
         scoreType
           ? scoreBoxByType[scoreType]
-          : live
-            ? "border-ink-300 bg-transparent text-ink-500"
-            : "border-border bg-ink-100 text-ink-500",
+          : mine
+            ? "border-brand-500 bg-surface text-ink-950"
+            : live
+              ? "border-ink-300 bg-transparent text-ink-500"
+              : "border-border bg-ink-100 text-ink-500",
       )}
     >
       {display}

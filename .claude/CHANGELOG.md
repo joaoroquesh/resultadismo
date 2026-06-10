@@ -211,6 +211,11 @@ _(vazio — próximas mudanças acumulam aqui)_
   competição vazia exclui com confirmação simples.
 
 ### Corrigido
+- **Stepper do palpite é temporário** (ajuste pós-lançamento do dia): o +/− só aparece ao tocar
+  pra editar e **some sozinho** (~3,5s sem mexer / depois do "salvo"); fechado, o palpite fica em
+  números com borda da marca ("Editar palpite"). E **reset da jornada de personalização**
+  (migration `20260610000000`): quem preencheu a versão antiga passa pela jornada nova no próximo
+  acesso — preservados The Best, grupo favorito e UF.
 - **Contraste no modo escuro.** Tons de texto dos accents (`-700/-800/-900` de brand/gold/grass/
   aqua/flame) agora clareiam no tema escuro (tokens em `index.css`, mesmo padrão do brand-600/700)
   — corrige textos quase ilegíveis (ex.: hero do "Construa com a gente", notas com barra lateral).
