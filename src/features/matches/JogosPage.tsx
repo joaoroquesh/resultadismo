@@ -265,7 +265,7 @@ export function JogosPage() {
         hasComps &&
         (() => {
           const scopeRow = (
-            <ScrollRow className="-mx-4 mb-3" innerClassName="px-4">
+            <ScrollRow dataTour="jogos-filtros" className="-mx-4 mb-3" innerClassName="px-4">
               {session && hasInterests && (
                 <button
                   onClick={() => setScope(MINE)}

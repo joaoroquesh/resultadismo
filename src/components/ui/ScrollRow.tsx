@@ -11,12 +11,15 @@ export function ScrollRow({
   children,
   className,
   innerClassName,
+  dataTour,
 }: {
   children: ReactNode;
   /** classes do wrapper (ex.: -mx-4 mb-3 pro bleed da página) */
   className?: string;
   /** classes da fileira interna (ex.: px-4) */
   innerClassName?: string;
+  /** âncora pro tour guiado (atributo data-tour no wrapper) */
+  dataTour?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [fade, setFade] = useState({ left: false, right: false });
@@ -43,7 +46,7 @@ export function ScrollRow({
   }, []);
 
   return (
-    <div className={cn("relative", className)}>
+    <div data-tour={dataTour} className={cn("relative", className)}>
       <div ref={ref} className={cn("no-scrollbar flex gap-2 overflow-x-auto", innerClassName)}>
         {children}
       </div>
