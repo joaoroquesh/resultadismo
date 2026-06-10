@@ -38,14 +38,14 @@ function Wheel({
       <div className="relative">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-1/2 z-10 h-[56px] -translate-y-1/2 rounded-md border-2 border-gold-500"
+          className="pointer-events-none absolute inset-x-0 top-1/2 z-10 h-[56px] -translate-y-1/2 rounded-md border-2 border-[var(--retro-board-ring)]"
         />
         <div
           ref={ref}
           onScroll={onScroll}
           role="listbox"
           aria-label={`Gols: ${label}`}
-          className="no-scrollbar h-[168px] w-[88px] snap-y snap-mandatory overflow-y-scroll overscroll-contain rounded-lg bg-ink-950 py-[56px] shadow-soft"
+          className="no-scrollbar h-[168px] w-[88px] snap-y snap-mandatory overflow-y-scroll overscroll-contain rounded-lg bg-[var(--retro-board)] py-[56px] shadow-soft"
         >
           {VALUES.map((v) => (
             <button
@@ -56,7 +56,7 @@ function Wheel({
               onClick={() => onChange(v)}
               className={cn(
                 "flex h-[56px] w-full snap-center items-center justify-center text-4xl font-bold tabular-nums transition-colors",
-                v === value ? "text-gold-400" : "text-ink-500",
+                v === value ? "text-[var(--retro-board-digit)]" : "text-[var(--retro-board-dim)]",
               )}
             >
               {v}

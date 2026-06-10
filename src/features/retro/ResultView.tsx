@@ -4,6 +4,7 @@ import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import { useNavigate } from "react-router-dom";
+import { track } from "@/lib/analytics";
 import { CampaignTrail, type TrailSlot } from "./CampaignTrail";
 import { Confetti } from "./RetroFx";
 import { buildShareText, fmtMs, type FinishedRun } from "./share";
@@ -72,7 +73,10 @@ export function ResultView({
       <Button
         size="lg"
         className="w-full font-bold"
-        onClick={() => void share(buildShareText(run, streak), (m) => toast(m, "success"))}
+        onClick={() => {
+          track("retro_share", { status: run.status });
+          void share(buildShareText(run, streak), (m) => toast(m, "success"));
+        }}
       >
         Compartilhar no WhatsApp 📲
       </Button>

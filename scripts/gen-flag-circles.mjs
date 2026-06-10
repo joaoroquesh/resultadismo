@@ -36,7 +36,14 @@ for (const file of readdirSync(DIR).filter((f) => f.endsWith(".svg")).sort()) {
   const inner = src.slice(src.indexOf(open[0]) + open[0].length, src.lastIndexOf("</svg>"));
   const clipId = `rd-c-${file.replace(/\W/g, "")}`;
 
-  const out = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" data-rd-circle="1">
+  // preserva TODOS os namespaces do original (xmlns:xlink etc.) — sem isso,
+  // bandeiras com <use xlink:href> viram XML inválido e não decodificam no <img>
+  const extraNs = [...attrs.matchAll(/xmlns:[\w-]+\s*=\s*"[^"]*"/g)]
+    .map((m) => m[0])
+    .filter((ns) => !ns.startsWith('xmlns:xml='))
+    .join(" ");
+
+  const out = `<svg xmlns="http://www.w3.org/2000/svg" ${extraNs} viewBox="0 0 100 100" data-rd-circle="1">
 <defs><clipPath id="${clipId}"><circle cx="50" cy="50" r="50"/></clipPath></defs>
 <g clip-path="url(#${clipId})">
 <svg viewBox="${viewBox}" width="100" height="100" preserveAspectRatio="xMidYMid slice">${inner}</svg>

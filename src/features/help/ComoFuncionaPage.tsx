@@ -23,6 +23,7 @@ import {
   SlidersHorizontal,
   Users,
   Star,
+  Gamepad2,
 } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
@@ -242,6 +243,31 @@ export function ComoFuncionaPage() {
               estratégia — e cuidado, se errar o jogo dobrado você não perde pontos, mas perde a
               chance de multiplicar.
             </p>
+          </Card>
+        </Section>
+
+        {/* Resultadismo Retrô (mini-jogo) */}
+        <Section icon={<Gamepad2 className="size-4" strokeWidth={2.4} />} title="Resultadismo Retrô">
+          <Card className="space-y-2 p-4">
+            <p className="text-sm leading-relaxed text-ink-600">
+              O <span className="font-bold text-ink-900">Retrô</span> é o nosso mini-jogo de{" "}
+              <span className="font-bold text-ink-900">placares históricos</span>: 7 jogos reais de
+              Copas do Mundo (1930–2022) e poucos segundos para cravar cada um. A pontuação é a
+              mesma do Resultadismo (cravada +3, saldo +2, acerto +1) — pontuou, avança na sua
+              própria Copa; errou no mata-mata, caiu. Vale o placar final com prorrogação; pênaltis
+              não contam.
+            </p>
+            <p className="text-sm leading-relaxed text-ink-600">
+              Dá pra jogar <span className="font-bold text-ink-900">sem conta</span>. Logado, você
+              entra no <span className="font-bold text-ink-900">ranking da Copa do Dia</span> (uma
+              tentativa por dia, os mesmos 7 jogos para todo mundo) e acumula a sua sequência 🔥.
+            </p>
+            <Link
+              to="/retro"
+              className="block rounded-md bg-brand-600 px-3 py-2 text-center text-sm font-bold text-white"
+            >
+              Jogar a Copa Retrô de hoje 🕹️
+            </Link>
           </Card>
         </Section>
 

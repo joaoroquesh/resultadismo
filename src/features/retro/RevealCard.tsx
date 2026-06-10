@@ -44,7 +44,7 @@ export function RevealCard({
 
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">Placar real</p>
-          <p className="animate-retro-flip mx-auto mt-1 inline-block rounded-lg bg-ink-950 px-6 py-2 text-5xl font-bold tabular-nums text-gold-400 shadow-pop">
+          <p className="animate-retro-flip mx-auto mt-1 inline-block rounded-lg bg-[var(--retro-board)] px-6 py-2 text-5xl font-bold tabular-nums text-[var(--retro-board-digit)] shadow-pop">
             {formatScore(r.home_score, r.away_score)}
           </p>
           <p className="mt-1 min-h-4 text-xs text-ink-500">

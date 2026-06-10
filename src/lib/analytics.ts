@@ -25,7 +25,11 @@ export type AnalyticsEvent =
   | "copy_invite" // { content_type: "group_invite" }
   | "nudge_sent" // {}
   | "feedback_submit" // { kind: "bug" | "idea" }
-  | "consent_set"; // { choice: "granted" | "denied" }
+  | "consent_set" // { choice: "granted" | "denied" }
+  | "retro_run_start" // { mode, pace, daily: boolean } — mini-jogo Retrô
+  | "retro_guess" // { slot, score_type, timeout: boolean }
+  | "retro_run_end" // { status, stage_rank, points, daily: boolean }
+  | "retro_share"; // { status } — share da campanha (WhatsApp/clipboard)
 
 /** Dispara um evento no GA4. No-op se o gtag ainda não carregou (ou foi bloqueado). */
 export function track(event: AnalyticsEvent, params?: Record<string, Primitive>): void {

@@ -57,6 +57,7 @@ daquele assunto.
 | 09 | [`09-PARALELISMO.md`](09-PARALELISMO.md) | **Vários chats/sessões no mesmo repo.** Regras anti-colisão. Ler antes de qualquer `git`. |
 | 10 | [`10-UX-WRITING.md`](10-UX-WRITING.md) | Escrever textos do app (microcopy): clareza/simplicidade, voz, tom, glossário, padrões de erro/vazio/sucesso. |
 | 11 | [`11-EQUIPE-E-PAPEIS.md`](11-EQUIPE-E-PAPEIS.md) | **Quem a IA é ao trabalhar.** A IA como equipe (papéis + cenários), o João como **PO**, os 3 portões e o gate plano-antes-de-codar (regras 15-16). |
+| 12 | [`12-RETRO-MINIJOGO.md`](12-RETRO-MINIJOGO.md) | Mexer no **Resultadismo Retrô** (mini-jogo de placares históricos em `/retro`): o que herda do MESTRE, o que muda deliberadamente, motor/RPCs, sorteio e backlog. |
 | — | [`CHANGELOG.md`](CHANGELOG.md) | O que mudou em cada versão. **Atualizar a cada mudança que sobe.** |
 | — | [`HISTORICO.md`](HISTORICO.md) | Narrativa de como o projeto evoluiu até aqui (consolida `docs/`). Contexto, não regra. |
 

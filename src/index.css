@@ -305,3 +305,13 @@
     transparent 3px
   );
 }
+
+/* Placar eletrônico do Retrô: SEMPRE escuro, nos dois temas (decisão do PO 10/06 —
+   "amarelo sobre branco tem pouco contraste"). Tokens próprios, não invertem no dark. */
+:root,
+[data-theme="dark"] {
+  --retro-board: oklch(0.17 0.012 235);
+  --retro-board-digit: oklch(0.83 0.16 92);
+  --retro-board-dim: oklch(0.52 0.02 230);
+  --retro-board-ring: oklch(0.7 0.14 92);
+}

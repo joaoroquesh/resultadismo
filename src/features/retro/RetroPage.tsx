@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { track } from "@/lib/analytics";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -90,6 +91,7 @@ export function RetroPage() {
       { mode, pace, daily },
       {
         onSuccess: (s: RetroStart) => {
+          track("retro_run_start", { mode: s.mode, pace: s.pace, daily });
           if (s.resumed) toast("Retomando a sua Copa do Dia de onde parou!", "info");
           retroMarkSeen(s.current?.match_id);
           const base: ActiveRun = {
@@ -133,6 +135,19 @@ export function RetroPage() {
       { runId: run.runId, home, away },
       {
         onSuccess: (ans) => {
+          track("retro_guess", {
+            slot: ans.run.slot,
+            score_type: ans.result.score_type,
+            timeout: ans.result.timeout,
+          });
+          if (ans.run.status !== "playing") {
+            track("retro_run_end", {
+              status: ans.run.status,
+              stage_rank: ans.run.stage_rank ?? 0,
+              points: ans.run.points,
+              daily: run?.isDaily ?? false,
+            });
+          }
           setRun((r) =>
             r && r.current
               ? {

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { track } from "@/lib/analytics";
 import {
@@ -10,6 +11,7 @@ import {
   ArrowRight,
   ChevronDown,
   Check,
+  Gamepad2,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -295,6 +297,16 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
             </FeatureRow>
           </Reveal>
           <Reveal delay={120}>
+            <FeatureRow icon={Gamepad2} title="Resultadismo Retrô (novo!)">
+              Mini-jogo de placares históricos: 7 jogos de Copas antigas, segundos pra cravar cada
+              um. Jogue de graça, sem conta —{" "}
+              <Link to="/retro" className="font-bold text-brand-700 underline">
+                jogar a Copa Retrô de hoje
+              </Link>
+              .
+            </FeatureRow>
+          </Reveal>
+          <Reveal>
             <FeatureRow icon={Swords} title="Enfrentar os amigos">
               Classificação que mexe a cada jogo. No fim, só sobra um pra contar vantagem no grupo.
             </FeatureRow>

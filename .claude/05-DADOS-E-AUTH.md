@@ -45,6 +45,7 @@
 | `access_control` / `access_sessions` | Sala de espera (fila FIFO) | config singleton + 1 linha por aba (`state` active/waiting) |
 | `rate_limits` | Rate limit das Edge Functions (janela fixa por bucket) — **1.1.0** | `bucket` (pk), `window_start`, `count`. Sem acesso de cliente; só `service_role`/`rate_limit_hit`. |
 | `private.sync_config` | Config server-side do sync (URL das functions + service_key) | schema **`private`** — não exposto na API |
+| `retro_matches` / `retro_runs` / `retro_run_matches` / `retro_daily` / `retro_usage_daily` | **Mini-jogo Retrô** (placares históricos) — 964 jogos de Copas (seed CC0), runs (permanentes só Copa do Dia de logado; resto purgado por cron), desafio do dia e agregado de uso anônimo | **Todas RLS-on SEM policy** (gabarito nunca desce ao client) — acesso só via RPCs `retro_*`. → [`12-RETRO-MINIJOGO.md`](12-RETRO-MINIJOGO.md) |
 
 ## 3. RLS — regras de acesso (resumo)
 
@@ -94,6 +95,12 @@ Padrão geral: **app-admin sempre pode**; o resto depende de propriedade/papel/v
 - `simulate_league_payment` (modo teste — **só app-admin** desde 1.1.0), `refund_league` (reembolso
   atômico, `for update`, só `service_role`), `rate_limit_hit` (janela fixa por bucket, só
   `service_role`), `validate_discount_code`, `admin_*` de pagamento.
+
+**Mini-jogo Retrô (2026-06-10)** — `retro_start_run` (Copa do Dia 1/dia com retomada + guarda
+anti-abuso anônimo 30/h), `retro_next` (serve o jogo sob demanda — o cronômetro nasce no clique),
+`retro_answer` (janela de tempo no servidor + pontuação via `compute_score_type`), `retro_run_summary`
+(share sem spoiler), `retro_leaderboard`, `retro_my_stats` (streak), `retro_touch_anon` (agregado,
+clamp 60s), `retro_purge_ephemeral` (cron diário). Detalhe: [`12-RETRO-MINIJOGO.md`](12-RETRO-MINIJOGO.md).
 
 **Helpers de segurança**: `is_app_admin()`, `is_league_member(id)`, `is_league_admin(id)`,
 `can_settle_leagues()`, `match_is_locked(id)`.

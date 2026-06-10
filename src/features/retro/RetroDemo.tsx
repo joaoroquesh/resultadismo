@@ -85,6 +85,18 @@ export function RetroDemo() {
           </Card>
         </div>
       ))}
+      <h3 className="text-sm font-bold text-ink-500">Card de DECISÃO (semi/final — moldura dourada pulsante)</h3>
+      <Card className="space-y-2 border-2 border-gold-500 p-4 shadow-brand">
+        <p className="animate-retro-tense text-center text-sm font-bold uppercase tracking-widest text-gold-600">
+          ⚡ FINAL ⚡
+        </p>
+        <p className="text-center text-xs text-ink-500">Copa de 1970 (México) · Final · nível 6/7</p>
+        <p className="text-center text-2xl font-bold">Brasil × Itália</p>
+        <p className="text-center text-xs text-ink-500">
+          (é assim que a semi e a final aparecem na run — com o cronômetro mais curto)
+        </p>
+      </Card>
+
       <h3 className="text-sm font-bold text-ink-500">Campeão 🏆</h3>
       <ResultView run={CHAMPION} streak={5} onPlayTraining={noop} onBackHome={noop} />
       <h3 className="text-sm font-bold text-ink-500">Eliminado na semi</h3>

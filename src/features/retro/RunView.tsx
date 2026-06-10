@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { TeamCrest } from "@/components/TeamCrest";
-import { teamCrestPath } from "@/lib/teamCrests";
+import { RetroCrest } from "./RetroCrest";
 import { CampaignTrail, type TrailSlot } from "./CampaignTrail";
 import { RetroTimer } from "./RetroTimer";
 import { ScoreWheels } from "./ScoreWheels";
@@ -11,7 +10,7 @@ import type { RetroCurrent } from "./api";
 function TeamSide({ slug, name }: { slug: string; name: string }) {
   return (
     <div className="flex min-w-0 flex-1 flex-col items-center gap-2">
-      <TeamCrest src={teamCrestPath(slug)} name={name} size={64} />
+      <RetroCrest slug={slug} name={name} size={64} />
       <span className="max-w-full truncate text-center text-base font-bold">{name}</span>
     </div>
   );

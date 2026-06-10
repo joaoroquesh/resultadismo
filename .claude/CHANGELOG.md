@@ -21,8 +21,14 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
-- **Mini-jogo Resultadismo Retrô — Portão A cumprido + Fases 1 (dados) e 2 (motor) concluídas e
-  validadas localmente** (ainda **não deployado**; sobe só após homologação do João — Portão B). Comentários
+- **Mini-jogo Resultadismo Retrô — EM PRODUÇÃO em `/retro` (2026-06-10, teste com amigos
+  autorizado pelo João).** Fases 1–3 + rodada 1 de homologação + Fase 4. Pós-deploy/Fase 4:
+  correção de contraste (placar eletrônico **sempre escuro** nos dois temas, tokens
+  `--retro-board*`), `RetroCrest` com retry (logos sumindo intermitente), guarda anti-abuso
+  anônimo (30 runs/h/token, migration `20260610150004`), eventos GA4
+  (`retro_run_start/guess/run_end/share`), seção Retrô no **Como Funciona** e na **landing**,
+  novo doc [`12-RETRO-MINIJOGO.md`](12-RETRO-MINIJOGO.md) + linha no MESTRE §2 + tabelas/RPCs no
+  doc 05. Histórico completo da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do
