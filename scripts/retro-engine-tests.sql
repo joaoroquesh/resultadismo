@@ -33,6 +33,7 @@ begin
     end if;
     v_ans := public.retro_answer(v_run, v_gh, v_ga, v_token, '{}');
     exit when v_ans->'run'->>'status' <> 'playing';
+    perform public.retro_next(v_run, v_token, '{}');
   end loop;
   return v_ans || jsonb_build_object('token', v_token);
 end $$;
@@ -97,6 +98,7 @@ begin
     end if;
     v_ans := public.retro_answer(v_run, v_gh, v_ga, v_token, '{}');
     exit when v_ans->'run'->>'status' <> 'playing';
+    perform public.retro_next(v_run, v_token, '{}');
   end loop;
   if v_ans->'run'->>'status' = 'eliminated' and v_ans->'run'->>'stage_reached' = 'Semifinal' then
     raise notice 'T4 barra da semi: OK (1 pt não passa na semi; caiu na Semifinal)';
@@ -138,6 +140,7 @@ begin
     exit when not found;
     v_ans := public.retro_answer(v_run, v_m.home_score, v_m.away_score, null, '{}');
     exit when v_ans->'run'->>'status' <> 'playing';
+    perform public.retro_next(v_run, null, '{}');
   end loop;
   if v_ans->'run'->>'status' = 'champion' then raise notice 'T5c campeão logado: OK'; end if;
   -- tentar de novo hoje → exceção
@@ -177,6 +180,7 @@ begin
     -- sempre SALDO (vencedor + diferença certa, placar errado): +1 em cada lado
     v_ans := public.retro_answer(v_run, v_m.home_score + 1, v_m.away_score + 1, v_token, '{}');
     exit when v_ans->'run'->>'status' <> 'playing';
+    perform public.retro_next(v_run, v_token, '{}');
   end loop;
   if v_ans->'run'->>'status' = 'eliminated' and v_ans->'run'->>'stage_reached' = 'Fase de grupos'
      and (v_ans->'run'->>'points')::int = 6 then

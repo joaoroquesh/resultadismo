@@ -30,13 +30,13 @@ export function RunView({
   points: number;
   slots: TrailSlot[];
   answering: boolean;
-  onSubmit: (home: number | null, away: number | null) => void;
+  onSubmit: (home: number, away: number) => void;
 }) {
-  // o pai remonta este componente por jogo (key=match_id): estado nasce zerado
-  const [home, setHome] = useState<number | null>(null);
-  const [away, setAway] = useState<number | null>(null);
+  // o pai remonta este componente por jogo (key=match_id): nasce 0×0 (palpite válido)
+  const [home, setHome] = useState(0);
+  const [away, setAway] = useState(0);
   const m = current.match;
-  const ready = home != null && away != null;
+  const decisao = current.slot >= 6; // semi e final ganham clima de decisão
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-col gap-4">
@@ -45,9 +45,17 @@ export function RunView({
         <span className="rounded-pill bg-ink-100 px-3 py-1 text-sm font-bold tabular-nums">{points} pts</span>
       </div>
 
-      <Card className="space-y-4 p-4">
+      <Card className={decisao ? "space-y-4 border-2 border-gold-500 p-4 shadow-brand" : "space-y-4 p-4"}>
         <div className="text-center">
-          <p className="text-xs font-bold uppercase tracking-wide text-brand-700">{current.slot_label}</p>
+          <p
+            className={
+              decisao
+                ? "animate-retro-tense text-sm font-bold uppercase tracking-widest text-gold-600"
+                : "text-xs font-bold uppercase tracking-wide text-brand-700"
+            }
+          >
+            {decisao ? `⚡ ${current.slot_label} ⚡` : current.slot_label}
+          </p>
           <p className="mt-0.5 text-xs text-ink-500">
             Copa de {m.wc_year} ({m.wc_host}) · {m.stage_label_pt} · nível {m.difficulty}/7
           </p>
@@ -73,8 +81,8 @@ export function RunView({
         />
         <Button
           size="lg"
-          className="w-full text-base font-bold"
-          disabled={!ready || answering}
+          className="w-full text-base font-bold tracking-wide"
+          disabled={answering}
           loading={answering}
           onClick={() => onSubmit(home, away)}
         >
@@ -84,7 +92,7 @@ export function RunView({
           {m.is_knockout
             ? "Vale o placar final (com prorrogação) — pênaltis não contam. Mata-mata pode terminar empatado!"
             : "Vale o placar final do jogo."}
-          {current.timer_seconds != null && " No fim do tempo, vale o que estiver marcado."}
+          {current.timer_seconds != null && " Role pra cima pra subir o placar — no fim do tempo, vale o que estiver marcado."}
         </p>
       </div>
     </div>

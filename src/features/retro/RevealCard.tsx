@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { ScorePill } from "@/components/ScorePill";
 import type { ScoreType } from "@/lib/types";
 import type { RetroAnswerResult } from "./api";
+import { Confetti } from "./RetroFx";
 
 const VERDICT: Record<ScoreType, { label: string; cls: string }> = {
   cravada: { label: "CRAVADA!", cls: "bg-gold-500 text-gold-950" },
@@ -10,24 +11,6 @@ const VERDICT: Record<ScoreType, { label: string; cls: string }> = {
   acerto: { label: "ACERTOU O VENCEDOR", cls: "bg-aqua-700 text-white" },
   erro: { label: "FORA!", cls: "bg-flame-600 text-white" },
 };
-
-function Confetti() {
-  return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-      {Array.from({ length: 14 }, (_, i) => (
-        <span
-          key={i}
-          className="animate-retro-confetti absolute top-0 block size-2 rounded-[2px] bg-gold-500"
-          style={{
-            left: `${6 + i * 6.5}%`,
-            animationDelay: `${(i % 7) * 90}ms`,
-            backgroundColor: i % 3 === 0 ? "var(--color-gold-400)" : i % 3 === 1 ? "var(--color-gold-600)" : "var(--color-brand-500)",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
 
 // O reveal pós-palpite (3 batidas): placar real vira na tela → carimbo do veredito →
 // status da campanha. Animação "fliperama" deliberada (exceção registrada ao motion
@@ -61,7 +44,7 @@ export function RevealCard({
 
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">Placar real</p>
-          <p className="animate-retro-flip text-5xl font-bold tabular-nums">
+          <p className="animate-retro-flip mx-auto mt-1 inline-block rounded-lg bg-ink-950 px-6 py-2 text-5xl font-bold tabular-nums text-gold-400 shadow-pop">
             {formatScore(r.home_score, r.away_score)}
           </p>
           <p className="mt-1 min-h-4 text-xs text-ink-500">

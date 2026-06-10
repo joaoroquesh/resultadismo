@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -12,6 +13,7 @@ import {
   useRetroAnonHeartbeat,
   useRetroAnswer,
   useRetroMyStats,
+  useRetroNext,
   useRetroStart,
   type RetroAnswerResult,
   type RetroCurrent,
@@ -25,6 +27,8 @@ import { RevealCard } from "./RevealCard";
 import { ResultView } from "./ResultView";
 import { fmtMs, type FinishedRun } from "./share";
 import { RetroLeaderboard } from "./RetroLeaderboard";
+import { RetroStripes } from "./RetroFx";
+import { RetroDemo } from "./RetroDemo";
 import type { TrailSlot } from "./CampaignTrail";
 
 type Phase = "home" | "play" | "reveal" | "done";
@@ -69,12 +73,14 @@ export function RetroPage() {
   const { user } = useAuth();
   const { open: openLogin } = useLoginModal();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [phase, setPhase] = useState<Phase>("home");
   const [mode, setMode] = useState<RetroMode>("acerto");
   const [pace, setPace] = useState<RetroPace>("resultadista");
   const [run, setRun] = useState<ActiveRun | null>(null);
   const startMut = useRetroStart();
   const answerMut = useRetroAnswer();
+  const nextMut = useRetroNext();
   const myStats = useRetroMyStats();
   useRetroAnonHeartbeat();
 
@@ -85,8 +91,8 @@ export function RetroPage() {
       {
         onSuccess: (s: RetroStart) => {
           if (s.resumed) toast("Retomando a sua Copa do Dia de onde parou!", "info");
-          retroMarkSeen(s.current.match_id);
-          setRun({
+          retroMarkSeen(s.current?.match_id);
+          const base: ActiveRun = {
             runId: s.run_id,
             shareCode: s.share_code,
             mode: s.mode,
@@ -97,15 +103,31 @@ export function RetroPage() {
             current: s.current,
             lastAnswer: null,
             lastGuess: { home: null, away: null },
-          });
-          setPhase("play");
+          };
+          if (s.current) {
+            setRun(base);
+            setPhase("play");
+          } else {
+            // retomada no meio: o slot atual ainda não foi servido — pede agora
+            nextMut.mutate(
+              { runId: s.run_id },
+              {
+                onSuccess: (cur) => {
+                  retroMarkSeen(cur.match_id);
+                  setRun({ ...base, current: cur });
+                  setPhase("play");
+                },
+                onError: (e) => toast(e.message, "error"),
+              },
+            );
+          }
         },
         onError: (e) => toast(e.message, "error"),
       },
     );
   }
 
-  function submitGuess(home: number | null, away: number | null) {
+  function submitGuess(home: number, away: number) {
     if (!run?.current || answerMut.isPending) return;
     answerMut.mutate(
       { runId: run.runId, home, away },
@@ -131,14 +153,22 @@ export function RetroPage() {
 
   function advanceFromReveal() {
     const ans = run?.lastAnswer;
-    if (!run || !ans) return;
-    if (ans.run.status === "playing" && ans.next) {
-      retroMarkSeen(ans.next.match_id);
-      setRun({ ...run, current: ans.next, lastAnswer: null });
-      setPhase("play");
-    } else {
+    if (!run || !ans || nextMut.isPending) return;
+    if (ans.run.status !== "playing") {
       setPhase("done");
+      return;
     }
+    nextMut.mutate(
+      { runId: run.runId },
+      {
+        onSuccess: (cur) => {
+          retroMarkSeen(cur.match_id);
+          setRun({ ...run, current: cur, lastAnswer: null });
+          setPhase("play");
+        },
+        onError: (e) => toast(e.message, "error"),
+      },
+    );
   }
 
   function backHome() {
@@ -147,6 +177,14 @@ export function RetroPage() {
   }
 
   const finished = toFinishedRun(run);
+
+  if (import.meta.env.DEV && new URLSearchParams(window.location.search).has("demo")) {
+    return (
+      <Page title="Resultadismo Retrô · demo">
+        <RetroDemo />
+      </Page>
+    );
+  }
 
   return (
     <Page title="Resultadismo Retrô">
@@ -163,6 +201,7 @@ export function RetroPage() {
           isLogged={!!user}
           onLogin={openLogin}
           onStart={start}
+          onGoMain={() => navigate("/")}
         />
       )}
       {phase === "play" && run?.current && (
@@ -209,6 +248,7 @@ function Home({
   isLogged,
   onLogin,
   onStart,
+  onGoMain,
 }: {
   mode: RetroMode;
   pace: RetroPace;
@@ -221,19 +261,14 @@ function Home({
   isLogged: boolean;
   onLogin: () => void;
   onStart: (daily: boolean) => void;
+  onGoMain: () => void;
 }) {
   return (
     <div className="mx-auto w-full max-w-md space-y-4">
-      {/* hero retrô: listras nas cores da pontuação (identidade adaptada de leve — D15) */}
-      <Card className="relative overflow-hidden bg-brand-600 p-5 text-white">
-        <div
-          aria-hidden
-          className="absolute inset-x-0 top-0 h-1.5"
-          style={{
-            background:
-              "linear-gradient(90deg, var(--color-gold-500) 0 25%, var(--color-grass-600) 0 50%, var(--color-aqua-700) 0 75%, var(--color-brand-400) 0)",
-          }}
-        />
+      {/* hero retrô: scanlines + listras nas cores da pontuação (D15) */}
+      <Card className="retro-scanlines relative overflow-hidden border-2 border-ink-950 bg-brand-700 p-5 text-white">
+        <RetroStripes className="absolute inset-x-0 top-0" />
+        <RetroStripes className="absolute inset-x-0 bottom-0" />
         <Badge tone="gold" className="mb-2">
           RETRÔ · 1930–2022
         </Badge>
@@ -256,9 +291,11 @@ function Home({
       </Card>
 
       <Card className="space-y-3 p-4">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-sm font-bold">Modo</span>
+        {/* empilhado (label em cima, controle largura cheia): nada de texto quebrando */}
+        <div className="space-y-1.5">
+          <span className="text-xs font-bold uppercase tracking-wide text-ink-500">Modo</span>
           <SegmentedControl<RetroMode>
+            className="w-full whitespace-nowrap"
             options={[
               { value: "acerto", label: "Acerto" },
               { value: "cravada", label: "Só Cravada" },
@@ -266,16 +303,17 @@ function Home({
             value={mode}
             onChange={setMode}
           />
+          <p className="text-xs text-ink-500">
+            {mode === "acerto"
+              ? "Pontuou, avançou (na semi e na final só saldo ou cravada salvam)."
+              : "Só o placar EXATO te leva adiante. Para quem não treme."}
+          </p>
         </div>
-        <p className="text-xs text-ink-500">
-          {mode === "acerto"
-            ? "Pontuou, avançou (na semi e na final só saldo ou cravada salvam)."
-            : "Só o placar EXATO te leva adiante. Para quem não treme."}
-        </p>
 
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-sm font-bold">Ritmo</span>
+        <div className="space-y-1.5">
+          <span className="text-xs font-bold uppercase tracking-wide text-ink-500">Ritmo</span>
           <SegmentedControl<RetroPace>
+            className="w-full whitespace-nowrap"
             options={[
               { value: "resultadista", label: "Resultadista" },
               { value: "classico", label: "Clássico" },
@@ -284,8 +322,8 @@ function Home({
             value={pace}
             onChange={setPace}
           />
+          <p className="text-xs text-ink-500">{PACE_HINT[pace]}</p>
         </div>
-        <p className="text-xs text-ink-500">{PACE_HINT[pace]}</p>
 
         {playedToday ? (
           <div className="rounded-lg bg-ink-100 p-3 text-center text-sm">
@@ -326,6 +364,16 @@ function Home({
       </Card>
 
       <RetroLeaderboard />
+
+      <Card className="p-4 text-center">
+        <p className="text-sm text-ink-700">
+          O Retrô é o irmão nostálgico do <b>Resultadismo</b> — lá você palpita nos jogos{" "}
+          <b>reais de hoje</b> e disputa em grupos com os amigos.
+        </p>
+        <Button variant="ghost" className="mt-1 w-full" onClick={onGoMain}>
+          ← Voltar pro Resultadismo
+        </Button>
+      </Card>
     </div>
   );
 }

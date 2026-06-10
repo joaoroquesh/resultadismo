@@ -2615,6 +2615,10 @@ export type Database = {
         Returns: Json
       }
       retro_my_stats: { Args: never; Returns: Json }
+      retro_next: {
+        Args: { p_anon_token?: string; p_run_id: string; p_seen?: string[] }
+        Returns: Json
+      }
       retro_pick_match: {
         Args: { p_exclude: string[]; p_slot: number }
         Returns: string

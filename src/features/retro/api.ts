@@ -40,7 +40,7 @@ export type RetroStart = {
   ranked?: boolean;
   resumed: boolean;
   points: number;
-  current: RetroCurrent;
+  current: RetroCurrent | null;
 };
 
 export type RetroAnswerResult = {
@@ -162,6 +162,23 @@ export function useRetroAnswer() {
         qc.invalidateQueries({ queryKey: ["retro-board"] });
         qc.invalidateQueries({ queryKey: ["retro-my-stats"] });
       }
+    },
+  });
+}
+
+// Serve o próximo jogo SOB DEMANDA (o cronômetro só nasce quando o jogador pede —
+// correção do bug "tempo correndo durante o reveal", migration 004).
+export function useRetroNext() {
+  const { user } = useAuth();
+  return useMutation({
+    mutationFn: async (input: { runId: string }) => {
+      const { data, error } = await supabase.rpc("retro_next", {
+        p_run_id: input.runId,
+        p_anon_token: anonTokenFor(user?.id),
+        p_seen: retroSeen(),
+      });
+      if (error) throw new Error(error.message);
+      return data as unknown as RetroCurrent;
     },
   });
 }
