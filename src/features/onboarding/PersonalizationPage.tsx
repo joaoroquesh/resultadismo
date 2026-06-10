@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Heart,
@@ -479,6 +479,10 @@ export function PersonalizationPage() {
           : step === 3
             ? anyFollow
             : true;
+
+  // Quem JÁ concluiu a personalização não re-passa o wizard inteiro: edita por
+  // item no hub (/perfil/editar). O wizard completo é só do 1º acesso.
+  if (hydrated && wasEditing && !editOnly) return <Navigate to="/perfil/editar" replace />;
 
   const loadingBase = !state || !comps;
 

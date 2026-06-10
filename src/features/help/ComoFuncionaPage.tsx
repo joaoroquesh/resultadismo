@@ -18,6 +18,11 @@ import {
   DoorOpen,
   ShieldCheck,
   Goal,
+  Hand,
+  Globe2,
+  SlidersHorizontal,
+  Users,
+  Star,
 } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
@@ -122,10 +127,27 @@ export function ComoFuncionaPage() {
         <div className="rounded-lg bg-surface-2 p-4">
           <p className="text-sm leading-relaxed text-ink-700">
             No <span className="font-bold text-brand-700">Resultadismo</span> você crava o placar dos
-            jogos antes da bola rolar. Quanto mais perto do resultado real, mais pontos você ganha — e
-            sobe na classificação dos seus grupos. Aqui vão as regras, sem complicação.
+            jogos antes da bola rolar. Chegou perto do resultado? Pontuou. Somou mais que os amigos?
+            Assumiu a liderança do grupo. Aqui vai o jogo completo, sem complicação.
           </p>
         </div>
+
+        {/* Palpitar */}
+        <Section icon={<Hand className="size-4" strokeWidth={2.4} />} title="Palpitar leva segundos">
+          <Card className="space-y-2 p-4">
+            <p className="text-sm leading-relaxed text-ink-600">
+              O placar de cada jogo fica <span className="font-bold text-ink-900">– × –</span> até
+              você palpitar. Tocou no card, ele vira{" "}
+              <span className="font-bold text-ink-900">0×0</span> e aparecem os botões{" "}
+              <span className="font-bold text-ink-900">+</span> e{" "}
+              <span className="font-bold text-ink-900">−</span> pra ajustar cada lado — sem teclado.
+            </p>
+            <p className="text-sm leading-relaxed text-ink-600">
+              O palpite <span className="font-semibold text-ink-900">salva sozinho</span> e dá pra
+              mudar à vontade até a bola rolar. Depois disso, trava — e aí é torcer.
+            </p>
+          </Card>
+        </Section>
 
         {/* Pontuação */}
         <Section icon={<Target className="size-4" strokeWidth={2.4} />} title="Como pontuar">
@@ -201,22 +223,20 @@ export function ComoFuncionaPage() {
           icon={<Trophy className="size-4" strokeWidth={2.4} />}
           title="Como a disputa funciona"
         >
-          <p className="-mt-1 text-sm leading-relaxed text-ink-600">
-            Cada disputa dentro de um grupo tem um{" "}
-            <span className="font-semibold text-ink-900">modo</span>. São dois jeitos de jogar:
-          </p>
           <div className="space-y-2">
             <Card className="space-y-1.5 p-4">
               <p className="flex items-center gap-2 font-bold text-ink-900">
                 <ListOrdered className="size-4 text-brand-600" strokeWidth={2.4} />
-                Pontos
+                Bolão
               </p>
               <p className="text-sm leading-relaxed text-ink-600">
-                Corrida de pontos: todo mundo acumula os pontos dos palpites e quem somou mais lidera.
-                É aberto, você entra quando quiser.
+                O modo da temporada: todo mundo palpita nos mesmos jogos, os pontos somam e{" "}
+                <span className="font-semibold text-ink-900">quem somou mais lidera</span>. Todo
+                grupo joga o <span className="font-semibold text-ink-900">bolão da Copa do Mundo
+                2026</span> — você entra quando quiser, sem ficar de fora.
               </p>
             </Card>
-            <Card className="space-y-2.5 p-4">
+            <Card className="space-y-1.5 p-4">
               <p className="flex items-center gap-2 font-bold text-ink-900">
                 <Swords className="size-4 text-brand-600" strokeWidth={2.4} />
                 Confronto
@@ -225,23 +245,8 @@ export function ComoFuncionaPage() {
                 </span>
               </p>
               <p className="text-sm leading-relaxed text-ink-600">
-                Mano a mano: a cada rodada você enfrenta um adversário e quem fizer mais pontos no
-                período vence o confronto. O admin{" "}
-                <span className="font-semibold text-ink-900">sorteia</span> os confrontos, e isso{" "}
-                <span className="font-semibold text-ink-900">trava os participantes</span> (quem entra
-                depois não joga aquela disputa). Tem dois formatos:
+                Disputas mano a mano dentro do grupo. Vem aí.
               </p>
-              <div className="space-y-1.5 rounded-md bg-surface-2 p-3 text-sm leading-relaxed text-ink-600">
-                <p>
-                  <span className="font-semibold text-ink-900">Liga</span>: todos contra todos. Cada
-                  confronto vale <span className="font-semibold">3 (vitória), 1 (empate), 0 (derrota)</span>{" "}
-                  e forma uma tabela.
-                </p>
-                <p>
-                  <span className="font-semibold text-ink-900">Copa</span>: mata-mata. Quem perde o
-                  confronto está fora, até sobrar o campeão.
-                </p>
-              </div>
             </Card>
           </div>
           <Card className="flex items-start gap-3 p-4">
@@ -284,12 +289,10 @@ export function ComoFuncionaPage() {
         <Section icon={<ShieldCheck className="size-4" strokeWidth={2.4} />} title="Grupos">
           <p className="-mt-1 text-sm leading-relaxed text-ink-600">
             O <span className="font-semibold text-ink-900">grupo</span> é o espaço onde você e seus
-            amigos jogam. Dentro dele rolam as{" "}
-            <span className="font-semibold text-ink-900">disputas</span>: hoje, o{" "}
-            <span className="font-semibold text-ink-900">bolão da Copa do Mundo</span> (modo Tabela).
-            Depois da Copa, dará para adicionar ligas de vários campeonatos — Brasileirão, top 5 da
-            Europa (Inglaterra, Espanha, Itália, França e Alemanha), Brasileirão Série B, Libertadores e
-            Copa do Brasil.
+            amigos jogam. Nesta temporada, todo grupo joga o{" "}
+            <span className="font-semibold text-ink-900">bolão da Copa do Mundo 2026</span>. Depois
+            da Copa chegam outros campeonatos — Brasileirão, top 5 da Europa, Série B, Libertadores
+            e Copa do Brasil.
           </p>
           <p className="text-sm leading-relaxed text-ink-600">
             Jogar, participar e <span className="font-semibold text-ink-900">criar grupos</span> é{" "}
@@ -325,7 +328,7 @@ export function ComoFuncionaPage() {
               <OptionRow
                 icon={<Mail className="size-4" strokeWidth={2.2} />}
                 title="Convite"
-                desc="Só entra quem recebe o código de convite do grupo. O controle é todo seu."
+                desc="Só entra quem recebe o código ou o link de convite do grupo — quem abre o link já chega com o código preenchido. O controle é todo seu."
               />
               <OptionRow
                 icon={<UserCheck className="size-4" strokeWidth={2.2} />}
@@ -340,6 +343,20 @@ export function ComoFuncionaPage() {
             </Card>
           </div>
 
+          <Card className="flex items-start gap-3 p-4">
+            <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-md bg-surface-2 text-brand-600">
+              <Users className="size-4" strokeWidth={2.4} />
+            </span>
+            <p className="text-sm leading-relaxed text-ink-600">
+              Em cada jogo, abra <span className="font-semibold text-ink-900">"Quem já palpitou"</span>{" "}
+              pra ver quem do grupo está em dia — e{" "}
+              <span className="font-semibold text-ink-900">cutucar</span> quem está devendo. Está em
+              mais de um grupo? Filtre a lista por grupo e use a{" "}
+              <Star className="inline size-3.5 -translate-y-px text-gold-500" aria-label="estrela" />{" "}
+              pra fixar seus rivais favoritos no topo.
+            </p>
+          </Card>
+
           <div className="flex items-start gap-2 rounded-md border-l-2 border-brand-600 bg-surface-2 p-3 text-xs leading-relaxed text-brand-800">
             <ShieldCheck className="mt-0.5 size-4 shrink-0" />
             <p>
@@ -348,6 +365,40 @@ export function ComoFuncionaPage() {
               evitar nomes ofensivos) — e você já joga normalmente enquanto isso.
             </p>
           </div>
+        </Section>
+
+        {/* The Best */}
+        <Section icon={<Globe2 className="size-4" strokeWidth={2.4} />} title="Resultadismo The Best">
+          <Card className="p-4">
+            <p className="text-sm leading-relaxed text-ink-600">
+              Além dos seus grupos, existe a{" "}
+              <span className="font-semibold text-ink-900">classificação geral</span> do
+              Resultadismo: o <span className="font-semibold text-brand-700">The Best</span>, com
+              todo mundo que topa participar. Você escolhe se aparece — e pode entrar ou sair quando
+              quiser, lá no seu perfil.
+            </p>
+          </Card>
+        </Section>
+
+        {/* Personalização */}
+        <Section
+          icon={<SlidersHorizontal className="size-4" strokeWidth={2.4} />}
+          title="Do seu jeito"
+        >
+          <Card className="space-y-2 p-4">
+            <p className="text-sm leading-relaxed text-ink-600">
+              No primeiro acesso você monta seu perfil: escudo, nome, estado,{" "}
+              <span className="font-semibold text-ink-900">time do coração</span>, seleção e os
+              campeonatos que quer acompanhar. Quer mudar algo depois? Tudo fica em{" "}
+              <span className="font-semibold text-ink-900">Perfil → Editar perfil</span>, item por
+              item.
+            </p>
+            <p className="text-sm leading-relaxed text-ink-600">
+              Dica: <span className="font-semibold text-ink-900">ative as notificações</span> pra
+              ser lembrado antes dos jogos — e{" "}
+              <span className="font-semibold text-ink-900">instale o app</span> pra abrir num toque.
+            </p>
+          </Card>
         </Section>
 
         {/* CTA */}

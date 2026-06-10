@@ -209,7 +209,7 @@ export function PerfilPage() {
             </Link>
           )}
           <Link
-            to="/perfil/personalizar"
+            to="/perfil/editar"
             className="flex items-center gap-3 p-4 transition hover:bg-ink-50"
           >
             <SlidersHorizontal className="size-5 text-brand-600" />

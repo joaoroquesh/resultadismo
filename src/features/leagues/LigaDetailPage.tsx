@@ -46,7 +46,10 @@ export function LigaDetailPage() {
   const isOwner = myMember?.role === "owner";
 
   const [tab, setTab] = useState<Tab>("classificacao");
-  const [editorOpen, setEditorOpen] = useState(false);
+  // ?editar=1 (lápis no card de /grupos) já abre o editor do grupo direto.
+  const [editorOpen, setEditorOpen] = useState(
+    () => new URLSearchParams(window.location.search).get("editar") === "1",
+  );
   const [leaveOpen, setLeaveOpen] = useState(false);
   const [lcId, setLcId] = useState<string>();
   const activeLcId = lcId ?? comps?.[0]?.id;

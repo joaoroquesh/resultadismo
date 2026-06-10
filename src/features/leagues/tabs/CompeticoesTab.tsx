@@ -102,7 +102,7 @@ export function CompeticoesTab({
   return (
     <div className="space-y-3">
       {comps.map((c) => {
-        // O bolão (Pontos/Tabela) é a base do grupo nesta temporada: sem remover
+        // O bolão é a base do grupo nesta temporada: sem remover
         // (o banco também recusa). Disputas de Confronto continuam removíveis.
         const isBolaoBase = c.mode === "points" || c.mode === "table";
         return (
@@ -171,7 +171,7 @@ export function CompeticoesTab({
               )}
               <p className="text-xs leading-snug text-ink-500">
                 {tipo === "pontos"
-                  ? "Corrida de pontos: todo mundo acumula, quem somou mais lidera."
+                  ? "Bolão: todo mundo acumula pontos e quem somou mais lidera."
                   : formato === "liga"
                     ? "Liga: todos contra todos; cada rodada vale 3/1/0 e forma uma tabela."
                     : "Copa: mata-mata; quem perde o confronto está fora."}
@@ -202,38 +202,9 @@ export function CompeticoesTab({
               )}
             </div>
           ) : (
-            <div className="space-y-1.5">
-              <p className="text-xs font-semibold text-ink-700">Modo de disputa</p>
-              <div className="flex gap-1 rounded-pill bg-ink-100 p-1">
-                <button
-                  type="button"
-                  className="flex-1 rounded-pill bg-surface px-3 py-1.5 text-sm font-semibold text-ink-950 shadow-[var(--shadow-soft)]"
-                >
-                  Pontos
-                </button>
-                <button
-                  type="button"
-                  disabled
-                  className="flex-1 cursor-not-allowed rounded-pill px-3 py-1.5 text-xs font-semibold text-ink-400"
-                  title="Em breve"
-                >
-                  Liga · em breve
-                </button>
-                <button
-                  type="button"
-                  disabled
-                  className="flex-1 cursor-not-allowed rounded-pill px-3 py-1.5 text-xs font-semibold text-ink-400"
-                  title="Em breve"
-                >
-                  Copa · em breve
-                </button>
-              </div>
-              <p className="text-xs leading-snug text-ink-500">
-                Corrida de pontos: soma tudo numa classificação única. Os modos
-                <strong> Liga </strong> (confronto direto) e <strong>Copa</strong> (mata-mata) chegam
-                em breve.
-              </p>
-            </div>
+            <p className="text-xs leading-snug text-ink-500">
+              Bolão: corrida de pontos — quem soma mais lidera. Outros modos chegam em breve.
+            </p>
           )}
           <div className="flex gap-2">
             <Button variant="ghost" fullWidth onClick={() => setOpen(false)}>

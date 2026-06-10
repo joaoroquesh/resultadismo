@@ -38,7 +38,7 @@ export function NovaLigaPage() {
   const [checkingDiscount, setCheckingDiscount] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
 
-  // Temporada da Copa: todo grupo nasce com a Copa do Mundo (modo Pontos), travada.
+  // Temporada da Copa: todo grupo nasce com o bolão da Copa do Mundo, travado.
   // O banco também enforça (trigger group_eligible). Outros campeonatos chegam depois.
   const worldCup = competitions?.length ? findWorldCupCompetition(competitions) : undefined;
 
@@ -70,7 +70,7 @@ export function NovaLigaPage() {
     if (!name.trim() || redirecting || !worldCup) return;
     setRedirecting(true);
     try {
-      // Todo grupo nasce com a Copa do Mundo em modo Pontos (o submit fica
+      // Todo grupo nasce com o bolão da Copa do Mundo (o submit fica
       // desabilitado até o catálogo carregar; o banco também enforça).
       const league = await create.mutateAsync({
         name: name.trim(),
@@ -246,11 +246,10 @@ export function NovaLigaPage() {
           <div className="flex items-start gap-2 rounded-md border-l-2 border-grass-600 bg-surface-2 p-3 text-xs text-grass-800">
             <Trophy className="mt-0.5 size-4 shrink-0" />
             <p>
-              <strong>É a temporada da Copa!</strong> Todo grupo joga a{" "}
-              <strong>Copa do Mundo 2026 em modo Pontos</strong>: cada palpite vale pontos e quem
-              somar mais lidera. Depois da Copa, outros campeonatos chegam para os grupos
-              (Brasileirão, Libertadores e mais). Os <strong>amistosos</strong> ficam abertos para
-              palpitar na aba Jogos, mas não valem pontos no grupo.
+              <strong>É a temporada da Copa!</strong> Todo grupo joga o{" "}
+              <strong>bolão da Copa do Mundo 2026</strong>: cada palpite vale pontos e quem somar
+              mais lidera. Os <strong>amistosos</strong> ficam abertos para palpitar na aba Jogos,
+              mas não valem pontos no grupo.
             </p>
           </div>
         </Card>
@@ -326,9 +325,9 @@ export function NovaLigaPage() {
 
         <div className="rounded-md border border-border bg-surface p-3 text-xs leading-relaxed text-ink-500">
           <strong className="text-ink-700">O que é um grupo?</strong> É o espaço onde você e seus
-          amigos jogam. Nesta temporada ele roda o <strong>bolão da Copa</strong> (modo Pontos: quem
-          soma mais pontos lidera). Depois da Copa, dará para adicionar outros campeonatos:
-          Brasileirão, top 5 da Europa, Série B, Libertadores e Copa do Brasil.
+          amigos jogam o <strong>bolão da Copa</strong>. Depois da Copa chegam outros campeonatos —
+          Brasileirão, top 5 da Europa, Série B, Libertadores e Copa do Brasil — e o modo
+          confronto (em breve).
         </div>
 
         <Button

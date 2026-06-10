@@ -309,7 +309,7 @@ function TeamSide({
         align === "right" ? "flex-row-reverse text-right" : "text-left",
       )}
     >
-      <TeamCrest team={team} name={name} size={28} />
+      <TeamCrest team={team} name={name} size={28} eager />
       <span className="line-clamp-2 text-xs font-semibold leading-tight text-ink-800">{name}</span>
     </div>
   );

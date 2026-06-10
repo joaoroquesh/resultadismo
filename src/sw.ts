@@ -1,11 +1,27 @@
 /// <reference lib="webworker" />
 import { precacheAndRoute } from "workbox-precaching";
+import { registerRoute } from "workbox-routing";
+import { CacheFirst } from "workbox-strategies";
+import { ExpirationPlugin } from "workbox-expiration";
 
 declare const self: ServiceWorkerGlobalScope & {
   __WB_MANIFEST: Array<{ url: string; revision: string | null }>;
 };
 
 precacheAndRoute(self.__WB_MANIFEST);
+
+// Escudos (repo /teams + CDNs dos provedores): CacheFirst — depois da 1ª vez,
+// carregam do cache na hora (some a "demora" das imagens).
+registerRoute(
+  ({ url }) =>
+    url.pathname.startsWith("/teams/") ||
+    url.hostname === "a.espncdn.com" ||
+    url.hostname === "crests.football-data.org",
+  new CacheFirst({
+    cacheName: "team-crests",
+    plugins: [new ExpirationPlugin({ maxEntries: 600, maxAgeSeconds: 30 * 24 * 3600 })],
+  }),
+);
 
 self.addEventListener("install", () => {
   self.skipWaiting();

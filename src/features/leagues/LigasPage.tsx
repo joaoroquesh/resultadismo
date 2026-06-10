@@ -354,8 +354,8 @@ function GroupCard({
           </button>
           {isAdmin && (
             <Link
-              to={`/grupos/${league.slug}`}
-              aria-label="Gerenciar grupo"
+              to={`/grupos/${league.slug}?editar=1`}
+              aria-label="Editar grupo"
               className="grid size-9 place-items-center rounded-md text-ink-400 transition hover:bg-ink-100 hover:text-ink-700"
             >
               <Pencil className="size-4" />

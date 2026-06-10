@@ -22,6 +22,23 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 _(vazio — próximas mudanças acumulam aqui)_
 
+## [Não lançado]
+
+### Adicionado
+- **Mini-jogo Resultadismo Retrô — Portão A cumprido + Fase 1 (dados) concluída e validada
+  localmente** (ainda **não deployado**; sobe só após homologação do João — Portão B). Comentários
+  do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
+  (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
+  Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do
+  Dia). Fase 1: migration `20260610000001_retro_matches.sql` (**964 jogos das 22 Copas**, fonte
+  openfootball CC0 em `data/retro-sources/`, dificuldade 1–7 com 34 jogos-lenda, **RLS ligado sem
+  policy** = gabarito inacessível ao client, verificado com `set role anon/authenticated` = 0
+  linhas); importador `scripts/gen-retro-seed.mjs` com portões de qualidade (pegou a prorrogação
+  de grupo de 1954 e o duplo Brasil×Tchecoslováquia de 1962); **33 bandeiras históricas** (URSS,
+  Iugoslávia, Zaire, Alemanha Oriental…) em `public/teams/` + manifest regenerado (325 escudos,
+  100% dos slugs do jogo resolvem). `db reset` + `db:types` + `typecheck` verdes. Ao subir:
+  atualizar `.claude/05` §2 e criar `.claude/12-RETRO-MINIJOGO.md`.
+
 ## [2.0.0] — 2026-06-09
 
 > **🏆 O marco da Copa (ADR [`0003`](decisions/0003-versionamento.md)): v2.0 = lançamento oficial.**
@@ -146,6 +163,16 @@ _(vazio — próximas mudanças acumulam aqui)_
   Pendente: escudos de Costa do Marfim e Suécia (Wikimedia quebrado).
 
 ### Alterado
+- **Polimento pré-lançamento (pedidos do PO).** Zoom desabilitado no site (app-like). Discurso
+  unificado: o modo do grupo é o **bolão** em toda copy (NovaLigaPage com card e rodapé sem
+  duplicação; bloco morto de "Modo de disputa" removido do CompeticoesTab); **confronto** aparece
+  só como "em breve". **Como funciona** reescrita: seção "Palpitar leva segundos" (traço → toque →
+  0×0 com +/−), bolão/confronto enxutos, convite por **link**, "quem já palpitou" com filtro por
+  grupo e estrela, **The Best** e **Do seu jeito** (personalização + notificações + app). Lápis no
+  card de /grupos abre **direto o editor** do grupo (`?editar=1`). Menu Perfil → Personalização
+  leva ao **hub** (`/perfil/editar`); o wizard completo é só do 1º acesso (quem já concluiu é
+  redirecionado). **Escudos com cache** (SW CacheFirst p/ `/teams/` e CDNs, 30 dias) e crests dos
+  cards de jogo carregam **eager** — some a demora das imagens.
 - **Varredura completa do "tom lavado"** (92 substituições, incl. o primitivo `Badge` → sólidos) —
   regra do [`12-DESIGN`](12-DESIGN.md) agora vale no app inteiro.
 - **Página de personalização reformada:** fluxo focado (nav colada embaixo, conteúdo rola, listas

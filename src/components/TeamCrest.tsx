@@ -15,12 +15,15 @@ export function TeamCrest({
   src,
   size = 32,
   className,
+  eager = false,
 }: {
   team?: Team | null;
   name?: string | null;
   src?: string | null;
   size?: number;
   className?: string;
+  /** true nos cards de jogo (acima da dobra): carrega já, sem lazy. */
+  eager?: boolean;
 }) {
   const label = name ?? team?.short_name ?? team?.name ?? "";
 
@@ -55,7 +58,8 @@ export function TeamCrest({
       alt={label}
       width={size}
       height={size}
-      loading="lazy"
+      loading={eager ? "eager" : "lazy"}
+      decoding="async"
       onError={() => setFailed((prev) => new Set(prev).add(url))}
       className={cn("inline-block object-contain", className)}
       style={{ width: size, height: size }}
