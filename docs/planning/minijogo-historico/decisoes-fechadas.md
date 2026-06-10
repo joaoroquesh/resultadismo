@@ -90,7 +90,7 @@ Dois eixos independentes, escolhidos antes da run:
   - `scripts/gen-retro-seed.mjs` — importador com portões de qualidade; pegou 2 casos históricos
     reais: prorrogação em jogo de GRUPO na Copa de 1954 (regra da edição) e o duplo
     Brasil×Tchecoslováquia de 1962 (0x0 no grupo + 3x1 na final).
-  - `supabase/migrations/20260610000001_retro_matches.sql` — tabela + RLS ligado SEM policy
+  - `supabase/migrations/20260610150000_retro_matches.sql` — tabela + RLS ligado SEM policy
     (anon e logado leem 0 linhas — gabarito protegido, verificado via `set role`) + 964 jogos.
     Distribuição de dificuldade: 1:36 · 2:133 · 3:315 · 4:267 · 5:150 · 6:54 · 7:9.
   - 33 bandeiras históricas em `public/teams/` (URSS, Iugoslávia, Zaire, Alemanha Oriental…)
@@ -106,7 +106,7 @@ Dois eixos independentes, escolhidos antes da run:
   retangulares (33 novos + 27 pré-existentes) envelopados em clip circular com corte centralizado —
   `scripts/gen-flag-circles.mjs` (idempotente, marcador `data-rd-circle`).
 - **Fase 2 (motor no banco) — CONCLUÍDA E TESTADA (09/06/2026).** Migration
-  `20260610000002_retro_engine.sql`: tabelas `retro_daily`/`retro_runs`/`retro_run_matches`/
+  `20260610150001_retro_engine.sql`: tabelas `retro_daily`/`retro_runs`/`retro_run_matches`/
   `retro_usage_daily` (todas RLS sem policy) + RPCs `retro_start_run` (retomada do daily,
   unicidade 1/dia por conta), `retro_answer` (janela de tempo NO servidor +2s, pontua com
   `compute_score_type`/`score_points`, progressão D3 com jogo de honra e barra ≥2 na semi/final,
@@ -117,7 +117,7 @@ Dois eixos independentes, escolhidos antes da run:
   grupos com jogo de honra, timeout de servidor, barra da semi, daily determinístico/retomável/único,
   ranking, summary sem identidade de jogos, Só Cravada, clamp anônimo, purga, RLS = 0 linhas.
 - **⚠️ Pendências antes do PUSH (a sessão que subir cumpre):** re-conferir numeração das migrations
-  `20260610000001/2` vs `origin/main` (doc 09 §3 — hoje o bookkeeping local já pegou uma colisão de
+  `20260610150000/2` vs `origin/main` (doc 09 §3 — hoje o bookkeeping local já pegou uma colisão de
   nº 000011 entre worktrees!); rodar `db reset` limpo de uma árvore atualizada; atualizar
   `.claude/05` §2 (tabelas `retro_*`) e criar `.claude/12-RETRO-MINIJOGO.md`; revisão AppSec do
   rate-limit das RPCs anônimas (hardening listado na pesquisa D14); homologação final (Portão B).
@@ -130,14 +130,14 @@ Dois eixos independentes, escolhidos antes da run:
   (campanha + share WhatsApp com grade de emojis sem spoiler), `RetroSharePage` (/retro/r/:code),
   `RetroLeaderboard`, heartbeat anônimo. Rotas públicas em `App.tsx`; keyframes "fliperama" no
   `index.css` (cobertos pelo kill-switch global de reduced-motion). Migration extra
-  `20260610000003_retro_ui_support.sql` (payload com match_id/difficulty + RPC `retro_my_stats`).
+  `20260610150002_retro_ui_support.sql` (payload com match_id/difficulty + RPC `retro_my_stats`).
   **Validação real**: typecheck + lint zerado (complexidade ≤20) + `check:arch` aprovado + **E2E
   Playwright em Chrome real** (run anônima completa de Treino, timer tenso + timeout auto-submit,
   reveal com flip visível, tela final, share-page 404, zero erros de console).
 - **Homologação do PO — rodada 1 (09/06, "gostei das animações") — 6 ajustes ATENDIDOS:**
   (1) BUG corrigido: o slot seguinte era servido no `retro_answer` e o cronômetro corria durante o
   reveal → falso "tempo esgotado"; agora `retro_next` serve sob demanda (migration
-  `20260610000004`), com E2E de regressão (ler reveal 12s + responder em 2s = sem timeout).
+  `20260610150003`), com E2E de regressão (ler reveal 12s + responder em 2s = sem timeout).
   (2) Roletas: maior número EM CIMA (rolar pra cima = mais gols) e começam em 0×0 (palpite válido).
   (3) Visual mais retrô: placar eletrônico ink-950 com dígitos dourados, scanlines no hero,
   listras duplas, roletas estilo placar de estádio. (4) Semi/final com moldura dourada pulsante

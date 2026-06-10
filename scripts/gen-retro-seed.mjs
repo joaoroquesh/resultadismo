@@ -18,7 +18,7 @@ import path from "node:path";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const SRC = path.join(ROOT, "data", "retro-sources");
-const MIGRATION = path.join(ROOT, "supabase", "migrations", "20260610000001_retro_matches.sql");
+const MIGRATION = path.join(ROOT, "supabase", "migrations", "20260610150000_retro_matches.sql");
 const DRY = process.argv.includes("--dry-run");
 
 const YEARS = [1930, 1934, 1938, 1950, 1954, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022];

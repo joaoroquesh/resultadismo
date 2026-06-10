@@ -1,6 +1,6 @@
 -- Bateria de testes do motor Retrô (Fase 2) — rodar contra o Supabase LOCAL:
 --   docker exec -i supabase_db_resultadismo psql -U postgres -d postgres < scripts/retro-engine-tests.sql
--- Pré-requisito: migrations 20260610000001/2 aplicadas (db reset). Idempotente.
+-- Pré-requisito: migrations 20260610150000/2 aplicadas (db reset). Idempotente.
 
 -- Bateria de testes do motor Retrô (roda como postgres; simula anon/logado via JWT claims)
 \set ON_ERROR_STOP on

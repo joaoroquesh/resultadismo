@@ -5,7 +5,7 @@ import { useAuth } from "@/features/auth/AuthProvider";
 import type { ScoreType } from "@/lib/types";
 import { retroAnonToken, retroSeen } from "./retroLocal";
 
-// ---------- tipos dos payloads jsonb das RPCs do motor (migration 20260610000002/3) ----------
+// ---------- tipos dos payloads jsonb das RPCs do motor (migration 20260610150001/3) ----------
 
 export type RetroMode = "acerto" | "cravada";
 export type RetroPace = "resultadista" | "classico" | "sempressa";
