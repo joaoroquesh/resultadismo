@@ -83,7 +83,9 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   novo"; convite pro bolão da Copa no fim, com logo do Resultadismo. **Rodada 14:** "Jogo livre"
   deixa de dizer "sem ranking" (ele ranqueia e é o jogo do dia a dia); telas mais leves (sem cards
   de Ritmo e "Como funciona", hero curto, sem "nível X/7"); removido o "Sem Pressa" (todo jogo é
-  cronometrado). Só front. Histórico completo da construção: Comentários
+  cronometrado). **Fix:** card do Retrô no Perfil usava `bg-ink-950` (que inverte no dark → ficava
+  claro com texto branco, ilegível); trocado pelo token estável `--retro-board` (escuro nos dois
+  temas). Histórico completo da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do

@@ -185,7 +185,7 @@ export function PerfilPage() {
 
         <Link to="/retro" className="block">
 
-          <Card className="relative overflow-hidden bg-ink-950 p-4 text-white transition hover:opacity-95">
+          <Card className="relative overflow-hidden bg-[var(--retro-board)] p-4 text-white transition hover:opacity-95">
 
             <div
 
