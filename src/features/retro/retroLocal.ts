@@ -36,3 +36,20 @@ export function retroMarkSeen(matchId: string | null | undefined) {
     /* sem storage, sem anti-repeat — o jogo segue */
   }
 }
+
+// Pré-aquece o cache das 85 bandeiras do jogo (feedback: "escudos demoram").
+// Roda 1x por sessão, em idle, na home do Retrô — na rodada, tudo já está no cache.
+let warmed = false;
+export function warmRetroFlags(resolve: (slug: string) => string | null) {
+  if (warmed) return;
+  warmed = true;
+  const go = async () => {
+    const { RETRO_FLAG_SLUGS } = await import("./retroFlagSlugs");
+    for (const slug of RETRO_FLAG_SLUGS) {
+      const src = resolve(slug);
+      if (src) new Image().src = src;
+    }
+  };
+  if ("requestIdleCallback" in window) requestIdleCallback(() => void go());
+  else setTimeout(() => void go(), 800);
+}

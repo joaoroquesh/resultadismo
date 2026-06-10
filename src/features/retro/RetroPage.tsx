@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { track } from "@/lib/analytics";
+import { useEffect } from "react";
+import { teamCrestPath } from "@/lib/teamCrests";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -22,7 +24,7 @@ import {
   type RetroPace,
   type RetroStart,
 } from "./api";
-import { retroMarkSeen } from "./retroLocal";
+import { retroMarkSeen, warmRetroFlags } from "./retroLocal";
 import { RunView } from "./RunView";
 import { RevealCard } from "./RevealCard";
 import { ResultView } from "./ResultView";
@@ -84,6 +86,7 @@ export function RetroPage() {
   const nextMut = useRetroNext();
   const myStats = useRetroMyStats();
   useRetroAnonHeartbeat();
+  useEffect(() => warmRetroFlags(teamCrestPath), []);
 
   function start(daily: boolean) {
     if (startMut.isPending) return;

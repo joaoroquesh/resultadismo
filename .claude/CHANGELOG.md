@@ -28,7 +28,10 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   anônimo (30 runs/h/token, migration `20260610150004`), eventos GA4
   (`retro_run_start/guess/run_end/share`), seção Retrô no **Como Funciona** e na **landing**,
   novo doc [`12-RETRO-MINIJOGO.md`](12-RETRO-MINIJOGO.md) + linha no MESTRE §2 + tabelas/RPCs no
-  doc 05. Histórico completo da construção: Comentários
+  doc 05. **Rodada 3 (feedback dos amigos):** ano/fase em destaque no card, 85 bandeiras
+  pré-aquecidas + respiro "Valendo…" (deadline +1,5s, migration `20260610150005`), botões +/− nas
+  roletas, semi/final recalibradas (janelas SF 3-5 · F 4-6, pesos 40/35/25). Histórico completo
+  da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do

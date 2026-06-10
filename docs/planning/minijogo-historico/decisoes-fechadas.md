@@ -155,6 +155,13 @@ Dois eixos independentes, escolhidos antes da run:
   (`retro_run_start/guess/run_end/share`); seção no Como Funciona + landing; guarda anti-abuso
   anônimo (30 runs/h/token, migration `20260610150004`); doc oficial `.claude/12-RETRO-MINIJOGO.md`
   + linha no MESTRE §2 + tabelas/RPCs no doc 05.
+- **Rodada 3 (10/06, feedback dos amigos em produção) — 4 ajustes ATENDIDOS, commit local:**
+  (1) ano/fase em DESTAQUE no card ("Copa de 1990" gigante + selo de fase); (2) escudos
+  instantâneos: 85 bandeiras pré-aquecidas na home + respiro "Valendo…" de 1,2s antes do cronômetro
+  (servidor compensa +1,5s no deadline, migration `20260610150005`); (3) botões +/− acima/abaixo
+  das roletas; (4) semi/final mais justas: janelas do sorteio desceram um degrau (SF 4-6→3-5,
+  F 5-7→4-6) + mata-mata pesa 40/35/25 pro fácil — a barra ≥2 pts da semi/final (D3) fica, é o
+  mecanismo de raridade do título; se seguir difícil, o próximo botão é ela.
 - **Backlog (fase 2 do Retrô)** — eventos GA4 (union do `analytics.ts`) ✓feito, entrada na navegação/Como Funciona/
   landing (pontos de contato), docs `.claude/05` §2 + `12-RETRO-MINIJOGO.md` → **Fase 5**:
   homologação com o João (Portão B), integração do worktree na main e deploy.

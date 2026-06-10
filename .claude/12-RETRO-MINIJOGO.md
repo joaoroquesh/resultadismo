@@ -55,9 +55,11 @@ grade de emojis **sem spoiler** + página pública `/retro/r/:code`.
   nasce no clique —, `retro_answer`, `retro_run_summary`, `retro_leaderboard`, `retro_my_stats`,
   `retro_touch_anon`, `retro_purge_ephemeral`). Testes: `scripts/retro-engine-tests.sql`
   (rodar contra o Supabase local).
-- **Sorteio:** nível primeiro (grupos 45/35/20 puxando pro fácil; demais fases uniforme), janelas
-  por fase (G 1–3 · 8ª 2–4 · 4ª 3–5 · SF 4–6 · F 5–7), 10% fora da janela; anti-repetição do
-  Treino via lista local (≤30 ids).
+- **Sorteio (calibrado na rodada 3, 10/06):** nível primeiro (grupos 45/35/20; mata-mata 40/35/25,
+  sempre puxando pro fácil), janelas por fase **G 1–3 · 8ª 2–4 · 4ª 3–5 · SF 3–5 · F 4–6**, 10%
+  fora da janela; anti-repetição do Treino via lista local (≤30 ids). O deadline do servidor tem
+  **+1,5s de respiro de leitura** (o client mostra o confronto ~1,2s antes do cronômetro visual;
+  bandeiras pré-aquecidas na home via `retroFlagSlugs.ts`).
 - **Bandeiras:** `public/teams/` (33 históricas adicionadas; todas as SVG padronizadas em
   **círculo** por `scripts/gen-flag-circles.mjs` — idempotente).
 - **Analytics:** eventos `retro_run_start`/`retro_guess`/`retro_run_end`/`retro_share` na union de

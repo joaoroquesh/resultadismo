@@ -33,8 +33,18 @@ function Wheel({
     if (VALUES[i] !== value) onChange(VALUES[i]);
   };
 
+  const bump = (delta: number) => onChange(Math.max(0, Math.min(10, value + delta)));
+
   return (
     <div className="flex flex-col items-center gap-1">
+      <button
+        type="button"
+        aria-label={`Mais um gol: ${label}`}
+        onClick={() => bump(1)}
+        className="grid size-9 place-items-center rounded-full bg-ink-100 text-lg font-bold text-ink-700 active:scale-95"
+      >
+        +
+      </button>
       <div className="relative">
         <div
           aria-hidden
@@ -64,6 +74,14 @@ function Wheel({
           ))}
         </div>
       </div>
+      <button
+        type="button"
+        aria-label={`Menos um gol: ${label}`}
+        onClick={() => bump(-1)}
+        className="grid size-9 place-items-center rounded-full bg-ink-100 text-lg font-bold text-ink-700 active:scale-95"
+      >
+        −
+      </button>
       <span className="max-w-[88px] truncate text-[11px] font-semibold text-ink-500">{label}</span>
     </div>
   );
@@ -87,7 +105,7 @@ export function ScoreWheels({
   return (
     <div className="flex items-center justify-center gap-4">
       <Wheel value={home} onChange={onHome} label={homeLabel} />
-      <span className="pb-5 text-2xl font-bold text-ink-400">×</span>
+      <span className="text-2xl font-bold text-ink-400">×</span>
       <Wheel value={away} onChange={onAway} label={awayLabel} />
     </div>
   );

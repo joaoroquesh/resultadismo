@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { RetroCrest } from "./RetroCrest";
@@ -34,6 +34,14 @@ export function RunView({
   // o pai remonta este componente por jogo (key=match_id): nasce 0×0 (palpite válido)
   const [home, setHome] = useState(0);
   const [away, setAway] = useState(0);
+  // respiro de leitura: ~1,2s vendo o confronto antes do cronômetro visual nascer
+  // (o servidor compensa com +1,5s no deadline; bandeiras vêm pré-aquecidas da home)
+  const [valendo, setValendo] = useState(current.timer_seconds == null);
+  useEffect(() => {
+    if (current.timer_seconds == null) return;
+    const t = window.setTimeout(() => setValendo(true), 1200);
+    return () => window.clearTimeout(t);
+  }, [current.timer_seconds]);
   const m = current.match;
   const decisao = current.slot >= 6; // semi e final ganham clima de decisão
 
@@ -55,8 +63,18 @@ export function RunView({
           >
             {decisao ? `⚡ ${current.slot_label} ⚡` : current.slot_label}
           </p>
-          <p className="mt-0.5 text-xs text-ink-500">
-            Copa de {m.wc_year} ({m.wc_host}) · {m.stage_label_pt} · nível {m.difficulty}/7
+          {/* leitura rápida do jogo (feedback dos amigos): ANO gigante + fase em selo */}
+          <p className="mt-1 text-3xl font-bold leading-none tracking-tight">
+            Copa de {m.wc_year}
+          </p>
+          <p className="mt-1.5 flex items-center justify-center gap-1.5 text-xs text-ink-500">
+            <span>{m.wc_host}</span>
+            <span aria-hidden>·</span>
+            <span className="rounded-pill bg-brand-500/10 px-2 py-0.5 font-bold text-brand-700">
+              {m.stage_label_pt}
+            </span>
+            <span aria-hidden>·</span>
+            <span>nível {m.difficulty}/7</span>
           </p>
         </div>
 
@@ -66,7 +84,13 @@ export function RunView({
           <TeamSide slug={m.away_slug} name={m.away_name_pt} />
         </div>
 
-        <RetroTimer totalSeconds={current.timer_seconds} onExpire={() => onSubmit(home, away)} />
+        {valendo ? (
+          <RetroTimer totalSeconds={current.timer_seconds} onExpire={() => onSubmit(home, away)} />
+        ) : (
+          <p className="animate-retro-tense text-center text-sm font-bold uppercase tracking-widest text-brand-700">
+            Valendo…
+          </p>
+        )}
       </Card>
 
       <div className="space-y-3">
