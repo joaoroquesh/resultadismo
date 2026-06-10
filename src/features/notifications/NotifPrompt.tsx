@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { getPushState, subscribePush } from "@/features/notifications/push";
+import { NotifDeniedHelp } from "@/features/notifications/NotifDeniedHelp";
 
 // Banner discreto pra ativar notificações nos primeiros acessos (2x) de quem
 // ainda não ativou. O 1º acesso já é coberto pela tela final do onboarding;
@@ -24,6 +25,7 @@ export function NotifPrompt() {
   });
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [denied, setDenied] = useState(false);
 
   const eligible = !!user && !onProfile && !!push?.supported && !push.subscribed;
 
@@ -52,8 +54,12 @@ export function NotifPrompt() {
   const activate = async () => {
     if (!user) return;
     setBusy(true);
-    await subscribePush(user.id);
+    const res = await subscribePush(user.id);
     setBusy(false);
+    if (!res.ok && Notification.permission === "denied") {
+      setDenied(true); // bloqueado no navegador → mostra o passo a passo
+      return;
+    }
     setShow(false);
   };
 
@@ -76,6 +82,19 @@ export function NotifPrompt() {
         <X className="size-4" />
       </button>
 
+      {denied ? (
+        <div className="pr-6">
+          <NotifDeniedHelp
+            onRetry={async () => {
+              if (!user) return false;
+              const res = await subscribePush(user.id);
+              if (res.ok) setShow(false);
+              return res.ok;
+            }}
+          />
+        </div>
+      ) : (
+      <>
       <div className="flex items-start gap-3 pr-6">
         <div className="grid size-10 shrink-0 place-items-center rounded-md bg-surface-2 text-brand-600">
           <Bell className="size-5" />
@@ -96,6 +115,8 @@ export function NotifPrompt() {
           <Bell className="size-4" /> Ativar
         </Button>
       </div>
+      </>
+      )}
     </div>
   );
 }

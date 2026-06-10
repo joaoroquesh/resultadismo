@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils";
 import { ESCUDO_SHAPES, legacyToCrest } from "@/lib/crest";
 import { getStoredInvite, clearStoredInvite } from "@/lib/invite";
 import { getPushState, subscribePush, unsubscribePush } from "@/features/notifications/push";
+import { NotifDeniedHelp } from "@/features/notifications/NotifDeniedHelp";
 import { useInstallState, promptInstall, isIOS } from "@/lib/pwa";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useJoinByCode } from "@/features/leagues/api";
@@ -792,7 +793,20 @@ function NotifSection({
       title="Ative as notificações"
       desc="Pra não esquecer de palpitar — a gente te lembra antes dos jogos."
     >
-      {push?.supported ? (
+      {push?.supported && push.permission === "denied" ? (
+        <NotifDeniedHelp
+          onRetry={async () => {
+            if (!userId) return false;
+            const res = await subscribePush(userId);
+            qc.invalidateQueries({ queryKey: ["onboarding-push"] });
+            onToast(
+              res.ok ? "Notificações ativadas! 🔔" : "Ainda bloqueado por aqui — confira o passo a passo.",
+              res.ok ? "success" : "error",
+            );
+            return res.ok;
+          }}
+        />
+      ) : push?.supported ? (
         <div className="flex w-full items-center justify-between gap-3 rounded-md border border-ink-200 bg-surface p-4">
           <span className="min-w-0 text-sm font-bold text-ink-900">Receber lembretes e avisos</span>
           <Switch checked={on} onChange={toggle} disabled={busy} label="Ativar notificações" />

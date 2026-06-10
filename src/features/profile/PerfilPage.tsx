@@ -35,6 +35,7 @@ import {
 } from "@/features/notifications/push";
 import { NotifPrefsCard } from "@/features/notifications/NotifPrefsCard";
 import { IosPushHint } from "@/features/notifications/IosPushHint";
+import { NotifDeniedHelp } from "@/features/notifications/NotifDeniedHelp";
 import { useInstallState, promptInstall, isIOS } from "@/lib/pwa";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -367,6 +368,17 @@ export function PerfilPage() {
             {notifControl}
           </Card>
           {/* iPhone: precisa instalar o app antes de poder receber push. */}
+          {push?.supported && push.permission === "denied" && (
+            <NotifDeniedHelp
+              onRetry={async () => {
+                if (!user) return false;
+                const { ok, error } = await subscribePush(user.id);
+                await refreshPush();
+                toast(ok ? "Notificações ativadas! 🔔" : error ?? "Ainda bloqueado.", ok ? "success" : "error");
+                return ok;
+              }}
+            />
+          )}
           <IosPushHint subscribed={!!push?.subscribed} />
           {/* Já inscrito: deixa escolher o que receber (vale pra conta toda). */}
           {push?.subscribed && <NotifPrefsCard />}

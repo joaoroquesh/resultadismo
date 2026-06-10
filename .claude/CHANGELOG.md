@@ -112,6 +112,13 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   erros de console). Ao subir: atualizar `.claude/05` §2 e criar `.claude/12-RETRO-MINIJOGO.md`.
 
 ### Corrigido
+- **"Permissão negada" nas notificações agora ensina a liberar.** Quando o navegador/celular está
+  com as notificações BLOQUEADAS (não dá pra abrir as configurações pela pessoa), aparece um guia
+  passo a passo por plataforma (Android no navegador → cadeado/Permissões; Android com app →
+  Configurações → Apps; iPhone → instalar o app / Ajustes → Notificações; desktop → cadeado) +
+  botão "Já liberei — tentar de novo". Cobre o onboarding (tela de notificações), o banner e o
+  Perfil (que só dizia "bloqueadas"). De quebra, corrigido um falso-positivo: navegador SEM
+  suporte não mostra mais o guia de bloqueio.
 - **Notificações clicáveis levam ao lugar de resolver.** Itens do sininho agora navegam pro
   destino (`data.url` do backend, com fallback por tipo: cutucada/lembrete → Jogos, feedback →
   Construa, alerta de admin → Admin → Alertas); o clique na push já abria o app no `data.url`
