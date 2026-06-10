@@ -21,6 +21,10 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Corrigido
+- **Link de convite pra quem já é de casa.** Quem abre um link `?convite=` e **já concluiu** o
+  1º acesso vai direto pra **/grupos com o código preenchido** (só na visita do clique — flag de
+  sessão consumida; visitas normais seguem nos Jogos). Quem ainda não concluiu continua caindo no
+  wizard, que já preenche o convite.
 - **Onboarding: dois bugs do fluxo.** (1) O campo de convite aparecia com um **UUID aleatório** —
   era o `?code=` do **callback do OAuth do Google** sendo capturado como convite; agora só `?convite=`
   conta, com formato validado (`A–Z0–9`, 3–12) e auto-limpeza do lixo já salvo no aparelho.
