@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/Switch";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
-import { useRetroConfig, useRetroSetConfig, type RetroConfig } from "./api";
+import { useRetroAdminStats, useRetroConfig, useRetroSetConfig, type RetroConfig } from "./api";
 import { FeedbackAdmin } from "@/features/feedback/FeedbackAdmin";
 
 type Min = "acerto" | "saldo" | "cravada";
@@ -25,6 +25,7 @@ export function RetroAdminPage() {
   return (
     <Page title="Admin · Retrô">
       <div className="mx-auto w-full max-w-md space-y-4">
+        <StatsPanel />
         {cfg.data ? <ConfigForm initial={cfg.data} /> : <Skeleton className="h-48 w-full" />}
 
         <div>
@@ -90,6 +91,44 @@ function ConfigForm({ initial }: { initial: RetroConfig }) {
       >
         Salvar
       </Button>
+    </Card>
+  );
+}
+
+function fmtDur(seconds: number): string {
+  const m = Math.round(seconds / 60);
+  if (m < 60) return `${m} min`;
+  const h = Math.floor(m / 60);
+  return `${h}h ${m % 60}min`;
+}
+
+// Acessos online (agora) e tempo de uso, Retrô vs Resultadismo (app-mãe).
+function StatsPanel() {
+  const { data: s } = useRetroAdminStats();
+  if (!s) return <Skeleton className="h-28 w-full" />;
+  const rows = [
+    { label: "Online agora", retro: String(s.online_retro), main: String(s.online_main) },
+    { label: "Tempo total", retro: fmtDur(s.retro_seconds_total), main: fmtDur(s.main_seconds_total) },
+  ];
+  return (
+    <Card className="p-4">
+      <h2 className="text-sm font-bold uppercase tracking-wide text-ink-500">Acessos & tempo</h2>
+      <div className="mt-2 grid grid-cols-3 gap-2 border-b border-border pb-1 text-[11px] font-bold uppercase tracking-wide text-ink-400">
+        <span></span>
+        <span className="text-right">🕹️ Retrô</span>
+        <span className="text-right">⚽ Normal</span>
+      </div>
+      {rows.map((r) => (
+        <div key={r.label} className="grid grid-cols-3 items-center gap-2 py-1.5 text-sm">
+          <span className="text-ink-500">{r.label}</span>
+          <span className="text-right font-bold tabular-nums text-brand-700">{r.retro}</span>
+          <span className="text-right font-bold tabular-nums text-ink-700">{r.main}</span>
+        </div>
+      ))}
+      <p className="mt-2 text-[11px] text-ink-400">
+        Retrô hoje: {fmtDur(s.retro_seconds_today)} · {s.retro_anon_runs_today} partidas anônimas ·{" "}
+        {s.retro_players_total} jogadores logados no total.
+      </p>
     </Card>
   );
 }

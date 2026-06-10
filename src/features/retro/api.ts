@@ -258,6 +258,29 @@ export function useRetroConfig() {
   });
 }
 
+export type RetroAdminStats = {
+  online_retro: number;
+  online_main: number;
+  retro_seconds_total: number;
+  main_seconds_total: number;
+  retro_seconds_today: number;
+  retro_anon_runs_today: number;
+  retro_players_total: number;
+};
+
+// Admin: presença online + tempo de uso, Retrô vs app-mãe
+export function useRetroAdminStats() {
+  return useQuery({
+    queryKey: ["retro-admin-stats"],
+    queryFn: async (): Promise<RetroAdminStats> => {
+      const { data, error } = await supabase.rpc("retro_admin_stats");
+      if (error) throw new Error(error.message);
+      return data as unknown as RetroAdminStats;
+    },
+    refetchInterval: 30_000,
+  });
+}
+
 // Admin: gravar a config (toggle da barra nas finais)
 export function useRetroSetConfig() {
   const qc = useQueryClient();

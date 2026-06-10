@@ -1270,6 +1270,8 @@ export type Database = {
           national_team_id: string | null
           notif_prefs: Json
           personalization_done: boolean
+          retro_last_active_at: string | null
+          retro_usage_seconds: number
           show_in_global_ranking: boolean
           uf: string | null
           updated_at: string
@@ -1292,6 +1294,8 @@ export type Database = {
           national_team_id?: string | null
           notif_prefs?: Json
           personalization_done?: boolean
+          retro_last_active_at?: string | null
+          retro_usage_seconds?: number
           show_in_global_ranking?: boolean
           uf?: string | null
           updated_at?: string
@@ -1314,6 +1318,8 @@ export type Database = {
           national_team_id?: string | null
           notif_prefs?: Json
           personalization_done?: boolean
+          retro_last_active_at?: string | null
+          retro_usage_seconds?: number
           show_in_global_ranking?: boolean
           uf?: string | null
           updated_at?: string
@@ -2649,6 +2655,7 @@ export type Database = {
         Args: { p_enforce: boolean; p_final_min?: string; p_semi_min?: string }
         Returns: Json
       }
+      retro_admin_stats: { Args: never; Returns: Json }
       retro_answer: {
         Args: {
           p_anon_token?: string

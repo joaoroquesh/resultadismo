@@ -186,7 +186,7 @@ export function PerfilPage() {
 
         <Link to="/retro" className="block">
 
-          <Card className="relative overflow-hidden bg-[var(--retro-board)] p-4 text-white transition hover:opacity-95">
+          <Card className="relative overflow-hidden bg-ink-950 p-4 text-ink-50 transition hover:opacity-95">
 
             <div
 
@@ -206,11 +206,11 @@ export function PerfilPage() {
 
             <div className="flex items-center gap-3">
 
-              <span className="grid size-10 flex-none place-items-center rounded-lg bg-white/10 text-xl">🕹️</span>
+              <span className="grid size-10 flex-none place-items-center rounded-lg bg-ink-500/20 text-xl">🕹️</span>
 
               <span className="min-w-0 flex-1">
 
-                <span className="block text-[10px] font-bold uppercase tracking-widest text-gold-400">
+                <span className="block text-[10px] font-bold uppercase tracking-widest text-gold-600">
 
                   Nosso outro jogo
 
@@ -218,7 +218,7 @@ export function PerfilPage() {
 
                 <span className="block font-bold">Resultadismo Retrô</span>
 
-                <span className="block truncate text-xs text-white/70">
+                <span className="block truncate text-xs text-ink-300">
 
                   Crave placares históricos das Copas
 

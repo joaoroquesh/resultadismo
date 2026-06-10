@@ -107,7 +107,11 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   temas). **Fix dark/share:** o banner do Retrô na landing deslogada agora INVERTE certo (no dark
   vira claro com texto escuro p/ destaque — tokens `ink-50`/`ink-300` + `gold-600`), em vez de texto
   branco ilegível; e o **texto** de compartilhamento passou a usar o emoji dinâmico por fase
-  (🏆🥈🔥💪👏😅) igual à imagem (era sempre 😭). Histórico completo da construção: Comentários
+  (🏆🥈🔥💪👏😅) igual à imagem (era sempre 😭). **Rodada 15:** card do Retrô no Perfil também
+  inverte no dark (claro com texto escuro), igual à landing; e **admin de acessos/tempo** —
+  `profiles.retro_last_active_at`/`retro_usage_seconds` + `retro_admin_stats` (migration
+  `20260610150014`) mostram online agora e tempo total **Retrô vs Normal** no `/admin/retro`.
+  Histórico completo da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do

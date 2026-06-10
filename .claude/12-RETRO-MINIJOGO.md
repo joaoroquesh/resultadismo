@@ -71,7 +71,7 @@ página pública `/retro/r/:code`.
   `retroLocal.ts` = token anônimo + anti-repetição local). Rotas públicas `/retro` e `/retro/r/:code`
   no `App.tsx`; entradas na Sidebar/BottomNav/PublicShell. Vitrine de animações: `/retro?demo=1`
   (**só DEV**).
-- **Banco (migrations `20260610150000–150013`; 150011 = Formato Copa/Pontos + config admin + fix reroll daily; 150008 RESET; 150009 abandono; 150010 final-aceita-saldo + ranking-por-dificuldade + feedback.product):** seed dos **964 jogos** (fonte openfootball CC0,
+- **Banco (migrations `20260610150000–150014`; 150011 = Formato Copa/Pontos + config admin + fix reroll daily; 150008 RESET; 150009 abandono; 150010 final-aceita-saldo + ranking-por-dificuldade + feedback.product):** seed dos **964 jogos** (fonte openfootball CC0,
   importador `scripts/gen-retro-seed.mjs` com portões de qualidade; dificuldade 1–7 com 34
   jogos-lenda) + motor (RPCs `retro_start_run`, `retro_next` — serve **sob demanda**, o cronômetro
   nasce no clique —, `retro_answer`, `retro_run_summary`, `retro_leaderboard`, `retro_my_stats`,
@@ -85,9 +85,11 @@ página pública `/retro/r/:code`.
 - **Bandeiras:** `public/teams/` (33 históricas adicionadas; todas as SVG padronizadas em
   **círculo** por `scripts/gen-flag-circles.mjs` — idempotente).
 - **Analytics:** eventos `retro_run_start`/`retro_guess`/`retro_run_end`/`retro_share` (sem PII).
-- **Tempo de tela SÓ do Retrô (rodada 11):** `RetroShell` bate `retro_touch` a cada 30s p/ TODOS
-  (anon+logado) → `retro_usage_daily.screen_seconds`. Separado do app-mãe (PresenceTracker não roda
-  no RetroShell).
+- **Tempo/presença SÓ do Retrô:** `RetroShell` bate `retro_touch` a cada 30s p/ TODOS (anon+logado)
+  → `retro_usage_daily.screen_seconds` (agregado) e, se logado, `profiles.retro_last_active_at` +
+  `retro_usage_seconds`. Separado do app-mãe (PresenceTracker/`last_active_at`/`usage_seconds` não
+  rodam no RetroShell). `retro_admin_stats()` compara online agora e tempo total Retrô vs Normal
+  (painel no `/admin/retro`).
 - **Feedback admin:** `/admin/retro` (acessível pela nav do **/admin** principal: chip "🕹️ Retrô")
   lista os reports do Retrô (`FeedbackAdmin
   product="retro"`, via `admin_list_feedback` com `product`) — autor, página, corpo, resolver/responder
