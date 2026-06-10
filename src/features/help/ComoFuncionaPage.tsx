@@ -51,7 +51,16 @@ function Section({
   );
 }
 
-/** Cartão de pontuação no padrão visual do selo +3/+2/+1. */
+/** Placar de exemplo (chip 2×1) nas linhas de pontuação. */
+function ScoreChip({ value }: { value: string }) {
+  return (
+    <span className="rounded border border-border bg-surface px-1.5 py-0.5 text-xs font-bold tabular-nums text-ink-900">
+      {value}
+    </span>
+  );
+}
+
+/** Cartão de pontuação no padrão visual do selo +3/+2/+1, com exemplo "mostrado". */
 function ScoreRow({
   pts,
   title,
@@ -59,6 +68,8 @@ function ScoreRow({
   pill,
   text,
   icon,
+  palpite,
+  placar,
 }: {
   pts: string;
   title: string;
@@ -66,20 +77,28 @@ function ScoreRow({
   pill: string;
   text: string;
   icon: ReactNode;
+  palpite: string;
+  placar: string;
 }) {
   return (
-    <Card className="flex items-center gap-3 p-3.5">
-      <span
-        className={`grid size-11 shrink-0 place-items-center rounded-md text-lg font-extrabold tabular-nums ${pill} ${text}`}
-      >
-        {pts}
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="flex items-center gap-1.5 font-bold text-ink-900">
-          {icon}
-          {title}
-        </p>
-        <p className="text-sm leading-snug text-ink-500">{desc}</p>
+    <Card className="p-3.5">
+      <div className="flex items-center gap-3">
+        <span
+          className={`grid size-11 shrink-0 place-items-center rounded-md text-lg font-extrabold tabular-nums ${pill} ${text}`}
+        >
+          {pts}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="flex items-center gap-1.5 font-bold text-ink-900">
+            {icon}
+            {title}
+          </p>
+          <p className="text-sm leading-snug text-ink-500">{desc}</p>
+        </div>
+      </div>
+      <div className="mt-2.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 rounded-md bg-surface-2 px-3 py-2 text-xs text-ink-500">
+        Você palpita <ScoreChip value={palpite} /> e o jogo termina{" "}
+        <ScoreChip value={placar} />
       </div>
     </Card>
   );
@@ -163,22 +182,28 @@ export function ComoFuncionaPage() {
               pill="bg-gold-500"
               text="text-gold-950"
               icon={<Target className="size-4 text-gold-600" strokeWidth={2.4} />}
+              palpite="2×1"
+              placar="2×1"
             />
             <ScoreRow
               pts="+2"
               title="Saldo"
-              desc="Errou o placar exato, mas acertou a diferença de gols (ex.: palpitou 2×0, deu 3×1). Cravar o empate também conta aqui (ex.: palpitou 1×1, deu 2×2)."
+              desc="Errou o placar exato, mas acertou a diferença de gols. Prever o empate também conta aqui (palpitou 1×1, deu 2×2)."
               pill="bg-grass-600"
               text="text-white"
               icon={<Scale className="size-4 text-grass-600" strokeWidth={2.4} />}
+              palpite="2×0"
+              placar="3×1"
             />
             <ScoreRow
               pts="+1"
               title="Acerto"
-              desc="Acertou só quem venceu, mas errou o saldo de gols (ex.: palpitou 2×0, deu 1×0)."
+              desc="Acertou só quem venceu, mas errou o saldo de gols."
               pill="bg-aqua-700"
               text="text-white"
               icon={<CheckCircle2 className="size-4 text-aqua-700" strokeWidth={2.4} />}
+              palpite="2×0"
+              placar="1×0"
             />
             <ScoreRow
               pts="0"
@@ -187,6 +212,8 @@ export function ComoFuncionaPage() {
               pill="bg-ink-200"
               text="text-ink-500"
               icon={<Goal className="size-4 text-ink-400" strokeWidth={2.4} />}
+              palpite="2×0"
+              placar="0×1"
             />
           </div>
         </Section>
