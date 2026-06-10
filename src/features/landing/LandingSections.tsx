@@ -11,7 +11,6 @@ import {
   ArrowRight,
   ChevronDown,
   Check,
-  Gamepad2,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
