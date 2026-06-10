@@ -27,6 +27,7 @@ export function RunView({
   rerolling,
   onSubmit,
   onReroll,
+  onExit,
 }: {
   current: RetroCurrent;
   points: number;
@@ -36,6 +37,7 @@ export function RunView({
   rerolling: boolean;
   onSubmit: (home: number, away: number) => void;
   onReroll: () => void;
+  onExit: () => void;
 }) {
   // o pai remonta este componente por jogo (key=match_id): nasce 0×0 (palpite válido)
   const [home, setHome] = useState(0);
@@ -52,11 +54,18 @@ export function RunView({
   const decisao = current.slot >= 6; // semi e final ganham clima de decisão
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-between gap-2 overflow-hidden px-1">
+    <div className="mx-auto flex w-full max-w-md flex-1 flex-col gap-2 overflow-hidden px-1">
+      {/* topo fixo: trilha + pontos + sair (tudo numa linha — tela limpa) */}
       <div className="flex items-center justify-between gap-2">
         <CampaignTrail slots={slots} currentSlot={current.slot} />
         <span className="rounded-pill bg-ink-100 px-2.5 py-0.5 text-xs font-bold tabular-nums">{points} pts</span>
+        <button type="button" onClick={onExit} className="text-[11px] font-semibold text-ink-400">
+          sair ✕
+        </button>
       </div>
+
+      {/* bloco do jogo CENTRADO no espaço restante (sem vãos esticados em telas altas) */}
+      <div className="flex flex-1 flex-col justify-center gap-3">
 
       <Card className={decisao ? "space-y-2 border-2 border-gold-500 p-3 shadow-brand" : "space-y-2 p-3"}>
         <div className="text-center">
@@ -132,6 +141,7 @@ export function RunView({
           {m.is_knockout ? "Vale o placar final, sem pênaltis — pode dar empate!" : "Vale o placar final."}
           {current.timer_seconds != null && " Tempo esgotado? Vale o que estiver marcado."}
         </p>
+      </div>
       </div>
     </div>
   );

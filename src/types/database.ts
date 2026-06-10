@@ -2607,6 +2607,10 @@ export type Database = {
         Args: { p_match_ids?: string[] }
         Returns: number
       }
+      retro_abandon: {
+        Args: { p_anon_token?: string; p_run_id: string }
+        Returns: Json
+      }
       retro_answer: {
         Args: {
           p_anon_token?: string

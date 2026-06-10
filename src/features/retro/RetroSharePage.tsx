@@ -63,6 +63,19 @@ export function RetroSharePage() {
             Jogar a minha Copa →
           </Button>
         </Card>
+
+        {/* a isca traz pro bolão: o Resultadismo da Copa que está acontecendo */}
+        <Card className="border-2 border-brand-500 p-4 text-center">
+          <p className="text-base font-bold text-ink-900">E o bolão da Copa de verdade? ⚽</p>
+          <p className="mt-1 text-sm text-ink-600">
+            Esse é o <b>Resultadismo Retrô</b>, nosso joguinho rápido. No <b>Resultadismo</b> você
+            crava o placar dos jogos da <b>Copa que está rolando</b> e disputa em grupo com os
+            amigos. De graça.
+          </p>
+          <Button variant="outline" className="mt-3 w-full font-bold" onClick={() => navigate("/")}>
+            Conhecer o bolão →
+          </Button>
+        </Card>
       </div>
     </Page>
   );

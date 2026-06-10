@@ -187,6 +187,14 @@ Dois eixos independentes, escolhidos antes da run:
   Padrão); (5) tela: `/retro*` ganhou **RetroShell próprio** (sem BottomNav/header do app),
   overlay z-[70], microcopy enxuta; (6) **banner do Retrô na landing** deslogada e **card próprio
   no topo do menu do Perfil** (saiu o item de lista).
+- **Rodada 7 (10/06, decisões do PO):** (1) **sair encerra a run** — no Treino sai direto; na
+  **Copa do Dia** um `ConfirmDialog` em 2 passos avisa que perde o ranking do dia (W.O. nos jogos
+  restantes, campanha congelada, sem retomada — RPC `retro_abandon`, migration `20260610150009`,
+  teste T10); (2) layout da run **centrado no espaço** (sem vãos esticados em telas altas, cabe em
+  qualquer altura); (3) botão "Treino livre" enxuto (1 linha, hint embaixo) e **loading
+  independente** do botão da Copa do Dia; (4) aba "Copa do Dia" do ranking sem quebra de linha;
+  (5) **estratégia de funil "bolão"**: CTAs do Retrô levam ao Resultadismo posicionado como
+  **bolão da Copa que está acontecendo** (card na home do Retrô + card na página pública de share).
 - **Backlog (fase 2 do Retrô)** — eventos GA4 (union do `analytics.ts`) ✓feito, entrada na navegação/Como Funciona/
   landing (pontos de contato), docs `.claude/05` §2 + `12-RETRO-MINIJOGO.md` → **Fase 5**:
   homologação com o João (Portão B), integração do worktree na main e deploy.

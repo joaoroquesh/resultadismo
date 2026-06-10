@@ -7,12 +7,14 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import type { ScoreType } from "@/lib/types";
 import {
   type RetroLevel,
+  useRetroAbandon,
   useRetroAnonHeartbeat,
   useRetroAnswer,
   useRetroMyStats,
@@ -98,6 +100,9 @@ export function RetroPage() {
   const answerMut = useRetroAnswer();
   const nextMut = useRetroNext();
   const rerollMut = useRetroReroll();
+  const abandonMut = useRetroAbandon();
+  const [confirmExit, setConfirmExit] = useState(false);
+  const [startKind, setStartKind] = useState<"daily" | "training" | null>(null);
   const myStats = useRetroMyStats();
   const today = useRetroToday();
   useRetroAnonHeartbeat();
@@ -105,6 +110,7 @@ export function RetroPage() {
 
   function start(daily: boolean) {
     if (startMut.isPending) return;
+    setStartKind(daily ? "daily" : "training");
     startMut.mutate(
       { mode, pace, daily, level },
       {
@@ -144,6 +150,7 @@ export function RetroPage() {
           }
         },
         onError: (e) => toast(e.message, "error"),
+        onSettled: () => setStartKind(null),
       },
     );
   }
@@ -226,6 +233,23 @@ export function RetroPage() {
     setPhase("home");
   }
 
+  // sair no meio da run: Treino abandona direto; Copa do Dia pede confirmação
+  // (perde o ranking do dia — W.O. no resto, sem retomada)
+  function requestExit() {
+    if (!run) return;
+    if (run.isDaily) setConfirmExit(true);
+    else doAbandon();
+  }
+
+  function doAbandon() {
+    if (!run) return;
+    setConfirmExit(false);
+    abandonMut.mutate(
+      { runId: run.runId },
+      { onSettled: backHome },
+    );
+  }
+
   const finished = toFinishedRun(run);
   const stats = viewStats(myStats.data);
 
@@ -244,7 +268,9 @@ export function RetroPage() {
           setPace={setPace}
           setLevel={setLevel}
           todayTeam={today.data ?? null}
-          starting={startMut.isPending}
+          startingDaily={startKind === "daily"}
+          startingTraining={startKind === "training"}
+          anyStarting={startMut.isPending}
           playedToday={stats.playedToday}
           streak={stats.streak}
           best={stats.best}
@@ -259,13 +285,6 @@ export function RetroPage() {
           data-retro-play
           className="fixed inset-0 z-[70] flex flex-col bg-[var(--color-background)] px-3 pb-3 pt-2"
         >
-          <button
-            type="button"
-            onClick={backHome}
-            className="self-end pb-1 text-[11px] font-semibold text-ink-400"
-          >
-            sair ✕
-          </button>
           <RunView
             key={run.current.match_id}
             current={run.current}
@@ -276,6 +295,17 @@ export function RetroPage() {
             rerolling={rerollMut.isPending}
             onSubmit={submitGuess}
             onReroll={rerollCurrent}
+            onExit={requestExit}
+          />
+          <ConfirmDialog
+            open={confirmExit}
+            title="Sair da Copa do Dia?"
+            message="Saindo agora, você PERDE o ranking de hoje: os jogos restantes viram W.O. e a campanha fica como está. Não dá pra continuar depois."
+            step2Message="Última chance: a Copa do Dia de hoje encerra de vez. Confirma a saída?"
+            confirmLabel="Sair e encerrar"
+            loading={abandonMut.isPending}
+            onConfirm={doAbandon}
+            onCancel={() => setConfirmExit(false)}
           />
         </div>
       )}
@@ -311,7 +341,9 @@ function Home({
   setPace,
   setLevel,
   todayTeam,
-  starting,
+  startingDaily,
+  startingTraining,
+  anyStarting,
   playedToday,
   streak,
   best,
@@ -327,7 +359,9 @@ function Home({
   setPace: (p: RetroPace) => void;
   setLevel: (l: RetroLevel) => void;
   todayTeam: { team_slug: string; team_name_pt: string } | null;
-  starting: boolean;
+  startingDaily: boolean;
+  startingTraining: boolean;
+  anyStarting: boolean;
   playedToday: boolean;
   streak: number;
   best: { stage_reached: string; points: number; total_ms: number } | null;
@@ -433,13 +467,28 @@ function Home({
             ✅ Você já jogou a Copa do Dia. <b>Volte amanhã</b> — ou treine à vontade.
           </div>
         ) : (
-          <Button size="lg" className="w-full text-base font-bold" loading={starting} onClick={() => onStart(true)}>
+          <Button
+            size="lg"
+            className="w-full text-base font-bold"
+            loading={startingDaily}
+            disabled={anyStarting}
+            onClick={() => onStart(true)}
+          >
             Jogar a Copa Retrô de hoje ⚽
           </Button>
         )}
-        <Button variant="secondary" className="w-full" disabled={starting} onClick={() => onStart(false)}>
-          Treino livre (jogos aleatórios, sem ranking)
-        </Button>
+        <div>
+          <Button
+            variant="secondary"
+            className="w-full font-bold"
+            loading={startingTraining}
+            disabled={anyStarting}
+            onClick={() => onStart(false)}
+          >
+            Treino livre
+          </Button>
+          <p className="mt-1 text-center text-[11px] text-ink-500">jogos aleatórios, sem ranking</p>
+        </div>
         {!isLogged && (
           <p className="text-center text-xs text-ink-500">
             Dá pra jogar sem conta!{" "}
@@ -468,13 +517,15 @@ function Home({
 
       <RetroLeaderboard />
 
-      <Card className="p-4 text-center">
-        <p className="text-sm text-ink-700">
-          O Retrô é o irmão nostálgico do <b>Resultadismo</b> — lá você palpita nos jogos{" "}
-          <b>reais de hoje</b> e disputa em grupos com os amigos.
+      {/* ponte pro jogo-mãe: o Retrô é a isca, o bolão da Copa é o destino */}
+      <Card className="relative overflow-hidden border-2 border-brand-500 p-4 text-center">
+        <p className="text-base font-bold text-ink-900">Quer fazer um bolão com os amigos? ⚽</p>
+        <p className="mt-1 text-sm text-ink-600">
+          No <b>Resultadismo</b> você crava o placar dos jogos da <b>Copa de verdade</b>, que está
+          acontecendo agora, e disputa em grupo com a galera. De graça.
         </p>
-        <Button variant="ghost" className="mt-1 w-full" onClick={onGoMain}>
-          ← Voltar pro Resultadismo
+        <Button className="mt-3 w-full font-bold" onClick={onGoMain}>
+          Bora pro bolão da Copa →
         </Button>
       </Card>
     </div>

@@ -20,6 +20,7 @@ export function RetroLeaderboard() {
         <div className="flex items-center justify-between gap-2">
           <h3 className="text-base font-bold">Ranking</h3>
           <SegmentedControl<"daily" | "treino">
+            className="whitespace-nowrap"
             options={[
               { value: "daily", label: "Copa do Dia" },
               { value: "treino", label: "Treino" },

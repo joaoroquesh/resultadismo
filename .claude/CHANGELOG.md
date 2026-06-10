@@ -50,7 +50,11 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   `retro_today` — migration `20260610150008`); emojis do share nas cores do app; ritmos só Sem
   Pressa/Resultadista; modos renomeados Vale Ponto/Vale Saldo; Dificuldade do Treino
   (Fácil/Padrão/Difícil); `RetroShell` próprio (separação total do app-mãe), banner na landing e
-  card no topo do Perfil. Histórico completo da construção: Comentários
+  card no topo do Perfil. **Rodada 7 (decisões do PO):** sair encerra a run (Copa do Dia confirma e
+  vira W.O. sem retomada — `retro_abandon`, migration `20260610150009`); layout da run centrado
+  (cabe em telas baixas), "Treino livre" em 1 linha com loading independente, aba "Copa do Dia"
+  sem quebra; CTAs de funil posicionando o Resultadismo como **bolão da Copa**. Histórico completo
+  da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do

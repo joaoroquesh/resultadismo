@@ -247,4 +247,37 @@ begin
   else raise exception 'T9c FALHOU'; end if;
 end $$;
 
+-- ============ T10: sair = W.O. + run encerrada SEM retomada (rodada 7) ============
+do $$
+declare v_user uuid; v_start jsonb; v_run uuid; v_h int; v_a int; v_ans jsonb; v_ab jsonb;
+begin
+  select id into v_user from public.profiles limit 1;
+  delete from public.retro_runs
+   where user_id = v_user and is_daily and daily_date = (now() at time zone 'America/Sao_Paulo')::date;
+  perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+  v_start := public.retro_start_run('acerto', 'sempressa', true, null, '{}');
+  v_run := (v_start->>'run_id')::uuid;
+  -- responde o jogo 1 cravando, serve o 2 e ABANDONA
+  select m.home_score, m.away_score into v_h, v_a
+    from public.retro_run_matches rm join public.retro_matches m on m.id = rm.match_id
+   where rm.run_id = v_run and rm.slot = 1;
+  v_ans := public.retro_answer(v_run, v_h, v_a, null, '{}');
+  perform public.retro_next(v_run, null, '{}');
+  v_ab := public.retro_abandon(v_run, null);
+  if v_ab->>'status' = 'eliminated' and v_ab->>'stage_reached' = 'Fase de grupos'
+     and (v_ab->>'points')::int = 3
+     and (select is_timeout from public.retro_run_matches where run_id = v_run and slot = 2) then
+    raise notice 'T10a abandono: OK (W.O. no jogo atual, campanha preservada, eliminado nos grupos)';
+  else raise exception 'T10a FALHOU: %', v_ab; end if;
+  -- retomada bloqueada: novo start do daily → "já jogou"
+  begin
+    perform public.retro_start_run('acerto', 'sempressa', true, null, '{}');
+    raise exception 'T10b FALHOU: deixou recomeçar';
+  exception when others then
+    if sqlerrm like '%já jogou%' then raise notice 'T10b sem retomada: OK';
+    else raise; end if;
+  end;
+  perform set_config('request.jwt.claims', '', true);
+end $$;
+
 select '=== TODOS OS TESTES PASSARAM ===';

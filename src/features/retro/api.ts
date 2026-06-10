@@ -173,6 +173,26 @@ export function useRetroAnswer() {
   });
 }
 
+// Sair no meio = encerra a run (W.O. no resto — decisão do PO, rodada 7)
+export function useRetroAbandon() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { runId: string }) => {
+      const { data, error } = await supabase.rpc("retro_abandon", {
+        p_run_id: input.runId,
+        p_anon_token: anonTokenFor(user?.id),
+      });
+      if (error) throw new Error(error.message);
+      return data as unknown as { status: string; stage_reached: string; points: number };
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["retro-board"] });
+      qc.invalidateQueries({ queryKey: ["retro-my-stats"] });
+    },
+  });
+}
+
 // 🎲 troca o jogo atual (gasta 1 ficha ganha por cravada — rodada 5)
 export function useRetroReroll() {
   const { user } = useAuth();
