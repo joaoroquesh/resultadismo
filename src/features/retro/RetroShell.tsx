@@ -1,10 +1,24 @@
+import { useEffect } from "react";
 import { Link, Outlet } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
 import { ConsentBanner } from "@/features/consent/ConsentBanner";
 import { RetroStripes } from "./RetroFx";
 
 // Casca própria do Retrô (rodada 6: separação total do app-mãe — sem Sidebar,
 // sem BottomNav, sem header do Resultadismo). Mini-header com a volta explícita.
 export function RetroShell() {
+  // tempo de tela SÓ do Retrô (anon + logado), separado do app-mãe — bate a cada 30s
+  // com a aba visível. O app-mãe (PresenceTracker) não roda aqui, então não mistura.
+  useEffect(() => {
+    const beat = () => {
+      if (document.visibilityState !== "visible") return;
+      void supabase.rpc("retro_touch", { p_seconds: 30 }).then(undefined, () => {});
+    };
+    beat();
+    const id = window.setInterval(beat, 30_000);
+    return () => window.clearInterval(id);
+  }, []);
+
   return (
     <div className="min-h-dvh bg-background text-ink-900">
       <header className="sticky top-0 z-30 border-b border-border bg-surface/90 backdrop-blur-md">

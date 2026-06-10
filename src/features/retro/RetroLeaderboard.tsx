@@ -4,15 +4,16 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { cn } from "@/lib/utils";
-import { useRetroLeaderboard, type RetroMode } from "./api";
+import { useRetroLeaderboard, type RetroFormat } from "./api";
 import { fmtMs } from "./share";
 
-// Ranking da Copa do Dia (fase alcançada → pontos → tempo). Só entra quem jogou
+// Ranking da Seleção do Dia (fase alcançada → pontos → tempo). Só entra quem jogou
 // logado no ritmo Resultadista — a comparação de tempo precisa ser justa.
 export function RetroLeaderboard() {
-  const [mode, setMode] = useState<RetroMode>("acerto");
+  const [format, setFormat] = useState<RetroFormat>("copa");
   const [board, setBoard] = useState<"daily" | "treino">("daily");
-  const { data, isLoading } = useRetroLeaderboard(mode, board);
+  const { data, isLoading } = useRetroLeaderboard(format, board);
+  const isPontos = format === "pontos";
 
   return (
     <Card className="space-y-3 p-4">
@@ -20,22 +21,23 @@ export function RetroLeaderboard() {
         <div className="flex items-center justify-between gap-2">
           <h3 className="text-base font-bold">Ranking</h3>
           <SegmentedControl<"daily" | "treino">
+            className="whitespace-nowrap"
             options={[
-              { value: "daily", label: "Copa do Dia" },
+              { value: "daily", label: "Seleção do Dia" },
               { value: "treino", label: "Treino" },
             ]}
             value={board}
             onChange={setBoard}
           />
         </div>
-        <SegmentedControl<RetroMode>
+        <SegmentedControl<RetroFormat>
           className="w-full"
           options={[
-            { value: "acerto", label: "Vale Ponto" },
-            { value: "cravada", label: "Vale Saldo" },
+            { value: "copa", label: "Copa 🏆" },
+            { value: "pontos", label: "Pontos 🎯" },
           ]}
-          value={mode}
-          onChange={setMode}
+          value={format}
+          onChange={setFormat}
         />
       </div>
 
@@ -50,7 +52,7 @@ export function RetroLeaderboard() {
           title="Ninguém no ranking ainda"
           description={
             board === "daily"
-              ? "A Copa do Dia ranqueia quem joga logado no ritmo Resultadista. Seja a primeira pessoa!"
+              ? "A Seleção do Dia ranqueia quem joga logado no ritmo Resultadista. Seja a primeira pessoa!"
               : "O Treino ranqueia a MELHOR campanha de cada um (logado, ritmo Resultadista). Bora abrir o placar!"
           }
         />
@@ -61,19 +63,36 @@ export function RetroLeaderboard() {
               key={r.pos}
               className={cn(
                 "flex items-center gap-3 py-2 text-sm",
+                r.pos === 1 && "rounded-md bg-gold-50 px-2",
                 r.is_me && "rounded-md bg-brand-500/10 px-2 font-semibold",
               )}
             >
-              <span className="w-6 text-right font-bold tabular-nums text-ink-500">{r.pos}º</span>
-              <span className="min-w-0 flex-1 truncate">{r.display_name}</span>
-              <span className="hidden text-xs text-ink-500 sm:block">{r.stage_reached}</span>
-              <span className="font-bold tabular-nums">{r.points} pts</span>
-              <span className="w-12 text-right text-xs tabular-nums text-ink-500">{fmtMs(r.total_ms)}</span>
+              <span className="w-6 text-right font-bold tabular-nums text-ink-500">
+                {r.pos === 1 ? "👑" : `${r.pos}º`}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate">{r.display_name}</span>
+                <span className="block text-[11px] text-ink-400">
+                  {isPontos ? fmtMs(r.total_ms) : `${r.points} pts · ${fmtMs(r.total_ms)}`}
+                </span>
+              </span>
+              <span className="shrink-0 text-right text-sm font-bold text-brand-800">
+                {isPontos ? `${r.points} pts` : r.stage_reached}
+              </span>
             </li>
           ))}
         </ol>
       )}
 
+      {data && data.rows.length > 0 && (
+        <p className="text-center text-[11px] leading-snug text-ink-400">
+          {isPontos ? (
+            <>Lidera quem faz <b>mais pontos</b> nos 7 jogos. Empatou? Decide o <b>tempo</b>.</>
+          ) : (
+            <>Lidera quem <b>chega mais longe</b>. Empatou na fase? Decidem os <b>pontos</b>; depois, o <b>tempo</b>.</>
+          )}
+        </p>
+      )}
       {data?.me && !data.rows.some((r) => r.is_me) && (
         <p className="text-center text-xs text-ink-500">
           Você: {data.me.pos}º · {data.me.stage_reached} · {data.me.points} pts

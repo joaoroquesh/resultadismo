@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" data-rd-circle="1">
 <defs><clipPath id="rd-c-togosvg"><circle cx="50" cy="50" r="50"/></clipPath></defs>
 <g clip-path="url(#rd-c-togosvg)">
-<svg viewBox="0 0 809.016 500" width="100" height="100" preserveAspectRatio="xMidYMid slice">
+<svg viewBox="0 0 809.016 500" width="100" height="100" preserveAspectRatio="xMidYMid slice" >
 <path fill="#006A4E" d="M0,0h809.016v500H0V0z"/>
 <path fill="#FFCE00" d="M0,100h809.016v100H0V100z"/>
 <path fill="#D21034" d="M0,0h300v300H0V0z"/>

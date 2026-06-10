@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 100 100" data-rd-circle="1">
 <defs><clipPath id="rd-c-tchecoslovaquiasvg"><circle cx="50" cy="50" r="50"/></clipPath></defs>
 <g clip-path="url(#rd-c-tchecoslovaquiasvg)">
-<svg viewBox="0 0 900 600" width="100" height="100" preserveAspectRatio="xMidYMid slice">
+<svg viewBox="0 0 900 600" width="100" height="100" preserveAspectRatio="xMidYMid slice" >
 	<rect width="900" height="600" fill="#d7141a"/>
 	<rect width="900" height="300" fill="#fff"/>
 	<path d="M 450,300 0,0 V 600 z" fill="#11457e"/>

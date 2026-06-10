@@ -7,11 +7,13 @@ import { retroAnonToken, retroSeen } from "./retroLocal";
 
 // ---------- tipos dos payloads jsonb das RPCs do motor (migration 20260610150001/3) ----------
 
-export type RetroMode = "acerto" | "cravada";
+export type RetroFormat = "copa" | "pontos";
 export type RetroPace = "resultadista" | "classico" | "sempressa";
-export type RetroLevel = "facil" | "padrao" | "dificil";
+export type RetroLevel = "facil" | "dificil";
 
 export type RetroToday = { daily_date: string; team_slug: string; team_name_pt: string };
+export type RetroConfig = { enforce_knockout_bar: boolean; semi_min: string; final_min: string };
+export type RetroRunStatus = "playing" | "eliminated" | "champion" | "finished";
 
 export type RetroMatchInfo = {
   wc_year: number;
@@ -38,7 +40,7 @@ export type RetroCurrent = {
 export type RetroStart = {
   run_id: string;
   share_code: string;
-  mode: RetroMode;
+  format: RetroFormat;
   pace: RetroPace;
   ranked?: boolean;
   resumed: boolean;
@@ -62,7 +64,8 @@ export type RetroAnswerResult = {
   };
   run: {
     id: string;
-    status: "playing" | "eliminated" | "champion";
+    status: RetroRunStatus;
+    format: RetroFormat;
     points: number;
     stage_reached: string | null;
     stage_rank: number | null;
@@ -83,9 +86,9 @@ export type RetroSlotSummary = {
 };
 
 export type RetroSummary = {
-  mode: RetroMode;
+  format: RetroFormat;
   pace: RetroPace;
-  status: "eliminated" | "champion";
+  status: "eliminated" | "champion" | "finished";
   stage_reached: string;
   points: number;
   total_ms: number;
@@ -103,12 +106,13 @@ export type RetroBoardRow = {
   stage_reached: string;
   points: number;
   total_ms: number;
+  level?: RetroLevel;
   is_me: boolean;
 };
 
 export type RetroBoard = {
   daily_date: string;
-  mode: RetroMode;
+  format: RetroFormat;
   rows: RetroBoardRow[];
   me: { pos: number; stage_reached: string; points: number; total_ms: number } | null;
 };
@@ -117,10 +121,10 @@ export type RetroMyStats = {
   streak: number;
   played_today: boolean;
   best: {
-    stage_reached: string;
-    stage_rank: number;
+    stage_reached: string | null;
     points: number;
     total_ms: number;
+    format: RetroFormat;
     daily_date: string;
   } | null;
 };
@@ -134,14 +138,14 @@ function anonTokenFor(userId: string | undefined): string | undefined {
 export function useRetroStart() {
   const { user } = useAuth();
   return useMutation({
-    mutationFn: async (input: { mode: RetroMode; pace: RetroPace; daily: boolean; level: RetroLevel }) => {
+    mutationFn: async (input: { format: RetroFormat; pace: RetroPace; daily: boolean; level: RetroLevel }) => {
       const { data, error } = await supabase.rpc("retro_start_run", {
-        p_mode: input.mode,
         p_pace: input.pace,
         p_daily: input.daily,
         p_anon_token: anonTokenFor(user?.id),
         p_seen: input.daily ? [] : retroSeen(),
         p_level: input.level,
+        p_format: input.format,
       });
       if (error) throw new Error(error.message);
       return data as unknown as RetroStart;
@@ -169,6 +173,26 @@ export function useRetroAnswer() {
         qc.invalidateQueries({ queryKey: ["retro-board"] });
         qc.invalidateQueries({ queryKey: ["retro-my-stats"] });
       }
+    },
+  });
+}
+
+// Sair no meio = encerra a run (W.O. no resto — decisão do PO, rodada 7)
+export function useRetroAbandon() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { runId: string }) => {
+      const { data, error } = await supabase.rpc("retro_abandon", {
+        p_run_id: input.runId,
+        p_anon_token: anonTokenFor(user?.id),
+      });
+      if (error) throw new Error(error.message);
+      return data as unknown as { status: string; stage_reached: string; points: number };
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["retro-board"] });
+      qc.invalidateQueries({ queryKey: ["retro-my-stats"] });
     },
   });
 }
@@ -206,18 +230,48 @@ export function useRetroNext() {
   });
 }
 
-export function useRetroLeaderboard(mode: RetroMode, board: "daily" | "treino" = "daily") {
+export function useRetroLeaderboard(format: RetroFormat, board: "daily" | "treino" = "daily") {
   return useQuery({
-    queryKey: ["retro-board", board, mode],
+    queryKey: ["retro-board", board, format],
     queryFn: async (): Promise<RetroBoard> => {
       const { data, error } = await supabase.rpc("retro_leaderboard", {
-        p_mode: mode,
+        p_format: format,
         p_limit: 50,
         p_board: board,
       });
       if (error) throw new Error(error.message);
       return data as unknown as RetroBoard;
     },
+  });
+}
+
+// Config pública (mostra/esconde a regra de saldo/cravada nas finais)
+export function useRetroConfig() {
+  return useQuery({
+    queryKey: ["retro-config"],
+    queryFn: async (): Promise<RetroConfig> => {
+      const { data, error } = await supabase.rpc("retro_get_config");
+      if (error) throw new Error(error.message);
+      return data as unknown as RetroConfig;
+    },
+    staleTime: 5 * 60_000,
+  });
+}
+
+// Admin: gravar a config (toggle da barra nas finais)
+export function useRetroSetConfig() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { enforce: boolean; semiMin: string; finalMin: string }) => {
+      const { data, error } = await supabase.rpc("retro_admin_set_config", {
+        p_enforce: input.enforce,
+        p_semi_min: input.semiMin,
+        p_final_min: input.finalMin,
+      });
+      if (error) throw new Error(error.message);
+      return data as unknown as RetroConfig;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["retro-config"] }),
   });
 }
 

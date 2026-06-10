@@ -187,6 +187,53 @@ Dois eixos independentes, escolhidos antes da run:
   Padrão); (5) tela: `/retro*` ganhou **RetroShell próprio** (sem BottomNav/header do app),
   overlay z-[70], microcopy enxuta; (6) **banner do Retrô na landing** deslogada e **card próprio
   no topo do menu do Perfil** (saiu o item de lista).
+- **Rodada 7 (10/06, decisões do PO):** (1) **sair encerra a run** — no Treino sai direto; na
+  **Copa do Dia** um `ConfirmDialog` em 2 passos avisa que perde o ranking do dia (W.O. nos jogos
+  restantes, campanha congelada, sem retomada — RPC `retro_abandon`, migration `20260610150009`,
+  teste T10); (2) layout da run **centrado no espaço** (sem vãos esticados em telas altas, cabe em
+  qualquer altura); (3) botão "Treino livre" enxuto (1 linha, hint embaixo) e **loading
+  independente** do botão da Copa do Dia; (4) aba "Copa do Dia" do ranking sem quebra de linha;
+  (5) **estratégia de funil "bolão"**: CTAs do Retrô levam ao Resultadismo posicionado como
+  **bolão da Copa que está acontecendo** (card na home do Retrô + card na página pública de share).
+- **Rodada 8 (10/06, decisões do PO):** (1) **FINAL aceita saldo** (semi e final = saldo/cravada;
+  reverteu o "final só cravada" da r5 — migration `20260610150010`, teste T4 unitário + T6);
+  (2) **ranking de Treino por dificuldade** — quem joga mais difícil fica na frente, mesmo com
+  desempenho pior (badge Fácil/Difícil na lista + nota); (3) **bug das bandeiras P&B** corrigido na
+  raiz (o circularizador descartava o `fill` do `<svg>` raiz → Honduras etc. ficavam pretas;
+  re-baixadas + auditoria de COR 60/60); (4) **textos por fase** no jogo (acima do card: grupos =
+  "pontue em 2 de 3", mata-mata, "reta final = saldo/cravada"); (5) **home mais clara** — cada
+  seletor diz o que controla (Modo/Ritmo/Dificuldade), textos curtos; (6) **feedback do Retrô**
+  (`/retro/feedback`, só logado, `feedback.product=retro`, reusa FeedbackPage).
+- **Rodada 9 (10/06, feedback dos amigos):** (1) tela do jogo **não estica em telas grandes**
+  (bloco max-w-sm centrado, gaps fixos); (2) **emoji dinâmico por fase** no share/tela final
+  (🏆/🥈/🔥/💪/👏/😅 — nada de choro pra quem chegou na semi) + manchete por fase (`verdict.ts`);
+  (3) **regra da semi/final gritante** — banner gold pulsante "só SALDO ou CRAVADA passa" durante o
+  jogo, e no reveal a explicação na hora da eliminação; (4) **"eliminado nos pênaltis 😬"** quando a
+  pessoa acertou o vencedor mas faltou saldo na semi/final (brincadeira que suaviza); (5) **ranking
+  valoriza a FASE** (quem chega mais longe lidera; pontos e tempo viram desempate em cinza, com nota
+  do critério). Sem migration (só front).
+- **Rodada 10 (10/06, SIMPLIFICAÇÃO + bug):** (1) **bug do reroll na Copa do Dia** corrigido
+  (serve_slot devolvia o mesmo jogo do dia; agora força sorteio — migration `20260610150011`,
+  teste T11); (2) **dois Formatos**: Copa 🏆 (eliminatório) e Pontos 🎯 (joga os 7, soma — resolve
+  "cravei tudo nos grupos e caí enquanto fulano só de acerto foi mais longe"); (3) a regra de
+  saldo/cravada nas finais virou **config admin** (`/admin/retro`, RPC `retro_admin_set_config`),
+  **desligada por padrão** (qualquer ponto avança — menos confusão); (4) **dificuldade 2 níveis**
+  (Fácil/Difícil); (5) **página de regras** `/retro/regras` em blocos curtos; (6) ranking por
+  formato. Saiu o eixo "Vale Ponto/Vale Saldo". Suite T1–T11 verde + db reset limpo.
+- **Rodada 11 (10/06, decisões do PO):** (1) **cor do Honduras** corrigida (azul-marinho →
+  turquesa #0073cf; o `fill` da raiz vinha de um variante errado); (2) **👑 no 1º** do ranking;
+  (3) **Copa do Dia → Seleção do Dia** e **Treino livre → Jogo livre** (renomes); (4) **removida a
+  dificuldade** (Fácil/Difícil) — um modo só, acaba a queixa "professor no Difícil na frente de
+  campeão no Fácil"; ranking = só fase/pontos/tempo; (5) **tempo de tela só do Retrô**
+  (`retro_touch` p/ todos no RetroShell → `screen_seconds`); (6) **feedback admin do Retrô** em
+  `/admin/retro` (autor/página/corpo + resolver/responder) e fix do "Meus envios" (filtrava só o
+  admin). Migration `20260610150012`. Nome "Jogo livre" foi escolha minha (o PO deixou em branco) —
+  confirmar.
+- **Rodada 12 (10/06, decisões do PO):** (1) no **modo Pontos** a trilha vira **J1..J7** (jogo 1
+  a 7, sem fases/divisor) e o card mostra "Jogo N de 7"; (2) **caminho admin→Retrô** (chip
+  "🕹️ Retrô" na nav do /admin); (3) **report sumido** corrigido — havia 2 `submit_feedback` (6 e
+  7 args); a 6-arg (sem product) foi dropada (migration `20260610150013`) e o admin principal agora
+  lista TODOS com badge de produto, garantindo que nada se esconda.
 - **Backlog (fase 2 do Retrô)** — eventos GA4 (union do `analytics.ts`) ✓feito, entrada na navegação/Como Funciona/
   landing (pontos de contato), docs `.claude/05` §2 + `12-RETRO-MINIJOGO.md` → **Fase 5**:
   homologação com o João (Portão B), integração do worktree na main e deploy.

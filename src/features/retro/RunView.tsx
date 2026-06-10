@@ -7,6 +7,15 @@ import { RetroTimer } from "./RetroTimer";
 import { ScoreWheels } from "./ScoreWheels";
 import type { RetroCurrent } from "./api";
 
+// Texto curto da regra da fase atual (acima do card). No Pontos não há eliminação;
+// na Copa, só fala de saldo/cravada se o admin tiver ligado a barra (enforce).
+function phaseHint(slot: number, format: "copa" | "pontos", enforce: boolean): string {
+  if (format === "pontos") return "Modo Pontos · some pontos nos 7 jogos";
+  if (slot <= 3) return "Fase de grupos · pontue em 2 dos 3 pra avançar";
+  if (slot <= 5) return "Mata-mata · pontuou, avança";
+  return enforce ? "Reta final · só saldo ou cravada passa" : "Reta final · pontuou, avança";
+}
+
 function TeamSide({ slug, name }: { slug: string; name: string }) {
   return (
     <div className="flex min-w-0 flex-1 flex-col items-center gap-1">
@@ -20,6 +29,8 @@ function TeamSide({ slug, name }: { slug: string; name: string }) {
 // bem grandes embaixo (dois polegares — pedido do PO).
 export function RunView({
   current,
+  format,
+  enforce,
   points,
   rerolls,
   slots,
@@ -27,8 +38,11 @@ export function RunView({
   rerolling,
   onSubmit,
   onReroll,
+  onExit,
 }: {
   current: RetroCurrent;
+  format: "copa" | "pontos";
+  enforce: boolean;
   points: number;
   rerolls: number;
   slots: TrailSlot[];
@@ -36,6 +50,7 @@ export function RunView({
   rerolling: boolean;
   onSubmit: (home: number, away: number) => void;
   onReroll: () => void;
+  onExit: () => void;
 }) {
   // o pai remonta este componente por jogo (key=match_id): nasce 0×0 (palpite válido)
   const [home, setHome] = useState(0);
@@ -49,14 +64,29 @@ export function RunView({
     return () => window.clearTimeout(t);
   }, [current.timer_seconds]);
   const m = current.match;
-  const decisao = current.slot >= 6; // semi e final ganham clima de decisão
+  const decisao = format === "copa" && enforce && current.slot >= 6; // só com barra ligada
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-between gap-2 overflow-hidden px-1">
+    <div className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-2 overflow-hidden px-1">
+      {/* topo fixo: trilha + pontos + sair (tudo numa linha — tela limpa) */}
       <div className="flex items-center justify-between gap-2">
-        <CampaignTrail slots={slots} currentSlot={current.slot} />
+        <CampaignTrail slots={slots} currentSlot={current.slot} format={format} />
         <span className="rounded-pill bg-ink-100 px-2.5 py-0.5 text-xs font-bold tabular-nums">{points} pts</span>
+        <button type="button" onClick={onExit} className="text-[11px] font-semibold text-ink-400">
+          sair ✕
+        </button>
       </div>
+
+      {/* bloco do jogo: compacto e centrado (gap fixo, não estica em telas grandes) */}
+      <div className="flex flex-1 flex-col justify-center">
+        <div className="flex flex-col gap-3">
+        {decisao ? (
+          <div className="animate-retro-tense rounded-lg bg-gold-100 px-3 py-1.5 text-center text-sm font-bold text-gold-800 ring-1 ring-gold-400">
+            ⚠️ {current.slot === 7 ? "FINAL" : "SEMIFINAL"}: só SALDO ou CRAVADA passa
+          </div>
+        ) : (
+          <p className="text-center text-xs font-semibold text-ink-500">{phaseHint(current.slot, format, enforce)}</p>
+        )}
 
       <Card className={decisao ? "space-y-2 border-2 border-gold-500 p-3 shadow-brand" : "space-y-2 p-3"}>
         <div className="text-center">
@@ -67,7 +97,11 @@ export function RunView({
                 : "text-xs font-bold uppercase tracking-wide text-brand-700"
             }
           >
-            {decisao ? `⚡ ${current.slot_label} ⚡` : current.slot_label}
+            {format === "pontos"
+              ? `Jogo ${current.slot} de 7`
+              : decisao
+                ? `⚡ ${current.slot_label} ⚡`
+                : current.slot_label}
           </p>
           {/* leitura rápida do jogo (feedback dos amigos): ANO gigante + fase em selo */}
           <p className="mt-0.5 text-2xl font-bold leading-none tracking-tight">
@@ -132,6 +166,8 @@ export function RunView({
           {m.is_knockout ? "Vale o placar final, sem pênaltis — pode dar empate!" : "Vale o placar final."}
           {current.timer_seconds != null && " Tempo esgotado? Vale o que estiver marcado."}
         </p>
+        </div>
+        </div>
       </div>
     </div>
   );

@@ -22,8 +22,8 @@ import {
 
 const BODY_MAX = 300;
 
-// Páginas do app pra apontar onde o erro aconteceu (sem precisar mandar print).
-const PAGES = [
+// Páginas pra apontar onde o erro aconteceu (sem precisar mandar print).
+const PAGES_CLASSICO = [
   "Jogos / palpites",
   "Meus grupos",
   "Detalhe de um grupo",
@@ -35,6 +35,16 @@ const PAGES = [
   "Entrar / login",
   "Outra",
 ];
+const PAGES_RETRO = [
+  "Tela inicial do Retrô",
+  "Durante a partida (cravar placar)",
+  "Cronômetro / tempo",
+  "Resultado da partida (reveal)",
+  "Tela final / compartilhar",
+  "Ranking",
+  "Entrar / login",
+  "Outra",
+];
 
 const STATUS_META: Record<FeedbackStatus, { label: string; tone: "neutral" | "gold" | "brand" | "grass"; icon: typeof Clock }> = {
   novo: { label: "Recebido", tone: "neutral", icon: Clock },
@@ -43,11 +53,13 @@ const STATUS_META: Record<FeedbackStatus, { label: string; tone: "neutral" | "go
   arquivado: { label: "Arquivado", tone: "neutral", icon: Archive },
 };
 
-export function FeedbackPage() {
+export function FeedbackPage({ product = "classico" }: { product?: "classico" | "retro" }) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const submit = useSubmitFeedback();
-  const { data: mine, isLoading } = useMyFeedback();
+  const { data: mine, isLoading } = useMyFeedback(product);
+  const isRetro = product === "retro";
+  const PAGES = isRetro ? PAGES_RETRO : PAGES_CLASSICO;
 
   const [kind, setKind] = useState<FeedbackKind>("bug");
   const [title, setTitle] = useState("");
@@ -60,7 +72,7 @@ export function FeedbackPage() {
     e.preventDefault();
     if (!canSend || submit.isPending) return;
     submit.mutate(
-      { kind, title: title.trim(), body: body.trim(), page: kind === "bug" ? page : null },
+      { kind, title: title.trim(), body: body.trim(), page: kind === "bug" ? page : null, product },
       {
         onSuccess: () => {
           toast(
@@ -77,9 +89,9 @@ export function FeedbackPage() {
 
   return (
     <Page
-      title="Construa com a gente"
+      title={isRetro ? "Feedback do Retrô" : "Construa com a gente"}
       action={
-        <Button variant="ghost" size="icon" onClick={() => navigate("/perfil")} aria-label="Voltar">
+        <Button variant="ghost" size="icon" onClick={() => navigate(isRetro ? "/retro" : "/perfil")} aria-label="Voltar">
           <ArrowLeft className="size-5" />
         </Button>
       }
@@ -87,10 +99,12 @@ export function FeedbackPage() {
       <div className="space-y-4">
         {/* Convite */}
         <Card className="bg-surface-2 p-4 ring-1 ring-border">
-          <h2 className="text-base font-extrabold text-brand-800">Construa o Resultadismo com a gente! 🛠️⚽</h2>
+          <h2 className="text-base font-extrabold text-brand-800">
+            {isRetro ? "Ajude a melhorar o Retrô! 🕹️" : "Construa o Resultadismo com a gente! 🛠️⚽"}
+          </h2>
           <p className="mt-1 text-sm text-brand-900/80">
-            Achou um erro ou tem uma ideia pra melhorar? Conta pra gente — a gente lê tudo, e te
-            avisa aqui quando resolver.
+            Achou um erro ou tem uma ideia? Conta pra gente — a gente lê tudo e te avisa aqui quando
+            resolver.
           </p>
         </Card>
 

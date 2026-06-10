@@ -7,22 +7,23 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import type { ScoreType } from "@/lib/types";
 import {
-  type RetroLevel,
-  useRetroAnonHeartbeat,
+  useRetroAbandon,
   useRetroAnswer,
   useRetroMyStats,
   useRetroNext,
   useRetroReroll,
+  useRetroConfig,
   useRetroStart,
   useRetroToday,
   type RetroAnswerResult,
   type RetroCurrent,
-  type RetroMode,
+  type RetroFormat,
   type RetroPace,
   type RetroStart,
 } from "./api";
@@ -42,7 +43,7 @@ type Phase = "home" | "play" | "reveal" | "done";
 type ActiveRun = {
   runId: string;
   shareCode: string;
-  mode: RetroMode;
+  format: RetroFormat;
   pace: RetroPace;
   isDaily: boolean;
   points: number;
@@ -66,12 +67,12 @@ function toFinishedRun(run: ActiveRun | null): FinishedRun | null {
   if (!run || !ans || ans.run.status === "playing") return null;
   return {
     status: ans.run.status,
-    stageReached: ans.run.stage_reached ?? "",
+    stageReached: ans.run.stage_reached,
     points: ans.run.points,
     totalMs: ans.run.total_ms,
     shareCode: run.shareCode,
     isDaily: run.isDaily,
-    mode: run.mode,
+    format: run.format,
     pace: run.pace,
     slots: run.slots,
   };
@@ -83,39 +84,42 @@ const PACE_HINT: Record<RetroPace, string> = {
   classico: "", // aposentado na rodada 6 (valor segue válido p/ runs antigas)
 };
 
-// /retro — a casa do mini-jogo: landing + Copa do Dia + Treino + a run em si.
+// /retro — a casa do mini-jogo: landing + Seleção do Dia + Jogo livre + a run em si.
 export function RetroPage() {
-  const { user } = useAuth();
+  const { user, isAppAdmin } = useAuth();
   const { open: openLogin } = useLoginModal();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [phase, setPhase] = useState<Phase>("home");
-  const [mode, setMode] = useState<RetroMode>("acerto");
+  const [format, setFormat] = useState<RetroFormat>("copa");
   const [pace, setPace] = useState<RetroPace>("resultadista");
-  const [level, setLevel] = useState<RetroLevel>("padrao");
   const [run, setRun] = useState<ActiveRun | null>(null);
   const startMut = useRetroStart();
   const answerMut = useRetroAnswer();
   const nextMut = useRetroNext();
   const rerollMut = useRetroReroll();
+  const abandonMut = useRetroAbandon();
+  const [confirmExit, setConfirmExit] = useState(false);
+  const [startKind, setStartKind] = useState<"daily" | "training" | null>(null);
   const myStats = useRetroMyStats();
   const today = useRetroToday();
-  useRetroAnonHeartbeat();
+  const config = useRetroConfig();
   useEffect(() => warmRetroFlags(teamCrestPath), []);
 
   function start(daily: boolean) {
     if (startMut.isPending) return;
+    setStartKind(daily ? "daily" : "training");
     startMut.mutate(
-      { mode, pace, daily, level },
+      { format, pace, daily, level: "facil" },
       {
         onSuccess: (s: RetroStart) => {
-          track("retro_run_start", { mode: s.mode, pace: s.pace, daily });
-          if (s.resumed) toast("Retomando a sua Copa do Dia de onde parou!", "info");
+          track("retro_run_start", { format: s.format, pace: s.pace, daily });
+          if (s.resumed) toast("Retomando a sua Seleção do Dia de onde parou!", "info");
           retroMarkSeen(s.current?.match_id);
           const base: ActiveRun = {
             runId: s.run_id,
             shareCode: s.share_code,
-            mode: s.mode,
+            format: s.format,
             pace: s.pace,
             isDaily: daily,
             points: s.points,
@@ -144,6 +148,7 @@ export function RetroPage() {
           }
         },
         onError: (e) => toast(e.message, "error"),
+        onSettled: () => setStartKind(null),
       },
     );
   }
@@ -226,6 +231,23 @@ export function RetroPage() {
     setPhase("home");
   }
 
+  // sair no meio da run: Treino abandona direto; Copa do Dia pede confirmação
+  // (perde o ranking do dia — W.O. no resto, sem retomada)
+  function requestExit() {
+    if (!run) return;
+    if (run.isDaily) setConfirmExit(true);
+    else doAbandon();
+  }
+
+  function doAbandon() {
+    if (!run) return;
+    setConfirmExit(false);
+    abandonMut.mutate(
+      { runId: run.runId },
+      { onSettled: backHome },
+    );
+  }
+
   const finished = toFinishedRun(run);
   const stats = viewStats(myStats.data);
 
@@ -237,21 +259,25 @@ export function RetroPage() {
     <div>
       {phase === "home" && (
         <Home
-          mode={mode}
+          format={format}
           pace={pace}
-          level={level}
-          setMode={setMode}
+          setFormat={setFormat}
           setPace={setPace}
-          setLevel={setLevel}
           todayTeam={today.data ?? null}
-          starting={startMut.isPending}
+          startingDaily={startKind === "daily"}
+          startingTraining={startKind === "training"}
+          anyStarting={startMut.isPending}
           playedToday={stats.playedToday}
           streak={stats.streak}
           best={stats.best}
           isLogged={!!user}
+          isAdmin={isAppAdmin}
           onLogin={openLogin}
           onStart={start}
           onGoMain={() => navigate("/")}
+          onFeedback={() => navigate("/retro/feedback")}
+          onRules={() => navigate("/retro/regras")}
+          onAdmin={() => navigate("/admin/retro")}
         />
       )}
       {phase === "play" && run?.current && (
@@ -259,16 +285,11 @@ export function RetroPage() {
           data-retro-play
           className="fixed inset-0 z-[70] flex flex-col bg-[var(--color-background)] px-3 pb-3 pt-2"
         >
-          <button
-            type="button"
-            onClick={backHome}
-            className="self-end pb-1 text-[11px] font-semibold text-ink-400"
-          >
-            sair ✕
-          </button>
           <RunView
             key={run.current.match_id}
             current={run.current}
+            format={run.format}
+            enforce={config.data?.enforce_knockout_bar ?? false}
             points={run.points}
             rerolls={run.rerolls}
             slots={run.slots}
@@ -276,6 +297,17 @@ export function RetroPage() {
             rerolling={rerollMut.isPending}
             onSubmit={submitGuess}
             onReroll={rerollCurrent}
+            onExit={requestExit}
+          />
+          <ConfirmDialog
+            open={confirmExit}
+            title="Sair da Seleção do Dia?"
+            message="Saindo agora, você PERDE o ranking de hoje: os jogos restantes viram W.O. e a campanha fica como está. Não dá pra continuar depois."
+            step2Message="Última chance: a Seleção do Dia de hoje encerra de vez. Confirma a saída?"
+            confirmLabel="Sair e encerrar"
+            loading={abandonMut.isPending}
+            onConfirm={doAbandon}
+            onCancel={() => setConfirmExit(false)}
           />
         </div>
       )}
@@ -304,37 +336,45 @@ export function RetroPage() {
 }
 
 function Home({
-  mode,
+  format,
   pace,
-  level,
-  setMode,
+  setFormat,
   setPace,
-  setLevel,
   todayTeam,
-  starting,
+  startingDaily,
+  startingTraining,
+  anyStarting,
   playedToday,
   streak,
   best,
   isLogged,
+  isAdmin,
   onLogin,
   onStart,
   onGoMain,
+  onFeedback,
+  onRules,
+  onAdmin,
 }: {
-  mode: RetroMode;
+  format: RetroFormat;
   pace: RetroPace;
-  level: RetroLevel;
-  setMode: (m: RetroMode) => void;
+  setFormat: (f: RetroFormat) => void;
   setPace: (p: RetroPace) => void;
-  setLevel: (l: RetroLevel) => void;
   todayTeam: { team_slug: string; team_name_pt: string } | null;
-  starting: boolean;
+  startingDaily: boolean;
+  startingTraining: boolean;
+  anyStarting: boolean;
   playedToday: boolean;
   streak: number;
-  best: { stage_reached: string; points: number; total_ms: number } | null;
+  best: { stage_reached: string | null; points: number; total_ms: number; format: RetroFormat } | null;
   isLogged: boolean;
+  isAdmin: boolean;
   onLogin: () => void;
   onStart: (daily: boolean) => void;
   onGoMain: () => void;
+  onFeedback: () => void;
+  onRules: () => void;
+  onAdmin: () => void;
 }) {
   return (
     <div className="mx-auto w-full max-w-md space-y-4">
@@ -356,7 +396,7 @@ function Home({
             {streak > 0 && best && " · "}
             {best && (
               <>
-                melhor campanha: {best.stage_reached} ({best.points} pts · {fmtMs(best.total_ms)})
+                melhor: {best.format === "pontos" ? `${best.points} pts` : best.stage_reached} ({fmtMs(best.total_ms)})
               </>
             )}
           </p>
@@ -366,25 +406,25 @@ function Home({
       <Card className="space-y-3 p-4">
         {/* empilhado (label em cima, controle largura cheia): nada de texto quebrando */}
         <div className="space-y-1.5">
-          <span className="text-xs font-bold uppercase tracking-wide text-ink-500">Modo</span>
-          <SegmentedControl<RetroMode>
+          <span className="text-xs font-bold uppercase tracking-wide text-ink-500">Formato</span>
+          <SegmentedControl<RetroFormat>
             className="w-full whitespace-nowrap"
             options={[
-              { value: "acerto", label: "Vale Ponto" },
-              { value: "cravada", label: "Vale Saldo" },
+              { value: "copa", label: "Copa 🏆" },
+              { value: "pontos", label: "Pontos 🎯" },
             ]}
-            value={mode}
-            onChange={setMode}
+            value={format}
+            onChange={setFormat}
           />
           <p className="text-xs text-ink-500">
-            {mode === "acerto"
-              ? "Qualquer ponto avança — mas a semi pede SALDO e a final, CRAVADA."
-              : "Acerto simples não vale: saldo/cravada sempre — e a final, CRAVADA."}
+            {format === "copa"
+              ? "Eliminatório: erre e tá fora. Sobreviva aos 7 e seja campeão."
+              : "Joga os 7 jogos e soma. Quem faz mais pontos vence — sem eliminação."}
           </p>
         </div>
 
         <div className="space-y-1.5">
-          <span className="text-xs font-bold uppercase tracking-wide text-ink-500">Ritmo</span>
+          <span className="text-xs font-bold uppercase tracking-wide text-ink-500">Ritmo · com ou sem tempo</span>
           <SegmentedControl<RetroPace>
             className="w-full whitespace-nowrap"
             options={[
@@ -397,31 +437,11 @@ function Home({
           <p className="text-xs text-ink-500">{PACE_HINT[pace]}</p>
         </div>
 
-        <div className="space-y-1.5">
-          <span className="text-xs font-bold uppercase tracking-wide text-ink-500">
-            Dificuldade do Treino
-          </span>
-          <SegmentedControl<RetroLevel>
-            className="w-full whitespace-nowrap"
-            options={[
-              { value: "facil", label: "Fácil" },
-              { value: "padrao", label: "Padrão" },
-              { value: "dificil", label: "Difícil" },
-            ]}
-            value={level}
-            onChange={setLevel}
-          />
-          <p className="text-xs text-ink-500">
-            Vale só no Treino (e o ranking de Treino compara o Padrão). A Copa do Dia tem
-            dificuldade própria: do fácil ao difícil.
-          </p>
-        </div>
-
         {todayTeam && (
           <div className="flex items-center justify-center gap-2 rounded-lg bg-brand-500/10 px-3 py-2">
             <RetroCrest slug={todayTeam.team_slug} name={todayTeam.team_name_pt} size={28} />
             <p className="text-sm font-bold text-brand-800">
-              Hoje: a Copa de <span className="uppercase">{todayTeam.team_name_pt}</span>
+              Hoje: <span className="uppercase">{todayTeam.team_name_pt}</span>
               <span className="block text-[11px] font-medium text-ink-500">
                 7 jogos da seleção, do mais fácil ao mais difícil
               </span>
@@ -430,16 +450,31 @@ function Home({
         )}
         {playedToday ? (
           <div className="rounded-lg bg-ink-100 p-3 text-center text-sm">
-            ✅ Você já jogou a Copa do Dia. <b>Volte amanhã</b> — ou treine à vontade.
+            ✅ Você já jogou a Seleção do Dia. <b>Volte amanhã</b> — ou jogue livre.
           </div>
         ) : (
-          <Button size="lg" className="w-full text-base font-bold" loading={starting} onClick={() => onStart(true)}>
-            Jogar a Copa Retrô de hoje ⚽
+          <Button
+            size="lg"
+            className="w-full text-base font-bold"
+            loading={startingDaily}
+            disabled={anyStarting}
+            onClick={() => onStart(true)}
+          >
+            Jogar a Seleção do Dia ⚽
           </Button>
         )}
-        <Button variant="secondary" className="w-full" disabled={starting} onClick={() => onStart(false)}>
-          Treino livre (jogos aleatórios, sem ranking)
-        </Button>
+        <div>
+          <Button
+            variant="secondary"
+            className="w-full font-bold"
+            loading={startingTraining}
+            disabled={anyStarting}
+            onClick={() => onStart(false)}
+          >
+            Jogo livre
+          </Button>
+          <p className="mt-1 text-center text-[11px] text-ink-500">jogos aleatórios, sem ranking</p>
+        </div>
         {!isLogged && (
           <p className="text-center text-xs text-ink-500">
             Dá pra jogar sem conta!{" "}
@@ -454,29 +489,63 @@ function Home({
       <Card className="space-y-2 p-4 text-sm">
         <h3 className="font-bold">Como funciona</h3>
         <ol className="list-decimal space-y-1 pl-5 text-ink-700">
-          <li>Aparece um jogo real de alguma Copa — você tem segundos para cravar o placar.</li>
+          <li>Aparece um jogo real de Copa — segundos pra cravar o placar.</li>
           <li>
-            <b className="text-gold-700">Cravada</b> vale 3, <b className="text-grass-600">saldo</b>{" "}
-            vale 2, <b className="text-aqua-700">acerto</b> vale 1 — pontuou, avançou.
+            <b className="text-gold-700">Cravada +3</b> · <b className="text-grass-600">saldo +2</b>{" "}
+            · <b className="text-aqua-700">acerto +1</b>.
           </li>
-          <li>Grupos: passe em 2 de 3. Mata-mata: errou, caiu. Sobreviveu aos 7? Campeão! 🏆</li>
+          <li><b>Copa 🏆</b>: erre e tá fora. <b>Pontos 🎯</b>: joga os 7 e soma.</li>
         </ol>
-        <p className="text-xs text-ink-500">
-          Vale o placar final com prorrogação; pênaltis não contam. Máximo da run: 21 pontos.
-        </p>
+        <button
+          type="button"
+          onClick={onRules}
+          className="text-xs font-semibold text-brand-700 underline-offset-2 hover:underline"
+        >
+          Ver todas as regras →
+        </button>
       </Card>
 
       <RetroLeaderboard />
 
-      <Card className="p-4 text-center">
-        <p className="text-sm text-ink-700">
-          O Retrô é o irmão nostálgico do <b>Resultadismo</b> — lá você palpita nos jogos{" "}
-          <b>reais de hoje</b> e disputa em grupos com os amigos.
+      {/* ponte pro jogo-mãe: o Retrô é a isca, o bolão da Copa é o destino */}
+      <Card className="relative overflow-hidden border-2 border-brand-500 p-4 text-center">
+        <p className="text-base font-bold text-ink-900">Quer fazer um bolão com os amigos? ⚽</p>
+        <p className="mt-1 text-sm text-ink-600">
+          No <b>Resultadismo</b> você crava o placar dos jogos da <b>Copa de verdade</b>, que está
+          acontecendo agora, e disputa em grupo com a galera. De graça.
         </p>
-        <Button variant="ghost" className="mt-1 w-full" onClick={onGoMain}>
-          ← Voltar pro Resultadismo
+        <Button className="mt-3 w-full font-bold" onClick={onGoMain}>
+          Bora pro bolão da Copa →
         </Button>
       </Card>
+
+      <div className="flex flex-col items-center gap-1.5 pt-1">
+        <button
+          type="button"
+          onClick={onRules}
+          className="text-xs font-semibold text-ink-500 underline-offset-2 hover:underline"
+        >
+          📖 Como funciona o Retrô (regras)
+        </button>
+        {isLogged && (
+          <button
+            type="button"
+            onClick={onFeedback}
+            className="text-xs font-semibold text-ink-500 underline-offset-2 hover:underline"
+          >
+            💬 Achou um bug ou tem uma ideia pro Retrô?
+          </button>
+        )}
+        {isAdmin && (
+          <button
+            type="button"
+            onClick={onAdmin}
+            className="text-xs font-semibold text-ink-400 underline-offset-2 hover:underline"
+          >
+            ⚙️ Admin do Retrô
+          </button>
+        )}
+      </div>
     </div>
   );
 }

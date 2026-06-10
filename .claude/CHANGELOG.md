@@ -50,7 +50,28 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   `retro_today` — migration `20260610150008`); emojis do share nas cores do app; ritmos só Sem
   Pressa/Resultadista; modos renomeados Vale Ponto/Vale Saldo; Dificuldade do Treino
   (Fácil/Padrão/Difícil); `RetroShell` próprio (separação total do app-mãe), banner na landing e
-  card no topo do Perfil. Histórico completo da construção: Comentários
+  card no topo do Perfil. **Rodada 7 (decisões do PO):** sair encerra a run (Copa do Dia confirma e
+  vira W.O. sem retomada — `retro_abandon`, migration `20260610150009`); layout da run centrado
+  (cabe em telas baixas), "Treino livre" em 1 linha com loading independente, aba "Copa do Dia"
+  sem quebra; CTAs de funil posicionando o Resultadismo como **bolão da Copa**. **Rodada 8 (decisões do PO):** final aceita saldo (semi e
+  final = saldo/cravada; migration `20260610150010`); ranking de Treino ordenado por dificuldade
+  (difícil na frente); correção do bug das bandeiras P&B (circularizador preservava o `fill` da
+  raiz; auditoria de cor 60/60); textos curtos por fase no jogo; home mais clara (cada seletor
+  diz o que controla); feedback do Retrô em `/retro/feedback` (só logado, `feedback.product`).
+  **Rodada 9 (feedback dos amigos):** jogo não estica em telas grandes; emoji/manchete dinâmicos
+  por fase no share e tela final (`verdict.ts`); regra da semi/final destacada (banner pulsante no
+  jogo + explicação no reveal); "eliminado nos pênaltis 😬" no near-miss; ranking dá destaque à
+  fase (pontos/tempo são desempate). **Rodada 10 (simplificação + bug):** corrigido o reroll na
+  Copa do Dia (voltava o mesmo jogo — migration `20260610150011`); dois Formatos (Copa eliminatório
+  / Pontos soma os 7); regra de saldo/cravada nas finais virou config admin em `/admin/retro`
+  (desligada por padrão); dificuldade 2 níveis; página de regras `/retro/regras`; ranking por
+  formato. **Rodada 11:** cor do Honduras corrigida; 👑 no 1º do ranking; renomes (Copa do Dia →
+  Seleção do Dia, Treino livre → Jogo livre); removida a dificuldade (um modo só, ranking
+  fase/pontos/tempo); tempo de tela só do Retrô (`retro_touch` → `screen_seconds`); feedback admin
+  do Retrô em `/admin/retro` + fix do "Meus envios". **Rodada 12:** trilha J1..J7 no modo Pontos;
+  caminho admin→Retrô (chip na nav do /admin); fix do report sumido (dropada a duplicata 6-arg de
+  `submit_feedback` que inseria sem product — migration `20260610150013`) + badge de produto no
+  admin. Histórico completo da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do

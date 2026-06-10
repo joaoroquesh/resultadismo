@@ -578,6 +578,7 @@ export type Database = {
           id: string
           kind: string
           page: string | null
+          product: string
           resolved_at: string | null
           resolved_by: string | null
           status: string
@@ -593,6 +594,7 @@ export type Database = {
           id?: string
           kind: string
           page?: string | null
+          product?: string
           resolved_at?: string | null
           resolved_by?: string | null
           status?: string
@@ -608,6 +610,7 @@ export type Database = {
           id?: string
           kind?: string
           page?: string | null
+          product?: string
           resolved_at?: string | null
           resolved_by?: string | null
           status?: string
@@ -1389,6 +1392,30 @@ export type Database = {
         }
         Relationships: []
       }
+      retro_config: {
+        Row: {
+          enforce_knockout_bar: boolean
+          final_min: string
+          id: number
+          semi_min: string
+          updated_at: string
+        }
+        Insert: {
+          enforce_knockout_bar?: boolean
+          final_min?: string
+          id?: number
+          semi_min?: string
+          updated_at?: string
+        }
+        Update: {
+          enforce_knockout_bar?: boolean
+          final_min?: string
+          id?: number
+          semi_min?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       retro_daily: {
         Row: {
           created_at: string
@@ -1551,6 +1578,7 @@ export type Database = {
           current_slot: number
           daily_date: string | null
           finished_at: string | null
+          format: string
           id: string
           is_daily: boolean
           level: string
@@ -1573,6 +1601,7 @@ export type Database = {
           current_slot?: number
           daily_date?: string | null
           finished_at?: string | null
+          format?: string
           id?: string
           is_daily?: boolean
           level?: string
@@ -1595,6 +1624,7 @@ export type Database = {
           current_slot?: number
           daily_date?: string | null
           finished_at?: string | null
+          format?: string
           id?: string
           is_daily?: boolean
           level?: string
@@ -1628,18 +1658,21 @@ export type Database = {
           anon_runs_started: number
           anon_seconds: number
           day: string
+          screen_seconds: number
         }
         Insert: {
           anon_runs_finished?: number
           anon_runs_started?: number
           anon_seconds?: number
           day: string
+          screen_seconds?: number
         }
         Update: {
           anon_runs_finished?: number
           anon_runs_started?: number
           anon_seconds?: number
           day?: string
+          screen_seconds?: number
         }
         Relationships: []
       }
@@ -1938,6 +1971,7 @@ export type Database = {
           id: string
           kind: string
           page: string
+          product: string
           resolved_at: string
           status: string
           title: string
@@ -2607,6 +2641,14 @@ export type Database = {
         Args: { p_match_ids?: string[] }
         Returns: number
       }
+      retro_abandon: {
+        Args: { p_anon_token?: string; p_run_id: string }
+        Returns: Json
+      }
+      retro_admin_set_config: {
+        Args: { p_enforce: boolean; p_final_min?: string; p_semi_min?: string }
+        Returns: Json
+      }
       retro_answer: {
         Args: {
           p_anon_token?: string
@@ -2617,12 +2659,13 @@ export type Database = {
         }
         Returns: Json
       }
+      retro_get_config: { Args: never; Returns: Json }
       retro_leaderboard: {
         Args: {
           p_board?: string
           p_daily_date?: string
+          p_format?: string
           p_limit?: number
-          p_mode?: string
         }
         Returns: Json
       }
@@ -2634,6 +2677,7 @@ export type Database = {
         }
         Returns: Json
       }
+      retro_min_points: { Args: { p_label: string }; Returns: number }
       retro_my_stats: { Args: never; Returns: Json }
       retro_next: {
         Args: { p_anon_token?: string; p_run_id: string; p_seen?: string[] }
@@ -2662,6 +2706,7 @@ export type Database = {
       retro_run_summary: { Args: { p_share_code: string }; Returns: Json }
       retro_serve_slot: {
         Args: {
+          p_force_random?: boolean
           p_run: Database["public"]["Tables"]["retro_runs"]["Row"]
           p_seen: string[]
           p_slot: number
@@ -2673,6 +2718,7 @@ export type Database = {
         Args: {
           p_anon_token?: string
           p_daily?: boolean
+          p_format?: string
           p_level?: string
           p_mode?: string
           p_pace?: string
@@ -2685,6 +2731,7 @@ export type Database = {
         Returns: number
       }
       retro_today: { Args: never; Returns: Json }
+      retro_touch: { Args: { p_seconds: number }; Returns: undefined }
       retro_touch_anon: { Args: { p_seconds: number }; Returns: undefined }
       run_football_sync:
         | { Args: never; Returns: undefined }
@@ -2756,37 +2803,72 @@ export type Database = {
         }
       }
       skip_personalization: { Args: never; Returns: undefined }
-      submit_feedback: {
-        Args: {
-          p_app_version?: string
-          p_body: string
-          p_kind: string
-          p_page?: string
-          p_title: string
-          p_user_agent?: string
-        }
-        Returns: {
-          admin_reply: string | null
-          app_version: string | null
-          body: string
-          created_at: string
-          id: string
-          kind: string
-          page: string | null
-          resolved_at: string | null
-          resolved_by: string | null
-          status: string
-          title: string
-          user_agent: string | null
-          user_id: string | null
-        }
-        SetofOptions: {
-          from: "*"
-          to: "feedback"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
+      submit_feedback:
+        | {
+            Args: {
+              p_app_version?: string
+              p_body: string
+              p_kind: string
+              p_page?: string
+              p_title: string
+              p_user_agent?: string
+            }
+            Returns: {
+              admin_reply: string | null
+              app_version: string | null
+              body: string
+              created_at: string
+              id: string
+              kind: string
+              page: string | null
+              product: string
+              resolved_at: string | null
+              resolved_by: string | null
+              status: string
+              title: string
+              user_agent: string | null
+              user_id: string | null
+            }
+            SetofOptions: {
+              from: "*"
+              to: "feedback"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+        | {
+            Args: {
+              p_app_version?: string
+              p_body: string
+              p_kind: string
+              p_page?: string
+              p_product?: string
+              p_title: string
+              p_user_agent?: string
+            }
+            Returns: {
+              admin_reply: string | null
+              app_version: string | null
+              body: string
+              created_at: string
+              id: string
+              kind: string
+              page: string | null
+              product: string
+              resolved_at: string | null
+              resolved_by: string | null
+              status: string
+              title: string
+              user_agent: string | null
+              user_id: string | null
+            }
+            SetofOptions: {
+              from: "*"
+              to: "feedback"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
       team_slug: { Args: { p: string }; Returns: string }
       toggle_confronto_optin: { Args: { p_lc_id: string }; Returns: boolean }
       touch_presence: { Args: never; Returns: undefined }

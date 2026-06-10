@@ -1,6 +1,6 @@
 // Helpers puros do resultado/share (fora dos componentes — fast refresh feliz).
 import type { ScoreType } from "@/lib/types";
-import type { RetroMode, RetroPace } from "./api";
+import type { RetroFormat, RetroPace } from "./api";
 
 // Emojis casados com as cores do app: cravada=dourado 🟨 · saldo=verde 🟩 · acerto=azul 🟦
 export const SCORE_EMOJI: Record<ScoreType, string> = {
@@ -11,13 +11,13 @@ export const SCORE_EMOJI: Record<ScoreType, string> = {
 };
 
 export type FinishedRun = {
-  status: "eliminated" | "champion";
-  stageReached: string;
+  status: "eliminated" | "champion" | "finished";
+  stageReached: string | null;
   points: number;
   totalMs: number | null;
   shareCode: string;
   isDaily: boolean;
-  mode: RetroMode;
+  format: RetroFormat;
   pace: RetroPace;
   slots: { slot: number; scoreType: ScoreType }[];
 };
@@ -40,9 +40,14 @@ export function buildShareText(run: FinishedRun, streak: number | undefined): st
     .map((s) => `${koLabels[s.slot - 4]} ${SCORE_EMOJI[s.scoreType]}`)
     .join(" · ");
   const headline =
-    run.status === "champion" ? "CAMPEÃO da minha Copa Retrô! 🏆" : `Caí: ${run.stageReached} 😭`;
+    run.format === "pontos"
+      ? `Fiz ${run.points} pts na minha Copa Retrô!`
+      : run.status === "champion"
+        ? "CAMPEÃO da minha Copa Retrô! 🏆"
+        : `Caí: ${run.stageReached} 😭`;
+  const fmtLabel = run.format === "pontos" ? " · Pontos" : "";
   return [
-    `⚽ Resultadismo Retrô — ${run.isDaily ? "Copa do Dia" : "Treino"}${run.mode === "cravada" ? " · Vale Saldo" : ""}`,
+    `⚽ Resultadismo Retrô — ${run.isDaily ? "Seleção do Dia" : "Jogo livre"}${fmtLabel}`,
     `Grupos ${groups}${ko ? ` · ${ko}` : ""}`,
     `${headline} · ${run.points} pts · ${fmtMs(run.totalMs)}${streak ? ` · 🔥 ${streak} dia${streak > 1 ? "s" : ""}` : ""}`,
     `Acha que faz melhor? 👉 https://www.resultadismo.com/retro/r/${run.shareCode}`,

@@ -18,20 +18,22 @@ fallback: copia a IMAGEM pro clipboard + wa.me → texto) + grade de emojis **se
 página pública `/retro/r/:code`.
 
 - **Modos e barras (rodada 5 do PO, migration `20260610150007` — `retro_pass_need`):**
-  `acerto` = ≥1 até as quartas · **semi pede saldo (≥2)** · **FINAL só com CRAVADA**;
-  `cravada` ("Na Crava") = ≥2 sempre · **FINAL só com CRAVADA**.
+  `acerto` (rótulo **Vale Ponto**) = ≥1 até as quartas · **semi e FINAL = saldo ou cravada (≥2)**;
+  `cravada` (rótulo **Vale Saldo**) = ≥2 sempre. (rodada 8: a final deixou de exigir cravada.)
 - **🎲 Fichas de troca:** cada CRAVADA dá 1 ficha; o jogador pode trocar o jogo atual da run
   (RPC `retro_reroll` — re-sorteia, cronômetro renasce; vale na Copa do Dia, ganho por mérito).
 - **Treinos ranqueados:** runs de LOGADO são todas persistentes; ranking de Treino = melhor
   campanha de cada um (`retro_leaderboard(p_board=>'treino')`); melhor campanha do perfil
   considera tudo. Anônimo segue efêmero (purga diária).
-- **Run em tela cheia:** o play roda num overlay imersivo z-[70] (cabe em qualquer altura, até
-  iPhone SE; "sair ✕" discreto). **Separação total (rodada 6):** as rotas `/retro*` vivem num
+- **Run em tela cheia:** overlay imersivo z-[70]; conteúdo em bloco **max-w-sm centrado** (não
+  estica em telas grandes/tablet). Na **semi/final** um banner gold pulsante avisa "só SALDO ou
+  CRAVADA passa"; hint curto da fase nas demais. "sair ✕" discreto. **Separação total (rodada 6):** as rotas `/retro*` vivem num
   **`RetroShell` próprio** (mini-header com "ir pro Resultadismo →" + ConsentBanner) — fora do
   AppShell: nada de Sidebar/BottomNav/header do app-mãe. Entradas: **card próprio no topo do menu
   do Perfil**, **banner na landing** e seção no Como Funciona.
-- **Ritmos:** `resultadista` (10/8/7s — o único que **ranqueia**) · `classico` (14/12/10s) ·
-  `sempressa` (sem timer). Cronômetro mostra **milésimos + cor nos 3s finais**.
+- **Ritmos:** `sempressa` · `resultadista` (10/8/7s — o que **ranqueia**). **Sem seletor de
+  dificuldade** (rodada 11: removido pra não confundir o ranking). Cronômetro com milésimos + cor
+  nos 3s finais. Rótulos: **Seleção do Dia** (era Copa do Dia) e **Jogo livre** (era Treino livre).
 - **Copa do Dia TEMÁTICA (rodada 6):** cada dia é a Copa de **uma seleção** (rotação determinística
   entre as 58 com ≥7 jogos; dia 0 = 10/06 = Brasil; RPC `retro_today` mostra o tema), com os 7
   jogos **ordenados do mais fácil ao mais difícil**; 1 tentativa por conta/dia, com retomada.
@@ -67,7 +69,7 @@ página pública `/retro/r/:code`.
   `retroLocal.ts` = token anônimo + anti-repetição local). Rotas públicas `/retro` e `/retro/r/:code`
   no `App.tsx`; entradas na Sidebar/BottomNav/PublicShell. Vitrine de animações: `/retro?demo=1`
   (**só DEV**).
-- **Banco (migrations `20260610150000–150008`; a 150008 RESETOU runs/ranking por ordem do PO):** seed dos **964 jogos** (fonte openfootball CC0,
+- **Banco (migrations `20260610150000–150013`; 150011 = Formato Copa/Pontos + config admin + fix reroll daily; 150008 RESET; 150009 abandono; 150010 final-aceita-saldo + ranking-por-dificuldade + feedback.product):** seed dos **964 jogos** (fonte openfootball CC0,
   importador `scripts/gen-retro-seed.mjs` com portões de qualidade; dificuldade 1–7 com 34
   jogos-lenda) + motor (RPCs `retro_start_run`, `retro_next` — serve **sob demanda**, o cronômetro
   nasce no clique —, `retro_answer`, `retro_run_summary`, `retro_leaderboard`, `retro_my_stats`,
@@ -80,8 +82,29 @@ página pública `/retro/r/:code`.
   bandeiras pré-aquecidas na home via `retroFlagSlugs.ts`).
 - **Bandeiras:** `public/teams/` (33 históricas adicionadas; todas as SVG padronizadas em
   **círculo** por `scripts/gen-flag-circles.mjs` — idempotente).
-- **Analytics:** eventos `retro_run_start`/`retro_guess`/`retro_run_end`/`retro_share` na union de
-  `src/lib/analytics.ts` (sem PII).
+- **Analytics:** eventos `retro_run_start`/`retro_guess`/`retro_run_end`/`retro_share` (sem PII).
+- **Tempo de tela SÓ do Retrô (rodada 11):** `RetroShell` bate `retro_touch` a cada 30s p/ TODOS
+  (anon+logado) → `retro_usage_daily.screen_seconds`. Separado do app-mãe (PresenceTracker não roda
+  no RetroShell).
+- **Feedback admin:** `/admin/retro` (acessível pela nav do **/admin** principal: chip "🕹️ Retrô")
+  lista os reports do Retrô (`FeedbackAdmin
+  product="retro"`, via `admin_list_feedback` com `product`) — autor, página, corpo, resolver/responder
+  (`admin_update_feedback`). "Meus envios" filtra por `auth.uid()`. O admin principal lista TODOS os
+  reports com **badge de produto** (🕹️ Retrô). **Rodada 12:** removida a duplicata de
+  `submit_feedback` (6-arg) que podia inserir sem `product` (sumindo o report do admin do Retrô).
+- **Trilha (CampaignTrail):** Copa = G1·G2·G3│8ª·4ª·SF·F; **Pontos = J1..J7** (sem fases nem
+  divisor); o card mostra "Jogo N de 7" no Pontos.
+- **Páginas:** `/retro/regras` (regras em blocos curtos), `/admin/retro` (config admin, RequireAdmin).
+- **Feedback do Retrô:** `/retro/feedback` (só logado) reusa a `FeedbackPage` com `product="retro"`
+  (coluna `feedback.product` classico|retro; `submit_feedback` ganhou `p_product`). Páginas
+  Retrô-específicas no seletor de bug. Link discreto na home do Retrô.
+- **Veredito dinâmico (`verdict.ts`):** emoji por fase (🏆 campeão · 🥈 vice · 🔥 semi · 💪 quartas
+  · 👏 oitavas · 😅 grupos) + manchete por fase, no reveal/tela final/share/página pública. Quem é
+  eliminado na semi/final com **acerto** vê "eliminado nos pênaltis 😬" (acertou o vencedor, faltou
+  saldo). **Ranking** dá destaque à FASE (pontos/tempo viram desempate em cinza), com nota do critério.
+- **Bandeiras (fix rodada 8):** o circularizador `gen-flag-circles.mjs` agora preserva
+  `fill`/`stroke`/`style` da raiz do SVG — sem isso, bandeiras que definem a cor no `<svg>` raiz
+  (Honduras etc.) renderizavam em preto. Re-baixadas e auditadas por COR (não só decode): 60/60 ok.
 
 ## 5. Backlog conhecido (fase 2 do Retrô)
 
