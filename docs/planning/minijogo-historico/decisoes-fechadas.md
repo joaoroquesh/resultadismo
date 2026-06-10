@@ -145,6 +145,16 @@ Dois eixos independentes, escolhidos antes da run:
   (5) Modo/Ritmo empilhados (sem quebra de linha). (6) Integração Retrô⇄Resultadismo: entrada
   "Retrô" na Sidebar + BottomNav (logado) e no header/PublicShell (deslogado); na home do jogo,
   card "Voltar pro Resultadismo"; pós-share, card "Palpitar nos jogos de hoje →" (Q1: aquisição).
-- **Próximo: Fase 4** — eventos GA4 (union do `analytics.ts`), entrada na navegação/Como Funciona/
+- **EM PRODUÇÃO (10/06/2026, commit dee3108)** — João autorizou o teste com amigos;
+  migrations renumeradas 20260610150000-3 (colisão com a 20260610120000 do release 2.0 evitada).
+- **Rodada 2 de homologação + FASE 4 — CONCLUÍDAS (10/06, commit bb8e625, aguardando teste local
+  do João antes do push):** placar eletrônico sempre escuro (tokens `--retro-board*` — contraste);
+  bandeiras corrigidas na RAIZ (wrapper preservava só xmlns básico e perdia `xmlns:xlink` → 12/60
+  SVGs não decodificavam; originais restaurados + script corrigido + auditoria 60/60 + RetroCrest
+  com retry); demo ganha prévia do card de decisão; eventos GA4
+  (`retro_run_start/guess/run_end/share`); seção no Como Funciona + landing; guarda anti-abuso
+  anônimo (30 runs/h/token, migration `20260610150004`); doc oficial `.claude/12-RETRO-MINIJOGO.md`
+  + linha no MESTRE §2 + tabelas/RPCs no doc 05.
+- **Backlog (fase 2 do Retrô)** — eventos GA4 (union do `analytics.ts`) ✓feito, entrada na navegação/Como Funciona/
   landing (pontos de contato), docs `.claude/05` §2 + `12-RETRO-MINIJOGO.md` → **Fase 5**:
   homologação com o João (Portão B), integração do worktree na main e deploy.
