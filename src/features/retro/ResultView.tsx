@@ -6,12 +6,14 @@ import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import { useNavigate } from "react-router-dom";
 import { track } from "@/lib/analytics";
 import { CampaignTrail, type TrailSlot } from "./CampaignTrail";
-import { Confetti } from "./RetroFx";
+import { Confetti, RetroStripes } from "./RetroFx";
 import { fmtMs, type FinishedRun } from "./share";
 import { isPenaltyOut, stageEmoji, verdictHeadline } from "./verdict";
 import { shareCampaign } from "./shareImage";
 
-// Tela final da campanha: o veredito, a grade compartilhável e o loop de recomeço.
+// Tela final: o "card" agora espelha a imagem do share (placar eletrônico escuro +
+// listras retrô), pra ser igual ao que a pessoa compartilha. Embaixo, o convite pro
+// bolão da Copa (logo do Resultadismo).
 export function ResultView({
   run,
   streak,
@@ -34,29 +36,29 @@ export function ResultView({
 
   return (
     <div className="mx-auto w-full max-w-md space-y-4">
-      <Card className={champion ? "relative overflow-hidden border-2 border-gold-500 bg-gold-50 p-5" : "p-5"}>
+      {/* CARD = espelho do share: fundo escuro, listras, emoji, trilha, pontos */}
+      <div className="retro-scanlines relative overflow-hidden rounded-2xl bg-[var(--retro-board)] p-6 text-center text-white shadow-pop">
+        <RetroStripes className="absolute inset-x-0 top-0" />
+        <RetroStripes className="absolute inset-x-0 bottom-0" />
         {champion && <Confetti tall />}
-        <div className="space-y-3 text-center">
-          <div className="animate-retro-stamp text-5xl">{stageEmoji(v)}</div>
-          <h2 className="text-2xl font-bold">{verdictHeadline(v)}</h2>
+        <div className="relative space-y-3">
+          <div className="animate-retro-stamp text-6xl">{stageEmoji(v)}</div>
+          <h2 className={champion ? "text-2xl font-bold text-[var(--retro-board-digit)]" : "text-2xl font-bold"}>
+            {verdictHeadline(v)}
+          </h2>
           {penalty && (
-            <p className="text-sm font-semibold text-aqua-700">
-              Eliminado nos pênaltis 😬 — você acertou o vencedor, mas aqui só saldo ou cravada passa.
+            <p className="text-sm font-semibold text-aqua-400">
+              Eliminado nos pênaltis 😬 — acertou o vencedor, mas aqui só saldo ou cravada passa.
             </p>
           )}
           <CampaignTrail slots={trail} currentSlot={null} format={run.format} />
-          <p className="text-sm text-ink-500">
-            <b className="tabular-nums">{run.points} pts</b> · tempo{" "}
-            <b className="tabular-nums">{fmtMs(run.totalMs)}</b>
-            {streak ? (
-              <>
-                {" "}
-                · <b>🔥 {streak} dia{streak > 1 ? "s" : ""} seguidos</b>
-              </>
-            ) : null}
+          <p className="text-4xl font-bold tabular-nums text-[var(--retro-board-digit)]">{run.points} pts</p>
+          <p className="text-sm text-white/75">
+            tempo <b className="tabular-nums">{fmtMs(run.totalMs)}</b>
+            {streak ? <> · 🔥 {streak} dia{streak > 1 ? "s" : ""} seguidos</> : null}
           </p>
         </div>
-      </Card>
+      </div>
 
       <Button
         size="lg"
@@ -68,7 +70,6 @@ export function ResultView({
       >
         Compartilhar 📲
       </Button>
-
 
       {!user && (
         <Card className="p-4 text-center">
@@ -82,22 +83,24 @@ export function ResultView({
       )}
 
       <div className="flex gap-2">
-        <Button variant="secondary" className="flex-1" onClick={onPlayTraining}>
-          Jogar Treino agora
+        <Button variant="secondary" className="flex-1 font-bold" onClick={onPlayTraining}>
+          Jogar de novo
         </Button>
         <Button variant="ghost" className="flex-1" onClick={onBackHome}>
           Voltar ao início
         </Button>
       </div>
 
-      {/* ponte pro jogo principal — depois do share, nunca antes (Q1: aquisição) */}
-      <Card className="p-4 text-center">
-        <p className="text-sm">
-          Curtiu cravar placar? No <b>Resultadismo</b> você palpita nos jogos{" "}
-          <b>de verdade</b> e disputa com os amigos.
+      {/* convite pro bolão da Copa — no FIM da página, com a logo do Resultadismo */}
+      <Card className="mt-2 p-5 text-center">
+        <img src="/brand/Resultadismo.svg" alt="Resultadismo" className="mx-auto h-7" />
+        <p className="mt-3 text-base font-bold text-ink-900">O bolão da Copa de verdade ⚽</p>
+        <p className="mt-1 text-sm text-ink-600">
+          Gostou de cravar placar? No <b>Resultadismo</b> você palpita nos jogos da{" "}
+          <b>Copa que está acontecendo</b> e disputa em grupo com os amigos. De graça.
         </p>
-        <Button variant="outline" className="mt-2 w-full" onClick={() => navigate("/")}>
-          Palpitar nos jogos de hoje →
+        <Button className="mt-3 w-full font-bold" onClick={() => navigate("/")}>
+          Fazer meu bolão da Copa →
         </Button>
       </Card>
     </div>

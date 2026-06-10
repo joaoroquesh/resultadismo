@@ -234,6 +234,12 @@ Dois eixos independentes, escolhidos antes da run:
   "🕹️ Retrô" na nav do /admin); (3) **report sumido** corrigido — havia 2 `submit_feedback` (6 e
   7 args); a 6-arg (sem product) foi dropada (migration `20260610150013`) e o admin principal agora
   lista TODOS com badge de produto, garantindo que nada se esconda.
+- **Rodada 13 (10/06, decisões do PO):** (1) **Seleção do Dia só no formato Copa** (o diário é
+  eliminatório; o formato só varia no Jogo livre; ranking diário = Copa); (2) **tela final
+  redesenhada** espelhando a imagem de share (card escuro placar-eletrônico + listras + scanlines,
+  levemente mais retrô); (3) "Jogar Treino agora" → **"Jogar de novo"**; (4) convite pro
+  **bolão da Copa no FIM da página, com a logo do Resultadismo** e copy sobre a Copa acontecendo.
+  Só front.
 - **Backlog (fase 2 do Retrô)** — eventos GA4 (union do `analytics.ts`) ✓feito, entrada na navegação/Como Funciona/
   landing (pontos de contato), docs `.claude/05` §2 + `12-RETRO-MINIJOGO.md` → **Fase 5**:
   homologação com o João (Portão B), integração do worktree na main e deploy.

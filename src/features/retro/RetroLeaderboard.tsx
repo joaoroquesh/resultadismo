@@ -12,8 +12,10 @@ import { fmtMs } from "./share";
 export function RetroLeaderboard() {
   const [format, setFormat] = useState<RetroFormat>("copa");
   const [board, setBoard] = useState<"daily" | "treino">("daily");
-  const { data, isLoading } = useRetroLeaderboard(format, board);
-  const isPontos = format === "pontos";
+  // a Seleção do Dia é sempre Copa; o formato só varia no Jogo livre (treino)
+  const effFormat: RetroFormat = board === "daily" ? "copa" : format;
+  const { data, isLoading } = useRetroLeaderboard(effFormat, board);
+  const isPontos = effFormat === "pontos";
 
   return (
     <Card className="space-y-3 p-4">
@@ -24,21 +26,23 @@ export function RetroLeaderboard() {
             className="whitespace-nowrap"
             options={[
               { value: "daily", label: "Seleção do Dia" },
-              { value: "treino", label: "Treino" },
+              { value: "treino", label: "Jogo livre" },
             ]}
             value={board}
             onChange={setBoard}
           />
         </div>
-        <SegmentedControl<RetroFormat>
-          className="w-full"
-          options={[
-            { value: "copa", label: "Copa 🏆" },
-            { value: "pontos", label: "Pontos 🎯" },
-          ]}
-          value={format}
-          onChange={setFormat}
-        />
+        {board === "treino" && (
+          <SegmentedControl<RetroFormat>
+            className="w-full"
+            options={[
+              { value: "copa", label: "Copa 🏆" },
+              { value: "pontos", label: "Pontos 🎯" },
+            ]}
+            value={format}
+            onChange={setFormat}
+          />
+        )}
       </div>
 
       {isLoading ? (

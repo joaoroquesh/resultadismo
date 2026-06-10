@@ -34,6 +34,8 @@ página pública `/retro/r/:code`.
 - **Ritmos:** `sempressa` · `resultadista` (10/8/7s — o que **ranqueia**). **Sem seletor de
   dificuldade** (rodada 11: removido pra não confundir o ranking). Cronômetro com milésimos + cor
   nos 3s finais. Rótulos: **Seleção do Dia** (era Copa do Dia) e **Jogo livre** (era Treino livre).
+- **Seleção do Dia = sempre Copa (rodada 13):** o desafio diário ranqueado é eliminatório (Copa).
+  O formato (Copa/Pontos) só varia no **Jogo livre**. Ranking diário = Copa apenas.
 - **Copa do Dia TEMÁTICA (rodada 6):** cada dia é a Copa de **uma seleção** (rotação determinística
   entre as 58 com ≥7 jogos; dia 0 = 10/06 = Brasil; RPC `retro_today` mostra o tema), com os 7
   jogos **ordenados do mais fácil ao mais difícil**; 1 tentativa por conta/dia, com retomada.
@@ -92,6 +94,9 @@ página pública `/retro/r/:code`.
   (`admin_update_feedback`). "Meus envios" filtra por `auth.uid()`. O admin principal lista TODOS os
   reports com **badge de produto** (🕹️ Retrô). **Rodada 12:** removida a duplicata de
   `submit_feedback` (6-arg) que podia inserir sem `product` (sumindo o report do admin do Retrô).
+- **Tela final (rodada 13):** o card espelha a IMAGEM de share — placar eletrônico escuro
+  (`--retro-board`) + listras + scanlines + emoji por fase + trilha + pontos dourados. Botões
+  "Jogar de novo" / "Voltar"; no FIM, convite pro **bolão da Copa** com a logo do Resultadismo.
 - **Trilha (CampaignTrail):** Copa = G1·G2·G3│8ª·4ª·SF·F; **Pontos = J1..J7** (sem fases nem
   divisor); o card mostra "Jogo N de 7" no Pontos.
 - **Páginas:** `/retro/regras` (regras em blocos curtos), `/admin/retro` (config admin, RequireAdmin).

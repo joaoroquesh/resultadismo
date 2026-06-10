@@ -110,7 +110,7 @@ export function RetroPage() {
     if (startMut.isPending) return;
     setStartKind(daily ? "daily" : "training");
     startMut.mutate(
-      { format, pace, daily, level: "facil" },
+      { format: daily ? "copa" : format, pace, daily, level: "facil" },
       {
         onSuccess: (s: RetroStart) => {
           track("retro_run_start", { format: s.format, pace: s.pace, daily });
@@ -403,10 +403,64 @@ function Home({
         )}
       </Card>
 
-      <Card className="space-y-3 p-4">
-        {/* empilhado (label em cima, controle largura cheia): nada de texto quebrando */}
+      {/* ritmo vale pros dois modos */}
+      <Card className="space-y-1.5 p-4">
+        <span className="text-xs font-bold uppercase tracking-wide text-ink-500">Ritmo · com ou sem tempo</span>
+        <SegmentedControl<RetroPace>
+          className="w-full whitespace-nowrap"
+          options={[
+            { value: "sempressa", label: "Sem Pressa" },
+            { value: "resultadista", label: "Resultadista" },
+          ]}
+          value={pace}
+          onChange={setPace}
+        />
+        <p className="text-xs text-ink-500">{PACE_HINT[pace]}</p>
+      </Card>
+
+      {/* SELEÇÃO DO DIA — sempre Copa (mata-mata), é o desafio ranqueado */}
+      <Card className="space-y-2 border-2 border-brand-500 p-4">
+        {todayTeam && (
+          <div className="flex items-center justify-center gap-2">
+            <RetroCrest slug={todayTeam.team_slug} name={todayTeam.team_name_pt} size={32} />
+            <p className="text-sm font-bold text-brand-800">
+              Seleção do Dia: <span className="uppercase">{todayTeam.team_name_pt}</span>
+              <span className="block text-[11px] font-medium text-ink-500">
+                7 jogos da seleção · formato Copa (mata-mata)
+              </span>
+            </p>
+          </div>
+        )}
+        {playedToday ? (
+          <div className="rounded-lg bg-ink-100 p-3 text-center text-sm">
+            ✅ Você já jogou a Seleção do Dia. <b>Volte amanhã</b> — ou jogue livre abaixo.
+          </div>
+        ) : (
+          <Button
+            size="lg"
+            className="w-full text-base font-bold"
+            loading={startingDaily}
+            disabled={anyStarting}
+            onClick={() => onStart(true)}
+          >
+            Jogar a Seleção do Dia ⚽
+          </Button>
+        )}
+        {!isLogged && (
+          <p className="text-center text-[11px] text-ink-500">
+            Dá pra jogar sem conta!{" "}
+            <button type="button" className="font-semibold text-brand-700 underline" onClick={onLogin}>
+              Entre com Google
+            </button>{" "}
+            para ranking e sequência 🔥
+          </p>
+        )}
+      </Card>
+
+      {/* JOGO LIVRE — escolhe o formato, sem ranking */}
+      <Card className="space-y-2 p-4">
         <div className="space-y-1.5">
-          <span className="text-xs font-bold uppercase tracking-wide text-ink-500">Formato</span>
+          <span className="text-xs font-bold uppercase tracking-wide text-ink-500">Jogo livre · escolha o formato</span>
           <SegmentedControl<RetroFormat>
             className="w-full whitespace-nowrap"
             options={[
@@ -422,68 +476,15 @@ function Home({
               : "Joga os 7 jogos e soma. Quem faz mais pontos vence — sem eliminação."}
           </p>
         </div>
-
-        <div className="space-y-1.5">
-          <span className="text-xs font-bold uppercase tracking-wide text-ink-500">Ritmo · com ou sem tempo</span>
-          <SegmentedControl<RetroPace>
-            className="w-full whitespace-nowrap"
-            options={[
-              { value: "sempressa", label: "Sem Pressa" },
-              { value: "resultadista", label: "Resultadista" },
-            ]}
-            value={pace}
-            onChange={setPace}
-          />
-          <p className="text-xs text-ink-500">{PACE_HINT[pace]}</p>
-        </div>
-
-        {todayTeam && (
-          <div className="flex items-center justify-center gap-2 rounded-lg bg-brand-500/10 px-3 py-2">
-            <RetroCrest slug={todayTeam.team_slug} name={todayTeam.team_name_pt} size={28} />
-            <p className="text-sm font-bold text-brand-800">
-              Hoje: <span className="uppercase">{todayTeam.team_name_pt}</span>
-              <span className="block text-[11px] font-medium text-ink-500">
-                7 jogos da seleção, do mais fácil ao mais difícil
-              </span>
-            </p>
-          </div>
-        )}
-        {playedToday ? (
-          <div className="rounded-lg bg-ink-100 p-3 text-center text-sm">
-            ✅ Você já jogou a Seleção do Dia. <b>Volte amanhã</b> — ou jogue livre.
-          </div>
-        ) : (
-          <Button
-            size="lg"
-            className="w-full text-base font-bold"
-            loading={startingDaily}
-            disabled={anyStarting}
-            onClick={() => onStart(true)}
-          >
-            Jogar a Seleção do Dia ⚽
-          </Button>
-        )}
-        <div>
-          <Button
-            variant="secondary"
-            className="w-full font-bold"
-            loading={startingTraining}
-            disabled={anyStarting}
-            onClick={() => onStart(false)}
-          >
-            Jogo livre
-          </Button>
-          <p className="mt-1 text-center text-[11px] text-ink-500">jogos aleatórios, sem ranking</p>
-        </div>
-        {!isLogged && (
-          <p className="text-center text-xs text-ink-500">
-            Dá pra jogar sem conta!{" "}
-            <button type="button" className="font-semibold text-brand-700 underline" onClick={onLogin}>
-              Entre com Google
-            </button>{" "}
-            para ranking e sequência 🔥
-          </p>
-        )}
+        <Button
+          variant="secondary"
+          className="w-full font-bold"
+          loading={startingTraining}
+          disabled={anyStarting}
+          onClick={() => onStart(false)}
+        >
+          Jogar livre (sem ranking)
+        </Button>
       </Card>
 
       <Card className="space-y-2 p-4 text-sm">

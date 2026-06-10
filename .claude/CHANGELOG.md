@@ -71,7 +71,10 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   do Retrô em `/admin/retro` + fix do "Meus envios". **Rodada 12:** trilha J1..J7 no modo Pontos;
   caminho admin→Retrô (chip na nav do /admin); fix do report sumido (dropada a duplicata 6-arg de
   `submit_feedback` que inseria sem product — migration `20260610150013`) + badge de produto no
-  admin. Histórico completo da construção: Comentários
+  admin. **Rodada 13:** Seleção do Dia só no formato Copa (ranking diário = Copa); tela final
+  redesenhada espelhando a imagem de share (card escuro retrô); "Jogar Treino agora" → "Jogar de
+  novo"; convite pro bolão da Copa no fim, com logo do Resultadismo. Só front. Histórico completo
+  da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do
