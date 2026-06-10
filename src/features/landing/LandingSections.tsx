@@ -306,7 +306,7 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
       {/* ---- RETRÔ (banner do outro jogo) ---- */}
       <section>
         <Reveal>
-          <div className="relative overflow-hidden rounded-2xl bg-ink-950 p-5 text-white shadow-pop">
+          <div className="relative overflow-hidden rounded-2xl bg-ink-950 p-5 text-ink-50 shadow-pop">
             <div
               aria-hidden
               className="absolute inset-x-0 top-0 h-1.5"
@@ -316,15 +316,15 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
               }}
             />
             <div className="flex items-center gap-4">
-              <span className="grid size-12 flex-none place-items-center rounded-xl bg-white/10 text-2xl">
+              <span className="grid size-12 flex-none place-items-center rounded-xl bg-ink-500/20 text-2xl">
                 🕹️
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold uppercase tracking-widest text-gold-400">
+                <p className="text-xs font-bold uppercase tracking-widest text-gold-600">
                   Novo · nosso outro jogo
                 </p>
                 <h3 className="text-lg font-bold leading-tight">Resultadismo Retrô</h3>
-                <p className="text-sm text-white/80">
+                <p className="text-sm text-ink-300">
                   Você lembra desse placar? 7 jogos históricos das Copas, segundos pra cravar cada
                   um. De graça, sem conta.
                 </p>

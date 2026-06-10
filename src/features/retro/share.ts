@@ -1,6 +1,7 @@
 // Helpers puros do resultado/share (fora dos componentes — fast refresh feliz).
 import type { ScoreType } from "@/lib/types";
 import type { RetroFormat, RetroPace } from "./api";
+import { stageEmoji } from "./verdict";
 
 // Emojis casados com as cores do app: cravada=dourado 🟨 · saldo=verde 🟩 · acerto=azul 🟦
 export const SCORE_EMOJI: Record<ScoreType, string> = {
@@ -39,12 +40,19 @@ export function buildShareText(run: FinishedRun, streak: number | undefined): st
     .filter((s) => s.slot >= 4)
     .map((s) => `${koLabels[s.slot - 4]} ${SCORE_EMOJI[s.scoreType]}`)
     .join(" · ");
+  // emoji dinâmico (mesmo da imagem): 🏆 🥈 🔥 💪 👏 😅 — nunca fixo no choro
+  const emoji = stageEmoji({
+    status: run.status,
+    stageReached: run.stageReached,
+    points: run.points,
+    format: run.format,
+  });
   const headline =
     run.format === "pontos"
-      ? `Fiz ${run.points} pts na minha Copa Retrô!`
+      ? `${emoji} Fiz ${run.points} pts na minha Copa Retrô!`
       : run.status === "champion"
-        ? "CAMPEÃO da minha Copa Retrô! 🏆"
-        : `Caí: ${run.stageReached} 😭`;
+        ? `${emoji} CAMPEÃO da minha Copa Retrô!`
+        : `${emoji} Caí: ${run.stageReached}`;
   const fmtLabel = run.format === "pontos" ? " · Pontos" : "";
   return [
     `⚽ Resultadismo Retrô — ${run.isDaily ? "Seleção do Dia" : "Jogo livre"}${fmtLabel}`,
