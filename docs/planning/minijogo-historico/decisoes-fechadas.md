@@ -212,6 +212,14 @@ Dois eixos independentes, escolhidos antes da run:
   pessoa acertou o vencedor mas faltou saldo na semi/final (brincadeira que suaviza); (5) **ranking
   valoriza a FASE** (quem chega mais longe lidera; pontos e tempo viram desempate em cinza, com nota
   do critério). Sem migration (só front).
+- **Rodada 10 (10/06, SIMPLIFICAÇÃO + bug):** (1) **bug do reroll na Copa do Dia** corrigido
+  (serve_slot devolvia o mesmo jogo do dia; agora força sorteio — migration `20260610150011`,
+  teste T11); (2) **dois Formatos**: Copa 🏆 (eliminatório) e Pontos 🎯 (joga os 7, soma — resolve
+  "cravei tudo nos grupos e caí enquanto fulano só de acerto foi mais longe"); (3) a regra de
+  saldo/cravada nas finais virou **config admin** (`/admin/retro`, RPC `retro_admin_set_config`),
+  **desligada por padrão** (qualquer ponto avança — menos confusão); (4) **dificuldade 2 níveis**
+  (Fácil/Difícil); (5) **página de regras** `/retro/regras` em blocos curtos; (6) ranking por
+  formato. Saiu o eixo "Vale Ponto/Vale Saldo". Suite T1–T11 verde + db reset limpo.
 - **Backlog (fase 2 do Retrô)** — eventos GA4 (union do `analytics.ts`) ✓feito, entrada na navegação/Como Funciona/
   landing (pontos de contato), docs `.claude/05` §2 + `12-RETRO-MINIJOGO.md` → **Fase 5**:
   homologação com o João (Portão B), integração do worktree na main e deploy.

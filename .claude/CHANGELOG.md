@@ -61,7 +61,11 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   **Rodada 9 (feedback dos amigos):** jogo não estica em telas grandes; emoji/manchete dinâmicos
   por fase no share e tela final (`verdict.ts`); regra da semi/final destacada (banner pulsante no
   jogo + explicação no reveal); "eliminado nos pênaltis 😬" no near-miss; ranking dá destaque à
-  fase (pontos/tempo são desempate). Só front. Histórico completo da construção: Comentários
+  fase (pontos/tempo são desempate). **Rodada 10 (simplificação + bug):** corrigido o reroll na
+  Copa do Dia (voltava o mesmo jogo — migration `20260610150011`); dois Formatos (Copa eliminatório
+  / Pontos soma os 7); regra de saldo/cravada nas finais virou config admin em `/admin/retro`
+  (desligada por padrão); dificuldade 2 níveis; página de regras `/retro/regras`; ranking por
+  formato. Só front. Histórico completo da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do

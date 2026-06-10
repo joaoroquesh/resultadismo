@@ -54,16 +54,17 @@ export async function buildShareImage(run: FinishedRun, streak?: number): Promis
   ctx.fillText("RESULTADISMO RETRÔ", W / 2, 130);
   ctx.fillStyle = "rgba(255,255,255,0.65)";
   ctx.font = font(34, 500);
-  const sub = `${run.isDaily ? "Copa do Dia" : "Treino"}${run.mode === "cravada" ? " · Vale Saldo" : ""}`;
+  const sub = `${run.isDaily ? "Copa do Dia" : "Treino"}${run.format === "pontos" ? " · Pontos" : ""}`;
   ctx.fillText(sub, W / 2, 190);
 
   // veredito (emoji + manchete por fase — dinâmico, sem choro pra quem foi longe)
   const champion = run.status === "champion";
   ctx.font = font(140);
-  ctx.fillText(stageEmoji(run.stageReached, run.status), W / 2, 380);
+  const v = { status: run.status, stageReached: run.stageReached, points: run.points, format: run.format };
+  ctx.fillText(stageEmoji(v), W / 2, 380);
   ctx.fillStyle = champion ? digit : "#ffffff";
   ctx.font = font(64);
-  ctx.fillText(verdictHeadline(run.stageReached, run.status), W / 2, 500);
+  ctx.fillText(verdictHeadline(v), W / 2, 500);
   if (isPenaltyOut(run.status, run.slots)) {
     ctx.fillStyle = cores.acerto;
     ctx.font = font(40, 500);

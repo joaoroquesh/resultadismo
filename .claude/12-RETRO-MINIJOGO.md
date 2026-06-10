@@ -31,8 +31,9 @@ página pública `/retro/r/:code`.
   **`RetroShell` próprio** (mini-header com "ir pro Resultadismo →" + ConsentBanner) — fora do
   AppShell: nada de Sidebar/BottomNav/header do app-mãe. Entradas: **card próprio no topo do menu
   do Perfil**, **banner na landing** e seção no Como Funciona.
-- **Ritmos:** `resultadista` (10/8/7s — o único que **ranqueia**) · `classico` (14/12/10s) ·
-  `sempressa` (sem timer). Cronômetro mostra **milésimos + cor nos 3s finais**.
+- **Ritmos:** `sempressa` · `resultadista` (10/8/7s — o que **ranqueia**; o `classico` foi
+  aposentado da UI). **Dificuldade (só Treino):** Fácil · Difícil (2 níveis). Cronômetro com
+  milésimos + cor nos 3s finais.
 - **Copa do Dia TEMÁTICA (rodada 6):** cada dia é a Copa de **uma seleção** (rotação determinística
   entre as 58 com ≥7 jogos; dia 0 = 10/06 = Brasil; RPC `retro_today` mostra o tema), com os 7
   jogos **ordenados do mais fácil ao mais difícil**; 1 tentativa por conta/dia, com retomada.
@@ -68,7 +69,7 @@ página pública `/retro/r/:code`.
   `retroLocal.ts` = token anônimo + anti-repetição local). Rotas públicas `/retro` e `/retro/r/:code`
   no `App.tsx`; entradas na Sidebar/BottomNav/PublicShell. Vitrine de animações: `/retro?demo=1`
   (**só DEV**).
-- **Banco (migrations `20260610150000–150010`; 150008 RESET; 150009 abandono; 150010 final-aceita-saldo + ranking-por-dificuldade + feedback.product):** seed dos **964 jogos** (fonte openfootball CC0,
+- **Banco (migrations `20260610150000–150011`; 150011 = Formato Copa/Pontos + config admin + fix reroll daily; 150008 RESET; 150009 abandono; 150010 final-aceita-saldo + ranking-por-dificuldade + feedback.product):** seed dos **964 jogos** (fonte openfootball CC0,
   importador `scripts/gen-retro-seed.mjs` com portões de qualidade; dificuldade 1–7 com 34
   jogos-lenda) + motor (RPCs `retro_start_run`, `retro_next` — serve **sob demanda**, o cronômetro
   nasce no clique —, `retro_answer`, `retro_run_summary`, `retro_leaderboard`, `retro_my_stats`,
@@ -83,6 +84,7 @@ página pública `/retro/r/:code`.
   **círculo** por `scripts/gen-flag-circles.mjs` — idempotente).
 - **Analytics:** eventos `retro_run_start`/`retro_guess`/`retro_run_end`/`retro_share` na union de
   `src/lib/analytics.ts` (sem PII).
+- **Páginas:** `/retro/regras` (regras em blocos curtos), `/admin/retro` (config admin, RequireAdmin).
 - **Feedback do Retrô:** `/retro/feedback` (só logado) reusa a `FeedbackPage` com `product="retro"`
   (coluna `feedback.product` classico|retro; `submit_feedback` ganhou `p_product`). Páginas
   Retrô-específicas no seletor de bug. Link discreto na home do Retrô.

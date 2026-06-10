@@ -1392,6 +1392,30 @@ export type Database = {
         }
         Relationships: []
       }
+      retro_config: {
+        Row: {
+          enforce_knockout_bar: boolean
+          final_min: string
+          id: number
+          semi_min: string
+          updated_at: string
+        }
+        Insert: {
+          enforce_knockout_bar?: boolean
+          final_min?: string
+          id?: number
+          semi_min?: string
+          updated_at?: string
+        }
+        Update: {
+          enforce_knockout_bar?: boolean
+          final_min?: string
+          id?: number
+          semi_min?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       retro_daily: {
         Row: {
           created_at: string
@@ -1554,6 +1578,7 @@ export type Database = {
           current_slot: number
           daily_date: string | null
           finished_at: string | null
+          format: string
           id: string
           is_daily: boolean
           level: string
@@ -1576,6 +1601,7 @@ export type Database = {
           current_slot?: number
           daily_date?: string | null
           finished_at?: string | null
+          format?: string
           id?: string
           is_daily?: boolean
           level?: string
@@ -1598,6 +1624,7 @@ export type Database = {
           current_slot?: number
           daily_date?: string | null
           finished_at?: string | null
+          format?: string
           id?: string
           is_daily?: boolean
           level?: string
@@ -2614,6 +2641,10 @@ export type Database = {
         Args: { p_anon_token?: string; p_run_id: string }
         Returns: Json
       }
+      retro_admin_set_config: {
+        Args: { p_enforce: boolean; p_final_min?: string; p_semi_min?: string }
+        Returns: Json
+      }
       retro_answer: {
         Args: {
           p_anon_token?: string
@@ -2624,12 +2655,13 @@ export type Database = {
         }
         Returns: Json
       }
+      retro_get_config: { Args: never; Returns: Json }
       retro_leaderboard: {
         Args: {
           p_board?: string
           p_daily_date?: string
+          p_format?: string
           p_limit?: number
-          p_mode?: string
         }
         Returns: Json
       }
@@ -2641,6 +2673,7 @@ export type Database = {
         }
         Returns: Json
       }
+      retro_min_points: { Args: { p_label: string }; Returns: number }
       retro_my_stats: { Args: never; Returns: Json }
       retro_next: {
         Args: { p_anon_token?: string; p_run_id: string; p_seen?: string[] }
@@ -2669,6 +2702,7 @@ export type Database = {
       retro_run_summary: { Args: { p_share_code: string }; Returns: Json }
       retro_serve_slot: {
         Args: {
+          p_force_random?: boolean
           p_run: Database["public"]["Tables"]["retro_runs"]["Row"]
           p_seen: string[]
           p_slot: number
@@ -2680,6 +2714,7 @@ export type Database = {
         Args: {
           p_anon_token?: string
           p_daily?: boolean
+          p_format?: string
           p_level?: string
           p_mode?: string
           p_pace?: string

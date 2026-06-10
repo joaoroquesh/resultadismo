@@ -30,14 +30,15 @@ export function ResultView({
   const champion = run.status === "champion";
   const trail: TrailSlot[] = run.slots.map((s) => ({ slot: s.slot, scoreType: s.scoreType }));
   const penalty = isPenaltyOut(run.status, run.slots);
+  const v = { status: run.status, stageReached: run.stageReached, points: run.points, format: run.format };
 
   return (
     <div className="mx-auto w-full max-w-md space-y-4">
       <Card className={champion ? "relative overflow-hidden border-2 border-gold-500 bg-gold-50 p-5" : "p-5"}>
         {champion && <Confetti tall />}
         <div className="space-y-3 text-center">
-          <div className="animate-retro-stamp text-5xl">{stageEmoji(run.stageReached, run.status)}</div>
-          <h2 className="text-2xl font-bold">{verdictHeadline(run.stageReached, run.status)}</h2>
+          <div className="animate-retro-stamp text-5xl">{stageEmoji(v)}</div>
+          <h2 className="text-2xl font-bold">{verdictHeadline(v)}</h2>
           {penalty && (
             <p className="text-sm font-semibold text-aqua-700">
               Eliminado nos pênaltis 😬 — você acertou o vencedor, mas aqui só saldo ou cravada passa.

@@ -7,11 +7,13 @@ import { RetroTimer } from "./RetroTimer";
 import { ScoreWheels } from "./ScoreWheels";
 import type { RetroCurrent } from "./api";
 
-// Texto curto da regra da fase atual (ocupa o espaço acima do card — pedido do PO)
-function phaseHint(slot: number, mode: "acerto" | "cravada"): string {
+// Texto curto da regra da fase atual (acima do card). No Pontos não há eliminação;
+// na Copa, só fala de saldo/cravada se o admin tiver ligado a barra (enforce).
+function phaseHint(slot: number, format: "copa" | "pontos", enforce: boolean): string {
+  if (format === "pontos") return "Modo Pontos · some pontos nos 7 jogos";
   if (slot <= 3) return "Fase de grupos · pontue em 2 dos 3 pra avançar";
-  if (slot <= 5) return mode === "cravada" ? "Mata-mata · saldo ou cravada pra passar" : "Mata-mata · pontuou, avança";
-  return "Reta final · só saldo ou cravada salva";
+  if (slot <= 5) return "Mata-mata · pontuou, avança";
+  return enforce ? "Reta final · só saldo ou cravada passa" : "Reta final · pontuou, avança";
 }
 
 function TeamSide({ slug, name }: { slug: string; name: string }) {
@@ -27,7 +29,8 @@ function TeamSide({ slug, name }: { slug: string; name: string }) {
 // bem grandes embaixo (dois polegares — pedido do PO).
 export function RunView({
   current,
-  mode,
+  format,
+  enforce,
   points,
   rerolls,
   slots,
@@ -38,7 +41,8 @@ export function RunView({
   onExit,
 }: {
   current: RetroCurrent;
-  mode: "acerto" | "cravada";
+  format: "copa" | "pontos";
+  enforce: boolean;
   points: number;
   rerolls: number;
   slots: TrailSlot[];
@@ -60,7 +64,7 @@ export function RunView({
     return () => window.clearTimeout(t);
   }, [current.timer_seconds]);
   const m = current.match;
-  const decisao = current.slot >= 6; // semi e final ganham clima de decisão
+  const decisao = format === "copa" && enforce && current.slot >= 6; // só com barra ligada
 
   return (
     <div className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-2 overflow-hidden px-1">
@@ -81,7 +85,7 @@ export function RunView({
             ⚠️ {current.slot === 7 ? "FINAL" : "SEMIFINAL"}: só SALDO ou CRAVADA passa
           </div>
         ) : (
-          <p className="text-center text-xs font-semibold text-ink-500">{phaseHint(current.slot, mode)}</p>
+          <p className="text-center text-xs font-semibold text-ink-500">{phaseHint(current.slot, format, enforce)}</p>
         )}
 
       <Card className={decisao ? "space-y-2 border-2 border-gold-500 p-3 shadow-brand" : "space-y-2 p-3"}>

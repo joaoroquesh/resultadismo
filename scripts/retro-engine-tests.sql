@@ -76,19 +76,30 @@ begin
   end if;
 end $$;
 
--- ============ T4: barras por modo/fase (rodada 8: semi e FINAL = saldo/cravada) ============
+-- ============ T4: config da barra (default off = ≥1) + formato Pontos joga os 7 ============
 do $$
+declare v_cfg jsonb; v_token uuid := gen_random_uuid(); v_start jsonb; v_run uuid;
+  v_i int := 0; v_h int; v_a int; v_ans jsonb; v_played int;
 begin
-  if public.retro_pass_need('acerto', 1) = 1
-     and public.retro_pass_need('acerto', 5) = 1   -- quartas: ≥1
-     and public.retro_pass_need('acerto', 6) = 2   -- semi: saldo
-     and public.retro_pass_need('acerto', 7) = 2   -- FINAL: saldo (não só cravada)
-     and public.retro_pass_need('cravada', 1) = 2  -- Vale Saldo: ≥2 sempre
-     and public.retro_pass_need('cravada', 7) = 2 then
-    raise notice 'T4 barras rodada 8: OK (acerto: quartas ≥1, semi/final ≥2; cravada: ≥2 sempre)';
-  else
-    raise exception 'T4 FALHOU: pass_need inesperado';
-  end if;
+  -- garante config no default (off)
+  perform public.retro_admin_set_config(false) from (select 1) x where public.is_app_admin();
+  -- formato PONTOS: erra tudo de propósito e ainda joga os 7 (sem eliminação)
+  v_start := public.retro_start_run('acerto','sempressa',false,v_token,'{}','padrao','pontos');
+  v_run := (v_start->>'run_id')::uuid;
+  loop
+    v_i := v_i + 1; if v_i > 9 then raise exception 'loop'; end if;
+    select m.home_score, m.away_score into v_h, v_a
+      from public.retro_run_matches rm join public.retro_matches m on m.id = rm.match_id
+     where rm.run_id = v_run and rm.answered_at is null;
+    exit when not found;
+    v_ans := public.retro_answer(v_run, 9, 0, v_token, '{}');  -- chute fixo (erra muita coisa)
+    exit when v_ans->'run'->>'status' <> 'playing';
+    perform public.retro_next(v_run, v_token, '{}');
+  end loop;
+  select count(*) into v_played from public.retro_run_matches where run_id = v_run and answered_at is not null;
+  if v_ans->'run'->>'status' = 'finished' and v_played = 7 then
+    raise notice 'T4a Pontos: OK (jogou os 7 sem eliminação, status finished)';
+  else raise exception 'T4a FALHOU: % / % jogos', v_ans->'run'->>'status', v_played; end if;
 end $$;
 
 -- ============ T5: Copa do Dia de LOGADO — retomar + unicidade + ranking ============
@@ -136,7 +147,7 @@ begin
     else raise; end if;
   end;
   -- ranking do dia tem a run (ranked = logado + resultadista + daily)
-  v_board := public.retro_leaderboard(null, 'acerto', 50);
+  v_board := public.retro_leaderboard(null, 'copa', 50);
   if jsonb_array_length(v_board->'rows') >= 1 and (v_board->'me'->>'pos') is not null then
     raise notice 'T5e leaderboard: OK (% linhas, minha pos %)',
       jsonb_array_length(v_board->'rows'), v_board->'me'->>'pos';
@@ -149,25 +160,24 @@ begin
   else raise exception 'T5f FALHOU'; end if;
 end $$;
 
--- ============ T6: modo Na Crava — saldo (≥2) AVANÇA em todas as fases (decisão PO 10/06) ============
+-- ============ T6: formato Pontos soma os 7 (7 saldos = 14 pts, finished) ============
 do $$
-declare v_token uuid := gen_random_uuid(); v_start jsonb; v_run uuid; v_m record; v_ans jsonb; v_i int := 0;
+declare v_token uuid := gen_random_uuid(); v_start jsonb; v_run uuid; v_h int; v_a int; v_ans jsonb; v_i int := 0;
 begin
-  v_start := public.retro_start_run('cravada', 'sempressa', false, v_token, '{}');
+  v_start := public.retro_start_run('acerto','sempressa',false,v_token,'{}','padrao','pontos');
   v_run := (v_start->>'run_id')::uuid;
   loop
-    v_i := v_i + 1; if v_i > 10 then exit; end if;
-    select m.home_score, m.away_score into v_m
+    v_i := v_i + 1; if v_i > 9 then raise exception 'loop'; end if;
+    select m.home_score, m.away_score into v_h, v_a
       from public.retro_run_matches rm join public.retro_matches m on m.id = rm.match_id
      where rm.run_id = v_run and rm.answered_at is null;
     exit when not found;
-    -- sempre SALDO (vencedor + diferença certa, placar errado): +1 em cada lado
-    v_ans := public.retro_answer(v_run, v_m.home_score + 1, v_m.away_score + 1, v_token, '{}');
+    v_ans := public.retro_answer(v_run, v_h + 1, v_a + 1, v_token, '{}'); -- sempre saldo
     exit when v_ans->'run'->>'status' <> 'playing';
     perform public.retro_next(v_run, v_token, '{}');
   end loop;
-  if v_ans->'run'->>'status' = 'champion' and (v_ans->'run'->>'points')::int = 14 then
-    raise notice 'T6 Vale Saldo rodada 8: OK (7 saldos = 14 pts = campeão; final aceita saldo)';
+  if v_ans->'run'->>'status' = 'finished' and (v_ans->'run'->>'points')::int = 14 then
+    raise notice 'T6 Pontos rodada 10: OK (7 saldos = 14 pts, finished)';
   else raise exception 'T6 FALHOU: %', v_ans->'run'; end if;
 end $$;
 
@@ -264,6 +274,30 @@ begin
     if sqlerrm like '%já jogou%' then raise notice 'T10b sem retomada: OK';
     else raise; end if;
   end;
+  perform set_config('request.jwt.claims', '', true);
+end $$;
+
+-- ============ T11: reroll na COPA DO DIA troca o jogo (bug reportado) ============
+do $$
+declare v_user uuid; v_start jsonb; v_run uuid; v_h int; v_a int; v_ans jsonb; v_old uuid; v_new jsonb;
+begin
+  select id into v_user from public.profiles limit 1;
+  delete from public.retro_runs where user_id = v_user and is_daily
+    and daily_date = (now() at time zone 'America/Sao_Paulo')::date and format = 'copa';
+  perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+  v_start := public.retro_start_run('acerto','sempressa',true,null,'{}','padrao','copa');
+  v_run := (v_start->>'run_id')::uuid;
+  -- crava o jogo 1 (ganha ficha), serve o 2 e REROLL no daily
+  select m.home_score, m.away_score into v_h, v_a
+    from public.retro_run_matches rm join public.retro_matches m on m.id = rm.match_id
+   where rm.run_id = v_run and rm.slot = 1;
+  v_ans := public.retro_answer(v_run, v_h, v_a, null, '{}');
+  perform public.retro_next(v_run, null, '{}');
+  select match_id into v_old from public.retro_run_matches where run_id = v_run and slot = 2;
+  v_new := public.retro_reroll(v_run, null, '{}');
+  if (select match_id from public.retro_run_matches where run_id = v_run and slot = 2) <> v_old then
+    raise notice 'T11 reroll na Copa do Dia: OK (trocou o jogo — bug corrigido)';
+  else raise exception 'T11 FALHOU: jogo do daily não mudou no reroll'; end if;
   perform set_config('request.jwt.claims', '', true);
 end $$;
 

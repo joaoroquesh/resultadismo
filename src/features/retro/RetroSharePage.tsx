@@ -29,18 +29,18 @@ export function RetroSharePage() {
         ) : (
           <Card className={data.status === "champion" ? "border-gold-500 bg-gold-50 p-5" : "p-5"}>
             <div className="space-y-3 text-center">
-              <div className="text-5xl">{stageEmoji(data.stage_reached, data.status)}</div>
+              <div className="text-5xl">{stageEmoji({ status: data.status, stageReached: data.stage_reached, points: data.points, format: data.format })}</div>
               <p className="text-sm text-ink-500">
                 {data.player?.display_name ?? "Alguém"} jogou a{" "}
                 {data.is_daily ? "Copa do Dia" : "Copa Retrô"}
-                {data.mode === "cravada" && (
+                {data.format === "pontos" && (
                   <>
                     {" "}
-                    no modo <b>Vale Saldo</b>
+                    no modo <b>Pontos</b>
                   </>
                 )}
               </p>
-              <h2 className="text-2xl font-bold">{verdictHeadline(data.stage_reached, data.status)}</h2>
+              <h2 className="text-2xl font-bold">{verdictHeadline({ status: data.status, stageReached: data.stage_reached, points: data.points, format: data.format })}</h2>
               <CampaignTrail
                 slots={data.slots.map((s): TrailSlot => ({ slot: s.slot, scoreType: s.score_type }))}
                 currentSlot={null}

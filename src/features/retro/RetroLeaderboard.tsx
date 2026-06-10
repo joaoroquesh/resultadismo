@@ -4,15 +4,16 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { cn } from "@/lib/utils";
-import { useRetroLeaderboard, type RetroMode } from "./api";
+import { useRetroLeaderboard, type RetroFormat } from "./api";
 import { fmtMs } from "./share";
 
 // Ranking da Copa do Dia (fase alcançada → pontos → tempo). Só entra quem jogou
 // logado no ritmo Resultadista — a comparação de tempo precisa ser justa.
 export function RetroLeaderboard() {
-  const [mode, setMode] = useState<RetroMode>("acerto");
+  const [format, setFormat] = useState<RetroFormat>("copa");
   const [board, setBoard] = useState<"daily" | "treino">("daily");
-  const { data, isLoading } = useRetroLeaderboard(mode, board);
+  const { data, isLoading } = useRetroLeaderboard(format, board);
+  const isPontos = format === "pontos";
 
   return (
     <Card className="space-y-3 p-4">
@@ -29,14 +30,14 @@ export function RetroLeaderboard() {
             onChange={setBoard}
           />
         </div>
-        <SegmentedControl<RetroMode>
+        <SegmentedControl<RetroFormat>
           className="w-full"
           options={[
-            { value: "acerto", label: "Vale Ponto" },
-            { value: "cravada", label: "Vale Saldo" },
+            { value: "copa", label: "Copa 🏆" },
+            { value: "pontos", label: "Pontos 🎯" },
           ]}
-          value={mode}
-          onChange={setMode}
+          value={format}
+          onChange={setFormat}
         />
       </div>
 
@@ -69,19 +70,18 @@ export function RetroLeaderboard() {
               <span className="min-w-0 flex-1">
                 <span className="block truncate">
                   {r.display_name}
-                  {board === "treino" && r.level && r.level !== "padrao" && (
+                  {board === "treino" && r.level && (
                     <span className="ml-1 rounded-pill bg-ink-100 px-1.5 text-[10px] font-bold text-ink-500">
                       {r.level === "dificil" ? "Difícil" : "Fácil"}
                     </span>
                   )}
                 </span>
-                {/* o que IMPORTA é a fase — pontos/tempo são desempate, em cinza */}
                 <span className="block text-[11px] text-ink-400">
-                  {r.points} pts · {fmtMs(r.total_ms)}
+                  {isPontos ? fmtMs(r.total_ms) : `${r.points} pts · ${fmtMs(r.total_ms)}`}
                 </span>
               </span>
               <span className="shrink-0 text-right text-sm font-bold text-brand-800">
-                {r.stage_reached}
+                {isPontos ? `${r.points} pts` : r.stage_reached}
               </span>
             </li>
           ))}
@@ -90,8 +90,12 @@ export function RetroLeaderboard() {
 
       {data && data.rows.length > 0 && (
         <p className="text-center text-[11px] leading-snug text-ink-400">
-          Lidera quem <b>chega mais longe</b>. Empatou na fase? Decide os <b>pontos</b>; depois, o
-          <b> tempo</b>.{board === "treino" ? " Dificuldade maior vem na frente." : ""}
+          {isPontos ? (
+            <>Lidera quem faz <b>mais pontos</b> nos 7 jogos. Empatou? Decide o <b>tempo</b>.</>
+          ) : (
+            <>Lidera quem <b>chega mais longe</b>. Empatou na fase? Decidem os <b>pontos</b>; depois, o <b>tempo</b>.</>
+          )}
+          {board === "treino" ? " Dificuldade maior vem na frente." : ""}
         </p>
       )}
       {data?.me && !data.rows.some((r) => r.is_me) && (

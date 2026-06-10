@@ -28,6 +28,8 @@ const FeedbackPage = lazy(() => import("@/features/feedback/FeedbackPage").then(
 const RetroPage = lazy(() => import("@/features/retro/RetroPage").then((m) => ({ default: m.RetroPage })));
 const RetroSharePage = lazy(() => import("@/features/retro/RetroSharePage").then((m) => ({ default: m.RetroSharePage })));
 const RetroShell = lazy(() => import("@/features/retro/RetroShell").then((m) => ({ default: m.RetroShell })));
+const RetroRulesPage = lazy(() => import("@/features/retro/RetroRulesPage").then((m) => ({ default: m.RetroRulesPage })));
+const RetroAdminPage = lazy(() => import("@/features/retro/RetroAdminPage").then((m) => ({ default: m.RetroAdminPage })));
 
 // Redireciona links antigos /ligas/:slug para /grupos/:slug (rename Liga -> Grupo)
 function FederacaoSlugRedirect() {
@@ -67,6 +69,7 @@ export default function App() {
           {/* mini-jogo Retrô: casca própria, separada do app (rodada 6) */}
           <Route element={<RetroShell />}>
             <Route path="/retro" element={<RetroPage />} />
+            <Route path="/retro/regras" element={<RetroRulesPage />} />
             <Route path="/retro/r/:code" element={<RetroSharePage />} />
             <Route element={<RequireAuth />}>
               <Route path="/retro/feedback" element={<FeedbackPage product="retro" />} />
@@ -95,6 +98,7 @@ export default function App() {
               <Route element={<RequireAdmin />}>
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/admin/competicoes/:id/jogos" element={<AdminCompMatchesPage />} />
+              <Route path="/admin/retro" element={<RetroAdminPage />} />
               </Route>
             </Route>
           </Route>

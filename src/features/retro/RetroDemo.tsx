@@ -24,6 +24,7 @@ function fakeAnswer(scoreType: ScoreType, points: number): RetroAnswerResult {
     run: {
       id: "demo",
       status: "playing",
+      format: "copa",
       points: 12,
       stage_reached: null,
       stage_rank: null,
@@ -43,7 +44,7 @@ const CHAMPION: FinishedRun = {
   totalMs: 83_000,
   shareCode: "demo",
   isDaily: true,
-  mode: "acerto",
+  format: "copa",
   pace: "resultadista",
   slots: [
     { slot: 1, scoreType: "cravada" },
