@@ -19,8 +19,8 @@ const FILTERS: { key: FeedbackStatus | "todos"; label: string }[] = [
   { key: "todos", label: "Todos" },
 ];
 
-export function FeedbackAdmin() {
-  const { data, isLoading } = useAdminFeedback();
+export function FeedbackAdmin({ product }: { product?: "classico" | "retro" } = {}) {
+  const { data, isLoading } = useAdminFeedback(product);
   const [filter, setFilter] = useState<FeedbackStatus | "todos">("novo");
 
   const counts = useMemo(() => {

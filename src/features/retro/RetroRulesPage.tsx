@@ -66,9 +66,9 @@ export function RetroRulesPage() {
         <p>Cada <b>cravada</b> te dá uma ficha 🎲. Com ela, você troca o jogo atual por outro sorteado.</p>
       </Bloco>
 
-      <Bloco emoji="📅" titulo="Copa do Dia & Treino">
-        <p><b>Copa do Dia</b>: a Copa de uma seleção, igual pra todo mundo, 1 vez por dia. Vale ranking 🔥.</p>
-        <p><b>Treino</b>: jogue à vontade, jogos aleatórios, sem ranking. Escolha Fácil ou Difícil.</p>
+      <Bloco emoji="📅" titulo="Seleção do Dia & Jogo livre">
+        <p><b>Seleção do Dia</b>: a Copa de uma seleção, igual pra todo mundo, 1 vez por dia. Vale ranking 🔥.</p>
+        <p><b>Jogo livre</b>: jogue à vontade, jogos aleatórios, sem ranking.</p>
         <p className="text-xs text-ink-400">Ritmo Resultadista (com tempo) é o que vale ranking. Sem Pressa é livre.</p>
       </Bloco>
 

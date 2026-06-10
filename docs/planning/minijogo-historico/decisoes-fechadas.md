@@ -220,6 +220,15 @@ Dois eixos independentes, escolhidos antes da run:
   **desligada por padrão** (qualquer ponto avança — menos confusão); (4) **dificuldade 2 níveis**
   (Fácil/Difícil); (5) **página de regras** `/retro/regras` em blocos curtos; (6) ranking por
   formato. Saiu o eixo "Vale Ponto/Vale Saldo". Suite T1–T11 verde + db reset limpo.
+- **Rodada 11 (10/06, decisões do PO):** (1) **cor do Honduras** corrigida (azul-marinho →
+  turquesa #0073cf; o `fill` da raiz vinha de um variante errado); (2) **👑 no 1º** do ranking;
+  (3) **Copa do Dia → Seleção do Dia** e **Treino livre → Jogo livre** (renomes); (4) **removida a
+  dificuldade** (Fácil/Difícil) — um modo só, acaba a queixa "professor no Difícil na frente de
+  campeão no Fácil"; ranking = só fase/pontos/tempo; (5) **tempo de tela só do Retrô**
+  (`retro_touch` p/ todos no RetroShell → `screen_seconds`); (6) **feedback admin do Retrô** em
+  `/admin/retro` (autor/página/corpo + resolver/responder) e fix do "Meus envios" (filtrava só o
+  admin). Migration `20260610150012`. Nome "Jogo livre" foi escolha minha (o PO deixou em branco) —
+  confirmar.
 - **Backlog (fase 2 do Retrô)** — eventos GA4 (union do `analytics.ts`) ✓feito, entrada na navegação/Como Funciona/
   landing (pontos de contato), docs `.claude/05` §2 + `12-RETRO-MINIJOGO.md` → **Fase 5**:
   homologação com o João (Portão B), integração do worktree na main e deploy.

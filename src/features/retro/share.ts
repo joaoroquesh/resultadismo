@@ -47,7 +47,7 @@ export function buildShareText(run: FinishedRun, streak: number | undefined): st
         : `Caí: ${run.stageReached} 😭`;
   const fmtLabel = run.format === "pontos" ? " · Pontos" : "";
   return [
-    `⚽ Resultadismo Retrô — ${run.isDaily ? "Copa do Dia" : "Treino"}${fmtLabel}`,
+    `⚽ Resultadismo Retrô — ${run.isDaily ? "Seleção do Dia" : "Jogo livre"}${fmtLabel}`,
     `Grupos ${groups}${ko ? ` · ${ko}` : ""}`,
     `${headline} · ${run.points} pts · ${fmtMs(run.totalMs)}${streak ? ` · 🔥 ${streak} dia${streak > 1 ? "s" : ""}` : ""}`,
     `Acha que faz melhor? 👉 https://www.resultadismo.com/retro/r/${run.shareCode}`,

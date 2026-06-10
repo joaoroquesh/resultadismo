@@ -8,6 +8,7 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
 import { useRetroConfig, useRetroSetConfig, type RetroConfig } from "./api";
+import { FeedbackAdmin } from "@/features/feedback/FeedbackAdmin";
 
 type Min = "acerto" | "saldo" | "cravada";
 const OPTS = [
@@ -25,6 +26,14 @@ export function RetroAdminPage() {
     <Page title="Admin · Retrô">
       <div className="mx-auto w-full max-w-md space-y-4">
         {cfg.data ? <ConfigForm initial={cfg.data} /> : <Skeleton className="h-48 w-full" />}
+
+        <div>
+          <h2 className="mb-2 mt-2 text-sm font-bold uppercase tracking-wide text-ink-500">
+            Sugestões e bugs do Retrô
+          </h2>
+          <FeedbackAdmin product="retro" />
+        </div>
+
         <Button variant="ghost" className="w-full" onClick={() => navigate("/retro")}>
           ← Voltar ao Retrô
         </Button>

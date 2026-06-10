@@ -65,7 +65,11 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   Copa do Dia (voltava o mesmo jogo — migration `20260610150011`); dois Formatos (Copa eliminatório
   / Pontos soma os 7); regra de saldo/cravada nas finais virou config admin em `/admin/retro`
   (desligada por padrão); dificuldade 2 níveis; página de regras `/retro/regras`; ranking por
-  formato. Só front. Histórico completo da construção: Comentários
+  formato. **Rodada 11:** cor do Honduras corrigida; 👑 no 1º do ranking; renomes (Copa do Dia →
+  Seleção do Dia, Treino livre → Jogo livre); removida a dificuldade (um modo só, ranking
+  fase/pontos/tempo); tempo de tela só do Retrô (`retro_touch` → `screen_seconds`); feedback admin
+  do Retrô em `/admin/retro` + fix do "Meus envios". Migration `20260610150012`. Histórico
+  completo da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do

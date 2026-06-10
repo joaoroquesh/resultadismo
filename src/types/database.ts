@@ -1658,18 +1658,21 @@ export type Database = {
           anon_runs_started: number
           anon_seconds: number
           day: string
+          screen_seconds: number
         }
         Insert: {
           anon_runs_finished?: number
           anon_runs_started?: number
           anon_seconds?: number
           day: string
+          screen_seconds?: number
         }
         Update: {
           anon_runs_finished?: number
           anon_runs_started?: number
           anon_seconds?: number
           day?: string
+          screen_seconds?: number
         }
         Relationships: []
       }
@@ -1968,6 +1971,7 @@ export type Database = {
           id: string
           kind: string
           page: string
+          product: string
           resolved_at: string
           status: string
           title: string
@@ -2727,6 +2731,7 @@ export type Database = {
         Returns: number
       }
       retro_today: { Args: never; Returns: Json }
+      retro_touch: { Args: { p_seconds: number }; Returns: undefined }
       retro_touch_anon: { Args: { p_seconds: number }; Returns: undefined }
       run_football_sync:
         | { Args: never; Returns: undefined }

@@ -32,7 +32,7 @@ export function RetroSharePage() {
               <div className="text-5xl">{stageEmoji({ status: data.status, stageReached: data.stage_reached, points: data.points, format: data.format })}</div>
               <p className="text-sm text-ink-500">
                 {data.player?.display_name ?? "Alguém"} jogou a{" "}
-                {data.is_daily ? "Copa do Dia" : "Copa Retrô"}
+                {data.is_daily ? "Seleção do Dia" : "Jogo livre"}
                 {data.format === "pontos" && (
                   <>
                     {" "}

@@ -54,7 +54,7 @@ export async function buildShareImage(run: FinishedRun, streak?: number): Promis
   ctx.fillText("RESULTADISMO RETRÔ", W / 2, 130);
   ctx.fillStyle = "rgba(255,255,255,0.65)";
   ctx.font = font(34, 500);
-  const sub = `${run.isDaily ? "Copa do Dia" : "Treino"}${run.format === "pontos" ? " · Pontos" : ""}`;
+  const sub = `${run.isDaily ? "Seleção do Dia" : "Jogo livre"}${run.format === "pontos" ? " · Pontos" : ""}`;
   ctx.fillText(sub, W / 2, 190);
 
   // veredito (emoji + manchete por fase — dinâmico, sem choro pra quem foi longe)

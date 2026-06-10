@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useRetroLeaderboard, type RetroFormat } from "./api";
 import { fmtMs } from "./share";
 
-// Ranking da Copa do Dia (fase alcançada → pontos → tempo). Só entra quem jogou
+// Ranking da Seleção do Dia (fase alcançada → pontos → tempo). Só entra quem jogou
 // logado no ritmo Resultadista — a comparação de tempo precisa ser justa.
 export function RetroLeaderboard() {
   const [format, setFormat] = useState<RetroFormat>("copa");
@@ -23,7 +23,7 @@ export function RetroLeaderboard() {
           <SegmentedControl<"daily" | "treino">
             className="whitespace-nowrap"
             options={[
-              { value: "daily", label: "Copa do Dia" },
+              { value: "daily", label: "Seleção do Dia" },
               { value: "treino", label: "Treino" },
             ]}
             value={board}
@@ -52,7 +52,7 @@ export function RetroLeaderboard() {
           title="Ninguém no ranking ainda"
           description={
             board === "daily"
-              ? "A Copa do Dia ranqueia quem joga logado no ritmo Resultadista. Seja a primeira pessoa!"
+              ? "A Seleção do Dia ranqueia quem joga logado no ritmo Resultadista. Seja a primeira pessoa!"
               : "O Treino ranqueia a MELHOR campanha de cada um (logado, ritmo Resultadista). Bora abrir o placar!"
           }
         />
@@ -63,19 +63,15 @@ export function RetroLeaderboard() {
               key={r.pos}
               className={cn(
                 "flex items-center gap-3 py-2 text-sm",
+                r.pos === 1 && "rounded-md bg-gold-50 px-2",
                 r.is_me && "rounded-md bg-brand-500/10 px-2 font-semibold",
               )}
             >
-              <span className="w-6 text-right font-bold tabular-nums text-ink-500">{r.pos}º</span>
+              <span className="w-6 text-right font-bold tabular-nums text-ink-500">
+                {r.pos === 1 ? "👑" : `${r.pos}º`}
+              </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate">
-                  {r.display_name}
-                  {board === "treino" && r.level && (
-                    <span className="ml-1 rounded-pill bg-ink-100 px-1.5 text-[10px] font-bold text-ink-500">
-                      {r.level === "dificil" ? "Difícil" : "Fácil"}
-                    </span>
-                  )}
-                </span>
+                <span className="block truncate">{r.display_name}</span>
                 <span className="block text-[11px] text-ink-400">
                   {isPontos ? fmtMs(r.total_ms) : `${r.points} pts · ${fmtMs(r.total_ms)}`}
                 </span>
@@ -95,7 +91,6 @@ export function RetroLeaderboard() {
           ) : (
             <>Lidera quem <b>chega mais longe</b>. Empatou na fase? Decidem os <b>pontos</b>; depois, o <b>tempo</b>.</>
           )}
-          {board === "treino" ? " Dificuldade maior vem na frente." : ""}
         </p>
       )}
       {data?.me && !data.rows.some((r) => r.is_me) && (

@@ -20,6 +20,7 @@ export type MyFeedback = {
   admin_reply: string | null;
   created_at: string;
   resolved_at: string | null;
+  product?: "classico" | "retro";
 };
 
 export function useSubmitFeedback() {
@@ -61,10 +62,12 @@ export function useMyFeedback(product: "classico" | "retro" = "classico") {
     queryKey: ["my-feedback", product, user?.id],
     queryFn: async (): Promise<MyFeedback[]> => {
       // RLS: o usuário só enxerga os próprios reports (feedback_select_own_or_admin).
+      const me = (await supabase.auth.getUser()).data.user?.id;
       const { data, error } = await supabase
         .from("feedback")
         .select("id,kind,title,body,page,status,admin_reply,created_at,resolved_at")
         .eq("product", product)
+        .eq("user_id", me ?? "")
         .order("created_at", { ascending: false });
       if (error) throw new Error(error.message);
       return (data ?? []) as unknown as MyFeedback[];
@@ -90,15 +93,17 @@ export type AdminFeedback = {
   user_id: string | null;
   author_name: string | null;
   author_email: string | null;
+  product: "classico" | "retro";
 };
 
-export function useAdminFeedback() {
+export function useAdminFeedback(product?: "classico" | "retro") {
   return useQuery({
-    queryKey: ["admin-feedback"],
+    queryKey: ["admin-feedback", product ?? "all"],
     queryFn: async (): Promise<AdminFeedback[]> => {
       const { data, error } = await supabase.rpc("admin_list_feedback");
       if (error) throw new Error(error.message);
-      return (data ?? []) as AdminFeedback[];
+      const rows = (data ?? []) as AdminFeedback[];
+      return product ? rows.filter((f) => (f.product ?? "classico") === product) : rows;
     },
   });
 }
