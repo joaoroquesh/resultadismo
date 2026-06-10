@@ -33,7 +33,10 @@ self.addEventListener("push", (event) => {
     self.registration.showNotification(title, {
       body,
       icon: "/favicon/android-chrome-192x192.png",
-      badge: "/favicon/favicon-32x32.png",
+      // Ícone da barra de status do Android: precisa ser MONOCROMÁTICO (branco +
+      // alpha). Bitmap colorido vira um quadrado achatado — era o bug do "quadrado
+      // branco". badge-96.png = silhueta sólida do escudo (gerada do 192).
+      badge: "/favicon/badge-96.png",
       lang: "pt-BR",
       // Agrupa por entidade quando o backend enviar data.tag (hoje undefined = sem agrupar).
       tag: payload.data?.tag,
