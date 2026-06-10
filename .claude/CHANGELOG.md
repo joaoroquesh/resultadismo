@@ -79,6 +79,11 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   erros de console). Ao subir: atualizar `.claude/05` §2 e criar `.claude/12-RETRO-MINIJOGO.md`.
 
 ### Corrigido
+- **Notificações clicáveis levam ao lugar de resolver.** Itens do sininho agora navegam pro
+  destino (`data.url` do backend, com fallback por tipo: cutucada/lembrete → Jogos, feedback →
+  Construa, alerta de admin → Admin → Alertas); o clique na push já abria o app no `data.url`
+  (service worker). `fan_notify_admins` sem url passa a apontar pra `/admin?t=alertas`
+  (migration `20260610170000`).
 - **Jogos personalizados + recorte de seleções no grupo.** (1) Aba Jogos ganha o filtro
   **"Meus interesses"** (ativo por padrão pra quem personalizou): mostra campeonatos seguidos
   inteiros + jogos dos times/seleções escolhidos (coração, seleção e seguidos) em **qualquer**

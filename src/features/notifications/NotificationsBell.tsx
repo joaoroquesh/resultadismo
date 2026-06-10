@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { fromNow } from "@/lib/format";
@@ -9,8 +10,25 @@ import {
   useNotificationsRealtime,
 } from "./api";
 import { setBadge } from "./badge";
+import type { Notification } from "./api";
+
+// Destino de cada notificação: o backend manda data.url; sem ele, cai no
+// destino natural do tipo (onde dá pra RESOLVER a notificação).
+function notificationUrl(n: Notification): string {
+  const fromData = typeof n.data?.url === "string" ? (n.data.url as string) : null;
+  if (fromData) return fromData;
+  switch (n.type) {
+    case "feedback_reply":
+      return "/construa";
+    case "admin_alert":
+      return "/admin?t=alertas";
+    default:
+      return "/"; // nudge/deadline/broadcast → palpitar nos Jogos
+  }
+}
 
 export function NotificationsBell({ className }: { className?: string }) {
+  const navigate = useNavigate();
   const { data: notifications } = useNotifications();
   const { data: unreadTotal } = useUnreadCount();
   const markRead = useMarkAllRead();
@@ -72,10 +90,19 @@ export function NotificationsBell({ className }: { className?: string }) {
               ) : (
                 <ul className="divide-y divide-border">
                   {notifications.map((n) => (
-                    <li key={n.id} className="px-4 py-3">
-                      <p className="text-sm font-semibold text-ink-900">{n.title}</p>
-                      {n.body && <p className="mt-0.5 text-xs text-ink-500">{n.body}</p>}
-                      <p className="mt-1 text-[10px] text-ink-400">{fromNow(n.created_at)}</p>
+                    <li key={n.id}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpen(false);
+                          navigate(notificationUrl(n));
+                        }}
+                        className="w-full px-4 py-3 text-left transition hover:bg-ink-50 active:bg-ink-100"
+                      >
+                        <p className="text-sm font-semibold text-ink-900">{n.title}</p>
+                        {n.body && <p className="mt-0.5 text-xs text-ink-500">{n.body}</p>}
+                        <p className="mt-1 text-[10px] text-ink-400">{fromNow(n.created_at)}</p>
+                      </button>
                     </li>
                   ))}
                 </ul>
