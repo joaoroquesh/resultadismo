@@ -94,7 +94,10 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   de Ritmo e "Como funciona", hero curto, sem "nível X/7"); removido o "Sem Pressa" (todo jogo é
   cronometrado). **Fix:** card do Retrô no Perfil usava `bg-ink-950` (que inverte no dark → ficava
   claro com texto branco, ilegível); trocado pelo token estável `--retro-board` (escuro nos dois
-  temas). Histórico completo da construção: Comentários
+  temas). **Fix dark/share:** o banner do Retrô na landing deslogada agora INVERTE certo (no dark
+  vira claro com texto escuro p/ destaque — tokens `ink-50`/`ink-300` + `gold-600`), em vez de texto
+  branco ilegível; e o **texto** de compartilhamento passou a usar o emoji dinâmico por fase
+  (🏆🥈🔥💪👏😅) igual à imagem (era sempre 😭). Histórico completo da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do
