@@ -127,6 +127,19 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   permanece intacto** (`font-src 'self'`), sai a dependência do Google (privacidade/LGPD) e a
   fonte carrega do mesmo domínio. → [`07`](07-BUILD-E-DEPLOY.md) §1.
 
+### Removido
+- **GitHub Pages legado desligado — fim do check vermelho "deploy".** Resquício do **v0** (site
+  estático em GitHub Pages): o repo ainda tinha o Pages **ligado** (Settings → Pages, source
+  `main`/raiz, build Jekyll) e um `CNAME` apontando para **`www.resultadismo.com`** — o **mesmo**
+  domínio da produção, que hoje roda no **Vercel**. O workflow auto-gerenciado
+  `pages build and deployment` (check **"deploy"**, sem arquivo em `.github/workflows`) passou a
+  **falhar com 401 "Requires authentication"** a partir de 2026-06-10 (revalidação do domínio
+  custom pelo GitHub: como o DNS resolve para o Vercel, o Pages perdeu a verificação e bloqueou o
+  deploy). **Produção nunca foi afetada** (DNS → Vercel; o Pages só servia a raiz crua do repo via
+  Jekyll). Pages **desabilitado** via API (`DELETE /repos/.../pages`) e **`CNAME` removido** do repo
+  (só tinha sentido para o Pages, agora desligado) — some o ruído de CI e a reivindicação dupla do
+  domínio. Decisão do PO. → [`HISTORICO.md`](HISTORICO.md).
+
 ## [2.0.0] — 2026-06-10
 
 > **🏆 O marco da Copa (ADR [`0003`](decisions/0003-versionamento.md)): v2.0 = lançamento oficial.**

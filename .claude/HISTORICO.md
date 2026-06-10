@@ -31,6 +31,7 @@
 | 2026-06-04 | Renome **Federação → Grupo** (UI, rotas, SEO) + **pagamento desligado**: criar grupos passa a ser **grátis** (modo `disabled`, ADR 0002 — conflita com a regra central 3; infra de pagamento preservada e reversível) | **v1.4.0** |
 | **2026-06-05** | **Admin v2** — overhaul do painel: Visão+ (decisões rápidas, "Hoje", pico de online, grupos pendentes), **config editável no painel** (limiar de online + sala de espera), ordenação/filtros em Grupos e Usuários, **moderação de usuário em 3 níveis** (suspender / excluir / excluir + bloquear e-mail, dupla verificação), **tempo de uso** por heartbeat, acordeão de jogos por data; correções (toggle, "jogo oculto" fora do ao-vivo, catálogo ESPN no cliente) | **v1.7.0** |
 | 2026-06-08 | **Jeito de trabalhar:** o João vira **PO**, a IA atua como **equipe multidisciplinar** (doc 11) e **nenhum código sobe sem plano validado antes** (regra 16, Portão A). Três portões nomeados (A plano / B homologação / C release). ADR [`0005`](decisions/0005-equipe-po-e-plano.md) | _(processo, sem release)_ |
+| 2026-06-10 | **Encerramento do v0:** GitHub Pages legado **desligado** (vinha falhando o check "deploy"/`pages-build-deployment` com 401; servia só a raiz crua via Jekyll, nunca o app) e `CNAME` removido. Produção (Vercel) intacta. | _(infra, sem release)_ |
 
 ---
 
