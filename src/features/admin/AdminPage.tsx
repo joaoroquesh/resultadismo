@@ -83,6 +83,13 @@ export function AdminPage() {
             </button>
           );
         })}
+        <button
+          type="button"
+          onClick={() => navigate("/admin/retro")}
+          className="flex shrink-0 items-center gap-1.5 rounded-pill border border-border bg-surface px-3.5 py-1.5 text-sm font-semibold text-ink-600 transition hover:bg-ink-100"
+        >
+          🕹️ Retrô
+        </button>
       </nav>
 
       {tab === "visao" && <AdminDashboard onNavigate={(t) => setTab(t as TabKey)} />}

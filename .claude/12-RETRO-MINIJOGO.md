@@ -69,7 +69,7 @@ página pública `/retro/r/:code`.
   `retroLocal.ts` = token anônimo + anti-repetição local). Rotas públicas `/retro` e `/retro/r/:code`
   no `App.tsx`; entradas na Sidebar/BottomNav/PublicShell. Vitrine de animações: `/retro?demo=1`
   (**só DEV**).
-- **Banco (migrations `20260610150000–150012`; 150011 = Formato Copa/Pontos + config admin + fix reroll daily; 150008 RESET; 150009 abandono; 150010 final-aceita-saldo + ranking-por-dificuldade + feedback.product):** seed dos **964 jogos** (fonte openfootball CC0,
+- **Banco (migrations `20260610150000–150013`; 150011 = Formato Copa/Pontos + config admin + fix reroll daily; 150008 RESET; 150009 abandono; 150010 final-aceita-saldo + ranking-por-dificuldade + feedback.product):** seed dos **964 jogos** (fonte openfootball CC0,
   importador `scripts/gen-retro-seed.mjs` com portões de qualidade; dificuldade 1–7 com 34
   jogos-lenda) + motor (RPCs `retro_start_run`, `retro_next` — serve **sob demanda**, o cronômetro
   nasce no clique —, `retro_answer`, `retro_run_summary`, `retro_leaderboard`, `retro_my_stats`,
@@ -86,10 +86,14 @@ página pública `/retro/r/:code`.
 - **Tempo de tela SÓ do Retrô (rodada 11):** `RetroShell` bate `retro_touch` a cada 30s p/ TODOS
   (anon+logado) → `retro_usage_daily.screen_seconds`. Separado do app-mãe (PresenceTracker não roda
   no RetroShell).
-- **Feedback admin (rodada 11):** `/admin/retro` lista os reports do Retrô (`FeedbackAdmin
+- **Feedback admin:** `/admin/retro` (acessível pela nav do **/admin** principal: chip "🕹️ Retrô")
+  lista os reports do Retrô (`FeedbackAdmin
   product="retro"`, via `admin_list_feedback` com `product`) — autor, página, corpo, resolver/responder
-  (`admin_update_feedback`). "Meus envios" (FeedbackPage) agora filtra por `auth.uid()` (antes o
-  admin via os de todos).
+  (`admin_update_feedback`). "Meus envios" filtra por `auth.uid()`. O admin principal lista TODOS os
+  reports com **badge de produto** (🕹️ Retrô). **Rodada 12:** removida a duplicata de
+  `submit_feedback` (6-arg) que podia inserir sem `product` (sumindo o report do admin do Retrô).
+- **Trilha (CampaignTrail):** Copa = G1·G2·G3│8ª·4ª·SF·F; **Pontos = J1..J7** (sem fases nem
+  divisor); o card mostra "Jogo N de 7" no Pontos.
 - **Páginas:** `/retro/regras` (regras em blocos curtos), `/admin/retro` (config admin, RequireAdmin).
 - **Feedback do Retrô:** `/retro/feedback` (só logado) reusa a `FeedbackPage` com `product="retro"`
   (coluna `feedback.product` classico|retro; `submit_feedback` ganhou `p_product`). Páginas

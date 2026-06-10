@@ -44,7 +44,7 @@ export function ResultView({
               Eliminado nos pênaltis 😬 — você acertou o vencedor, mas aqui só saldo ou cravada passa.
             </p>
           )}
-          <CampaignTrail slots={trail} currentSlot={null} />
+          <CampaignTrail slots={trail} currentSlot={null} format={run.format} />
           <p className="text-sm text-ink-500">
             <b className="tabular-nums">{run.points} pts</b> · tempo{" "}
             <b className="tabular-nums">{fmtMs(run.totalMs)}</b>

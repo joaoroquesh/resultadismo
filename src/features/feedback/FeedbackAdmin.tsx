@@ -102,7 +102,10 @@ function FeedbackCard({ f }: { f: AdminFeedback }) {
           <p className="font-semibold text-ink-900">{f.title}</p>
           <p className="mt-0.5 whitespace-pre-wrap text-sm text-ink-600">{f.body}</p>
         </div>
-        <Badge tone={isBug ? "flame" : "gold"}>{isBug ? "erro" : "ideia"}</Badge>
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          {f.product === "retro" && <Badge tone="brand">🕹️ Retrô</Badge>}
+          <Badge tone={isBug ? "flame" : "gold"}>{isBug ? "erro" : "ideia"}</Badge>
+        </div>
       </div>
 
       {/* Contexto do erro */}

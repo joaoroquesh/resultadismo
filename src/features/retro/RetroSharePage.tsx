@@ -44,6 +44,7 @@ export function RetroSharePage() {
               <CampaignTrail
                 slots={data.slots.map((s): TrailSlot => ({ slot: s.slot, scoreType: s.score_type }))}
                 currentSlot={null}
+                format={data.format}
               />
               <p className="text-sm text-ink-500">
                 <b className="tabular-nums">{data.points} pts</b> ·{" "}

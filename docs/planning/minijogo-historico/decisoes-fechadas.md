@@ -229,6 +229,11 @@ Dois eixos independentes, escolhidos antes da run:
   `/admin/retro` (autor/página/corpo + resolver/responder) e fix do "Meus envios" (filtrava só o
   admin). Migration `20260610150012`. Nome "Jogo livre" foi escolha minha (o PO deixou em branco) —
   confirmar.
+- **Rodada 12 (10/06, decisões do PO):** (1) no **modo Pontos** a trilha vira **J1..J7** (jogo 1
+  a 7, sem fases/divisor) e o card mostra "Jogo N de 7"; (2) **caminho admin→Retrô** (chip
+  "🕹️ Retrô" na nav do /admin); (3) **report sumido** corrigido — havia 2 `submit_feedback` (6 e
+  7 args); a 6-arg (sem product) foi dropada (migration `20260610150013`) e o admin principal agora
+  lista TODOS com badge de produto, garantindo que nada se esconda.
 - **Backlog (fase 2 do Retrô)** — eventos GA4 (union do `analytics.ts`) ✓feito, entrada na navegação/Como Funciona/
   landing (pontos de contato), docs `.claude/05` §2 + `12-RETRO-MINIJOGO.md` → **Fase 5**:
   homologação com o João (Portão B), integração do worktree na main e deploy.

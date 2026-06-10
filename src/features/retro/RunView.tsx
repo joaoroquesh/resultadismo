@@ -70,7 +70,7 @@ export function RunView({
     <div className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-2 overflow-hidden px-1">
       {/* topo fixo: trilha + pontos + sair (tudo numa linha — tela limpa) */}
       <div className="flex items-center justify-between gap-2">
-        <CampaignTrail slots={slots} currentSlot={current.slot} />
+        <CampaignTrail slots={slots} currentSlot={current.slot} format={format} />
         <span className="rounded-pill bg-ink-100 px-2.5 py-0.5 text-xs font-bold tabular-nums">{points} pts</span>
         <button type="button" onClick={onExit} className="text-[11px] font-semibold text-ink-400">
           sair ✕
@@ -97,7 +97,11 @@ export function RunView({
                 : "text-xs font-bold uppercase tracking-wide text-brand-700"
             }
           >
-            {decisao ? `⚡ ${current.slot_label} ⚡` : current.slot_label}
+            {format === "pontos"
+              ? `Jogo ${current.slot} de 7`
+              : decisao
+                ? `⚡ ${current.slot_label} ⚡`
+                : current.slot_label}
           </p>
           {/* leitura rápida do jogo (feedback dos amigos): ANO gigante + fase em selo */}
           <p className="mt-0.5 text-2xl font-bold leading-none tracking-tight">
