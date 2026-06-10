@@ -68,14 +68,14 @@ export function RetroRulesPage() {
 
       <Bloco emoji="📅" titulo="Seleção do Dia & Jogo livre">
         <p><b>Seleção do Dia</b>: a Copa de uma seleção, igual pra todo mundo, 1 vez por dia. Vale ranking 🔥.</p>
-        <p><b>Jogo livre</b>: jogue à vontade, jogos aleatórios, sem ranking.</p>
-        <p className="text-xs text-ink-400">Ritmo Resultadista (com tempo) é o que vale ranking. Sem Pressa é livre.</p>
+        <p><b>Jogo livre</b>: o jogo do dia a dia — jogue quantas vezes quiser. Logado, entra no ranking.</p>
+        <p className="text-xs text-ink-400">Todo jogo tem tempo: poucos segundos por placar.</p>
       </Bloco>
 
       <Bloco emoji="🥇" titulo="Ranking">
         <p><b>Copa</b>: lidera quem chega mais longe; pontos e tempo são desempate.</p>
         <p><b>Pontos</b>: lidera quem faz mais pontos; o tempo desempata.</p>
-        <p className="text-xs text-ark-400">Só entra no ranking quem joga logado, no ritmo Resultadista.</p>
+        <p className="text-xs text-ink-400">Só entra no ranking quem joga logado.</p>
       </Bloco>
 
       <Button variant="secondary" className="w-full" onClick={() => navigate("/retro")}>

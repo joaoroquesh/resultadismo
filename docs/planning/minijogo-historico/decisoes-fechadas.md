@@ -240,6 +240,11 @@ Dois eixos independentes, escolhidos antes da run:
   levemente mais retrô); (3) "Jogar Treino agora" → **"Jogar de novo"**; (4) convite pro
   **bolão da Copa no FIM da página, com a logo do Resultadismo** e copy sobre a Copa acontecendo.
   Só front.
+- **Rodada 14 (10/06, decisões do PO):** (1) corrigido "Jogar livre (sem ranking)" — o Jogo livre
+  TEM ranking e é o jogo do dia a dia; copy reframed ("Entra no ranking 🏆"); (2) **telas mais
+  leves** (queixa de sobrecarga): removidos o card de Ritmo e o card "Como funciona" (virou link),
+  hero curto, tirado "nível X/7" da tela do jogo; (3) **removido o "Sem Pressa"** — todo jogo é
+  cronometrado. Só front.
 - **Backlog (fase 2 do Retrô)** — eventos GA4 (union do `analytics.ts`) ✓feito, entrada na navegação/Como Funciona/
   landing (pontos de contato), docs `.claude/05` §2 + `12-RETRO-MINIJOGO.md` → **Fase 5**:
   homologação com o João (Portão B), integração do worktree na main e deploy.

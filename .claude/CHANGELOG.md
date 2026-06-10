@@ -73,8 +73,10 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   `submit_feedback` que inseria sem product — migration `20260610150013`) + badge de produto no
   admin. **Rodada 13:** Seleção do Dia só no formato Copa (ranking diário = Copa); tela final
   redesenhada espelhando a imagem de share (card escuro retrô); "Jogar Treino agora" → "Jogar de
-  novo"; convite pro bolão da Copa no fim, com logo do Resultadismo. Só front. Histórico completo
-  da construção: Comentários
+  novo"; convite pro bolão da Copa no fim, com logo do Resultadismo. **Rodada 14:** "Jogo livre"
+  deixa de dizer "sem ranking" (ele ranqueia e é o jogo do dia a dia); telas mais leves (sem cards
+  de Ritmo e "Como funciona", hero curto, sem "nível X/7"); removido o "Sem Pressa" (todo jogo é
+  cronometrado). Só front. Histórico completo da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do

@@ -31,9 +31,9 @@ página pública `/retro/r/:code`.
   **`RetroShell` próprio** (mini-header com "ir pro Resultadismo →" + ConsentBanner) — fora do
   AppShell: nada de Sidebar/BottomNav/header do app-mãe. Entradas: **card próprio no topo do menu
   do Perfil**, **banner na landing** e seção no Como Funciona.
-- **Ritmos:** `sempressa` · `resultadista` (10/8/7s — o que **ranqueia**). **Sem seletor de
-  dificuldade** (rodada 11: removido pra não confundir o ranking). Cronômetro com milésimos + cor
-  nos 3s finais. Rótulos: **Seleção do Dia** (era Copa do Dia) e **Jogo livre** (era Treino livre).
+- **Sempre com tempo (rodada 14):** o "Sem Pressa" foi removido — todo jogo é cronometrado
+  (10/8/7s). Sem seletor de ritmo nem de dificuldade. Rótulos: **Seleção do Dia** (diário, Copa,
+  ranqueado) e **Jogo livre** (o jogo do dia a dia — Copa/Pontos, também ranqueia logado).
 - **Seleção do Dia = sempre Copa (rodada 13):** o desafio diário ranqueado é eliminatório (Copa).
   O formato (Copa/Pontos) só varia no **Jogo livre**. Ranking diário = Copa apenas.
 - **Copa do Dia TEMÁTICA (rodada 6):** cada dia é a Copa de **uma seleção** (rotação determinística
@@ -97,6 +97,8 @@ página pública `/retro/r/:code`.
 - **Tela final (rodada 13):** o card espelha a IMAGEM de share — placar eletrônico escuro
   (`--retro-board`) + listras + scanlines + emoji por fase + trilha + pontos dourados. Botões
   "Jogar de novo" / "Voltar"; no FIM, convite pro **bolão da Copa** com a logo do Resultadismo.
+- **UI enxuta (rodada 14):** home sem cards de Ritmo e de "Como funciona" (vira link), hero curto;
+  tela do jogo sem "nível X/7". Menos texto, mais direto (queixa de telas sobrecarregadas).
 - **Trilha (CampaignTrail):** Copa = G1·G2·G3│8ª·4ª·SF·F; **Pontos = J1..J7** (sem fases nem
   divisor); o card mostra "Jogo N de 7" no Pontos.
 - **Páginas:** `/retro/regras` (regras em blocos curtos), `/admin/retro` (config admin, RequireAdmin).

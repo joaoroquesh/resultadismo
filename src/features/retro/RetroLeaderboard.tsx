@@ -56,8 +56,8 @@ export function RetroLeaderboard() {
           title="Ninguém no ranking ainda"
           description={
             board === "daily"
-              ? "A Seleção do Dia ranqueia quem joga logado no ritmo Resultadista. Seja a primeira pessoa!"
-              : "O Treino ranqueia a MELHOR campanha de cada um (logado, ritmo Resultadista). Bora abrir o placar!"
+              ? "A Seleção do Dia ranqueia quem joga logado. Seja a primeira pessoa!"
+              : "O Jogo livre ranqueia a MELHOR campanha de cada um (logado). Bora abrir o placar!"
           }
         />
       ) : (

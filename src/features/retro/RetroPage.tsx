@@ -5,7 +5,6 @@ import { useEffect } from "react";
 import { teamCrestPath } from "@/lib/teamCrests";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
@@ -32,7 +31,7 @@ import { RetroCrest } from "./RetroCrest";
 import { RunView } from "./RunView";
 import { RevealCard } from "./RevealCard";
 import { ResultView } from "./ResultView";
-import { fmtMs, type FinishedRun } from "./share";
+import { type FinishedRun } from "./share";
 import { RetroLeaderboard } from "./RetroLeaderboard";
 import { RetroStripes } from "./RetroFx";
 import { RetroDemo } from "./RetroDemo";
@@ -78,12 +77,6 @@ function toFinishedRun(run: ActiveRun | null): FinishedRun | null {
   };
 }
 
-const PACE_HINT: Record<RetroPace, string> = {
-  sempressa: "Sem cronômetro. Pensa à vontade, sem ranking.",
-  resultadista: "10s → 8s → 7s por jogo. O ritmo que vale ranking.",
-  classico: "", // aposentado na rodada 6 (valor segue válido p/ runs antigas)
-};
-
 // /retro — a casa do mini-jogo: landing + Seleção do Dia + Jogo livre + a run em si.
 export function RetroPage() {
   const { user, isAppAdmin } = useAuth();
@@ -92,7 +85,6 @@ export function RetroPage() {
   const navigate = useNavigate();
   const [phase, setPhase] = useState<Phase>("home");
   const [format, setFormat] = useState<RetroFormat>("copa");
-  const [pace, setPace] = useState<RetroPace>("resultadista");
   const [run, setRun] = useState<ActiveRun | null>(null);
   const startMut = useRetroStart();
   const answerMut = useRetroAnswer();
@@ -110,10 +102,10 @@ export function RetroPage() {
     if (startMut.isPending) return;
     setStartKind(daily ? "daily" : "training");
     startMut.mutate(
-      { format: daily ? "copa" : format, pace, daily, level: "facil" },
+      { format: daily ? "copa" : format, pace: "resultadista", daily, level: "facil" },
       {
         onSuccess: (s: RetroStart) => {
-          track("retro_run_start", { format: s.format, pace: s.pace, daily });
+          track("retro_run_start", { format: s.format, daily });
           if (s.resumed) toast("Retomando a sua Seleção do Dia de onde parou!", "info");
           retroMarkSeen(s.current?.match_id);
           const base: ActiveRun = {
@@ -260,9 +252,7 @@ export function RetroPage() {
       {phase === "home" && (
         <Home
           format={format}
-          pace={pace}
           setFormat={setFormat}
-          setPace={setPace}
           todayTeam={today.data ?? null}
           startingDaily={startKind === "daily"}
           startingTraining={startKind === "training"}
@@ -337,9 +327,7 @@ export function RetroPage() {
 
 function Home({
   format,
-  pace,
   setFormat,
-  setPace,
   todayTeam,
   startingDaily,
   startingTraining,
@@ -357,9 +345,7 @@ function Home({
   onAdmin,
 }: {
   format: RetroFormat;
-  pace: RetroPace;
   setFormat: (f: RetroFormat) => void;
-  setPace: (p: RetroPace) => void;
   todayTeam: { team_slug: string; team_name_pt: string } | null;
   startingDaily: boolean;
   startingTraining: boolean;
@@ -377,63 +363,35 @@ function Home({
   onAdmin: () => void;
 }) {
   return (
-    <div className="mx-auto w-full max-w-md space-y-4">
-      {/* hero retrô: scanlines + listras nas cores da pontuação (D15) */}
-      <Card className="retro-scanlines relative overflow-hidden border-2 border-ink-950 bg-brand-700 p-5 text-white">
+    <div className="mx-auto w-full max-w-md space-y-3">
+      {/* hero curto */}
+      <Card className="retro-scanlines relative overflow-hidden border-2 border-ink-950 bg-brand-700 p-4 text-white">
         <RetroStripes className="absolute inset-x-0 top-0" />
         <RetroStripes className="absolute inset-x-0 bottom-0" />
-        <Badge tone="gold" className="mb-2">
-          RETRÔ · 1930–2022
-        </Badge>
-        <h2 className="text-2xl font-bold leading-tight">Você lembra desse placar?</h2>
-        <p className="mt-1 text-sm text-white/90">
-          7 jogos reais de Copas do Mundo, segundos para cravar cada um. Passe da fase de grupos,
-          sobreviva ao mata-mata e seja campeão da <b>sua</b> Copa.
-        </p>
+        <h2 className="text-xl font-bold leading-tight">Você lembra desse placar? 🕹️</h2>
+        <p className="mt-0.5 text-sm text-white/90">7 jogos de Copas antigas, segundos pra cravar cada um.</p>
         {isLogged && (streak > 0 || best) && (
-          <p className="mt-3 text-xs font-semibold text-white/95">
-            {streak > 0 && <>🔥 {streak} dia{streak > 1 ? "s" : ""} seguidos</>}
+          <p className="mt-2 text-xs font-semibold text-white/95">
+            {streak > 0 && <>🔥 {streak} dia{streak > 1 ? "s" : ""}</>}
             {streak > 0 && best && " · "}
-            {best && (
-              <>
-                melhor: {best.format === "pontos" ? `${best.points} pts` : best.stage_reached} ({fmtMs(best.total_ms)})
-              </>
-            )}
+            {best && <>melhor: {best.format === "pontos" ? `${best.points} pts` : best.stage_reached}</>}
           </p>
         )}
       </Card>
 
-      {/* ritmo vale pros dois modos */}
-      <Card className="space-y-1.5 p-4">
-        <span className="text-xs font-bold uppercase tracking-wide text-ink-500">Ritmo · com ou sem tempo</span>
-        <SegmentedControl<RetroPace>
-          className="w-full whitespace-nowrap"
-          options={[
-            { value: "sempressa", label: "Sem Pressa" },
-            { value: "resultadista", label: "Resultadista" },
-          ]}
-          value={pace}
-          onChange={setPace}
-        />
-        <p className="text-xs text-ink-500">{PACE_HINT[pace]}</p>
-      </Card>
-
-      {/* SELEÇÃO DO DIA — sempre Copa (mata-mata), é o desafio ranqueado */}
+      {/* SELEÇÃO DO DIA — desafio diário ranqueado (Copa) */}
       <Card className="space-y-2 border-2 border-brand-500 p-4">
         {todayTeam && (
           <div className="flex items-center justify-center gap-2">
-            <RetroCrest slug={todayTeam.team_slug} name={todayTeam.team_name_pt} size={32} />
+            <RetroCrest slug={todayTeam.team_slug} name={todayTeam.team_name_pt} size={30} />
             <p className="text-sm font-bold text-brand-800">
               Seleção do Dia: <span className="uppercase">{todayTeam.team_name_pt}</span>
-              <span className="block text-[11px] font-medium text-ink-500">
-                7 jogos da seleção · formato Copa (mata-mata)
-              </span>
             </p>
           </div>
         )}
         {playedToday ? (
           <div className="rounded-lg bg-ink-100 p-3 text-center text-sm">
-            ✅ Você já jogou a Seleção do Dia. <b>Volte amanhã</b> — ou jogue livre abaixo.
+            ✅ Já jogou a de hoje. <b>Volte amanhã</b> — ou jogue à vontade abaixo.
           </div>
         ) : (
           <Button
@@ -446,36 +404,19 @@ function Home({
             Jogar a Seleção do Dia ⚽
           </Button>
         )}
-        {!isLogged && (
-          <p className="text-center text-[11px] text-ink-500">
-            Dá pra jogar sem conta!{" "}
-            <button type="button" className="font-semibold text-brand-700 underline" onClick={onLogin}>
-              Entre com Google
-            </button>{" "}
-            para ranking e sequência 🔥
-          </p>
-        )}
       </Card>
 
-      {/* JOGO LIVRE — escolhe o formato, sem ranking */}
+      {/* JOGO LIVRE — o jogo do dia a dia; também entra no ranking (logado) */}
       <Card className="space-y-2 p-4">
-        <div className="space-y-1.5">
-          <span className="text-xs font-bold uppercase tracking-wide text-ink-500">Jogo livre · escolha o formato</span>
-          <SegmentedControl<RetroFormat>
-            className="w-full whitespace-nowrap"
-            options={[
-              { value: "copa", label: "Copa 🏆" },
-              { value: "pontos", label: "Pontos 🎯" },
-            ]}
-            value={format}
-            onChange={setFormat}
-          />
-          <p className="text-xs text-ink-500">
-            {format === "copa"
-              ? "Eliminatório: erre e tá fora. Sobreviva aos 7 e seja campeão."
-              : "Joga os 7 jogos e soma. Quem faz mais pontos vence — sem eliminação."}
-          </p>
-        </div>
+        <SegmentedControl<RetroFormat>
+          className="w-full whitespace-nowrap"
+          options={[
+            { value: "copa", label: "Copa 🏆" },
+            { value: "pontos", label: "Pontos 🎯" },
+          ]}
+          value={format}
+          onChange={setFormat}
+        />
         <Button
           variant="secondary"
           className="w-full font-bold"
@@ -483,27 +424,16 @@ function Home({
           disabled={anyStarting}
           onClick={() => onStart(false)}
         >
-          Jogar livre (sem ranking)
+          Jogar livre
         </Button>
-      </Card>
-
-      <Card className="space-y-2 p-4 text-sm">
-        <h3 className="font-bold">Como funciona</h3>
-        <ol className="list-decimal space-y-1 pl-5 text-ink-700">
-          <li>Aparece um jogo real de Copa — segundos pra cravar o placar.</li>
-          <li>
-            <b className="text-gold-700">Cravada +3</b> · <b className="text-grass-600">saldo +2</b>{" "}
-            · <b className="text-aqua-700">acerto +1</b>.
-          </li>
-          <li><b>Copa 🏆</b>: erre e tá fora. <b>Pontos 🎯</b>: joga os 7 e soma.</li>
-        </ol>
-        <button
-          type="button"
-          onClick={onRules}
-          className="text-xs font-semibold text-brand-700 underline-offset-2 hover:underline"
-        >
-          Ver todas as regras →
-        </button>
+        <p className="text-center text-[11px] text-ink-500">
+          {format === "copa" ? "Eliminatório, jogue quantas vezes quiser." : "Some pontos nos 7 jogos."}{" "}
+          {isLogged ? "Entra no ranking 🏆" : (
+            <button type="button" className="font-semibold text-brand-700 underline" onClick={onLogin}>
+              Entre pra rankear
+            </button>
+          )}
+        </p>
       </Card>
 
       <RetroLeaderboard />

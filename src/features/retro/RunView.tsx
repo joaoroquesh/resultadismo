@@ -113,8 +113,6 @@ export function RunView({
             <span className="rounded-pill bg-brand-500/10 px-2 py-0.5 font-bold text-brand-700">
               {m.stage_label_pt}
             </span>
-            <span aria-hidden>·</span>
-            <span>nível {m.difficulty}/7</span>
           </p>
         </div>
 
