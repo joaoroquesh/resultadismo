@@ -237,7 +237,7 @@ export function ComoFuncionaPage() {
                 <span className="font-bold text-aqua-700">+2</span>.
               </p>
             </div>
-            <p className="rounded-md border-l-2 border-brand-600 bg-surface-2 px-3 py-2 text-xs font-medium text-brand-700">
+            <p className="rounded-md bg-surface-2 px-3 py-2 text-xs font-medium text-brand-700">
               Atenção: você tem no máximo{" "}
               <span className="font-bold">2 dobros por semana</span> (de segunda a domingo). Use com
               estratégia — e cuidado, se errar o jogo dobrado você não perde pontos, mas perde a
@@ -410,7 +410,7 @@ export function ComoFuncionaPage() {
             </p>
           </Card>
 
-          <div className="flex items-start gap-2 rounded-md border-l-2 border-brand-600 bg-surface-2 p-3 text-xs leading-relaxed text-brand-800">
+          <div className="flex items-start gap-2 rounded-md bg-surface-2 p-3 text-xs leading-relaxed text-brand-800">
             <ShieldCheck className="mt-0.5 size-4 shrink-0" />
             <p>
               Seu grupo fica <span className="font-semibold">ativo na hora</span>. Só o{" "}

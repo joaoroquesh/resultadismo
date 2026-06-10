@@ -157,7 +157,7 @@ export function SimuladorPage() {
             <p
               className={cn(
                 "rounded-md px-3 py-2 text-xs leading-relaxed",
-                result.viavel ? "border-l-2 border-brand-600 bg-surface-2 text-brand-700" : "border-l-2 border-flame-600 bg-surface-2 text-flame-700",
+                result.viavel ? "bg-surface-2 text-brand-700" : "bg-surface-2 text-flame-700",
               )}
             >
               {result.aviso}

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Info, Ticket, Trophy, Lock } from "lucide-react";
 import { Page } from "@/components/layout/Page";
@@ -10,6 +10,7 @@ import { Coachmark } from "@/components/ui/Coachmark";
 import { useToast } from "@/components/ui/Toast";
 import { useCompetitions, findWorldCupCompetition } from "@/features/matches/api";
 import { useCreateLeague, startLeagueCheckout } from "./api";
+import { catalogNations, expandTeamSlugs } from "@/features/onboarding/teamsCatalog";
 import {
   usePaymentSettings,
   useSimulatePayment,
@@ -20,6 +21,13 @@ import {
   type DiscountInfo,
 } from "@/features/payments/api";
 import { formatBRL } from "@/lib/pricing";
+
+function cnScope(on: boolean) {
+  return [
+    "inline-flex items-center gap-1.5 rounded-pill border px-2.5 py-1.5 text-xs font-semibold transition",
+    on ? "border-brand-600 bg-brand-600 text-white" : "border-ink-200 bg-surface text-ink-700 hover:border-ink-300",
+  ].join(" ");
+}
 
 export function NovaLigaPage() {
   const navigate = useNavigate();
@@ -37,6 +45,19 @@ export function NovaLigaPage() {
   const [discount, setDiscount] = useState<DiscountInfo | null>(null);
   const [checkingDiscount, setCheckingDiscount] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
+  // Recorte do bolão: que seleções valem pontos no ranking do grupo.
+  // "Todas" abre marcado de propósito — motivar acompanhar a Copa inteira.
+  const [teamScope, setTeamScope] = useState<"all" | "brasil" | "custom">("all");
+  const [scopeSel, setScopeSel] = useState<Set<string>>(() => new Set(["brasil"]));
+  const nations = useMemo(() => catalogNations(), []);
+  function toggleNation(slug: string) {
+    setScopeSel((prev) => {
+      const n = new Set(prev);
+      if (n.has(slug)) n.delete(slug);
+      else n.add(slug);
+      return n;
+    });
+  }
 
   // Temporada da Copa: todo grupo nasce com o bolão da Copa do Mundo, travado.
   // O banco também enforça (trigger group_eligible). Outros campeonatos chegam depois.
@@ -79,6 +100,12 @@ export function NovaLigaPage() {
         joinPolicy,
         competitionId: worldCup.id,
         mode: "points",
+        followedTeamSlugs:
+          teamScope === "all"
+            ? null
+            : Array.from(
+                expandTeamSlugs(teamScope === "brasil" ? ["brasil"] : Array.from(scopeSel)),
+              ),
       });
       const slug = league.slug;
 
@@ -243,7 +270,7 @@ export function NovaLigaPage() {
             </div>
           </div>
 
-          <div className="flex items-start gap-2 rounded-md border-l-2 border-grass-600 bg-surface-2 p-3 text-xs text-grass-800">
+          <div className="flex items-start gap-2 rounded-md bg-surface-2 p-3 text-xs text-grass-800">
             <Trophy className="mt-0.5 size-4 shrink-0" />
             <p>
               <strong>É a temporada da Copa!</strong> Todo grupo joga o{" "}
@@ -251,6 +278,49 @@ export function NovaLigaPage() {
               mais lidera. Os <strong>amistosos</strong> ficam abertos para palpitar na aba Jogos,
               mas não valem pontos no grupo.
             </p>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-ink-800">
+              Quais seleções valem pontos no grupo?
+            </label>
+            <SegmentedControl<"all" | "brasil" | "custom">
+              value={teamScope}
+              onChange={setTeamScope}
+              options={[
+                { value: "all", label: "Todas" },
+                { value: "brasil", label: "Só o Brasil" },
+                { value: "custom", label: "Escolher" },
+              ]}
+            />
+            <p className="text-xs leading-snug text-ink-500">
+              {teamScope === "all"
+                ? "A Copa inteira vale ponto — a disputa mais completa (recomendado)."
+                : teamScope === "brasil"
+                  ? "Só os jogos do Brasil valem ponto no ranking do grupo."
+                  : "Só os jogos das seleções marcadas valem ponto no ranking."}
+            </p>
+            {teamScope === "custom" && (
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {nations.map((n) => {
+                  const on = scopeSel.has(n.id);
+                  return (
+                    <button
+                      key={n.id}
+                      type="button"
+                      onClick={() => toggleNation(n.id)}
+                      aria-pressed={on}
+                      className={cnScope(on)}
+                    >
+                      {n.local_crest && (
+                        <img src={n.local_crest} alt="" className="size-4 rounded-[3px] object-contain" />
+                      )}
+                      {n.short_name ?? n.name}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </Card>
 
@@ -288,7 +358,7 @@ export function NovaLigaPage() {
           </Card>
         )}
 
-        <div className="flex items-start gap-2 rounded-md border-l-2 border-brand-600 bg-surface-2 p-3 text-xs text-brand-800">
+        <div className="flex items-start gap-2 rounded-md bg-surface-2 p-3 text-xs text-brand-800">
           <Info className="mt-0.5 size-4 shrink-0" />
           <p>
             {payMode === "disabled" ? (

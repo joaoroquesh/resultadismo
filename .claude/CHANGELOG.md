@@ -21,6 +21,13 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
+- **Convite de grupo com o texto de divulgação completo.** O compartilhamento do código (card do
+  grupo em `/grupos` e botão da página do grupo) agora usa o **pitch de marketing aprovado pelo
+  João** ("🏆 Achei o melhor bolão pra Copa do Mundo!" + benefícios) fechando com **"Entre no meu
+  grupo \"nome\"" + código + link parametrizado** (`?convite=CÓDIGO`, que preenche o campo sozinho
+  no 1º acesso). Texto unificado em `features/leagues/inviteShare.ts` (regra 9: os dois pontos de
+  share falam a mesma coisa); grupo público compartilhado da vitrine sai sem código, apontando
+  `/grupos`. Corrigido o typo "Entra na meu grupo" e o card passou a registrar o evento `share`.
 - **Mini-jogo Resultadismo Retrô — EM PRODUÇÃO em `/retro` (2026-06-10, teste com amigos
   autorizado pelo João).** Fases 1–3 + rodada 1 de homologação + Fase 4. Pós-deploy/Fase 4:
   correção de contraste (placar eletrônico **sempre escuro** nos dois temas, tokens
@@ -72,6 +79,15 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   erros de console). Ao subir: atualizar `.claude/05` §2 e criar `.claude/12-RETRO-MINIJOGO.md`.
 
 ### Corrigido
+- **Jogos personalizados + recorte de seleções no grupo.** (1) Aba Jogos ganha o filtro
+  **"Meus interesses"** (ativo por padrão pra quem personalizou): mostra campeonatos seguidos
+  inteiros + jogos dos times/seleções escolhidos (coração, seleção e seguidos) em **qualquer**
+  campeonato disponível — interesse indisponível é ignorado. (2) Na **criação do grupo**, escolha
+  leve de quais seleções **valem ponto no ranking**: *Todas* (padrão, recomendado), *Só o Brasil*
+  ou *Escolher* (chips com bandeira). Guardado em `league_competitions.followed_team_slugs`
+  (expandido com aliases) e respeitado pelo `get_league_standings` via `team_slug()` SQL
+  (migration `20260610160000`). (3) Notas/avisos **sem barra lateral única** (17 removidas;
+  regra atualizada no [`12-DESIGN`](12-DESIGN.md)).
 - **Fonte Ubuntu bloqueada pelo CSP em produção — agora self-hosted.** O CSP do `vercel.json`
   (`style-src` sem `fonts.googleapis.com`) bloqueava a stylesheet do Google Fonts desde a adição
   dos headers, e **todo visitante via a fonte de sistema** em vez da Ubuntu (passava despercebido

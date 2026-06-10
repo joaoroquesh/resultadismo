@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { CalendarClock, Trophy, Zap, LayoutGrid } from "lucide-react";
+import { CalendarClock, Trophy, Zap, LayoutGrid, Sparkles } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -10,6 +10,8 @@ import { TeamCrest } from "@/components/TeamCrest";
 import { cn } from "@/lib/utils";
 import { dayjs } from "@/lib/format";
 import { MatchCard } from "./MatchCard";
+import { usePersonalizationState } from "@/features/onboarding/personalizationApi";
+import { expandTeamSlugs, teamNameMatches } from "@/features/onboarding/teamsCatalog";
 import {
   useCompetitions,
   useMatches,
@@ -52,15 +54,52 @@ export function JogosPage() {
   const { open: openLogin } = useLoginModal();
   const { data: competitions, isLoading: loadingComps } = useCompetitions();
 
-  // "Todos os campeonatos" é o padrão.
-  const [scope, setScope] = useState<Scope>(ALL);
-  const isAll = scope === ALL;
-  const compId = isAll ? undefined : scope;
+  // Interesses da personalização → filtro "Meus interesses" (padrão quando existir).
+  const { data: perso } = usePersonalizationState();
+  const interestSlugs = useMemo(() => {
+    if (!perso) return null;
+    const slugs = new Set<string>();
+    if (perso.favorite_team_id) slugs.add(perso.favorite_team_id);
+    if (perso.national_team_id) slugs.add(perso.national_team_id);
+    for (const arr of Object.values(perso.followed_teams ?? {}))
+      for (const s of arr) slugs.add(s);
+    return slugs.size ? expandTeamSlugs(slugs) : null;
+  }, [perso]);
+  const followedCompIds = useMemo(
+    () => new Set(perso?.followed_competition_ids ?? []),
+    [perso],
+  );
+  const hasInterests = !!interestSlugs || followedCompIds.size > 0;
+
+  // "Meus interesses" é o padrão quando a pessoa personalizou; senão "Todos".
+  const MINE = "__mine__";
+  const [scopeManual, setScopeManual] = useState<Scope | null>(null);
+  const scope: Scope = scopeManual ?? (hasInterests ? MINE : ALL);
+  const setScope = (s: Scope) => setScopeManual(s);
+  const isMine = scope === MINE;
+  const isAll = scope === ALL || isMine; // MINE usa a carga de "todos" e filtra
+  const compId = scope === ALL || isMine ? undefined : scope;
 
   // dados por escopo (um hook só fica ativo por vez via `enabled`)
   const single = useMatches(compId);
   const all = useAllMatches(isAll);
-  const matches = isAll ? all.data : single.data;
+  const matchesRaw = isAll ? all.data : single.data;
+  // "Meus interesses": campeonato seguido inteiro OU time/seleção de interesse
+  // no jogo (vale em qualquer campeonato — Copa e amistosos). Interesse
+  // indisponível é simplesmente ignorado.
+  const matches = useMemo(() => {
+    if (!isMine || !matchesRaw) return matchesRaw;
+    return matchesRaw.filter((m) => {
+      if (m.competition_id && followedCompIds.has(m.competition_id)) return true;
+      if (!interestSlugs) return false;
+      return (
+        teamNameMatches(interestSlugs, m.home_team?.short_name ?? m.home_team_name) ||
+        teamNameMatches(interestSlugs, m.home_team?.name ?? null) ||
+        teamNameMatches(interestSlugs, m.away_team?.short_name ?? m.away_team_name) ||
+        teamNameMatches(interestSlugs, m.away_team?.name ?? null)
+      );
+    });
+  }, [isMine, matchesRaw, interestSlugs, followedCompIds]);
   const loadingMatches = isAll ? all.isLoading : single.isLoading;
 
   const singlePred = useMyPredictions(compId);
@@ -192,12 +231,26 @@ export function JogosPage() {
       ) : (
         hasComps && (
           <div className="no-scrollbar -mx-4 mb-3 flex gap-2 overflow-x-auto px-4">
+            {session && hasInterests && (
+              <button
+                onClick={() => setScope(MINE)}
+                aria-pressed={isMine}
+                className={cn(
+                  "flex shrink-0 items-center gap-1.5 rounded-pill border px-3 py-1.5 text-sm font-semibold transition",
+                  isMine
+                    ? "border-brand-600 bg-brand-600 text-white"
+                    : "border-ink-200 bg-surface text-ink-600",
+                )}
+              >
+                <Sparkles className="size-3.5" /> Meus interesses
+              </button>
+            )}
             <button
               onClick={() => setScope(ALL)}
-              aria-pressed={isAll}
+              aria-pressed={scope === ALL}
               className={cn(
                 "flex shrink-0 items-center gap-1.5 rounded-pill border px-3 py-1.5 text-sm font-semibold transition",
-                isAll
+                scope === ALL
                   ? "border-brand-600 bg-brand-600 text-white"
                   : "border-ink-200 bg-surface text-ink-600",
               )}

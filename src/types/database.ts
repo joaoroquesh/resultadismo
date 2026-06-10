@@ -638,6 +638,7 @@ export type Database = {
           confronto_state: string
           created_at: string
           drawn_at: string | null
+          followed_team_slugs: string[] | null
           id: string
           league_id: string
           liga_format: string
@@ -656,6 +657,7 @@ export type Database = {
           confronto_state?: string
           created_at?: string
           drawn_at?: string | null
+          followed_team_slugs?: string[] | null
           id?: string
           league_id: string
           liga_format?: string
@@ -674,6 +676,7 @@ export type Database = {
           confronto_state?: string
           created_at?: string
           drawn_at?: string | null
+          followed_team_slugs?: string[] | null
           id?: string
           league_id?: string
           liga_format?: string
@@ -2784,6 +2787,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      team_slug: { Args: { p: string }; Returns: string }
       toggle_confronto_optin: { Args: { p_lc_id: string }; Returns: boolean }
       touch_presence: { Args: never; Returns: undefined }
       undo_confronto_draw: { Args: { p_lc_id: string }; Returns: undefined }

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { track } from "@/lib/analytics";
+import { shareGroupInvite } from "./inviteShare";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Copy, Clock, LogOut, Pencil, Sparkles, MessageCircle } from "lucide-react";
@@ -124,41 +125,13 @@ export function LigaDetailPage() {
     toast("Código copiado!", "success");
   }
 
-  // Compartilha o convite. Estratégia: tenta a Web Share API primeiro porque
-  // ela passa o texto NATIVO (sem URL-encoding), preservando emojis multi-byte
-  // que o wa.me/?text= corrompe em alguns clientes WhatsApp (🏆 ✅ 📲 👉 viravam
-  // � � � � pra alguns destinatários). No mobile o sistema abre o "Compartilhar
-  // com…" com WhatsApp em destaque (1 toque). No desktop sem Web Share, cai no
-  // wa.me como fallback.
+  // Compartilha o convite: texto único em inviteShare.ts (pitch + "Entre no meu
+  // grupo" com o NOME + código + link parametrizado ?convite=). Web Share primeiro
+  // (preserva emojis que o wa.me corrompe); wa.me como fallback.
   function shareWhatsApp() {
     if (!league?.join_code) return;
     track("share", { method: "whatsapp", content_type: "group_invite" });
-    const text = `🏆 Achei o melhor bolão pra Copa do Mundo!
-
-No Resultadismo você:
-✅ palpita no placar dos jogos
-✅ ganha pontos cada vez que acerta
-✅ enfrenta os amigos no ranking ao vivo
-
-📲 Abre pelo celular e instala como app em 10 segundos. ⚽
-
-Bora jogar junto? Entra na meu grupo:
-Código: ${league.join_code}
-👉 https://www.resultadismo.com/?convite=${encodeURIComponent(league.join_code)}`;
-
-    const fallback = () =>
-      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
-
-    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
-      navigator.share({ text }).catch((err: unknown) => {
-        const name = (err as { name?: string } | undefined)?.name;
-        // AbortError = usuário cancelou no share sheet; não cai no fallback.
-        if (name !== "AbortError") fallback();
-      });
-      return;
-    }
-
-    fallback();
+    shareGroupInvite(league.name, league.join_code);
   }
 
   async function handleLeave() {
@@ -182,7 +155,7 @@ Código: ${league.join_code}
       }
     >
       {league.status === "active" && league.name_approved === false && (
-          <div className="mb-4 flex items-start gap-2 rounded-md border-l-2 border-brand-600 bg-surface-2 p-3 text-sm text-brand-800">
+          <div className="mb-4 flex items-start gap-2 rounded-md bg-surface-2 p-3 text-sm text-brand-800">
             <Clock className="mt-0.5 size-4 shrink-0" />
             <p>
               Seu grupo está <strong>ativa</strong> e já dá pra jogar! Só o <strong>nome</strong>{" "}
@@ -192,7 +165,7 @@ Código: ${league.join_code}
         )}
 
       {league.payment_status === "pending" && league.status !== "active" ? (
-        <div className="mb-4 rounded-md border-l-2 border-gold-500 bg-surface-2 p-3 text-sm text-gold-800">
+        <div className="mb-4 rounded-md bg-surface-2 p-3 text-sm text-gold-800">
           <div className="flex items-start gap-2">
             <Clock className="mt-0.5 size-4 shrink-0" />
             <p>
@@ -254,7 +227,7 @@ Código: ${league.join_code}
           </div>
         </div>
       ) : league.status === "pending" ? (
-        <div className="mb-4 rounded-md border-l-2 border-gold-500 bg-surface-2 p-3 text-sm text-gold-800">
+        <div className="mb-4 rounded-md bg-surface-2 p-3 text-sm text-gold-800">
           <div className="flex items-start gap-2">
             <Clock className="mt-0.5 size-4 shrink-0" />
             <p>Este grupo aguarda aprovação de um administrador para ficar ativa.</p>

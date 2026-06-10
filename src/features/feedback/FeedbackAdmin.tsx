@@ -140,7 +140,7 @@ function FeedbackCard({ f }: { f: AdminFeedback }) {
 
       {/* Resposta já dada */}
       {f.status === "resolvido" && f.admin_reply && !replying && (
-        <div className="mt-2 rounded-md border-l-2 border-grass-600 bg-surface-2 p-2.5 text-xs text-grass-800">
+        <div className="mt-2 rounded-md bg-surface-2 p-2.5 text-xs text-grass-800">
           <span className="font-semibold">Resposta enviada:</span> {f.admin_reply}
         </div>
       )}

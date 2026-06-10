@@ -195,7 +195,7 @@ export function CompeticoesTab({
                 </div>
               )}
               {tipo === "confronto" && (
-                <p className="rounded-md border-l-2 border-brand-600 bg-surface-2 px-3 py-2 text-[11px] leading-relaxed text-brand-700">
+                <p className="rounded-md bg-surface-2 px-3 py-2 text-[11px] leading-relaxed text-brand-700">
                   Depois de criar, você <span className="font-semibold">sorteia os confrontos</span>.
                   Isso trava os participantes: quem entrar depois não joga esta disputa.
                 </p>

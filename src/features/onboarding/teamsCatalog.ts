@@ -89,3 +89,33 @@ export function teamsForCompetition(
       return toLite(t, [...new Set(ids)]);
     });
 }
+
+/* ── Interesses → matcher de jogos ───────────────────────────────────────── */
+
+import { teamCrestSlug } from "@/lib/teamCrests";
+
+/**
+ * Expande slugs do catálogo para TODAS as grafias casáveis (slug, nome, short,
+ * TLA e aliases — slugificados). É o mesmo princípio do matching de escudos:
+ * o jogo guarda o nome curto ("Coreia"), o catálogo indexa por "coreiadosul".
+ */
+export function expandTeamSlugs(slugs: Iterable<string>): Set<string> {
+  const want = new Set(slugs);
+  const out = new Set<string>();
+  for (const t of CATALOG) {
+    if (!want.has(t.slug)) continue;
+    for (const cand of [t.slug, t.name_pt, t.short_pt, t.tla, ...(t.aliases ?? [])]) {
+      const k = teamCrestSlug(cand);
+      if (k) out.add(k);
+    }
+  }
+  // slugs fora do catálogo entram como estão (degrada graciosamente)
+  for (const s of want) if (!out.has(s)) out.add(s);
+  return out;
+}
+
+/** true se o nome de time (como vem no jogo) bate com o conjunto expandido. */
+export function teamNameMatches(expanded: Set<string>, name: string | null | undefined): boolean {
+  const k = teamCrestSlug(name);
+  return !!k && expanded.has(k);
+}

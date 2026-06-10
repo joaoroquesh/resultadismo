@@ -25,6 +25,11 @@ deve ser **substituído e evitado** em telas novas/tocadas.
 **Resumo:** destaque = **sólido (marca/dourado) + contorno + elevação**, sobre **superfícies neutras**
 (`surface`, `surface-2`, `ink-50/100`). Cor translúcida da própria cor, nunca.
 
+### Notas e avisos
+Nota/aviso = bloco em **superfície neutra** (`bg-surface-2`, cantos arredondados) com o texto na
+cor do tom (ex.: `text-brand-800`). **Sem barra/borda lateral única** (decisão do PO 2026-06-10 —
+o `border-l-2` usado na migração de 06/2026 foi removido).
+
 ## Tokens de cor (de `src/index.css`)
 `brand` (turquesa, hue ~182) · `gold` (dourado) · `flame`/`grass`/`aqua` (acentos) ·
 `ink` (neutros) · `surface`/`surface-2`/`background`. Elevação: `shadow-brand`.

@@ -127,7 +127,7 @@ export function CompetitionDangerDialog({
           <div className="h-16 animate-pulse rounded-md bg-ink-100" />
         ) : blocked ? (
           <div className="space-y-3">
-            <div className="rounded-md border-l-2 border-flame-600 bg-surface-2 p-3 text-sm text-ink-800">
+            <div className="rounded-md bg-surface-2 p-3 text-sm text-ink-800">
               <p className="flex items-center gap-1.5 font-semibold text-flame-700">
                 <AlertTriangle className="size-4" /> Em uso — não dá pra excluir aqui
               </p>

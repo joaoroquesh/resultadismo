@@ -144,6 +144,8 @@ export function useCreateLeague() {
       joinPolicy: "open" | "approval" | "invite";
       competitionId?: string;
       mode?: LeagueMode;
+      /** recorte do bolão: null/ausente = todas as seleções; senão slugs EXPANDIDOS. */
+      followedTeamSlugs?: string[] | null;
     }) => {
       const slug = `${slugify(input.name)}-${Math.random().toString(36).slice(2, 6)}`;
       const { data: league, error } = await supabase
@@ -166,6 +168,7 @@ export function useCreateLeague() {
           competition_id: input.competitionId,
           name: `Bolão · ${input.name}`,
           mode: input.mode ?? "table",
+          followed_team_slugs: input.followedTeamSlugs ?? null,
         });
         if (lcErr) throw lcErr;
       }

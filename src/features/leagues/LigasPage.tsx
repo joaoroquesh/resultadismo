@@ -16,6 +16,8 @@ import {
   Check,
 } from "lucide-react";
 import { Escudo } from "@/components/ui/Escudo";
+import { track } from "@/lib/analytics";
+import { shareGroupInvite } from "./inviteShare";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -283,21 +285,11 @@ function GroupCard({
   const count = preview?.count ?? 0;
 
   function share() {
-    const code = league.join_code;
-    const text = isPublic
-      ? `🏆 Entra no meu grupo "${league.name}" no Resultadismo!\n\nPalpita nos jogos e me enfrenta no ranking ao vivo. ⚽\n\n👉 https://www.resultadismo.com/grupos`
-      : `🏆 Entra no meu grupo "${league.name}" no Resultadismo!\n\nPalpita nos jogos e me enfrenta no ranking ao vivo. ⚽\n\nCódigo de convite: ${code ?? ""}\n👉 https://www.resultadismo.com/?convite=${encodeURIComponent(code ?? "")}`;
-    const fallback = () =>
-      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
-    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
-      navigator
-        .share({ text })
-        .catch((err: unknown) => {
-          if ((err as { name?: string } | undefined)?.name !== "AbortError") fallback();
-        });
-      return;
-    }
-    fallback();
+    track("share", { method: "whatsapp", content_type: "group_invite" });
+    // Texto único do convite (pitch + "Entre no meu grupo" + código + link
+    // parametrizado) — mesmo do botão da página do grupo. Público sem código
+    // aponta a vitrine /grupos.
+    shareGroupInvite(league.name, isPublic ? null : league.join_code);
   }
 
   return (

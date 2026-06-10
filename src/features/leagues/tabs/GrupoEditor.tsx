@@ -101,7 +101,7 @@ export function GrupoEditor({
       </div>
 
       {nameChanged && (
-        <p className="rounded-md border-l-2 border-gold-500 bg-surface-2 px-3 py-2 text-xs text-gold-800">
+        <p className="rounded-md bg-surface-2 px-3 py-2 text-xs text-gold-800">
           Ao trocar o nome, ele passa por uma <strong>revisão rápida</strong> antes de aparecer
           publicamente — o grupo segue funcionando normalmente.
         </p>

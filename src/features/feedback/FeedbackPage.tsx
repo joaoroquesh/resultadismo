@@ -207,7 +207,7 @@ function MyFeedbackRow({ f }: { f: MyFeedback }) {
         </Badge>
       </div>
       {f.admin_reply && (
-        <div className="mt-2 rounded-md border-l-2 border-grass-600 bg-surface-2 p-2.5 text-xs text-grass-800">
+        <div className="mt-2 rounded-md bg-surface-2 p-2.5 text-xs text-grass-800">
           <span className="font-semibold">Resposta do time:</span> {f.admin_reply}
         </div>
       )}
