@@ -39,7 +39,7 @@ _(vazio — próximas mudanças acumulam aqui)_
   100% dos slugs do jogo resolvem). `db reset` + `db:types` + `typecheck` verdes. Ao subir:
   atualizar `.claude/05` §2 e criar `.claude/12-RETRO-MINIJOGO.md`.
 
-## [2.0.0] — 2026-06-09
+## [2.0.0] — 2026-06-10
 
 > **🏆 O marco da Copa (ADR [`0003`](decisions/0003-versionamento.md)): v2.0 = lançamento oficial.**
 > Cortada pelo João em 2026-06-09. Consolida personalização repaginada, placar com stepper,
