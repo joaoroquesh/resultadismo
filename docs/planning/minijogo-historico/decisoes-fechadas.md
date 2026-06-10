@@ -134,6 +134,17 @@ Dois eixos independentes, escolhidos antes da run:
   **Validação real**: typecheck + lint zerado (complexidade ≤20) + `check:arch` aprovado + **E2E
   Playwright em Chrome real** (run anônima completa de Treino, timer tenso + timeout auto-submit,
   reveal com flip visível, tela final, share-page 404, zero erros de console).
+- **Homologação do PO — rodada 1 (09/06, "gostei das animações") — 6 ajustes ATENDIDOS:**
+  (1) BUG corrigido: o slot seguinte era servido no `retro_answer` e o cronômetro corria durante o
+  reveal → falso "tempo esgotado"; agora `retro_next` serve sob demanda (migration
+  `20260610000004`), com E2E de regressão (ler reveal 12s + responder em 2s = sem timeout).
+  (2) Roletas: maior número EM CIMA (rolar pra cima = mais gols) e começam em 0×0 (palpite válido).
+  (3) Visual mais retrô: placar eletrônico ink-950 com dígitos dourados, scanlines no hero,
+  listras duplas, roletas estilo placar de estádio. (4) Semi/final com moldura dourada pulsante
+  ("⚡ decisão"); campeão com confete; vitrine `/retro?demo=1` (DEV) mostra todos os vereditos.
+  (5) Modo/Ritmo empilhados (sem quebra de linha). (6) Integração Retrô⇄Resultadismo: entrada
+  "Retrô" na Sidebar + BottomNav (logado) e no header/PublicShell (deslogado); na home do jogo,
+  card "Voltar pro Resultadismo"; pós-share, card "Palpitar nos jogos de hoje →" (Q1: aquisição).
 - **Próximo: Fase 4** — eventos GA4 (union do `analytics.ts`), entrada na navegação/Como Funciona/
   landing (pontos de contato), docs `.claude/05` §2 + `12-RETRO-MINIJOGO.md` → **Fase 5**:
   homologação com o João (Portão B), integração do worktree na main e deploy.
