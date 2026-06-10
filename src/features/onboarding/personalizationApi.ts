@@ -117,6 +117,8 @@ export type PersonalizationPatch = {
   /** follow de time por campeonato: { [competition_id]: team_id[] } */
   followedTeams?: Record<string, string[]> | null;
   showInRanking?: boolean | null;
+  /** true só no Concluir/fim do fluxo — marca personalization_done. */
+  markDone?: boolean;
 };
 
 export function useSetPersonalization() {
@@ -131,6 +133,7 @@ export function useSetPersonalization() {
         p_followed_competition_ids: patch.followedCompetitionIds ?? undefined,
         p_followed_teams: patch.followedTeams ?? undefined,
         p_show_in_ranking: patch.showInRanking ?? undefined,
+        p_mark_done: patch.markDone ?? false,
       });
       if (error) throw new Error(error.message);
     },

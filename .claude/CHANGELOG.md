@@ -222,6 +222,11 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   competição vazia exclui com confirmação simples.
 
 ### Corrigido
+- **Jornada de personalização não some mais no meio.** O RPC marcava `personalization_done` em
+  TODA chamada — avançar 1 tela já "concluía" (recarregou no meio → nunca via o resto). Agora o
+  done é explícito (`p_mark_done`): só **Concluir** (ou pular a última tela) fecha a jornada;
+  persistências intermediárias e edições do hub não mexem. + **novo reset geral** pra jornada
+  aparecer pra todos no próximo acesso (migration `20260610130000`).
 - **Prod: lista de campeonatos da personalização vazia (só Copa).** Drift local×prod: a migration
   `20260607000006` pulou os inserts em produção (os campeonatos já existiam como **rascunho**) e o
   RPC filtra `status='active'` — no banco local zerado tudo nasce ativo e o bug ficou invisível.

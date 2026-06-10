@@ -351,13 +351,14 @@ export function PersonalizationPage() {
     setWasEditing(state.personalization_done);
   }
 
-  function persist() {
+  function persist(markDone = false) {
     setPerso.mutate({
       favoriteTeamId: favoriteTeamId || null,
       nationalTeamId: nationalId || null,
       followedCompetitionIds: followedComps,
       followedTeams,
       showInRanking: participateRtb,
+      markDone,
     });
     if (name.trim()) {
       saveProfile.mutate({ display_name: name.trim(), avatar_url: crest || null, uf: uf || null });
@@ -367,7 +368,7 @@ export function PersonalizationPage() {
     navigate(wasEditing ? "/perfil" : "/");
   }
   async function finish() {
-    persist();
+    persist(true);
     if (code.trim()) {
       try {
         await join.mutateAsync(code.trim());
@@ -381,7 +382,7 @@ export function PersonalizationPage() {
     leave();
   }
   function saveOnly() {
-    persist();
+    persist(); // edição avulsa (hub): não mexe no done
     toast("Salvo!", "success");
     navigate("/perfil/editar");
   }
@@ -392,7 +393,7 @@ export function PersonalizationPage() {
   }
   function skipStep() {
     if (step >= STEP_COUNT - 1) {
-      persist();
+      persist(true); // chegou ao fim — pular a última tela também conclui
       leave();
     } else {
       setStep((s) => s + 1);
