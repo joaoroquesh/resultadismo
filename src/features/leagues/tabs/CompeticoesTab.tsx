@@ -9,6 +9,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
 import { useCompetitions, findWorldCupCompetition } from "@/features/matches/api";
 import { useAddLeagueCompetition, useDeleteLeagueCompetition } from "../api";
+import { TeamScopeCard } from "./TeamScopeCard";
 import type { LeagueMode } from "@/lib/types";
 
 // Temporada da Copa (ADR 0007): 1 competição por grupo — a Copa do Mundo, fixa
@@ -22,7 +23,7 @@ export function CompeticoesTab({
   confrontoEnabled,
 }: {
   leagueId: string;
-  comps: { id: string; name: string; mode: string }[];
+  comps: { id: string; name: string; mode: string; followed_team_slugs?: string[] | null }[];
   confrontoEnabled: boolean;
 }) {
   const { data: competitions } = useCompetitions();
@@ -124,6 +125,19 @@ export function CompeticoesTab({
           </Card>
         );
       })}
+
+      {/* Recorte de seleções do bolão: editável até o 1º jogo da Copa começar. */}
+      {(() => {
+        const bolao = comps.find((c) => c.mode === "points" || c.mode === "table");
+        return bolao ? (
+          <TeamScopeCard
+            key={bolao.id}
+            leagueId={leagueId}
+            lcId={bolao.id}
+            savedSlugs={bolao.followed_team_slugs ?? null}
+          />
+        ) : null;
+      })()}
 
       {reachedLimit ? (
         <p className="rounded-md bg-ink-50 px-3 py-2 text-xs text-ink-500">

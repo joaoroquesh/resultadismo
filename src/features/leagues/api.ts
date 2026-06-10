@@ -422,6 +422,40 @@ export function useDeleteLeagueCompetition() {
   });
 }
 
+/** Janela de edição do recorte de seleções: aberta até o 1º jogo da competição
+ * começar (RPC team_scope_window; o trigger no banco é quem manda). */
+export function useTeamScopeWindow(lcId: string | undefined) {
+  return useQuery({
+    enabled: !!lcId,
+    queryKey: ["team-scope-window", lcId],
+    queryFn: async (): Promise<{ editable: boolean; reason: string | null }> => {
+      const { data, error } = await supabase.rpc("team_scope_window", { p_lc_id: lcId! });
+      if (error) throw new Error(error.message);
+      const row = (data as { editable: boolean; reason: string | null }[] | null)?.[0];
+      return row ?? { editable: false, reason: null };
+    },
+  });
+}
+
+/** Atualiza o recorte de seleções do bolão (null = todas). RLS: admin do grupo;
+ * trigger trava depois que a Copa começa. */
+export function useUpdateTeamScope() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { leagueId: string; lcId: string; slugs: string[] | null }) => {
+      const { error } = await supabase
+        .from("league_competitions")
+        .update({ followed_team_slugs: input.slugs })
+        .eq("id", input.lcId);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: ["league-competitions", v.leagueId] });
+      qc.invalidateQueries({ queryKey: ["standings"] });
+    },
+  });
+}
+
 export function useUpdateMember() {
   const qc = useQueryClient();
   return useMutation({

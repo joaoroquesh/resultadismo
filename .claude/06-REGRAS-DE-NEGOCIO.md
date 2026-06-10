@@ -125,6 +125,14 @@ uma troca de significado proposital.
   para grupos no futuro: `group_eligible = true` + republicar). A **personalização continua
   listando** campeonatos em rascunho de propósito (o usuário já segue o Brasileirão pro futuro;
   o feed só mostra o publicado).
+- **Recorte de seleções do bolão é editável ATÉ a Copa começar (2026-06-10 — decisão do João):**
+  o admin do grupo pode mudar o recorte (`followed_team_slugs`: Todas ↔ Só o Brasil ↔ escolhidas)
+  na **aba Competições** enquanto **nenhum jogo da competição tiver iniciado** (todos `scheduled`
+  com kickoff futuro, ignorando ocultos). Depois do 1º jogo, **trava** — mudar no meio retroagiria
+  o ranking. Enforçado no banco (trigger `trg_lc_team_scope_window`, migration `20260610180000`);
+  o front espelha via RPC `team_scope_window` (estado + motivo). Palpites **não** entram na janela:
+  são globais por usuário e o recorte só muda a **contagem** do grupo. Seletor único
+  (`TeamScopeSelector`) compartilhado entre criação e edição.
 
 ---
 

@@ -21,6 +21,13 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
+- **Recorte de seleções do grupo editável até a Copa começar.** Quem criou o grupo sem reparar no
+  recorte ("Todas" × "Só o Brasil" × escolhidas) agora pode **ajustar na aba Competições** (card
+  "Seleções que valem ponto", só admin) enquanto **nenhum jogo da Copa tiver começado** — depois
+  do 1º jogo trava (mudar no meio retroagiria o ranking). Trava **no banco** (trigger
+  `trg_lc_team_scope_window`, migration `20260610180000`) + RPC `team_scope_window` pro front
+  mostrar o estado; seletor único `TeamScopeSelector` compartilhado entre a criação e a edição
+  (a criação agora avisa "dá pra mudar até a Copa começar"). → [`06`](06-REGRAS-DE-NEGOCIO.md) §4.
 - **Convite de grupo com o texto de divulgação completo.** O compartilhamento do código (card do
   grupo em `/grupos` e botão da página do grupo) agora usa o **pitch de marketing aprovado pelo
   João** ("🏆 Achei o melhor bolão pra Copa do Mundo!" + benefícios) fechando com **"Entre no meu

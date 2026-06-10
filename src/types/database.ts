@@ -2803,72 +2803,46 @@ export type Database = {
         }
       }
       skip_personalization: { Args: never; Returns: undefined }
-      submit_feedback:
-        | {
-            Args: {
-              p_app_version?: string
-              p_body: string
-              p_kind: string
-              p_page?: string
-              p_title: string
-              p_user_agent?: string
-            }
-            Returns: {
-              admin_reply: string | null
-              app_version: string | null
-              body: string
-              created_at: string
-              id: string
-              kind: string
-              page: string | null
-              product: string
-              resolved_at: string | null
-              resolved_by: string | null
-              status: string
-              title: string
-              user_agent: string | null
-              user_id: string | null
-            }
-            SetofOptions: {
-              from: "*"
-              to: "feedback"
-              isOneToOne: true
-              isSetofReturn: false
-            }
-          }
-        | {
-            Args: {
-              p_app_version?: string
-              p_body: string
-              p_kind: string
-              p_page?: string
-              p_product?: string
-              p_title: string
-              p_user_agent?: string
-            }
-            Returns: {
-              admin_reply: string | null
-              app_version: string | null
-              body: string
-              created_at: string
-              id: string
-              kind: string
-              page: string | null
-              product: string
-              resolved_at: string | null
-              resolved_by: string | null
-              status: string
-              title: string
-              user_agent: string | null
-              user_id: string | null
-            }
-            SetofOptions: {
-              from: "*"
-              to: "feedback"
-              isOneToOne: true
-              isSetofReturn: false
-            }
-          }
+      submit_feedback: {
+        Args: {
+          p_app_version?: string
+          p_body: string
+          p_kind: string
+          p_page?: string
+          p_product?: string
+          p_title: string
+          p_user_agent?: string
+        }
+        Returns: {
+          admin_reply: string | null
+          app_version: string | null
+          body: string
+          created_at: string
+          id: string
+          kind: string
+          page: string | null
+          product: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          title: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "feedback"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      team_scope_window: {
+        Args: { p_lc_id: string }
+        Returns: {
+          editable: boolean
+          reason: string
+        }[]
+      }
       team_slug: { Args: { p: string }; Returns: string }
       toggle_confronto_optin: { Args: { p_lc_id: string }; Returns: boolean }
       touch_presence: { Args: never; Returns: undefined }

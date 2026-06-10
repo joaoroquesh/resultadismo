@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Info, Ticket, Trophy, Lock } from "lucide-react";
 import { Page } from "@/components/layout/Page";
@@ -10,7 +10,8 @@ import { Coachmark } from "@/components/ui/Coachmark";
 import { useToast } from "@/components/ui/Toast";
 import { useCompetitions, findWorldCupCompetition } from "@/features/matches/api";
 import { useCreateLeague, startLeagueCheckout } from "./api";
-import { catalogNations, expandTeamSlugs } from "@/features/onboarding/teamsCatalog";
+import { expandTeamSlugs } from "@/features/onboarding/teamsCatalog";
+import { TeamScopeSelector } from "./TeamScopeSelector";
 import {
   usePaymentSettings,
   useSimulatePayment,
@@ -21,13 +22,6 @@ import {
   type DiscountInfo,
 } from "@/features/payments/api";
 import { formatBRL } from "@/lib/pricing";
-
-function cnScope(on: boolean) {
-  return [
-    "inline-flex items-center gap-1.5 rounded-pill border px-2.5 py-1.5 text-xs font-semibold transition",
-    on ? "border-brand-600 bg-brand-600 text-white" : "border-ink-200 bg-surface text-ink-700 hover:border-ink-300",
-  ].join(" ");
-}
 
 export function NovaLigaPage() {
   const navigate = useNavigate();
@@ -49,7 +43,6 @@ export function NovaLigaPage() {
   // "Todas" abre marcado de propósito — motivar acompanhar a Copa inteira.
   const [teamScope, setTeamScope] = useState<"all" | "brasil" | "custom">("all");
   const [scopeSel, setScopeSel] = useState<Set<string>>(() => new Set(["brasil"]));
-  const nations = useMemo(() => catalogNations(), []);
   function toggleNation(slug: string) {
     setScopeSel((prev) => {
       const n = new Set(prev);
@@ -284,43 +277,15 @@ export function NovaLigaPage() {
             <label className="text-sm font-medium text-ink-800">
               Quais seleções valem pontos no grupo?
             </label>
-            <SegmentedControl<"all" | "brasil" | "custom">
-              value={teamScope}
-              onChange={setTeamScope}
-              options={[
-                { value: "all", label: "Todas" },
-                { value: "brasil", label: "Só o Brasil" },
-                { value: "custom", label: "Escolher" },
-              ]}
+            <TeamScopeSelector
+              scope={teamScope}
+              onScopeChange={setTeamScope}
+              sel={scopeSel}
+              onToggle={toggleNation}
             />
-            <p className="text-xs leading-snug text-ink-500">
-              {teamScope === "all"
-                ? "A Copa inteira vale ponto — a disputa mais completa (recomendado)."
-                : teamScope === "brasil"
-                  ? "Só os jogos do Brasil valem ponto no ranking do grupo."
-                  : "Só os jogos das seleções marcadas valem ponto no ranking."}
+            <p className="text-xs leading-snug text-ink-400">
+              Dá pra mudar isso na página do grupo (aba Competições) até a Copa começar.
             </p>
-            {teamScope === "custom" && (
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {nations.map((n) => {
-                  const on = scopeSel.has(n.id);
-                  return (
-                    <button
-                      key={n.id}
-                      type="button"
-                      onClick={() => toggleNation(n.id)}
-                      aria-pressed={on}
-                      className={cnScope(on)}
-                    >
-                      {n.local_crest && (
-                        <img src={n.local_crest} alt="" className="size-4 rounded-[3px] object-contain" />
-                      )}
-                      {n.short_name ?? n.name}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
           </div>
         </Card>
 
