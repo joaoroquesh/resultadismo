@@ -1,0 +1,96 @@
+import { cn, formatScore } from "@/lib/utils";
+import { Button } from "@/components/ui/Button";
+import { ScorePill } from "@/components/ScorePill";
+import type { ScoreType } from "@/lib/types";
+import type { RetroAnswerResult } from "./api";
+
+const VERDICT: Record<ScoreType, { label: string; cls: string }> = {
+  cravada: { label: "CRAVADA!", cls: "bg-gold-500 text-gold-950" },
+  saldo: { label: "NO SALDO!", cls: "bg-grass-600 text-white" },
+  acerto: { label: "ACERTOU O VENCEDOR", cls: "bg-aqua-700 text-white" },
+  erro: { label: "FORA!", cls: "bg-flame-600 text-white" },
+};
+
+function Confetti() {
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      {Array.from({ length: 14 }, (_, i) => (
+        <span
+          key={i}
+          className="animate-retro-confetti absolute top-0 block size-2 rounded-[2px] bg-gold-500"
+          style={{
+            left: `${6 + i * 6.5}%`,
+            animationDelay: `${(i % 7) * 90}ms`,
+            backgroundColor: i % 3 === 0 ? "var(--color-gold-400)" : i % 3 === 1 ? "var(--color-gold-600)" : "var(--color-brand-500)",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// O reveal pós-palpite (3 batidas): placar real vira na tela → carimbo do veredito →
+// status da campanha. Animação "fliperama" deliberada (exceção registrada ao motion
+// sutil do app-mãe — doc 12).
+export function RevealCard({
+  answer,
+  guess,
+  onNext,
+}: {
+  answer: RetroAnswerResult;
+  guess: { home: number | null; away: number | null };
+  onNext: () => void;
+}) {
+  const r = answer.result;
+  const run = answer.run;
+  const verdict = VERDICT[r.score_type];
+  const finished = run.status !== "playing";
+
+  return (
+    <div className="relative">
+      {r.score_type === "cravada" && <Confetti />}
+      <div className={cn("space-y-4 text-center", r.score_type === "erro" && "animate-retro-shake")}>
+        <div
+          className={cn(
+            "animate-retro-stamp mx-auto inline-block rounded-lg px-5 py-2 text-2xl font-bold tracking-wide",
+            verdict.cls,
+          )}
+        >
+          {r.timeout ? "TEMPO ESGOTADO!" : verdict.label}
+        </div>
+
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">Placar real</p>
+          <p className="animate-retro-flip text-5xl font-bold tabular-nums">
+            {formatScore(r.home_score, r.away_score)}
+          </p>
+          <p className="mt-1 min-h-4 text-xs text-ink-500">
+            {[
+              r.went_extra_time && "com prorrogação",
+              r.pens_home != null && `pênaltis ${r.pens_home}–${r.pens_away} (não contam)`,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
+        </div>
+
+        <div className="flex items-center justify-center gap-3 text-sm">
+          <span className="text-ink-500">
+            Seu palpite: <b className="tabular-nums">{formatScore(guess.home, guess.away)}</b>
+          </span>
+          <ScorePill type={r.score_type} withLabel />
+        </div>
+
+        {finished ? (
+          <Button onClick={onNext} className="w-full" size="lg">
+            {run.status === "champion" ? "VER MINHA CAMPANHA 🏆" : "Ver minha campanha"}
+          </Button>
+        ) : (
+          <Button onClick={onNext} className="w-full" size="lg">
+            {r.passed ? "PRÓXIMO JOGO →" : "Continuar"}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}

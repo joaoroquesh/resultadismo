@@ -253,3 +253,40 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ===== Retrô (mini-jogo): animações "fliperama" — exceção deliberada ao motion
+   sutil do app (doc 12). O kill-switch global de prefers-reduced-motion acima
+   também zera estas. ===== */
+@keyframes retro-stamp {
+  0% { transform: scale(2.2) rotate(-10deg); opacity: 0; }
+  60% { transform: scale(0.92) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1) rotate(-2deg); opacity: 1; }
+}
+.animate-retro-stamp { animation: retro-stamp 0.45s var(--ease-out-expo) both; }
+
+@keyframes retro-flip {
+  0% { transform: perspective(400px) rotateX(90deg); opacity: 0; }
+  100% { transform: perspective(400px) rotateX(0deg); opacity: 1; }
+}
+.animate-retro-flip { animation: retro-flip 0.5s 0.25s var(--ease-out-quart) both; }
+
+@keyframes retro-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-7px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(2px); }
+}
+.animate-retro-shake { animation: retro-shake 0.5s 0.3s ease-in-out both; }
+
+@keyframes retro-confetti {
+  0% { transform: translateY(-12px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(340px) rotate(540deg); opacity: 0; }
+}
+.animate-retro-confetti { animation: retro-confetti 1.5s ease-in both; }
+
+@keyframes retro-tense {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+.animate-retro-tense { animation: retro-tense 0.5s ease-in-out infinite; }

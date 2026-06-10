@@ -25,6 +25,8 @@ const SimuladorPage = lazy(() => import("@/features/confronto/SimuladorPage").th
 const RankingPage = lazy(() => import("@/features/ranking/RankingPage").then((m) => ({ default: m.RankingPage })));
 const ConfrontosPage = lazy(() => import("@/features/confronto/ConfrontosPage").then((m) => ({ default: m.ConfrontosPage })));
 const FeedbackPage = lazy(() => import("@/features/feedback/FeedbackPage").then((m) => ({ default: m.FeedbackPage })));
+const RetroPage = lazy(() => import("@/features/retro/RetroPage").then((m) => ({ default: m.RetroPage })));
+const RetroSharePage = lazy(() => import("@/features/retro/RetroSharePage").then((m) => ({ default: m.RetroSharePage })));
 
 // Redireciona links antigos /ligas/:slug para /grupos/:slug (rename Liga -> Grupo)
 function FederacaoSlugRedirect() {
@@ -65,6 +67,9 @@ export default function App() {
             {/* público: ver jogos sem login */}
             <Route path="/" element={<JogosPage />} />
             <Route path="/como-funciona" element={<ComoFuncionaPage />} />
+            {/* mini-jogo Retrô: jogável sem login; ranking exige conta */}
+            <Route path="/retro" element={<RetroPage />} />
+            <Route path="/retro/r/:code" element={<RetroSharePage />} />
 
             {/* exige login */}
             <Route element={<RequireAuth />}>

@@ -42,7 +42,13 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   / `retro_leaderboard` (fase→pontos→tempo) / `retro_touch_anon` (agregado diário) /
   `retro_purge_ephemeral` + cron (runs permanentes só da Copa do Dia de logados — D17). **Bateria
   de 8 testes verde** em `scripts/retro-engine-tests.sql`. `db reset` + `db:types` + `typecheck`
-  verdes. Ao subir: atualizar `.claude/05` §2 e criar `.claude/12-RETRO-MINIJOGO.md`.
+  verdes. **Fase 3 (UI, branch `feat/retro-minijogo`):** feature slice `src/features/retro/`
+  (landing com Copa do Dia/Treino e seletor Modo×Ritmo, roletas de placar com rolagem, timer com
+  milésimos nos 3s finais e auto-submit, reveal "fliperama" com carimbo/flip/confete, tela de
+  campanha com share de emojis sem spoiler, página pública `/retro/r/:code`, ranking, streak via
+  `retro_my_stats` na migration `20260610000003`); rotas públicas no `App.tsx`; validado com
+  typecheck + lint zerado + check:arch + E2E Playwright (Chrome real, run anônima completa, zero
+  erros de console). Ao subir: atualizar `.claude/05` §2 e criar `.claude/12-RETRO-MINIJOGO.md`.
 
 ## [2.0.0] — 2026-06-10
 
