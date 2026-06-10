@@ -24,13 +24,42 @@ export type SharePlayer = { avatarUrl?: string | null; displayName?: string | nu
 const COLOR_HEX = new Map(CREST_COLORS.map((c) => [c.key, c.hex] as const));
 const hexOf = (key: string): string => COLOR_HEX.get(key) ?? CREST_COLORS[0]!.hex;
 
-function loadImage(url: string): Promise<HTMLImageElement> {
+function loadImage(url: string, opts?: { cors?: boolean; timeoutMs?: number }): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
+    // cors=anonymous é obrigatório p/ desenhar a foto sem "sujar" o canvas (toBlob).
+    if (opts?.cors) img.crossOrigin = "anonymous";
+    let done = false;
+    const finish = (fn: () => void) => {
+      if (done) return;
+      done = true;
+      clearTimeout(tid);
+      fn();
+    };
+    // timeout: foto lenta/offline não pode travar a geração da imagem do share.
+    const tid = setTimeout(() => finish(() => reject(new Error("timeout"))), opts?.timeoutMs ?? 4000);
+    img.onload = () => finish(() => resolve(img));
+    img.onerror = () => finish(() => reject(new Error("load error")));
     img.src = url;
   });
+}
+
+// Foto do escudo (cross-origin). Cache-bust dedicado força uma resposta CORS nova: a
+// UI viva já cacheou a mesma URL via CSS SEM cors, e reusar essa entrada sujaria o
+// canvas. Token estável na sessão → as 2 gerações do share reusam o mesmo <img>.
+const SHARE_BUST = `_s=${Date.now()}`;
+const photoCache = new Map<string, Promise<HTMLImageElement>>();
+function loadPhoto(url: string): Promise<HTMLImageElement> {
+  let p = photoCache.get(url);
+  if (!p) {
+    const sep = url.includes("?") ? "&" : "?";
+    p = loadImage(`${url}${sep}${SHARE_BUST}`, { cors: true, timeoutMs: 4000 }).catch((e) => {
+      photoCache.delete(url); // falhou → permite nova tentativa numa próxima geração
+      throw e;
+    });
+    photoCache.set(url, p);
+  }
+  return p;
 }
 
 // Eixo do gradiente a partir do ângulo CSS (0deg = pra cima, horário).
@@ -43,8 +72,8 @@ function linearGrad(t: CanvasRenderingContext2D, size: number, rotDeg: number) {
   return t.createLinearGradient(c - dx * half, c - dy * half, c + dx * half, c + dy * half);
 }
 
-// Pinta o fundo do escudo (mesma lógica do crestBackground, em canvas). Foto vira
-// sólido — evita "tainted canvas" ao carregar imagem cross-origin antes do toBlob.
+// Pinta o FUNDO do escudo (sólido/listras/grade/bola), igual ao crestBackground. No
+// caso foto, isto é o fallback: a foto de verdade entra por cima no drawEscudo.
 function paintCrestBg(t: CanvasRenderingContext2D, size: number, cfg: CrestConfig, c: string[]) {
   switch (cfg.fill) {
     case "stripes": {
@@ -92,13 +121,14 @@ function paintCrestBg(t: CanvasRenderingContext2D, size: number, cfg: CrestConfi
       t.fillStyle = g;
       break;
     }
-    default: // solid + photo (foto→sólido)
+    default: // solid + photo (no caso foto, é o fundo/fallback; a foto entra no drawEscudo)
       t.fillStyle = c[0] ?? hexOf("turquesa");
   }
   t.fillRect(0, 0, size, size);
 }
 
-// Desenha o escudo do jogador no canvas: fundo → recorte pela silhueta SVG → inicial.
+// Desenha o escudo do jogador no canvas: fundo → (foto, se carregar) → recorte pela
+// silhueta SVG → inicial (só quando não há foto).
 async function drawEscudo(
   ctx: CanvasRenderingContext2D,
   cx: number,
@@ -115,7 +145,27 @@ async function drawEscudo(
   const t = tmp.getContext("2d");
   if (!t) return;
 
-  paintCrestBg(t, size, cfg, c);
+  paintCrestBg(t, size, cfg, c); // sólido/listras embaixo = fallback garantido
+
+  // foto de verdade por cima do sólido (cover-crop), só se carregar via CORS; qualquer
+  // falha (sem CORS, host estranho, timeout, offline) mantém o sólido + a inicial.
+  let photoOk = false;
+  if (cfg.fill === "photo" && cfg.photo) {
+    try {
+      const img = await loadPhoto(cfg.photo);
+      const iw = img.naturalWidth || img.width;
+      const ih = img.naturalHeight || img.height;
+      if (iw > 0 && ih > 0) {
+        const scale = Math.max(size / iw, size / ih); // cover: preenche o quadrado
+        const sw = size / scale;
+        const sh = size / scale;
+        t.drawImage(img, (iw - sw) / 2, (ih - sh) / 2, sw, sh, 0, 0, size, size); // crop central
+        photoOk = true;
+      }
+    } catch {
+      /* mantém o sólido já pintado; photoOk=false faz a inicial voltar */
+    }
+  }
 
   // recorta pela máscara (SVG same-origin → sem taint); sem máscara → círculo
   const maskUrl = crestShapeUrl(cfg.kind, cfg.shape);
@@ -131,8 +181,8 @@ async function drawEscudo(
   }
   t.globalCompositeOperation = "source-over";
 
-  // inicial do nome por cima (some quando há foto de verdade)
-  if (!(cfg.fill === "photo" && cfg.photo)) {
+  // inicial do nome por cima (some só quando a foto REALMENTE entrou)
+  if (!photoOk) {
     t.fillStyle = crestTextColor(cfg);
     t.textAlign = "center";
     t.textBaseline = "middle";
