@@ -211,6 +211,11 @@ _(vazio — próximas mudanças acumulam aqui)_
   competição vazia exclui com confirmação simples.
 
 ### Corrigido
+- **Prod: lista de campeonatos da personalização vazia (só Copa).** Drift local×prod: a migration
+  `20260607000006` pulou os inserts em produção (os campeonatos já existiam como **rascunho**) e o
+  RPC filtra `status='active'` — no banco local zerado tudo nasce ativo e o bug ficou invisível.
+  Corretivo `20260610120000` (gerado do registro): ativa + garante os 38 curados (`is_published`
+  intocado — a temporada só-Copa continua mandando no que é jogável).
 - **Stepper do palpite é temporário** (ajuste pós-lançamento do dia): o +/− só aparece ao tocar
   pra editar e **some sozinho** (~3,5s sem mexer / depois do "salvo"); fechado, o palpite fica em
   números com borda da marca ("Editar palpite"). E **reset da jornada de personalização**
