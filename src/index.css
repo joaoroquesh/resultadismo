@@ -1,6 +1,54 @@
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------ */
+/*  Ubuntu (fonte da marca) — self-hosted em public/fonts (subset      */
+/*  latin). Não usar Google Fonts: o CSP do vercel.json só permite     */
+/*  font-src 'self', e self-hosted carrega mais rápido (mesmo domínio).*/
+/* ------------------------------------------------------------------ */
+@font-face {
+  font-family: "Ubuntu";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("/fonts/ubuntu-latin-300.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Ubuntu";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/ubuntu-latin-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Ubuntu";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/ubuntu-latin-500.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Ubuntu";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/ubuntu-latin-700.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Ubuntu";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/ubuntu-latin-400italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Ubuntu";
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/ubuntu-latin-500italic.woff2") format("woff2");
+}
+
+/* ------------------------------------------------------------------ */
 /*  Resultadismo Design System v3 — OKLCH, tema claro/escuro           */
 /*  Truque do tema: a escala neutra `ink` e as semânticas viram via    */
 /*  variáveis CSS em [data-theme=dark]; os componentes não mudam.      */

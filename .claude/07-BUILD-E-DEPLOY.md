@@ -14,6 +14,11 @@
 - **Roteamento SPA:** `vercel.json` reescreve tudo para `/index.html`, **e** aplica **CSP + headers de
   segurança** (`Content-Security-Policy`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`,
   `X-Frame-Options: DENY`) — adicionados em 1.1.0.
+- **Fontes:** a Ubuntu (fonte da marca) é **self-hosted** em `public/fonts/*.woff2` (subset latin;
+  `@font-face` em `src/index.css`, `preload` dos pesos 400/500/700 no `index.html`, cache
+  `immutable` via `vercel.json`). **Não usar Google Fonts:** o CSP só permite `font-src 'self'` —
+  foi exatamente isso que bloqueou a fonte em produção até 2026-06-10 (a stylesheet externa
+  violava o `style-src`).
 
 > O build só afeta o **frontend**. Banco e Edge Functions têm pipelines próprios (§3).
 

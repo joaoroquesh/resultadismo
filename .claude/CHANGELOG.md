@@ -66,6 +66,17 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   typecheck + lint zerado + check:arch + E2E Playwright (Chrome real, run anônima completa, zero
   erros de console). Ao subir: atualizar `.claude/05` §2 e criar `.claude/12-RETRO-MINIJOGO.md`.
 
+### Corrigido
+- **Fonte Ubuntu bloqueada pelo CSP em produção — agora self-hosted.** O CSP do `vercel.json`
+  (`style-src` sem `fonts.googleapis.com`) bloqueava a stylesheet do Google Fonts desde a adição
+  dos headers, e **todo visitante via a fonte de sistema** em vez da Ubuntu (passava despercebido
+  em máquinas com a Ubuntu instalada localmente, como a do João). Correção escolhida pelo PO
+  (opção B): **self-host** dos 6 `.woff2` (subset latin, pesos 300/400/500/700 + itálico 400/500,
+  ~96 KB) em `public/fonts/`, `@font-face` no `src/index.css`, `preload` dos pesos 400/500/700 no
+  `index.html` e `Cache-Control: immutable` para `/fonts/` no `vercel.json`. **O CSP estrito
+  permanece intacto** (`font-src 'self'`), sai a dependência do Google (privacidade/LGPD) e a
+  fonte carrega do mesmo domínio. → [`07`](07-BUILD-E-DEPLOY.md) §1.
+
 ## [2.0.0] — 2026-06-10
 
 > **🏆 O marco da Copa (ADR [`0003`](decisions/0003-versionamento.md)): v2.0 = lançamento oficial.**
