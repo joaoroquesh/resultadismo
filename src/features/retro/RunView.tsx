@@ -63,7 +63,7 @@ export function RunView({
   const decisao = current.slot >= 6; // semi e final ganham clima de decisão
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-1 flex-col gap-2 overflow-hidden px-1">
+    <div className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-2 overflow-hidden px-1">
       {/* topo fixo: trilha + pontos + sair (tudo numa linha — tela limpa) */}
       <div className="flex items-center justify-between gap-2">
         <CampaignTrail slots={slots} currentSlot={current.slot} />
@@ -73,9 +73,16 @@ export function RunView({
         </button>
       </div>
 
-      {/* bloco do jogo CENTRADO no espaço restante (sem vãos esticados em telas altas) */}
-      <div className="flex flex-1 flex-col justify-center gap-3">
-        <p className="text-center text-xs font-semibold text-ink-500">{phaseHint(current.slot, mode)}</p>
+      {/* bloco do jogo: compacto e centrado (gap fixo, não estica em telas grandes) */}
+      <div className="flex flex-1 flex-col justify-center">
+        <div className="flex flex-col gap-3">
+        {decisao ? (
+          <div className="animate-retro-tense rounded-lg bg-gold-100 px-3 py-1.5 text-center text-sm font-bold text-gold-800 ring-1 ring-gold-400">
+            ⚠️ {current.slot === 7 ? "FINAL" : "SEMIFINAL"}: só SALDO ou CRAVADA passa
+          </div>
+        ) : (
+          <p className="text-center text-xs font-semibold text-ink-500">{phaseHint(current.slot, mode)}</p>
+        )}
 
       <Card className={decisao ? "space-y-2 border-2 border-gold-500 p-3 shadow-brand" : "space-y-2 p-3"}>
         <div className="text-center">
@@ -151,7 +158,8 @@ export function RunView({
           {m.is_knockout ? "Vale o placar final, sem pênaltis — pode dar empate!" : "Vale o placar final."}
           {current.timer_seconds != null && " Tempo esgotado? Vale o que estiver marcado."}
         </p>
-      </div>
+        </div>
+        </div>
       </div>
     </div>
   );

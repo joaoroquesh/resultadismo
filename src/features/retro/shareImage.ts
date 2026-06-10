@@ -3,6 +3,7 @@
 // com fallback para download + texto. Cores lidas dos tokens CSS em runtime.
 import type { ScoreType } from "@/lib/types";
 import { buildShareText, fmtMs, type FinishedRun } from "./share";
+import { isPenaltyOut, stageEmoji, verdictHeadline } from "./verdict";
 
 const W = 1080;
 const H = 1350;
@@ -56,17 +57,17 @@ export async function buildShareImage(run: FinishedRun, streak?: number): Promis
   const sub = `${run.isDaily ? "Copa do Dia" : "Treino"}${run.mode === "cravada" ? " · Vale Saldo" : ""}`;
   ctx.fillText(sub, W / 2, 190);
 
-  // veredito
+  // veredito (emoji + manchete por fase — dinâmico, sem choro pra quem foi longe)
   const champion = run.status === "champion";
   ctx.font = font(140);
-  ctx.fillText(champion ? "🏆" : "😭", W / 2, 380);
+  ctx.fillText(stageEmoji(run.stageReached, run.status), W / 2, 380);
   ctx.fillStyle = champion ? digit : "#ffffff";
-  ctx.font = font(72);
-  ctx.fillText(champion ? "CAMPEÃO DO MUNDO!" : "MINHA COPA PAROU:", W / 2, 500);
-  if (!champion) {
-    ctx.fillStyle = cores.erro;
-    ctx.font = font(58);
-    ctx.fillText(run.stageReached.toUpperCase(), W / 2, 580);
+  ctx.font = font(64);
+  ctx.fillText(verdictHeadline(run.stageReached, run.status), W / 2, 500);
+  if (isPenaltyOut(run.status, run.slots)) {
+    ctx.fillStyle = cores.acerto;
+    ctx.font = font(40, 500);
+    ctx.fillText("eliminado nos pênaltis 😬", W / 2, 565);
   }
 
   // trilha da campanha (círculos coloridos por veredito)

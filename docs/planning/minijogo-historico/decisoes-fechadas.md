@@ -204,6 +204,14 @@ Dois eixos independentes, escolhidos antes da run:
   "pontue em 2 de 3", mata-mata, "reta final = saldo/cravada"); (5) **home mais clara** — cada
   seletor diz o que controla (Modo/Ritmo/Dificuldade), textos curtos; (6) **feedback do Retrô**
   (`/retro/feedback`, só logado, `feedback.product=retro`, reusa FeedbackPage).
+- **Rodada 9 (10/06, feedback dos amigos):** (1) tela do jogo **não estica em telas grandes**
+  (bloco max-w-sm centrado, gaps fixos); (2) **emoji dinâmico por fase** no share/tela final
+  (🏆/🥈/🔥/💪/👏/😅 — nada de choro pra quem chegou na semi) + manchete por fase (`verdict.ts`);
+  (3) **regra da semi/final gritante** — banner gold pulsante "só SALDO ou CRAVADA passa" durante o
+  jogo, e no reveal a explicação na hora da eliminação; (4) **"eliminado nos pênaltis 😬"** quando a
+  pessoa acertou o vencedor mas faltou saldo na semi/final (brincadeira que suaviza); (5) **ranking
+  valoriza a FASE** (quem chega mais longe lidera; pontos e tempo viram desempate em cinza, com nota
+  do critério). Sem migration (só front).
 - **Backlog (fase 2 do Retrô)** — eventos GA4 (union do `analytics.ts`) ✓feito, entrada na navegação/Como Funciona/
   landing (pontos de contato), docs `.claude/05` §2 + `12-RETRO-MINIJOGO.md` → **Fase 5**:
   homologação com o João (Portão B), integração do worktree na main e deploy.

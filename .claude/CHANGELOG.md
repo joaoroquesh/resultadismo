@@ -58,7 +58,10 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   (difícil na frente); correção do bug das bandeiras P&B (circularizador preservava o `fill` da
   raiz; auditoria de cor 60/60); textos curtos por fase no jogo; home mais clara (cada seletor
   diz o que controla); feedback do Retrô em `/retro/feedback` (só logado, `feedback.product`).
-  Histórico completo da construção: Comentários
+  **Rodada 9 (feedback dos amigos):** jogo não estica em telas grandes; emoji/manchete dinâmicos
+  por fase no share e tela final (`verdict.ts`); regra da semi/final destacada (banner pulsante no
+  jogo + explicação no reveal); "eliminado nos pênaltis 😬" no near-miss; ranking dá destaque à
+  fase (pontos/tempo são desempate). Só front. Histórico completo da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do

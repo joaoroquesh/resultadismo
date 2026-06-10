@@ -25,8 +25,9 @@ página pública `/retro/r/:code`.
 - **Treinos ranqueados:** runs de LOGADO são todas persistentes; ranking de Treino = melhor
   campanha de cada um (`retro_leaderboard(p_board=>'treino')`); melhor campanha do perfil
   considera tudo. Anônimo segue efêmero (purga diária).
-- **Run em tela cheia:** o play roda num overlay imersivo z-[70] (cabe em qualquer altura, até
-  iPhone SE; "sair ✕" discreto). **Separação total (rodada 6):** as rotas `/retro*` vivem num
+- **Run em tela cheia:** overlay imersivo z-[70]; conteúdo em bloco **max-w-sm centrado** (não
+  estica em telas grandes/tablet). Na **semi/final** um banner gold pulsante avisa "só SALDO ou
+  CRAVADA passa"; hint curto da fase nas demais. "sair ✕" discreto. **Separação total (rodada 6):** as rotas `/retro*` vivem num
   **`RetroShell` próprio** (mini-header com "ir pro Resultadismo →" + ConsentBanner) — fora do
   AppShell: nada de Sidebar/BottomNav/header do app-mãe. Entradas: **card próprio no topo do menu
   do Perfil**, **banner na landing** e seção no Como Funciona.
@@ -85,6 +86,10 @@ página pública `/retro/r/:code`.
 - **Feedback do Retrô:** `/retro/feedback` (só logado) reusa a `FeedbackPage` com `product="retro"`
   (coluna `feedback.product` classico|retro; `submit_feedback` ganhou `p_product`). Páginas
   Retrô-específicas no seletor de bug. Link discreto na home do Retrô.
+- **Veredito dinâmico (`verdict.ts`):** emoji por fase (🏆 campeão · 🥈 vice · 🔥 semi · 💪 quartas
+  · 👏 oitavas · 😅 grupos) + manchete por fase, no reveal/tela final/share/página pública. Quem é
+  eliminado na semi/final com **acerto** vê "eliminado nos pênaltis 😬" (acertou o vencedor, faltou
+  saldo). **Ranking** dá destaque à FASE (pontos/tempo viram desempate em cinza), com nota do critério.
 - **Bandeiras (fix rodada 8):** o circularizador `gen-flag-circles.mjs` agora preserva
   `fill`/`stroke`/`style` da raiz do SVG — sem isso, bandeiras que definem a cor no `<svg>` raiz
   (Honduras etc.) renderizavam em preto. Re-baixadas e auditadas por COR (não só decode): 60/60 ok.

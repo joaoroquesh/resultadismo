@@ -8,6 +8,7 @@ import { track } from "@/lib/analytics";
 import { CampaignTrail, type TrailSlot } from "./CampaignTrail";
 import { Confetti } from "./RetroFx";
 import { fmtMs, type FinishedRun } from "./share";
+import { isPenaltyOut, stageEmoji, verdictHeadline } from "./verdict";
 import { shareCampaign } from "./shareImage";
 
 // Tela final da campanha: o veredito, a grade compartilhável e o loop de recomeço.
@@ -28,16 +29,20 @@ export function ResultView({
   const navigate = useNavigate();
   const champion = run.status === "champion";
   const trail: TrailSlot[] = run.slots.map((s) => ({ slot: s.slot, scoreType: s.scoreType }));
+  const penalty = isPenaltyOut(run.status, run.slots);
 
   return (
     <div className="mx-auto w-full max-w-md space-y-4">
       <Card className={champion ? "relative overflow-hidden border-2 border-gold-500 bg-gold-50 p-5" : "p-5"}>
         {champion && <Confetti tall />}
         <div className="space-y-3 text-center">
-          {champion && <div className="animate-retro-stamp text-5xl">🏆</div>}
-          <h2 className="text-2xl font-bold">
-            {champion ? "CAMPEÃO DO MUNDO (RETRÔ)!" : `Sua Copa parou: ${run.stageReached}`}
-          </h2>
+          <div className="animate-retro-stamp text-5xl">{stageEmoji(run.stageReached, run.status)}</div>
+          <h2 className="text-2xl font-bold">{verdictHeadline(run.stageReached, run.status)}</h2>
+          {penalty && (
+            <p className="text-sm font-semibold text-aqua-700">
+              Eliminado nos pênaltis 😬 — você acertou o vencedor, mas aqui só saldo ou cravada passa.
+            </p>
+          )}
           <CampaignTrail slots={trail} currentSlot={null} />
           <p className="text-sm text-ink-500">
             <b className="tabular-nums">{run.points} pts</b> · tempo{" "}

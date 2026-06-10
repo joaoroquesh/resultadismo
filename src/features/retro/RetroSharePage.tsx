@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { useRetroSummary } from "./api";
 import { CampaignTrail, type TrailSlot } from "./CampaignTrail";
 import { fmtMs } from "./share";
+import { stageEmoji, verdictHeadline } from "./verdict";
 
 // /retro/r/:code — a página pública do share: a campanha de quem mandou o link e o
 // CTA-desafio (lição do 7a0). Sem identidade dos jogos — zero spoiler da Copa do Dia.
@@ -28,7 +29,7 @@ export function RetroSharePage() {
         ) : (
           <Card className={data.status === "champion" ? "border-gold-500 bg-gold-50 p-5" : "p-5"}>
             <div className="space-y-3 text-center">
-              {data.status === "champion" && <div className="text-5xl">🏆</div>}
+              <div className="text-5xl">{stageEmoji(data.stage_reached, data.status)}</div>
               <p className="text-sm text-ink-500">
                 {data.player?.display_name ?? "Alguém"} jogou a{" "}
                 {data.is_daily ? "Copa do Dia" : "Copa Retrô"}
@@ -39,9 +40,7 @@ export function RetroSharePage() {
                   </>
                 )}
               </p>
-              <h2 className="text-2xl font-bold">
-                {data.status === "champion" ? "CAMPEÃO! 🏆" : data.stage_reached}
-              </h2>
+              <h2 className="text-2xl font-bold">{verdictHeadline(data.stage_reached, data.status)}</h2>
               <CampaignTrail
                 slots={data.slots.map((s): TrailSlot => ({ slot: s.slot, scoreType: s.score_type }))}
                 currentSlot={null}

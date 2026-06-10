@@ -66,25 +66,32 @@ export function RetroLeaderboard() {
               )}
             >
               <span className="w-6 text-right font-bold tabular-nums text-ink-500">{r.pos}º</span>
-              <span className="min-w-0 flex-1 truncate">
-                {r.display_name}
-                {board === "treino" && r.level && r.level !== "padrao" && (
-                  <span className="ml-1 rounded-pill bg-ink-100 px-1.5 text-[10px] font-bold text-ink-500">
-                    {r.level === "dificil" ? "Difícil" : "Fácil"}
-                  </span>
-                )}
+              <span className="min-w-0 flex-1">
+                <span className="block truncate">
+                  {r.display_name}
+                  {board === "treino" && r.level && r.level !== "padrao" && (
+                    <span className="ml-1 rounded-pill bg-ink-100 px-1.5 text-[10px] font-bold text-ink-500">
+                      {r.level === "dificil" ? "Difícil" : "Fácil"}
+                    </span>
+                  )}
+                </span>
+                {/* o que IMPORTA é a fase — pontos/tempo são desempate, em cinza */}
+                <span className="block text-[11px] text-ink-400">
+                  {r.points} pts · {fmtMs(r.total_ms)}
+                </span>
               </span>
-              <span className="hidden text-xs text-ink-500 sm:block">{r.stage_reached}</span>
-              <span className="font-bold tabular-nums">{r.points} pts</span>
-              <span className="w-12 text-right text-xs tabular-nums text-ink-500">{fmtMs(r.total_ms)}</span>
+              <span className="shrink-0 text-right text-sm font-bold text-brand-800">
+                {r.stage_reached}
+              </span>
             </li>
           ))}
         </ol>
       )}
 
-      {board === "treino" && data && data.rows.length > 0 && (
-        <p className="text-center text-[11px] text-ink-400">
-          Quem joga mais difícil fica na frente, mesmo com menos pontos.
+      {data && data.rows.length > 0 && (
+        <p className="text-center text-[11px] leading-snug text-ink-400">
+          Lidera quem <b>chega mais longe</b>. Empatou na fase? Decide os <b>pontos</b>; depois, o
+          <b> tempo</b>.{board === "treino" ? " Dificuldade maior vem na frente." : ""}
         </p>
       )}
       {data?.me && !data.rows.some((r) => r.is_me) && (

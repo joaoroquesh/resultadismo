@@ -28,6 +28,7 @@ export function RevealCard({
   const run = answer.run;
   const verdict = VERDICT[r.score_type];
   const finished = run.status !== "playing";
+  const penaltyOut = run.status === "eliminated" && r.score_type === "acerto" && run.slot >= 6;
 
   return (
     <div className="relative">
@@ -66,6 +67,11 @@ export function RevealCard({
         {r.reroll_earned && (
           <p className="animate-retro-stamp text-sm font-bold text-gold-700">
             +1 🎲 ficha de troca de jogo — guarde para a hora certa!
+          </p>
+        )}
+        {penaltyOut && (
+          <p className="text-sm font-semibold text-aqua-700">
+            Eliminado nos pênaltis 😬 — aqui só <b>saldo ou cravada</b> passava.
           </p>
         )}
 
