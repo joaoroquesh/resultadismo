@@ -82,6 +82,11 @@ enum `'espn'` que não entrou).
   ninguém notar (já aconteceu); o CI [`quality.yml`](../.github/workflows/quality.yml) reprova, mas
   o certo é pegar **antes** do push. → [`02`](02-CODIGO.md) §7.
 - **Alto impacto** (pagamento, destrutivo, login) → confirmar com o João **antes**. → [`08`](08-PROCESSO.md).
+- **A main NUNCA anda para trás.** `git push --force`/`--force-with-lease` na `main` é **proibido**
+  — com deploy-on-push, regredir a main **redeploya código antigo em produção** e cria corrida com
+  as outras sessões (aconteceu em 2026-06-10: a main recuou e avançou em minutos durante deploys).
+  Errou um commit já publicado? Conserte **pra frente** (`git revert` ou commit corretivo) — nunca
+  reescrevendo o histórico publicado.
 
 ## 6. Nunca faça
 
@@ -92,6 +97,8 @@ enum `'espn'` que não entrou).
 - ❌ Criar migration com número já usado por outra sessão.
 - ❌ **Subir a versão** (`package.json` / header do CHANGELOG) por conta própria — só em **release
   deliberado** (1 dono); sessões apenas **acumulam em `[Não lançado]`** (ADR 0003 / [`MESTRE.md`](MESTRE.md) §6).
+- ❌ `git push --force` (qualquer variante) na `main` — regride produção e quebra as outras sessões;
+  conserte com `git revert`/commit novo (§5).
 - ❌ `supabase db push`/`link` (CLI desta máquina aponta para outro projeto). → [`07`](07-BUILD-E-DEPLOY.md) §4.
 
 ## 7. Coordenação por área (quem mexe onde)
