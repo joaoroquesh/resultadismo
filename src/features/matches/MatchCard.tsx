@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { track } from "@/lib/analytics";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
-import { Check, Loader2, Lock, ChevronDown, Users, Zap, Hand, Plus, Minus, Star } from "lucide-react";
+import { Check, Loader2, Lock, ChevronDown, Users, Zap, Hand, Plus, Minus, Star, Share2 } from "lucide-react";
 import { TeamCrest } from "@/components/TeamCrest";
 import { ScorePill } from "@/components/ScorePill";
 import { Avatar } from "@/components/ui/Avatar";
@@ -15,8 +15,25 @@ import { useMyLeagues, useLeagueMembers } from "@/features/leagues/api";
 import { useMyFavorites, useToggleFavorite } from "@/features/players/api";
 import { supabase } from "@/lib/supabase";
 import type { MatchWithTeams, Prediction, ScoreType } from "@/lib/types";
+import { SCORE_LABEL, SCORE_POINTS } from "@/lib/types";
+import { provisionalScoreType } from "@/lib/score";
+import { buildScoreShareImage, shareImageBlob } from "./shareImage";
 
 type SaveState = "idle" | "saving" | "saved" | "error";
+
+// Prévia AO VIVO: suave — só a borda (e o número) na cor do tipo, sem fundo.
+const scoreBoxLiveByType: Record<ScoreType, string> = {
+  cravada: "border-gold-500 bg-transparent text-gold-700",
+  saldo: "border-grass-600 bg-transparent text-grass-700",
+  acerto: "border-aqua-700 bg-transparent text-aqua-700",
+  erro: "border-ink-300 bg-transparent text-ink-500",
+};
+const liveTextByType: Record<ScoreType, string> = {
+  cravada: "text-gold-700",
+  saldo: "text-grass-700",
+  acerto: "text-aqua-700",
+  erro: "text-ink-400",
+};
 
 const scoreBoxByType: Record<ScoreType, string> = {
   cravada: "bg-gold-500 text-gold-950 border-gold-500",
@@ -136,6 +153,31 @@ export function MatchCard({
   }, [active, home, away, saveState]);
 
   const scoreType = finished ? prediction?.score_type ?? null : null;
+  // Prévia ao vivo: como o palpite está pontuando AGORA (cor suave + texto).
+  const liveType: ScoreType | null =
+    live && prediction ? provisionalScoreType(prediction.home_pred, prediction.away_pred, liveHome, liveAway) : null;
+
+  const { profile } = useAuth();
+  const shareType = scoreType ?? liveType;
+  async function shareResult() {
+    if (!prediction || !shareType) return;
+    const blob = await buildScoreShareImage(
+      [{
+        homeName: match.home_team?.short_name ?? match.home_team_name ?? "Time",
+        awayName: match.away_team?.short_name ?? match.away_team_name ?? "Time",
+        homePred: prediction.home_pred,
+        awayPred: prediction.away_pred,
+        homeScore: finished ? match.home_score : liveHome,
+        awayScore: finished ? match.away_score : liveAway,
+        live,
+        type: shareType,
+        joker: isJoker,
+      }],
+      profile?.display_name ?? "Resultadista",
+    );
+    const how = await shareImageBlob(blob, "resultadismo-palpite.png");
+    toast(how === "shared" ? "Imagem compartilhada! 📸" : "Imagem salva! 📸", "success");
+  }
 
   return (
     <div
@@ -199,9 +241,9 @@ export function MatchCard({
             </button>
           ) : (
             <>
-              <ScoreBox value={home} onChange={setHomeScore} editable={canEdit && active} scoreType={scoreType} live={live} />
+              <ScoreBox value={home} onChange={setHomeScore} editable={canEdit && active} scoreType={scoreType} live={live} liveType={liveType} />
               <span className="text-sm font-bold text-ink-300">×</span>
-              <ScoreBox value={away} onChange={setAwayScore} editable={canEdit && active} scoreType={scoreType} live={live} />
+              <ScoreBox value={away} onChange={setAwayScore} editable={canEdit && active} scoreType={scoreType} live={live} liveType={liveType} />
             </>
           )}
         </div>
@@ -216,6 +258,22 @@ export function MatchCard({
             {finished ? `${match.home_score} × ${match.away_score}` : `${liveHome} × ${liveAway}`}
           </span>
           {finished && scoreType && <ScorePill type={scoreType} withLabel doubled={isJoker} />}
+          {live && liveType && (
+            <span className={cn("text-xs font-semibold tabular-nums", liveTextByType[liveType])}>
+              {SCORE_LABEL[liveType]}{" "}
+              {liveType === "erro" ? "0" : `+${SCORE_POINTS[liveType] * (isJoker ? 2 : 1)}`}
+            </span>
+          )}
+          {prediction && shareType && (
+            <button
+              type="button"
+              onClick={() => void shareResult()}
+              aria-label="Compartilhar resultado como imagem"
+              className="grid size-6 shrink-0 place-items-center rounded text-ink-400 transition hover:bg-ink-100 hover:text-brand-700"
+            >
+              <Share2 className="size-3.5" />
+            </button>
+          )}
         </div>
       )}
 
@@ -330,6 +388,7 @@ function ScoreBox({
   editable,
   scoreType,
   live,
+  liveType = null,
   mine = false,
 }: {
   value: string;
@@ -337,6 +396,8 @@ function ScoreBox({
   editable: boolean;
   scoreType: ScoreType | null;
   live: boolean;
+  /** prévia AO VIVO: borda na cor do tipo que o palpite está fazendo agora. */
+  liveType?: ScoreType | null;
   /** palpite salvo (pré-jogo, fechado): números fortes + borda da marca. */
   mine?: boolean;
 }) {
@@ -380,9 +441,11 @@ function ScoreBox({
           ? scoreBoxByType[scoreType]
           : mine
             ? "border-brand-500 bg-surface text-ink-950"
-            : live
-              ? "border-ink-300 bg-transparent text-ink-500"
-              : "border-border bg-ink-100 text-ink-500",
+            : live && liveType
+              ? scoreBoxLiveByType[liveType]
+              : live
+                ? "border-ink-300 bg-transparent text-ink-500"
+                : "border-border bg-ink-100 text-ink-500",
       )}
     >
       {display}

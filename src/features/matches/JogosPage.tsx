@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { CalendarClock, Trophy, Zap, LayoutGrid, Sparkles, Users } from "lucide-react";
+import { CalendarClock, Trophy, Zap, LayoutGrid, Sparkles, Users, Share2, Check, X } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { ScrollRow } from "@/components/ui/ScrollRow";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -11,6 +11,9 @@ import { TeamCrest } from "@/components/TeamCrest";
 import { cn } from "@/lib/utils";
 import { dayjs } from "@/lib/format";
 import { MatchCard } from "./MatchCard";
+import { provisionalScoreType } from "@/lib/score";
+import { buildScoreShareImage, shareImageBlob, type ShareRow } from "./shareImage";
+import { useToast } from "@/components/ui/Toast";
 import { usePersonalizationState } from "@/features/onboarding/personalizationApi";
 import { expandTeamSlugs, teamNameMatches } from "@/features/onboarding/teamsCatalog";
 import {
@@ -144,6 +147,55 @@ export function JogosPage() {
 
   // dia escolhido pelo usuário (null = usa o default automático do escopo).
   const [picked, setPicked] = useState<string | null>(null);
+  const { toast } = useToast();
+  const { profile } = useAuth();
+
+  // ── compartilhar placares como IMAGEM (1+ jogos do dia) ──────────────────
+  // null = fora do modo seleção; Set = ids escolhidos.
+  const [shareSel, setShareSel] = useState<Set<string> | null>(null);
+  const isShareable = (m: (typeof dayMatches)[number]) => {
+    const pred = predMap?.get(m.id);
+    if (!pred) return false;
+    return m.status === "finished" || m.status === "live";
+  };
+  function toggleShare(id: string) {
+    setShareSel((prev) => {
+      const n = new Set(prev ?? []);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      return n;
+    });
+  }
+  async function generateShare() {
+    if (!shareSel || shareSel.size === 0) return;
+    const rows: ShareRow[] = dayMatches
+      .filter((m) => shareSel.has(m.id))
+      .map((m) => {
+        const pred = predMap!.get(m.id)!;
+        const finished = m.status === "finished";
+        const hs = m.home_score ?? 0;
+        const as_ = m.away_score ?? 0;
+        const type =
+          finished && pred.score_type
+            ? pred.score_type
+            : provisionalScoreType(pred.home_pred, pred.away_pred, hs, as_);
+        return {
+          homeName: m.home_team?.short_name ?? m.home_team_name ?? "Time",
+          awayName: m.away_team?.short_name ?? m.away_team_name ?? "Time",
+          homePred: pred.home_pred,
+          awayPred: pred.away_pred,
+          homeScore: m.home_score ?? (finished ? null : 0),
+          awayScore: m.away_score ?? (finished ? null : 0),
+          live: m.status === "live",
+          type,
+          joker: pred.is_joker ?? false,
+        };
+      });
+    const blob = await buildScoreShareImage(rows, profile?.display_name ?? "Resultadista");
+    const how = await shareImageBlob(blob, "resultadismo-palpites.png");
+    toast(how === "shared" ? "Imagem compartilhada! 📸" : "Imagem salva! 📸", "success");
+    setShareSel(null);
+  }
 
   // troca de campeonato (ou "Todos") = contexto de dia novo → zera a escolha.
   // Ajuste no render via valor anterior, sem efeito ("you might not need an effect").
@@ -233,18 +285,73 @@ export function JogosPage() {
       {foldGames.map((m) => {
         const compKey = m.competition_id ?? "?";
         const wk = weekKey(m.kickoff_at);
+        const selectable = shareSel != null && isShareable(m);
+        const selected = !!shareSel?.has(m.id);
         return (
-          <MatchCard
-            key={m.id}
-            match={m}
-            prediction={predMap?.get(m.id) ?? null}
-            jokersUsed={jokersByCompWeek.get(`${compKey}:${wk}`) ?? 0}
-            maxJokers={jokerMax.get(compKey) ?? 2}
-          />
+          <div key={m.id} className="relative">
+            <MatchCard
+              match={m}
+              prediction={predMap?.get(m.id) ?? null}
+              jokersUsed={jokersByCompWeek.get(`${compKey}:${wk}`) ?? 0}
+              maxJokers={jokerMax.get(compKey) ?? 2}
+            />
+            {shareSel != null && (
+              <button
+                type="button"
+                onClick={() => selectable && toggleShare(m.id)}
+                aria-label={selectable ? "Selecionar jogo pra imagem" : "Sem palpite pra compartilhar"}
+                aria-pressed={selected}
+                className={cn(
+                  "absolute inset-0 rounded-lg transition",
+                  selected
+                    ? "ring-2 ring-inset ring-brand-600"
+                    : selectable
+                      ? "bg-surface/10 hover:ring-2 hover:ring-inset hover:ring-ink-300"
+                      : "cursor-not-allowed bg-background/60",
+                )}
+              >
+                {selectable && (
+                  <span
+                    className={cn(
+                      "absolute right-2 top-2 grid size-6 place-items-center rounded-full border-2",
+                      selected ? "border-brand-600 bg-brand-600 text-white" : "border-ink-300 bg-surface",
+                    )}
+                  >
+                    {selected && <Check className="size-4" strokeWidth={3} />}
+                  </span>
+                )}
+              </button>
+            )}
+          </div>
         );
       })}
     </div>
   );
+
+  const shareBar =
+    shareSel != null ? (
+      <div className="fixed inset-x-3 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-50 mx-auto flex max-w-sm items-center gap-2 rounded-lg bg-surface p-3 shadow-[var(--shadow-pop)] ring-1 ring-border lg:bottom-6">
+        <p className="min-w-0 flex-1 text-sm font-semibold text-ink-900">
+          {shareSel.size === 0 ? "Toque nos jogos" : `${shareSel.size} jogo(s)`}
+        </p>
+        <button
+          type="button"
+          onClick={() => setShareSel(null)}
+          aria-label="Cancelar"
+          className="grid size-8 place-items-center rounded-md text-ink-400 transition hover:bg-ink-100"
+        >
+          <X className="size-4" />
+        </button>
+        <button
+          type="button"
+          disabled={shareSel.size === 0}
+          onClick={() => void generateShare()}
+          className="rounded-pill bg-brand-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-brand-700 disabled:opacity-40"
+        >
+          Gerar imagem
+        </button>
+      </div>
+    ) : null;
 
   return (
     <Page
@@ -376,6 +483,22 @@ export function JogosPage() {
               </button>
             );
           })}
+          {session && dayMatches.some(isShareable) && (
+            <button
+              type="button"
+              onClick={() => setShareSel(shareSel ? null : new Set())}
+              aria-pressed={!!shareSel}
+              aria-label="Compartilhar placares como imagem"
+              className={cn(
+                "flex shrink-0 items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-semibold transition",
+                shareSel
+                  ? "border-brand-600 bg-brand-600 text-white"
+                  : "border-ink-200 bg-surface text-ink-600",
+              )}
+            >
+              <Share2 className="size-3.5" /> {shareSel ? "Cancelar" : "Compartilhar"}
+            </button>
+          )}
         </ScrollRow>
       )}
 
@@ -436,6 +559,7 @@ export function JogosPage() {
 
       {/* Landing híbrida para visitantes deslogados. */}
       {!session && <LandingSections onOpenLogin={openLogin} />}
+      {shareBar}
     </Page>
   );
 }

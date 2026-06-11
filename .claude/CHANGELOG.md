@@ -39,6 +39,12 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   da torcida" seguem com as 66** (a Itália joga amistosos e pode ser a seleção do coração).
 
 ### Adicionado
+- **Pontuação prévia AO VIVO + compartilhar placar como imagem.** (1) Com o jogo rolando, o
+  palpite mostra como está pontuando: borda do placar na cor do tipo (dourado/verde/azul; cinza no
+  erro) + texto plano ("Cravada +3"), sem o chip de resultado final — volta da v0, mais suave.
+  (2) Botão de **compartilhar** no card (live/encerrado) gera uma **imagem da marca** (escudos,
+  placar, palpite, selo da pontuação e total) via Web Share/download; e dá pra **selecionar vários
+  jogos do dia** ("Compartilhar" na fileira de dias → toca nos cards → Gerar imagem).
 - **Tour guiado de 1º acesso (coach-marks na UI real).** Depois da personalização **e** do carrossel
   de boas-vindas, um **tour guiado** (`GuidedTour`) acende, em sequência, os pontos reais da tela: a
   **barra de filtros de Jogos** (Meus interesses × Todos), a aba **Grupos** (criar grupo + o
