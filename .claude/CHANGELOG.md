@@ -194,7 +194,16 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   anônimo): grupos = pontue em 2 de 3 (pílulas 3/2/1), oitavas em diante = errou caiu, cravada =
   ficha. **Como jogar** reescrito (bloco dos 3 modos no lugar do Pontos). `retro_my_stats` blindado
   (runs legadas do Pontos com stage_rank NULL roubavam o "melhor" do hero). Suite T4/T6 testa os
-  modos (janelas estatísticas, 200 sorteios). Histórico completo da construção: Comentários
+  modos (janelas estatísticas, 200 sorteios). **Rodada 19 (OG próprio do Retrô):** compartilhar um
+  link `/retro*` no WhatsApp/Twitter agora mostra o **card do Retrô** (`public/og-retro.jpg`,
+  1200×630 — estilo do hero: brand-700 + scanlines + listras + lockup escudo "Resultadismo RETRÔ"
+  dourado + "Você lembra desse placar? 🕹️" + trilha colorida), não mais o do bolão. Como é SPA:
+  `scripts/build-retro-html.mjs` (roda no `postbuild`) gera `dist/retro.html` clonando o
+  `dist/index.html` com title/description/canonical/OG/Twitter do Retrô (falha o build se o
+  index.html mudar de formato — sem OG errado em silêncio), e o `vercel.json` reescreve `/retro` e
+  `/retro/:path*` pra esse arquivo ANTES do catch-all. Bônus: a página pública do share
+  (`/retro/r/:code`) também ganha o card do Retrô. SPA intacta (mesmos bundles; router lê a URL).
+  Histórico completo da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do
