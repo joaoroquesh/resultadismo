@@ -21,6 +21,11 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Corrigido
+- **JogosPage: memoização do `dayMatches` restaurada na ordem certa.** O erro do React Compiler
+  ("Existing memoization could not be preserved") era causado pelas funções de compartilhar
+  declaradas **antes** do `dayMatches` que elas leem; o hotfix anterior tirou o `useMemo` e deixou
+  2 avisos de deps. Agora o bloco de share vem **depois** da declaração e o `useMemo` voltou —
+  lint zerou no arquivo (sobrou só o aviso de complexidade do backlog).
 - **Link de convite pra quem já é de casa.** Quem abre um link `?convite=` e **já concluiu** o
   1º acesso vai direto pra **/grupos com o código preenchido** (só na visita do clique — flag de
   sessão consumida; visitas normais seguem nos Jogos). Quem ainda não concluiu continua caindo no

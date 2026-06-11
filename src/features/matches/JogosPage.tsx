@@ -150,6 +150,36 @@ export function JogosPage() {
   const { toast } = useToast();
   const { profile } = useAuth();
 
+  // troca de campeonato (ou "Todos") = contexto de dia novo → zera a escolha.
+  // Ajuste no render via valor anterior, sem efeito ("you might not need an effect").
+  const [prevScope, setPrevScope] = useState(scope);
+  if (scope !== prevScope) {
+    setPrevScope(scope);
+    setPicked(null);
+  }
+
+  // dias únicos com jogos, ordenados
+  const days = useMemo(() => {
+    if (!matches) return [];
+    const set = new Set<string>();
+    for (const m of matches) set.add(dayKey(m.kickoff_at));
+    return Array.from(set).filter((d) => d !== "sem-data").sort();
+  }, [matches]);
+
+  // dia efetivo (derivado): mantém a escolha do usuário se ainda existe no escopo;
+  // senão crava hoje (ou o próximo dia com jogos, ou o último). Sem efeito.
+  const day = picked && days.includes(picked) ? picked : pickDefaultDay(days);
+
+  // ATENÇÃO à ordem: quem lê dayMatches (isShareable etc.) precisa vir DEPOIS
+  // desta declaração — função içada acima lendo o memo faz o React Compiler
+  // pular o componente ("Existing memoization could not be preserved").
+  const dayMatches = useMemo(() => {
+    if (!matches || !day) return [];
+    return matches
+      .filter((m) => dayKey(m.kickoff_at) === day)
+      .sort((a, b) => dayjs(a.kickoff_at ?? 0).valueOf() - dayjs(b.kickoff_at ?? 0).valueOf());
+  }, [matches, day]);
+
   // ── compartilhar placares como IMAGEM (1+ jogos do dia) ──────────────────
   // null = fora do modo seleção; Set = ids escolhidos.
   const [shareSel, setShareSel] = useState<Set<string> | null>(null);
@@ -196,36 +226,6 @@ export function JogosPage() {
     toast(how === "shared" ? "Imagem compartilhada! 📸" : "Imagem salva! 📸", "success");
     setShareSel(null);
   }
-
-  // troca de campeonato (ou "Todos") = contexto de dia novo → zera a escolha.
-  // Ajuste no render via valor anterior, sem efeito ("you might not need an effect").
-  const [prevScope, setPrevScope] = useState(scope);
-  if (scope !== prevScope) {
-    setPrevScope(scope);
-    setPicked(null);
-  }
-
-  // dias únicos com jogos, ordenados
-  const days = useMemo(() => {
-    if (!matches) return [];
-    const set = new Set<string>();
-    for (const m of matches) set.add(dayKey(m.kickoff_at));
-    return Array.from(set).filter((d) => d !== "sem-data").sort();
-  }, [matches]);
-
-  // dia efetivo (derivado): mantém a escolha do usuário se ainda existe no escopo;
-  // senão crava hoje (ou o próximo dia com jogos, ou o último). Sem efeito.
-  const day = picked && days.includes(picked) ? picked : pickDefaultDay(days);
-
-  // sem useMemo manual: ele era lido por funções declaradas acima (isShareable etc.)
-  // e o React Compiler pulava o componente por não conseguir preservá-lo —
-  // derivação direta deixa o compilador memoizar sozinho.
-  const dayMatches =
-    !matches || !day
-      ? []
-      : matches
-          .filter((m) => dayKey(m.kickoff_at) === day)
-          .sort((a, b) => dayjs(a.kickoff_at ?? 0).valueOf() - dayjs(b.kickoff_at ?? 0).valueOf());
 
   // dobros usados por (competição × semana) — funciona pra um campeonato e pra "Todos"
   const jokerMax = useMemo(() => {
