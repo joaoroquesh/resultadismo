@@ -494,6 +494,93 @@ export function useUpdateTeamScope() {
   });
 }
 
+// ── Gestão do Bolão (ADR 0008): organização da caixinha PELO grupo. ─────────
+// O app não movimenta dinheiro: registra o combinado e calcula o rateio.
+
+export function usePotPayers(lcId: string | null | undefined) {
+  return useQuery({
+    enabled: !!lcId,
+    queryKey: ["pot-payers", lcId],
+    queryFn: async (): Promise<Set<string>> => {
+      const { data, error } = await supabase
+        .from("league_pot_payers")
+        .select("user_id")
+        .eq("lc_id", lcId!);
+      if (error) throw new Error(error.message);
+      return new Set((data ?? []).map((r) => r.user_id as string));
+    },
+  });
+}
+
+export function useTogglePotPayer() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { lcId: string; userId: string; paid: boolean; markedBy: string }) => {
+      if (input.paid) {
+        const { error } = await supabase.from("league_pot_payers").insert({
+          lc_id: input.lcId,
+          user_id: input.userId,
+          marked_by: input.markedBy,
+        });
+        if (error) throw new Error(error.message);
+      } else {
+        const { error } = await supabase
+          .from("league_pot_payers")
+          .delete()
+          .eq("lc_id", input.lcId)
+          .eq("user_id", input.userId);
+        if (error) throw new Error(error.message);
+      }
+    },
+    onSuccess: (_d, v) => qc.invalidateQueries({ queryKey: ["pot-payers", v.lcId] }),
+  });
+}
+
+export function useUpdatePotSettings() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      leagueId: string;
+      lcId: string;
+      enabled?: boolean;
+      entryCents?: number | null;
+      split?: Record<string, number> | null;
+    }) => {
+      const patch: {
+        pot_enabled?: boolean;
+        pot_entry_cents?: number | null;
+        pot_split?: Record<string, number> | null;
+      } = {};
+      if (input.enabled !== undefined) patch.pot_enabled = input.enabled;
+      if (input.entryCents !== undefined) patch.pot_entry_cents = input.entryCents;
+      if (input.split !== undefined) patch.pot_split = input.split;
+      const { error } = await supabase
+        .from("league_competitions")
+        .update(patch)
+        .eq("id", input.lcId);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: (_d, v) =>
+      qc.invalidateQueries({ queryKey: ["league-competitions", v.leagueId] }),
+  });
+}
+
+/** Trava/destrava as definições — exclusivo do DONO (o banco enforça). */
+export function useTogglePotLock() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { leagueId: string; lcId: string; locked: boolean }) => {
+      const { error } = await supabase
+        .from("league_competitions")
+        .update({ pot_locked: input.locked })
+        .eq("id", input.lcId);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: (_d, v) =>
+      qc.invalidateQueries({ queryKey: ["league-competitions", v.leagueId] }),
+  });
+}
+
 export function useUpdateMember() {
   const qc = useQueryClient();
   return useMutation({

@@ -11,12 +11,19 @@ export function ScrollRow({
   children,
   className,
   innerClassName,
+  fadeClassName,
+  dataTour,
 }: {
   children: ReactNode;
   /** classes do wrapper (ex.: -mx-4 mb-3 pro bleed da página) */
   className?: string;
   /** classes da fileira interna (ex.: px-4) */
   innerClassName?: string;
+  /** cor do degradê quando a fileira NÃO está sobre o fundo da página
+   * (ex.: "from-[var(--color-ink-100)]" dentro do SegmentedControl) */
+  fadeClassName?: string;
+  /** âncora pro tour guiado (atributo data-tour no wrapper) */
+  dataTour?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [fade, setFade] = useState({ left: false, right: false });
@@ -43,15 +50,25 @@ export function ScrollRow({
   }, []);
 
   return (
-    <div className={cn("relative", className)}>
+    <div data-tour={dataTour} className={cn("relative", className)}>
       <div ref={ref} className={cn("no-scrollbar flex gap-2 overflow-x-auto", innerClassName)}>
         {children}
       </div>
       {fade.left && (
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-[var(--color-background)] to-transparent" />
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r to-transparent",
+            fadeClassName ?? "from-[var(--color-background)]",
+          )}
+        />
       )}
       {fade.right && (
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-[var(--color-background)] to-transparent" />
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l to-transparent",
+            fadeClassName ?? "from-[var(--color-background)]",
+          )}
+        />
       )}
     </div>
   );
