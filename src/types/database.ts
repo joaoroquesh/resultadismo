@@ -649,6 +649,10 @@ export type Database = {
           name: string
           participant_mode: string
           period_kind: string
+          pot_enabled: boolean
+          pot_entry_cents: number | null
+          pot_locked: boolean
+          pot_split: Json | null
           scheduled_draw_at: string | null
           settings: Json
           starts_on: string | null
@@ -668,6 +672,10 @@ export type Database = {
           name: string
           participant_mode?: string
           period_kind?: string
+          pot_enabled?: boolean
+          pot_entry_cents?: number | null
+          pot_locked?: boolean
+          pot_split?: Json | null
           scheduled_draw_at?: string | null
           settings?: Json
           starts_on?: string | null
@@ -687,6 +695,10 @@ export type Database = {
           name?: string
           participant_mode?: string
           period_kind?: string
+          pot_enabled?: boolean
+          pot_entry_cents?: number | null
+          pot_locked?: boolean
+          pot_split?: Json | null
           scheduled_draw_at?: string | null
           settings?: Json
           starts_on?: string | null
@@ -814,6 +826,52 @@ export type Database = {
           },
           {
             foreignKeyName: "league_payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      league_pot_payers: {
+        Row: {
+          id: string
+          lc_id: string
+          marked_at: string
+          marked_by: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          lc_id: string
+          marked_at?: string
+          marked_by?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          lc_id?: string
+          marked_at?: string
+          marked_by?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "league_pot_payers_lc_id_fkey"
+            columns: ["lc_id"]
+            isOneToOne: false
+            referencedRelation: "league_competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "league_pot_payers_marked_by_fkey"
+            columns: ["marked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "league_pot_payers_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"

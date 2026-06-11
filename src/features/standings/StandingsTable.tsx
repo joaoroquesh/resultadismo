@@ -3,14 +3,18 @@ import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar";
 import { cn } from "@/lib/utils";
+import { formatBRL } from "@/lib/pricing";
 import type { StandingRow } from "@/lib/types";
 
 export function StandingsTable({
   rows,
   currentUserId,
+  pot,
 }: {
   rows: StandingRow[];
   currentUserId?: string | null;
+  /** Gestão do Bolão: selo de quem está levando prêmio (cents por user). */
+  pot?: { prizeByUserId: Map<string, number> };
 }) {
   const [expanded, setExpanded] = useState(false);
   const gap = expanded ? "gap-2" : "gap-3";
@@ -95,9 +99,19 @@ export function StandingsTable({
                         <span className="ml-1 text-xs font-medium text-brand-600">(você)</span>
                       )}
                     </span>
-                    {!expanded && (
-                      <span className="whitespace-nowrap text-[11px] text-ink-400">
-                        {row.jogos} {row.jogos === 1 ? "jogo" : "jogos"}
+                    {/* selo na linha de baixo: não disputa espaço com o nome no mobile */}
+                    {(!expanded || pot?.prizeByUserId.has(row.user_id)) && (
+                      <span className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-ink-400">
+                        {!expanded && (
+                          <>
+                            {row.jogos} {row.jogos === 1 ? "jogo" : "jogos"}
+                          </>
+                        )}
+                        {pot?.prizeByUserId.has(row.user_id) && (
+                          <span className="inline-flex shrink-0 items-center rounded-pill bg-gold-600/15 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-gold-700">
+                            💰 {formatBRL(pot.prizeByUserId.get(row.user_id)!)}
+                          </span>
+                        )}
                       </span>
                     )}
                   </div>

@@ -24,6 +24,7 @@ import {
   Users,
   Star,
   Gamepad2,
+  HandCoins,
 } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
@@ -416,6 +417,34 @@ export function ComoFuncionaPage() {
               Seu grupo fica <span className="font-semibold">ativo na hora</span>. Só o{" "}
               <span className="font-semibold">nome</span> passa por uma revisão rápida da moderação (pra
               evitar nomes ofensivos) — e você já joga normalmente enquanto isso.
+            </p>
+          </div>
+        </Section>
+
+        {/* Gestão do Bolão */}
+        <Section icon={<HandCoins className="size-4" strokeWidth={2.4} />} title="Gestão do Bolão">
+          <Card className="space-y-2 p-4">
+            <p className="text-sm leading-relaxed text-ink-600">
+              Seu grupo já combina um bolão entre amigos? A aba{" "}
+              <span className="font-semibold text-ink-900">Gestão</span> do grupo ajuda a organizar:
+              o admin marca <span className="font-semibold text-ink-900">quem pagou</span>, registra
+              o <span className="font-semibold text-ink-900">valor da inscrição</span> e define a{" "}
+              <span className="font-semibold text-ink-900">divisão do prêmio</span> (1º, 2º e 3º).
+              Na classificação, um selo mostra quem está levando o quê — contando só quem
+              participa do bolão.
+            </p>
+            <p className="text-sm leading-relaxed text-ink-600">
+              Quando estiver tudo combinado, o{" "}
+              <span className="font-semibold text-ink-900">dono do grupo pode travar</span> as
+              definições pra ninguém mudar no meio da disputa.
+            </p>
+          </Card>
+          <div className="flex items-start gap-2 rounded-md bg-surface-2 p-3 text-xs leading-relaxed text-brand-800">
+            <ShieldCheck className="mt-0.5 size-4 shrink-0" />
+            <p>
+              <span className="font-semibold">Nenhum dinheiro passa pelo Resultadismo.</span> O app
+              só organiza a informação: pagamento e prêmio são combinados e acertados entre vocês,
+              fora do app.
             </p>
           </div>
         </Section>

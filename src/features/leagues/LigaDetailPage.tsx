@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { Coachmark } from "@/components/ui/Coachmark";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Escudo } from "@/components/ui/Escudo";
 import { useToast } from "@/components/ui/Toast";
@@ -29,8 +30,11 @@ import { ClassificacaoTab } from "./tabs/ClassificacaoTab";
 import { MembrosTab } from "./tabs/MembrosTab";
 import { CompeticoesTab } from "./tabs/CompeticoesTab";
 import { GrupoEditor } from "./tabs/GrupoEditor";
+import { GestaoBolaoTab } from "./tabs/GestaoBolaoTab";
+import { usePotPayers } from "./api";
+import { computePot, prizeByUser } from "./potMath";
 
-type Tab = "classificacao" | "membros" | "competicoes";
+type Tab = "classificacao" | "membros" | "competicoes" | "bolao";
 
 export function LigaDetailPage() {
   const { slug } = useParams();
@@ -55,6 +59,31 @@ export function LigaDetailPage() {
   const [lcId, setLcId] = useState<string>();
   const activeLcId = lcId ?? comps?.[0]?.id;
   const { data: standings, isLoading: loadingStandings } = useStandings(activeLcId);
+
+  // Gestão do Bolão (ADR 0008): vive no bolão base do grupo (mode points/table).
+  const potLc = useMemo(() => {
+    const found = (comps ?? []).find((c) => c.mode === "points" || c.mode === "table");
+    return found as
+      | (typeof found & {
+          pot_enabled?: boolean | null;
+          pot_entry_cents?: number | null;
+          pot_split?: Record<string, number> | null;
+          pot_locked?: boolean | null;
+        })
+      | undefined;
+  }, [comps]);
+  const potOn = potLc?.pot_enabled === true;
+  const { data: potPayers } = usePotPayers(potOn ? potLc?.id : null);
+  // Selo 💰 na classificação: quem leva o quê HOJE (só quando a aba olha o bolão).
+  const potForStandings = useMemo(() => {
+    if (!potOn || !potLc || !potPayers || activeLcId !== potLc.id || !standings) return undefined;
+    const { prizes } = computePot(
+      potLc.pot_entry_cents ?? 0,
+      potPayers.size,
+      (potLc.pot_split ?? {}) as { 1?: number; 2?: number; 3?: number },
+    );
+    return { payers: potPayers, prizeByUserId: prizeByUser(standings, potPayers, prizes) };
+  }, [potOn, potLc, potPayers, activeLcId, standings]);
 
   const leave = useLeaveLeague();
   const setConfronto = useSetConfrontoEnabled();
@@ -98,8 +127,9 @@ export function LigaDetailPage() {
       { value: "membros", label: `Membros${members ? ` (${members.length})` : ""}` },
     ];
     if (isAdmin) base.push({ value: "competicoes", label: "Competições" });
+    if (potLc && (potLc.pot_enabled || isAdmin)) base.push({ value: "bolao", label: "Gestão" });
     return base;
-  }, [members, isAdmin]);
+  }, [members, isAdmin, potLc]);
 
   if (isLoading) {
     return (
@@ -365,7 +395,27 @@ export function LigaDetailPage() {
         </Card>
       )}
 
-      <SegmentedControl<Tab> className="mb-4" value={tab} onChange={setTab} options={tabs} />
+      {/* Anúncio da Gestão do Bolão: só pra quem vê a aba (admin sempre; membro com pot ativo). */}
+      {tabs.some((t) => t.value === "bolao") ? (
+        <Coachmark
+          storageKey="resultadismo-coach-gestao-bolao-v1"
+          title="Novidade: Gestão do Bolão"
+          placement="bottom"
+          align="end"
+          className="mb-4"
+          content={
+            <>
+              Na aba <span className="font-bold text-ink-50">Gestão</span> o grupo organiza o
+              bolão: quem pagou, valor da inscrição e divisão do prêmio. O dinheiro continua
+              entre vocês, fora do Resultadismo.
+            </>
+          }
+        >
+          <SegmentedControl<Tab> value={tab} onChange={setTab} options={tabs} />
+        </Coachmark>
+      ) : (
+        <SegmentedControl<Tab> className="mb-4" value={tab} onChange={setTab} options={tabs} />
+      )}
 
       {tab === "classificacao" && (
         <ClassificacaoTab
@@ -377,11 +427,27 @@ export function LigaDetailPage() {
           currentUserId={user?.id}
           isAdmin={isAdmin}
           confrontoEnabled={league.confronto_enabled ?? false}
+          pot={potForStandings}
         />
       )}
 
       {tab === "membros" && (
-        <MembrosTab members={members ?? []} isAdmin={isAdmin} />
+        <MembrosTab
+          members={members ?? []}
+          isAdmin={isAdmin}
+          potLc={potOn && potLc ? { id: potLc.id, locked: potLc.pot_locked === true } : undefined}
+          currentUserId={user?.id}
+        />
+      )}
+
+      {tab === "bolao" && potLc && (
+        <GestaoBolaoTab
+          leagueId={league.id}
+          lc={potLc}
+          isAdmin={isAdmin}
+          isOwner={isOwner}
+          currentUserId={user?.id}
+        />
       )}
 
       {tab === "competicoes" && isAdmin && (

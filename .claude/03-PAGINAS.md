@@ -61,9 +61,12 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
 - **`LigaDetailPage`** (`/grupos/:slug`): detalhe — identidade (escudo/nome/descrição) + código de
   convite; **dono/admin edita nome, descrição e escudo** em "Editar grupo" (`GrupoEditor`; trocar o
   nome volta à moderação). Abas
-  **Classificação** (tabela de Pontos ou `ConfrontoSection`), **Membros** (papéis, aprovar/remover),
-  **Competições** (admin: adicionar competição/modo). Banner "Pagar agora" se pendente; botão de
-  reembolso só p/ dono (≤7 dias).
+  **Classificação** (tabela de Pontos ou `ConfrontoSection`; selo 💰 de prêmio quando o bolão está
+  ativo), **Membros** (papéis, aprovar/remover; botão $ marca pagantes do bolão),
+  **Competições** (admin: adicionar competição/modo) e **Gestão** (`GestaoBolaoTab` — Gestão do
+  Bolão, ADR [`0009`](decisions/0009-gestao-bolao.md): membro vê quando ativa, admin sempre;
+  coachmark `resultadismo-coach-gestao-bolao-v1` na fileira de abas). Banner "Pagar agora" se
+  pendente; botão de reembolso só p/ dono (≤7 dias).
 - **`RefundFederationButton`**: botão isolado de cancelar+reembolsar (2 passos). → [`06`](06-REGRAS-DE-NEGOCIO.md).
 
 ### Classificação — `features/standings`

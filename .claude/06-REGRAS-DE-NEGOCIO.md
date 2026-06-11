@@ -146,6 +146,23 @@ grátis.** **Não é casa de apostas** (sem aposta, sem prêmio em dinheiro, sem
 A **infra de pagamento abaixo fica preservada** (test/live, Mercado Pago, cupom, reembolso), apenas
 **desligada** — se voltar a cobrar, é **taxa de serviço** pela criação de Grupo, nunca aposta/prêmio.
 
+### Gestão do Bolão (2026-06-10, ADR [`0009`](decisions/0009-gestao-bolao.md))
+
+Ferramenta **opcional e meramente informativa** pra organizar o bolão que grupos de amigos já fazem
+**por fora** — **nenhum dinheiro passa pelo app** (a regra-mãe acima segue intacta):
+- **Onde:** aba **Gestão** na página do grupo (membro vê quando ativa; admin sempre vê). Dados em
+  `league_competitions.pot_*` + `league_pot_payers` (migration `20260610200000`).
+- **Quem faz o quê (enforçado no banco, triggers + RLS):** admins ativam, definem valor da
+  inscrição (`pot_entry_cents`) e divisão % 1º/2º/3º (`pot_split`), e marcam **quem pagou**;
+  **só o DONO trava/destrava** (`pot_locked`, manual — decisão do PO); travado, nada de pot_* muda.
+- **Rateio (`potMath.ts`):** prêmio total = pagantes × inscrição; cada prêmio arredonda **pra
+  baixo**; % não usados, sobras e colocações sem pagante ficam no "caixa do grupo". **Prêmio só
+  entre pagantes**: o rateio cruza a classificação oficial com o conjunto de pagantes (selo 💰 na
+  classificação).
+- **Disclaimers obrigatórios** (aba + Termos §5 + Como Funciona): o app não recebe, não guarda,
+  não repassa nem intermedeia valores; acerto financeiro é fora do app, entre os membros.
+- Visível **só a membros** do grupo (RLS select = membro).
+
 **Modo global** (`app_settings.payment_mode`, aba Pgto do admin):
 - `disabled` — criação grátis (sem cobrança). **← modo atual em produção (ADR 0002).**
 - `test` — pagamento **simulado** sem Mercado Pago (`simulate_league_payment` — **só app-admin** desde

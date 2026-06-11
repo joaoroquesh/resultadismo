@@ -20,6 +20,7 @@ export function ClassificacaoTab({
   currentUserId,
   isAdmin,
   confrontoEnabled,
+  pot,
 }: {
   comps: {
     id: string;
@@ -35,6 +36,7 @@ export function ClassificacaoTab({
   currentUserId?: string;
   isAdmin: boolean;
   confrontoEnabled: boolean;
+  pot?: { payers: Set<string>; prizeByUserId: Map<string, number> };
 }) {
   const { slug } = useParams<{ slug: string }>();
   const isConfronto = (m: string) => m === "liga" || m === "cup";
@@ -104,7 +106,7 @@ export function ClassificacaoTab({
       {loading ? (
         <Skeleton className="h-64 w-full" />
       ) : standings && standings.length > 0 ? (
-        <StandingsTable rows={standings} currentUserId={currentUserId} />
+        <StandingsTable rows={standings} currentUserId={currentUserId} pot={pot} />
       ) : (
         <EmptyState title="Sem pontos ainda" description="A classificação aparece após os jogos." />
       )}

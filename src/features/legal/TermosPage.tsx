@@ -4,7 +4,7 @@ const CONTATO = "resultadismoapp@gmail.com";
 
 export function TermosPage() {
   return (
-    <LegalLayout title="Termos de Serviço" updatedAt="31 de maio de 2026">
+    <LegalLayout title="Termos de Serviço" updatedAt="10 de junho de 2026">
       <p>
         Bem-vindo ao <strong>Resultadismo</strong>. Estes Termos regem o uso do site e do aplicativo em{" "}
         <strong>resultadismo.com</strong>. Ao acessar ou usar o app, você concorda com estes Termos. Se
@@ -51,7 +51,32 @@ export function TermosPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="5. Pontuação e regras do jogo">
+      <LegalSection title="5. Gestão do Bolão (organização entre membros)">
+        <p>
+          Grupos podem ativar a <strong>Gestão do Bolão</strong>, uma ferramenta{" "}
+          <strong>opcional e meramente organizacional</strong> para grupos de amigos que, por conta
+          própria, combinam um bolão entre si. Nela, os administradores do grupo registram quem
+          contribuiu, o valor combinado e a divisão do prêmio.
+        </p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li>
+            <strong>Nenhum dinheiro passa pelo Resultadismo.</strong> O app não recebe, não guarda,
+            não repassa e não intermedeia qualquer valor. Os números exibidos são apenas
+            informativos, inseridos pelos próprios administradores do grupo.
+          </li>
+          <li>
+            O acerto financeiro (cobrança, pagamento e entrega de prêmios) acontece{" "}
+            <strong>fora do app</strong> e é de responsabilidade exclusiva dos membros do grupo.
+          </li>
+          <li>
+            O Resultadismo não garante, não cobra e não se responsabiliza por valores combinados
+            entre membros, nem atua como mediador de disputas sobre eles.
+          </li>
+          <li>Essas informações são visíveis apenas para os membros do grupo.</li>
+        </ul>
+      </LegalSection>
+
+      <LegalSection title="6. Pontuação e regras do jogo">
         <p>
           As regras de pontuação (cravada, saldo, acerto), o Dobro de Pontos e os critérios de desempate
           fazem parte do funcionamento do app e podem ser ajustados para melhorar a experiência. A
@@ -64,7 +89,7 @@ export function TermosPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="6. Dados de futebol de terceiros">
+      <LegalSection title="7. Dados de futebol de terceiros">
         <p>
           Os resultados, horários e informações dos jogos vêm de provedores públicos de dados (ex.:
           football-data.org) e podem conter atrasos, erros ou alterações. Fazemos esforço para manter
@@ -73,7 +98,7 @@ export function TermosPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="7. Disponibilidade do serviço">
+      <LegalSection title="8. Disponibilidade do serviço">
         <p>
           O app é oferecido "no estado em que se encontra". Pode haver manutenções, indisponibilidades ou
           fila de acesso em momentos de pico. Podemos alterar, suspender ou descontinuar funcionalidades a
@@ -81,7 +106,7 @@ export function TermosPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="8. Propriedade intelectual">
+      <LegalSection title="9. Propriedade intelectual">
         <p>
           A marca "Resultadismo", o design, os textos e o código do app são protegidos. Escudos, nomes de
           times e competições pertencem aos seus respectivos titulares e são usados apenas para fins
@@ -93,7 +118,7 @@ export function TermosPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="9. Limitação de responsabilidade">
+      <LegalSection title="10. Limitação de responsabilidade">
         <p>
           Na máxima extensão permitida pela lei, o Resultadismo não se responsabiliza por danos indiretos,
           perda de dados ou prejuízos decorrentes do uso ou da indisponibilidade do serviço, nem por
@@ -102,14 +127,14 @@ export function TermosPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="10. Suspensão e encerramento">
+      <LegalSection title="11. Suspensão e encerramento">
         <p>
           Podemos suspender ou encerrar contas que violem estes Termos. Você pode encerrar sua conta a
           qualquer momento solicitando pelo contato abaixo.
         </p>
       </LegalSection>
 
-      <LegalSection title="11. Alterações nos Termos">
+      <LegalSection title="12. Alterações nos Termos">
         <p>
           Podemos atualizar estes Termos. Mudanças relevantes serão indicadas pela data de "última
           atualização" no topo e, quando significativas, avisadas dentro do app com antecedência razoável
@@ -118,7 +143,7 @@ export function TermosPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="12. Pagamentos">
+      <LegalSection title="13. Pagamentos">
         <p>
           Hoje, <strong>criar e participar de grupos é totalmente gratuito</strong> — sem taxa, sem
           mensalidade e sem cobrança de qualquer tipo. Não há aposta de dinheiro nem prêmios em dinheiro.
@@ -130,7 +155,7 @@ export function TermosPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="13. Lei aplicável e foro">
+      <LegalSection title="14. Lei aplicável e foro">
         <p>
           Estes Termos são regidos pelas leis brasileiras, incluindo o Código de Defesa do Consumidor
           (CDC), o Marco Civil da Internet (Lei nº 12.965/2014) e a Lei Geral de Proteção de Dados (LGPD,
@@ -139,7 +164,7 @@ export function TermosPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="14. Contato">
+      <LegalSection title="15. Contato">
         <p>
           Dúvidas sobre estes Termos? Fale com a gente em <strong>{CONTATO}</strong>.
         </p>

@@ -45,6 +45,17 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   (2) Botão de **compartilhar** no card (live/encerrado) gera uma **imagem da marca** (escudos,
   placar, palpite, selo da pontuação e total) via Web Share/download; e dá pra **selecionar vários
   jogos do dia** ("Compartilhar" na fileira de dias → toca nos cards → Gerar imagem).
+- **Gestão do Bolão — organize o bolão do grupo dentro do app (sem dinheiro no app).** Nova aba
+  **Gestão** na página do grupo (ADR [`0009`](decisions/0009-gestao-bolao.md)): o admin ativa,
+  define o **valor da inscrição** e a **divisão do prêmio** (% pro 1º/2º/3º, com presets), e marca
+  **quem pagou** (botão $ na aba Membros); o app calcula o prêmio total (pagantes × valor) e mostra
+  na classificação o **selo 💰** de quem está levando o quê — prêmio disputado **só entre
+  pagantes**, sobras ficam no "caixa do grupo". O **dono** trava/destrava as definições quando o
+  combinado fechar (dica: antes de a Copa começar). Tudo enforçado **no banco** (migration
+  `20260610200000`: colunas `pot_*` em `league_competitions` + tabela `league_pot_payers`, RLS
+  só-membros, triggers de trava/dono). **Nenhum dinheiro passa pelo app** — disclaimers fixos na
+  aba, cláusula nova nos **Termos** (§5) e seção no **Como Funciona**; anúncio por broadcast +
+  coachmark na página do grupo. → [`06`](06-REGRAS-DE-NEGOCIO.md) §5, [`03`](03-PAGINAS.md).
 - **Tour guiado de 1º acesso (coach-marks na UI real).** Depois da personalização **e** do carrossel
   de boas-vindas, um **tour guiado** (`GuidedTour`) acende, em sequência, os pontos reais da tela: a
   **barra de filtros de Jogos** (Meus interesses × Todos), a aba **Grupos** (criar grupo + o
