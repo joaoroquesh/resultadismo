@@ -51,7 +51,6 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   — ninguém perde o que tinha selecionado (única perda: `favorite_competition_id`, FK SET NULL,
   irrecuperável sem backup). Idempotente, só-INSERT com guardas (id/provider_code/slug), validada
   na simulação local (restaura + religa + lista na personalização + no-op na 2ª execução).
->>>>>>> b044fe3 (fix(dados): restaura as 16 competições apagadas por engano no admin (mesmos ids, seguidores intactos))
 - **Imagem de palpites: selo da pontuação alinhado e raio visível na cravada.** O ⚡ era um emoji
   no canvas: métrica própria desalinhava/"quebrava" a linha do selo e, amarelo sobre o fundo
   dourado da cravada, ele sumia. Agora o raio do 2× é **desenhado** (polígono) na mesma baseline
