@@ -217,12 +217,15 @@ export function JogosPage() {
   // senão crava hoje (ou o próximo dia com jogos, ou o último). Sem efeito.
   const day = picked && days.includes(picked) ? picked : pickDefaultDay(days);
 
-  const dayMatches = useMemo(() => {
-    if (!matches || !day) return [];
-    return matches
-      .filter((m) => dayKey(m.kickoff_at) === day)
-      .sort((a, b) => dayjs(a.kickoff_at ?? 0).valueOf() - dayjs(b.kickoff_at ?? 0).valueOf());
-  }, [matches, day]);
+  // sem useMemo manual: ele era lido por funções declaradas acima (isShareable etc.)
+  // e o React Compiler pulava o componente por não conseguir preservá-lo —
+  // derivação direta deixa o compilador memoizar sozinho.
+  const dayMatches =
+    !matches || !day
+      ? []
+      : matches
+          .filter((m) => dayKey(m.kickoff_at) === day)
+          .sort((a, b) => dayjs(a.kickoff_at ?? 0).valueOf() - dayjs(b.kickoff_at ?? 0).valueOf());
 
   // dobros usados por (competição × semana) — funciona pra um campeonato e pra "Todos"
   const jokerMax = useMemo(() => {
