@@ -126,8 +126,9 @@ export function LigaDetailPage() {
       { value: "classificacao", label: "Classificação" },
       { value: "membros", label: `Membros${members ? ` (${members.length})` : ""}` },
     ];
-    if (isAdmin) base.push({ value: "competicoes", label: "Competições" });
+    // Gestão antes de Competições: dá destaque à funcionalidade nova do bolão.
     if (potLc && (potLc.pot_enabled || isAdmin)) base.push({ value: "bolao", label: "Gestão" });
+    if (isAdmin) base.push({ value: "competicoes", label: "Competições" });
     return base;
   }, [members, isAdmin, potLc]);
 

@@ -11,6 +11,7 @@ export function ScrollRow({
   children,
   className,
   innerClassName,
+  fadeClassName,
   dataTour,
 }: {
   children: ReactNode;
@@ -18,6 +19,9 @@ export function ScrollRow({
   className?: string;
   /** classes da fileira interna (ex.: px-4) */
   innerClassName?: string;
+  /** cor do degradê quando a fileira NÃO está sobre o fundo da página
+   * (ex.: "from-[var(--color-ink-100)]" dentro do SegmentedControl) */
+  fadeClassName?: string;
   /** âncora pro tour guiado (atributo data-tour no wrapper) */
   dataTour?: string;
 }) {
@@ -51,10 +55,20 @@ export function ScrollRow({
         {children}
       </div>
       {fade.left && (
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-[var(--color-background)] to-transparent" />
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r to-transparent",
+            fadeClassName ?? "from-[var(--color-background)]",
+          )}
+        />
       )}
       {fade.right && (
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-[var(--color-background)] to-transparent" />
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l to-transparent",
+            fadeClassName ?? "from-[var(--color-background)]",
+          )}
+        />
       )}
     </div>
   );

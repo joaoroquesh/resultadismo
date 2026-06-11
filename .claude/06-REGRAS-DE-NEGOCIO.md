@@ -99,11 +99,16 @@ uma troca de significado proposital.
     **vitrine de grupos públicos** (`list_public_leagues`, só `status='active'`) pra qualquer
     Resultadista achar e entrar (`join_public_league`: aberto → ativo na hora; aprovação → pendente).
   - Grupos antigos foram **normalizados** na migration (privado→invite; público+invite→approval).
-- **/grupos (vitrine social, 2026-06-06):** prévia do **Resultadismo The Best** com **3 pessoas**
-  (você + vizinhos, `get_global_rank_window`; fallback no pódio se você ainda não pontuou) →
-  "Recebeu um convite?" → **Seus grupos** (cards ricos: flâmula, **posição no ranking do grupo** via
-  `get_my_league_positions`, escudos de membros sobrepostos, **WhatsApp** + lápis do admin) →
-  **Grupos públicos**.
+- **/grupos (vitrine social):** topo = **prévia da classificação dos grupos favoritados**
+  (carrossel na ordem de favoritar; cada slide = janela de 3 "você + vizinhos" via
+  `get_group_rank_window`) — **só entra o grupo que já tem pontuação** na competição-bolão dele
+  (gate do `get_group_rank_window`); sem favorito ou nenhum pontuado, um card-dica. Logo abaixo, o
+  **Resultadismo The Best compacto**: só título + "ver ranking" + **minha posição geral, sem
+  pontuação** (`get_my_global_rank`). Favoritar é por **grupo** (estrela no card; coluna
+  `favorite_group_ids` ordenada em `profiles` + RPC `toggle_favorite_group`, validando ser membro;
+  migration `20260610190000`). Depois: "Recebeu um convite?" → **Seus grupos** (cards ricos:
+  flâmula, **posição no ranking do grupo** via `get_my_league_positions`, escudos de membros
+  sobrepostos, **WhatsApp** + lápis do admin) → **Grupos públicos**.
 - **Criação → ativação:** depende do **modo de pagamento** global (ver §5). Todo grupo tem
   `status` (pending/active/rejected/archived) e `payment_status`.
 - **Revisão de nome:** grupo pago **ativa na hora**; só o **nome** entra em revisão do admin

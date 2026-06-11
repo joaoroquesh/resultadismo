@@ -34,6 +34,13 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   declaradas **antes** do `dayMatches` que elas leem; o hotfix anterior tirou o `useMemo` e deixou
   2 avisos de deps. Agora o bloco de share vem **depois** da declaração e o `useMemo` voltou —
   lint zerou no arquivo (sobrou só o aviso de complexidade do backlog).
+- **Abas do grupo não quebram mais no mobile (aba Gestão).** Com 4 abas, o `SegmentedControl`
+  estourava a largura da tela em celulares. Agora o conteúdo **rola lateralmente DENTRO da
+  pílula** (labels nunca quebram linha) com o **degradê do `ScrollRow`** na cor da pílula
+  avisando que tem mais aba pra arrastar — mesmo padrão das fileiras de Jogos (regra 9). O
+  `ScrollRow` ganhou a prop `fadeClassName` pra usar o fade fora do fundo da página. Vale pros
+  9 usos do componente (Retrô, Nova Liga, admin etc.): quando as opções cabem, nada muda
+  (continuam esticando); quando não cabem, rola em vez de quebrar.
 - **Link de convite pra quem já é de casa.** Quem abre um link `?convite=` e **já concluiu** o
   1º acesso vai direto pra **/grupos com o código preenchido** (só na visita do clique — flag de
   sessão consumida; visitas normais seguem nos Jogos). Quem ainda não concluiu continua caindo no
@@ -52,6 +59,16 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   da torcida" seguem com as 66** (a Itália joga amistosos e pode ser a seleção do coração).
 
 ### Adicionado
+- **Favoritar grupo → prévia da classificação no topo da /grupos.** O usuário marca a **estrela**
+  num grupo e a **prévia da classificação dele** (janela de 3: você + vizinhos de cima e de baixo)
+  sobe pro topo, no lugar do Resultadismo The Best. Favoritou vários → vira um **carrossel** (com
+  bolinhas), na ordem que favoritou. A prévia de um grupo **só aparece quando ele já tem pontuação**
+  na competição-bolão dele (antes da Copa, fica de fora). O **Resultadismo The Best** virou um
+  **card pequeno**: só título + "ver ranking" + **minha posição geral (sem pontuação)**. Banco:
+  `profiles.favorite_group_ids` (ordenado) + RPCs `toggle_favorite_group` (valida ser membro) e
+  `get_group_rank_window` (janela por grupo, visão Pontos, com o gate de pontuação); hooks isolados
+  em `features/leagues/favorites.ts`. Migration `20260610190000`. → [`03`](03-PAGINAS.md),
+  [`06`](06-REGRAS-DE-NEGOCIO.md) §4.
 - **Pontuação prévia AO VIVO + compartilhar placar como imagem.** (1) Com o jogo rolando, o
   palpite mostra como está pontuando: borda do placar na cor do tipo (dourado/verde/azul; cinza no
   erro) + texto plano ("Cravada +3"), sem o chip de resultado final — volta da v0, mais suave.
@@ -185,7 +202,16 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   anônimo): grupos = pontue em 2 de 3 (pílulas 3/2/1), oitavas em diante = errou caiu, cravada =
   ficha. **Como jogar** reescrito (bloco dos 3 modos no lugar do Pontos). `retro_my_stats` blindado
   (runs legadas do Pontos com stage_rank NULL roubavam o "melhor" do hero). Suite T4/T6 testa os
-  modos (janelas estatísticas, 200 sorteios). Histórico completo da construção: Comentários
+  modos (janelas estatísticas, 200 sorteios). **Rodada 19 (OG próprio do Retrô):** compartilhar um
+  link `/retro*` no WhatsApp/Twitter agora mostra o **card do Retrô** (`public/og-retro.jpg`,
+  1200×630 — estilo do hero: brand-700 + scanlines + listras + lockup escudo "Resultadismo RETRÔ"
+  dourado + "Você lembra desse placar? 🕹️" + trilha colorida), não mais o do bolão. Como é SPA:
+  `scripts/build-retro-html.mjs` (roda no `postbuild`) gera `dist/retro.html` clonando o
+  `dist/index.html` com title/description/canonical/OG/Twitter do Retrô (falha o build se o
+  index.html mudar de formato — sem OG errado em silêncio), e o `vercel.json` reescreve `/retro` e
+  `/retro/:path*` pra esse arquivo ANTES do catch-all. Bônus: a página pública do share
+  (`/retro/r/:code`) também ganha o card do Retrô. SPA intacta (mesmos bundles; router lê a URL).
+  Histórico completo da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do

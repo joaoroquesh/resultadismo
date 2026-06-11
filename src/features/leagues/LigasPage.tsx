@@ -12,8 +12,8 @@ import {
   Pencil,
   Share2,
   Search,
-  BarChart3,
   Check,
+  Star,
 } from "lucide-react";
 import { Escudo } from "@/components/ui/Escudo";
 import { track } from "@/lib/analytics";
@@ -40,12 +40,13 @@ import {
   type LeaguePosition,
   type MemberAvatar,
 } from "./api";
+import { useMyGlobalRank } from "@/features/ranking/api";
 import {
-  useGlobalRankWindow,
-  useMyGlobalRank,
-  useGlobalStandings,
-  type RTBRow,
-} from "@/features/ranking/api";
+  useFavoriteGroups,
+  useToggleFavoriteGroup,
+  useGroupRankWindows,
+  type GroupRankRow,
+} from "./favorites";
 
 export function LigasPage() {
   const { data: leagues, isLoading } = useMyLeagues();
@@ -57,6 +58,9 @@ export function LigasPage() {
   const leagueIds = useMemo(() => (leagues ?? []).map((l) => l.id), [leagues]);
   const { data: positions } = useMyLeaguePositions(leagueIds);
   const { data: membersPreview } = useLeaguesMembersPreview(leagueIds);
+  const { data: favIds = [] } = useFavoriteGroups();
+  const toggleFav = useToggleFavoriteGroup();
+  const favSet = useMemo(() => new Set(favIds), [favIds]);
 
   async function handleJoin(e: FormEvent) {
     e.preventDefault();
@@ -84,8 +88,10 @@ export function LigasPage() {
         </Link>
       }
     >
-      {/* Resultadismo The Best — prévia sempre com 3 (você + vizinhos) */}
-      <RTBPreview />
+      {/* Topo: prévia da classificação dos grupos favoritados (carrossel) +
+          Resultadismo The Best compacto (sempre pequeno). */}
+      <FavoriteGroupsPreview leagues={leagues ?? []} positions={positions} favIds={favIds} />
+      <RTBMiniCard />
 
       {/* Recebeu convite? entre aqui */}
       <form onSubmit={handleJoin} className="mb-6 mt-6 flex items-end gap-2">
@@ -137,6 +143,8 @@ export function LigasPage() {
                 league={l}
                 position={positions?.[l.id]}
                 preview={membersPreview?.[l.id]}
+                isFavorite={favSet.has(l.id)}
+                onToggleFavorite={() => toggleFav.mutate(l.id)}
               />
             ))}
           </div>
@@ -150,120 +158,187 @@ export function LigasPage() {
 }
 
 /* ────────────────────────────────────────────────────────────────────────── */
-/*  Resultadismo The Best — prévia de 3 (você + vizinhos de cima/baixo)         */
+/*  Topo da /grupos: prévia dos grupos favoritados (carrossel) + RTB compacto   */
 /* ────────────────────────────────────────────────────────────────────────── */
-function RTBPreview() {
-  const [detailed, setDetailed] = useState(false);
-  const { data: myRank } = useMyGlobalRank({});
-  const { data: windowRows, isLoading: loadingWindow } = useGlobalRankWindow({}, 1);
-  // Fallback quando ainda não pontuei: mostra o pódio (top 3).
-  const ranked = !!windowRows && windowRows.length > 0;
-  const { data: top } = useGlobalStandings({}, 3);
-  const rows: RTBRow[] = ranked ? windowRows : top ?? [];
-  const myId = ranked ? windowRows.find((r) => r.is_me)?.user_id : undefined;
+// Carrossel das prévias dos grupos FAVORITADOS (na ordem de favoritar). Só
+// entram os grupos que já têm pontuação (rows não-vazio — gate do get_group_
+// rank_window). Sem favoritos ou nenhum pontuado ainda → card-dica.
+function FavoriteGroupsPreview({
+  leagues,
+  positions,
+  favIds,
+}: {
+  leagues: MyLeague[];
+  positions?: Record<string, LeaguePosition>;
+  favIds: string[];
+}) {
+  // Plano (sem useMemo): o React Compiler memoiza o que dá; o resultado do
+  // useQueries (windows) muda de referência a cada render, então um useMemo aqui
+  // não se preservaria de qualquer forma.
+  const byId = new Map(leagues.map((l) => [l.id, l]));
+  const favLeagues = favIds.map((id) => byId.get(id)).filter((l): l is MyLeague => !!l);
+
+  const windows = useGroupRankWindows(favLeagues.map((l) => l.id));
+  const loading = windows.some((w) => w.isLoading);
+  const slides = favLeagues
+    .map((l, i) => ({ league: l, rows: windows[i]?.data?.rows ?? [] }))
+    .filter((s) => s.rows.length > 0);
+
+  const [active, setActive] = useState(0);
+  const clampedActive = Math.min(active, Math.max(slides.length - 1, 0));
+
+  if (loading && slides.length === 0 && favLeagues.length > 0) {
+    return <Skeleton className="mb-1 h-40 w-full rounded-xl" />;
+  }
+
+  // sem favoritos OU nenhum favorito pontuou ainda → não some o topo: mostra dica
+  if (slides.length === 0) {
+    return (
+      <Card className="mb-1 flex items-center gap-3 bg-surface-2 p-4 ring-1 ring-border">
+        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-surface text-gold-500">
+          <Star className="size-5" />
+        </span>
+        <p className="text-sm leading-snug text-ink-600">
+          {favLeagues.length === 0 ? (
+            <>
+              Favorite um grupo na{" "}
+              <Star className="inline size-3.5 -translate-y-px fill-gold-400 text-gold-500" /> pra ver
+              a prévia da classificação dele aqui no topo.
+            </>
+          ) : (
+            <>A prévia do seu grupo favorito aparece aqui assim que ele começar a pontuar.</>
+          )}
+        </p>
+      </Card>
+    );
+  }
 
   return (
-    <Card className="overflow-hidden p-0">
-      <div className="flex items-center justify-between gap-3 bg-brand-600 px-4 py-3 text-white">
-        <div className="flex items-center gap-2">
-          <Globe2 className="size-4" strokeWidth={2.4} />
-          <span className="text-sm font-extrabold tracking-tight">Resultadismo The Best</span>
+    <div className="mb-1">
+      <div
+        className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto"
+        onScroll={(e) => {
+          const el = e.currentTarget;
+          const i = Math.round(el.scrollLeft / Math.max(el.clientWidth, 1));
+          if (i !== clampedActive) setActive(i);
+        }}
+      >
+        {slides.map((s) => (
+          <div key={s.league.id} className="w-full shrink-0 snap-center">
+            <FavoriteGroupSlide league={s.league} position={positions?.[s.league.id]} rows={s.rows} />
+          </div>
+        ))}
+      </div>
+      {slides.length > 1 && (
+        <div className="mt-2 flex items-center justify-center gap-1.5">
+          {slides.map((s, i) => (
+            <span
+              key={s.league.id}
+              className={cn(
+                "h-1.5 rounded-pill transition-all",
+                i === clampedActive ? "w-4 bg-brand-600" : "w-1.5 bg-ink-300",
+              )}
+            />
+          ))}
         </div>
+      )}
+    </div>
+  );
+}
+
+function FavoriteGroupSlide({
+  league,
+  position,
+  rows,
+}: {
+  league: MyLeague;
+  position?: LeaguePosition;
+  rows: GroupRankRow[];
+}) {
+  return (
+    <Card className="overflow-hidden p-0">
+      <div className="flex items-center justify-between gap-2 border-b border-border bg-surface-2 px-3 py-2.5">
+        <Link to={`/grupos/${league.slug}`} className="flex min-w-0 items-center gap-2">
+          <Escudo src={league.logo_url} name={league.name} size="sm" />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-bold text-ink-900">{league.name}</p>
+            <p className="text-[11px] text-ink-500">
+              {position ? `Você é o ${position.rank}º de ${position.total}` : "Classificação"}
+            </p>
+          </div>
+        </Link>
         <Link
-          to="/ranking"
-          className="rounded-pill bg-white/15 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white transition hover:bg-white/25"
+          to={`/grupos/${league.slug}`}
+          className="flex shrink-0 items-center gap-0.5 rounded-pill bg-ink-100 px-2.5 py-1 text-[11px] font-bold text-ink-600 transition hover:bg-ink-200"
         >
-          ver ranking
+          ver grupo <ChevronRight className="size-3.5" />
         </Link>
       </div>
-
-      {/* posição do user — sempre o primeiro recado */}
-      <div className="flex items-center justify-between gap-2 border-b border-border bg-surface-2 px-4 py-2.5">
-        {myRank ? (
-          <p className="text-sm leading-snug text-ink-700">
-            Você é o{" "}
-            <span className="font-extrabold tabular-nums text-ink-950">{myRank.rank}º</span>{" "}
-            <span className="text-ink-500">Resultadista</span>{" "}
-            <span className="text-ink-300">·</span>{" "}
-            <span className="font-bold tabular-nums text-ink-950">{myRank.pontos} pts</span>{" "}
-            <span className="text-ink-400">de {myRank.total_resultadistas}</span>
-          </p>
-        ) : (
-          <p className="text-sm text-ink-600">
-            Faça seu primeiro palpite e entre na disputa.{" "}
-            <Link to="/" className="font-semibold text-brand-700 underline">
-              Ver jogos →
-            </Link>
-          </p>
-        )}
-        {rows.length > 0 && (
-          <button
-            type="button"
-            onClick={() => setDetailed((v) => !v)}
-            aria-label={detailed ? "Ver resumo" : "Ver detalhes"}
-            className="flex shrink-0 items-center gap-1 rounded-pill bg-ink-100 px-2 py-1 text-[11px] font-semibold text-ink-600 transition hover:bg-ink-200"
-          >
-            <BarChart3 className="size-3.5" />
-            {detailed ? "resumo" : "detalhe"}
-          </button>
-        )}
-      </div>
-
-      {/* janela de 3 */}
-      {loadingWindow ? (
-        <div className="space-y-2 p-3">
-          {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-10 w-full" />
-          ))}
-        </div>
-      ) : rows.length === 0 ? (
-        <p className="px-4 py-3 text-xs text-ink-500">
-          Sem Resultadistas pontuados ainda. Você pode ser o primeiro.
-        </p>
-      ) : (
-        <ul className="divide-y divide-border">
-          {rows.map((r) => (
-            <RankRowMini key={r.user_id} row={r} isMe={r.user_id === myId} detailed={detailed} />
-          ))}
-        </ul>
-      )}
+      <ul className="divide-y divide-border">
+        {rows.map((r) => (
+          <GroupRankRowMini key={r.user_id} row={r} />
+        ))}
+      </ul>
     </Card>
   );
 }
 
-function RankRowMini({ row, isMe, detailed }: { row: RTBRow; isMe: boolean; detailed: boolean }) {
+function GroupRankRowMini({ row }: { row: GroupRankRow }) {
   const medal = row.rank === 1 ? "🥇" : row.rank === 2 ? "🥈" : row.rank === 3 ? "🥉" : null;
-  const aprov = row.jogos > 0 ? Math.round((row.pontos / (row.jogos * 3)) * 100) : 0;
   return (
     <li
       className={cn(
-        "flex items-center gap-3 px-4 py-2.5 transition-colors",
-        isMe && "bg-surface-2 ring-1 ring-inset ring-brand-600",
+        "flex items-center gap-3 px-3 py-2",
+        row.is_me && "bg-surface-2 ring-1 ring-inset ring-brand-600",
       )}
     >
       <span className="w-6 text-center text-sm font-bold tabular-nums text-ink-600">
         {medal ?? row.rank}
       </span>
       <Avatar src={row.avatar_url} name={row.display_name} size="sm" />
-      <div className="min-w-0 flex-1">
-        <p className="flex items-center gap-1.5 truncate text-sm font-semibold text-ink-900">
-          {row.display_name || "Resultadista"}
-          {isMe && <Badge tone="brand" className="text-[10px]">você</Badge>}
-        </p>
-        {detailed && (
-          <p className="flex flex-wrap gap-x-2.5 text-[11px] tabular-nums text-ink-500">
-            <span><b className="text-gold-700">{row.cravadas}</b> crav</span>
-            <span><b className="text-grass-700">{row.saldos}</b> saldo</span>
-            <span><b className="text-aqua-700">{row.acertos}</b> acerto</span>
-            <span><b className="text-ink-700">{aprov}%</b> aprov</span>
-          </p>
-        )}
-      </div>
-      <div className="text-right tabular-nums">
-        <p className="text-base font-extrabold text-ink-950">{row.pontos}</p>
-        <p className="text-[10px] uppercase tracking-wide text-ink-400">pts</p>
+      <p className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-sm font-semibold text-ink-900">
+        {row.display_name || "Resultadista"}
+        {row.is_me && <Badge tone="brand" className="text-[10px]">você</Badge>}
+      </p>
+      <div className="shrink-0 text-right tabular-nums">
+        <span className="text-base font-extrabold text-ink-950">{row.pontos}</span>
+        <span className="ml-0.5 text-[10px] uppercase tracking-wide text-ink-400">pts</span>
       </div>
     </li>
+  );
+}
+
+// Resultadismo The Best COMPACTO — só título + "ver ranking" + minha posição
+// geral (sem pontuação, a pedido). A classificação completa fica em /ranking.
+function RTBMiniCard() {
+  const { data: myRank } = useMyGlobalRank({});
+  return (
+    <Card className="mb-2 mt-3 flex items-center justify-between gap-3 p-3.5">
+      <div className="flex min-w-0 items-center gap-2.5">
+        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-brand-600 text-white">
+          <Globe2 className="size-4" strokeWidth={2.4} />
+        </span>
+        <div className="min-w-0">
+          <p className="text-sm font-extrabold tracking-tight text-ink-950">Resultadismo The Best</p>
+          <p className="truncate text-xs text-ink-500">
+            {myRank ? (
+              <>
+                Você é o <span className="font-bold tabular-nums text-ink-800">{myRank.rank}º</span> de{" "}
+                {myRank.total_resultadistas}
+              </>
+            ) : (
+              "Faça seu primeiro palpite e entre na disputa."
+            )}
+          </p>
+        </div>
+      </div>
+      <Link
+        to="/ranking"
+        className="shrink-0 rounded-pill bg-brand-600 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white transition hover:bg-brand-700"
+      >
+        ver ranking
+      </Link>
+    </Card>
   );
 }
 
@@ -274,10 +349,14 @@ function GroupCard({
   league,
   position,
   preview,
+  isFavorite,
+  onToggleFavorite,
 }: {
   league: MyLeague;
   position?: LeaguePosition;
   preview?: { avatars: MemberAvatar[]; count: number };
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
 }) {
   const isAdmin = league.my_role === "owner" || league.my_role === "admin";
   const isPublic = league.visibility === "public";
@@ -336,6 +415,18 @@ function GroupCard({
       <div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-3">
         <MemberStack avatars={preview?.avatars ?? []} count={count} />
         <div className="flex shrink-0 items-center gap-0.5">
+          <button
+            type="button"
+            onClick={onToggleFavorite}
+            aria-label={isFavorite ? "Desfavoritar grupo" : "Favoritar grupo"}
+            aria-pressed={isFavorite}
+            className={cn(
+              "grid size-9 place-items-center rounded-md transition hover:bg-ink-100",
+              isFavorite ? "text-gold-500" : "text-ink-400 hover:text-gold-500",
+            )}
+          >
+            <Star className={cn("size-4", isFavorite && "fill-gold-400")} />
+          </button>
           <button
             type="button"
             onClick={share}

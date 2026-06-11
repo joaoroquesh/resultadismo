@@ -131,6 +131,12 @@ página pública `/retro/r/:code`.
   forma via `destination-in` (assets same-origin → sem taint), e põe a inicial por cima. Foto
   cross-origin cai p/ sólido (evita tainted canvas no `toBlob`). O escudo do logado vem do
   `profile` (`ResultView` → `shareCampaign` → `buildShareImage`); anônimo mantém a imagem sem escudo.
+- **OG próprio (rodada 19):** `/retro*` tem card OG/Twitter próprio (`public/og-retro.jpg`,
+  1200×630, estilo do hero). SPA não serve meta por rota, então `scripts/build-retro-html.mjs`
+  (`postbuild`) gera `dist/retro.html` (clone do index com o SEO do Retrô; **falha o build** se o
+  formato do index mudar) e o `vercel.json` reescreve `/retro` + `/retro/:path*` pra ele, antes do
+  catch-all. Vale também pra página do share `/retro/r/:code`. Pra regerar a imagem: o fonte do
+  layout é HTML simples (tokens + fontes do app) renderizado a 1200×630 @2x → JPEG.
 - **Foto no escudo da imagem (rodada 17):** `fill=photo` (a maioria dos logados Google tem foto —
   `avatar_url` nasce como a URL crua e vira `fill=photo` via `legacyToCrest`) agora desenha a **foto
   de verdade** no canvas, não mais sólido. `loadPhoto` carrega com `crossOrigin="anonymous"`
