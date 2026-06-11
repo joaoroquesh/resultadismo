@@ -94,6 +94,17 @@ Pagamento · Avisos · Construa · Dados · Changelog**. Todas as ações chamam
 - **Histórico** (`admin_list_broadcasts`): o que já foi enviado, com segmento, alcance e autor.
 - O envio insere 1 notificação por destinatário (o trigger `notifications_send_push` empurra o push
   de cada uma) e **audita** em `admin_audit_log` (`broadcast_send`).
+- **Alcance real do push**: o rodapé mostra "Push no aparelho: N aparelhos (M pessoas)" via
+  `admin_push_stats` — in-app chega pra todo o segmento; push só pra quem tem aparelho inscrito.
+  A `send-push` responde `{sent, total, failed[]}` e **loga toda falha de entrega** (status+motivo)
+  no dashboard, consultável em `net._http_response`.
+
+### Alertas automáticos pros app-admins (`fan_notify_admins`, dedupe 6h por kind+ref)
+- **Grupo aguardando aprovação** (`group_pending`): dispara na criação de grupo `pending` (modo
+  grátis) — sininho + push com link pra `Admin → Grupos`. *(O alerta `name_review` só existe no
+  fluxo de pagamento e na edição de nome.)*
+- **Sync** (`sync_alert`), **feedback novo** (`feedback`) e **nome editado** (`name_review`)
+  completam a família.
 
 ### Aba **Construa** (`FeedbackAdmin`) — "Construa o Resultadismo com a gente!"
 - Reportes de **erro** (🐞) e **sugestões** (💡) que os usuários enviam em **`/construa`**. Filtros por

@@ -2145,6 +2145,13 @@ export type Database = {
           id: string
         }[]
       }
+      admin_push_stats: {
+        Args: never
+        Returns: {
+          devices: number
+          users: number
+        }[]
+      }
       admin_remove_competition_source: {
         Args: { p_id: string }
         Returns: undefined

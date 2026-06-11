@@ -14,6 +14,7 @@ import {
   useBroadcastPreview,
   useSendBroadcast,
   useBroadcasts,
+  useAdminPushStats,
   type SegmentKey,
   type Broadcast,
 } from "./sync";
@@ -39,6 +40,7 @@ export function BroadcastPanel() {
   const { toast } = useToast();
   const targets = useGroupTargets();
   const send = useSendBroadcast();
+  const pushStats = useAdminPushStats();
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -244,6 +246,7 @@ export function BroadcastPanel() {
                   ? "Falta um título pra liberar o envio."
                   : "Já descontamos quem desativou os avisos."}
               </p>
+              <PushStatsLine stats={pushStats.data} />
             </div>
           </div>
           <Button onClick={onSendClick} loading={send.isPending} disabled={!canSend}>
@@ -270,6 +273,20 @@ export function BroadcastPanel() {
         onCancel={() => setConfirmOpen(false)}
       />
     </div>
+  );
+}
+
+// Alcance honesto do push: in-app chega pra todo o segmento; push só pra quem
+// tem aparelho inscrito. Some quieto enquanto carrega (ou se a RPC falhar).
+function PushStatsLine({ stats }: { stats?: { devices: number; users: number } }) {
+  if (!stats) return null;
+  const aparelhos = stats.devices === 1 ? "aparelho inscrito" : "aparelhos inscritos";
+  const pessoas = stats.users === 1 ? "pessoa" : "pessoas";
+  return (
+    <p className="text-xs text-ink-400">
+      Push no aparelho: {stats.devices} {aparelhos} ({stats.users} {pessoas}) — o resto recebe só
+      no sininho.
+    </p>
   );
 }
 

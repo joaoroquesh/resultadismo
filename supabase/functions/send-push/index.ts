@@ -45,6 +45,9 @@ Deno.serve(async (req) => {
 
   const payload = JSON.stringify({ title: title ?? "Resultadismo", body: body ?? "", data: { url: url ?? "/" } });
   let sent = 0;
+  // Falha NUNCA é engolida em silêncio: cada erro vira log (dashboard) e entra
+  // na resposta — que fica consultável em net._http_response pro diagnóstico.
+  const failed: Array<{ status: number | null; reason: string }> = [];
   for (const s of subs ?? []) {
     try {
       await webpush.sendNotification(
@@ -53,14 +56,28 @@ Deno.serve(async (req) => {
       );
       sent++;
     } catch (e) {
-      const status = (e as { statusCode?: number }).statusCode;
+      const status = (e as { statusCode?: number }).statusCode ?? null;
+      const reason =
+        ((e as { body?: string }).body || (e as Error).message || "erro desconhecido")
+          .replace(/\s+/g, " ")
+          .slice(0, 140);
+      failed.push({ status, reason });
+      // endpoint é capability URL — loga só o sufixo, suficiente pra distinguir aparelhos
+      console.error("send-push: falha de entrega", {
+        user_id,
+        status,
+        reason,
+        endpoint_fim: s.endpoint.slice(-12),
+      });
       if (status === 404 || status === 410) {
         await admin.from("push_subscriptions").delete().eq("id", s.id);
       }
     }
   }
 
-  return new Response(JSON.stringify({ sent }), {
-    headers: { ...cors, "Content-Type": "application/json" },
-  });
+  const total = (subs ?? []).length;
+  return new Response(
+    JSON.stringify(failed.length ? { sent, total, failed } : { sent, total }),
+    { headers: { ...cors, "Content-Type": "application/json" } },
+  );
 });

@@ -298,6 +298,22 @@ export function useGroupTargets() {
   });
 }
 
+// Push ativo na base: quantos aparelhos inscritos, de quantas pessoas. Mantém o
+// alcance do aviso honesto — in-app chega pra todo o segmento; push só pra quem
+// tem aparelho inscrito.
+export function useAdminPushStats() {
+  return useQuery({
+    queryKey: ["admin", "push-stats"],
+    staleTime: 60_000,
+    queryFn: async (): Promise<{ devices: number; users: number }> => {
+      const { data, error } = await supabase.rpc("admin_push_stats");
+      if (error) throw new Error(error.message);
+      const row = (data as { devices: number; users: number }[] | null)?.[0];
+      return { devices: Number(row?.devices ?? 0), users: Number(row?.users ?? 0) };
+    },
+  });
+}
+
 // Quanta gente recebe esse aviso (debounce fica no componente). Habilitável
 // para não chamar a RPC antes de o segmento/argumento estarem prontos.
 export function useBroadcastPreview(

@@ -21,6 +21,19 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
+- **Grupo aguardando aprovação agora avisa os admins** (sininho + push, link direto pra
+  `Admin → Grupos`). Lacuna confirmada em produção: no modo grátis o grupo nasce `pending`
+  esperando liberação, mas nenhum trigger cobria esse caminho — 3 grupos foram aprovados sem
+  ninguém ser avisado (o alerta `name_review` pertence só ao fluxo de pagamento). Trigger novo
+  `notify_admins_group_pending` com dedupe padrão de 6h por grupo. Validado em transação no banco
+  local (INSERT como o front faz → 1 alerta por admin → rollback). → [`04`](04-ADMIN.md).
+- **Painel de Avisos mostra o alcance real do push**: "Push no aparelho: N aparelhos (M pessoas) —
+  o resto recebe só no sininho" (RPC nova `admin_push_stats`, só app-admin). Evita a impressão de
+  que o aviso vira push pra todo o segmento.
+- **`send-push` não engole mais erro de entrega**: cada falha vira log no dashboard (status +
+  motivo + sufixo do endpoint) e a resposta passa a ser `{sent, total, failed[]}` — consultável em
+  `net._http_response` pra diagnóstico definitivo (o silêncio de 10–11/06 ficou sem causa exata
+  justamente por falta disso; a investigação confirmou criação/envio/exibição funcionando hoje).
 - **Aba "Grupos" na página de jogos: os palpites que valem ponto nunca somem.** Quem personalizou
   "só Brasil" mas está num grupo que conta outras seleções vê os jogos do grupo numa aba própria.
   Ordem das abas: **Interesses** (encurtada; só personalização) → **Grupos** (união dos recortes dos
