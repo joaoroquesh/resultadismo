@@ -20,6 +20,14 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+### Alterado
+- **Compartilhar vários jogos ficou achável.** O ícone no card ganhou o rótulo "compartilhar"
+  e **abre o modo de seleção já com aquele jogo marcado** — a barra ("1 jogo — toque em mais
+  pra juntar" → "Gerar imagem") ensina o gesto; tocar nos outros cards soma na mesma imagem.
+  Antes, o único jeito de juntar jogos era um botão no fim da fileira de dias (segue lá como
+  atalho), que podia ficar fora da tela. De quebra, jogo no "ao vivo automático" (agendado que
+  já começou há <4h) agora também conta como selecionável, na mesma régua do card.
+
 ### Corrigido
 - **JogosPage: memoização do `dayMatches` restaurada na ordem certa.** O erro do React Compiler
   ("Existing memoization could not be preserved") era causado pelas funções de compartilhar

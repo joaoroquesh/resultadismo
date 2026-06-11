@@ -183,10 +183,18 @@ export function JogosPage() {
   // ── compartilhar placares como IMAGEM (1+ jogos do dia) ──────────────────
   // null = fora do modo seleção; Set = ids escolhidos.
   const [shareSel, setShareSel] = useState<Set<string> | null>(null);
+  // mesma régua do "ao vivo automático" do card: agendado que já começou há <4h
+  // conta como rolando (a API às vezes demora a virar o status).
+  const isLiveish = (m: (typeof dayMatches)[number]) => {
+    if (m.status === "live") return true;
+    if (m.status !== "scheduled" || !m.kickoff_at) return false;
+    const ms = dayjs().valueOf() - dayjs(m.kickoff_at).valueOf();
+    return ms > 0 && ms < 4 * 60 * 60 * 1000;
+  };
   const isShareable = (m: (typeof dayMatches)[number]) => {
     const pred = predMap?.get(m.id);
     if (!pred) return false;
-    return m.status === "finished" || m.status === "live";
+    return m.status === "finished" || isLiveish(m);
   };
   function toggleShare(id: string) {
     setShareSel((prev) => {
@@ -216,7 +224,7 @@ export function JogosPage() {
           awayPred: pred.away_pred,
           homeScore: m.home_score ?? (finished ? null : 0),
           awayScore: m.away_score ?? (finished ? null : 0),
-          live: m.status === "live",
+          live: !finished && isLiveish(m),
           type,
           joker: pred.is_joker ?? false,
         };
@@ -297,6 +305,7 @@ export function JogosPage() {
               prediction={predMap?.get(m.id) ?? null}
               jokersUsed={jokersByCompWeek.get(`${compKey}:${wk}`) ?? 0}
               maxJokers={jokerMax.get(compKey) ?? 2}
+              onShare={() => setShareSel(new Set([m.id]))}
             />
             {shareSel != null && (
               <button
@@ -335,7 +344,11 @@ export function JogosPage() {
     shareSel != null ? (
       <div className="fixed inset-x-3 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-50 mx-auto flex max-w-sm items-center gap-2 rounded-lg bg-surface p-3 shadow-[var(--shadow-pop)] ring-1 ring-border lg:bottom-6">
         <p className="min-w-0 flex-1 text-sm font-semibold text-ink-900">
-          {shareSel.size === 0 ? "Toque nos jogos" : `${shareSel.size} jogo(s)`}
+          {shareSel.size === 0
+            ? "Toque nos jogos"
+            : shareSel.size === 1
+              ? "1 jogo — toque em mais pra juntar"
+              : `${shareSel.size} jogos na imagem`}
         </p>
         <button
           type="button"

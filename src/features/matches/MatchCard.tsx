@@ -17,7 +17,6 @@ import { supabase } from "@/lib/supabase";
 import type { MatchWithTeams, Prediction, ScoreType } from "@/lib/types";
 import { SCORE_LABEL, SCORE_POINTS } from "@/lib/types";
 import { provisionalScoreType } from "@/lib/score";
-import { buildScoreShareImage, shareImageBlob } from "./shareImage";
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 
@@ -47,11 +46,14 @@ export function MatchCard({
   prediction,
   jokersUsed = 0,
   maxJokers = 99,
+  onShare,
 }: {
   match: MatchWithTeams;
   prediction: Prediction | null;
   jokersUsed?: number;
   maxJokers?: number;
+  /** abre o modo de seleção da imagem já com este jogo marcado (página Jogos). */
+  onShare?: () => void;
 }) {
   const { session } = useAuth();
   const { open: openLogin } = useLoginModal();
@@ -157,27 +159,7 @@ export function MatchCard({
   const liveType: ScoreType | null =
     live && prediction ? provisionalScoreType(prediction.home_pred, prediction.away_pred, liveHome, liveAway) : null;
 
-  const { profile } = useAuth();
   const shareType = scoreType ?? liveType;
-  async function shareResult() {
-    if (!prediction || !shareType) return;
-    const blob = await buildScoreShareImage(
-      [{
-        homeName: match.home_team?.short_name ?? match.home_team_name ?? "Time",
-        awayName: match.away_team?.short_name ?? match.away_team_name ?? "Time",
-        homePred: prediction.home_pred,
-        awayPred: prediction.away_pred,
-        homeScore: finished ? match.home_score : liveHome,
-        awayScore: finished ? match.away_score : liveAway,
-        live,
-        type: shareType,
-        joker: isJoker,
-      }],
-      profile?.display_name ?? "Resultadista",
-    );
-    const how = await shareImageBlob(blob, "resultadismo-palpite.png");
-    toast(how === "shared" ? "Imagem compartilhada! 📸" : "Imagem salva! 📸", "success");
-  }
 
   return (
     <div
@@ -264,14 +246,14 @@ export function MatchCard({
               {liveType === "erro" ? "0" : `+${SCORE_POINTS[liveType] * (isJoker ? 2 : 1)}`}
             </span>
           )}
-          {prediction && shareType && (
+          {prediction && shareType && onShare && (
             <button
               type="button"
-              onClick={() => void shareResult()}
+              onClick={onShare}
               aria-label="Compartilhar resultado como imagem"
-              className="grid size-6 shrink-0 place-items-center rounded text-ink-400 transition hover:bg-ink-100 hover:text-brand-700"
+              className="flex h-6 shrink-0 items-center gap-1 rounded px-1.5 text-[11px] font-semibold text-ink-400 transition hover:bg-ink-100 hover:text-brand-700"
             >
-              <Share2 className="size-3.5" />
+              <Share2 className="size-3.5" /> compartilhar
             </button>
           )}
         </div>
