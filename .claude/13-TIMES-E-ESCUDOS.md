@@ -54,6 +54,15 @@ Edite várias entradas no `data/teams-registry.json` (é só JSON), solte os PNG
 - **Seleção que aparece nos amistosos/eliminatórias mas não tem cadastro** passa batida em inglês
   (ou cai num fallback) — se ela ganhar destaque, cadastre como `kind: "national"` com o alias em
   inglês da ESPN (ex.: `camboja`/"Cambodia", `comores`/"Comoros", `grecia`/"Greece").
+- **Varredura 2026-06-11 (caso "Argentina × Iceland"):** todas as seleções que a ESPN/football-data
+  mandam nos amistosos em prod foram cadastradas (**77 novas**, ex.: `islandia`/"Iceland",
+  `eslovaquia`/"Slovakia", `republicacentroafricana`/"Central African Republic" + "Cent Afr Rep").
+  Os aliases são os nomes **exatos** das APIs (displayName e shortDisplayName quando difere),
+  conferidos contra a tabela `teams` e os jogos reais de prod (REST anônimo). 20 casaram escudo já
+  existente em `public/teams/` (`islandia.svg`, `russia.svg`, `hungria.svg`…); 59 seguem sem
+  arquivo (cai no fallback de iniciais até alguém soltar a bandeira). Clubes fora do registro
+  (Série C, Ligue 1…) ficaram **de fora de propósito** — escopo era seleções. Nome em inglês já
+  gravado num jogo só se corrige no próximo sync em modo `catalog` (modo `scores` não toca nome).
 
 ## Competições (curadoria editável)
 **`data/competitions-registry.json`** — uma entrada por campeonato:

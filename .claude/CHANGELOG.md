@@ -41,6 +41,19 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   no registro como seleções (Grécia casou o `grecia.svg` que já existia). Auditoria pós-fix:
   182 seleções da ESPN, zero caem em clube; nenhuma chave existente mudou de dono. Migration
   `20260611150000` corrige os dados já gravados (2 times + 3 jogos; placar/pontuação intactos).
+- **Seleções de amistoso sem cadastro apareciam em inglês e sem escudo ("Argentina × Iceland").**
+  O registro tinha só 69 seleções; o que a ESPN mandava fora dele ficava com o nome cru em inglês
+  no banco e o escudo caía no quadradinho de sigla (`teamCrestPath("Iceland")` → slug "iceland"
+  não existe; o arquivo é `islandia.svg`). Varredura contra os dados reais de prod (REST anônimo:
+  tabela `teams` + nomes dos 180 jogos): **77 seleções novas** no `data/teams-registry.json` com
+  os aliases em inglês exatos das APIs (Iceland, Slovakia, Kazakhstan, "Cent Afr Rep",
+  "Trin & Tob"…); 20 casaram escudo que já existia (`islandia.svg`, `russia.svg`, `hungria.svg`…).
+  Pós-`gen:all`: todos os nomes de prod resolvem (sobram só clubes — fora do escopo — e o
+  placeholder "Time"); nenhuma chave existente do canônico mudou de dono. Jogos já gravados em
+  inglês se corrigem sozinhos no próximo sync em modo `catalog` (modo `scores` não toca nome).
+  Obs.: Guam e Guatemala têm a mesma sigla (GUA) — cadastrá-los só ficou seguro com o fix do TLA
+  acima, que subiu primeiro. Efeito colateral: o seletor de "seleção que torce"
+  (perfil/onboarding) passa de 69 pra 146 opções, 59 sem bandeira.
 - **Competições apagadas por engano no admin RESTAURADAS (com os "seguindo" intactos).** O João
   apagou 16 campeonatos em rascunho (Copa América, Eurocopa, Nations League, as 5 Eliminatórias,
   Saudi Pro League, Primeira Liga, Eredivisie, Süper Lig, Pro League BEL, Premiership SCO, Super

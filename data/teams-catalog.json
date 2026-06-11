@@ -19,6 +19,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "afeganistao",
+    "name_pt": "Afeganistão",
+    "short_pt": "Afeganistão",
+    "tla": "AFG",
+    "country": "Afeganistão",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Afghanistan"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "africadosul",
     "name_pt": "África do Sul",
     "short_pt": "Á. do Sul",
@@ -377,6 +393,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "angola",
+    "name_pt": "Angola",
+    "short_pt": "Angola",
+    "tla": "ANG",
+    "country": "Angola",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Angola"
+    ],
+    "crest_file": "angola.svg",
+    "crest_source": "repo (public/teams)"
+  },
+  {
     "slug": "aparecidense",
     "name_pt": "Aparecidense",
     "short_pt": "Aparecidense",
@@ -444,6 +476,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "armenia",
+    "name_pt": "Armênia",
+    "short_pt": "Armênia",
+    "tla": "ARM",
+    "country": "Armênia",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Armenia"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "arsenal",
     "name_pt": "Arsenal",
     "short_pt": "Arsenal",
@@ -460,6 +508,22 @@
     ],
     "crest_file": "arsenal.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "aruba",
+    "name_pt": "Aruba",
+    "short_pt": "Aruba",
+    "tla": "ARU",
+    "country": "Aruba",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Aruba"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "astonvilla",
@@ -709,6 +773,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "azerbaijao",
+    "name_pt": "Azerbaijão",
+    "short_pt": "Azerbaijão",
+    "tla": "AZE",
+    "country": "Azerbaijão",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Azerbaijan"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "bahia",
     "name_pt": "Bahia",
     "short_pt": "Bahia",
@@ -728,6 +808,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "bahrein",
+    "name_pt": "Bahrein",
+    "short_pt": "Bahrein",
+    "tla": "BHR",
+    "country": "Bahrein",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Bahrain"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "banfield",
     "name_pt": "Banfield",
     "short_pt": "Banfield",
@@ -741,6 +837,22 @@
     ],
     "crest_file": "banfield.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "bangladesh",
+    "name_pt": "Bangladesh",
+    "short_pt": "Bangladesh",
+    "tla": "BAN",
+    "country": "Bangladesh",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Bangladesh"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "barcelona",
@@ -799,6 +911,23 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "belarus",
+    "name_pt": "Belarus",
+    "short_pt": "Belarus",
+    "tla": "BLR",
+    "country": "Belarus",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Belarus",
+      "Bielorrússia"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "belgica",
     "name_pt": "Bélgica",
     "short_pt": "Bélgica",
@@ -830,6 +959,22 @@
     ],
     "crest_file": "benfica.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "benin",
+    "name_pt": "Benin",
+    "short_pt": "Benin",
+    "tla": "BEN",
+    "country": "Benin",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Benin"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "bielefeld",
@@ -1029,6 +1174,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "botsuana",
+    "name_pt": "Botsuana",
+    "short_pt": "Botsuana",
+    "tla": "BOT",
+    "country": "Botsuana",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Botswana"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "bournemouth",
     "name_pt": "Bournemouth",
     "short_pt": "Bournemouth",
@@ -1167,6 +1328,38 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "bulgaria",
+    "name_pt": "Bulgária",
+    "short_pt": "Bulgária",
+    "tla": "BUL",
+    "country": "Bulgária",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Bulgaria"
+    ],
+    "crest_file": "bulgaria.svg",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "burkinafaso",
+    "name_pt": "Burkina Faso",
+    "short_pt": "Burkina Faso",
+    "tla": "BKA",
+    "country": "Burkina Faso",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Burkina Faso"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "burnley",
     "name_pt": "Burnley",
     "short_pt": "Burnley",
@@ -1182,6 +1375,38 @@
     ],
     "crest_file": "burnley.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "burundi",
+    "name_pt": "Burundi",
+    "short_pt": "Burundi",
+    "tla": "BDI",
+    "country": "Burundi",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Burundi"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
+    "slug": "butao",
+    "name_pt": "Butão",
+    "short_pt": "Butão",
+    "tla": "BHU",
+    "country": "Butão",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Bhutan"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "caboverde",
@@ -1315,6 +1540,22 @@
     ],
     "crest_file": "catar.svg",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "cazaquistao",
+    "name_pt": "Cazaquistão",
+    "short_pt": "Cazaquistão",
+    "tla": "KAZ",
+    "country": "Cazaquistão",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Kazakhstan"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "ceara",
@@ -1453,6 +1694,39 @@
     ],
     "crest_file": "chile.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "china",
+    "name_pt": "China",
+    "short_pt": "China",
+    "tla": "CHN",
+    "country": "China",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "China",
+      "China PR"
+    ],
+    "crest_file": "china.svg",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "chipre",
+    "name_pt": "Chipre",
+    "short_pt": "Chipre",
+    "tla": "CYP",
+    "country": "Chipre",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Cyprus"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "cienciano",
@@ -1645,6 +1919,22 @@
       "Côte d'Ivoire"
     ],
     "crest_file": "costadomarfim.svg",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "costarica",
+    "name_pt": "Costa Rica",
+    "short_pt": "Costa Rica",
+    "tla": "CRC",
+    "country": "Costa Rica",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Costa Rica"
+    ],
+    "crest_file": "costarica.svg",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -1907,6 +2197,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "elsalvador",
+    "name_pt": "El Salvador",
+    "short_pt": "El Salvador",
+    "tla": "SLV",
+    "country": "El Salvador",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "El Salvador"
+    ],
+    "crest_file": "elsalvador.svg",
+    "crest_source": "repo (public/teams)"
+  },
+  {
     "slug": "empoli",
     "name_pt": "Empoli",
     "short_pt": "Empoli",
@@ -1954,6 +2260,38 @@
       "Scotland"
     ],
     "crest_file": "escocia.svg",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "eslovaquia",
+    "name_pt": "Eslováquia",
+    "short_pt": "Eslováquia",
+    "tla": "SVK",
+    "country": "Eslováquia",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Slovakia"
+    ],
+    "crest_file": "eslovaquia.svg",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "eslovenia",
+    "name_pt": "Eslovênia",
+    "short_pt": "Eslovênia",
+    "tla": "SVN",
+    "country": "Eslovênia",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Slovenia"
+    ],
+    "crest_file": "eslovenia.svg",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -2022,6 +2360,22 @@
     ],
     "crest_file": "estudiantes.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "etiopia",
+    "name_pt": "Etiópia",
+    "short_pt": "Etiópia",
+    "tla": "ETH",
+    "country": "Etiópia",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Ethiopia"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "eua",
@@ -2095,6 +2449,38 @@
     ],
     "crest_file": "ferroviario.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "fiji",
+    "name_pt": "Fiji",
+    "short_pt": "Fiji",
+    "tla": "FIJ",
+    "country": "Fiji",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Fiji"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
+    "slug": "filipinas",
+    "name_pt": "Filipinas",
+    "short_pt": "Filipinas",
+    "tla": "PHI",
+    "country": "Filipinas",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Philippines"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "finlandia",
@@ -2307,6 +2693,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "georgia",
+    "name_pt": "Geórgia",
+    "short_pt": "Geórgia",
+    "tla": "GEO",
+    "country": "Geórgia",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Georgia"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "getafe",
     "name_pt": "Getafe",
     "short_pt": "Getafe",
@@ -2426,6 +2828,71 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "guam",
+    "name_pt": "Guam",
+    "short_pt": "Guam",
+    "tla": "GUA",
+    "country": "Guam",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Guam"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
+    "slug": "guatemala",
+    "name_pt": "Guatemala",
+    "short_pt": "Guatemala",
+    "tla": "GUA",
+    "country": "Guatemala",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Guatemala"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
+    "slug": "guine",
+    "name_pt": "Guiné",
+    "short_pt": "Guiné",
+    "tla": "GUI",
+    "country": "Guiné",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Guinea"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
+    "slug": "guineequatorial",
+    "name_pt": "Guiné Equatorial",
+    "short_pt": "G. Equatorial",
+    "tla": "EQG",
+    "country": "Guiné Equatorial",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Equatorial Guinea",
+      "Eq. Guinea"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "haiti",
     "name_pt": "Haiti",
     "short_pt": "Haiti",
@@ -2493,6 +2960,54 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "honduras",
+    "name_pt": "Honduras",
+    "short_pt": "Honduras",
+    "tla": "HON",
+    "country": "Honduras",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Honduras"
+    ],
+    "crest_file": "honduras.svg",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "hongkong",
+    "name_pt": "Hong Kong",
+    "short_pt": "Hong Kong",
+    "tla": "HKG",
+    "country": "Hong Kong",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Hong Kong"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
+    "slug": "hungria",
+    "name_pt": "Hungria",
+    "short_pt": "Hungria",
+    "tla": "HUN",
+    "country": "Hungria",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Hungary"
+    ],
+    "crest_file": "hungria.svg",
+    "crest_source": "repo (public/teams)"
+  },
+  {
     "slug": "huracan",
     "name_pt": "Huracán",
     "short_pt": "Huracán",
@@ -2510,6 +3025,40 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "ilhascayman",
+    "name_pt": "Ilhas Cayman",
+    "short_pt": "I. Cayman",
+    "tla": "CAY",
+    "country": "Ilhas Cayman",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Cayman Islands",
+      "Cayman Isl"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
+    "slug": "ilhasvirgensbritanicas",
+    "name_pt": "Ilhas Virgens Britânicas",
+    "short_pt": "I. Virgens Br.",
+    "tla": "BVI",
+    "country": "Ilhas Virgens Britânicas",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "British Virgin Islands",
+      "Br Virgin Isl"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "inddelvalle",
     "name_pt": "Independiente del Valle",
     "short_pt": "Ind. del Valle",
@@ -2525,6 +3074,22 @@
     ],
     "crest_file": "inddelvalle.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "indonesia",
+    "name_pt": "Indonésia",
+    "short_pt": "Indonésia",
+    "tla": "IDN",
+    "country": "Indonésia",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Indonesia"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "inglaterra",
@@ -2664,6 +3229,23 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "irlanda",
+    "name_pt": "Irlanda",
+    "short_pt": "Irlanda",
+    "tla": "IRL",
+    "country": "Irlanda",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Ireland",
+      "Republic of Ireland"
+    ],
+    "crest_file": "irlanda.svg",
+    "crest_source": "repo (public/teams)"
+  },
+  {
     "slug": "irlandadonorte",
     "name_pt": "Irlanda do Norte",
     "short_pt": "Irl. Norte",
@@ -2675,6 +3257,38 @@
       "Northern Ireland"
     ],
     "crest_file": "irlandadonorte.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "islandia",
+    "name_pt": "Islândia",
+    "short_pt": "Islândia",
+    "tla": "ISL",
+    "country": "Islândia",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Iceland"
+    ],
+    "crest_file": "islandia.svg",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "israel",
+    "name_pt": "Israel",
+    "short_pt": "Israel",
+    "tla": "ISR",
+    "country": "Israel",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Israel"
+    ],
+    "crest_file": "israel.svg",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -2690,6 +3304,22 @@
       "Italia"
     ],
     "crest_file": "italia.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "jamaica",
+    "name_pt": "Jamaica",
+    "short_pt": "Jamaica",
+    "tla": "JAM",
+    "country": "Jamaica",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Jamaica"
+    ],
+    "crest_file": "jamaica.svg",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -2807,6 +3437,38 @@
       "Kiel"
     ],
     "crest_file": "kiel.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "kosovo",
+    "name_pt": "Kosovo",
+    "short_pt": "Kosovo",
+    "tla": "KOS",
+    "country": "Kosovo",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Kosovo"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
+    "slug": "kuwait",
+    "name_pt": "Kuwait",
+    "short_pt": "Kuwait",
+    "tla": "KUW",
+    "country": "Kuwait",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Kuwait"
+    ],
+    "crest_file": "kuwait.svg",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -2945,6 +3607,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "lesoto",
+    "name_pt": "Lesoto",
+    "short_pt": "Lesoto",
+    "tla": "LES",
+    "country": "Lesoto",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Lesotho"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "levante",
     "name_pt": "Levante",
     "short_pt": "Levante",
@@ -2980,6 +3658,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "liberia",
+    "name_pt": "Libéria",
+    "short_pt": "Libéria",
+    "tla": "LBR",
+    "country": "Libéria",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Liberia"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "libertad",
     "name_pt": "Libertad",
     "short_pt": "Libertad",
@@ -2995,6 +3689,22 @@
     ],
     "crest_file": "libertad.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "liechtenstein",
+    "name_pt": "Liechtenstein",
+    "short_pt": "Liechtenstein",
+    "tla": "LIE",
+    "country": "Liechtenstein",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Liechtenstein"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "lituania",
@@ -3046,6 +3756,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "luxemburgo",
+    "name_pt": "Luxemburgo",
+    "short_pt": "Luxemburgo",
+    "tla": "LUX",
+    "country": "Luxemburgo",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Luxembourg"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "macedonia",
     "name_pt": "Macedônia do Norte",
     "short_pt": "Macedônia",
@@ -3059,6 +3785,22 @@
     ],
     "crest_file": "macedonia.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "madagascar",
+    "name_pt": "Madagascar",
+    "short_pt": "Madagascar",
+    "tla": "MAD",
+    "country": "Madagascar",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Madagascar"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "mainz",
@@ -3076,6 +3818,54 @@
     ],
     "crest_file": "mainz.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "malawi",
+    "name_pt": "Malawi",
+    "short_pt": "Malawi",
+    "tla": "MWI",
+    "country": "Malawi",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Malawi"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
+    "slug": "maldivas",
+    "name_pt": "Maldivas",
+    "short_pt": "Maldivas",
+    "tla": "MDV",
+    "country": "Maldivas",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Maldives"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
+    "slug": "mali",
+    "name_pt": "Mali",
+    "short_pt": "Mali",
+    "tla": "MLI",
+    "country": "Mali",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Mali"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "mallorca",
@@ -3263,6 +4053,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "mianmar",
+    "name_pt": "Mianmar",
+    "short_pt": "Mianmar",
+    "tla": "MYA",
+    "country": "Mianmar",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Myanmar"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "milan",
     "name_pt": "Milan",
     "short_pt": "Milan",
@@ -3299,6 +4105,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "mocambique",
+    "name_pt": "Moçambique",
+    "short_pt": "Moçambique",
+    "tla": "MOZ",
+    "country": "Moçambique",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Mozambique"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "moldavia",
     "name_pt": "Moldávia",
     "short_pt": "Moldávia",
@@ -3311,6 +4133,38 @@
     ],
     "crest_file": "moldavia.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "mongolia",
+    "name_pt": "Mongólia",
+    "short_pt": "Mongólia",
+    "tla": "MGL",
+    "country": "Mongólia",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Mongolia"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
+    "slug": "montenegro",
+    "name_pt": "Montenegro",
+    "short_pt": "Montenegro",
+    "tla": "MNE",
+    "country": "Montenegro",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Montenegro"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "monterrey",
@@ -3434,6 +4288,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "nicaragua",
+    "name_pt": "Nicarágua",
+    "short_pt": "Nicarágua",
+    "tla": "NCA",
+    "country": "Nicarágua",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Nicaragua"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "nice",
     "name_pt": "Nice",
     "short_pt": "Nice",
@@ -3449,6 +4319,22 @@
       "Nice"
     ],
     "crest_file": "nice.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "nigeria",
+    "name_pt": "Nigéria",
+    "short_pt": "Nigéria",
+    "tla": "NGA",
+    "country": "Nigéria",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Nigeria"
+    ],
+    "crest_file": "nigeria.svg",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -3540,6 +4426,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "oma",
+    "name_pt": "Omã",
+    "short_pt": "Omã",
+    "tla": "OMA",
+    "country": "Omã",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Oman"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "oncecaldas",
     "name_pt": "Once Caldas",
     "short_pt": "Once Caldas",
@@ -3620,6 +4522,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "palestina",
+    "name_pt": "Palestina",
+    "short_pt": "Palestina",
+    "tla": "PLE",
+    "country": "Palestina",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Palestine"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "palestino",
     "name_pt": "Palestino",
     "short_pt": "Palestino",
@@ -3671,6 +4589,22 @@
     ],
     "crest_file": "panama.svg",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "paquistao",
+    "name_pt": "Paquistão",
+    "short_pt": "Paquistão",
+    "tla": "PAK",
+    "country": "Paquistão",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Pakistan"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "paraguai",
@@ -3791,6 +4725,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "portorico",
+    "name_pt": "Porto Rico",
+    "short_pt": "Porto Rico",
+    "tla": "PUR",
+    "country": "Porto Rico",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Puerto Rico"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "portugal",
     "name_pt": "Portugal",
     "short_pt": "Portugal",
@@ -3855,6 +4805,40 @@
     ],
     "crest_file": "pyramids.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "quenia",
+    "name_pt": "Quênia",
+    "short_pt": "Quênia",
+    "tla": "KEN",
+    "country": "Quênia",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Kenya"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
+    "slug": "quirguistao",
+    "name_pt": "Quirguistão",
+    "short_pt": "Quirguistão",
+    "tla": "KGZ",
+    "country": "Quirguistão",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Kyrgyz Republic",
+      "Kyrgyz Rep.",
+      "Kyrgyzstan"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "racing",
@@ -4053,6 +5037,40 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "republicacentroafricana",
+    "name_pt": "República Centro-Africana",
+    "short_pt": "R. Centro-Afr.",
+    "tla": "CTA",
+    "country": "República Centro-Africana",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Central African Republic",
+      "Cent Afr Rep"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
+    "slug": "republicadominicana",
+    "name_pt": "República Dominicana",
+    "short_pt": "R. Dominicana",
+    "tla": "DOM",
+    "country": "República Dominicana",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Dominican Republic",
+      "Dominican Rep"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "retro",
     "name_pt": "Retrô",
     "short_pt": "Retrô",
@@ -4106,6 +5124,54 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "romenia",
+    "name_pt": "Romênia",
+    "short_pt": "Romênia",
+    "tla": "ROU",
+    "country": "Romênia",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Romania"
+    ],
+    "crest_file": "romenia.svg",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "ruanda",
+    "name_pt": "Ruanda",
+    "short_pt": "Ruanda",
+    "tla": "RWA",
+    "country": "Ruanda",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Rwanda"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
+    "slug": "russia",
+    "name_pt": "Rússia",
+    "short_pt": "Rússia",
+    "tla": "RUS",
+    "country": "Rússia",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Russia"
+    ],
+    "crest_file": "russia.svg",
+    "crest_source": "repo (public/teams)"
+  },
+  {
     "slug": "sampaio",
     "name_pt": "Sampaio Corrêa",
     "short_pt": "Sampaio Corrêa",
@@ -4140,6 +5206,22 @@
     ],
     "crest_file": "sanjose.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "sanmarino",
+    "name_pt": "San Marino",
+    "short_pt": "San Marino",
+    "tla": "SMR",
+    "country": "San Marino",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "San Marino"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "santafe",
@@ -4248,6 +5330,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "serraleoa",
+    "name_pt": "Serra Leoa",
+    "short_pt": "Serra Leoa",
+    "tla": "SLE",
+    "country": "Serra Leoa",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Sierra Leone"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "servia",
     "name_pt": "Sérvia",
     "short_pt": "Sérvia",
@@ -4295,6 +5393,38 @@
     ],
     "crest_file": "sheffieldunited.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "singapura",
+    "name_pt": "Singapura",
+    "short_pt": "Singapura",
+    "tla": "SIN",
+    "country": "Singapura",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Singapore"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
+    "slug": "siria",
+    "name_pt": "Síria",
+    "short_pt": "Síria",
+    "tla": "SYR",
+    "country": "Síria",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Syria"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "southampton",
@@ -4470,6 +5600,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "tailandia",
+    "name_pt": "Tailândia",
+    "short_pt": "Tailândia",
+    "tla": "THA",
+    "country": "Tailândia",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Thailand"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "talleres",
     "name_pt": "Talleres",
     "short_pt": "Talleres",
@@ -4487,6 +5633,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "tanzania",
+    "name_pt": "Tanzânia",
+    "short_pt": "Tanzânia",
+    "tla": "TAN",
+    "country": "Tanzânia",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Tanzania"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "tchequia",
     "name_pt": "Tchéquia",
     "short_pt": "Tchéquia",
@@ -4501,6 +5663,22 @@
       "Czech Republic"
     ],
     "crest_file": "tchequia.png",
+    "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "togo",
+    "name_pt": "Togo",
+    "short_pt": "Togo",
+    "tla": "TOG",
+    "country": "Togo",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Togo"
+    ],
+    "crest_file": "togo.svg",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -4540,6 +5718,24 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "trinidadetobago",
+    "name_pt": "Trinidad e Tobago",
+    "short_pt": "Trin. e Tobago",
+    "tla": "TRI",
+    "country": "Trinidad e Tobago",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Trinidad and Tobago",
+      "Trinidad & Tobago",
+      "Trin & Tob"
+    ],
+    "crest_file": "trinidadetobago.svg",
+    "crest_source": "repo (public/teams)"
+  },
+  {
     "slug": "tunisia",
     "name_pt": "Tunísia",
     "short_pt": "Tunísia",
@@ -4574,6 +5770,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "ucrania",
+    "name_pt": "Ucrânia",
+    "short_pt": "Ucrânia",
+    "tla": "UKR",
+    "country": "Ucrânia",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Ukraine"
+    ],
+    "crest_file": "ucrania.svg",
+    "crest_source": "repo (public/teams)"
+  },
+  {
     "slug": "udinese",
     "name_pt": "Udinese",
     "short_pt": "Udinese",
@@ -4589,6 +5801,22 @@
     ],
     "crest_file": "udinese.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "uganda",
+    "name_pt": "Uganda",
+    "short_pt": "Uganda",
+    "tla": "UGA",
+    "country": "Uganda",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Uganda"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "ulsan",
@@ -4806,6 +6034,22 @@
     ],
     "crest_file": "vancouver.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "vanuatu",
+    "name_pt": "Vanuatu",
+    "short_pt": "Vanuatu",
+    "tla": "VAN",
+    "country": "Vanuatu",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Vanuatu"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "vasco",

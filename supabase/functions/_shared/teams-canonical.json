@@ -15,6 +15,16 @@
    "short": "ABC",
    "crest": "/teams/abc.png"
   },
+  "afeganistao": {
+   "name": "Afeganistão",
+   "short": "Afeganistão",
+   "crest": null
+  },
+  "afghanistan": {
+   "name": "Afeganistão",
+   "short": "Afeganistão",
+   "crest": null
+  },
   "africadosul": {
    "name": "África do Sul",
    "short": "Á. do Sul",
@@ -230,6 +240,11 @@
    "short": "Andorra",
    "crest": "/teams/andorra.png"
   },
+  "angola": {
+   "name": "Angola",
+   "short": "Angola",
+   "crest": "/teams/angola.svg"
+  },
   "aparecidense": {
    "name": "Aparecidense",
    "short": "Aparecidense",
@@ -270,6 +285,11 @@
    "short": "Argentina",
    "crest": "/teams/argentina.png"
   },
+  "armenia": {
+   "name": "Armênia",
+   "short": "Armênia",
+   "crest": null
+  },
   "arsenal": {
    "name": "Arsenal",
    "short": "Arsenal",
@@ -279,6 +299,11 @@
    "name": "Arsenal",
    "short": "Arsenal",
    "crest": "/teams/arsenal.png"
+  },
+  "aruba": {
+   "name": "Aruba",
+   "short": "Aruba",
+   "crest": null
   },
   "astonvilla": {
    "name": "Aston Villa",
@@ -435,6 +460,16 @@
    "short": "Avaí",
    "crest": "/teams/avai.png"
   },
+  "azerbaijao": {
+   "name": "Azerbaijão",
+   "short": "Azerbaijão",
+   "crest": null
+  },
+  "azerbaijan": {
+   "name": "Azerbaijão",
+   "short": "Azerbaijão",
+   "crest": null
+  },
   "bahia": {
    "name": "Bahia",
    "short": "Bahia",
@@ -445,6 +480,16 @@
    "short": "Bahia",
    "crest": "/teams/bahia.png"
   },
+  "bahrein": {
+   "name": "Bahrein",
+   "short": "Bahrein",
+   "crest": null
+  },
+  "bahrain": {
+   "name": "Bahrein",
+   "short": "Bahrein",
+   "crest": null
+  },
   "banfield": {
    "name": "Banfield",
    "short": "Banfield",
@@ -454,6 +499,11 @@
    "name": "Banfield",
    "short": "Banfield",
    "crest": "/teams/banfield.png"
+  },
+  "bangladesh": {
+   "name": "Bangladesh",
+   "short": "Bangladesh",
+   "crest": null
   },
   "barcelona": {
    "name": "Barcelona",
@@ -515,6 +565,16 @@
    "short": "Bayern",
    "crest": "/teams/bayern.png"
   },
+  "belarus": {
+   "name": "Belarus",
+   "short": "Belarus",
+   "crest": null
+  },
+  "bielorrussia": {
+   "name": "Belarus",
+   "short": "Belarus",
+   "crest": null
+  },
   "belgica": {
    "name": "Bélgica",
    "short": "Bélgica",
@@ -534,6 +594,11 @@
    "name": "Benfica",
    "short": "Benfica",
    "crest": "/teams/benfica.png"
+  },
+  "benin": {
+   "name": "Benin",
+   "short": "Benin",
+   "crest": null
   },
   "bielefeld": {
    "name": "Arminia Bielefeld",
@@ -655,6 +720,16 @@
    "short": "Botafogo-SP",
    "crest": "/teams/botafogosp.png"
   },
+  "botsuana": {
+   "name": "Botsuana",
+   "short": "Botsuana",
+   "crest": null
+  },
+  "botswana": {
+   "name": "Botsuana",
+   "short": "Botsuana",
+   "crest": null
+  },
   "bournemouth": {
    "name": "Bournemouth",
    "short": "Bournemouth",
@@ -740,6 +815,16 @@
    "short": "Bucaramanga",
    "crest": "/teams/bucaramanga.png"
   },
+  "bulgaria": {
+   "name": "Bulgária",
+   "short": "Bulgária",
+   "crest": "/teams/bulgaria.svg"
+  },
+  "burkinafaso": {
+   "name": "Burkina Faso",
+   "short": "Burkina Faso",
+   "crest": null
+  },
   "burnley": {
    "name": "Burnley",
    "short": "Burnley",
@@ -749,6 +834,21 @@
    "name": "Burnley",
    "short": "Burnley",
    "crest": "/teams/burnley.png"
+  },
+  "burundi": {
+   "name": "Burundi",
+   "short": "Burundi",
+   "crest": null
+  },
+  "butao": {
+   "name": "Butão",
+   "short": "Butão",
+   "crest": null
+  },
+  "bhutan": {
+   "name": "Butão",
+   "short": "Butão",
+   "crest": null
   },
   "caboverde": {
    "name": "Cabo Verde",
@@ -830,6 +930,16 @@
    "short": "Catar",
    "crest": "/teams/catar.svg"
   },
+  "cazaquistao": {
+   "name": "Cazaquistão",
+   "short": "Cazaquistão",
+   "crest": null
+  },
+  "kazakhstan": {
+   "name": "Cazaquistão",
+   "short": "Cazaquistão",
+   "crest": null
+  },
   "ceara": {
    "name": "Ceará",
    "short": "Ceará",
@@ -909,6 +1019,26 @@
    "name": "Chile",
    "short": "Chile",
    "crest": "/teams/chile.png"
+  },
+  "china": {
+   "name": "China",
+   "short": "China",
+   "crest": "/teams/china.svg"
+  },
+  "chinapr": {
+   "name": "China",
+   "short": "China",
+   "crest": "/teams/china.svg"
+  },
+  "chipre": {
+   "name": "Chipre",
+   "short": "Chipre",
+   "crest": null
+  },
+  "cyprus": {
+   "name": "Chipre",
+   "short": "Chipre",
+   "crest": null
   },
   "cienciano": {
    "name": "Cienciano",
@@ -1039,6 +1169,11 @@
    "name": "Costa do Marfim",
    "short": "C. Marfim",
    "crest": "/teams/costadomarfim.svg"
+  },
+  "costarica": {
+   "name": "Costa Rica",
+   "short": "Costa Rica",
+   "crest": "/teams/costarica.svg"
   },
   "crb": {
    "name": "CRB",
@@ -1195,6 +1330,11 @@
    "short": "Egito",
    "crest": "/teams/egito.svg"
   },
+  "elsalvador": {
+   "name": "El Salvador",
+   "short": "El Salvador",
+   "crest": "/teams/elsalvador.svg"
+  },
   "empoli": {
    "name": "Empoli",
    "short": "Empoli",
@@ -1224,6 +1364,26 @@
    "name": "Escócia",
    "short": "Escócia",
    "crest": "/teams/escocia.svg"
+  },
+  "eslovaquia": {
+   "name": "Eslováquia",
+   "short": "Eslováquia",
+   "crest": "/teams/eslovaquia.svg"
+  },
+  "slovakia": {
+   "name": "Eslováquia",
+   "short": "Eslováquia",
+   "crest": "/teams/eslovaquia.svg"
+  },
+  "eslovenia": {
+   "name": "Eslovênia",
+   "short": "Eslovênia",
+   "crest": "/teams/eslovenia.svg"
+  },
+  "slovenia": {
+   "name": "Eslovênia",
+   "short": "Eslovênia",
+   "crest": "/teams/eslovenia.svg"
   },
   "espanha": {
    "name": "Espanha",
@@ -1274,6 +1434,16 @@
    "name": "Estudiantes",
    "short": "Estudiantes",
    "crest": "/teams/estudiantes.png"
+  },
+  "etiopia": {
+   "name": "Etiópia",
+   "short": "Etiópia",
+   "crest": null
+  },
+  "ethiopia": {
+   "name": "Etiópia",
+   "short": "Etiópia",
+   "crest": null
   },
   "eua": {
    "name": "Estados Unidos",
@@ -1329,6 +1499,21 @@
    "name": "Ferroviário",
    "short": "Ferroviário",
    "crest": "/teams/ferroviario.png"
+  },
+  "fiji": {
+   "name": "Fiji",
+   "short": "Fiji",
+   "crest": null
+  },
+  "filipinas": {
+   "name": "Filipinas",
+   "short": "Filipinas",
+   "crest": null
+  },
+  "philippines": {
+   "name": "Filipinas",
+   "short": "Filipinas",
+   "crest": null
   },
   "finlandia": {
    "name": "Finlândia",
@@ -1460,6 +1645,11 @@
    "short": "Genoa",
    "crest": "/teams/genoa.png"
   },
+  "georgia": {
+   "name": "Geórgia",
+   "short": "Geórgia",
+   "crest": null
+  },
   "getafe": {
    "name": "Getafe",
    "short": "Getafe",
@@ -1525,6 +1715,46 @@
    "short": "Grêmio",
    "crest": "/teams/gremio.png"
   },
+  "guam": {
+   "name": "Guam",
+   "short": "Guam",
+   "crest": null
+  },
+  "guatemala": {
+   "name": "Guatemala",
+   "short": "Guatemala",
+   "crest": null
+  },
+  "guine": {
+   "name": "Guiné",
+   "short": "Guiné",
+   "crest": null
+  },
+  "guinea": {
+   "name": "Guiné",
+   "short": "Guiné",
+   "crest": null
+  },
+  "guineequatorial": {
+   "name": "Guiné Equatorial",
+   "short": "G. Equatorial",
+   "crest": null
+  },
+  "gequatorial": {
+   "name": "Guiné Equatorial",
+   "short": "G. Equatorial",
+   "crest": null
+  },
+  "equatorialguinea": {
+   "name": "Guiné Equatorial",
+   "short": "G. Equatorial",
+   "crest": null
+  },
+  "eqguinea": {
+   "name": "Guiné Equatorial",
+   "short": "G. Equatorial",
+   "crest": null
+  },
   "haiti": {
    "name": "Haiti",
    "short": "Haiti",
@@ -1565,6 +1795,26 @@
    "short": "Holanda",
    "crest": "/teams/holanda.png"
   },
+  "honduras": {
+   "name": "Honduras",
+   "short": "Honduras",
+   "crest": "/teams/honduras.svg"
+  },
+  "hongkong": {
+   "name": "Hong Kong",
+   "short": "Hong Kong",
+   "crest": null
+  },
+  "hungria": {
+   "name": "Hungria",
+   "short": "Hungria",
+   "crest": "/teams/hungria.svg"
+  },
+  "hungary": {
+   "name": "Hungria",
+   "short": "Hungria",
+   "crest": "/teams/hungria.svg"
+  },
   "huracan": {
    "name": "Huracán",
    "short": "Huracán",
@@ -1575,6 +1825,46 @@
    "short": "Huracán",
    "crest": "/teams/huracan.png"
   },
+  "ilhascayman": {
+   "name": "Ilhas Cayman",
+   "short": "I. Cayman",
+   "crest": null
+  },
+  "icayman": {
+   "name": "Ilhas Cayman",
+   "short": "I. Cayman",
+   "crest": null
+  },
+  "caymanislands": {
+   "name": "Ilhas Cayman",
+   "short": "I. Cayman",
+   "crest": null
+  },
+  "caymanisl": {
+   "name": "Ilhas Cayman",
+   "short": "I. Cayman",
+   "crest": null
+  },
+  "ilhasvirgensbritanicas": {
+   "name": "Ilhas Virgens Britânicas",
+   "short": "I. Virgens Br.",
+   "crest": null
+  },
+  "ivirgensbr": {
+   "name": "Ilhas Virgens Britânicas",
+   "short": "I. Virgens Br.",
+   "crest": null
+  },
+  "britishvirginislands": {
+   "name": "Ilhas Virgens Britânicas",
+   "short": "I. Virgens Br.",
+   "crest": null
+  },
+  "brvirginisl": {
+   "name": "Ilhas Virgens Britânicas",
+   "short": "I. Virgens Br.",
+   "crest": null
+  },
   "inddelvalle": {
    "name": "Independiente del Valle",
    "short": "Ind. del Valle",
@@ -1584,6 +1874,11 @@
    "name": "Independiente del Valle",
    "short": "Ind. del Valle",
    "crest": "/teams/inddelvalle.png"
+  },
+  "indonesia": {
+   "name": "Indonésia",
+   "short": "Indonésia",
+   "crest": null
   },
   "inglaterra": {
    "name": "Inglaterra",
@@ -1685,6 +1980,21 @@
    "short": "Iraque",
    "crest": "/teams/iraque.svg"
   },
+  "irlanda": {
+   "name": "Irlanda",
+   "short": "Irlanda",
+   "crest": "/teams/irlanda.svg"
+  },
+  "ireland": {
+   "name": "Irlanda",
+   "short": "Irlanda",
+   "crest": "/teams/irlanda.svg"
+  },
+  "republicofireland": {
+   "name": "Irlanda",
+   "short": "Irlanda",
+   "crest": "/teams/irlanda.svg"
+  },
   "irlandadonorte": {
    "name": "Irlanda do Norte",
    "short": "Irl. Norte",
@@ -1700,6 +2010,21 @@
    "short": "Irl. Norte",
    "crest": "/teams/irlandadonorte.png"
   },
+  "islandia": {
+   "name": "Islândia",
+   "short": "Islândia",
+   "crest": "/teams/islandia.svg"
+  },
+  "iceland": {
+   "name": "Islândia",
+   "short": "Islândia",
+   "crest": "/teams/islandia.svg"
+  },
+  "israel": {
+   "name": "Israel",
+   "short": "Israel",
+   "crest": "/teams/israel.svg"
+  },
   "italia": {
    "name": "Itália",
    "short": "Itália",
@@ -1709,6 +2034,11 @@
    "name": "Itália",
    "short": "Itália",
    "crest": "/teams/italia.png"
+  },
+  "jamaica": {
+   "name": "Jamaica",
+   "short": "Jamaica",
+   "crest": "/teams/jamaica.svg"
   },
   "japao": {
    "name": "Japão",
@@ -1779,6 +2109,16 @@
    "name": "Holstein Kiel",
    "short": "Kiel",
    "crest": "/teams/kiel.png"
+  },
+  "kosovo": {
+   "name": "Kosovo",
+   "short": "Kosovo",
+   "crest": null
+  },
+  "kuwait": {
+   "name": "Kuwait",
+   "short": "Kuwait",
+   "crest": "/teams/kuwait.svg"
   },
   "lafc": {
    "name": "Los Angeles FC",
@@ -1870,6 +2210,16 @@
    "short": "Leicester",
    "crest": "/teams/leicester.png"
   },
+  "lesoto": {
+   "name": "Lesoto",
+   "short": "Lesoto",
+   "crest": null
+  },
+  "lesotho": {
+   "name": "Lesoto",
+   "short": "Lesoto",
+   "crest": null
+  },
   "levante": {
    "name": "Levante",
    "short": "Levante",
@@ -1890,6 +2240,11 @@
    "short": "Leverkusen",
    "crest": "/teams/leverkusen.png"
   },
+  "liberia": {
+   "name": "Libéria",
+   "short": "Libéria",
+   "crest": null
+  },
   "libertad": {
    "name": "Libertad",
    "short": "Libertad",
@@ -1899,6 +2254,11 @@
    "name": "Libertad",
    "short": "Libertad",
    "crest": "/teams/libertad.png"
+  },
+  "liechtenstein": {
+   "name": "Liechtenstein",
+   "short": "Liechtenstein",
+   "crest": null
   },
   "lituania": {
    "name": "Lituânia",
@@ -1930,6 +2290,16 @@
    "short": "Luqueño",
    "crest": "/teams/luqueno.png"
   },
+  "luxemburgo": {
+   "name": "Luxemburgo",
+   "short": "Luxemburgo",
+   "crest": null
+  },
+  "luxembourg": {
+   "name": "Luxemburgo",
+   "short": "Luxemburgo",
+   "crest": null
+  },
   "macedonia": {
    "name": "Macedônia do Norte",
    "short": "Macedônia",
@@ -1945,6 +2315,11 @@
    "short": "Macedônia",
    "crest": "/teams/macedonia.png"
   },
+  "madagascar": {
+   "name": "Madagascar",
+   "short": "Madagascar",
+   "crest": null
+  },
   "mainz": {
    "name": "Mainz 05",
    "short": "Mainz",
@@ -1954,6 +2329,26 @@
    "name": "Mainz 05",
    "short": "Mainz",
    "crest": "/teams/mainz.png"
+  },
+  "malawi": {
+   "name": "Malawi",
+   "short": "Malawi",
+   "crest": null
+  },
+  "maldivas": {
+   "name": "Maldivas",
+   "short": "Maldivas",
+   "crest": null
+  },
+  "maldives": {
+   "name": "Maldivas",
+   "short": "Maldivas",
+   "crest": null
+  },
+  "mali": {
+   "name": "Mali",
+   "short": "Mali",
+   "crest": null
   },
   "mallorca": {
    "name": "Mallorca",
@@ -2080,6 +2475,16 @@
    "short": "M'gladbach",
    "crest": "/teams/mgladbach.png"
   },
+  "mianmar": {
+   "name": "Mianmar",
+   "short": "Mianmar",
+   "crest": null
+  },
+  "myanmar": {
+   "name": "Mianmar",
+   "short": "Mianmar",
+   "crest": null
+  },
   "milan": {
    "name": "Milan",
    "short": "Milan",
@@ -2100,6 +2505,16 @@
    "short": "Mirassol",
    "crest": "/teams/mirassol.png"
   },
+  "mocambique": {
+   "name": "Moçambique",
+   "short": "Moçambique",
+   "crest": null
+  },
+  "mozambique": {
+   "name": "Moçambique",
+   "short": "Moçambique",
+   "crest": null
+  },
   "moldavia": {
    "name": "Moldávia",
    "short": "Moldávia",
@@ -2109,6 +2524,16 @@
    "name": "Moldávia",
    "short": "Moldávia",
    "crest": "/teams/moldavia.png"
+  },
+  "mongolia": {
+   "name": "Mongólia",
+   "short": "Mongólia",
+   "crest": null
+  },
+  "montenegro": {
+   "name": "Montenegro",
+   "short": "Montenegro",
+   "crest": null
   },
   "monterrey": {
    "name": "Monterrey",
@@ -2185,6 +2610,11 @@
    "short": "Newcastle",
    "crest": "/teams/newcastle.png"
   },
+  "nicaragua": {
+   "name": "Nicarágua",
+   "short": "Nicarágua",
+   "crest": null
+  },
   "nice": {
    "name": "Nice",
    "short": "Nice",
@@ -2194,6 +2624,11 @@
    "name": "Nice",
    "short": "Nice",
    "crest": "/teams/nice.png"
+  },
+  "nigeria": {
+   "name": "Nigéria",
+   "short": "Nigéria",
+   "crest": "/teams/nigeria.svg"
   },
   "noruega": {
    "name": "Noruega",
@@ -2260,6 +2695,16 @@
    "short": "Olympiacos",
    "crest": "/teams/olympiacos.png"
   },
+  "oma": {
+   "name": "Omã",
+   "short": "Omã",
+   "crest": null
+  },
+  "oman": {
+   "name": "Omã",
+   "short": "Omã",
+   "crest": null
+  },
   "oncecaldas": {
    "name": "Once Caldas",
    "short": "Once Caldas",
@@ -2315,6 +2760,16 @@
    "short": "Gales",
    "crest": "/teams/paisdegales.png"
   },
+  "palestina": {
+   "name": "Palestina",
+   "short": "Palestina",
+   "crest": null
+  },
+  "palestine": {
+   "name": "Palestina",
+   "short": "Palestina",
+   "crest": null
+  },
   "palestino": {
    "name": "Palestino",
    "short": "Palestino",
@@ -2339,6 +2794,16 @@
    "name": "Panamá",
    "short": "Panamá",
    "crest": "/teams/panama.svg"
+  },
+  "paquistao": {
+   "name": "Paquistão",
+   "short": "Paquistão",
+   "crest": null
+  },
+  "pakistan": {
+   "name": "Paquistão",
+   "short": "Paquistão",
+   "crest": null
   },
   "paraguai": {
    "name": "Paraguai",
@@ -2410,6 +2875,16 @@
    "short": "Porto",
    "crest": "/teams/porto.png"
   },
+  "portorico": {
+   "name": "Porto Rico",
+   "short": "Porto Rico",
+   "crest": null
+  },
+  "puertorico": {
+   "name": "Porto Rico",
+   "short": "Porto Rico",
+   "crest": null
+  },
   "portugal": {
    "name": "Portugal",
    "short": "Portugal",
@@ -2449,6 +2924,36 @@
    "name": "Pyramids",
    "short": "Pyramids",
    "crest": "/teams/pyramids.png"
+  },
+  "quenia": {
+   "name": "Quênia",
+   "short": "Quênia",
+   "crest": null
+  },
+  "kenya": {
+   "name": "Quênia",
+   "short": "Quênia",
+   "crest": null
+  },
+  "quirguistao": {
+   "name": "Quirguistão",
+   "short": "Quirguistão",
+   "crest": null
+  },
+  "kyrgyzrepublic": {
+   "name": "Quirguistão",
+   "short": "Quirguistão",
+   "crest": null
+  },
+  "kyrgyzrep": {
+   "name": "Quirguistão",
+   "short": "Quirguistão",
+   "crest": null
+  },
+  "kyrgyzstan": {
+   "name": "Quirguistão",
+   "short": "Quirguistão",
+   "crest": null
   },
   "racing": {
    "name": "Racing",
@@ -2580,6 +3085,46 @@
    "short": "Remo",
    "crest": "/teams/remo.png"
   },
+  "republicacentroafricana": {
+   "name": "República Centro-Africana",
+   "short": "R. Centro-Afr.",
+   "crest": null
+  },
+  "rcentroafr": {
+   "name": "República Centro-Africana",
+   "short": "R. Centro-Afr.",
+   "crest": null
+  },
+  "centralafricanrepublic": {
+   "name": "República Centro-Africana",
+   "short": "R. Centro-Afr.",
+   "crest": null
+  },
+  "centafrrep": {
+   "name": "República Centro-Africana",
+   "short": "R. Centro-Afr.",
+   "crest": null
+  },
+  "republicadominicana": {
+   "name": "República Dominicana",
+   "short": "R. Dominicana",
+   "crest": null
+  },
+  "rdominicana": {
+   "name": "República Dominicana",
+   "short": "R. Dominicana",
+   "crest": null
+  },
+  "dominicanrepublic": {
+   "name": "República Dominicana",
+   "short": "R. Dominicana",
+   "crest": null
+  },
+  "dominicanrep": {
+   "name": "República Dominicana",
+   "short": "R. Dominicana",
+   "crest": null
+  },
   "retro": {
    "name": "Retrô",
    "short": "Retrô",
@@ -2615,6 +3160,31 @@
    "short": "Roma",
    "crest": "/teams/roma.png"
   },
+  "romenia": {
+   "name": "Romênia",
+   "short": "Romênia",
+   "crest": "/teams/romenia.svg"
+  },
+  "romania": {
+   "name": "Romênia",
+   "short": "Romênia",
+   "crest": "/teams/romenia.svg"
+  },
+  "ruanda": {
+   "name": "Ruanda",
+   "short": "Ruanda",
+   "crest": null
+  },
+  "rwanda": {
+   "name": "Ruanda",
+   "short": "Ruanda",
+   "crest": null
+  },
+  "russia": {
+   "name": "Rússia",
+   "short": "Rússia",
+   "crest": "/teams/russia.svg"
+  },
   "sampaio": {
    "name": "Sampaio Corrêa",
    "short": "Sampaio Corrêa",
@@ -2644,6 +3214,11 @@
    "name": "San José",
    "short": "San José",
    "crest": "/teams/sanjose.png"
+  },
+  "sanmarino": {
+   "name": "San Marino",
+   "short": "San Marino",
+   "crest": null
   },
   "santafe": {
    "name": "Independiente Santa Fe",
@@ -2705,6 +3280,16 @@
    "short": "Senegal",
    "crest": "/teams/senegal.png"
   },
+  "serraleoa": {
+   "name": "Serra Leoa",
+   "short": "Serra Leoa",
+   "crest": null
+  },
+  "sierraleone": {
+   "name": "Serra Leoa",
+   "short": "Serra Leoa",
+   "crest": null
+  },
   "servia": {
    "name": "Sérvia",
    "short": "Sérvia",
@@ -2739,6 +3324,26 @@
    "name": "Sheffield United",
    "short": "Sheffield Utd",
    "crest": "/teams/sheffieldunited.png"
+  },
+  "singapura": {
+   "name": "Singapura",
+   "short": "Singapura",
+   "crest": null
+  },
+  "singapore": {
+   "name": "Singapura",
+   "short": "Singapura",
+   "crest": null
+  },
+  "siria": {
+   "name": "Síria",
+   "short": "Síria",
+   "crest": null
+  },
+  "syria": {
+   "name": "Síria",
+   "short": "Síria",
+   "crest": null
   },
   "southampton": {
    "name": "Southampton",
@@ -2860,6 +3465,16 @@
    "short": "Sunderland",
    "crest": "/teams/sunderland.png"
   },
+  "tailandia": {
+   "name": "Tailândia",
+   "short": "Tailândia",
+   "crest": null
+  },
+  "thailand": {
+   "name": "Tailândia",
+   "short": "Tailândia",
+   "crest": null
+  },
   "talleres": {
    "name": "Talleres",
    "short": "Talleres",
@@ -2869,6 +3484,11 @@
    "name": "Talleres",
    "short": "Talleres",
    "crest": "/teams/talleres.png"
+  },
+  "tanzania": {
+   "name": "Tanzânia",
+   "short": "Tanzânia",
+   "crest": null
   },
   "tchequia": {
    "name": "Tchéquia",
@@ -2884,6 +3504,11 @@
    "name": "Tchéquia",
    "short": "Tchéquia",
    "crest": "/teams/tchequia.png"
+  },
+  "togo": {
+   "name": "Togo",
+   "short": "Togo",
+   "crest": "/teams/togo.svg"
   },
   "torino": {
    "name": "Torino",
@@ -2910,6 +3535,31 @@
    "short": "Tottenham",
    "crest": "/teams/tottenham.png"
   },
+  "trinidadetobago": {
+   "name": "Trinidad e Tobago",
+   "short": "Trin. e Tobago",
+   "crest": "/teams/trinidadetobago.svg"
+  },
+  "trinetobago": {
+   "name": "Trinidad e Tobago",
+   "short": "Trin. e Tobago",
+   "crest": "/teams/trinidadetobago.svg"
+  },
+  "trinidadandtobago": {
+   "name": "Trinidad e Tobago",
+   "short": "Trin. e Tobago",
+   "crest": "/teams/trinidadetobago.svg"
+  },
+  "trinidadtobago": {
+   "name": "Trinidad e Tobago",
+   "short": "Trin. e Tobago",
+   "crest": "/teams/trinidadetobago.svg"
+  },
+  "trintob": {
+   "name": "Trinidad e Tobago",
+   "short": "Trin. e Tobago",
+   "crest": "/teams/trinidadetobago.svg"
+  },
   "tunisia": {
    "name": "Tunísia",
    "short": "Tunísia",
@@ -2930,6 +3580,16 @@
    "short": "Turquia",
    "crest": "/teams/turquia.png"
   },
+  "ucrania": {
+   "name": "Ucrânia",
+   "short": "Ucrânia",
+   "crest": "/teams/ucrania.svg"
+  },
+  "ukraine": {
+   "name": "Ucrânia",
+   "short": "Ucrânia",
+   "crest": "/teams/ucrania.svg"
+  },
   "udinese": {
    "name": "Udinese",
    "short": "Udinese",
@@ -2939,6 +3599,11 @@
    "name": "Udinese",
    "short": "Udinese",
    "crest": "/teams/udinese.png"
+  },
+  "uganda": {
+   "name": "Uganda",
+   "short": "Uganda",
+   "crest": null
   },
   "ulsan": {
    "name": "Ulsan HD",
@@ -3109,6 +3774,11 @@
    "name": "Vancouver Whitecaps",
    "short": "Vancouver",
    "crest": "/teams/vancouver.png"
+  },
+  "vanuatu": {
+   "name": "Vanuatu",
+   "short": "Vanuatu",
+   "crest": null
   },
   "vasco": {
    "name": "Vasco da Gama",
@@ -3281,6 +3951,16 @@
    "name": "ABC",
    "short": "ABC",
    "crest": "/teams/abc.png"
+  },
+  "afeganistao": {
+   "name": "Afeganistão",
+   "short": "Afeganistão",
+   "crest": null
+  },
+  "afghanistan": {
+   "name": "Afeganistão",
+   "short": "Afeganistão",
+   "crest": null
   },
   "africadosul": {
    "name": "África do Sul",
@@ -3467,6 +4147,11 @@
    "short": "Andorra",
    "crest": "/teams/andorra.png"
   },
+  "angola": {
+   "name": "Angola",
+   "short": "Angola",
+   "crest": "/teams/angola.svg"
+  },
   "aparecidense": {
    "name": "Aparecidense",
    "short": "Aparecidense",
@@ -3507,10 +4192,20 @@
    "short": "Argentina",
    "crest": "/teams/argentina.png"
   },
+  "armenia": {
+   "name": "Armênia",
+   "short": "Armênia",
+   "crest": null
+  },
   "arsenal": {
    "name": "Arsenal",
    "short": "Arsenal",
    "crest": "/teams/arsenal.png"
+  },
+  "aruba": {
+   "name": "Aruba",
+   "short": "Aruba",
+   "crest": null
   },
   "astonvilla": {
    "name": "Aston Villa",
@@ -3667,10 +4362,30 @@
    "short": "Avaí",
    "crest": "/teams/avai.png"
   },
+  "azerbaijao": {
+   "name": "Azerbaijão",
+   "short": "Azerbaijão",
+   "crest": null
+  },
+  "azerbaijan": {
+   "name": "Azerbaijão",
+   "short": "Azerbaijão",
+   "crest": null
+  },
   "bahia": {
    "name": "Bahia",
    "short": "Bahia",
    "crest": "/teams/bahia.png"
+  },
+  "bahrein": {
+   "name": "Bahrein",
+   "short": "Bahrein",
+   "crest": null
+  },
+  "bahrain": {
+   "name": "Bahrein",
+   "short": "Bahrein",
+   "crest": null
   },
   "banfield": {
    "name": "Banfield",
@@ -3681,6 +4396,11 @@
    "name": "Banfield",
    "short": "Banfield",
    "crest": "/teams/banfield.png"
+  },
+  "bangladesh": {
+   "name": "Bangladesh",
+   "short": "Bangladesh",
+   "crest": null
   },
   "barca": {
    "name": "Barcelona",
@@ -3727,6 +4447,16 @@
    "short": "Bayern",
    "crest": "/teams/bayern.png"
   },
+  "belarus": {
+   "name": "Belarus",
+   "short": "Belarus",
+   "crest": null
+  },
+  "bielorrussia": {
+   "name": "Belarus",
+   "short": "Belarus",
+   "crest": null
+  },
   "belgica": {
    "name": "Bélgica",
    "short": "Bélgica",
@@ -3746,6 +4476,11 @@
    "name": "Benfica",
    "short": "Benfica",
    "crest": "/teams/benfica.png"
+  },
+  "benin": {
+   "name": "Benin",
+   "short": "Benin",
+   "crest": null
   },
   "bielefeld": {
    "name": "Arminia Bielefeld",
@@ -3862,6 +4597,16 @@
    "short": "Botafogo-SP",
    "crest": "/teams/botafogosp.png"
   },
+  "botsuana": {
+   "name": "Botsuana",
+   "short": "Botsuana",
+   "crest": null
+  },
+  "botswana": {
+   "name": "Botsuana",
+   "short": "Botsuana",
+   "crest": null
+  },
   "bournemouth": {
    "name": "Bournemouth",
    "short": "Bournemouth",
@@ -3922,10 +4667,35 @@
    "short": "Bucaramanga",
    "crest": "/teams/bucaramanga.png"
   },
+  "bulgaria": {
+   "name": "Bulgária",
+   "short": "Bulgária",
+   "crest": "/teams/bulgaria.svg"
+  },
+  "burkinafaso": {
+   "name": "Burkina Faso",
+   "short": "Burkina Faso",
+   "crest": null
+  },
   "burnley": {
    "name": "Burnley",
    "short": "Burnley",
    "crest": "/teams/burnley.png"
+  },
+  "burundi": {
+   "name": "Burundi",
+   "short": "Burundi",
+   "crest": null
+  },
+  "butao": {
+   "name": "Butão",
+   "short": "Butão",
+   "crest": null
+  },
+  "bhutan": {
+   "name": "Butão",
+   "short": "Butão",
+   "crest": null
   },
   "caboverde": {
    "name": "Cabo Verde",
@@ -3992,6 +4762,16 @@
    "short": "Catar",
    "crest": "/teams/catar.svg"
   },
+  "cazaquistao": {
+   "name": "Cazaquistão",
+   "short": "Cazaquistão",
+   "crest": null
+  },
+  "kazakhstan": {
+   "name": "Cazaquistão",
+   "short": "Cazaquistão",
+   "crest": null
+  },
   "ceara": {
    "name": "Ceará",
    "short": "Ceará",
@@ -4056,6 +4836,26 @@
    "name": "Chile",
    "short": "Chile",
    "crest": "/teams/chile.png"
+  },
+  "china": {
+   "name": "China",
+   "short": "China",
+   "crest": "/teams/china.svg"
+  },
+  "chinapr": {
+   "name": "China",
+   "short": "China",
+   "crest": "/teams/china.svg"
+  },
+  "chipre": {
+   "name": "Chipre",
+   "short": "Chipre",
+   "crest": null
+  },
+  "cyprus": {
+   "name": "Chipre",
+   "short": "Chipre",
+   "crest": null
   },
   "cienciano": {
    "name": "Cienciano",
@@ -4176,6 +4976,11 @@
    "name": "Costa do Marfim",
    "short": "C. Marfim",
    "crest": "/teams/costadomarfim.svg"
+  },
+  "costarica": {
+   "name": "Costa Rica",
+   "short": "Costa Rica",
+   "crest": "/teams/costarica.svg"
   },
   "crb": {
    "name": "CRB",
@@ -4317,6 +5122,11 @@
    "short": "Egito",
    "crest": "/teams/egito.svg"
   },
+  "elsalvador": {
+   "name": "El Salvador",
+   "short": "El Salvador",
+   "crest": "/teams/elsalvador.svg"
+  },
   "empoli": {
    "name": "Empoli",
    "short": "Empoli",
@@ -4341,6 +5151,26 @@
    "name": "Escócia",
    "short": "Escócia",
    "crest": "/teams/escocia.svg"
+  },
+  "eslovaquia": {
+   "name": "Eslováquia",
+   "short": "Eslováquia",
+   "crest": "/teams/eslovaquia.svg"
+  },
+  "slovakia": {
+   "name": "Eslováquia",
+   "short": "Eslováquia",
+   "crest": "/teams/eslovaquia.svg"
+  },
+  "eslovenia": {
+   "name": "Eslovênia",
+   "short": "Eslovênia",
+   "crest": "/teams/eslovenia.svg"
+  },
+  "slovenia": {
+   "name": "Eslovênia",
+   "short": "Eslovênia",
+   "crest": "/teams/eslovenia.svg"
   },
   "espanha": {
    "name": "Espanha",
@@ -4392,6 +5222,16 @@
    "short": "Estudiantes",
    "crest": "/teams/estudiantes.png"
   },
+  "etiopia": {
+   "name": "Etiópia",
+   "short": "Etiópia",
+   "crest": null
+  },
+  "ethiopia": {
+   "name": "Etiópia",
+   "short": "Etiópia",
+   "crest": null
+  },
   "eua": {
    "name": "Estados Unidos",
    "short": "EUA",
@@ -4436,6 +5276,21 @@
    "name": "Ferroviário",
    "short": "Ferroviário",
    "crest": "/teams/ferroviario.png"
+  },
+  "fiji": {
+   "name": "Fiji",
+   "short": "Fiji",
+   "crest": null
+  },
+  "filipinas": {
+   "name": "Filipinas",
+   "short": "Filipinas",
+   "crest": null
+  },
+  "philippines": {
+   "name": "Filipinas",
+   "short": "Filipinas",
+   "crest": null
   },
   "finlandia": {
    "name": "Finlândia",
@@ -4547,6 +5402,11 @@
    "short": "Genoa",
    "crest": "/teams/genoa.png"
   },
+  "georgia": {
+   "name": "Geórgia",
+   "short": "Geórgia",
+   "crest": null
+  },
   "getafe": {
    "name": "Getafe",
    "short": "Getafe",
@@ -4597,6 +5457,46 @@
    "short": "Grêmio",
    "crest": "/teams/gremio.png"
   },
+  "guam": {
+   "name": "Guam",
+   "short": "Guam",
+   "crest": null
+  },
+  "guatemala": {
+   "name": "Guatemala",
+   "short": "Guatemala",
+   "crest": null
+  },
+  "guine": {
+   "name": "Guiné",
+   "short": "Guiné",
+   "crest": null
+  },
+  "guinea": {
+   "name": "Guiné",
+   "short": "Guiné",
+   "crest": null
+  },
+  "guineequatorial": {
+   "name": "Guiné Equatorial",
+   "short": "G. Equatorial",
+   "crest": null
+  },
+  "gequatorial": {
+   "name": "Guiné Equatorial",
+   "short": "G. Equatorial",
+   "crest": null
+  },
+  "equatorialguinea": {
+   "name": "Guiné Equatorial",
+   "short": "G. Equatorial",
+   "crest": null
+  },
+  "eqguinea": {
+   "name": "Guiné Equatorial",
+   "short": "G. Equatorial",
+   "crest": null
+  },
   "haiti": {
    "name": "Haiti",
    "short": "Haiti",
@@ -4637,6 +5537,26 @@
    "short": "Holanda",
    "crest": "/teams/holanda.png"
   },
+  "honduras": {
+   "name": "Honduras",
+   "short": "Honduras",
+   "crest": "/teams/honduras.svg"
+  },
+  "hongkong": {
+   "name": "Hong Kong",
+   "short": "Hong Kong",
+   "crest": null
+  },
+  "hungria": {
+   "name": "Hungria",
+   "short": "Hungria",
+   "crest": "/teams/hungria.svg"
+  },
+  "hungary": {
+   "name": "Hungria",
+   "short": "Hungria",
+   "crest": "/teams/hungria.svg"
+  },
   "huracan": {
    "name": "Huracán",
    "short": "Huracán",
@@ -4647,6 +5567,46 @@
    "short": "Huracán",
    "crest": "/teams/huracan.png"
   },
+  "ilhascayman": {
+   "name": "Ilhas Cayman",
+   "short": "I. Cayman",
+   "crest": null
+  },
+  "icayman": {
+   "name": "Ilhas Cayman",
+   "short": "I. Cayman",
+   "crest": null
+  },
+  "caymanislands": {
+   "name": "Ilhas Cayman",
+   "short": "I. Cayman",
+   "crest": null
+  },
+  "caymanisl": {
+   "name": "Ilhas Cayman",
+   "short": "I. Cayman",
+   "crest": null
+  },
+  "ilhasvirgensbritanicas": {
+   "name": "Ilhas Virgens Britânicas",
+   "short": "I. Virgens Br.",
+   "crest": null
+  },
+  "ivirgensbr": {
+   "name": "Ilhas Virgens Britânicas",
+   "short": "I. Virgens Br.",
+   "crest": null
+  },
+  "britishvirginislands": {
+   "name": "Ilhas Virgens Britânicas",
+   "short": "I. Virgens Br.",
+   "crest": null
+  },
+  "brvirginisl": {
+   "name": "Ilhas Virgens Britânicas",
+   "short": "I. Virgens Br.",
+   "crest": null
+  },
   "inddelvalle": {
    "name": "Independiente del Valle",
    "short": "Ind. del Valle",
@@ -4656,6 +5616,11 @@
    "name": "Independiente del Valle",
    "short": "Ind. del Valle",
    "crest": "/teams/inddelvalle.png"
+  },
+  "indonesia": {
+   "name": "Indonésia",
+   "short": "Indonésia",
+   "crest": null
   },
   "inglaterra": {
    "name": "Inglaterra",
@@ -4747,6 +5712,21 @@
    "short": "Iraque",
    "crest": "/teams/iraque.svg"
   },
+  "irlanda": {
+   "name": "Irlanda",
+   "short": "Irlanda",
+   "crest": "/teams/irlanda.svg"
+  },
+  "ireland": {
+   "name": "Irlanda",
+   "short": "Irlanda",
+   "crest": "/teams/irlanda.svg"
+  },
+  "republicofireland": {
+   "name": "Irlanda",
+   "short": "Irlanda",
+   "crest": "/teams/irlanda.svg"
+  },
   "irlandadonorte": {
    "name": "Irlanda do Norte",
    "short": "Irl. Norte",
@@ -4762,6 +5742,21 @@
    "short": "Irl. Norte",
    "crest": "/teams/irlandadonorte.png"
   },
+  "islandia": {
+   "name": "Islândia",
+   "short": "Islândia",
+   "crest": "/teams/islandia.svg"
+  },
+  "iceland": {
+   "name": "Islândia",
+   "short": "Islândia",
+   "crest": "/teams/islandia.svg"
+  },
+  "israel": {
+   "name": "Israel",
+   "short": "Israel",
+   "crest": "/teams/israel.svg"
+  },
   "italia": {
    "name": "Itália",
    "short": "Itália",
@@ -4771,6 +5766,11 @@
    "name": "Itália",
    "short": "Itália",
    "crest": "/teams/italia.png"
+  },
+  "jamaica": {
+   "name": "Jamaica",
+   "short": "Jamaica",
+   "crest": "/teams/jamaica.svg"
   },
   "japao": {
    "name": "Japão",
@@ -4831,6 +5831,16 @@
    "name": "Holstein Kiel",
    "short": "Kiel",
    "crest": "/teams/kiel.png"
+  },
+  "kosovo": {
+   "name": "Kosovo",
+   "short": "Kosovo",
+   "crest": null
+  },
+  "kuwait": {
+   "name": "Kuwait",
+   "short": "Kuwait",
+   "crest": "/teams/kuwait.svg"
   },
   "lafc": {
    "name": "Los Angeles FC",
@@ -4917,6 +5927,16 @@
    "short": "Leicester",
    "crest": "/teams/leicester.png"
   },
+  "lesoto": {
+   "name": "Lesoto",
+   "short": "Lesoto",
+   "crest": null
+  },
+  "lesotho": {
+   "name": "Lesoto",
+   "short": "Lesoto",
+   "crest": null
+  },
   "levante": {
    "name": "Levante",
    "short": "Levante",
@@ -4937,6 +5957,11 @@
    "short": "Leverkusen",
    "crest": "/teams/leverkusen.png"
   },
+  "liberia": {
+   "name": "Libéria",
+   "short": "Libéria",
+   "crest": null
+  },
   "libertad": {
    "name": "Libertad",
    "short": "Libertad",
@@ -4946,6 +5971,11 @@
    "name": "Libertad",
    "short": "Libertad",
    "crest": "/teams/libertad.png"
+  },
+  "liechtenstein": {
+   "name": "Liechtenstein",
+   "short": "Liechtenstein",
+   "crest": null
   },
   "lituania": {
    "name": "Lituânia",
@@ -4972,6 +6002,16 @@
    "short": "Luqueño",
    "crest": "/teams/luqueno.png"
   },
+  "luxemburgo": {
+   "name": "Luxemburgo",
+   "short": "Luxemburgo",
+   "crest": null
+  },
+  "luxembourg": {
+   "name": "Luxemburgo",
+   "short": "Luxemburgo",
+   "crest": null
+  },
   "macedonia": {
    "name": "Macedônia do Norte",
    "short": "Macedônia",
@@ -4987,6 +6027,11 @@
    "short": "Macedônia",
    "crest": "/teams/macedonia.png"
   },
+  "madagascar": {
+   "name": "Madagascar",
+   "short": "Madagascar",
+   "crest": null
+  },
   "mainz": {
    "name": "Mainz 05",
    "short": "Mainz",
@@ -4996,6 +6041,26 @@
    "name": "Mainz 05",
    "short": "Mainz",
    "crest": "/teams/mainz.png"
+  },
+  "malawi": {
+   "name": "Malawi",
+   "short": "Malawi",
+   "crest": null
+  },
+  "maldivas": {
+   "name": "Maldivas",
+   "short": "Maldivas",
+   "crest": null
+  },
+  "maldives": {
+   "name": "Maldivas",
+   "short": "Maldivas",
+   "crest": null
+  },
+  "mali": {
+   "name": "Mali",
+   "short": "Mali",
+   "crest": null
   },
   "mallorca": {
    "name": "Mallorca",
@@ -5112,6 +6177,16 @@
    "short": "M'gladbach",
    "crest": "/teams/mgladbach.png"
   },
+  "mianmar": {
+   "name": "Mianmar",
+   "short": "Mianmar",
+   "crest": null
+  },
+  "myanmar": {
+   "name": "Mianmar",
+   "short": "Mianmar",
+   "crest": null
+  },
   "milan": {
    "name": "Milan",
    "short": "Milan",
@@ -5122,6 +6197,16 @@
    "short": "Mirassol",
    "crest": "/teams/mirassol.png"
   },
+  "mocambique": {
+   "name": "Moçambique",
+   "short": "Moçambique",
+   "crest": null
+  },
+  "mozambique": {
+   "name": "Moçambique",
+   "short": "Moçambique",
+   "crest": null
+  },
   "moldavia": {
    "name": "Moldávia",
    "short": "Moldávia",
@@ -5131,6 +6216,16 @@
    "name": "Moldávia",
    "short": "Moldávia",
    "crest": "/teams/moldavia.png"
+  },
+  "mongolia": {
+   "name": "Mongólia",
+   "short": "Mongólia",
+   "crest": null
+  },
+  "montenegro": {
+   "name": "Montenegro",
+   "short": "Montenegro",
+   "crest": null
   },
   "monterrey": {
    "name": "Monterrey",
@@ -5192,6 +6287,11 @@
    "short": "Newcastle",
    "crest": "/teams/newcastle.png"
   },
+  "nicaragua": {
+   "name": "Nicarágua",
+   "short": "Nicarágua",
+   "crest": null
+  },
   "nice": {
    "name": "Nice",
    "short": "Nice",
@@ -5201,6 +6301,11 @@
    "name": "Nice",
    "short": "Nice",
    "crest": "/teams/nice.png"
+  },
+  "nigeria": {
+   "name": "Nigéria",
+   "short": "Nigéria",
+   "crest": "/teams/nigeria.svg"
   },
   "noruega": {
    "name": "Noruega",
@@ -5262,6 +6367,16 @@
    "short": "Olympiacos",
    "crest": "/teams/olympiacos.png"
   },
+  "oma": {
+   "name": "Omã",
+   "short": "Omã",
+   "crest": null
+  },
+  "oman": {
+   "name": "Omã",
+   "short": "Omã",
+   "crest": null
+  },
   "oncecaldas": {
    "name": "Once Caldas",
    "short": "Once Caldas",
@@ -5312,6 +6427,16 @@
    "short": "Gales",
    "crest": "/teams/paisdegales.png"
   },
+  "palestina": {
+   "name": "Palestina",
+   "short": "Palestina",
+   "crest": null
+  },
+  "palestine": {
+   "name": "Palestina",
+   "short": "Palestina",
+   "crest": null
+  },
   "palestino": {
    "name": "Palestino",
    "short": "Palestino",
@@ -5331,6 +6456,16 @@
    "name": "Panamá",
    "short": "Panamá",
    "crest": "/teams/panama.svg"
+  },
+  "paquistao": {
+   "name": "Paquistão",
+   "short": "Paquistão",
+   "crest": null
+  },
+  "pakistan": {
+   "name": "Paquistão",
+   "short": "Paquistão",
+   "crest": null
   },
   "paraguai": {
    "name": "Paraguai",
@@ -5392,6 +6527,16 @@
    "short": "Porto",
    "crest": "/teams/porto.png"
   },
+  "portorico": {
+   "name": "Porto Rico",
+   "short": "Porto Rico",
+   "crest": null
+  },
+  "puertorico": {
+   "name": "Porto Rico",
+   "short": "Porto Rico",
+   "crest": null
+  },
   "portugal": {
    "name": "Portugal",
    "short": "Portugal",
@@ -5426,6 +6571,36 @@
    "name": "Pyramids",
    "short": "Pyramids",
    "crest": "/teams/pyramids.png"
+  },
+  "quenia": {
+   "name": "Quênia",
+   "short": "Quênia",
+   "crest": null
+  },
+  "kenya": {
+   "name": "Quênia",
+   "short": "Quênia",
+   "crest": null
+  },
+  "quirguistao": {
+   "name": "Quirguistão",
+   "short": "Quirguistão",
+   "crest": null
+  },
+  "kyrgyzrepublic": {
+   "name": "Quirguistão",
+   "short": "Quirguistão",
+   "crest": null
+  },
+  "kyrgyzrep": {
+   "name": "Quirguistão",
+   "short": "Quirguistão",
+   "crest": null
+  },
+  "kyrgyzstan": {
+   "name": "Quirguistão",
+   "short": "Quirguistão",
+   "crest": null
   },
   "racing": {
    "name": "Racing",
@@ -5552,6 +6727,46 @@
    "short": "Remo",
    "crest": "/teams/remo.png"
   },
+  "republicacentroafricana": {
+   "name": "República Centro-Africana",
+   "short": "R. Centro-Afr.",
+   "crest": null
+  },
+  "rcentroafr": {
+   "name": "República Centro-Africana",
+   "short": "R. Centro-Afr.",
+   "crest": null
+  },
+  "centralafricanrepublic": {
+   "name": "República Centro-Africana",
+   "short": "R. Centro-Afr.",
+   "crest": null
+  },
+  "centafrrep": {
+   "name": "República Centro-Africana",
+   "short": "R. Centro-Afr.",
+   "crest": null
+  },
+  "republicadominicana": {
+   "name": "República Dominicana",
+   "short": "R. Dominicana",
+   "crest": null
+  },
+  "rdominicana": {
+   "name": "República Dominicana",
+   "short": "R. Dominicana",
+   "crest": null
+  },
+  "dominicanrepublic": {
+   "name": "República Dominicana",
+   "short": "R. Dominicana",
+   "crest": null
+  },
+  "dominicanrep": {
+   "name": "República Dominicana",
+   "short": "R. Dominicana",
+   "crest": null
+  },
   "retro": {
    "name": "Retrô",
    "short": "Retrô",
@@ -5582,6 +6797,31 @@
    "short": "Roma",
    "crest": "/teams/roma.png"
   },
+  "romenia": {
+   "name": "Romênia",
+   "short": "Romênia",
+   "crest": "/teams/romenia.svg"
+  },
+  "romania": {
+   "name": "Romênia",
+   "short": "Romênia",
+   "crest": "/teams/romenia.svg"
+  },
+  "ruanda": {
+   "name": "Ruanda",
+   "short": "Ruanda",
+   "crest": null
+  },
+  "rwanda": {
+   "name": "Ruanda",
+   "short": "Ruanda",
+   "crest": null
+  },
+  "russia": {
+   "name": "Rússia",
+   "short": "Rússia",
+   "crest": "/teams/russia.svg"
+  },
   "sampaio": {
    "name": "Sampaio Corrêa",
    "short": "Sampaio Corrêa",
@@ -5606,6 +6846,11 @@
    "name": "San José",
    "short": "San José",
    "crest": "/teams/sanjose.png"
+  },
+  "sanmarino": {
+   "name": "San Marino",
+   "short": "San Marino",
+   "crest": null
   },
   "santafe": {
    "name": "Independiente Santa Fe",
@@ -5652,6 +6897,16 @@
    "short": "Senegal",
    "crest": "/teams/senegal.png"
   },
+  "serraleoa": {
+   "name": "Serra Leoa",
+   "short": "Serra Leoa",
+   "crest": null
+  },
+  "sierraleone": {
+   "name": "Serra Leoa",
+   "short": "Serra Leoa",
+   "crest": null
+  },
   "servia": {
    "name": "Sérvia",
    "short": "Sérvia",
@@ -5681,6 +6936,26 @@
    "name": "Sheffield United",
    "short": "Sheffield Utd",
    "crest": "/teams/sheffieldunited.png"
+  },
+  "singapura": {
+   "name": "Singapura",
+   "short": "Singapura",
+   "crest": null
+  },
+  "singapore": {
+   "name": "Singapura",
+   "short": "Singapura",
+   "crest": null
+  },
+  "siria": {
+   "name": "Síria",
+   "short": "Síria",
+   "crest": null
+  },
+  "syria": {
+   "name": "Síria",
+   "short": "Síria",
+   "crest": null
   },
   "southampton": {
    "name": "Southampton",
@@ -5787,6 +7062,16 @@
    "short": "Sunderland",
    "crest": "/teams/sunderland.png"
   },
+  "tailandia": {
+   "name": "Tailândia",
+   "short": "Tailândia",
+   "crest": null
+  },
+  "thailand": {
+   "name": "Tailândia",
+   "short": "Tailândia",
+   "crest": null
+  },
   "talleres": {
    "name": "Talleres",
    "short": "Talleres",
@@ -5796,6 +7081,11 @@
    "name": "Talleres",
    "short": "Talleres",
    "crest": "/teams/talleres.png"
+  },
+  "tanzania": {
+   "name": "Tanzânia",
+   "short": "Tanzânia",
+   "crest": null
   },
   "tchequia": {
    "name": "Tchéquia",
@@ -5811,6 +7101,11 @@
    "name": "Tchéquia",
    "short": "Tchéquia",
    "crest": "/teams/tchequia.png"
+  },
+  "togo": {
+   "name": "Togo",
+   "short": "Togo",
+   "crest": "/teams/togo.svg"
   },
   "torino": {
    "name": "Torino",
@@ -5832,6 +7127,31 @@
    "short": "Tottenham",
    "crest": "/teams/tottenham.png"
   },
+  "trinidadetobago": {
+   "name": "Trinidad e Tobago",
+   "short": "Trin. e Tobago",
+   "crest": "/teams/trinidadetobago.svg"
+  },
+  "trinetobago": {
+   "name": "Trinidad e Tobago",
+   "short": "Trin. e Tobago",
+   "crest": "/teams/trinidadetobago.svg"
+  },
+  "trinidadandtobago": {
+   "name": "Trinidad e Tobago",
+   "short": "Trin. e Tobago",
+   "crest": "/teams/trinidadetobago.svg"
+  },
+  "trinidadtobago": {
+   "name": "Trinidad e Tobago",
+   "short": "Trin. e Tobago",
+   "crest": "/teams/trinidadetobago.svg"
+  },
+  "trintob": {
+   "name": "Trinidad e Tobago",
+   "short": "Trin. e Tobago",
+   "crest": "/teams/trinidadetobago.svg"
+  },
   "tunisia": {
    "name": "Tunísia",
    "short": "Tunísia",
@@ -5852,6 +7172,16 @@
    "short": "Turquia",
    "crest": "/teams/turquia.png"
   },
+  "ucrania": {
+   "name": "Ucrânia",
+   "short": "Ucrânia",
+   "crest": "/teams/ucrania.svg"
+  },
+  "ukraine": {
+   "name": "Ucrânia",
+   "short": "Ucrânia",
+   "crest": "/teams/ucrania.svg"
+  },
   "udinese": {
    "name": "Udinese",
    "short": "Udinese",
@@ -5861,6 +7191,11 @@
    "name": "Udinese",
    "short": "Udinese",
    "crest": "/teams/udinese.png"
+  },
+  "uganda": {
+   "name": "Uganda",
+   "short": "Uganda",
+   "crest": null
   },
   "ulsan": {
    "name": "Ulsan HD",
@@ -6026,6 +7361,11 @@
    "name": "Vancouver Whitecaps",
    "short": "Vancouver",
    "crest": "/teams/vancouver.png"
+  },
+  "vanuatu": {
+   "name": "Vanuatu",
+   "short": "Vanuatu",
+   "crest": null
   },
   "vasco": {
    "name": "Vasco da Gama",
