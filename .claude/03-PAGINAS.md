@@ -54,7 +54,11 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
   "Galera" (quem palpitou). Trava ao chegar o `kickoff_at`.
 
 ### Grupos — `features/leagues`
-- **`LigasPage`** (`/grupos`): minhos grupos + entrar por código.
+- **`LigasPage`** (`/grupos`): topo com a **prévia da classificação dos grupos favoritados**
+  (carrossel na ordem de favoritar — só os grupos que **já têm pontuação**) + **Resultadismo The Best
+  compacto** (título + ver ranking + minha posição geral, **sem pontos**); depois meus grupos (cada
+  card com a **estrela** de favoritar) + entrar por código. → `leagues/favorites.ts`, migration
+  `20260610190000`.
 - **`NovaLigaPage`** (`/grupos/nova`): criar grupo — nome (com **prefixo-badge**
   Bolão/Liga/Copa), descrição, visibilidade, política de entrada, competição inicial (padrão Copa do
   Mundo), modo, cupom (se pagamento ativo). → checkout/ativação conforme o modo de pagamento.

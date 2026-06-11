@@ -44,6 +44,16 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   da torcida" seguem com as 66** (a Itália joga amistosos e pode ser a seleção do coração).
 
 ### Adicionado
+- **Favoritar grupo → prévia da classificação no topo da /grupos.** O usuário marca a **estrela**
+  num grupo e a **prévia da classificação dele** (janela de 3: você + vizinhos de cima e de baixo)
+  sobe pro topo, no lugar do Resultadismo The Best. Favoritou vários → vira um **carrossel** (com
+  bolinhas), na ordem que favoritou. A prévia de um grupo **só aparece quando ele já tem pontuação**
+  na competição-bolão dele (antes da Copa, fica de fora). O **Resultadismo The Best** virou um
+  **card pequeno**: só título + "ver ranking" + **minha posição geral (sem pontuação)**. Banco:
+  `profiles.favorite_group_ids` (ordenado) + RPCs `toggle_favorite_group` (valida ser membro) e
+  `get_group_rank_window` (janela por grupo, visão Pontos, com o gate de pontuação); hooks isolados
+  em `features/leagues/favorites.ts`. Migration `20260610190000`. → [`03`](03-PAGINAS.md),
+  [`06`](06-REGRAS-DE-NEGOCIO.md) §4.
 - **Pontuação prévia AO VIVO + compartilhar placar como imagem.** (1) Com o jogo rolando, o
   palpite mostra como está pontuando: borda do placar na cor do tipo (dourado/verde/azul; cinza no
   erro) + texto plano ("Cravada +3"), sem o chip de resultado final — volta da v0, mais suave.
