@@ -20,7 +20,22 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+### Adicionado
+- **Aba "Grupos" na página de jogos: os palpites que valem ponto nunca somem.** Quem personalizou
+  "só Brasil" mas está num grupo que conta outras seleções vê os jogos do grupo numa aba própria.
+  Ordem das abas: **Interesses** (encurtada; só personalização) → **Grupos** (união dos recortes dos
+  meus grupos, inclusive pendentes de aprovação; é o **padrão** quando a pessoa tem grupo) →
+  **Todos** → competições. **Coachmark** na 1ª visita explica a aba. As fileiras de abas e de dias
+  usam o novo **`ScrollRow`** (componente de UI): **degradê nas bordas** quando há mais conteúdo pra
+  arrastar, sumindo no fim do scroll. → [`03`](03-PAGINAS.md).
+
 ### Alterado
+- **Imagem de palpites junta jogos de DIAS diferentes.** A seleção não se perde ao trocar a aba
+  de dia: marca o de ontem, troca a aba, marca o de hoje e gera UMA imagem — em ordem de horário e
+  com a **data pequenininha** em cada jogo ("QUA 10/06") pra dar o contexto. A barra ensina ("1
+  jogo — toque em mais (até de outro dia)"); trocar de escopo zera a seleção. No caminho, corrigido
+  um crash de tela branca pra usuário logado que existia só no working tree de hoje (estado da
+  seleção lido antes de declarar) — nunca chegou em produção.
 - **Compartilhar vários jogos ficou achável.** O ícone no card ganhou o rótulo "compartilhar"
   e **abre o modo de seleção já com aquele jogo marcado** — a barra ("1 jogo — toque em mais
   pra juntar" → "Gerar imagem") ensina o gesto; tocar nos outros cards soma na mesma imagem.

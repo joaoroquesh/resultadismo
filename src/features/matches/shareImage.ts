@@ -13,6 +13,8 @@ export type ShareRow = {
   live: boolean;
   type: ScoreType;
   joker: boolean;
+  /** data curta do jogo ("QUA 10/06") — dá contexto quando a imagem junta dias. */
+  date?: string | null;
 };
 
 // Paleta da marca em hex (canvas não lê os tokens oklch do CSS).
@@ -73,7 +75,7 @@ function drawCrestFallback(g: CanvasRenderingContext2D, x: number, y: number, si
 export async function buildScoreShareImage(rows: ShareRow[], playerName: string): Promise<Blob> {
   const W = 1080;
   const HEADER = 168;
-  const ROW = 168;
+  const ROW = 190; // comporta a linha de data acima do placar
   const FOOTER = 92;
   const PAD = 48;
   const H = HEADER + rows.length * (ROW + 16) + FOOTER;
@@ -135,16 +137,21 @@ export async function buildScoreShareImage(rows: ShareRow[], playerName: string)
     g.fillText(r.homeName.slice(0, 14), PAD + 8 + crestSize / 2, y + ROW - 18);
     g.fillText(r.awayName.slice(0, 14), axX + crestSize / 2, y + ROW - 18);
 
-    // centro: placar real grande + palpite pequeno
+    // centro: data pequena + placar real grande + palpite pequeno
     const cx = W / 2;
+    if (r.date) {
+      g.fillStyle = C.dim;
+      g.font = "600 21px system-ui, -apple-system, sans-serif";
+      g.fillText(r.date, cx, y + 32);
+    }
     const score =
       r.homeScore != null && r.awayScore != null ? `${r.homeScore} × ${r.awayScore}` : "– × –";
     g.fillStyle = C.text;
     g.font = "800 56px system-ui, -apple-system, sans-serif";
-    g.fillText(score, cx, y + 66);
+    g.fillText(score, cx, y + 86);
     g.fillStyle = C.dim;
     g.font = "600 26px system-ui, -apple-system, sans-serif";
-    g.fillText(`meu palpite ${r.homePred} × ${r.awayPred}`, cx, y + 102);
+    g.fillText(`meu palpite ${r.homePred} × ${r.awayPred}`, cx, y + 122);
 
     // selo da pontuação
     const pts = SCORE_POINTS[r.type] * (r.joker ? 2 : 1);
@@ -153,7 +160,7 @@ export async function buildScoreShareImage(rows: ShareRow[], playerName: string)
     const tw = g.measureText(label).width;
     const pw = tw + 36;
     const px = cx - pw / 2;
-    const py = y + ROW - 22;
+    const py = y + ROW - 24;
     g.fillStyle = TYPE_COLOR[r.type];
     roundRect(g, px, py - 24, pw, 38, 19);
     g.fill();

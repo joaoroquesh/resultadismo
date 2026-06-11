@@ -54,24 +54,16 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
   "Galera" (quem palpitou). Trava ao chegar o `kickoff_at`.
 
 ### Grupos — `features/leagues`
-- **`LigasPage`** (`/grupos`): topo com a **prévia da classificação dos grupos favoritados**
-  (carrossel na ordem de favoritar — só os grupos que **já têm pontuação**) + **Resultadismo The Best
-  compacto** (título + ver ranking + minha posição geral, **sem pontos**); depois meus grupos (cada
-  card com a **estrela** de favoritar) + entrar por código. → `leagues/favorites.ts`, migration
-  `20260610190000`.
+- **`LigasPage`** (`/grupos`): minhos grupos + entrar por código.
 - **`NovaLigaPage`** (`/grupos/nova`): criar grupo — nome (com **prefixo-badge**
   Bolão/Liga/Copa), descrição, visibilidade, política de entrada, competição inicial (padrão Copa do
   Mundo), modo, cupom (se pagamento ativo). → checkout/ativação conforme o modo de pagamento.
 - **`LigaDetailPage`** (`/grupos/:slug`): detalhe — identidade (escudo/nome/descrição) + código de
   convite; **dono/admin edita nome, descrição e escudo** em "Editar grupo" (`GrupoEditor`; trocar o
   nome volta à moderação). Abas
-  **Classificação** (tabela de Pontos ou `ConfrontoSection`; selo 💰 de prêmio quando o bolão está
-  ativo), **Membros** (papéis, aprovar/remover; botão $ marca pagantes do bolão),
-  **Gestão** (`GestaoBolaoTab` — Gestão do Bolão, ADR [`0009`](decisions/0009-gestao-bolao.md):
-  membro vê quando ativa, admin sempre; vem **antes de Competições** pra dar destaque à
-  funcionalidade nova; coachmark `resultadismo-coach-gestao-bolao-v1` na fileira de abas) e
-  **Competições** (admin: adicionar competição/modo). Banner "Pagar agora" se
-  pendente; botão de reembolso só p/ dono (≤7 dias).
+  **Classificação** (tabela de Pontos ou `ConfrontoSection`), **Membros** (papéis, aprovar/remover),
+  **Competições** (admin: adicionar competição/modo). Banner "Pagar agora" se pendente; botão de
+  reembolso só p/ dono (≤7 dias).
 - **`RefundFederationButton`**: botão isolado de cancelar+reembolsar (2 passos). → [`06`](06-REGRAS-DE-NEGOCIO.md).
 
 ### Classificação — `features/standings`
@@ -96,8 +88,7 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
 - **`PersonalizationPage`** (`/perfil/personalizar`): no **1º acesso**, wizard de 6 telas (perfil →
   coração → seleção → campeonatos → The Best+convite → notificações+instalar); com `?only=coracao|
   selecao|campeonatos`, edita **um item só** (Salvar → volta ao hub). Convite por link (`?convite=`)
-  é capturado no boot e preenche o campo. Depois vêm, nesta ordem: o **carrossel de boas-vindas**
-  (`Onboarding`, 3 slides de conceito) e o **tour guiado** (`GuidedTour`, coach-marks na UI real).
+  é capturado no boot e preenche o campo. O tour de boas-vindas (`Onboarding`) vem **depois**.
 - **`PlayerProfilePage`** (`/jogador/:id`): perfil público de outro jogador (stats + grupos
   visíveis).
 
@@ -111,15 +102,7 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
   desempate, promoção).
 - **`landing/LandingSections`**: hero + features para visitantes (dentro da JogosPage deslogada).
 - **`legal/PrivacidadePage` / `TermosPage`**: páginas legais (LGPD, pagamento §12, arrependimento).
-- **`onboarding/Onboarding`**: **carrossel de boas-vindas** do 1º acesso — 3 slides de conceito
-  (bem-vindo · pontuação · 2×). Montado no `App` root; refazível pelo admin (Perfil → "Rever tour").
-  Ao fechar, dispara o evento `resultadismo:onboarding-done` → o `GuidedTour`.
-- **`onboarding/GuidedTour`**: **tour guiado em coach-marks** que apontam elementos **reais** da UI
-  (via `data-tour`), em sequência: barra de filtros de **Jogos** → aba **Grupos** (cria grupo + "The
-  Best") → aba **Perfil**. Roda inteiro em `/` (os 3 alvos estão à vista: filtro na página + nav
-  fixa). Vem **depois** do carrossel; gate por `personalization_done` + `localStorage`
-  (`resultadismo-onboarding-v1` visto + `resultadismo-tour-v1` não visto) + estar em `/`. Mede o
-  alvo visível (mobile×desktop) e reusa a linguagem do `Coachmark` (anel turquesa + balão escuro).
+- **`onboarding/Onboarding`**: tour de primeiro acesso (montado no `App` root; refazível pelo admin).
 - **`auth/*`**: `LoginModal` (bottom-sheet — **único** login do app), `AuthCallback`, `AuthProvider`, guards.
 - **`notifications/NotificationsBell`**: sino + lista de notificações.
 - **`access/AccessGate` + `WaitingRoom`**: sala de espera (fila FIFO em pico). → [`05`](05-DADOS-E-AUTH.md).
@@ -137,7 +120,7 @@ Tema: `theme/ThemeProvider` + `ThemeToggle`. PWA: `pwa/InstallPrompt`.
 ## 5. Fluxos principais (telas que participam)
 
 - **Login**: `/` (deslogado) → botão "Entrar" abre o **`LoginModal`** (bottom-sheet) → Google → `/auth/callback` → `AuthProvider`
-  cria/carrega profile → no 1º acesso: personalização → `Onboarding` (carrossel) → `GuidedTour` (tour guiado).
+  cria/carrega profile → `Onboarding` no 1º acesso.
 - **Palpitar**: `JogosPage` → escolhe competição/dia → `MatchCard` (inputs auto-save) → opcional 2×
   → resultado pontua sozinho ao encerrar o jogo.
 - **Criar/entrar grupo**: `NovaLigaPage` (cria → checkout/ativação) **ou** `LigasPage` (entrar

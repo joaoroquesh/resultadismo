@@ -150,12 +150,18 @@ export function JogosPage() {
   const { toast } = useToast();
   const { profile } = useAuth();
 
+  // seleção do "compartilhar como imagem": null = fora do modo; Set = ids
+  // escolhidos. Declarado AQUI em cima porque o bloco de troca de escopo
+  // logo abaixo zera a seleção (useState depois = TDZ → crash no render).
+  const [shareSel, setShareSel] = useState<Set<string> | null>(null);
+
   // troca de campeonato (ou "Todos") = contexto de dia novo → zera a escolha.
   // Ajuste no render via valor anterior, sem efeito ("you might not need an effect").
   const [prevScope, setPrevScope] = useState(scope);
   if (scope !== prevScope) {
     setPrevScope(scope);
     setPicked(null);
+    setShareSel(null); // escopo novo = outra lista de jogos; seleção de imagem zera
   }
 
   // dias únicos com jogos, ordenados
@@ -180,9 +186,7 @@ export function JogosPage() {
       .sort((a, b) => dayjs(a.kickoff_at ?? 0).valueOf() - dayjs(b.kickoff_at ?? 0).valueOf());
   }, [matches, day]);
 
-  // ── compartilhar placares como IMAGEM (1+ jogos do dia) ──────────────────
-  // null = fora do modo seleção; Set = ids escolhidos.
-  const [shareSel, setShareSel] = useState<Set<string> | null>(null);
+  // ── compartilhar placares como IMAGEM (1+ jogos, atravessa os dias) ───────
   // mesma régua do "ao vivo automático" do card: agendado que já começou há <4h
   // conta como rolando (a API às vezes demora a virar o status).
   const isLiveish = (m: (typeof dayMatches)[number]) => {
@@ -206,8 +210,11 @@ export function JogosPage() {
   }
   async function generateShare() {
     if (!shareSel || shareSel.size === 0) return;
-    const rows: ShareRow[] = dayMatches
+    // a seleção atravessa as abas de dia: junta TODOS os marcados do escopo,
+    // em ordem de horário, com a data curta em cada um pra dar contexto.
+    const rows: ShareRow[] = (matches ?? [])
       .filter((m) => shareSel.has(m.id))
+      .sort((a, b) => dayjs(a.kickoff_at ?? 0).valueOf() - dayjs(b.kickoff_at ?? 0).valueOf())
       .map((m) => {
         const pred = predMap!.get(m.id)!;
         const finished = m.status === "finished";
@@ -227,6 +234,9 @@ export function JogosPage() {
           live: !finished && isLiveish(m),
           type,
           joker: pred.is_joker ?? false,
+          date: m.kickoff_at
+            ? dayjs(m.kickoff_at).format("ddd DD/MM").replace(".", "").toUpperCase()
+            : null,
         };
       });
     const blob = await buildScoreShareImage(rows, profile?.display_name ?? "Resultadista");
@@ -347,7 +357,7 @@ export function JogosPage() {
           {shareSel.size === 0
             ? "Toque nos jogos"
             : shareSel.size === 1
-              ? "1 jogo — toque em mais pra juntar"
+              ? "1 jogo — toque em mais (até de outro dia)"
               : `${shareSel.size} jogos na imagem`}
         </p>
         <button
@@ -499,7 +509,7 @@ export function JogosPage() {
               </button>
             );
           })}
-          {session && dayMatches.some(isShareable) && (
+          {session && (shareSel != null || dayMatches.some(isShareable)) && (
             <button
               type="button"
               onClick={() => setShareSel(shareSel ? null : new Set())}
