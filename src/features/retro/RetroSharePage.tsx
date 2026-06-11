@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { Escudo } from "@/components/ui/Escudo";
 import { useRetroSummary } from "./api";
 import { CampaignTrail, type TrailSlot } from "./CampaignTrail";
 import { fmtMs } from "./share";
@@ -30,9 +31,16 @@ export function RetroSharePage() {
           <Card className={data.status === "champion" ? "border-gold-500 bg-gold-50 p-5" : "p-5"}>
             <div className="space-y-3 text-center">
               <div className="text-5xl">{stageEmoji({ status: data.status, stageReached: data.stage_reached, points: data.points, format: data.format })}</div>
+              {/* escudo do jogador (só quem jogou logado tem player) */}
+              {data.player && (
+                <div className="flex items-center justify-center gap-2">
+                  <Escudo src={data.player.avatar_url} name={data.player.display_name} size="sm" />
+                  <span className="font-semibold">{data.player.display_name}</span>
+                </div>
+              )}
               <p className="text-sm text-ink-500">
-                {data.player?.display_name ?? "Alguém"} jogou a{" "}
-                {data.is_daily ? "Seleção do Dia" : "Jogo livre"}
+                {data.player?.display_name ?? "Alguém"} jogou{" "}
+                {data.is_daily ? "a Seleção do Dia" : "o Jogo livre"}
                 {data.format === "pontos" && (
                   <>
                     {" "}

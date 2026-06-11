@@ -111,6 +111,26 @@ página pública `/retro/r/:code`.
   · 👏 oitavas · 😅 grupos) + manchete por fase, no reveal/tela final/share/página pública. Quem é
   eliminado na semi/final com **acerto** vê "eliminado nos pênaltis 😬" (acertou o vencedor, faltou
   saldo). **Ranking** dá destaque à FASE (pontos/tempo viram desempate em cinza), com nota do critério.
+- **Ranking 1º lugar (rodada 16):** a faixa do líder usa o par inversível `bg-ink-950`/`text-ink-50`
+  (claro→faixa escura+texto claro; escuro→faixa clara+texto escuro) — acabou o texto claro em fundo
+  claro no dark. Secundário em `ink-300`, fase em `ink-50` (ambos acompanham a inversão).
+- **Escudo no share (rodada 16):** página do link mostra o escudo do jogador (logado) ao lado do
+  nome + artigo certo ("jogou **a** Seleção do Dia" / "**o** Jogo livre"). Na **imagem** (canvas), o
+  escudo é desenhado fiel em `shareImage.ts` (`drawEscudo`): pinta o fundo (sólido/listras via
+  gradiente no ângulo CSS / grade em 4 quadrantes / bola radial), **recorta pela máscara SVG** da
+  forma via `destination-in` (assets same-origin → sem taint), e põe a inicial por cima. Foto
+  cross-origin cai p/ sólido (evita tainted canvas no `toBlob`). O escudo do logado vem do
+  `profile` (`ResultView` → `shareCampaign` → `buildShareImage`); anônimo mantém a imagem sem escudo.
+- **Foto no escudo da imagem (rodada 17):** `fill=photo` (a maioria dos logados Google tem foto —
+  `avatar_url` nasce como a URL crua e vira `fill=photo` via `legacyToCrest`) agora desenha a **foto
+  de verdade** no canvas, não mais sólido. `loadPhoto` carrega com `crossOrigin="anonymous"`
+  (Google `lh3.googleusercontent.com` serve `access-control-allow-origin: *`; a CSP de prod
+  `img-src https:` permite — **localhost bloqueia por origem, prod não**) + **cache-bust** estável
+  por sessão (a UI viva já cacheou a URL via CSS **sem** cors; reusar essa entrada sujaria o canvas)
+  + **timeout 4s** + cover-crop idêntico ao `center/cover` do CSS. Tudo em `try/catch`: qualquer
+  falha (sem CORS, host não-Google, offline, timeout) mantém o sólido já pintado por `paintCrestBg`
+  + inicial (`photoOk=false`) — `toBlob` nunca quebra, a imagem **sempre** sai. `<img>` carregado com
+  `crossOrigin` cacheado por URL → as 2 gerações do share (file + clipboard) reusam sem rebaixar 2×.
 - **Bandeiras (fix rodada 8):** o circularizador `gen-flag-circles.mjs` agora preserva
   `fill`/`stroke`/`style` da raiz do SVG — sem isso, bandeiras que definem a cor no `<svg>` raiz
   (Honduras etc.) renderizavam em preto. Re-baixadas e auditadas por COR (não só decode): 60/60 ok.

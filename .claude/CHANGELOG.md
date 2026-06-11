@@ -133,6 +133,18 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   inverte no dark (claro com texto escuro), igual à landing; e **admin de acessos/tempo** —
   `profiles.retro_last_active_at`/`retro_usage_seconds` + `retro_admin_stats` (migration
   `20260610150014`) mostram online agora e tempo total **Retrô vs Normal** no `/admin/retro`.
+  **Rodada 16:** 1º lugar do ranking agora INVERTE no tema (claro→faixa escura/texto claro;
+  escuro→faixa clara/texto escuro — par `ink-950`/`ink-50`, fim do texto claro em fundo claro no
+  dark); na página do link compartilhado, artigo certo ("jogou **a** Seleção do Dia" / "**o** Jogo
+  livre") + **escudo do jogador** ao lado do nome (logado); e o **escudo entrou na imagem** do share
+  — render fiel no canvas (silhueta SVG da forma + cores sólido/listras/grade/bola + inicial), com
+  fallback de círculo e foto cross-origin caindo p/ sólido (sem tainted canvas). Só front, sem
+  migration. **Rodada 17:** a **foto** do escudo agora aparece na imagem do share (antes virava
+  sólido). Foto carregada com `crossOrigin="anonymous"` (Google `lh3.googleusercontent.com` serve
+  `access-control-allow-origin: *` — verificado empiricamente; a CSP de prod `img-src https:`
+  permite) + **cache-bust dedicado** (a UI viva já cacheou a URL via CSS sem cors; reusar sujaria o
+  canvas) + **timeout 4s** + cover-crop igual ao CSS. Qualquer falha (host sem CORS, offline,
+  timeout) cai no escudo sólido + inicial — a imagem **sempre** gera. Só front, sem migration.
   Histórico completo da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos

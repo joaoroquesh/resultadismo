@@ -67,8 +67,13 @@ export function RetroLeaderboard() {
               key={r.pos}
               className={cn(
                 "flex items-center gap-3 py-2 text-sm",
-                r.pos === 1 && "rounded-md bg-gold-50 px-2",
-                r.is_me && "rounded-md bg-brand-500/10 px-2 font-semibold",
+                // 1º lugar = destaque inversível (ink-950/ink-50 viram o par tema↔escuro):
+                // no tema claro → faixa escura + texto claro; no escuro → faixa clara + texto escuro.
+                r.pos === 1
+                  ? "rounded-md bg-ink-950 px-2 text-ink-50"
+                  : r.is_me
+                    ? "rounded-md bg-brand-500/10 px-2 font-semibold"
+                    : "",
               )}
             >
               <span className="w-6 text-right font-bold tabular-nums text-ink-500">
@@ -76,11 +81,11 @@ export function RetroLeaderboard() {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate">{r.display_name}</span>
-                <span className="block text-[11px] text-ink-400">
+                <span className={cn("block text-[11px]", r.pos === 1 ? "text-ink-300" : "text-ink-400")}>
                   {isPontos ? fmtMs(r.total_ms) : `${r.points} pts · ${fmtMs(r.total_ms)}`}
                 </span>
               </span>
-              <span className="shrink-0 text-right text-sm font-bold text-brand-800">
+              <span className={cn("shrink-0 text-right text-sm font-bold", r.pos === 1 ? "text-ink-50" : "text-brand-800")}>
                 {isPontos ? `${r.points} pts` : r.stage_reached}
               </span>
             </li>

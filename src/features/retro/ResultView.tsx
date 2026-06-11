@@ -25,7 +25,7 @@ export function ResultView({
   onPlayTraining: () => void;
   onBackHome: () => void;
 }) {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { open: openLogin } = useLoginModal();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -65,7 +65,10 @@ export function ResultView({
         className="w-full font-bold"
         onClick={() => {
           track("retro_share", { status: run.status });
-          void shareCampaign(run, streak, (m) => toast(m, "success"));
+          const sharePlayer = profile
+            ? { avatarUrl: profile.avatar_url, displayName: profile.display_name }
+            : undefined;
+          void shareCampaign(run, streak, (m) => toast(m, "success"), sharePlayer);
         }}
       >
         Compartilhar 📲
