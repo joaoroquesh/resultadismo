@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -12,6 +12,8 @@ export function ScrollRow({
   className,
   innerClassName,
   fadeClassName,
+  centerSelector,
+  centerKey,
   dataTour,
 }: {
   children: ReactNode;
@@ -22,11 +24,32 @@ export function ScrollRow({
   /** cor do degradê quando a fileira NÃO está sobre o fundo da página
    * (ex.: "from-[var(--color-ink-100)]" dentro do SegmentedControl) */
   fadeClassName?: string;
+  /** seletor (dentro da fileira) do item que deve nascer CENTRALIZADO ao montar.
+   * Com clamp: se o item está numa ponta, encosta na borda em vez de forçar. */
+  centerSelector?: string;
+  /** muda → re-centraliza o `centerSelector` (ex.: trocou de contexto). NÃO
+   * mude isso a cada clique do usuário, senão a rolagem manual dele é desfeita. */
+  centerKey?: string;
   /** âncora pro tour guiado (atributo data-tour no wrapper) */
   dataTour?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [fade, setFade] = useState({ left: false, right: false });
+
+  // centraliza o item-alvo na 1ª pintura (e quando `centerKey` muda). Mede DOM
+  // (sistema externo) em layout-effect: a fileira já nasce centralizada, sem
+  // flash. O clamp natural do scrollLeft mantém o 1º/último item na ponta.
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el || !centerSelector) return;
+    const target = el.querySelector<HTMLElement>(centerSelector);
+    if (!target) return;
+    const cr = el.getBoundingClientRect();
+    const tr = target.getBoundingClientRect();
+    const delta = tr.left + tr.width / 2 - (cr.left + el.clientWidth / 2);
+    const max = el.scrollWidth - el.clientWidth;
+    el.scrollLeft = Math.max(0, Math.min(el.scrollLeft + delta, max));
+  }, [centerSelector, centerKey]);
 
   useEffect(() => {
     const el = ref.current;

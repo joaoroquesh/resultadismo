@@ -496,9 +496,16 @@ export function JogosPage() {
         })()
       )}
 
-      {/* tabs de dia */}
+      {/* tabs de dia — py-1.5 no scroller dá respiro pra bolinha "ao vivo" não
+          ser cortada no topo pelo overflow; o dia ativo nasce centralizado
+          (centerKey=scope: re-centra ao trocar de aba, não a cada clique). */}
       {!loadingMatches && days.length > 0 && (
-        <ScrollRow className="-mx-4 mb-4" innerClassName="px-4">
+        <ScrollRow
+          className="-mx-4 mb-4"
+          innerClassName="px-4 py-1.5"
+          centerSelector="[data-day-active]"
+          centerKey={String(scope)}
+        >
           {days.map((d) => {
             const isToday = d === dayjs().format("YYYY-MM-DD");
             const hasLive = matches?.some(
@@ -508,6 +515,7 @@ export function JogosPage() {
               <button
                 key={d}
                 onClick={() => setPicked(d)}
+                data-day-active={day === d ? "" : undefined}
                 className={cn(
                   "relative flex shrink-0 flex-col items-center rounded-md border px-3 py-1.5 text-sm font-semibold leading-tight transition",
                   day === d

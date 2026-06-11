@@ -31,6 +31,13 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   decisivo, depois do outro. Encerrado ordena pela mesma régua (pontuação oficial).
 
 ### Corrigido
+- **Fileira de dias: hoje nasce CENTRALIZADO e a bolinha de "ao vivo" não corta mais.** (1) Ao
+  abrir/atualizar a página, o dia selecionado (hoje) vem centralizado na fileira, com clamp: se ele
+  está numa ponta, encosta na borda (1º dia → à esquerda, último → à direita) em vez de forçar; a
+  rolagem manual do usuário não é mais desfeita (só re-centra ao trocar de aba de escopo, não a cada
+  toque num dia). `ScrollRow` ganhou `centerSelector`/`centerKey`. (2) O ponto vermelho de jogo ao
+  vivo no tab do dia era cortado no topo pelo `overflow` da fileira; agora há respiro vertical
+  (`py-1.5`) e ele aparece inteiro.
 - **Sync: sigla (TLA) deixou de ser chave de matching de time — "Camboja 2×0 Hong Kong" não vira
   mais "Atlético-MG 2×0 Hong Kong".** O gerador do mapa canônico (`gen-teams-catalog.mjs`)
   indexava também o TLA de cada time; a abreviação da ESPN pra países sem cadastro colidia com
