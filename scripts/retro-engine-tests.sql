@@ -76,30 +76,25 @@ begin
   end if;
 end $$;
 
--- ============ T4: config da barra (default off = ≥1) + formato Pontos joga os 7 ============
+-- ============ T4: modos (rodada 18) — start devolve level + difficulty; Pontos morto ============
 do $$
-declare v_cfg jsonb; v_token uuid := gen_random_uuid(); v_start jsonb; v_run uuid;
-  v_i int := 0; v_h int; v_a int; v_ans jsonb; v_played int;
+declare v_token uuid := gen_random_uuid(); v_start jsonb; v_ans jsonb;
 begin
-  -- garante config no default (off)
-  perform public.retro_admin_set_config(false) from (select 1) x where public.is_app_admin();
-  -- formato PONTOS: erra tudo de propósito e ainda joga os 7 (sem eliminação)
-  v_start := public.retro_start_run('acerto','sempressa',false,v_token,'{}','padrao','pontos');
-  v_run := (v_start->>'run_id')::uuid;
-  loop
-    v_i := v_i + 1; if v_i > 9 then raise exception 'loop'; end if;
-    select m.home_score, m.away_score into v_h, v_a
-      from public.retro_run_matches rm join public.retro_matches m on m.id = rm.match_id
-     where rm.run_id = v_run and rm.answered_at is null;
-    exit when not found;
-    v_ans := public.retro_answer(v_run, 9, 0, v_token, '{}');  -- chute fixo (erra muita coisa)
-    exit when v_ans->'run'->>'status' <> 'playing';
-    perform public.retro_next(v_run, v_token, '{}');
-  end loop;
-  select count(*) into v_played from public.retro_run_matches where run_id = v_run and answered_at is not null;
-  if v_ans->'run'->>'status' = 'finished' and v_played = 7 then
-    raise notice 'T4a Pontos: OK (jogou os 7 sem eliminação, status finished)';
-  else raise exception 'T4a FALHOU: % / % jogos', v_ans->'run'->>'status', v_played; end if;
+  -- start lenda devolve level e o payload traz a dificuldade do jogo (barra do card)
+  v_start := public.retro_start_run(p_daily => false, p_anon_token => v_token, p_level => 'lenda');
+  if v_start->>'level' <> 'lenda' then raise exception 'T4a FALHOU: level %', v_start->>'level'; end if;
+  if (v_start->'current'->'match'->>'difficulty') is null then raise exception 'T4a FALHOU: sem difficulty'; end if;
+  v_ans := public.retro_answer((v_start->>'run_id')::uuid, null, null, v_token, '{}');
+  if v_ans->'run'->>'level' <> 'lenda' then raise exception 'T4a FALHOU: answer sem level'; end if;
+  raise notice 'T4a start/answer com level + difficulty no payload: OK';
+  -- níveis antigos (facil/padrao/dificil) rejeitados
+  begin
+    perform public.retro_start_run(p_daily => false, p_anon_token => v_token, p_level => 'padrao');
+    raise exception 'T4b FALHOU: aceitou level padrao';
+  exception when others then
+    if sqlerrm like '%T4b%' then raise; end if;
+    raise notice 'T4b níveis antigos rejeitados: OK';
+  end;
 end $$;
 
 -- ============ T5: Copa do Dia de LOGADO — retomar + unicidade + ranking ============
@@ -147,7 +142,7 @@ begin
     else raise; end if;
   end;
   -- ranking do dia tem a run (ranked = logado + resultadista + daily)
-  v_board := public.retro_leaderboard(null, 'copa', 50);
+  v_board := public.retro_leaderboard(null, 'classico', 50);
   if jsonb_array_length(v_board->'rows') >= 1 and (v_board->'me'->>'pos') is not null then
     raise notice 'T5e leaderboard: OK (% linhas, minha pos %)',
       jsonb_array_length(v_board->'rows'), v_board->'me'->>'pos';
@@ -160,25 +155,22 @@ begin
   else raise exception 'T5f FALHOU'; end if;
 end $$;
 
--- ============ T6: formato Pontos soma os 7 (7 saldos = 14 pts, finished) ============
+-- ============ T6: janelas de dificuldade por MODO (rodada 18; estatístico, 200 sorteios) ============
 do $$
-declare v_token uuid := gen_random_uuid(); v_start jsonb; v_run uuid; v_h int; v_a int; v_ans jsonb; v_i int := 0;
+declare v_id uuid; v_diff int; i int;
+  amist_g int[] := '{}'; amist_f int[] := '{}'; lenda_g int[] := '{}'; lenda_f int[] := '{}';
 begin
-  v_start := public.retro_start_run('acerto','sempressa',false,v_token,'{}','padrao','pontos');
-  v_run := (v_start->>'run_id')::uuid;
-  loop
-    v_i := v_i + 1; if v_i > 9 then raise exception 'loop'; end if;
-    select m.home_score, m.away_score into v_h, v_a
-      from public.retro_run_matches rm join public.retro_matches m on m.id = rm.match_id
-     where rm.run_id = v_run and rm.answered_at is null;
-    exit when not found;
-    v_ans := public.retro_answer(v_run, v_h + 1, v_a + 1, v_token, '{}'); -- sempre saldo
-    exit when v_ans->'run'->>'status' <> 'playing';
-    perform public.retro_next(v_run, v_token, '{}');
+  for i in 1..200 loop
+    v_id := public.retro_pick_match(1, '{}', 'amistoso'); select difficulty into v_diff from public.retro_matches where id = v_id; amist_g := amist_g || v_diff;
+    v_id := public.retro_pick_match(7, '{}', 'amistoso'); select difficulty into v_diff from public.retro_matches where id = v_id; amist_f := amist_f || v_diff;
+    v_id := public.retro_pick_match(1, '{}', 'lenda');    select difficulty into v_diff from public.retro_matches where id = v_id; lenda_g := lenda_g || v_diff;
+    v_id := public.retro_pick_match(7, '{}', 'lenda');    select difficulty into v_diff from public.retro_matches where id = v_id; lenda_f := lenda_f || v_diff;
   end loop;
-  if v_ans->'run'->>'status' = 'finished' and (v_ans->'run'->>'points')::int = 14 then
-    raise notice 'T6 Pontos rodada 10: OK (7 saldos = 14 pts, finished)';
-  else raise exception 'T6 FALHOU: %', v_ans->'run'; end if;
+  if exists (select 1 from unnest(amist_g) x where x > 2) then raise exception 'T6 FALHOU: amistoso grupos fora de 1-2'; end if;
+  if exists (select 1 from unnest(amist_f) x where x not in (3, 4)) then raise exception 'T6 FALHOU: amistoso final fora de 3-4'; end if;
+  if exists (select 1 from unnest(lenda_g) x where x not in (3, 4, 5)) then raise exception 'T6 FALHOU: lenda grupos fora de 3-5'; end if;
+  if exists (select 1 from unnest(lenda_f) x where x not in (5, 6, 7)) then raise exception 'T6 FALHOU: lenda final fora de 5-7'; end if;
+  raise notice 'T6 janelas por modo: OK (amistoso 1-2→3+raros4 · lenda 4-5+alguns3→5-6+raros7)';
 end $$;
 
 -- ============ T7: tempo de uso anônimo (clamp 60s) + RLS + purga ============
@@ -285,7 +277,7 @@ begin
   delete from public.retro_runs where user_id = v_user and is_daily
     and daily_date = (now() at time zone 'America/Sao_Paulo')::date and format = 'copa';
   perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
-  v_start := public.retro_start_run('acerto','sempressa',true,null,'{}','padrao','copa');
+  v_start := public.retro_start_run('acerto', 'sempressa', true, null, '{}');
   v_run := (v_start->>'run_id')::uuid;
   -- crava o jogo 1 (ganha ficha), serve o 2 e REROLL no daily
   select m.home_score, m.away_score into v_h, v_a

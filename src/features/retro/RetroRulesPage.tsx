@@ -46,7 +46,7 @@ export function RetroRulesPage() {
         <p className="text-xs text-ink-400">Vale o placar final com prorrogação. Pênaltis não contam.</p>
       </Bloco>
 
-      <Bloco emoji="🏆" titulo="Formato Copa">
+      <Bloco emoji="🏆" titulo="A sua Copa">
         <p>Eliminatório. Nos grupos, pontue em <b>2 dos 3</b> jogos pra avançar.</p>
         <p>No mata-mata, errou o jogo, tá <b>fora</b>. Sobreviveu aos 7? <b>Campeão</b>! 🏆</p>
         {enforce && (
@@ -55,11 +55,20 @@ export function RetroRulesPage() {
             <b>{cfg.data?.final_min}</b>.
           </p>
         )}
+        <p className="text-xs text-ink-400">Máximo possível: 21 pontos (7 cravadas).</p>
       </Bloco>
 
-      <Bloco emoji="🎯" titulo="Formato Pontos">
-        <p>Sem eliminação: você joga os <b>7 jogos</b> e soma. Quem faz <b>mais pontos</b> vence.</p>
-        <p className="text-xs text-ink-400">Máximo possível: 21 pontos (7 cravadas).</p>
+      <Bloco emoji="🎚️" titulo="Modos do Jogo livre">
+        <p><b>Amistoso 🤝</b> — placares famosos, pra aquecer sem pressão.</p>
+        <p><b>Clássico ⚽</b> — o desafio de sempre, equilibrado.</p>
+        <p><b>Lenda 🐐</b> — só placar cabeludo, pros raiz de verdade.</p>
+        <p className="rounded-md bg-gold-100 px-2 py-1 text-xs font-semibold text-gold-800">
+          Na Lenda: mais de <b>15 pts</b> = campanha <b>HISTÓRICA</b> 📜 · <b>21 pts</b> ={" "}
+          <b>ZEROU O GAME</b> 👾
+        </p>
+        <p className="text-xs text-ink-400">
+          Em todos os modos a dificuldade sobe dos grupos até a final.
+        </p>
       </Bloco>
 
       <Bloco emoji="🎲" titulo="Ficha de troca">
@@ -73,8 +82,8 @@ export function RetroRulesPage() {
       </Bloco>
 
       <Bloco emoji="🥇" titulo="Ranking">
-        <p><b>Copa</b>: lidera quem chega mais longe; pontos e tempo são desempate.</p>
-        <p><b>Pontos</b>: lidera quem faz mais pontos; o tempo desempata.</p>
+        <p>Lidera quem <b>chega mais longe</b>; pontos e tempo são desempate.</p>
+        <p>O Jogo livre tem <b>um ranking por modo</b> (Amistoso, Clássico e Lenda) — sem misturar.</p>
         <p className="text-xs text-ink-400">Só entra no ranking quem joga logado.</p>
       </Bloco>
 

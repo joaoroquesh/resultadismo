@@ -1,7 +1,7 @@
 // Helpers puros do resultado/share (fora dos componentes — fast refresh feliz).
 import type { ScoreType } from "@/lib/types";
-import type { RetroFormat, RetroPace } from "./api";
-import { stageEmoji } from "./verdict";
+import { LEVEL_EMOJI, LEVEL_LABEL, type RetroFormat, type RetroLevel, type RetroPace } from "./api";
+import { stageEmoji, verdictBadge } from "./verdict";
 
 // Emojis casados com as cores do app: cravada=dourado 🟨 · saldo=verde 🟩 · acerto=azul 🟦
 export const SCORE_EMOJI: Record<ScoreType, string> = {
@@ -19,9 +19,16 @@ export type FinishedRun = {
   shareCode: string;
   isDaily: boolean;
   format: RetroFormat;
+  level: RetroLevel | null;
   pace: RetroPace;
   slots: { slot: number; scoreType: ScoreType }[];
 };
+
+// Rótulo do modo: só no Jogo livre (a Seleção do Dia não tem escolha de dificuldade)
+export function modeLabel(run: Pick<FinishedRun, "isDaily" | "level">): string | null {
+  if (run.isDaily || !run.level) return null;
+  return `${LEVEL_LABEL[run.level]} ${LEVEL_EMOJI[run.level]}`;
+}
 
 export function fmtMs(ms: number | null): string {
   if (ms == null) return "–";
@@ -41,23 +48,25 @@ export function buildShareText(run: FinishedRun, streak: number | undefined): st
     .map((s) => `${koLabels[s.slot - 4]} ${SCORE_EMOJI[s.scoreType]}`)
     .join(" · ");
   // emoji dinâmico (mesmo da imagem): 🏆 🥈 🔥 💪 👏 😅 — nunca fixo no choro
-  const emoji = stageEmoji({
-    status: run.status,
-    stageReached: run.stageReached,
-    points: run.points,
-    format: run.format,
-  });
+  const v = { status: run.status, stageReached: run.stageReached, points: run.points, format: run.format, level: run.level };
+  const emoji = stageEmoji(v);
+  const badge = verdictBadge(v);
   const headline =
-    run.format === "pontos"
-      ? `${emoji} Fiz ${run.points} pts na minha Copa Retrô!`
-      : run.status === "champion"
-        ? `${emoji} CAMPEÃO da minha Copa Retrô!`
-        : `${emoji} Caí: ${run.stageReached}`;
-  const fmtLabel = run.format === "pontos" ? " · Pontos" : "";
+    badge === "zerou"
+      ? `${emoji} ZEROU O GAME! 21/21 no modo Lenda`
+      : run.format === "pontos"
+        ? `${emoji} Fiz ${run.points} pts na minha Copa Retrô!`
+        : run.status === "champion"
+          ? `${emoji} CAMPEÃO da minha Copa Retrô!`
+          : `${emoji} Caí: ${run.stageReached}`;
+  const mode = modeLabel(run);
+  const fmtLabel = run.format === "pontos" ? " · Pontos" : mode ? ` · ${mode}` : "";
+  const badgeLine = badge === "historico" ? "📜 Campanha HISTÓRICA no modo Lenda!" : null;
   return [
     `⚽ Resultadismo Retrô — ${run.isDaily ? "Seleção do Dia" : "Jogo livre"}${fmtLabel}`,
     `Grupos ${groups}${ko ? ` · ${ko}` : ""}`,
     `${headline} · ${run.points} pts · ${fmtMs(run.totalMs)}${streak ? ` · 🔥 ${streak} dia${streak > 1 ? "s" : ""}` : ""}`,
+    ...(badgeLine ? [badgeLine] : []),
     `Acha que faz melhor? 👉 https://www.resultadismo.com/retro/r/${run.shareCode}`,
   ].join("\n");
 }

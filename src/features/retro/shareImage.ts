@@ -11,8 +11,8 @@ import {
   parseCrest,
   type CrestConfig,
 } from "@/lib/crest";
-import { buildShareText, fmtMs, type FinishedRun } from "./share";
-import { isPenaltyOut, stageEmoji, verdictHeadline } from "./verdict";
+import { buildShareText, fmtMs, modeLabel, type FinishedRun } from "./share";
+import { isPenaltyOut, stageEmoji, verdictBadge, verdictHeadline } from "./verdict";
 
 const W = 1080;
 const H = 1350;
@@ -216,6 +216,64 @@ function stripe(ctx: CanvasRenderingContext2D, y: number, h: number, cores: stri
   });
 }
 
+type FontFn = (px: number, weight?: number) => string;
+
+// Selo do MODO em destaque (Jogo livre: Amistoso/Clássico/Lenda — rodada 18)
+function drawModePill(
+  ctx: CanvasRenderingContext2D,
+  run: FinishedRun,
+  cores: Record<ScoreType, string>,
+  brand: string,
+  font: FontFn,
+) {
+  const mode = modeLabel(run);
+  if (!mode) return;
+  const modeColor =
+    run.level === "lenda" ? cores.cravada : run.level === "amistoso" ? cores.saldo : brand;
+  ctx.font = font(36);
+  const tw = ctx.measureText(mode.toUpperCase()).width;
+  const pillW = tw + 72;
+  const pillH = 62;
+  const pillY = 222;
+  ctx.fillStyle = modeColor;
+  ctx.beginPath();
+  ctx.roundRect((W - pillW) / 2, pillY, pillW, pillH, pillH / 2);
+  ctx.fill();
+  ctx.fillStyle = run.level === "lenda" ? "#3d2e00" : "#ffffff";
+  ctx.fillText(mode.toUpperCase(), W / 2, pillY + 43);
+}
+
+// Veredito (emoji + manchete por fase) + selos da Lenda (HISTÓRICO/ZEROU) / pênaltis
+function drawVerdict(
+  ctx: CanvasRenderingContext2D,
+  run: FinishedRun,
+  cores: Record<ScoreType, string>,
+  digit: string,
+  font: FontFn,
+) {
+  const champion = run.status === "champion";
+  const v = { status: run.status, stageReached: run.stageReached, points: run.points, format: run.format, level: run.level };
+  const badge = verdictBadge(v);
+  ctx.font = font(140);
+  ctx.fillText(stageEmoji(v), W / 2, 410);
+  ctx.fillStyle = champion || badge === "zerou" ? digit : "#ffffff";
+  ctx.font = font(badge === "zerou" ? 72 : 64);
+  ctx.fillText(verdictHeadline(v), W / 2, 525);
+  if (badge === "zerou") {
+    ctx.fillStyle = cores.cravada;
+    ctx.font = font(40, 600);
+    ctx.fillText("21 de 21 no modo Lenda. Perfeito. 🐐", W / 2, 590);
+  } else if (badge === "historico") {
+    ctx.fillStyle = cores.cravada;
+    ctx.font = font(40, 600);
+    ctx.fillText("📜 Campanha HISTÓRICA no modo Lenda", W / 2, 590);
+  } else if (isPenaltyOut(run.status, run.slots)) {
+    ctx.fillStyle = cores.acerto;
+    ctx.font = font(40, 500);
+    ctx.fillText("eliminado nos pênaltis 😬", W / 2, 590);
+  }
+}
+
 export async function buildShareImage(
   run: FinishedRun,
   streak?: number,
@@ -255,19 +313,8 @@ export async function buildShareImage(
   const sub = `${run.isDaily ? "Seleção do Dia" : "Jogo livre"}${run.format === "pontos" ? " · Pontos" : ""}`;
   ctx.fillText(sub, W / 2, 190);
 
-  // veredito (emoji + manchete por fase — dinâmico, sem choro pra quem foi longe)
-  const champion = run.status === "champion";
-  ctx.font = font(140);
-  const v = { status: run.status, stageReached: run.stageReached, points: run.points, format: run.format };
-  ctx.fillText(stageEmoji(v), W / 2, 380);
-  ctx.fillStyle = champion ? digit : "#ffffff";
-  ctx.font = font(64);
-  ctx.fillText(verdictHeadline(v), W / 2, 500);
-  if (isPenaltyOut(run.status, run.slots)) {
-    ctx.fillStyle = cores.acerto;
-    ctx.font = font(40, 500);
-    ctx.fillText("eliminado nos pênaltis 😬", W / 2, 565);
-  }
+  drawModePill(ctx, run, cores, brand, font);
+  drawVerdict(ctx, run, cores, digit, font);
 
   // trilha da campanha (círculos coloridos por veredito)
   const cy = 740;

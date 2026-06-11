@@ -32,17 +32,27 @@ página pública `/retro/r/:code`.
   AppShell: nada de Sidebar/BottomNav/header do app-mãe. Entradas: **card próprio no topo do menu
   do Perfil**, **banner na landing** e seção no Como Funciona.
 - **Sempre com tempo (rodada 14):** o "Sem Pressa" foi removido — todo jogo é cronometrado
-  (10/8/7s). Sem seletor de ritmo nem de dificuldade. Rótulos: **Seleção do Dia** (diário, Copa,
-  ranqueado) e **Jogo livre** (o jogo do dia a dia — Copa/Pontos, também ranqueia logado).
-- **Seleção do Dia = sempre Copa (rodada 13):** o desafio diário ranqueado é eliminatório (Copa).
-  O formato (Copa/Pontos) só varia no **Jogo livre**. Ranking diário = Copa apenas.
+  (10/8/7s). Rótulos: **Seleção do Dia** (diário, ranqueado) e **Jogo livre** (o dia a dia).
+- **MODOS do Jogo livre (rodada 18 — migration `20260610150015`):** o formato **Pontos saiu** da
+  entrada (runs/links antigos seguem como legado: ramo no `retro_answer` e no `verdict.ts`); o jogo
+  é sempre a Copa eliminatória. A dimensão que varia é a **dificuldade**, com nomes de futebol e
+  **valores `retro_runs.level in (amistoso, classico, lenda)`** (todas as runs antigas migraram pra
+  `classico` — preserva o ranking). Janelas do sorteio por modo em `retro_pick_match`
+  (grupos→oitavas→quartas/semi→final): **amistoso** `[1,2]→[2,3]→[2,3]→[3]` + 12% de nível 4 só na
+  semi/final; **classico** `[1,2]→[1,3]→[2,4]→[3,5]` + 10% de fuga (a curva de sempre); **lenda**
+  `[4,5]→[4,6]→[5,6]→[5,6]` + 20% de nível 3 nos grupos + 10% de nível 7 na final (o catálogo tem
+  SÓ 9 jogos nível 7 — raridade de propósito). Os níveis 1-7 **não aparecem na UI** (regra de
+  negócio); em todos os modos a dificuldade escala pelas fases. **Selos da Lenda:** >15 pts =
+  **HISTÓRICA 📜** · 21 pts = **ZEROU O GAME 👾** (`verdictBadge` em `verdict.ts`; animação
+  `ZerouFx`; selo na imagem/texto/página do share). **Ranking do Jogo livre é POR MODO**
+  (`retro_leaderboard(p_level)`). **Barra de dificuldade** discreta no card (7 pips;
+  `retro_match_payload.difficulty`). **Modal de 1º acesso** `RetroIntro` (localStorage
+  `retro-intro-v1`, anônimo incluso) montado na home do `RetroPage`.
+- **Seleção do Dia = sempre Copa (rodada 13):** o desafio diário ranqueado é eliminatório, sem
+  escolha de modo (level fixo `classico`; a curva do daily vem da ordenação fácil→difícil do array).
 - **Copa do Dia TEMÁTICA (rodada 6):** cada dia é a Copa de **uma seleção** (rotação determinística
   entre as 58 com ≥7 jogos; dia 0 = 10/06 = Brasil; RPC `retro_today` mostra o tema), com os 7
   jogos **ordenados do mais fácil ao mais difícil**; 1 tentativa por conta/dia, com retomada.
-  **Treino:** infinito, com **dificuldade Fácil/Padrão/Difícil** (janelas do sorteio ±1; board de
-  Treino = melhor campanha por pessoa, só no Padrão). **Ritmos:** Sem Pressa · Resultadista (o
-  Clássico foi aposentado na UI; valor segue válido no banco). Rótulos dos modos: **Vale Ponto**
-  (`acerto`) e **Vale Saldo** (`cravada`). Seletores sempre do fácil (esquerda) ao difícil (direita).
 - **Placar canônico:** final com prorrogação, **sem pênaltis** (informativos) — regra central nº 1
   preservada; empate real em mata-mata pontua como empate.
 
@@ -71,7 +81,7 @@ página pública `/retro/r/:code`.
   `retroLocal.ts` = token anônimo + anti-repetição local). Rotas públicas `/retro` e `/retro/r/:code`
   no `App.tsx`; entradas na Sidebar/BottomNav/PublicShell. Vitrine de animações: `/retro?demo=1`
   (**só DEV**).
-- **Banco (migrations `20260610150000–150014`; 150011 = Formato Copa/Pontos + config admin + fix reroll daily; 150008 RESET; 150009 abandono; 150010 final-aceita-saldo + ranking-por-dificuldade + feedback.product):** seed dos **964 jogos** (fonte openfootball CC0,
+- **Banco (migrations `20260610150000–150015`; 150015 = modos amistoso/classico/lenda + fim do Pontos na entrada + difficulty no payload; 150011 = Formato Copa/Pontos + config admin + fix reroll daily; 150008 RESET; 150009 abandono; 150010 final-aceita-saldo + ranking-por-dificuldade + feedback.product):** seed dos **964 jogos** (fonte openfootball CC0,
   importador `scripts/gen-retro-seed.mjs` com portões de qualidade; dificuldade 1–7 com 34
   jogos-lenda) + motor (RPCs `retro_start_run`, `retro_next` — serve **sob demanda**, o cronômetro
   nasce no clique —, `retro_answer`, `retro_run_summary`, `retro_leaderboard`, `retro_my_stats`,

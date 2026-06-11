@@ -1,17 +1,28 @@
-// Veredito dinâmico do Retrô. No formato COPA: emoji/manchete por FASE. No formato
-// PONTOS: por faixa de pontos (não há "campeão/eliminado"). + "eliminado nos pênaltis"
-// quando, na Copa com a barra ligada, a pessoa acertou o vencedor mas faltou saldo.
+// Veredito dinâmico do Retrô: emoji/manchete por FASE da Copa + selos do modo Lenda
+// (rodada 18): >15 pts = HISTÓRICO 📜 · 21 pts = ZEROU O GAME 👾. O ramo "pontos" é
+// LEGADO (modo removido na entrada) — mantém links de share antigos renderizando.
 import type { ScoreType } from "@/lib/types";
-import type { RetroFormat, RetroRunStatus } from "./api";
+import type { RetroFormat, RetroLevel, RetroRunStatus } from "./api";
 
 export type VerdictInput = {
   status: RetroRunStatus;
   stageReached: string | null;
   points: number;
   format: RetroFormat;
+  level?: RetroLevel | null;
 };
 
+// Selo do modo Lenda: 21 pts (7 cravadas, campeão perfeito) = zerou; >15 = histórico.
+export type VerdictBadge = "zerou" | "historico" | null;
+export function verdictBadge(v: Pick<VerdictInput, "level" | "points">): VerdictBadge {
+  if (v.level !== "lenda") return null;
+  if (v.points >= 21) return "zerou";
+  if (v.points > 15) return "historico";
+  return null;
+}
+
 export function stageEmoji(v: VerdictInput): string {
+  if (verdictBadge(v) === "zerou") return "👾";
   if (v.format === "pontos") {
     if (v.points >= 18) return "🏆";
     if (v.points >= 13) return "🔥";
@@ -28,6 +39,7 @@ export function stageEmoji(v: VerdictInput): string {
 }
 
 export function verdictHeadline(v: VerdictInput): string {
+  if (verdictBadge(v) === "zerou") return "ZEROU O GAME!";
   if (v.format === "pontos") return `${v.points} ponto${v.points === 1 ? "" : "s"}!`;
   const s = v.stageReached ?? "";
   if (v.status === "champion") return "CAMPEÃO DO MUNDO!";

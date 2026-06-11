@@ -161,7 +161,23 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   permite) + **cache-bust dedicado** (a UI viva já cacheou a URL via CSS sem cors; reusar sujaria o
   canvas) + **timeout 4s** + cover-crop igual ao CSS. Qualquer falha (host sem CORS, offline,
   timeout) cai no escudo sólido + inicial — a imagem **sempre** gera. Só front, sem migration.
-  Histórico completo da construção: Comentários
+  **Rodada 18 (modos de dificuldade — migration `20260610150015`):** o **modo Pontos saiu** da
+  entrada (ninguém usava; runs antigas e links de share seguem renderizando como legado) e o **Jogo
+  livre ganhou 3 modos** com nomes de futebol — **Amistoso 🤝** (só jogos nível 1-3; raros nível 4
+  na semi/final), **Clássico ⚽** (a curva servida até hoje; as runs/ranking existentes migraram pra
+  cá) e **Lenda 🐐** (nível 4-7; alguns 3 nos grupos; nível 7 raro — só 9 jogos no catálogo). Os
+  níveis 1-7 NÃO aparecem na tela (regra de negócio); a dificuldade segue escalando dos grupos à
+  final em todos. **Ranking do Jogo livre por modo** (`retro_leaderboard` trocou `p_format` por
+  `p_level`). **Selos da Lenda**: >15 pts = **HISTÓRICA 📜**; 21 pts = **ZEROU O GAME 👾** com
+  animação própria (`ZerouFx`: chuva dourada densa + manchete pulsante + anel dourado, acima do
+  confete de campeão). **Imagem do share** ganhou selo destacado do modo (pílula colorida) + selos
+  HISTÓRICO/ZEROU; texto e página pública idem. **Barra de dificuldade discreta** no card do jogo
+  (7 pips coloridos por faixa; `retro_match_payload` agora manda `difficulty` — índice de raridade,
+  não dá o placar). **Modal de 1º acesso** (`RetroIntro`, localStorage `retro-intro-v1`, vale pra
+  anônimo): grupos = pontue em 2 de 3 (pílulas 3/2/1), oitavas em diante = errou caiu, cravada =
+  ficha. **Como jogar** reescrito (bloco dos 3 modos no lugar do Pontos). `retro_my_stats` blindado
+  (runs legadas do Pontos com stage_rank NULL roubavam o "melhor" do hero). Suite T4/T6 testa os
+  modos (janelas estatísticas, 200 sorteios). Histórico completo da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
   Resultadista/Clássico/Sem Pressa, Copa do Dia + Treino, runs permanentes só de logados na Copa do
