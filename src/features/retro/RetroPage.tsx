@@ -12,6 +12,8 @@ import { useAuth } from "@/features/auth/AuthProvider";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import type { ScoreType } from "@/lib/types";
 import {
+  LEVEL_EMOJI,
+  LEVEL_LABEL,
   useRetroAbandon,
   useRetroAnswer,
   useRetroMyStats,
@@ -22,7 +24,7 @@ import {
   useRetroToday,
   type RetroAnswerResult,
   type RetroCurrent,
-  type RetroFormat,
+  type RetroLevel,
   type RetroPace,
   type RetroStart,
 } from "./api";
@@ -31,6 +33,7 @@ import { RetroCrest } from "./RetroCrest";
 import { RunView } from "./RunView";
 import { RevealCard } from "./RevealCard";
 import { ResultView } from "./ResultView";
+import { RetroIntro } from "./RetroIntro";
 import { type FinishedRun } from "./share";
 import { RetroLeaderboard } from "./RetroLeaderboard";
 import { RetroStripes } from "./RetroFx";
@@ -42,7 +45,7 @@ type Phase = "home" | "play" | "reveal" | "done";
 type ActiveRun = {
   runId: string;
   shareCode: string;
-  format: RetroFormat;
+  level: RetroLevel;
   pace: RetroPace;
   isDaily: boolean;
   points: number;
@@ -71,7 +74,8 @@ function toFinishedRun(run: ActiveRun | null): FinishedRun | null {
     totalMs: ans.run.total_ms,
     shareCode: run.shareCode,
     isDaily: run.isDaily,
-    format: run.format,
+    format: "copa",
+    level: run.level,
     pace: run.pace,
     slots: run.slots,
   };
@@ -84,7 +88,7 @@ export function RetroPage() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [phase, setPhase] = useState<Phase>("home");
-  const [format, setFormat] = useState<RetroFormat>("copa");
+  const [level, setLevel] = useState<RetroLevel>("classico");
   const [run, setRun] = useState<ActiveRun | null>(null);
   const startMut = useRetroStart();
   const answerMut = useRetroAnswer();
@@ -102,16 +106,16 @@ export function RetroPage() {
     if (startMut.isPending) return;
     setStartKind(daily ? "daily" : "training");
     startMut.mutate(
-      { format: daily ? "copa" : format, pace: "resultadista", daily, level: "facil" },
+      { pace: "resultadista", daily, level: daily ? "classico" : level },
       {
         onSuccess: (s: RetroStart) => {
-          track("retro_run_start", { format: s.format, daily });
+          track("retro_run_start", { level: s.level, daily });
           if (s.resumed) toast("Retomando a sua Seleção do Dia de onde parou!", "info");
           retroMarkSeen(s.current?.match_id);
           const base: ActiveRun = {
             runId: s.run_id,
             shareCode: s.share_code,
-            format: s.format,
+            level: s.level,
             pace: s.pace,
             isDaily: daily,
             points: s.points,
@@ -251,8 +255,8 @@ export function RetroPage() {
     <div>
       {phase === "home" && (
         <Home
-          format={format}
-          setFormat={setFormat}
+          level={level}
+          setLevel={setLevel}
           todayTeam={today.data ?? null}
           startingDaily={startKind === "daily"}
           startingTraining={startKind === "training"}
@@ -278,7 +282,6 @@ export function RetroPage() {
           <RunView
             key={run.current.match_id}
             current={run.current}
-            format={run.format}
             enforce={config.data?.enforce_knockout_bar ?? false}
             points={run.points}
             rerolls={run.rerolls}
@@ -326,8 +329,8 @@ export function RetroPage() {
 }
 
 function Home({
-  format,
-  setFormat,
+  level,
+  setLevel,
   todayTeam,
   startingDaily,
   startingTraining,
@@ -344,15 +347,15 @@ function Home({
   onRules,
   onAdmin,
 }: {
-  format: RetroFormat;
-  setFormat: (f: RetroFormat) => void;
+  level: RetroLevel;
+  setLevel: (l: RetroLevel) => void;
   todayTeam: { team_slug: string; team_name_pt: string } | null;
   startingDaily: boolean;
   startingTraining: boolean;
   anyStarting: boolean;
   playedToday: boolean;
   streak: number;
-  best: { stage_reached: string | null; points: number; total_ms: number; format: RetroFormat } | null;
+  best: { stage_reached: string | null; points: number; total_ms: number } | null;
   isLogged: boolean;
   isAdmin: boolean;
   onLogin: () => void;
@@ -364,6 +367,8 @@ function Home({
 }) {
   return (
     <div className="mx-auto w-full max-w-md space-y-3">
+      {/* modal de 1º acesso: como o jogo funciona, em 4 linhas */}
+      <RetroIntro onRules={onRules} />
       {/* hero curto */}
       <Card className="retro-scanlines relative overflow-hidden border-2 border-ink-950 bg-brand-700 p-4 text-white">
         <RetroStripes className="absolute inset-x-0 top-0" />
@@ -374,7 +379,7 @@ function Home({
           <p className="mt-2 text-xs font-semibold text-white/95">
             {streak > 0 && <>🔥 {streak} dia{streak > 1 ? "s" : ""}</>}
             {streak > 0 && best && " · "}
-            {best && <>melhor: {best.format === "pontos" ? `${best.points} pts` : best.stage_reached}</>}
+            {best && <>melhor: {best.stage_reached}</>}
           </p>
         )}
       </Card>
@@ -406,16 +411,16 @@ function Home({
         )}
       </Card>
 
-      {/* JOGO LIVRE — o jogo do dia a dia; também entra no ranking (logado) */}
+      {/* JOGO LIVRE — o jogo do dia a dia; 3 modos de dificuldade, ranking por modo */}
       <Card className="space-y-2 p-4">
-        <SegmentedControl<RetroFormat>
+        <SegmentedControl<RetroLevel>
           className="w-full whitespace-nowrap"
-          options={[
-            { value: "copa", label: "Copa 🏆" },
-            { value: "pontos", label: "Pontos 🎯" },
-          ]}
-          value={format}
-          onChange={setFormat}
+          options={(["amistoso", "classico", "lenda"] as const).map((l) => ({
+            value: l,
+            label: `${LEVEL_LABEL[l]} ${LEVEL_EMOJI[l]}`,
+          }))}
+          value={level}
+          onChange={setLevel}
         />
         <Button
           variant="secondary"
@@ -427,7 +432,11 @@ function Home({
           Jogar livre
         </Button>
         <p className="text-center text-[11px] text-ink-500">
-          {format === "copa" ? "Eliminatório, jogue quantas vezes quiser." : "Some pontos nos 7 jogos."}{" "}
+          {level === "amistoso"
+            ? "Placares famosos, pra aquecer."
+            : level === "classico"
+              ? "O desafio de sempre."
+              : "Só placar cabeludo. 21 pts aqui = ZEROU O GAME 👾"}{" "}
           {isLogged ? "Entra no ranking 🏆" : (
             <button type="button" className="font-semibold text-brand-700 underline" onClick={onLogin}>
               Entre pra rankear

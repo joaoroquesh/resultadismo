@@ -5,10 +5,65 @@ import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Escudo } from "@/components/ui/Escudo";
-import { useRetroSummary } from "./api";
+import { LEVEL_EMOJI, LEVEL_LABEL, useRetroSummary } from "./api";
 import { CampaignTrail, type TrailSlot } from "./CampaignTrail";
 import { fmtMs } from "./share";
-import { stageEmoji, verdictHeadline } from "./verdict";
+import { stageEmoji, verdictBadge, verdictHeadline } from "./verdict";
+
+// O card da campanha compartilhada: veredito + modo + selos da Lenda + trilha.
+function ShareCard({ data }: { data: NonNullable<ReturnType<typeof useRetroSummary>["data"]> }) {
+  const v = { status: data.status, stageReached: data.stage_reached, points: data.points, format: data.format, level: data.level };
+  const badge = verdictBadge(v);
+  // modo só aparece no Jogo livre (a Seleção do Dia não tem escolha)
+  const mode = !data.is_daily && data.level ? `${LEVEL_LABEL[data.level]} ${LEVEL_EMOJI[data.level]}` : null;
+  return (
+    <Card className={data.status === "champion" || badge ? "border-gold-500 bg-gold-50 p-5" : "p-5"}>
+      <div className="space-y-3 text-center">
+        <div className="text-5xl">{stageEmoji(v)}</div>
+        {/* escudo do jogador (só quem jogou logado tem player) */}
+        {data.player && (
+          <div className="flex items-center justify-center gap-2">
+            <Escudo src={data.player.avatar_url} name={data.player.display_name} size="sm" />
+            <span className="font-semibold">{data.player.display_name}</span>
+          </div>
+        )}
+        <p className="text-sm text-ink-500">
+          {data.player?.display_name ?? "Alguém"} jogou{" "}
+          {data.is_daily ? "a Seleção do Dia" : "o Jogo livre"}
+          {mode && (
+            <>
+              {" "}
+              no modo <b>{mode}</b>
+            </>
+          )}
+          {data.format === "pontos" && (
+            <>
+              {" "}
+              no modo <b>Pontos</b>
+            </>
+          )}
+        </p>
+        <h2 className="text-2xl font-bold">{verdictHeadline(v)}</h2>
+        {badge === "zerou" && (
+          <p className="text-sm font-bold text-gold-700">21 de 21 no modo Lenda. Perfeito. 🐐</p>
+        )}
+        {badge === "historico" && (
+          <p className="rounded-md bg-gold-500/15 px-3 py-1.5 text-sm font-bold text-gold-700 ring-1 ring-gold-500/40">
+            📜 Campanha HISTÓRICA — mais de 15 pts no modo Lenda!
+          </p>
+        )}
+        <CampaignTrail
+          slots={data.slots.map((s): TrailSlot => ({ slot: s.slot, scoreType: s.score_type }))}
+          currentSlot={null}
+        />
+        <p className="text-sm text-ink-500">
+          <b className="tabular-nums">{data.points} pts</b> ·{" "}
+          <b className="tabular-nums">{fmtMs(data.total_ms)}</b>
+        </p>
+      </div>
+    </Card>
+  );
+}
 
 // /retro/r/:code — a página pública do share: a campanha de quem mandou o link e o
 // CTA-desafio (lição do 7a0). Sem identidade dos jogos — zero spoiler da Copa do Dia.
@@ -28,38 +83,9 @@ export function RetroSharePage() {
             description="Esse link expirou ou não existe. Que tal jogar a sua própria Copa?"
           />
         ) : (
-          <Card className={data.status === "champion" ? "border-gold-500 bg-gold-50 p-5" : "p-5"}>
-            <div className="space-y-3 text-center">
-              <div className="text-5xl">{stageEmoji({ status: data.status, stageReached: data.stage_reached, points: data.points, format: data.format })}</div>
-              {/* escudo do jogador (só quem jogou logado tem player) */}
-              {data.player && (
-                <div className="flex items-center justify-center gap-2">
-                  <Escudo src={data.player.avatar_url} name={data.player.display_name} size="sm" />
-                  <span className="font-semibold">{data.player.display_name}</span>
-                </div>
-              )}
-              <p className="text-sm text-ink-500">
-                {data.player?.display_name ?? "Alguém"} jogou{" "}
-                {data.is_daily ? "a Seleção do Dia" : "o Jogo livre"}
-                {data.format === "pontos" && (
-                  <>
-                    {" "}
-                    no modo <b>Pontos</b>
-                  </>
-                )}
-              </p>
-              <h2 className="text-2xl font-bold">{verdictHeadline({ status: data.status, stageReached: data.stage_reached, points: data.points, format: data.format })}</h2>
-              <CampaignTrail
-                slots={data.slots.map((s): TrailSlot => ({ slot: s.slot, scoreType: s.score_type }))}
-                currentSlot={null}
-                format={data.format}
-              />
-              <p className="text-sm text-ink-500">
-                <b className="tabular-nums">{data.points} pts</b> ·{" "}
-                <b className="tabular-nums">{fmtMs(data.total_ms)}</b>
-              </p>
-            </div>
-          </Card>
+          <ShareCard
+            data={data}
+          />
         )}
 
         <Card className="p-4 text-center">

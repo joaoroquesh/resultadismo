@@ -7,9 +7,22 @@ import { retroAnonToken, retroSeen } from "./retroLocal";
 
 // ---------- tipos dos payloads jsonb das RPCs do motor (migration 20260610150001/3) ----------
 
+// "pontos" é legado (rodada 18 removeu o modo da entrada; links/runs antigos seguem lendo)
 export type RetroFormat = "copa" | "pontos";
 export type RetroPace = "resultadista" | "classico" | "sempressa";
-export type RetroLevel = "facil" | "dificil";
+// Os modos do Jogo livre (rodada 18). Os níveis 1-7 dos jogos não aparecem na UI.
+export type RetroLevel = "amistoso" | "classico" | "lenda";
+
+export const LEVEL_LABEL: Record<RetroLevel, string> = {
+  amistoso: "Amistoso",
+  classico: "Clássico",
+  lenda: "Lenda",
+};
+export const LEVEL_EMOJI: Record<RetroLevel, string> = {
+  amistoso: "🤝",
+  classico: "⚽",
+  lenda: "🐐",
+};
 
 export type RetroToday = { daily_date: string; team_slug: string; team_name_pt: string };
 export type RetroConfig = { enforce_knockout_bar: boolean; semi_min: string; final_min: string };
@@ -40,7 +53,7 @@ export type RetroCurrent = {
 export type RetroStart = {
   run_id: string;
   share_code: string;
-  format: RetroFormat;
+  level: RetroLevel;
   pace: RetroPace;
   ranked?: boolean;
   resumed: boolean;
@@ -66,6 +79,7 @@ export type RetroAnswerResult = {
     id: string;
     status: RetroRunStatus;
     format: RetroFormat;
+    level: RetroLevel;
     points: number;
     stage_reached: string | null;
     stage_rank: number | null;
@@ -87,6 +101,7 @@ export type RetroSlotSummary = {
 
 export type RetroSummary = {
   format: RetroFormat;
+  level: RetroLevel;
   pace: RetroPace;
   status: "eliminated" | "champion" | "finished";
   stage_reached: string;
@@ -106,13 +121,12 @@ export type RetroBoardRow = {
   stage_reached: string;
   points: number;
   total_ms: number;
-  level?: RetroLevel;
   is_me: boolean;
 };
 
 export type RetroBoard = {
   daily_date: string;
-  format: RetroFormat;
+  level?: RetroLevel;
   rows: RetroBoardRow[];
   me: { pos: number; stage_reached: string; points: number; total_ms: number } | null;
 };
@@ -124,7 +138,7 @@ export type RetroMyStats = {
     stage_reached: string | null;
     points: number;
     total_ms: number;
-    format: RetroFormat;
+    level: RetroLevel;
     daily_date: string;
   } | null;
 };
@@ -138,14 +152,13 @@ function anonTokenFor(userId: string | undefined): string | undefined {
 export function useRetroStart() {
   const { user } = useAuth();
   return useMutation({
-    mutationFn: async (input: { format: RetroFormat; pace: RetroPace; daily: boolean; level: RetroLevel }) => {
+    mutationFn: async (input: { pace: RetroPace; daily: boolean; level: RetroLevel }) => {
       const { data, error } = await supabase.rpc("retro_start_run", {
         p_pace: input.pace,
         p_daily: input.daily,
         p_anon_token: anonTokenFor(user?.id),
         p_seen: input.daily ? [] : retroSeen(),
         p_level: input.level,
-        p_format: input.format,
       });
       if (error) throw new Error(error.message);
       return data as unknown as RetroStart;
@@ -230,12 +243,12 @@ export function useRetroNext() {
   });
 }
 
-export function useRetroLeaderboard(format: RetroFormat, board: "daily" | "treino" = "daily") {
+export function useRetroLeaderboard(level: RetroLevel, board: "daily" | "treino" = "daily") {
   return useQuery({
-    queryKey: ["retro-board", board, format],
+    queryKey: ["retro-board", board, level],
     queryFn: async (): Promise<RetroBoard> => {
       const { data, error } = await supabase.rpc("retro_leaderboard", {
-        p_format: format,
+        p_level: level,
         p_limit: 50,
         p_board: board,
       });

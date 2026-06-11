@@ -26,7 +26,7 @@ export type AnalyticsEvent =
   | "nudge_sent" // {}
   | "feedback_submit" // { kind: "bug" | "idea" }
   | "consent_set" // { choice: "granted" | "denied" }
-  | "retro_run_start" // { mode, pace, daily: boolean } — mini-jogo Retrô
+  | "retro_run_start" // { level, daily: boolean } — mini-jogo Retrô (modos rodada 18)
   | "retro_guess" // { slot, score_type, timeout: boolean }
   | "retro_run_end" // { status, stage_rank, points, daily: boolean }
   | "retro_share"; // { status } — share da campanha (WhatsApp/clipboard)

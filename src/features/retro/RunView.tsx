@@ -7,10 +7,9 @@ import { RetroTimer } from "./RetroTimer";
 import { ScoreWheels } from "./ScoreWheels";
 import type { RetroCurrent } from "./api";
 
-// Texto curto da regra da fase atual (acima do card). No Pontos não há eliminação;
-// na Copa, só fala de saldo/cravada se o admin tiver ligado a barra (enforce).
-function phaseHint(slot: number, format: "copa" | "pontos", enforce: boolean): string {
-  if (format === "pontos") return "Modo Pontos · some pontos nos 7 jogos";
+// Texto curto da regra da fase atual (acima do card). Só fala de saldo/cravada se o
+// admin tiver ligado a barra (enforce).
+function phaseHint(slot: number, enforce: boolean): string {
   if (slot <= 3) return "Fase de grupos · pontue em 2 dos 3 pra avançar";
   if (slot <= 5) return "Mata-mata · pontuou, avança";
   return enforce ? "Reta final · só saldo ou cravada passa" : "Reta final · pontuou, avança";
@@ -25,11 +24,31 @@ function TeamSide({ slug, name }: { slug: string; name: string }) {
   );
 }
 
+// Barra discreta da dificuldade do placar (1-7): pips preenchidos até o nível, sem
+// número nem texto na tela (decisão do PO — os níveis são regra de negócio).
+function DifficultyBar({ level }: { level: number }) {
+  const tone = level <= 2 ? "bg-grass-500" : level <= 4 ? "bg-gold-500" : "bg-flame-600";
+  return (
+    <span
+      className="inline-flex items-center gap-0.5"
+      role="img"
+      aria-label={`Dificuldade do placar: ${level} de 7`}
+      title="Dificuldade do placar"
+    >
+      {Array.from({ length: 7 }, (_, i) => (
+        <span
+          key={i}
+          className={`h-1.5 w-1 rounded-full ${i < level ? tone : "bg-ink-200"}`}
+        />
+      ))}
+    </span>
+  );
+}
+
 // A tela da rodada: 1 jogo histórico por vez, cronômetro em cima, roletas de placar
 // bem grandes embaixo (dois polegares — pedido do PO).
 export function RunView({
   current,
-  format,
   enforce,
   points,
   rerolls,
@@ -41,7 +60,6 @@ export function RunView({
   onExit,
 }: {
   current: RetroCurrent;
-  format: "copa" | "pontos";
   enforce: boolean;
   points: number;
   rerolls: number;
@@ -64,13 +82,13 @@ export function RunView({
     return () => window.clearTimeout(t);
   }, [current.timer_seconds]);
   const m = current.match;
-  const decisao = format === "copa" && enforce && current.slot >= 6; // só com barra ligada
+  const decisao = enforce && current.slot >= 6; // só com barra ligada
 
   return (
     <div className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-2 overflow-hidden px-1">
       {/* topo fixo: trilha + pontos + sair (tudo numa linha — tela limpa) */}
       <div className="flex items-center justify-between gap-2">
-        <CampaignTrail slots={slots} currentSlot={current.slot} format={format} />
+        <CampaignTrail slots={slots} currentSlot={current.slot} />
         <span className="rounded-pill bg-ink-100 px-2.5 py-0.5 text-xs font-bold tabular-nums">{points} pts</span>
         <button type="button" onClick={onExit} className="text-[11px] font-semibold text-ink-400">
           sair ✕
@@ -85,7 +103,7 @@ export function RunView({
             ⚠️ {current.slot === 7 ? "FINAL" : "SEMIFINAL"}: só SALDO ou CRAVADA passa
           </div>
         ) : (
-          <p className="text-center text-xs font-semibold text-ink-500">{phaseHint(current.slot, format, enforce)}</p>
+          <p className="text-center text-xs font-semibold text-ink-500">{phaseHint(current.slot, enforce)}</p>
         )}
 
       <Card className={decisao ? "space-y-2 border-2 border-gold-500 p-3 shadow-brand" : "space-y-2 p-3"}>
@@ -97,11 +115,7 @@ export function RunView({
                 : "text-xs font-bold uppercase tracking-wide text-brand-700"
             }
           >
-            {format === "pontos"
-              ? `Jogo ${current.slot} de 7`
-              : decisao
-                ? `⚡ ${current.slot_label} ⚡`
-                : current.slot_label}
+            {decisao ? `⚡ ${current.slot_label} ⚡` : current.slot_label}
           </p>
           {/* leitura rápida do jogo (feedback dos amigos): ANO gigante + fase em selo */}
           <p className="mt-0.5 text-2xl font-bold leading-none tracking-tight">
@@ -113,6 +127,12 @@ export function RunView({
             <span className="rounded-pill bg-brand-500/10 px-2 py-0.5 font-bold text-brand-700">
               {m.stage_label_pt}
             </span>
+            {m.difficulty != null && (
+              <>
+                <span aria-hidden>·</span>
+                <DifficultyBar level={m.difficulty} />
+              </>
+            )}
           </p>
         </div>
 

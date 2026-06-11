@@ -4,18 +4,16 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { cn } from "@/lib/utils";
-import { useRetroLeaderboard, type RetroFormat } from "./api";
+import { LEVEL_EMOJI, LEVEL_LABEL, useRetroLeaderboard, type RetroLevel } from "./api";
 import { fmtMs } from "./share";
 
 // Ranking da Seleção do Dia (fase alcançada → pontos → tempo). Só entra quem jogou
 // logado no ritmo Resultadista — a comparação de tempo precisa ser justa.
+// No Jogo livre, o ranking é POR MODO (Amistoso/Clássico/Lenda) — sem misturar.
 export function RetroLeaderboard() {
-  const [format, setFormat] = useState<RetroFormat>("copa");
+  const [level, setLevel] = useState<RetroLevel>("classico");
   const [board, setBoard] = useState<"daily" | "treino">("daily");
-  // a Seleção do Dia é sempre Copa; o formato só varia no Jogo livre (treino)
-  const effFormat: RetroFormat = board === "daily" ? "copa" : format;
-  const { data, isLoading } = useRetroLeaderboard(effFormat, board);
-  const isPontos = effFormat === "pontos";
+  const { data, isLoading } = useRetroLeaderboard(level, board);
 
   return (
     <Card className="space-y-3 p-4">
@@ -33,14 +31,14 @@ export function RetroLeaderboard() {
           />
         </div>
         {board === "treino" && (
-          <SegmentedControl<RetroFormat>
+          <SegmentedControl<RetroLevel>
             className="w-full"
-            options={[
-              { value: "copa", label: "Copa 🏆" },
-              { value: "pontos", label: "Pontos 🎯" },
-            ]}
-            value={format}
-            onChange={setFormat}
+            options={(["amistoso", "classico", "lenda"] as const).map((l) => ({
+              value: l,
+              label: `${LEVEL_LABEL[l]} ${LEVEL_EMOJI[l]}`,
+            }))}
+            value={level}
+            onChange={setLevel}
           />
         )}
       </div>
@@ -57,7 +55,7 @@ export function RetroLeaderboard() {
           description={
             board === "daily"
               ? "A Seleção do Dia ranqueia quem joga logado. Seja a primeira pessoa!"
-              : "O Jogo livre ranqueia a MELHOR campanha de cada um (logado). Bora abrir o placar!"
+              : `O modo ${LEVEL_LABEL[level]} ranqueia a MELHOR campanha de cada um (logado). Bora abrir o placar!`
           }
         />
       ) : (
@@ -82,11 +80,11 @@ export function RetroLeaderboard() {
               <span className="min-w-0 flex-1">
                 <span className="block truncate">{r.display_name}</span>
                 <span className={cn("block text-[11px]", r.pos === 1 ? "text-ink-300" : "text-ink-400")}>
-                  {isPontos ? fmtMs(r.total_ms) : `${r.points} pts · ${fmtMs(r.total_ms)}`}
+                  {r.points} pts · {fmtMs(r.total_ms)}
                 </span>
               </span>
               <span className={cn("shrink-0 text-right text-sm font-bold", r.pos === 1 ? "text-ink-50" : "text-brand-800")}>
-                {isPontos ? `${r.points} pts` : r.stage_reached}
+                {r.stage_reached}
               </span>
             </li>
           ))}
@@ -95,11 +93,7 @@ export function RetroLeaderboard() {
 
       {data && data.rows.length > 0 && (
         <p className="text-center text-[11px] leading-snug text-ink-400">
-          {isPontos ? (
-            <>Lidera quem faz <b>mais pontos</b> nos 7 jogos. Empatou? Decide o <b>tempo</b>.</>
-          ) : (
-            <>Lidera quem <b>chega mais longe</b>. Empatou na fase? Decidem os <b>pontos</b>; depois, o <b>tempo</b>.</>
-          )}
+          Lidera quem <b>chega mais longe</b>. Empatou na fase? Decidem os <b>pontos</b>; depois, o <b>tempo</b>.
         </p>
       )}
       {data?.me && !data.rows.some((r) => r.is_me) && (

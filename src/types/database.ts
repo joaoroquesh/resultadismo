@@ -2729,7 +2729,7 @@ export type Database = {
         Args: {
           p_board?: string
           p_daily_date?: string
-          p_format?: string
+          p_level?: string
           p_limit?: number
         }
         Returns: Json
@@ -2783,7 +2783,6 @@ export type Database = {
         Args: {
           p_anon_token?: string
           p_daily?: boolean
-          p_format?: string
           p_level?: string
           p_mode?: string
           p_pace?: string

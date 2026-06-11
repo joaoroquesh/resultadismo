@@ -25,6 +25,7 @@ function fakeAnswer(scoreType: ScoreType, points: number): RetroAnswerResult {
       id: "demo",
       status: "playing",
       format: "copa",
+      level: "classico",
       points: 12,
       stage_reached: null,
       stage_rank: null,
@@ -45,6 +46,7 @@ const CHAMPION: FinishedRun = {
   shareCode: "demo",
   isDaily: true,
   format: "copa",
+  level: "classico",
   pace: "resultadista",
   slots: [
     { slot: 1, scoreType: "cravada" },
@@ -64,6 +66,24 @@ const ELIMINATED: FinishedRun = {
   points: 9,
   totalMs: 61_000,
   slots: CHAMPION.slots.slice(0, 6).map((s, i) => (i === 5 ? { slot: 6, scoreType: "erro" } : s)),
+};
+
+// 21/21 no modo Lenda — a celebração máxima (ZerouFx + manchete pulsante)
+const ZEROU: FinishedRun = {
+  ...CHAMPION,
+  isDaily: false,
+  level: "lenda",
+  points: 21,
+  totalMs: 74_000,
+  slots: CHAMPION.slots.map((s) => ({ ...s, scoreType: "cravada" as const })),
+};
+
+// >15 pts na Lenda sem zerar — selo HISTÓRICO
+const HISTORICO: FinishedRun = {
+  ...CHAMPION,
+  isDaily: false,
+  level: "lenda",
+  points: 17,
 };
 
 const VEREDITOS: { titulo: string; tipo: ScoreType; pontos: number }[] = [
@@ -104,6 +124,10 @@ export function RetroDemo() {
       <ResultView run={CHAMPION} streak={5} onPlayTraining={noop} onBackHome={noop} />
       <h3 className="text-sm font-bold text-ink-500">Eliminado na semi</h3>
       <ResultView run={ELIMINATED} onPlayTraining={noop} onBackHome={noop} />
+      <h3 className="text-sm font-bold text-ink-500">ZEROU O GAME 👾 (21/21 na Lenda)</h3>
+      <ResultView run={ZEROU} onPlayTraining={noop} onBackHome={noop} />
+      <h3 className="text-sm font-bold text-ink-500">HISTÓRICO 📜 (&gt;15 pts na Lenda)</h3>
+      <ResultView run={HISTORICO} onPlayTraining={noop} onBackHome={noop} />
     </div>
   );
 }

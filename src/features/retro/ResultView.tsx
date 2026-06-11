@@ -6,9 +6,9 @@ import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import { useNavigate } from "react-router-dom";
 import { track } from "@/lib/analytics";
 import { CampaignTrail, type TrailSlot } from "./CampaignTrail";
-import { Confetti, RetroStripes } from "./RetroFx";
-import { fmtMs, type FinishedRun } from "./share";
-import { isPenaltyOut, stageEmoji, verdictHeadline } from "./verdict";
+import { Confetti, RetroStripes, ZerouFx } from "./RetroFx";
+import { fmtMs, modeLabel, type FinishedRun } from "./share";
+import { isPenaltyOut, stageEmoji, verdictBadge, verdictHeadline } from "./verdict";
 import { shareCampaign } from "./shareImage";
 
 // Tela final: o "card" agora espelha a imagem do share (placar eletrônico escuro +
@@ -32,26 +32,55 @@ export function ResultView({
   const champion = run.status === "champion";
   const trail: TrailSlot[] = run.slots.map((s) => ({ slot: s.slot, scoreType: s.scoreType }));
   const penalty = isPenaltyOut(run.status, run.slots);
-  const v = { status: run.status, stageReached: run.stageReached, points: run.points, format: run.format };
+  const v = { status: run.status, stageReached: run.stageReached, points: run.points, format: run.format, level: run.level };
+  const badge = verdictBadge(v);
+  const mode = modeLabel(run);
 
   return (
     <div className="mx-auto w-full max-w-md space-y-4">
       {/* CARD = espelho do share: fundo escuro, listras, emoji, trilha, pontos */}
-      <div className="retro-scanlines relative overflow-hidden rounded-2xl bg-[var(--retro-board)] p-6 text-center text-white shadow-pop">
+      <div
+        className={
+          badge === "zerou"
+            ? "retro-scanlines relative overflow-hidden rounded-2xl bg-[var(--retro-board)] p-6 text-center text-white shadow-pop ring-4 ring-gold-500"
+            : "retro-scanlines relative overflow-hidden rounded-2xl bg-[var(--retro-board)] p-6 text-center text-white shadow-pop"
+        }
+      >
         <RetroStripes className="absolute inset-x-0 top-0" />
         <RetroStripes className="absolute inset-x-0 bottom-0" />
-        {champion && <Confetti tall />}
+        {badge === "zerou" ? <ZerouFx /> : champion && <Confetti tall />}
         <div className="relative space-y-3">
+          {mode && (
+            <span className="inline-block rounded-pill bg-white/10 px-3 py-0.5 text-xs font-bold uppercase tracking-widest text-white/85">
+              {mode}
+            </span>
+          )}
           <div className="animate-retro-stamp text-6xl">{stageEmoji(v)}</div>
-          <h2 className={champion ? "text-2xl font-bold text-[var(--retro-board-digit)]" : "text-2xl font-bold"}>
+          <h2
+            className={
+              badge === "zerou"
+                ? "animate-retro-tense text-3xl font-bold tracking-tight text-[var(--retro-board-digit)]"
+                : champion
+                  ? "text-2xl font-bold text-[var(--retro-board-digit)]"
+                  : "text-2xl font-bold"
+            }
+          >
             {verdictHeadline(v)}
           </h2>
+          {badge === "zerou" && (
+            <p className="text-sm font-bold text-gold-400">21 de 21 no modo Lenda. Perfeito. 🐐</p>
+          )}
+          {badge === "historico" && (
+            <p className="animate-retro-stamp rounded-md bg-gold-500/15 px-3 py-1.5 text-sm font-bold text-gold-400 ring-1 ring-gold-500/40">
+              📜 Campanha HISTÓRICA — mais de 15 pts no modo Lenda!
+            </p>
+          )}
           {penalty && (
             <p className="text-sm font-semibold text-aqua-400">
               Eliminado nos pênaltis 😬 — acertou o vencedor, mas aqui só saldo ou cravada passa.
             </p>
           )}
-          <CampaignTrail slots={trail} currentSlot={null} format={run.format} />
+          <CampaignTrail slots={trail} currentSlot={null} />
           <p className="text-4xl font-bold tabular-nums text-[var(--retro-board-digit)]">{run.points} pts</p>
           <p className="text-sm text-white/75">
             tempo <b className="tabular-nums">{fmtMs(run.totalMs)}</b>

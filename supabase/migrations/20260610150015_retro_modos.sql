@@ -1,0 +1,397 @@
+-- Retrô — rodada 18 (decisões do PO, 10/06):
+-- 1) MODO PONTOS SAI DA ENTRADA (ninguém usa): toda run nova é Copa eliminatória.
+--    retro_answer MANTÉM o ramo 'pontos' (runs em andamento no deploy terminam em paz)
+--    e o histórico fica no banco; só não dá mais pra começar.
+-- 2) DIFICULDADES no Jogo livre — amistoso · classico · lenda (nomes de futebol; os
+--    níveis 1-7 dos jogos NÃO aparecem na UI, são regra de negócio):
+--      · amistoso: só jogos nível 1-3, com raros nível 4 na semi/final (12%).
+--      · classico: exatamente a curva servida até hoje (a UI mandava level='facil',
+--        que deslocava a janela base -1) — as runs existentes migram pra cá, o que
+--        preserva o ranking atual do Jogo livre.
+--      · lenda: jogos nível 4-7; alguns nível 3 nos grupos (20%, pra variar) e o
+--        nível 7 só na final e raro (10% — o catálogo tem APENAS 9 jogos nível 7).
+--    A dificuldade continua escalando dos grupos pra final em todos os modos.
+-- 3) Ranking do Jogo livre passa a ser POR MODO (p_level substitui p_format).
+-- 4) retro_match_payload ganha 'difficulty' (barra discreta no card do jogo — decisão
+--    do PO; é índice de raridade do confronto, não dá o placar).
+-- Distribuição real do catálogo (964): n1 36 · n2 133 · n3 315 · n4 267 · n5 150 ·
+-- n6 54 · n7 9.
+
+-- ---------- level: amistoso/classico/lenda (existentes viram classico) ----------
+alter table public.retro_runs drop constraint if exists retro_runs_level_check;
+update public.retro_runs set level = 'classico' where level <> 'classico';
+alter table public.retro_runs alter column level set default 'classico';
+alter table public.retro_runs add constraint retro_runs_level_check
+  check (level in ('amistoso', 'classico', 'lenda'));
+
+-- ---------- sorteio por modo (janelas + temperos) ----------
+create or replace function public.retro_pick_match(p_slot int, p_exclude uuid[], p_level text default 'classico')
+returns uuid
+language plpgsql security definer set search_path = '' as $$
+declare
+  v_lo int; v_hi int; v_lvl int; v_r numeric; v_id uuid;
+begin
+  if p_level = 'amistoso' then
+    -- grupos 1-2 · oitavas 2-3 · quartas/semi 2-3 · final 3; tempero: nível 4 na
+    -- semi/final (12%) pra variar de vez em quando
+    select case when p_slot <= 3 then 1 when p_slot = 4 then 2 when p_slot in (5, 6) then 2 else 3 end,
+           case when p_slot <= 3 then 2 else 3 end
+      into v_lo, v_hi;
+    if p_slot >= 6 and random() < 0.12 then
+      select id into v_id from public.retro_matches
+       where difficulty = 4 and id <> all(coalesce(p_exclude, '{}'))
+       order by random() limit 1;
+      if v_id is not null then return v_id; end if;
+    end if;
+  elsif p_level = 'lenda' then
+    -- grupos 4-5 · oitavas 4-6 · quartas/semi/final 5-6; temperos: nível 3 nos grupos
+    -- (20%, pra não serem os mesmos jogos de sempre) e nível 7 na final (10%, raridade)
+    select case when p_slot <= 4 then 4 else 5 end,
+           case when p_slot <= 3 then 5 else 6 end
+      into v_lo, v_hi;
+    if p_slot <= 3 and random() < 0.20 then
+      select id into v_id from public.retro_matches
+       where difficulty = 3 and id <> all(coalesce(p_exclude, '{}'))
+       order by random() limit 1;
+      if v_id is not null then return v_id; end if;
+    elsif p_slot = 7 and random() < 0.10 then
+      select id into v_id from public.retro_matches
+       where difficulty = 7 and id <> all(coalesce(p_exclude, '{}'))
+       order by random() limit 1;
+      if v_id is not null then return v_id; end if;
+    end if;
+  else
+    -- classico: a curva de sempre (grupos 1-2 · oitavas 1-3 · quartas/semi 2-4 ·
+    -- final 3-5) + 10% de fuga pra QUALQUER nível fora da janela (surpresa)
+    select case when p_slot <= 4 then 1 when p_slot in (5, 6) then 2 else 3 end,
+           case when p_slot <= 3 then 2 when p_slot = 4 then 3 when p_slot in (5, 6) then 4 else 5 end
+      into v_lo, v_hi;
+    if random() < 0.10 then
+      select id into v_id from public.retro_matches
+       where (difficulty < v_lo or difficulty > v_hi) and id <> all(coalesce(p_exclude, '{}'))
+       order by random() limit 1;
+      if v_id is not null then return v_id; end if;
+    end if;
+  end if;
+
+  -- pesos dentro da janela: grupos puxam pro fundo (45/35/20), mata-mata menos (40/35/25)
+  v_r := random() * 100;
+  if p_slot <= 3 then
+    v_lvl := case when v_r < 45 then v_lo when v_r < 80 then least(v_hi, v_lo + 1) else v_hi end;
+  else
+    v_lvl := case when v_r < 40 then v_lo when v_r < 75 then least(v_hi, v_lo + 1) else v_hi end;
+  end if;
+
+  select id into v_id from public.retro_matches
+   where difficulty = v_lvl and id <> all(coalesce(p_exclude, '{}'))
+   order by random() limit 1;
+  if v_id is null then
+    select id into v_id from public.retro_matches
+     where difficulty between v_lo and v_hi and id <> all(coalesce(p_exclude, '{}'))
+     order by random() limit 1;
+  end if;
+  return v_id;
+end $$;
+revoke execute on function public.retro_pick_match(int, uuid[], text) from public, anon, authenticated;
+
+-- ---------- payload ganha a dificuldade (barra no card) ----------
+create or replace function public.retro_match_payload(p_run public.retro_runs, p_slot int)
+returns jsonb
+language sql security definer set search_path = '' as $$
+  select jsonb_build_object(
+    'slot', p_slot,
+    'slot_label', public.retro_slot_label(p_slot),
+    'timer_seconds', public.retro_timer_seconds(p_run.pace, p_slot),
+    'deadline_at', rm.deadline_at,
+    'served_at', rm.served_at,
+    'match', jsonb_build_object(
+      'wc_year', m.wc_year, 'wc_host', m.wc_host,
+      'stage_label_pt', m.stage_label_pt, 'is_knockout', m.is_knockout,
+      'difficulty', m.difficulty,
+      'home_name_pt', m.home_name_pt, 'away_name_pt', m.away_name_pt,
+      'home_slug', m.home_slug, 'away_slug', m.away_slug
+    ))
+  from public.retro_run_matches rm
+  join public.retro_matches m on m.id = rm.match_id
+  where rm.run_id = p_run.id and rm.slot = p_slot
+$$;
+revoke execute on function public.retro_match_payload(public.retro_runs, int) from public, anon, authenticated;
+
+-- ---------- start sem formato (sempre copa) + level novo ----------
+create or replace function public.retro_start_run(
+  p_mode text default 'acerto',
+  p_pace text default 'resultadista',
+  p_daily boolean default true,
+  p_anon_token uuid default null,
+  p_seen uuid[] default '{}',
+  p_level text default 'classico'
+) returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare
+  v_user uuid := auth.uid();
+  v_today date := (now() at time zone 'America/Sao_Paulo')::date;
+  v_run public.retro_runs;
+begin
+  if p_pace not in ('resultadista','classico','sempressa') then raise exception 'ritmo inválido'; end if;
+  if p_level not in ('amistoso','classico','lenda') then raise exception 'dificuldade inválida'; end if;
+  if v_user is null and p_anon_token is null then raise exception 'anônimo precisa de anon_token'; end if;
+  if array_length(p_seen, 1) > 60 then p_seen := p_seen[1:60]; end if;
+
+  if v_user is null and (select count(*) from public.retro_runs
+       where anon_token = p_anon_token and started_at > now() - interval '1 hour') >= 30 then
+    raise exception 'muitas partidas seguidas — respira, toma uma água e volta já 😉';
+  end if;
+
+  if p_daily and v_user is not null then
+    select * into v_run from public.retro_runs
+     where user_id = v_user and is_daily and daily_date = v_today and format = 'copa';
+    if found then
+      if v_run.status = 'playing' then
+        return jsonb_build_object('run_id', v_run.id, 'share_code', v_run.share_code,
+          'level', v_run.level, 'pace', v_run.pace, 'resumed', true, 'points', v_run.points,
+          'rerolls', v_run.rerolls, 'current', public.retro_match_payload(v_run, v_run.current_slot));
+      end if;
+      raise exception 'você já jogou a Seleção do Dia de hoje — volte amanhã (ou jogue o Jogo livre)';
+    end if;
+  end if;
+
+  insert into public.retro_runs (user_id, anon_token, is_daily, daily_date, mode, pace, ranked, persistent, level, format)
+  values (v_user, case when v_user is null then p_anon_token end,
+          p_daily, case when p_daily then v_today end, 'acerto', p_pace,
+          p_daily and v_user is not null and p_pace = 'resultadista',
+          v_user is not null, case when p_daily then 'classico' else p_level end, 'copa')
+  returning * into v_run;
+
+  if v_user is null then
+    insert into public.retro_usage_daily as u (day, anon_runs_started) values (v_today, 1)
+    on conflict (day) do update set anon_runs_started = u.anon_runs_started + 1;
+  end if;
+
+  perform public.retro_serve_slot(v_run, 1, p_seen);
+  return jsonb_build_object('run_id', v_run.id, 'share_code', v_run.share_code,
+    'level', v_run.level, 'pace', v_run.pace, 'ranked', v_run.ranked, 'resumed', false,
+    'points', 0, 'rerolls', 0, 'current', public.retro_match_payload(v_run, 1));
+end $$;
+drop function if exists public.retro_start_run(text, text, boolean, uuid, uuid[], text, text);
+revoke execute on function public.retro_start_run(text, text, boolean, uuid, uuid[], text) from public;
+grant execute on function public.retro_start_run(text, text, boolean, uuid, uuid[], text) to anon, authenticated;
+
+-- ---------- answer: idêntico ao round10, SÓ adiciona 'level' no objeto run ----------
+-- (selos HISTÓRICO/ZEROU no front precisam do modo; o ramo 'pontos' fica como legado
+-- p/ runs em andamento no deploy)
+create or replace function public.retro_answer(
+  p_run_id uuid, p_home int default null, p_away int default null,
+  p_anon_token uuid default null, p_seen uuid[] default '{}'
+) returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare
+  v_run public.retro_runs; v_rm public.retro_run_matches; v_m public.retro_matches;
+  v_timeout boolean; v_type public.score_type; v_pts int := 0;
+  v_need int; v_passed boolean; v_group_passes int;
+  v_finish_status text := null; v_stage_reached text; v_stage_rank int;
+  v_cfg public.retro_config; v_result jsonb;
+begin
+  select * into v_run from public.retro_runs where id = p_run_id for update;
+  if not found or not public.retro_run_owned(v_run, p_anon_token) then raise exception 'run não encontrada'; end if;
+  if v_run.status <> 'playing' then raise exception 'run já encerrada'; end if;
+  select * into v_rm from public.retro_run_matches where run_id = v_run.id and slot = v_run.current_slot for update;
+  if not found then raise exception 'jogo ainda não servido — chame retro_next'; end if;
+  if v_rm.answered_at is not null then raise exception 'slot já respondido'; end if;
+  select * into v_m from public.retro_matches where id = v_rm.match_id;
+
+  v_timeout := (v_rm.deadline_at is not null and now() > v_rm.deadline_at + interval '2 seconds')
+               or p_home is null or p_away is null;
+  if v_timeout then v_type := 'erro'; v_pts := 0;
+  else v_type := public.compute_score_type(p_home, p_away, v_m.home_score, v_m.away_score);
+       v_pts := public.score_points(v_type); end if;
+
+  update public.retro_run_matches
+     set guess_home = case when v_timeout then null else p_home end,
+         guess_away = case when v_timeout then null else p_away end,
+         answered_at = now(), is_timeout = v_timeout, score_type = v_type, points = v_pts
+   where run_id = v_run.id and slot = v_run.current_slot;
+  if v_pts > 0 then update public.retro_matches set scored_count = scored_count + 1 where id = v_m.id; end if;
+  update public.retro_runs
+     set points = points + v_pts,
+         rerolls = rerolls + case when v_type = 'cravada' then 1 else 0 end
+   where id = v_run.id returning * into v_run;
+
+  if v_run.format = 'pontos' then
+    -- legado: joga os 7 sempre; sem eliminação. fim no 7º.
+    v_passed := true;
+    if v_run.current_slot >= 7 then v_finish_status := 'finished'; v_stage_reached := null; v_stage_rank := null; end if;
+  else
+    -- COPA (eliminatório). barra lê a config (default: ≥1 em tudo)
+    select * into v_cfg from public.retro_config where id = 1;
+    if v_run.current_slot >= 6 and v_cfg.enforce_knockout_bar then
+      v_need := public.retro_min_points(case when v_run.current_slot = 6 then v_cfg.semi_min else v_cfg.final_min end);
+    else
+      v_need := 1;
+    end if;
+    v_passed := v_pts >= v_need;
+
+    if v_run.current_slot < 3 then null;  -- grupos: joga os 3
+    elsif v_run.current_slot = 3 then
+      select count(*) into v_group_passes from public.retro_run_matches
+       where run_id = v_run.id and slot <= 3 and points >= 1;
+      if v_group_passes < 2 then v_finish_status := 'eliminated'; v_stage_reached := 'Fase de grupos'; v_stage_rank := 1; end if;
+    elsif v_run.current_slot < 7 then
+      if not v_passed then v_finish_status := 'eliminated';
+        v_stage_reached := public.retro_slot_label(v_run.current_slot); v_stage_rank := v_run.current_slot - 2; end if;
+    else
+      if v_passed then v_finish_status := 'champion'; v_stage_reached := 'Campeão 🏆'; v_stage_rank := 6;
+      else v_finish_status := 'eliminated'; v_stage_reached := 'Vice-campeão'; v_stage_rank := 5; end if;
+    end if;
+  end if;
+
+  if v_finish_status is not null then
+    update public.retro_runs
+       set status = v_finish_status, stage_reached = v_stage_reached, stage_rank = v_stage_rank, finished_at = now(),
+           total_ms = (select coalesce(sum(least(
+                         extract(epoch from (rm2.answered_at - rm2.served_at)) * 1000,
+                         coalesce(extract(epoch from (rm2.deadline_at - rm2.served_at)) * 1000 + 2000,
+                                  extract(epoch from (rm2.answered_at - rm2.served_at)) * 1000)))::bigint, 0)
+                       from public.retro_run_matches rm2 where rm2.run_id = v_run.id and rm2.answered_at is not null)
+     where id = v_run.id returning * into v_run;
+    if v_run.user_id is null then
+      insert into public.retro_usage_daily as u (day, anon_runs_finished)
+      values ((now() at time zone 'America/Sao_Paulo')::date, 1)
+      on conflict (day) do update set anon_runs_finished = u.anon_runs_finished + 1;
+    end if;
+  else
+    update public.retro_runs set current_slot = current_slot + 1 where id = v_run.id returning * into v_run;
+  end if;
+
+  v_result := jsonb_build_object(
+    'home_score', v_m.home_score, 'away_score', v_m.away_score,
+    'pens_home', v_m.pens_home, 'pens_away', v_m.pens_away, 'went_extra_time', v_m.went_extra_time,
+    'score_type', v_type, 'points', v_pts, 'timeout', v_timeout, 'passed', v_passed,
+    'reroll_earned', v_type = 'cravada');
+  return jsonb_build_object(
+    'result', v_result,
+    'run', jsonb_build_object('id', v_run.id, 'status', v_run.status, 'format', v_run.format,
+      'level', v_run.level, 'points', v_run.points, 'stage_reached', v_run.stage_reached,
+      'stage_rank', v_run.stage_rank, 'total_ms', v_run.total_ms, 'share_code', v_run.share_code,
+      'slot', v_run.current_slot, 'rerolls', v_run.rerolls),
+    'next', null);
+end $$;
+
+-- ---------- summary devolve o level (página do link mostra o modo) ----------
+create or replace function public.retro_run_summary(p_share_code text) returns jsonb
+language sql security definer set search_path = '' as $$
+  select jsonb_build_object(
+    'format', r.format, 'pace', r.pace, 'status', r.status, 'level', r.level,
+    'stage_reached', r.stage_reached, 'points', r.points, 'total_ms', r.total_ms,
+    'is_daily', r.is_daily, 'daily_date', r.daily_date, 'finished_at', r.finished_at,
+    'player', case when r.user_id is not null
+      then (select jsonb_build_object('display_name', p.display_name, 'avatar_url', p.avatar_url)
+              from public.profiles p where p.id = r.user_id) end,
+    'slots', (select jsonb_agg(jsonb_build_object(
+        'slot', rm.slot, 'slot_label', public.retro_slot_label(rm.slot),
+        'score_type', rm.score_type, 'points', rm.points, 'timeout', rm.is_timeout) order by rm.slot)
+      from public.retro_run_matches rm where rm.run_id = r.id and rm.answered_at is not null))
+  from public.retro_runs r where r.share_code = p_share_code and r.status <> 'playing'
+$$;
+revoke execute on function public.retro_run_summary(text) from public;
+grant execute on function public.retro_run_summary(text) to anon, authenticated;
+
+-- ---------- my_stats: melhor campanha só da Copa (runs legadas do Pontos têm ----------
+-- stage_rank NULL, que ordena PRIMEIRO em desc e roubaria o "melhor" do hero)
+create or replace function public.retro_my_stats() returns jsonb
+language plpgsql stable security definer set search_path = '' as $$
+declare
+  v_user uuid := auth.uid();
+  v_today date := (now() at time zone 'America/Sao_Paulo')::date;
+  v_streak int := 0;
+  v_d date;
+  v_best jsonb;
+  v_played_today boolean;
+begin
+  if v_user is null then
+    return jsonb_build_object('streak', 0, 'best', null, 'played_today', false);
+  end if;
+
+  select exists (select 1 from public.retro_runs
+    where user_id = v_user and is_daily and daily_date = v_today) into v_played_today;
+
+  v_d := case when v_played_today then v_today else v_today - 1 end;
+  while exists (select 1 from public.retro_runs
+    where user_id = v_user and is_daily and daily_date = v_d
+      and (status <> 'playing' or daily_date = v_today)) loop
+    v_streak := v_streak + 1;
+    v_d := v_d - 1;
+  end loop;
+
+  select jsonb_build_object('stage_reached', stage_reached, 'stage_rank', stage_rank,
+                            'points', points, 'total_ms', total_ms, 'daily_date', daily_date,
+                            'level', level)
+    into v_best
+  from public.retro_runs
+  where user_id = v_user and status <> 'playing' and format = 'copa'
+  order by coalesce(stage_rank, 0) desc, points desc, total_ms asc
+  limit 1;
+
+  return jsonb_build_object('streak', v_streak, 'best', v_best, 'played_today', v_played_today);
+end $$;
+
+-- ---------- ranking por MODO (p_level no lugar de p_format) ----------
+drop function if exists public.retro_leaderboard(date, text, int, text);
+create or replace function public.retro_leaderboard(
+  p_daily_date date default null, p_level text default 'classico',
+  p_limit int default 50, p_board text default 'daily'
+) returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare
+  v_date date := coalesce(p_daily_date, (now() at time zone 'America/Sao_Paulo')::date);
+  v_level text := case when p_level in ('amistoso','classico','lenda') then p_level else 'classico' end;
+  v_rows jsonb; v_me jsonb;
+begin
+  if p_board = 'treino' then
+    with best as (
+      select distinct on (r.user_id) r.*
+        from public.retro_runs r
+       where not r.is_daily and r.pace = 'resultadista' and r.user_id is not null
+         and r.status <> 'playing' and r.format = 'copa' and r.level = v_level
+       order by r.user_id, coalesce(r.stage_rank, 0) desc, r.points desc, r.total_ms asc
+    ), ranked as (
+      select b.*, row_number() over (
+               order by coalesce(b.stage_rank, 0) desc, b.points desc, b.total_ms asc) as pos
+        from best b
+    )
+    select jsonb_agg(jsonb_build_object(
+             'pos', rk.pos, 'display_name', p.display_name, 'avatar_url', p.avatar_url,
+             'stage_reached', rk.stage_reached, 'points', rk.points, 'total_ms', rk.total_ms,
+             'is_me', rk.user_id = auth.uid()) order by rk.pos)
+      into v_rows from ranked rk join public.profiles p on p.id = rk.user_id
+     where p.show_in_global_ranking and rk.pos <= least(coalesce(p_limit, 50), 100);
+    return jsonb_build_object('board', 'treino', 'level', v_level,
+                              'rows', coalesce(v_rows, '[]'::jsonb), 'me', null);
+  end if;
+
+  select jsonb_agg(row_data) into v_rows from (
+    select jsonb_build_object(
+      'pos', row_number() over (order by coalesce(r.stage_rank, 0) desc, r.points desc, r.total_ms asc),
+      'display_name', p.display_name, 'avatar_url', p.avatar_url,
+      'stage_reached', r.stage_reached, 'points', r.points, 'total_ms', r.total_ms,
+      'is_me', r.user_id = auth.uid()) as row_data
+    from public.retro_runs r join public.profiles p on p.id = r.user_id
+    where r.ranked and r.status <> 'playing' and r.daily_date = v_date and r.format = 'copa'
+      and p.show_in_global_ranking
+    order by coalesce(r.stage_rank, 0) desc, r.points desc, r.total_ms asc
+    limit least(coalesce(p_limit, 50), 100)
+  ) t;
+
+  if auth.uid() is not null then
+    select jsonb_build_object('pos', pos, 'stage_reached', stage_reached, 'points', points, 'total_ms', total_ms) into v_me
+    from (select r.user_id, r.stage_reached, r.points, r.total_ms,
+                 row_number() over (
+                   order by coalesce(r.stage_rank, 0) desc, r.points desc, r.total_ms asc) as pos
+            from public.retro_runs r
+           where r.ranked and r.status <> 'playing' and r.daily_date = v_date and r.format = 'copa') t
+    where t.user_id = auth.uid();
+  end if;
+  return jsonb_build_object('board', 'daily', 'daily_date', v_date,
+                            'rows', coalesce(v_rows, '[]'::jsonb), 'me', v_me);
+end $$;
+revoke execute on function public.retro_leaderboard(date, text, int, text) from public;
+grant execute on function public.retro_leaderboard(date, text, int, text) to anon, authenticated;
