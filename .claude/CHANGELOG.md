@@ -20,6 +20,14 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+### Corrigido
+- **Imagem de palpites: selo da pontuação alinhado e raio visível na cravada.** O ⚡ era um emoji
+  no canvas: métrica própria desalinhava/"quebrava" a linha do selo e, amarelo sobre o fundo
+  dourado da cravada, ele sumia. Agora o raio do 2× é **desenhado** (polígono) na mesma baseline
+  do texto, escuro no dourado e branco nos demais. De quebra: o escudo passa a ser buscado pelo
+  **nome completo** do time (o curto abreviado tipo "Á. do Sul" caía no quadradinho de sigla) e o
+  nome completo vira o rótulo quando cabe — África do Sul com bandeira e por extenso.
+
 ### Adicionado
 - **Grupo aguardando aprovação agora avisa os admins** (sininho + push, link direto pra
   `Admin → Grupos`). Lacuna confirmada em produção: no modo grátis o grupo nasce `pending`

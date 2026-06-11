@@ -15,6 +15,10 @@ export type ShareRow = {
   joker: boolean;
   /** data curta do jogo ("QUA 10/06") — dá contexto quando a imagem junta dias. */
   date?: string | null;
+  /** caminho do escudo já resolvido (ex.: pelo nome COMPLETO do time); se
+   *  ausente, tenta resolver pelo nome de exibição. */
+  homeCrest?: string | null;
+  awayCrest?: string | null;
 };
 
 // Paleta da marca em hex (canvas não lê os tokens oklch do CSS).
@@ -55,6 +59,23 @@ function loadImage(src: string): Promise<HTMLImageElement | null> {
     img.onerror = () => resolve(null);
     img.src = src;
   });
+}
+
+/** Raio do "2×" desenhado na mão: o emoji ⚡ tem métrica própria (desalinha a
+ *  linha) e é amarelo — some no fundo dourado da cravada. Polígono = cor e
+ *  baseline 100% controladas. (x, baseline) ancoram no texto ao lado. */
+function drawBolt(g: CanvasRenderingContext2D, x: number, baseline: number, color: string) {
+  const t = baseline - 19; // topo do raio (altura ~20px, casa com fonte 26px)
+  g.fillStyle = color;
+  g.beginPath();
+  g.moveTo(x + 7.5, t);
+  g.lineTo(x + 1, t + 11);
+  g.lineTo(x + 5.5, t + 11);
+  g.lineTo(x + 3.5, t + 20);
+  g.lineTo(x + 11, t + 8);
+  g.lineTo(x + 6.5, t + 8);
+  g.closePath();
+  g.fill();
 }
 
 function drawCrestFallback(g: CanvasRenderingContext2D, x: number, y: number, size: number, name: string) {
@@ -118,9 +139,9 @@ export async function buildScoreShareImage(rows: ShareRow[], playerName: string)
     roundRect(g, PAD - 16, y, W - 2 * (PAD - 16), ROW, 24);
     g.fill();
 
-    // escudos
-    const homeCrest = teamCrestPath(r.homeName);
-    const awayCrest = teamCrestPath(r.awayName);
+    // escudos (caminho já resolvido pelo chamador > nome de exibição)
+    const homeCrest = r.homeCrest ?? teamCrestPath(r.homeName);
+    const awayCrest = r.awayCrest ?? teamCrestPath(r.awayName);
     const cy = y + ROW / 2 - crestSize / 2 - 10;
     const hi = homeCrest ? await loadImage(homeCrest) : null;
     const ai = awayCrest ? await loadImage(awayCrest) : null;
@@ -153,19 +174,39 @@ export async function buildScoreShareImage(rows: ShareRow[], playerName: string)
     g.font = "600 26px system-ui, -apple-system, sans-serif";
     g.fillText(`meu palpite ${r.homePred} × ${r.awayPred}`, cx, y + 122);
 
-    // selo da pontuação
+    // selo da pontuação — sem emoji: o raio do 2× é desenhado (drawBolt) pra
+    // ficar na MESMA baseline do texto e com cor que contrasta no dourado.
     const pts = SCORE_POINTS[r.type] * (r.joker ? 2 : 1);
-    const label = `${r.type === "erro" ? "0" : `+${pts}`} ${SCORE_LABEL[r.type]}${r.joker && r.type !== "erro" ? " ⚡2×" : ""}${r.live ? " · ao vivo" : ""}`;
+    const showBolt = r.joker && r.type !== "erro";
+    const seg1 = `${r.type === "erro" ? "0" : `+${pts}`} ${SCORE_LABEL[r.type]}`;
+    const seg2 = showBolt ? "2×" : "";
+    const seg3 = r.live ? " · ao vivo" : "";
     g.font = "700 26px system-ui, -apple-system, sans-serif";
-    const tw = g.measureText(label).width;
-    const pw = tw + 36;
+    const BOLT_W = 12; // largura do raio + respiro à direita
+    const w1 = g.measureText(seg1).width;
+    const w2 = seg2 ? 9 + BOLT_W + 2 + g.measureText(seg2).width : 0;
+    const w3 = seg3 ? g.measureText(seg3).width : 0;
+    const pw = w1 + w2 + w3 + 36;
     const px = cx - pw / 2;
     const py = y + ROW - 24;
     g.fillStyle = TYPE_COLOR[r.type];
     roundRect(g, px, py - 24, pw, 38, 19);
     g.fill();
-    g.fillStyle = r.type === "cravada" ? C.goldInk : "#FFFFFF";
-    g.fillText(label, cx, py + 4);
+    const ink = r.type === "cravada" ? C.goldInk : "#FFFFFF";
+    const base = py + 4;
+    g.fillStyle = ink;
+    g.textAlign = "left";
+    let tx = px + 18;
+    g.fillText(seg1, tx, base);
+    tx += w1;
+    if (seg2) {
+      drawBolt(g, tx + 9, base, ink);
+      g.fillStyle = ink;
+      g.fillText(seg2, tx + 9 + BOLT_W + 2, base);
+      tx += w2;
+    }
+    if (seg3) g.fillText(seg3, tx, base);
+    g.textAlign = "center"; // volta pro padrão das linhas seguintes
   }
 
   // rodapé

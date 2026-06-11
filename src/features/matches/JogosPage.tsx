@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { dayjs } from "@/lib/format";
 import { MatchCard } from "./MatchCard";
 import { provisionalScoreType } from "@/lib/score";
+import { teamCrestPath } from "@/lib/teamCrests";
 import { buildScoreShareImage, shareImageBlob, type ShareRow } from "./shareImage";
 import { useToast } from "@/components/ui/Toast";
 import { usePersonalizationState } from "@/features/onboarding/personalizationApi";
@@ -211,6 +212,12 @@ export function JogosPage() {
   }
   async function generateShare() {
     if (!shareSel || shareSel.size === 0) return;
+    // Nome de exibição: o COMPLETO quando cabe na linha (evita "Á. do Sul");
+    // escudo: tenta o nome completo primeiro (o curto abreviado não resolve).
+    const teamLabel = (full?: string | null, short?: string | null) =>
+      full && full.length <= 14 ? full : short ?? full ?? "Time";
+    const crestOf = (full?: string | null, short?: string | null) =>
+      (full ? teamCrestPath(full) : null) ?? (short ? teamCrestPath(short) : null);
     // a seleção atravessa as abas de dia: junta TODOS os marcados do escopo,
     // em ordem de horário, com a data curta em cada um pra dar contexto.
     const rows: ShareRow[] = (matches ?? [])
@@ -225,9 +232,13 @@ export function JogosPage() {
           finished && pred.score_type
             ? pred.score_type
             : provisionalScoreType(pred.home_pred, pred.away_pred, hs, as_);
+        const homeFull = m.home_team?.name ?? m.home_team_name;
+        const awayFull = m.away_team?.name ?? m.away_team_name;
         return {
-          homeName: m.home_team?.short_name ?? m.home_team_name ?? "Time",
-          awayName: m.away_team?.short_name ?? m.away_team_name ?? "Time",
+          homeName: teamLabel(homeFull, m.home_team?.short_name),
+          awayName: teamLabel(awayFull, m.away_team?.short_name),
+          homeCrest: crestOf(homeFull, m.home_team?.short_name),
+          awayCrest: crestOf(awayFull, m.away_team?.short_name),
           homePred: pred.home_pred,
           awayPred: pred.away_pred,
           homeScore: m.home_score ?? (finished ? null : 0),
