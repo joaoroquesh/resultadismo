@@ -67,9 +67,10 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
   nome volta à moderação). Abas
   **Classificação** (tabela de Pontos ou `ConfrontoSection`; selo 💰 de prêmio quando o bolão está
   ativo), **Membros** (papéis, aprovar/remover; botão $ marca pagantes do bolão),
-  **Competições** (admin: adicionar competição/modo) e **Gestão** (`GestaoBolaoTab` — Gestão do
-  Bolão, ADR [`0009`](decisions/0009-gestao-bolao.md): membro vê quando ativa, admin sempre;
-  coachmark `resultadismo-coach-gestao-bolao-v1` na fileira de abas). Banner "Pagar agora" se
+  **Gestão** (`GestaoBolaoTab` — Gestão do Bolão, ADR [`0009`](decisions/0009-gestao-bolao.md):
+  membro vê quando ativa, admin sempre; vem **antes de Competições** pra dar destaque à
+  funcionalidade nova; coachmark `resultadismo-coach-gestao-bolao-v1` na fileira de abas) e
+  **Competições** (admin: adicionar competição/modo). Banner "Pagar agora" se
   pendente; botão de reembolso só p/ dono (≤7 dias).
 - **`RefundFederationButton`**: botão isolado de cancelar+reembolsar (2 passos). → [`06`](06-REGRAS-DE-NEGOCIO.md).
 
