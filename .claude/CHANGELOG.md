@@ -20,6 +20,16 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+### Alterado
+- **Palpites da galera: só os SEUS grupos, na ordem dos favoritos, e ranking ao vivo.** O chip
+  "Todos" morreu — palpite de quem não está nos seus grupos não aparece (sem grupo, a área convida
+  a entrar num). Os chips seguem a MESMA ordem da página /grupos (favoritos primeiro, na ordem de
+  favoritar; a estrela ao lado favorita/desfavorita o grupo ativo) e o primeiro abre por padrão.
+  Com o jogo ROLANDO, a lista ordena pela pontuação em curso e mostra só o número colorido ao lado
+  (+6 dourado, +2 verde, +1 azul, 0 cinza) — sem o selo de fundo, que segue só no encerrado.
+  Desempate: vitória do mandante → empate → vitória do visitante; dentro, mais gols do lado
+  decisivo, depois do outro. Encerrado ordena pela mesma régua (pontuação oficial).
+
 ### Corrigido
 - **Imagem de palpites: selo da pontuação alinhado e raio visível na cravada.** O ⚡ era um emoji
   no canvas: métrica própria desalinhava/"quebrava" a linha do selo e, amarelo sobre o fundo

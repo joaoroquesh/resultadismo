@@ -12,8 +12,8 @@ import { useToast } from "@/components/ui/Toast";
 import { useSavePrediction, useSetJoker, useMatchPredictions, useMatchPredictStatus } from "./api";
 import { useNudge } from "@/features/notifications/api";
 import { useMyLeagues, useLeagueMembers } from "@/features/leagues/api";
+import { useFavoriteGroups, useToggleFavoriteGroup } from "@/features/leagues/favorites";
 import { useMyFavorites, useToggleFavorite } from "@/features/players/api";
-import { supabase } from "@/lib/supabase";
 import type { MatchWithTeams, Prediction, ScoreType } from "@/lib/types";
 import { SCORE_LABEL, SCORE_POINTS } from "@/lib/types";
 import { provisionalScoreType } from "@/lib/score";
@@ -335,7 +335,16 @@ export function MatchCard({
             <Users className="size-3.5" /> {locked ? "Palpites da galera" : "Quem já palpitou"}
             <ChevronDown className={cn("size-3.5 transition-transform", showGalera && "rotate-180")} />
           </button>
-          {showGalera && <GaleraArea matchId={match.id} locked={locked} finished={finished} />}
+          {showGalera && (
+            <GaleraArea
+              matchId={match.id}
+              locked={locked}
+              finished={finished}
+              live={live}
+              liveHome={liveHome}
+              liveAway={liveAway}
+            />
+          )}
         </>
       )}
     </div>
@@ -436,33 +445,47 @@ function ScoreBox({
 }
 
 /**
- * Área "quem já palpitou / palpites da galera": com mais de um grupo, chips
- * (scroll lateral) filtram a lista POR GRUPO — o grupo favorito (estrela ao lado
- * do chip ativo; profiles.favorite_group_id) abre por padrão. Resultadistas
- * favoritados (estrela na linha) fixam no topo.
+ * Área "quem já palpitou / palpites da galera": SÓ os grupos da pessoa — sem
+ * "Todos" (palpite de estranho não diz nada). Chips na MESMA ordem da página
+ * /grupos: favoritos primeiro (ordem de favoritar), depois os demais; o
+ * primeiro abre por padrão. Resultadistas favoritados (estrela) fixam no topo.
  */
 function GaleraArea({
   matchId,
   locked,
   finished,
+  live,
+  liveHome,
+  liveAway,
 }: {
   matchId: string;
   locked: boolean;
   finished: boolean;
+  live: boolean;
+  liveHome: number;
+  liveAway: number;
 }) {
-  const { session, user, profile, refreshProfile } = useAuth();
+  const { session, user } = useAuth();
   const { data: leagues } = useMyLeagues();
-  const myLeagues = useMemo(
-    () => (leagues ?? []).filter((l) => l.my_status === "active"),
-    [leagues],
-  );
-  const favGroup = profile?.favorite_group_id ?? null;
-  // undefined = ainda sem escolha manual → segue o grupo favorito.
-  const [selManual, setSelManual] = useState<string | null | undefined>(undefined);
-  const selRaw = selManual === undefined ? favGroup : selManual;
-  const sel = selRaw && myLeagues.some((l) => l.id === selRaw) ? selRaw : null;
+  const { data: favGroupIds = [] } = useFavoriteGroups();
+  const toggleFavGroup = useToggleFavoriteGroup();
+  const myLeagues = useMemo(() => {
+    const active = (leagues ?? []).filter((l) => l.my_status === "active");
+    const pos = new Map(favGroupIds.map((id, i) => [id, i]));
+    // sort estável: favoritos na ordem de favoritar, o resto na ordem natural
+    return [...active].sort(
+      (a, b) => (pos.get(a.id) ?? Infinity) - (pos.get(b.id) ?? Infinity),
+    );
+  }, [leagues, favGroupIds]);
+
+  const [selManual, setSelManual] = useState<string | null>(null);
+  const sel =
+    selManual && myLeagues.some((l) => l.id === selManual)
+      ? selManual
+      : myLeagues[0]?.id ?? null;
 
   const { data: members } = useLeagueMembers(sel ?? undefined);
+  // null = membros ainda carregando (lista segura em "carregando…")
   const memberIds = useMemo(() => {
     if (!sel || !members) return null;
     return new Set(members.map((m) => m.profile?.id).filter(Boolean) as string[]);
@@ -473,19 +496,18 @@ function GaleraArea({
   const isFav = (id: string) => !!favs?.has(id);
   const star = (id: string) => toggleFav.mutate({ userId: id, next: !isFav(id) });
 
-  async function setFavoriteGroup(id: string | null) {
-    if (!user) return;
-    await supabase.from("profiles").update({ favorite_group_id: id }).eq("id", user.id);
-    void refreshProfile();
-  }
+  // Sem grupo não tem galera: nada de vazar palpite do site inteiro.
+  if (myLeagues.length === 0)
+    return (
+      <div className="border-t border-border px-3 py-3 text-center text-xs text-ink-400">
+        Entre num grupo para ver os palpites da galera.
+      </div>
+    );
 
   return (
     <div>
       {myLeagues.length > 1 && (
         <div className="flex items-center gap-1.5 overflow-x-auto border-t border-border px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <GroupChip active={sel === null} onClick={() => setSelManual(null)}>
-            Todos
-          </GroupChip>
           {myLeagues.map((l) => (
             <GroupChip key={l.id} active={sel === l.id} onClick={() => setSelManual(l.id)}>
               {l.name}
@@ -494,13 +516,17 @@ function GaleraArea({
           {sel && (
             <button
               type="button"
-              aria-label={favGroup === sel ? "Remover grupo favorito" : "Marcar como grupo favorito"}
-              aria-pressed={favGroup === sel}
-              title="Grupo favorito abre primeiro"
-              onClick={() => void setFavoriteGroup(favGroup === sel ? null : sel)}
+              aria-label={
+                favGroupIds.includes(sel) ? "Remover grupo dos favoritos" : "Favoritar grupo"
+              }
+              aria-pressed={favGroupIds.includes(sel)}
+              title="Grupo favorito aparece primeiro"
+              onClick={() => toggleFavGroup.mutate(sel)}
               className="grid size-7 shrink-0 place-items-center rounded-pill text-gold-600 transition hover:bg-ink-100"
             >
-              <Star className={cn("size-4", favGroup === sel && "fill-gold-500 text-gold-500")} />
+              <Star
+                className={cn("size-4", favGroupIds.includes(sel) && "fill-gold-500 text-gold-500")}
+              />
             </button>
           )}
         </div>
@@ -509,6 +535,9 @@ function GaleraArea({
         <Galera
           matchId={matchId}
           finished={finished}
+          live={live}
+          liveHome={liveHome}
+          liveAway={liveAway}
           memberIds={memberIds}
           isFav={isFav}
           onStar={session ? star : undefined}
@@ -564,6 +593,9 @@ function FavStar({ on, onClick }: { on: boolean; onClick: () => void }) {
 function Galera({
   matchId,
   finished,
+  live,
+  liveHome,
+  liveAway,
   memberIds,
   isFav,
   onStar,
@@ -571,6 +603,9 @@ function Galera({
 }: {
   matchId: string;
   finished: boolean;
+  live: boolean;
+  liveHome: number;
+  liveAway: number;
   memberIds: Set<string> | null;
   isFav: (id: string) => boolean;
   onStar?: (id: string) => void;
@@ -578,34 +613,76 @@ function Galera({
 }) {
   const { data, isLoading } = useMatchPredictions(matchId, true);
 
-  if (isLoading) return <div className="px-3 py-3 text-center text-xs text-ink-400">carregando…</div>;
-  const filtered = (data ?? []).filter(
-    (p) => !memberIds || (p.user?.id && memberIds.has(p.user.id)),
-  );
+  if (isLoading || memberIds === null)
+    return <div className="px-3 py-3 text-center text-xs text-ink-400">carregando…</div>;
+  const filtered = (data ?? []).filter((p) => p.user?.id && memberIds.has(p.user.id));
   if (filtered.length === 0)
     return <div className="px-3 py-3 text-center text-xs text-ink-400">ninguém palpitou ainda</div>;
-  // favoritos primeiro (ordem original preservada dentro de cada bloco)
+
+  // Pontuação por linha: oficial quando encerrado; prévia 3/2/1 ao vivo.
+  const rowType = (p: (typeof filtered)[number]): ScoreType | null =>
+    finished
+      ? p.score_type
+      : live
+        ? provisionalScoreType(p.home_pred, p.away_pred, liveHome, liveAway)
+        : null;
+  const rowPts = (p: (typeof filtered)[number]) => {
+    const t = rowType(p);
+    if (!t) return -1;
+    return SCORE_POINTS[t] * (p.is_joker ? 2 : 1);
+  };
+  // Desempate (regra do PO): vitória do mandante → empate → vitória do
+  // visitante; dentro, mais gols do lado decisivo, depois do outro lado.
+  const outcomeRank = (p: (typeof filtered)[number]) =>
+    p.home_pred > p.away_pred ? 0 : p.home_pred === p.away_pred ? 1 : 2;
+  const scoring = finished || live;
   const rows = filtered
     .map((p, i) => ({ p, i }))
-    .sort((a, b) => Number(isFav(b.p.user?.id ?? "")) - Number(isFav(a.p.user?.id ?? "")) || a.i - b.i);
+    .sort((a, b) => {
+      if (scoring) {
+        const d = rowPts(b.p) - rowPts(a.p);
+        if (d) return d;
+        const r = outcomeRank(a.p) - outcomeRank(b.p);
+        if (r) return r;
+        const keyA = outcomeRank(a.p) === 2 ? a.p.away_pred : a.p.home_pred;
+        const keyB = outcomeRank(b.p) === 2 ? b.p.away_pred : b.p.home_pred;
+        if (keyB !== keyA) return keyB - keyA;
+        const offA = outcomeRank(a.p) === 2 ? a.p.home_pred : a.p.away_pred;
+        const offB = outcomeRank(b.p) === 2 ? b.p.home_pred : b.p.away_pred;
+        if (offB !== offA) return offB - offA;
+      }
+      return (
+        Number(isFav(b.p.user?.id ?? "")) - Number(isFav(a.p.user?.id ?? "")) || a.i - b.i
+      );
+    });
 
   return (
     <ul className="divide-y divide-border border-t border-border bg-surface/60 px-1 py-1">
-      {rows.map(({ p, i }) => (
-        <li key={p.user?.id ?? i} className="flex items-center gap-2 px-2.5 py-1.5">
-          <Avatar src={p.user?.avatar_url} name={p.user?.display_name} size="xs" />
-          <span className="min-w-0 flex-1 truncate text-xs font-medium text-ink-800">
-            {p.user?.display_name ?? "—"}
-          </span>
-          {onStar && p.user?.id && p.user.id !== myId && (
-            <FavStar on={isFav(p.user.id)} onClick={() => onStar(p.user!.id)} />
-          )}
-          <span className="text-xs font-bold tabular-nums text-ink-600">
-            {p.home_pred} × {p.away_pred}
-          </span>
-          {finished && p.score_type && <ScorePill type={p.score_type} />}
-        </li>
-      ))}
+      {rows.map(({ p, i }) => {
+        const t = rowType(p);
+        return (
+          <li key={p.user?.id ?? i} className="flex items-center gap-2 px-2.5 py-1.5">
+            <Avatar src={p.user?.avatar_url} name={p.user?.display_name} size="xs" />
+            <span className="min-w-0 flex-1 truncate text-xs font-medium text-ink-800">
+              {p.user?.display_name ?? "—"}
+            </span>
+            {onStar && p.user?.id && p.user.id !== myId && (
+              <FavStar on={isFav(p.user.id)} onClick={() => onStar(p.user!.id)} />
+            )}
+            <span className="text-xs font-bold tabular-nums text-ink-600">
+              {p.home_pred} × {p.away_pred}
+            </span>
+            {finished && p.score_type && <ScorePill type={p.score_type} />}
+            {!finished && live && t && (
+              <span
+                className={cn("w-7 text-right text-xs font-bold tabular-nums", liveTextByType[t])}
+              >
+                {t === "erro" ? "0" : `+${SCORE_POINTS[t] * (p.is_joker ? 2 : 1)}`}
+              </span>
+            )}
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -627,9 +704,9 @@ function PredictStatus({
   const nudge = useNudge();
   const { data, isLoading } = useMatchPredictStatus(matchId, true);
 
-  if (isLoading)
+  if (isLoading || memberIds === null)
     return <div className="px-3 py-3 text-center text-xs text-ink-400">carregando…</div>;
-  const filtered = (data ?? []).filter((m) => !memberIds || memberIds.has(m.user_id));
+  const filtered = (data ?? []).filter((m) => memberIds.has(m.user_id));
   if (filtered.length === 0)
     return (
       <div className="px-3 py-3 text-center text-xs text-ink-400">

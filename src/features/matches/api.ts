@@ -243,6 +243,7 @@ export type MatchPrediction = {
   away_pred: number;
   score_type: import("@/lib/types").ScoreType | null;
   points: number | null;
+  is_joker: boolean | null;
   user: { id: string; display_name: string; avatar_url: string | null } | null;
 };
 
@@ -255,7 +256,7 @@ export function useMatchPredictions(matchId: string, enabled: boolean) {
       const { data, error } = await supabase
         .from("predictions")
         .select(
-          "home_pred, away_pred, score_type, points, user:profiles!predictions_user_id_fkey(id, display_name, avatar_url)",
+          "home_pred, away_pred, score_type, points, is_joker, user:profiles!predictions_user_id_fkey(id, display_name, avatar_url)",
         )
         .eq("match_id", matchId)
         .order("points", { ascending: false, nullsFirst: false });
