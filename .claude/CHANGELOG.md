@@ -26,6 +26,13 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   declaradas **antes** do `dayMatches` que elas leem; o hotfix anterior tirou o `useMemo` e deixou
   2 avisos de deps. Agora o bloco de share vem **depois** da declaração e o `useMemo` voltou —
   lint zerou no arquivo (sobrou só o aviso de complexidade do backlog).
+- **Abas do grupo não quebram mais no mobile (aba Gestão).** Com 4 abas, o `SegmentedControl`
+  estourava a largura da tela em celulares. Agora o conteúdo **rola lateralmente DENTRO da
+  pílula** (labels nunca quebram linha) com o **degradê do `ScrollRow`** na cor da pílula
+  avisando que tem mais aba pra arrastar — mesmo padrão das fileiras de Jogos (regra 9). O
+  `ScrollRow` ganhou a prop `fadeClassName` pra usar o fade fora do fundo da página. Vale pros
+  9 usos do componente (Retrô, Nova Liga, admin etc.): quando as opções cabem, nada muda
+  (continuam esticando); quando não cabem, rola em vez de quebrar.
 - **Link de convite pra quem já é de casa.** Quem abre um link `?convite=` e **já concluiu** o
   1º acesso vai direto pra **/grupos com o código preenchido** (só na visita do clique — flag de
   sessão consumida; visitas normais seguem nos Jogos). Quem ainda não concluiu continua caindo no
