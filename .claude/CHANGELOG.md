@@ -31,6 +31,16 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   decisivo, depois do outro. Encerrado ordena pela mesma régua (pontuação oficial).
 
 ### Corrigido
+- **Sync: sigla (TLA) deixou de ser chave de matching de time — "Camboja 2×0 Hong Kong" não vira
+  mais "Atlético-MG 2×0 Hong Kong".** O gerador do mapa canônico (`gen-teams-catalog.mjs`)
+  indexava também o TLA de cada time; a abreviação da ESPN pra países sem cadastro colidia com
+  sigla de clube e o sync gravava o clube no lugar da seleção (auditoria: Camboja→Atlético-MG e
+  Comores→Como **já em prod** nos amistosos pré-Copa; Grécia→Grêmio, Botswana→Botafogo e
+  Bahamas→Bahia eram minas armadas). Agora só slug/nome/short/aliases viram chave (sigla fica
+  para os fallbacks `TEAM_PT`/`COUNTRY_EN_PT` do sync) e **Camboja, Comores e Grécia** entraram
+  no registro como seleções (Grécia casou o `grecia.svg` que já existia). Auditoria pós-fix:
+  182 seleções da ESPN, zero caem em clube; nenhuma chave existente mudou de dono. Migration
+  `20260611150000` corrige os dados já gravados (2 times + 3 jogos; placar/pontuação intactos).
 - **Imagem de palpites: selo da pontuação alinhado e raio visível na cravada.** O ⚡ era um emoji
   no canvas: métrica própria desalinhava/"quebrava" a linha do selo e, amarelo sobre o fundo
   dourado da cravada, ele sumia. Agora o raio do 2× é **desenhado** (polígono) na mesma baseline

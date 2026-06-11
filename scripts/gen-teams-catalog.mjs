@@ -81,6 +81,9 @@ for (const out of OUTS) {
 // exact: slug completo (sem remoção de sufixo) → tradução; loose: normName (com
 // remoção de fc/ec/atletico…, igual ao sync) — chaves ambíguas ficam FORA do
 // loose (reportadas) pra nunca traduzir errado.
+// TLA NÃO vira chave: a sigla de 3 letras colide entre clube e país na ESPN
+// (CAM = Camboja, não Atlético-MG; COM/GRE/BOT/BAH idem). Sigla só serve aos
+// fallbacks TEAM_PT/COUNTRY_EN_PT do sync, depois que o canônico não casou.
 const syncNorm = (s) =>
   (s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
     .replace(/\b(fc|ec|sc|cf|ac|afc|cd|clube|futebol|esporte|atletico)\b/g, "")
@@ -88,7 +91,7 @@ const syncNorm = (s) =>
 const exact = {}; const looseRaw = new Map(); const ambiguous = new Set();
 for (const t of catalog) {
   const entry = { name: t.name_pt, short: t.short_pt ?? t.name_pt, crest: t.crest_file ? "/teams/" + t.crest_file : null };
-  for (const cand of [t.slug, t.name_pt, t.short_pt, t.tla, ...(t.aliases ?? [])]) {
+  for (const cand of [t.slug, t.name_pt, t.short_pt, ...(t.aliases ?? [])]) {
     const ke = slug(cand); if (ke && !(ke in exact)) exact[ke] = entry;
     const kl = syncNorm(cand);
     if (!kl) continue;

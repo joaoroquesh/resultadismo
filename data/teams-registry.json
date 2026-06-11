@@ -1218,6 +1218,22 @@
     "crest_source": "repo (public/teams)"
   },
   {
+    "slug": "camboja",
+    "name_pt": "Camboja",
+    "short_pt": "Camboja",
+    "tla": "CAM",
+    "country": "Camboja",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Cambodia"
+    ],
+    "crest_file": null,
+    "crest_source": null
+  },
+  {
     "slug": "canada",
     "name_pt": "Canadá",
     "short_pt": "Canadá",
@@ -1504,6 +1520,22 @@
     ],
     "crest_file": "como.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "comores",
+    "name_pt": "Comores",
+    "short_pt": "Comores",
+    "tla": "COM",
+    "country": "Comores",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Comoros"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "confianca",
@@ -2355,6 +2387,22 @@
     ],
     "crest_file": "goias.png",
     "crest_source": "repo (public/teams)"
+  },
+  {
+    "slug": "grecia",
+    "name_pt": "Grécia",
+    "short_pt": "Grécia",
+    "tla": "GRE",
+    "country": "Grécia",
+    "kind": "national",
+    "competitions": [
+      "fifa.friendly"
+    ],
+    "aliases": [
+      "Greece"
+    ],
+    "crest_file": null,
+    "crest_source": null
   },
   {
     "slug": "gremio",

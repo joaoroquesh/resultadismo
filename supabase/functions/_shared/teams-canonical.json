@@ -25,11 +25,6 @@
    "short": "Á. do Sul",
    "crest": "/teams/africadosul.svg"
   },
-  "rsa": {
-   "name": "África do Sul",
-   "short": "Á. do Sul",
-   "crest": "/teams/africadosul.svg"
-  },
   "southafrica": {
    "name": "África do Sul",
    "short": "Á. do Sul",
@@ -51,11 +46,6 @@
    "crest": "/teams/aguiademaraba.png"
   },
   "ajax": {
-   "name": "Ajax",
-   "short": "Ajax",
-   "crest": "/teams/ajax.png"
-  },
-  "aja": {
    "name": "Ajax",
    "short": "Ajax",
    "crest": "/teams/ajax.png"
@@ -110,11 +100,6 @@
    "short": "Alavés",
    "crest": "/teams/alaves.png"
   },
-  "ala": {
-   "name": "Alavés",
-   "short": "Alavés",
-   "crest": "/teams/alaves.png"
-  },
   "deportivoalaves": {
    "name": "Alavés",
    "short": "Alavés",
@@ -125,17 +110,7 @@
    "short": "Albânia",
    "crest": "/teams/albania.png"
   },
-  "alb": {
-   "name": "Albânia",
-   "short": "Albânia",
-   "crest": "/teams/albania.png"
-  },
   "alemanha": {
-   "name": "Alemanha",
-   "short": "Alemanha",
-   "crest": "/teams/alemanha.png"
-  },
-  "ger": {
    "name": "Alemanha",
    "short": "Alemanha",
    "crest": "/teams/alemanha.png"
@@ -240,11 +215,6 @@
    "short": "América-MG",
    "crest": "/teams/americamg.png"
   },
-  "ame": {
-   "name": "América-MG",
-   "short": "América-MG",
-   "crest": "/teams/americamg.png"
-  },
   "americamineiro": {
    "name": "América-MG",
    "short": "América-MG",
@@ -256,11 +226,6 @@
    "crest": "/teams/americarn.png"
   },
   "andorra": {
-   "name": "Andorra",
-   "short": "Andorra",
-   "crest": "/teams/andorra.png"
-  },
-  "and": {
    "name": "Andorra",
    "short": "Andorra",
    "crest": "/teams/andorra.png"
@@ -285,22 +250,12 @@
    "short": "Arábia S.",
    "crest": "/teams/arabiasaudita.svg"
   },
-  "ksa": {
-   "name": "Arábia Saudita",
-   "short": "Arábia S.",
-   "crest": "/teams/arabiasaudita.svg"
-  },
   "saudiarabia": {
    "name": "Arábia Saudita",
    "short": "Arábia S.",
    "crest": "/teams/arabiasaudita.svg"
   },
   "argelia": {
-   "name": "Argélia",
-   "short": "Argélia",
-   "crest": "/teams/argelia.svg"
-  },
-  "alg": {
    "name": "Argélia",
    "short": "Argélia",
    "crest": "/teams/argelia.svg"
@@ -315,17 +270,7 @@
    "short": "Argentina",
    "crest": "/teams/argentina.png"
   },
-  "arg": {
-   "name": "Argentina",
-   "short": "Argentina",
-   "crest": "/teams/argentina.png"
-  },
   "arsenal": {
-   "name": "Arsenal",
-   "short": "Arsenal",
-   "crest": "/teams/arsenal.png"
-  },
-  "ars": {
    "name": "Arsenal",
    "short": "Arsenal",
    "crest": "/teams/arsenal.png"
@@ -340,17 +285,7 @@
    "short": "Aston Villa",
    "crest": "/teams/astonvilla.png"
   },
-  "avl": {
-   "name": "Aston Villa",
-   "short": "Aston Villa",
-   "crest": "/teams/astonvilla.png"
-  },
   "atalanta": {
-   "name": "Atalanta",
-   "short": "Atalanta",
-   "crest": "/teams/atalanta.png"
-  },
-  "ata": {
    "name": "Atalanta",
    "short": "Atalanta",
    "crest": "/teams/atalanta.png"
@@ -370,22 +305,12 @@
    "short": "Athletic",
    "crest": "/teams/athleticbilbao.png"
   },
-  "ath": {
-   "name": "Athletic Bilbao",
-   "short": "Athletic",
-   "crest": "/teams/athleticbilbao.png"
-  },
   "athleticclub": {
    "name": "Athletic Bilbao",
    "short": "Athletic",
    "crest": "/teams/athleticbilbao.png"
   },
   "athleticopr": {
-   "name": "Athletico-PR",
-   "short": "Athletico-PR",
-   "crest": "/teams/athleticopr.png"
-  },
-  "cap": {
    "name": "Athletico-PR",
    "short": "Athletico-PR",
    "crest": "/teams/athleticopr.png"
@@ -401,11 +326,6 @@
    "crest": "/teams/athleticopr.png"
   },
   "atleticogo": {
-   "name": "Atlético-GO",
-   "short": "Atlético-GO",
-   "crest": "/teams/atleticogo.png"
-  },
-  "acg": {
    "name": "Atlético-GO",
    "short": "Atlético-GO",
    "crest": "/teams/atleticogo.png"
@@ -435,22 +355,12 @@
    "short": "Atlético",
    "crest": "/teams/atleticomadrid.png"
   },
-  "atm": {
-   "name": "Atlético de Madrid",
-   "short": "Atlético",
-   "crest": "/teams/atleticomadrid.png"
-  },
   "atleti": {
    "name": "Atlético de Madrid",
    "short": "Atlético",
    "crest": "/teams/atleticomadrid.png"
   },
   "atleticomg": {
-   "name": "Atlético-MG",
-   "short": "Atlético-MG",
-   "crest": "/teams/atleticomg.png"
-  },
-  "cam": {
    "name": "Atlético-MG",
    "short": "Atlético-MG",
    "crest": "/teams/atleticomg.png"
@@ -490,11 +400,6 @@
    "short": "Augsburg",
    "crest": "/teams/augsburg.png"
   },
-  "fca": {
-   "name": "Augsburg",
-   "short": "Augsburg",
-   "crest": "/teams/augsburg.png"
-  },
   "fcaugsburg": {
    "name": "Augsburg",
    "short": "Augsburg",
@@ -505,22 +410,12 @@
    "short": "Austrália",
    "crest": "/teams/australia.svg"
   },
-  "aus": {
-   "name": "Austrália",
-   "short": "Austrália",
-   "crest": "/teams/australia.svg"
-  },
   "socceroos": {
    "name": "Austrália",
    "short": "Austrália",
    "crest": "/teams/australia.svg"
   },
   "austria": {
-   "name": "Áustria",
-   "short": "Áustria",
-   "crest": "/teams/austria.svg"
-  },
-  "aut": {
    "name": "Áustria",
    "short": "Áustria",
    "crest": "/teams/austria.svg"
@@ -545,11 +440,6 @@
    "short": "Bahia",
    "crest": "/teams/bahia.png"
   },
-  "bah": {
-   "name": "Bahia",
-   "short": "Bahia",
-   "crest": "/teams/bahia.png"
-  },
   "ecbahia": {
    "name": "Bahia",
    "short": "Bahia",
@@ -566,11 +456,6 @@
    "crest": "/teams/banfield.png"
   },
   "barcelona": {
-   "name": "Barcelona",
-   "short": "Barcelona",
-   "crest": "/teams/barcelona.png"
-  },
-  "bar": {
    "name": "Barcelona",
    "short": "Barcelona",
    "crest": "/teams/barcelona.png"
@@ -620,11 +505,6 @@
    "short": "Bayern",
    "crest": "/teams/bayern.png"
   },
-  "fcb": {
-   "name": "Bayern de Munique",
-   "short": "Bayern",
-   "crest": "/teams/bayern.png"
-  },
   "bayernmunich": {
    "name": "Bayern de Munique",
    "short": "Bayern",
@@ -640,22 +520,12 @@
    "short": "Bélgica",
    "crest": "/teams/belgica.png"
   },
-  "bel": {
-   "name": "Bélgica",
-   "short": "Bélgica",
-   "crest": "/teams/belgica.png"
-  },
   "belgium": {
    "name": "Bélgica",
    "short": "Bélgica",
    "crest": "/teams/belgica.png"
   },
   "benfica": {
-   "name": "Benfica",
-   "short": "Benfica",
-   "crest": "/teams/benfica.png"
-  },
-  "slb": {
    "name": "Benfica",
    "short": "Benfica",
    "crest": "/teams/benfica.png"
@@ -681,11 +551,6 @@
    "crest": "/teams/bocajuniors.png"
   },
   "boca": {
-   "name": "Boca Juniors",
-   "short": "Boca",
-   "crest": "/teams/bocajuniors.png"
-  },
-  "boc": {
    "name": "Boca Juniors",
    "short": "Boca",
    "crest": "/teams/bocajuniors.png"
@@ -735,11 +600,6 @@
    "short": "Bolívia",
    "crest": "/teams/bolivia.png"
   },
-  "bol": {
-   "name": "Bolívia",
-   "short": "Bolívia",
-   "crest": "/teams/bolivia.png"
-  },
   "bologna": {
    "name": "Bologna",
    "short": "Bologna",
@@ -760,11 +620,6 @@
    "short": "Bósnia",
    "crest": "/teams/bosniaeherzegovina.svg"
   },
-  "bih": {
-   "name": "Bósnia e Herzegovina",
-   "short": "Bósnia",
-   "crest": "/teams/bosniaeherzegovina.svg"
-  },
   "bosniaandherzegovina": {
    "name": "Bósnia e Herzegovina",
    "short": "Bósnia",
@@ -776,11 +631,6 @@
    "crest": "/teams/bosniaeherzegovina.svg"
   },
   "botafogo": {
-   "name": "Botafogo",
-   "short": "Botafogo",
-   "crest": "/teams/botafogo.png"
-  },
-  "bot": {
    "name": "Botafogo",
    "short": "Botafogo",
    "crest": "/teams/botafogo.png"
@@ -810,22 +660,12 @@
    "short": "Bournemouth",
    "crest": "/teams/bournemouth.png"
   },
-  "bou": {
-   "name": "Bournemouth",
-   "short": "Bournemouth",
-   "crest": "/teams/bournemouth.png"
-  },
   "afcbournemouth": {
    "name": "Bournemouth",
    "short": "Bournemouth",
    "crest": "/teams/bournemouth.png"
   },
   "braga": {
-   "name": "Braga",
-   "short": "Braga",
-   "crest": "/teams/braga.png"
-  },
-  "scb": {
    "name": "Braga",
    "short": "Braga",
    "crest": "/teams/braga.png"
@@ -845,11 +685,6 @@
    "short": "Brasil",
    "crest": "/teams/brasil.png"
   },
-  "bra": {
-   "name": "Brasil",
-   "short": "Brasil",
-   "crest": "/teams/brasil.png"
-  },
   "brazil": {
    "name": "Brasil",
    "short": "Brasil",
@@ -865,17 +700,7 @@
    "short": "Bremen",
    "crest": "/teams/bremen.png"
   },
-  "svw": {
-   "name": "Werder Bremen",
-   "short": "Bremen",
-   "crest": "/teams/bremen.png"
-  },
   "brentford": {
-   "name": "Brentford",
-   "short": "Brentford",
-   "crest": "/teams/brentford.png"
-  },
-  "bre": {
    "name": "Brentford",
    "short": "Brentford",
    "crest": "/teams/brentford.png"
@@ -886,11 +711,6 @@
    "crest": "/teams/brentford.png"
   },
   "brighton": {
-   "name": "Brighton",
-   "short": "Brighton",
-   "crest": "/teams/brighton.png"
-  },
-  "bha": {
    "name": "Brighton",
    "short": "Brighton",
    "crest": "/teams/brighton.png"
@@ -925,22 +745,12 @@
    "short": "Burnley",
    "crest": "/teams/burnley.png"
   },
-  "bur": {
-   "name": "Burnley",
-   "short": "Burnley",
-   "crest": "/teams/burnley.png"
-  },
   "burnleyfc": {
    "name": "Burnley",
    "short": "Burnley",
    "crest": "/teams/burnley.png"
   },
   "caboverde": {
-   "name": "Cabo Verde",
-   "short": "Cabo Verde",
-   "crest": "/teams/caboverde.svg"
-  },
-  "cpv": {
    "name": "Cabo Verde",
    "short": "Cabo Verde",
    "crest": "/teams/caboverde.svg"
@@ -955,22 +765,22 @@
    "short": "Cagliari",
    "crest": "/teams/cagliari.png"
   },
-  "cag": {
-   "name": "Cagliari",
-   "short": "Cagliari",
-   "crest": "/teams/cagliari.png"
-  },
   "cagliaricalcio": {
    "name": "Cagliari",
    "short": "Cagliari",
    "crest": "/teams/cagliari.png"
   },
-  "canada": {
-   "name": "Canadá",
-   "short": "Canadá",
-   "crest": "/teams/canada.svg"
+  "camboja": {
+   "name": "Camboja",
+   "short": "Camboja",
+   "crest": null
   },
-  "can": {
+  "cambodia": {
+   "name": "Camboja",
+   "short": "Camboja",
+   "crest": null
+  },
+  "canada": {
    "name": "Canadá",
    "short": "Canadá",
    "crest": "/teams/canada.svg"
@@ -1015,22 +825,12 @@
    "short": "Catar",
    "crest": "/teams/catar.svg"
   },
-  "qat": {
-   "name": "Catar",
-   "short": "Catar",
-   "crest": "/teams/catar.svg"
-  },
   "qatar": {
    "name": "Catar",
    "short": "Catar",
    "crest": "/teams/catar.svg"
   },
   "ceara": {
-   "name": "Ceará",
-   "short": "Ceará",
-   "crest": "/teams/ceara.png"
-  },
-  "cea": {
    "name": "Ceará",
    "short": "Ceará",
    "crest": "/teams/ceara.png"
@@ -1046,11 +846,6 @@
    "crest": "/teams/celta.png"
   },
   "celtadevigo": {
-   "name": "Celta de Vigo",
-   "short": "Celta",
-   "crest": "/teams/celta.png"
-  },
-  "cel": {
    "name": "Celta de Vigo",
    "short": "Celta",
    "crest": "/teams/celta.png"
@@ -1095,11 +890,6 @@
    "short": "Chapecoense",
    "crest": "/teams/chapecoense.png"
   },
-  "cha": {
-   "name": "Chapecoense",
-   "short": "Chapecoense",
-   "crest": "/teams/chapecoense.png"
-  },
   "chapecoenseaf": {
    "name": "Chapecoense",
    "short": "Chapecoense",
@@ -1110,22 +900,12 @@
    "short": "Chelsea",
    "crest": "/teams/chelsea.png"
   },
-  "che": {
-   "name": "Chelsea",
-   "short": "Chelsea",
-   "crest": "/teams/chelsea.png"
-  },
   "chelseafc": {
    "name": "Chelsea",
    "short": "Chelsea",
    "crest": "/teams/chelsea.png"
   },
   "chile": {
-   "name": "Chile",
-   "short": "Chile",
-   "crest": "/teams/chile.png"
-  },
-  "chi": {
    "name": "Chile",
    "short": "Chile",
    "crest": "/teams/chile.png"
@@ -1145,17 +925,7 @@
    "short": "Colômbia",
    "crest": "/teams/colombia.png"
   },
-  "col": {
-   "name": "Colômbia",
-   "short": "Colômbia",
-   "crest": "/teams/colombia.png"
-  },
   "como": {
-   "name": "Como",
-   "short": "Como",
-   "crest": "/teams/como.png"
-  },
-  "com": {
    "name": "Como",
    "short": "Como",
    "crest": "/teams/como.png"
@@ -1164,6 +934,16 @@
    "name": "Como",
    "short": "Como",
    "crest": "/teams/como.png"
+  },
+  "comores": {
+   "name": "Comores",
+   "short": "Comores",
+   "crest": null
+  },
+  "comoros": {
+   "name": "Comores",
+   "short": "Comores",
+   "crest": null
   },
   "confianca": {
    "name": "Confiança",
@@ -1176,11 +956,6 @@
    "crest": "/teams/confianca.png"
   },
   "congord": {
-   "name": "Congo (RD)",
-   "short": "Congo RD",
-   "crest": "/teams/congord.svg"
-  },
-  "cod": {
    "name": "Congo (RD)",
    "short": "Congo RD",
    "crest": "/teams/congord.svg"
@@ -1215,11 +990,6 @@
    "short": "Coreia",
    "crest": "/teams/coreiadosul.svg"
   },
-  "kor": {
-   "name": "Coreia do Sul",
-   "short": "Coreia",
-   "crest": "/teams/coreiadosul.svg"
-  },
   "southkorea": {
    "name": "Coreia do Sul",
    "short": "Coreia",
@@ -1235,22 +1005,12 @@
    "short": "Corinthians",
    "crest": "/teams/corinthians.png"
   },
-  "cor": {
-   "name": "Corinthians",
-   "short": "Corinthians",
-   "crest": "/teams/corinthians.png"
-  },
   "sccorinthians": {
    "name": "Corinthians",
    "short": "Corinthians",
    "crest": "/teams/corinthians.png"
   },
   "coritiba": {
-   "name": "Coritiba",
-   "short": "Coritiba",
-   "crest": "/teams/coritiba.png"
-  },
-  "cfc": {
    "name": "Coritiba",
    "short": "Coritiba",
    "crest": "/teams/coritiba.png"
@@ -1266,11 +1026,6 @@
    "crest": "/teams/costadomarfim.svg"
   },
   "cmarfim": {
-   "name": "Costa do Marfim",
-   "short": "C. Marfim",
-   "crest": "/teams/costadomarfim.svg"
-  },
-  "civ": {
    "name": "Costa do Marfim",
    "short": "C. Marfim",
    "crest": "/teams/costadomarfim.svg"
@@ -1300,22 +1055,12 @@
    "short": "Criciúma",
    "crest": "/teams/criciuma.png"
   },
-  "cri": {
-   "name": "Criciúma",
-   "short": "Criciúma",
-   "crest": "/teams/criciuma.png"
-  },
   "criciumaec": {
    "name": "Criciúma",
    "short": "Criciúma",
    "crest": "/teams/criciuma.png"
   },
   "croacia": {
-   "name": "Croácia",
-   "short": "Croácia",
-   "crest": "/teams/croacia.png"
-  },
-  "cro": {
    "name": "Croácia",
    "short": "Croácia",
    "crest": "/teams/croacia.png"
@@ -1340,22 +1085,12 @@
    "short": "Cruzeiro",
    "crest": "/teams/cruzeiro.png"
   },
-  "cru": {
-   "name": "Cruzeiro",
-   "short": "Cruzeiro",
-   "crest": "/teams/cruzeiro.png"
-  },
   "cruzeiroec": {
    "name": "Cruzeiro",
    "short": "Cruzeiro",
    "crest": "/teams/cruzeiro.png"
   },
   "crystalpalace": {
-   "name": "Crystal Palace",
-   "short": "Crystal Palace",
-   "crest": "/teams/crystalpalace.png"
-  },
-  "cry": {
    "name": "Crystal Palace",
    "short": "Crystal Palace",
    "crest": "/teams/crystalpalace.png"
@@ -1375,22 +1110,12 @@
    "short": "Cuiabá",
    "crest": "/teams/cuiaba.png"
   },
-  "cui": {
-   "name": "Cuiabá",
-   "short": "Cuiabá",
-   "crest": "/teams/cuiaba.png"
-  },
   "cuiabaec": {
    "name": "Cuiabá",
    "short": "Cuiabá",
    "crest": "/teams/cuiaba.png"
   },
   "curacao": {
-   "name": "Curaçao",
-   "short": "Curaçao",
-   "crest": "/teams/curacao.svg"
-  },
-  "cuw": {
    "name": "Curaçao",
    "short": "Curaçao",
    "crest": "/teams/curacao.svg"
@@ -1421,11 +1146,6 @@
    "crest": "/teams/deptachira.png"
   },
   "dinamarca": {
-   "name": "Dinamarca",
-   "short": "Dinamarca",
-   "crest": "/teams/dinamarca.png"
-  },
-  "den": {
    "name": "Dinamarca",
    "short": "Dinamarca",
    "crest": "/teams/dinamarca.png"
@@ -1470,22 +1190,12 @@
    "short": "Egito",
    "crest": "/teams/egito.svg"
   },
-  "egy": {
-   "name": "Egito",
-   "short": "Egito",
-   "crest": "/teams/egito.svg"
-  },
   "egypt": {
    "name": "Egito",
    "short": "Egito",
    "crest": "/teams/egito.svg"
   },
   "empoli": {
-   "name": "Empoli",
-   "short": "Empoli",
-   "crest": "/teams/empoli.png"
-  },
-  "emp": {
    "name": "Empoli",
    "short": "Empoli",
    "crest": "/teams/empoli.png"
@@ -1500,11 +1210,6 @@
    "short": "Equador",
    "crest": "/teams/equador.png"
   },
-  "ecu": {
-   "name": "Equador",
-   "short": "Equador",
-   "crest": "/teams/equador.png"
-  },
   "ecuador": {
    "name": "Equador",
    "short": "Equador",
@@ -1515,22 +1220,12 @@
    "short": "Escócia",
    "crest": "/teams/escocia.svg"
   },
-  "sco": {
-   "name": "Escócia",
-   "short": "Escócia",
-   "crest": "/teams/escocia.svg"
-  },
   "scotland": {
    "name": "Escócia",
    "short": "Escócia",
    "crest": "/teams/escocia.svg"
   },
   "espanha": {
-   "name": "Espanha",
-   "short": "Espanha",
-   "crest": "/teams/espanha.png"
-  },
-  "esp": {
    "name": "Espanha",
    "short": "Espanha",
    "crest": "/teams/espanha.png"
@@ -1590,12 +1285,12 @@
    "short": "EUA",
    "crest": "/teams/eua.png"
   },
-  "usa": {
+  "unitedstates": {
    "name": "Estados Unidos",
    "short": "EUA",
    "crest": "/teams/eua.png"
   },
-  "unitedstates": {
+  "usa": {
    "name": "Estados Unidos",
    "short": "EUA",
    "crest": "/teams/eua.png"
@@ -1606,11 +1301,6 @@
    "crest": "/teams/eua.png"
   },
   "everton": {
-   "name": "Everton",
-   "short": "Everton",
-   "crest": "/teams/everton.png"
-  },
-  "eve": {
    "name": "Everton",
    "short": "Everton",
    "crest": "/teams/everton.png"
@@ -1645,11 +1335,6 @@
    "short": "Finlândia",
    "crest": "/teams/finlandia.png"
   },
-  "fin": {
-   "name": "Finlândia",
-   "short": "Finlândia",
-   "crest": "/teams/finlandia.png"
-  },
   "finland": {
    "name": "Finlândia",
    "short": "Finlândia",
@@ -1665,11 +1350,6 @@
    "short": "Fiorentina",
    "crest": "/teams/fiorentina.png"
   },
-  "fio": {
-   "name": "Fiorentina",
-   "short": "Fiorentina",
-   "crest": "/teams/fiorentina.png"
-  },
   "acffiorentina": {
    "name": "Fiorentina",
    "short": "Fiorentina",
@@ -1680,22 +1360,12 @@
    "short": "Flamengo",
    "crest": "/teams/flamengo.png"
   },
-  "fla": {
-   "name": "Flamengo",
-   "short": "Flamengo",
-   "crest": "/teams/flamengo.png"
-  },
   "crflamengo": {
    "name": "Flamengo",
    "short": "Flamengo",
    "crest": "/teams/flamengo.png"
   },
   "fluminense": {
-   "name": "Fluminense",
-   "short": "Fluminense",
-   "crest": "/teams/fluminense.png"
-  },
-  "flu": {
    "name": "Fluminense",
    "short": "Fluminense",
    "crest": "/teams/fluminense.png"
@@ -1720,17 +1390,7 @@
    "short": "Nottm Forest",
    "crest": "/teams/forest.png"
   },
-  "nfo": {
-   "name": "Nottingham Forest",
-   "short": "Nottm Forest",
-   "crest": "/teams/forest.png"
-  },
   "fortaleza": {
-   "name": "Fortaleza",
-   "short": "Fortaleza",
-   "crest": "/teams/fortaleza.png"
-  },
-  "for": {
    "name": "Fortaleza",
    "short": "Fortaleza",
    "crest": "/teams/fortaleza.png"
@@ -1741,11 +1401,6 @@
    "crest": "/teams/fortaleza.png"
   },
   "franca": {
-   "name": "França",
-   "short": "França",
-   "crest": "/teams/franca.png"
-  },
-  "fra": {
    "name": "França",
    "short": "França",
    "crest": "/teams/franca.png"
@@ -1765,17 +1420,7 @@
    "short": "Frankfurt",
    "crest": "/teams/frankfurt.png"
   },
-  "sge": {
-   "name": "Eintracht Frankfurt",
-   "short": "Frankfurt",
-   "crest": "/teams/frankfurt.png"
-  },
   "freiburg": {
-   "name": "Freiburg",
-   "short": "Freiburg",
-   "crest": "/teams/freiburg.png"
-  },
-  "scf": {
    "name": "Freiburg",
    "short": "Freiburg",
    "crest": "/teams/freiburg.png"
@@ -1790,22 +1435,12 @@
    "short": "Fulham",
    "crest": "/teams/fulham.png"
   },
-  "ful": {
-   "name": "Fulham",
-   "short": "Fulham",
-   "crest": "/teams/fulham.png"
-  },
   "fulhamfc": {
    "name": "Fulham",
    "short": "Fulham",
    "crest": "/teams/fulham.png"
   },
   "gana": {
-   "name": "Gana",
-   "short": "Gana",
-   "crest": "/teams/gana.svg"
-  },
-  "gha": {
    "name": "Gana",
    "short": "Gana",
    "crest": "/teams/gana.svg"
@@ -1820,22 +1455,12 @@
    "short": "Genoa",
    "crest": "/teams/genoa.png"
   },
-  "gen": {
-   "name": "Genoa",
-   "short": "Genoa",
-   "crest": "/teams/genoa.png"
-  },
   "genoacfc": {
    "name": "Genoa",
    "short": "Genoa",
    "crest": "/teams/genoa.png"
   },
   "getafe": {
-   "name": "Getafe",
-   "short": "Getafe",
-   "crest": "/teams/getafe.png"
-  },
-  "get": {
    "name": "Getafe",
    "short": "Getafe",
    "crest": "/teams/getafe.png"
@@ -1850,17 +1475,7 @@
    "short": "Gibraltar",
    "crest": "/teams/gibraltar.png"
   },
-  "gib": {
-   "name": "Gibraltar",
-   "short": "Gibraltar",
-   "crest": "/teams/gibraltar.png"
-  },
   "girona": {
-   "name": "Girona",
-   "short": "Girona",
-   "crest": "/teams/girona.png"
-  },
-  "gir": {
    "name": "Girona",
    "short": "Girona",
    "crest": "/teams/girona.png"
@@ -1880,22 +1495,22 @@
    "short": "Goiás",
    "crest": "/teams/goias.png"
   },
-  "goi": {
-   "name": "Goiás",
-   "short": "Goiás",
-   "crest": "/teams/goias.png"
-  },
   "goiasec": {
    "name": "Goiás",
    "short": "Goiás",
    "crest": "/teams/goias.png"
   },
-  "gremio": {
-   "name": "Grêmio",
-   "short": "Grêmio",
-   "crest": "/teams/gremio.png"
+  "grecia": {
+   "name": "Grécia",
+   "short": "Grécia",
+   "crest": "/teams/grecia.svg"
   },
-  "gre": {
+  "greece": {
+   "name": "Grécia",
+   "short": "Grécia",
+   "crest": "/teams/grecia.svg"
+  },
+  "gremio": {
    "name": "Grêmio",
    "short": "Grêmio",
    "crest": "/teams/gremio.png"
@@ -1915,11 +1530,6 @@
    "short": "Haiti",
    "crest": "/teams/haiti.svg"
   },
-  "hai": {
-   "name": "Haiti",
-   "short": "Haiti",
-   "crest": "/teams/haiti.svg"
-  },
   "heidenheim": {
    "name": "Heidenheim",
    "short": "Heidenheim",
@@ -1935,22 +1545,12 @@
    "short": "Hoffenheim",
    "crest": "/teams/hoffenheim.png"
   },
-  "tsg": {
-   "name": "Hoffenheim",
-   "short": "Hoffenheim",
-   "crest": "/teams/hoffenheim.png"
-  },
   "tsghoffenheim": {
    "name": "Hoffenheim",
    "short": "Hoffenheim",
    "crest": "/teams/hoffenheim.png"
   },
   "holanda": {
-   "name": "Holanda",
-   "short": "Holanda",
-   "crest": "/teams/holanda.png"
-  },
-  "ned": {
    "name": "Holanda",
    "short": "Holanda",
    "crest": "/teams/holanda.png"
@@ -1990,11 +1590,6 @@
    "short": "Inglaterra",
    "crest": "/teams/inglaterra.png"
   },
-  "eng": {
-   "name": "Inglaterra",
-   "short": "Inglaterra",
-   "crest": "/teams/inglaterra.png"
-  },
   "england": {
    "name": "Inglaterra",
    "short": "Inglaterra",
@@ -2006,11 +1601,6 @@
    "crest": "/teams/inter.png"
   },
   "interdemilao": {
-   "name": "Inter de Milão",
-   "short": "Inter",
-   "crest": "/teams/inter.png"
-  },
-  "int": {
    "name": "Inter de Milão",
    "short": "Inter",
    "crest": "/teams/inter.png"
@@ -2060,11 +1650,6 @@
    "short": "Ipswich",
    "crest": "/teams/ipswich.png"
   },
-  "ips": {
-   "name": "Ipswich Town",
-   "short": "Ipswich",
-   "crest": "/teams/ipswich.png"
-  },
   "iquique": {
    "name": "Deportes Iquique",
    "short": "Iquique",
@@ -2076,11 +1661,6 @@
    "crest": "/teams/iquique.png"
   },
   "ira": {
-   "name": "Irã",
-   "short": "Irã",
-   "crest": "/teams/ira.svg"
-  },
-  "irn": {
    "name": "Irã",
    "short": "Irã",
    "crest": "/teams/ira.svg"
@@ -2100,11 +1680,6 @@
    "short": "Iraque",
    "crest": "/teams/iraque.svg"
   },
-  "irq": {
-   "name": "Iraque",
-   "short": "Iraque",
-   "crest": "/teams/iraque.svg"
-  },
   "iraq": {
    "name": "Iraque",
    "short": "Iraque",
@@ -2120,22 +1695,12 @@
    "short": "Irl. Norte",
    "crest": "/teams/irlandadonorte.png"
   },
-  "nir": {
-   "name": "Irlanda do Norte",
-   "short": "Irl. Norte",
-   "crest": "/teams/irlandadonorte.png"
-  },
   "northernireland": {
    "name": "Irlanda do Norte",
    "short": "Irl. Norte",
    "crest": "/teams/irlandadonorte.png"
   },
   "italia": {
-   "name": "Itália",
-   "short": "Itália",
-   "crest": "/teams/italia.png"
-  },
-  "ita": {
    "name": "Itália",
    "short": "Itália",
    "crest": "/teams/italia.png"
@@ -2150,22 +1715,12 @@
    "short": "Japão",
    "crest": "/teams/japao.svg"
   },
-  "jpn": {
-   "name": "Japão",
-   "short": "Japão",
-   "crest": "/teams/japao.svg"
-  },
   "japan": {
    "name": "Japão",
    "short": "Japão",
    "crest": "/teams/japao.svg"
   },
   "jordania": {
-   "name": "Jordânia",
-   "short": "Jordânia",
-   "crest": "/teams/jordania.svg"
-  },
-  "jor": {
    "name": "Jordânia",
    "short": "Jordânia",
    "crest": "/teams/jordania.svg"
@@ -2181,11 +1736,6 @@
    "crest": "/teams/juazeirense.png"
   },
   "juventude": {
-   "name": "Juventude",
-   "short": "Juventude",
-   "crest": "/teams/juventude.png"
-  },
-  "juv": {
    "name": "Juventude",
    "short": "Juventude",
    "crest": "/teams/juventude.png"
@@ -2255,22 +1805,12 @@
    "short": "Las Palmas",
    "crest": "/teams/laspalmas.png"
   },
-  "lpa": {
-   "name": "Las Palmas",
-   "short": "Las Palmas",
-   "crest": "/teams/laspalmas.png"
-  },
   "udlaspalmas": {
    "name": "Las Palmas",
    "short": "Las Palmas",
    "crest": "/teams/laspalmas.png"
   },
   "lazio": {
-   "name": "Lazio",
-   "short": "Lazio",
-   "crest": "/teams/lazio.png"
-  },
-  "laz": {
    "name": "Lazio",
    "short": "Lazio",
    "crest": "/teams/lazio.png"
@@ -2305,22 +1845,12 @@
    "short": "Lecce",
    "crest": "/teams/lecce.png"
   },
-  "lec": {
-   "name": "Lecce",
-   "short": "Lecce",
-   "crest": "/teams/lecce.png"
-  },
   "uslecce": {
    "name": "Lecce",
    "short": "Lecce",
    "crest": "/teams/lecce.png"
   },
   "leganes": {
-   "name": "Leganés",
-   "short": "Leganés",
-   "crest": "/teams/leganes.png"
-  },
-  "leg": {
    "name": "Leganés",
    "short": "Leganés",
    "crest": "/teams/leganes.png"
@@ -2340,17 +1870,7 @@
    "short": "Leicester",
    "crest": "/teams/leicester.png"
   },
-  "lei": {
-   "name": "Leicester City",
-   "short": "Leicester",
-   "crest": "/teams/leicester.png"
-  },
   "levante": {
-   "name": "Levante",
-   "short": "Levante",
-   "crest": "/teams/levante.png"
-  },
-  "lev": {
    "name": "Levante",
    "short": "Levante",
    "crest": "/teams/levante.png"
@@ -2370,11 +1890,6 @@
    "short": "Leverkusen",
    "crest": "/teams/leverkusen.png"
   },
-  "b04": {
-   "name": "Bayer Leverkusen",
-   "short": "Leverkusen",
-   "crest": "/teams/leverkusen.png"
-  },
   "libertad": {
    "name": "Libertad",
    "short": "Libertad",
@@ -2390,22 +1905,12 @@
    "short": "Lituânia",
    "crest": "/teams/lituania.png"
   },
-  "ltu": {
-   "name": "Lituânia",
-   "short": "Lituânia",
-   "crest": "/teams/lituania.png"
-  },
   "lithuania": {
    "name": "Lituânia",
    "short": "Lituânia",
    "crest": "/teams/lituania.png"
   },
   "liverpool": {
-   "name": "Liverpool",
-   "short": "Liverpool",
-   "crest": "/teams/liverpool.png"
-  },
-  "liv": {
    "name": "Liverpool",
    "short": "Liverpool",
    "crest": "/teams/liverpool.png"
@@ -2435,11 +1940,6 @@
    "short": "Macedônia",
    "crest": "/teams/macedonia.png"
   },
-  "mkd": {
-   "name": "Macedônia do Norte",
-   "short": "Macedônia",
-   "crest": "/teams/macedonia.png"
-  },
   "northmacedonia": {
    "name": "Macedônia do Norte",
    "short": "Macedônia",
@@ -2455,17 +1955,7 @@
    "short": "Mainz",
    "crest": "/teams/mainz.png"
   },
-  "m05": {
-   "name": "Mainz 05",
-   "short": "Mainz",
-   "crest": "/teams/mainz.png"
-  },
   "mallorca": {
-   "name": "Mallorca",
-   "short": "Mallorca",
-   "crest": "/teams/mallorca.png"
-  },
-  "mll": {
    "name": "Mallorca",
    "short": "Mallorca",
    "crest": "/teams/mallorca.png"
@@ -2476,11 +1966,6 @@
    "crest": "/teams/mallorca.png"
   },
   "malta": {
-   "name": "Malta",
-   "short": "Malta",
-   "crest": "/teams/malta.png"
-  },
-  "mlt": {
    "name": "Malta",
    "short": "Malta",
    "crest": "/teams/malta.png"
@@ -2510,22 +1995,12 @@
    "short": "Man City",
    "crest": "/teams/mancity.png"
   },
-  "mci": {
-   "name": "Manchester City",
-   "short": "Man City",
-   "crest": "/teams/mancity.png"
-  },
   "manunited": {
    "name": "Manchester United",
    "short": "Man United",
    "crest": "/teams/manunited.png"
   },
   "manchesterunited": {
-   "name": "Manchester United",
-   "short": "Man United",
-   "crest": "/teams/manunited.png"
-  },
-  "mun": {
    "name": "Manchester United",
    "short": "Man United",
    "crest": "/teams/manunited.png"
@@ -2565,11 +2040,6 @@
    "short": "Marrocos",
    "crest": "/teams/marrocos.svg"
   },
-  "mar": {
-   "name": "Marrocos",
-   "short": "Marrocos",
-   "crest": "/teams/marrocos.svg"
-  },
   "morocco": {
    "name": "Marrocos",
    "short": "Marrocos",
@@ -2590,22 +2060,12 @@
    "short": "México",
    "crest": "/teams/mexico.png"
   },
-  "mex": {
-   "name": "México",
-   "short": "México",
-   "crest": "/teams/mexico.png"
-  },
   "mgladbach": {
    "name": "Borussia M'gladbach",
    "short": "M'gladbach",
    "crest": "/teams/mgladbach.png"
   },
   "borussiamgladbach": {
-   "name": "Borussia M'gladbach",
-   "short": "M'gladbach",
-   "crest": "/teams/mgladbach.png"
-  },
-  "bmg": {
    "name": "Borussia M'gladbach",
    "short": "M'gladbach",
    "crest": "/teams/mgladbach.png"
@@ -2621,11 +2081,6 @@
    "crest": "/teams/mgladbach.png"
   },
   "milan": {
-   "name": "Milan",
-   "short": "Milan",
-   "crest": "/teams/milan.png"
-  },
-  "mil": {
    "name": "Milan",
    "short": "Milan",
    "crest": "/teams/milan.png"
@@ -2646,11 +2101,6 @@
    "crest": "/teams/mirassol.png"
   },
   "moldavia": {
-   "name": "Moldávia",
-   "short": "Moldávia",
-   "crest": "/teams/moldavia.png"
-  },
-  "mda": {
    "name": "Moldávia",
    "short": "Moldávia",
    "crest": "/teams/moldavia.png"
@@ -2676,11 +2126,6 @@
    "crest": "/teams/monterrey.png"
   },
   "monza": {
-   "name": "Monza",
-   "short": "Monza",
-   "crest": "/teams/monza.png"
-  },
-  "mon": {
    "name": "Monza",
    "short": "Monza",
    "crest": "/teams/monza.png"
@@ -2715,11 +2160,6 @@
    "short": "Napoli",
    "crest": "/teams/napoli.png"
   },
-  "nap": {
-   "name": "Napoli",
-   "short": "Napoli",
-   "crest": "/teams/napoli.png"
-  },
   "sscnapoli": {
    "name": "Napoli",
    "short": "Napoli",
@@ -2740,11 +2180,6 @@
    "short": "Newcastle",
    "crest": "/teams/newcastle.png"
   },
-  "new": {
-   "name": "Newcastle",
-   "short": "Newcastle",
-   "crest": "/teams/newcastle.png"
-  },
   "newcastleunited": {
    "name": "Newcastle",
    "short": "Newcastle",
@@ -2755,22 +2190,12 @@
    "short": "Nice",
    "crest": "/teams/nice.png"
   },
-  "nic": {
-   "name": "Nice",
-   "short": "Nice",
-   "crest": "/teams/nice.png"
-  },
   "ogcnice": {
    "name": "Nice",
    "short": "Nice",
    "crest": "/teams/nice.png"
   },
   "noruega": {
-   "name": "Noruega",
-   "short": "Noruega",
-   "crest": "/teams/noruega.png"
-  },
-  "nor": {
    "name": "Noruega",
    "short": "Noruega",
    "crest": "/teams/noruega.png"
@@ -2791,11 +2216,6 @@
    "crest": "/teams/novazelandia.svg"
   },
   "nzelandia": {
-   "name": "Nova Zelândia",
-   "short": "N. Zelândia",
-   "crest": "/teams/novazelandia.svg"
-  },
-  "nzl": {
    "name": "Nova Zelândia",
    "short": "N. Zelândia",
    "crest": "/teams/novazelandia.svg"
@@ -2865,11 +2285,6 @@
    "short": "Osasuna",
    "crest": "/teams/osasuna.png"
   },
-  "osa": {
-   "name": "Osasuna",
-   "short": "Osasuna",
-   "crest": "/teams/osasuna.png"
-  },
   "caosasuna": {
    "name": "Osasuna",
    "short": "Osasuna",
@@ -2895,11 +2310,6 @@
    "short": "Gales",
    "crest": "/teams/paisdegales.png"
   },
-  "wal": {
-   "name": "País de Gales",
-   "short": "Gales",
-   "crest": "/teams/paisdegales.png"
-  },
   "wales": {
    "name": "País de Gales",
    "short": "Gales",
@@ -2920,11 +2330,6 @@
    "short": "Palmeiras",
    "crest": "/teams/palmeiras.png"
   },
-  "pal": {
-   "name": "Palmeiras",
-   "short": "Palmeiras",
-   "crest": "/teams/palmeiras.png"
-  },
   "sepalmeiras": {
    "name": "Palmeiras",
    "short": "Palmeiras",
@@ -2935,17 +2340,7 @@
    "short": "Panamá",
    "crest": "/teams/panama.svg"
   },
-  "pan": {
-   "name": "Panamá",
-   "short": "Panamá",
-   "crest": "/teams/panama.svg"
-  },
   "paraguai": {
-   "name": "Paraguai",
-   "short": "Paraguai",
-   "crest": "/teams/paraguai.png"
-  },
-  "par": {
    "name": "Paraguai",
    "short": "Paraguai",
    "crest": "/teams/paraguai.png"
@@ -2990,17 +2385,7 @@
    "short": "Peru",
    "crest": "/teams/peru.png"
   },
-  "per": {
-   "name": "Peru",
-   "short": "Peru",
-   "crest": "/teams/peru.png"
-  },
   "polonia": {
-   "name": "Polônia",
-   "short": "Polônia",
-   "crest": "/teams/polonia.png"
-  },
-  "pol": {
    "name": "Polônia",
    "short": "Polônia",
    "crest": "/teams/polonia.png"
@@ -3020,22 +2405,12 @@
    "short": "Porto",
    "crest": "/teams/porto.png"
   },
-  "fcp": {
-   "name": "Porto",
-   "short": "Porto",
-   "crest": "/teams/porto.png"
-  },
   "fcporto": {
    "name": "Porto",
    "short": "Porto",
    "crest": "/teams/porto.png"
   },
   "portugal": {
-   "name": "Portugal",
-   "short": "Portugal",
-   "crest": "/teams/portugal.png"
-  },
-  "por": {
    "name": "Portugal",
    "short": "Portugal",
    "crest": "/teams/portugal.png"
@@ -3115,11 +2490,6 @@
    "short": "Rayo",
    "crest": "/teams/rayovallecano.png"
   },
-  "ray": {
-   "name": "Rayo Vallecano",
-   "short": "Rayo",
-   "crest": "/teams/rayovallecano.png"
-  },
   "rbbragantino": {
    "name": "Red Bull Bragantino",
    "short": "Bragantino",
@@ -3135,17 +2505,7 @@
    "short": "Bragantino",
    "crest": "/teams/rbbragantino.png"
   },
-  "rbb": {
-   "name": "Red Bull Bragantino",
-   "short": "Bragantino",
-   "crest": "/teams/rbbragantino.png"
-  },
   "rbleipzig": {
-   "name": "RB Leipzig",
-   "short": "RB Leipzig",
-   "crest": "/teams/rbleipzig.png"
-  },
-  "rbl": {
    "name": "RB Leipzig",
    "short": "RB Leipzig",
    "crest": "/teams/rbleipzig.png"
@@ -3180,17 +2540,7 @@
    "short": "Betis",
    "crest": "/teams/realbetis.png"
   },
-  "bet": {
-   "name": "Real Betis",
-   "short": "Betis",
-   "crest": "/teams/realbetis.png"
-  },
   "realmadrid": {
-   "name": "Real Madrid",
-   "short": "Real Madrid",
-   "crest": "/teams/realmadrid.png"
-  },
-  "rma": {
    "name": "Real Madrid",
    "short": "Real Madrid",
    "crest": "/teams/realmadrid.png"
@@ -3211,11 +2561,6 @@
    "crest": "/teams/realoviedo.png"
   },
   "realsociedad": {
-   "name": "Real Sociedad",
-   "short": "Real Sociedad",
-   "crest": "/teams/realsociedad.png"
-  },
-  "rso": {
    "name": "Real Sociedad",
    "short": "Real Sociedad",
    "crest": "/teams/realsociedad.png"
@@ -3255,22 +2600,12 @@
    "short": "River",
    "crest": "/teams/riverplate.png"
   },
-  "riv": {
-   "name": "River Plate",
-   "short": "River",
-   "crest": "/teams/riverplate.png"
-  },
   "cariverplate": {
    "name": "River Plate",
    "short": "River",
    "crest": "/teams/riverplate.png"
   },
   "roma": {
-   "name": "Roma",
-   "short": "Roma",
-   "crest": "/teams/roma.png"
-  },
-  "rom": {
    "name": "Roma",
    "short": "Roma",
    "crest": "/teams/roma.png"
@@ -3325,11 +2660,6 @@
    "short": "Santos",
    "crest": "/teams/santos.png"
   },
-  "san": {
-   "name": "Santos",
-   "short": "Santos",
-   "crest": "/teams/santos.png"
-  },
   "santosfc": {
    "name": "Santos",
    "short": "Santos",
@@ -3346,11 +2676,6 @@
    "crest": "/teams/saojosers.png"
   },
   "saopaulo": {
-   "name": "São Paulo",
-   "short": "São Paulo",
-   "crest": "/teams/saopaulo.png"
-  },
-  "sao": {
    "name": "São Paulo",
    "short": "São Paulo",
    "crest": "/teams/saopaulo.png"
@@ -3380,17 +2705,7 @@
    "short": "Senegal",
    "crest": "/teams/senegal.png"
   },
-  "sen": {
-   "name": "Senegal",
-   "short": "Senegal",
-   "crest": "/teams/senegal.png"
-  },
   "servia": {
-   "name": "Sérvia",
-   "short": "Sérvia",
-   "crest": "/teams/servia.png"
-  },
-  "srb": {
    "name": "Sérvia",
    "short": "Sérvia",
    "crest": "/teams/servia.png"
@@ -3410,11 +2725,6 @@
    "short": "Sevilla",
    "crest": "/teams/sevilla.png"
   },
-  "sev": {
-   "name": "Sevilla",
-   "short": "Sevilla",
-   "crest": "/teams/sevilla.png"
-  },
   "sevillafc": {
    "name": "Sevilla",
    "short": "Sevilla",
@@ -3430,17 +2740,7 @@
    "short": "Sheffield Utd",
    "crest": "/teams/sheffieldunited.png"
   },
-  "shu": {
-   "name": "Sheffield United",
-   "short": "Sheffield Utd",
-   "crest": "/teams/sheffieldunited.png"
-  },
   "southampton": {
-   "name": "Southampton",
-   "short": "Southampton",
-   "crest": "/teams/southampton.png"
-  },
-  "sou": {
    "name": "Southampton",
    "short": "Southampton",
    "crest": "/teams/southampton.png"
@@ -3451,11 +2751,6 @@
    "crest": "/teams/southampton.png"
   },
   "sport": {
-   "name": "Sport",
-   "short": "Sport",
-   "crest": "/teams/sport.png"
-  },
-  "spt": {
    "name": "Sport",
    "short": "Sport",
    "crest": "/teams/sport.png"
@@ -3471,11 +2766,6 @@
    "crest": "/teams/sport.png"
   },
   "sporting": {
-   "name": "Sporting",
-   "short": "Sporting",
-   "crest": "/teams/sporting.png"
-  },
-  "scp": {
    "name": "Sporting",
    "short": "Sporting",
    "crest": "/teams/sporting.png"
@@ -3510,11 +2800,6 @@
    "short": "Reims",
    "crest": "/teams/stadedereims.png"
   },
-  "rei": {
-   "name": "Reims",
-   "short": "Reims",
-   "crest": "/teams/stadedereims.png"
-  },
   "stpauli": {
    "name": "St. Pauli",
    "short": "St. Pauli",
@@ -3530,22 +2815,12 @@
    "short": "Stuttgart",
    "crest": "/teams/stuttgart.png"
   },
-  "vfb": {
-   "name": "Stuttgart",
-   "short": "Stuttgart",
-   "crest": "/teams/stuttgart.png"
-  },
   "vfbstuttgart": {
    "name": "Stuttgart",
    "short": "Stuttgart",
    "crest": "/teams/stuttgart.png"
   },
   "suecia": {
-   "name": "Suécia",
-   "short": "Suécia",
-   "crest": "/teams/suecia.svg"
-  },
-  "swe": {
    "name": "Suécia",
    "short": "Suécia",
    "crest": "/teams/suecia.svg"
@@ -3565,11 +2840,6 @@
    "short": "Suíça",
    "crest": "/teams/suica.png"
   },
-  "sui": {
-   "name": "Suíça",
-   "short": "Suíça",
-   "crest": "/teams/suica.png"
-  },
   "switzerland": {
    "name": "Suíça",
    "short": "Suíça",
@@ -3581,11 +2851,6 @@
    "crest": "/teams/suica.png"
   },
   "sunderland": {
-   "name": "Sunderland",
-   "short": "Sunderland",
-   "crest": "/teams/sunderland.png"
-  },
-  "sun": {
    "name": "Sunderland",
    "short": "Sunderland",
    "crest": "/teams/sunderland.png"
@@ -3610,11 +2875,6 @@
    "short": "Tchéquia",
    "crest": "/teams/tchequia.png"
   },
-  "cze": {
-   "name": "Tchéquia",
-   "short": "Tchéquia",
-   "crest": "/teams/tchequia.png"
-  },
   "czechia": {
    "name": "Tchéquia",
    "short": "Tchéquia",
@@ -3630,22 +2890,12 @@
    "short": "Torino",
    "crest": "/teams/torino.png"
   },
-  "tor": {
-   "name": "Torino",
-   "short": "Torino",
-   "crest": "/teams/torino.png"
-  },
   "torinofc": {
    "name": "Torino",
    "short": "Torino",
    "crest": "/teams/torino.png"
   },
   "tottenham": {
-   "name": "Tottenham",
-   "short": "Tottenham",
-   "crest": "/teams/tottenham.png"
-  },
-  "tot": {
    "name": "Tottenham",
    "short": "Tottenham",
    "crest": "/teams/tottenham.png"
@@ -3665,17 +2915,7 @@
    "short": "Tunísia",
    "crest": "/teams/tunisia.svg"
   },
-  "tun": {
-   "name": "Tunísia",
-   "short": "Tunísia",
-   "crest": "/teams/tunisia.svg"
-  },
   "turquia": {
-   "name": "Turquia",
-   "short": "Turquia",
-   "crest": "/teams/turquia.png"
-  },
-  "tur": {
    "name": "Turquia",
    "short": "Turquia",
    "crest": "/teams/turquia.png"
@@ -3691,11 +2931,6 @@
    "crest": "/teams/turquia.png"
   },
   "udinese": {
-   "name": "Udinese",
-   "short": "Udinese",
-   "crest": "/teams/udinese.png"
-  },
-  "udi": {
    "name": "Udinese",
    "short": "Udinese",
    "crest": "/teams/udinese.png"
@@ -3741,11 +2976,6 @@
    "crest": "/teams/union.png"
   },
   "unionberlin": {
-   "name": "Union Berlin",
-   "short": "Union Berlin",
-   "crest": "/teams/unionberlin.png"
-  },
-  "fcu": {
    "name": "Union Berlin",
    "short": "Union Berlin",
    "crest": "/teams/unionberlin.png"
@@ -3830,22 +3060,12 @@
    "short": "Uruguai",
    "crest": "/teams/uruguai.png"
   },
-  "uru": {
-   "name": "Uruguai",
-   "short": "Uruguai",
-   "crest": "/teams/uruguai.png"
-  },
   "uruguay": {
    "name": "Uruguai",
    "short": "Uruguai",
    "crest": "/teams/uruguai.png"
   },
   "uzbequistao": {
-   "name": "Uzbequistão",
-   "short": "Uzbequistão",
-   "crest": "/teams/uzbequistao.svg"
-  },
-  "uzb": {
    "name": "Uzbequistão",
    "short": "Uzbequistão",
    "crest": "/teams/uzbequistao.svg"
@@ -3860,22 +3080,12 @@
    "short": "Valencia",
    "crest": "/teams/valencia.png"
   },
-  "val": {
-   "name": "Valencia",
-   "short": "Valencia",
-   "crest": "/teams/valencia.png"
-  },
   "valenciacf": {
    "name": "Valencia",
    "short": "Valencia",
    "crest": "/teams/valencia.png"
   },
   "valladolid": {
-   "name": "Valladolid",
-   "short": "Valladolid",
-   "crest": "/teams/valladolid.png"
-  },
-  "vll": {
    "name": "Valladolid",
    "short": "Valladolid",
    "crest": "/teams/valladolid.png"
@@ -3910,11 +3120,6 @@
    "short": "Vasco",
    "crest": "/teams/vasco.png"
   },
-  "vas": {
-   "name": "Vasco da Gama",
-   "short": "Vasco",
-   "crest": "/teams/vasco.png"
-  },
   "crvascodagama": {
    "name": "Vasco da Gama",
    "short": "Vasco",
@@ -3931,11 +3136,6 @@
    "crest": "/teams/velezsarsfield.png"
   },
   "venezia": {
-   "name": "Venezia",
-   "short": "Venezia",
-   "crest": "/teams/venezia.png"
-  },
-  "ven": {
    "name": "Venezia",
    "short": "Venezia",
    "crest": "/teams/venezia.png"
@@ -3960,11 +3160,6 @@
    "short": "Verona",
    "crest": "/teams/verona.png"
   },
-  "ver": {
-   "name": "Hellas Verona",
-   "short": "Verona",
-   "crest": "/teams/verona.png"
-  },
   "vilanova": {
    "name": "Vila Nova",
    "short": "Vila Nova",
@@ -3980,22 +3175,12 @@
    "short": "Villarreal",
    "crest": "/teams/villarreal.png"
   },
-  "vil": {
-   "name": "Villarreal",
-   "short": "Villarreal",
-   "crest": "/teams/villarreal.png"
-  },
   "villarrealcf": {
    "name": "Villarreal",
    "short": "Villarreal",
    "crest": "/teams/villarreal.png"
   },
   "vitoria": {
-   "name": "Vitória",
-   "short": "Vitória",
-   "crest": "/teams/vitoria.png"
-  },
-  "vit": {
    "name": "Vitória",
    "short": "Vitória",
    "crest": "/teams/vitoria.png"
@@ -4030,22 +3215,12 @@
    "short": "West Ham",
    "crest": "/teams/westham.png"
   },
-  "whu": {
-   "name": "West Ham",
-   "short": "West Ham",
-   "crest": "/teams/westham.png"
-  },
   "westhamunited": {
    "name": "West Ham",
    "short": "West Ham",
    "crest": "/teams/westham.png"
   },
   "wolfsburg": {
-   "name": "Wolfsburg",
-   "short": "Wolfsburg",
-   "crest": "/teams/wolfsburg.png"
-  },
-  "wob": {
    "name": "Wolfsburg",
    "short": "Wolfsburg",
    "crest": "/teams/wolfsburg.png"
@@ -4061,11 +3236,6 @@
    "crest": "/teams/wolves.png"
   },
   "wolverhampton": {
-   "name": "Wolverhampton",
-   "short": "Wolves",
-   "crest": "/teams/wolves.png"
-  },
-  "wol": {
    "name": "Wolverhampton",
    "short": "Wolves",
    "crest": "/teams/wolves.png"
@@ -4122,11 +3292,6 @@
    "short": "Á. do Sul",
    "crest": "/teams/africadosul.svg"
   },
-  "rsa": {
-   "name": "África do Sul",
-   "short": "Á. do Sul",
-   "crest": "/teams/africadosul.svg"
-  },
   "southafrica": {
    "name": "África do Sul",
    "short": "Á. do Sul",
@@ -4143,11 +3308,6 @@
    "crest": "/teams/aguiademaraba.png"
   },
   "ajax": {
-   "name": "Ajax",
-   "short": "Ajax",
-   "crest": "/teams/ajax.png"
-  },
-  "aja": {
    "name": "Ajax",
    "short": "Ajax",
    "crest": "/teams/ajax.png"
@@ -4187,11 +3347,6 @@
    "short": "Alavés",
    "crest": "/teams/alaves.png"
   },
-  "ala": {
-   "name": "Alavés",
-   "short": "Alavés",
-   "crest": "/teams/alaves.png"
-  },
   "deportivoalaves": {
    "name": "Alavés",
    "short": "Alavés",
@@ -4202,17 +3357,7 @@
    "short": "Albânia",
    "crest": "/teams/albania.png"
   },
-  "alb": {
-   "name": "Albânia",
-   "short": "Albânia",
-   "crest": "/teams/albania.png"
-  },
   "alemanha": {
-   "name": "Alemanha",
-   "short": "Alemanha",
-   "crest": "/teams/alemanha.png"
-  },
-  "ger": {
    "name": "Alemanha",
    "short": "Alemanha",
    "crest": "/teams/alemanha.png"
@@ -4307,11 +3452,6 @@
    "short": "América-MG",
    "crest": "/teams/americamg.png"
   },
-  "ame": {
-   "name": "América-MG",
-   "short": "América-MG",
-   "crest": "/teams/americamg.png"
-  },
   "americamineiro": {
    "name": "América-MG",
    "short": "América-MG",
@@ -4323,11 +3463,6 @@
    "crest": "/teams/americarn.png"
   },
   "andorra": {
-   "name": "Andorra",
-   "short": "Andorra",
-   "crest": "/teams/andorra.png"
-  },
-  "and": {
    "name": "Andorra",
    "short": "Andorra",
    "crest": "/teams/andorra.png"
@@ -4352,22 +3487,12 @@
    "short": "Arábia S.",
    "crest": "/teams/arabiasaudita.svg"
   },
-  "ksa": {
-   "name": "Arábia Saudita",
-   "short": "Arábia S.",
-   "crest": "/teams/arabiasaudita.svg"
-  },
   "saudiarabia": {
    "name": "Arábia Saudita",
    "short": "Arábia S.",
    "crest": "/teams/arabiasaudita.svg"
   },
   "argelia": {
-   "name": "Argélia",
-   "short": "Argélia",
-   "crest": "/teams/argelia.svg"
-  },
-  "alg": {
    "name": "Argélia",
    "short": "Argélia",
    "crest": "/teams/argelia.svg"
@@ -4382,17 +3507,7 @@
    "short": "Argentina",
    "crest": "/teams/argentina.png"
   },
-  "arg": {
-   "name": "Argentina",
-   "short": "Argentina",
-   "crest": "/teams/argentina.png"
-  },
   "arsenal": {
-   "name": "Arsenal",
-   "short": "Arsenal",
-   "crest": "/teams/arsenal.png"
-  },
-  "ars": {
    "name": "Arsenal",
    "short": "Arsenal",
    "crest": "/teams/arsenal.png"
@@ -4402,17 +3517,7 @@
    "short": "Aston Villa",
    "crest": "/teams/astonvilla.png"
   },
-  "avl": {
-   "name": "Aston Villa",
-   "short": "Aston Villa",
-   "crest": "/teams/astonvilla.png"
-  },
   "atalanta": {
-   "name": "Atalanta",
-   "short": "Atalanta",
-   "crest": "/teams/atalanta.png"
-  },
-  "ata": {
    "name": "Atalanta",
    "short": "Atalanta",
    "crest": "/teams/atalanta.png"
@@ -4432,22 +3537,12 @@
    "short": "Athletic",
    "crest": "/teams/athleticbilbao.png"
   },
-  "ath": {
-   "name": "Athletic Bilbao",
-   "short": "Athletic",
-   "crest": "/teams/athleticbilbao.png"
-  },
   "athleticclub": {
    "name": "Athletic Bilbao",
    "short": "Athletic",
    "crest": "/teams/athleticbilbao.png"
   },
   "athleticopr": {
-   "name": "Athletico-PR",
-   "short": "Athletico-PR",
-   "crest": "/teams/athleticopr.png"
-  },
-  "cap": {
    "name": "Athletico-PR",
    "short": "Athletico-PR",
    "crest": "/teams/athleticopr.png"
@@ -4468,11 +3563,6 @@
    "crest": "/teams/atleticogo.png"
   },
   "go": {
-   "name": "Atlético-GO",
-   "short": "Atlético-GO",
-   "crest": "/teams/atleticogo.png"
-  },
-  "acg": {
    "name": "Atlético-GO",
    "short": "Atlético-GO",
    "crest": "/teams/atleticogo.png"
@@ -4502,11 +3592,6 @@
    "short": "Atlético",
    "crest": "/teams/atleticomadrid.png"
   },
-  "atm": {
-   "name": "Atlético de Madrid",
-   "short": "Atlético",
-   "crest": "/teams/atleticomadrid.png"
-  },
   "madrid": {
    "name": "Atlético de Madrid",
    "short": "Atlético",
@@ -4523,11 +3608,6 @@
    "crest": "/teams/atleticomg.png"
   },
   "mg": {
-   "name": "Atlético-MG",
-   "short": "Atlético-MG",
-   "crest": "/teams/atleticomg.png"
-  },
-  "cam": {
    "name": "Atlético-MG",
    "short": "Atlético-MG",
    "crest": "/teams/atleticomg.png"
@@ -4562,17 +3642,7 @@
    "short": "Augsburg",
    "crest": "/teams/augsburg.png"
   },
-  "fca": {
-   "name": "Augsburg",
-   "short": "Augsburg",
-   "crest": "/teams/augsburg.png"
-  },
   "australia": {
-   "name": "Austrália",
-   "short": "Austrália",
-   "crest": "/teams/australia.svg"
-  },
-  "aus": {
    "name": "Austrália",
    "short": "Austrália",
    "crest": "/teams/australia.svg"
@@ -4583,11 +3653,6 @@
    "crest": "/teams/australia.svg"
   },
   "austria": {
-   "name": "Áustria",
-   "short": "Áustria",
-   "crest": "/teams/austria.svg"
-  },
-  "aut": {
    "name": "Áustria",
    "short": "Áustria",
    "crest": "/teams/austria.svg"
@@ -4607,11 +3672,6 @@
    "short": "Bahia",
    "crest": "/teams/bahia.png"
   },
-  "bah": {
-   "name": "Bahia",
-   "short": "Bahia",
-   "crest": "/teams/bahia.png"
-  },
   "banfield": {
    "name": "Banfield",
    "short": "Banfield",
@@ -4621,11 +3681,6 @@
    "name": "Banfield",
    "short": "Banfield",
    "crest": "/teams/banfield.png"
-  },
-  "bar": {
-   "name": "Barcelona",
-   "short": "Barcelona",
-   "crest": "/teams/barcelona.png"
   },
   "barca": {
    "name": "Barcelona",
@@ -4662,11 +3717,6 @@
    "short": "Bayern",
    "crest": "/teams/bayern.png"
   },
-  "fcb": {
-   "name": "Bayern de Munique",
-   "short": "Bayern",
-   "crest": "/teams/bayern.png"
-  },
   "bayernmunich": {
    "name": "Bayern de Munique",
    "short": "Bayern",
@@ -4682,22 +3732,12 @@
    "short": "Bélgica",
    "crest": "/teams/belgica.png"
   },
-  "bel": {
-   "name": "Bélgica",
-   "short": "Bélgica",
-   "crest": "/teams/belgica.png"
-  },
   "belgium": {
    "name": "Bélgica",
    "short": "Bélgica",
    "crest": "/teams/belgica.png"
   },
   "benfica": {
-   "name": "Benfica",
-   "short": "Benfica",
-   "crest": "/teams/benfica.png"
-  },
-  "slb": {
    "name": "Benfica",
    "short": "Benfica",
    "crest": "/teams/benfica.png"
@@ -4787,11 +3827,6 @@
    "short": "Bósnia",
    "crest": "/teams/bosniaeherzegovina.svg"
   },
-  "bih": {
-   "name": "Bósnia e Herzegovina",
-   "short": "Bósnia",
-   "crest": "/teams/bosniaeherzegovina.svg"
-  },
   "bosniaandherzegovina": {
    "name": "Bósnia e Herzegovina",
    "short": "Bósnia",
@@ -4803,11 +3838,6 @@
    "crest": "/teams/bosniaeherzegovina.svg"
   },
   "botafogo": {
-   "name": "Botafogo",
-   "short": "Botafogo",
-   "crest": "/teams/botafogo.png"
-  },
-  "bot": {
    "name": "Botafogo",
    "short": "Botafogo",
    "crest": "/teams/botafogo.png"
@@ -4837,17 +3867,7 @@
    "short": "Bournemouth",
    "crest": "/teams/bournemouth.png"
   },
-  "bou": {
-   "name": "Bournemouth",
-   "short": "Bournemouth",
-   "crest": "/teams/bournemouth.png"
-  },
   "braga": {
-   "name": "Braga",
-   "short": "Braga",
-   "crest": "/teams/braga.png"
-  },
-  "scb": {
    "name": "Braga",
    "short": "Braga",
    "crest": "/teams/braga.png"
@@ -4858,11 +3878,6 @@
    "crest": "/teams/braga.png"
   },
   "brasil": {
-   "name": "Brasil",
-   "short": "Brasil",
-   "crest": "/teams/brasil.png"
-  },
-  "bra": {
    "name": "Brasil",
    "short": "Brasil",
    "crest": "/teams/brasil.png"
@@ -4882,27 +3897,12 @@
    "short": "Bremen",
    "crest": "/teams/bremen.png"
   },
-  "svw": {
-   "name": "Werder Bremen",
-   "short": "Bremen",
-   "crest": "/teams/bremen.png"
-  },
   "brentford": {
    "name": "Brentford",
    "short": "Brentford",
    "crest": "/teams/brentford.png"
   },
-  "bre": {
-   "name": "Brentford",
-   "short": "Brentford",
-   "crest": "/teams/brentford.png"
-  },
   "brighton": {
-   "name": "Brighton",
-   "short": "Brighton",
-   "crest": "/teams/brighton.png"
-  },
-  "bha": {
    "name": "Brighton",
    "short": "Brighton",
    "crest": "/teams/brighton.png"
@@ -4927,17 +3927,7 @@
    "short": "Burnley",
    "crest": "/teams/burnley.png"
   },
-  "bur": {
-   "name": "Burnley",
-   "short": "Burnley",
-   "crest": "/teams/burnley.png"
-  },
   "caboverde": {
-   "name": "Cabo Verde",
-   "short": "Cabo Verde",
-   "crest": "/teams/caboverde.svg"
-  },
-  "cpv": {
    "name": "Cabo Verde",
    "short": "Cabo Verde",
    "crest": "/teams/caboverde.svg"
@@ -4952,22 +3942,22 @@
    "short": "Cagliari",
    "crest": "/teams/cagliari.png"
   },
-  "cag": {
-   "name": "Cagliari",
-   "short": "Cagliari",
-   "crest": "/teams/cagliari.png"
-  },
   "cagliaricalcio": {
    "name": "Cagliari",
    "short": "Cagliari",
    "crest": "/teams/cagliari.png"
   },
-  "canada": {
-   "name": "Canadá",
-   "short": "Canadá",
-   "crest": "/teams/canada.svg"
+  "camboja": {
+   "name": "Camboja",
+   "short": "Camboja",
+   "crest": null
   },
-  "can": {
+  "cambodia": {
+   "name": "Camboja",
+   "short": "Camboja",
+   "crest": null
+  },
+  "canada": {
    "name": "Canadá",
    "short": "Canadá",
    "crest": "/teams/canada.svg"
@@ -4997,11 +3987,6 @@
    "short": "Catar",
    "crest": "/teams/catar.svg"
   },
-  "qat": {
-   "name": "Catar",
-   "short": "Catar",
-   "crest": "/teams/catar.svg"
-  },
   "qatar": {
    "name": "Catar",
    "short": "Catar",
@@ -5012,22 +3997,12 @@
    "short": "Ceará",
    "crest": "/teams/ceara.png"
   },
-  "cea": {
-   "name": "Ceará",
-   "short": "Ceará",
-   "crest": "/teams/ceara.png"
-  },
   "celta": {
    "name": "Celta de Vigo",
    "short": "Celta",
    "crest": "/teams/celta.png"
   },
   "celtadevigo": {
-   "name": "Celta de Vigo",
-   "short": "Celta",
-   "crest": "/teams/celta.png"
-  },
-  "cel": {
    "name": "Celta de Vigo",
    "short": "Celta",
    "crest": "/teams/celta.png"
@@ -5067,11 +4042,6 @@
    "short": "Chapecoense",
    "crest": "/teams/chapecoense.png"
   },
-  "cha": {
-   "name": "Chapecoense",
-   "short": "Chapecoense",
-   "crest": "/teams/chapecoense.png"
-  },
   "chapecoenseaf": {
    "name": "Chapecoense",
    "short": "Chapecoense",
@@ -5082,17 +4052,7 @@
    "short": "Chelsea",
    "crest": "/teams/chelsea.png"
   },
-  "che": {
-   "name": "Chelsea",
-   "short": "Chelsea",
-   "crest": "/teams/chelsea.png"
-  },
   "chile": {
-   "name": "Chile",
-   "short": "Chile",
-   "crest": "/teams/chile.png"
-  },
-  "chi": {
    "name": "Chile",
    "short": "Chile",
    "crest": "/teams/chile.png"
@@ -5112,17 +4072,7 @@
    "short": "Colômbia",
    "crest": "/teams/colombia.png"
   },
-  "col": {
-   "name": "Colômbia",
-   "short": "Colômbia",
-   "crest": "/teams/colombia.png"
-  },
   "como": {
-   "name": "Como",
-   "short": "Como",
-   "crest": "/teams/como.png"
-  },
-  "com": {
    "name": "Como",
    "short": "Como",
    "crest": "/teams/como.png"
@@ -5131,6 +4081,16 @@
    "name": "Como",
    "short": "Como",
    "crest": "/teams/como.png"
+  },
+  "comores": {
+   "name": "Comores",
+   "short": "Comores",
+   "crest": null
+  },
+  "comoros": {
+   "name": "Comores",
+   "short": "Comores",
+   "crest": null
   },
   "confianca": {
    "name": "Confiança",
@@ -5143,11 +4103,6 @@
    "crest": "/teams/confianca.png"
   },
   "congord": {
-   "name": "Congo (RD)",
-   "short": "Congo RD",
-   "crest": "/teams/congord.svg"
-  },
-  "cod": {
    "name": "Congo (RD)",
    "short": "Congo RD",
    "crest": "/teams/congord.svg"
@@ -5182,11 +4137,6 @@
    "short": "Coreia",
    "crest": "/teams/coreiadosul.svg"
   },
-  "kor": {
-   "name": "Coreia do Sul",
-   "short": "Coreia",
-   "crest": "/teams/coreiadosul.svg"
-  },
   "southkorea": {
    "name": "Coreia do Sul",
    "short": "Coreia",
@@ -5202,17 +4152,7 @@
    "short": "Corinthians",
    "crest": "/teams/corinthians.png"
   },
-  "cor": {
-   "name": "Corinthians",
-   "short": "Corinthians",
-   "crest": "/teams/corinthians.png"
-  },
   "coritiba": {
-   "name": "Coritiba",
-   "short": "Coritiba",
-   "crest": "/teams/coritiba.png"
-  },
-  "cfc": {
    "name": "Coritiba",
    "short": "Coritiba",
    "crest": "/teams/coritiba.png"
@@ -5223,11 +4163,6 @@
    "crest": "/teams/costadomarfim.svg"
   },
   "cmarfim": {
-   "name": "Costa do Marfim",
-   "short": "C. Marfim",
-   "crest": "/teams/costadomarfim.svg"
-  },
-  "civ": {
    "name": "Costa do Marfim",
    "short": "C. Marfim",
    "crest": "/teams/costadomarfim.svg"
@@ -5257,17 +4192,7 @@
    "short": "Criciúma",
    "crest": "/teams/criciuma.png"
   },
-  "cri": {
-   "name": "Criciúma",
-   "short": "Criciúma",
-   "crest": "/teams/criciuma.png"
-  },
   "croacia": {
-   "name": "Croácia",
-   "short": "Croácia",
-   "crest": "/teams/croacia.png"
-  },
-  "cro": {
    "name": "Croácia",
    "short": "Croácia",
    "crest": "/teams/croacia.png"
@@ -5292,17 +4217,7 @@
    "short": "Cruzeiro",
    "crest": "/teams/cruzeiro.png"
   },
-  "cru": {
-   "name": "Cruzeiro",
-   "short": "Cruzeiro",
-   "crest": "/teams/cruzeiro.png"
-  },
   "crystalpalace": {
-   "name": "Crystal Palace",
-   "short": "Crystal Palace",
-   "crest": "/teams/crystalpalace.png"
-  },
-  "cry": {
    "name": "Crystal Palace",
    "short": "Crystal Palace",
    "crest": "/teams/crystalpalace.png"
@@ -5322,17 +4237,7 @@
    "short": "Cuiabá",
    "crest": "/teams/cuiaba.png"
   },
-  "cui": {
-   "name": "Cuiabá",
-   "short": "Cuiabá",
-   "crest": "/teams/cuiaba.png"
-  },
   "curacao": {
-   "name": "Curaçao",
-   "short": "Curaçao",
-   "crest": "/teams/curacao.svg"
-  },
-  "cuw": {
    "name": "Curaçao",
    "short": "Curaçao",
    "crest": "/teams/curacao.svg"
@@ -5363,11 +4268,6 @@
    "crest": "/teams/deptachira.png"
   },
   "dinamarca": {
-   "name": "Dinamarca",
-   "short": "Dinamarca",
-   "crest": "/teams/dinamarca.png"
-  },
-  "den": {
    "name": "Dinamarca",
    "short": "Dinamarca",
    "crest": "/teams/dinamarca.png"
@@ -5412,11 +4312,6 @@
    "short": "Egito",
    "crest": "/teams/egito.svg"
   },
-  "egy": {
-   "name": "Egito",
-   "short": "Egito",
-   "crest": "/teams/egito.svg"
-  },
   "egypt": {
    "name": "Egito",
    "short": "Egito",
@@ -5427,17 +4322,7 @@
    "short": "Empoli",
    "crest": "/teams/empoli.png"
   },
-  "emp": {
-   "name": "Empoli",
-   "short": "Empoli",
-   "crest": "/teams/empoli.png"
-  },
   "equador": {
-   "name": "Equador",
-   "short": "Equador",
-   "crest": "/teams/equador.png"
-  },
-  "ecu": {
    "name": "Equador",
    "short": "Equador",
    "crest": "/teams/equador.png"
@@ -5448,11 +4333,6 @@
    "crest": "/teams/equador.png"
   },
   "escocia": {
-   "name": "Escócia",
-   "short": "Escócia",
-   "crest": "/teams/escocia.svg"
-  },
-  "sco": {
    "name": "Escócia",
    "short": "Escócia",
    "crest": "/teams/escocia.svg"
@@ -5522,12 +4402,12 @@
    "short": "EUA",
    "crest": "/teams/eua.png"
   },
-  "usa": {
+  "unitedstates": {
    "name": "Estados Unidos",
    "short": "EUA",
    "crest": "/teams/eua.png"
   },
-  "unitedstates": {
+  "usa": {
    "name": "Estados Unidos",
    "short": "EUA",
    "crest": "/teams/eua.png"
@@ -5538,11 +4418,6 @@
    "crest": "/teams/eua.png"
   },
   "everton": {
-   "name": "Everton",
-   "short": "Everton",
-   "crest": "/teams/everton.png"
-  },
-  "eve": {
    "name": "Everton",
    "short": "Everton",
    "crest": "/teams/everton.png"
@@ -5567,11 +4442,6 @@
    "short": "Finlândia",
    "crest": "/teams/finlandia.png"
   },
-  "fin": {
-   "name": "Finlândia",
-   "short": "Finlândia",
-   "crest": "/teams/finlandia.png"
-  },
   "finland": {
    "name": "Finlândia",
    "short": "Finlândia",
@@ -5587,11 +4457,6 @@
    "short": "Fiorentina",
    "crest": "/teams/fiorentina.png"
   },
-  "fio": {
-   "name": "Fiorentina",
-   "short": "Fiorentina",
-   "crest": "/teams/fiorentina.png"
-  },
   "acffiorentina": {
    "name": "Fiorentina",
    "short": "Fiorentina",
@@ -5602,22 +4467,12 @@
    "short": "Flamengo",
    "crest": "/teams/flamengo.png"
   },
-  "fla": {
-   "name": "Flamengo",
-   "short": "Flamengo",
-   "crest": "/teams/flamengo.png"
-  },
   "crflamengo": {
    "name": "Flamengo",
    "short": "Flamengo",
    "crest": "/teams/flamengo.png"
   },
   "fluminense": {
-   "name": "Fluminense",
-   "short": "Fluminense",
-   "crest": "/teams/fluminense.png"
-  },
-  "flu": {
    "name": "Fluminense",
    "short": "Fluminense",
    "crest": "/teams/fluminense.png"
@@ -5637,27 +4492,12 @@
    "short": "Nottm Forest",
    "crest": "/teams/forest.png"
   },
-  "nfo": {
-   "name": "Nottingham Forest",
-   "short": "Nottm Forest",
-   "crest": "/teams/forest.png"
-  },
   "fortaleza": {
    "name": "Fortaleza",
    "short": "Fortaleza",
    "crest": "/teams/fortaleza.png"
   },
-  "for": {
-   "name": "Fortaleza",
-   "short": "Fortaleza",
-   "crest": "/teams/fortaleza.png"
-  },
   "franca": {
-   "name": "França",
-   "short": "França",
-   "crest": "/teams/franca.png"
-  },
-  "fra": {
    "name": "França",
    "short": "França",
    "crest": "/teams/franca.png"
@@ -5677,17 +4517,7 @@
    "short": "Frankfurt",
    "crest": "/teams/frankfurt.png"
   },
-  "sge": {
-   "name": "Eintracht Frankfurt",
-   "short": "Frankfurt",
-   "crest": "/teams/frankfurt.png"
-  },
   "freiburg": {
-   "name": "Freiburg",
-   "short": "Freiburg",
-   "crest": "/teams/freiburg.png"
-  },
-  "scf": {
    "name": "Freiburg",
    "short": "Freiburg",
    "crest": "/teams/freiburg.png"
@@ -5697,17 +4527,7 @@
    "short": "Fulham",
    "crest": "/teams/fulham.png"
   },
-  "ful": {
-   "name": "Fulham",
-   "short": "Fulham",
-   "crest": "/teams/fulham.png"
-  },
   "gana": {
-   "name": "Gana",
-   "short": "Gana",
-   "crest": "/teams/gana.svg"
-  },
-  "gha": {
    "name": "Gana",
    "short": "Gana",
    "crest": "/teams/gana.svg"
@@ -5722,11 +4542,6 @@
    "short": "Genoa",
    "crest": "/teams/genoa.png"
   },
-  "gen": {
-   "name": "Genoa",
-   "short": "Genoa",
-   "crest": "/teams/genoa.png"
-  },
   "genoacfc": {
    "name": "Genoa",
    "short": "Genoa",
@@ -5737,27 +4552,12 @@
    "short": "Getafe",
    "crest": "/teams/getafe.png"
   },
-  "get": {
-   "name": "Getafe",
-   "short": "Getafe",
-   "crest": "/teams/getafe.png"
-  },
   "gibraltar": {
    "name": "Gibraltar",
    "short": "Gibraltar",
    "crest": "/teams/gibraltar.png"
   },
-  "gib": {
-   "name": "Gibraltar",
-   "short": "Gibraltar",
-   "crest": "/teams/gibraltar.png"
-  },
   "girona": {
-   "name": "Girona",
-   "short": "Girona",
-   "crest": "/teams/girona.png"
-  },
-  "gir": {
    "name": "Girona",
    "short": "Girona",
    "crest": "/teams/girona.png"
@@ -5772,17 +4572,17 @@
    "short": "Goiás",
    "crest": "/teams/goias.png"
   },
-  "goi": {
-   "name": "Goiás",
-   "short": "Goiás",
-   "crest": "/teams/goias.png"
+  "grecia": {
+   "name": "Grécia",
+   "short": "Grécia",
+   "crest": "/teams/grecia.svg"
+  },
+  "greece": {
+   "name": "Grécia",
+   "short": "Grécia",
+   "crest": "/teams/grecia.svg"
   },
   "gremio": {
-   "name": "Grêmio",
-   "short": "Grêmio",
-   "crest": "/teams/gremio.png"
-  },
-  "gre": {
    "name": "Grêmio",
    "short": "Grêmio",
    "crest": "/teams/gremio.png"
@@ -5802,11 +4602,6 @@
    "short": "Haiti",
    "crest": "/teams/haiti.svg"
   },
-  "hai": {
-   "name": "Haiti",
-   "short": "Haiti",
-   "crest": "/teams/haiti.svg"
-  },
   "heidenheim": {
    "name": "Heidenheim",
    "short": "Heidenheim",
@@ -5822,22 +4617,12 @@
    "short": "Hoffenheim",
    "crest": "/teams/hoffenheim.png"
   },
-  "tsg": {
-   "name": "Hoffenheim",
-   "short": "Hoffenheim",
-   "crest": "/teams/hoffenheim.png"
-  },
   "tsghoffenheim": {
    "name": "Hoffenheim",
    "short": "Hoffenheim",
    "crest": "/teams/hoffenheim.png"
   },
   "holanda": {
-   "name": "Holanda",
-   "short": "Holanda",
-   "crest": "/teams/holanda.png"
-  },
-  "ned": {
    "name": "Holanda",
    "short": "Holanda",
    "crest": "/teams/holanda.png"
@@ -5873,11 +4658,6 @@
    "crest": "/teams/inddelvalle.png"
   },
   "inglaterra": {
-   "name": "Inglaterra",
-   "short": "Inglaterra",
-   "crest": "/teams/inglaterra.png"
-  },
-  "eng": {
    "name": "Inglaterra",
    "short": "Inglaterra",
    "crest": "/teams/inglaterra.png"
@@ -5932,11 +4712,6 @@
    "short": "Ipswich",
    "crest": "/teams/ipswich.png"
   },
-  "ips": {
-   "name": "Ipswich Town",
-   "short": "Ipswich",
-   "crest": "/teams/ipswich.png"
-  },
   "iquique": {
    "name": "Deportes Iquique",
    "short": "Iquique",
@@ -5948,11 +4723,6 @@
    "crest": "/teams/iquique.png"
   },
   "ira": {
-   "name": "Irã",
-   "short": "Irã",
-   "crest": "/teams/ira.svg"
-  },
-  "irn": {
    "name": "Irã",
    "short": "Irã",
    "crest": "/teams/ira.svg"
@@ -5972,11 +4742,6 @@
    "short": "Iraque",
    "crest": "/teams/iraque.svg"
   },
-  "irq": {
-   "name": "Iraque",
-   "short": "Iraque",
-   "crest": "/teams/iraque.svg"
-  },
   "iraq": {
    "name": "Iraque",
    "short": "Iraque",
@@ -5992,22 +4757,12 @@
    "short": "Irl. Norte",
    "crest": "/teams/irlandadonorte.png"
   },
-  "nir": {
-   "name": "Irlanda do Norte",
-   "short": "Irl. Norte",
-   "crest": "/teams/irlandadonorte.png"
-  },
   "northernireland": {
    "name": "Irlanda do Norte",
    "short": "Irl. Norte",
    "crest": "/teams/irlandadonorte.png"
   },
   "italia": {
-   "name": "Itália",
-   "short": "Itália",
-   "crest": "/teams/italia.png"
-  },
-  "ita": {
    "name": "Itália",
    "short": "Itália",
    "crest": "/teams/italia.png"
@@ -6022,22 +4777,12 @@
    "short": "Japão",
    "crest": "/teams/japao.svg"
   },
-  "jpn": {
-   "name": "Japão",
-   "short": "Japão",
-   "crest": "/teams/japao.svg"
-  },
   "japan": {
    "name": "Japão",
    "short": "Japão",
    "crest": "/teams/japao.svg"
   },
   "jordania": {
-   "name": "Jordânia",
-   "short": "Jordânia",
-   "crest": "/teams/jordania.svg"
-  },
-  "jor": {
    "name": "Jordânia",
    "short": "Jordânia",
    "crest": "/teams/jordania.svg"
@@ -6112,22 +4857,12 @@
    "short": "Las Palmas",
    "crest": "/teams/laspalmas.png"
   },
-  "lpa": {
-   "name": "Las Palmas",
-   "short": "Las Palmas",
-   "crest": "/teams/laspalmas.png"
-  },
   "udlaspalmas": {
    "name": "Las Palmas",
    "short": "Las Palmas",
    "crest": "/teams/laspalmas.png"
   },
   "lazio": {
-   "name": "Lazio",
-   "short": "Lazio",
-   "crest": "/teams/lazio.png"
-  },
-  "laz": {
    "name": "Lazio",
    "short": "Lazio",
    "crest": "/teams/lazio.png"
@@ -6162,22 +4897,12 @@
    "short": "Lecce",
    "crest": "/teams/lecce.png"
   },
-  "lec": {
-   "name": "Lecce",
-   "short": "Lecce",
-   "crest": "/teams/lecce.png"
-  },
   "uslecce": {
    "name": "Lecce",
    "short": "Lecce",
    "crest": "/teams/lecce.png"
   },
   "leganes": {
-   "name": "Leganés",
-   "short": "Leganés",
-   "crest": "/teams/leganes.png"
-  },
-  "leg": {
    "name": "Leganés",
    "short": "Leganés",
    "crest": "/teams/leganes.png"
@@ -6192,17 +4917,7 @@
    "short": "Leicester",
    "crest": "/teams/leicester.png"
   },
-  "lei": {
-   "name": "Leicester City",
-   "short": "Leicester",
-   "crest": "/teams/leicester.png"
-  },
   "levante": {
-   "name": "Levante",
-   "short": "Levante",
-   "crest": "/teams/levante.png"
-  },
-  "lev": {
    "name": "Levante",
    "short": "Levante",
    "crest": "/teams/levante.png"
@@ -6222,11 +4937,6 @@
    "short": "Leverkusen",
    "crest": "/teams/leverkusen.png"
   },
-  "b04": {
-   "name": "Bayer Leverkusen",
-   "short": "Leverkusen",
-   "crest": "/teams/leverkusen.png"
-  },
   "libertad": {
    "name": "Libertad",
    "short": "Libertad",
@@ -6242,22 +4952,12 @@
    "short": "Lituânia",
    "crest": "/teams/lituania.png"
   },
-  "ltu": {
-   "name": "Lituânia",
-   "short": "Lituânia",
-   "crest": "/teams/lituania.png"
-  },
   "lithuania": {
    "name": "Lituânia",
    "short": "Lituânia",
    "crest": "/teams/lituania.png"
   },
   "liverpool": {
-   "name": "Liverpool",
-   "short": "Liverpool",
-   "crest": "/teams/liverpool.png"
-  },
-  "liv": {
    "name": "Liverpool",
    "short": "Liverpool",
    "crest": "/teams/liverpool.png"
@@ -6282,11 +4982,6 @@
    "short": "Macedônia",
    "crest": "/teams/macedonia.png"
   },
-  "mkd": {
-   "name": "Macedônia do Norte",
-   "short": "Macedônia",
-   "crest": "/teams/macedonia.png"
-  },
   "northmacedonia": {
    "name": "Macedônia do Norte",
    "short": "Macedônia",
@@ -6302,17 +4997,7 @@
    "short": "Mainz",
    "crest": "/teams/mainz.png"
   },
-  "m05": {
-   "name": "Mainz 05",
-   "short": "Mainz",
-   "crest": "/teams/mainz.png"
-  },
   "mallorca": {
-   "name": "Mallorca",
-   "short": "Mallorca",
-   "crest": "/teams/mallorca.png"
-  },
-  "mll": {
    "name": "Mallorca",
    "short": "Mallorca",
    "crest": "/teams/mallorca.png"
@@ -6323,11 +5008,6 @@
    "crest": "/teams/mallorca.png"
   },
   "malta": {
-   "name": "Malta",
-   "short": "Malta",
-   "crest": "/teams/malta.png"
-  },
-  "mlt": {
    "name": "Malta",
    "short": "Malta",
    "crest": "/teams/malta.png"
@@ -6357,22 +5037,12 @@
    "short": "Man City",
    "crest": "/teams/mancity.png"
   },
-  "mci": {
-   "name": "Manchester City",
-   "short": "Man City",
-   "crest": "/teams/mancity.png"
-  },
   "manunited": {
    "name": "Manchester United",
    "short": "Man United",
    "crest": "/teams/manunited.png"
   },
   "manchesterunited": {
-   "name": "Manchester United",
-   "short": "Man United",
-   "crest": "/teams/manunited.png"
-  },
-  "mun": {
    "name": "Manchester United",
    "short": "Man United",
    "crest": "/teams/manunited.png"
@@ -6402,11 +5072,6 @@
    "short": "Marrocos",
    "crest": "/teams/marrocos.svg"
   },
-  "mar": {
-   "name": "Marrocos",
-   "short": "Marrocos",
-   "crest": "/teams/marrocos.svg"
-  },
   "morocco": {
    "name": "Marrocos",
    "short": "Marrocos",
@@ -6427,22 +5092,12 @@
    "short": "México",
    "crest": "/teams/mexico.png"
   },
-  "mex": {
-   "name": "México",
-   "short": "México",
-   "crest": "/teams/mexico.png"
-  },
   "mgladbach": {
    "name": "Borussia M'gladbach",
    "short": "M'gladbach",
    "crest": "/teams/mgladbach.png"
   },
   "borussiamgladbach": {
-   "name": "Borussia M'gladbach",
-   "short": "M'gladbach",
-   "crest": "/teams/mgladbach.png"
-  },
-  "bmg": {
    "name": "Borussia M'gladbach",
    "short": "M'gladbach",
    "crest": "/teams/mgladbach.png"
@@ -6462,22 +5117,12 @@
    "short": "Milan",
    "crest": "/teams/milan.png"
   },
-  "mil": {
-   "name": "Milan",
-   "short": "Milan",
-   "crest": "/teams/milan.png"
-  },
   "mirassol": {
    "name": "Mirassol",
    "short": "Mirassol",
    "crest": "/teams/mirassol.png"
   },
   "moldavia": {
-   "name": "Moldávia",
-   "short": "Moldávia",
-   "crest": "/teams/moldavia.png"
-  },
-  "mda": {
    "name": "Moldávia",
    "short": "Moldávia",
    "crest": "/teams/moldavia.png"
@@ -6502,11 +5147,6 @@
    "short": "Monza",
    "crest": "/teams/monza.png"
   },
-  "mon": {
-   "name": "Monza",
-   "short": "Monza",
-   "crest": "/teams/monza.png"
-  },
   "mushucruna": {
    "name": "Mushuc Runa",
    "short": "Mushuc Runa",
@@ -6523,11 +5163,6 @@
    "crest": "/teams/nacional.png"
   },
   "napoli": {
-   "name": "Napoli",
-   "short": "Napoli",
-   "crest": "/teams/napoli.png"
-  },
-  "nap": {
    "name": "Napoli",
    "short": "Napoli",
    "crest": "/teams/napoli.png"
@@ -6552,11 +5187,6 @@
    "short": "Newcastle",
    "crest": "/teams/newcastle.png"
   },
-  "new": {
-   "name": "Newcastle",
-   "short": "Newcastle",
-   "crest": "/teams/newcastle.png"
-  },
   "newcastleunited": {
    "name": "Newcastle",
    "short": "Newcastle",
@@ -6567,22 +5197,12 @@
    "short": "Nice",
    "crest": "/teams/nice.png"
   },
-  "nic": {
-   "name": "Nice",
-   "short": "Nice",
-   "crest": "/teams/nice.png"
-  },
   "ogcnice": {
    "name": "Nice",
    "short": "Nice",
    "crest": "/teams/nice.png"
   },
   "noruega": {
-   "name": "Noruega",
-   "short": "Noruega",
-   "crest": "/teams/noruega.png"
-  },
-  "nor": {
    "name": "Noruega",
    "short": "Noruega",
    "crest": "/teams/noruega.png"
@@ -6603,11 +5223,6 @@
    "crest": "/teams/novazelandia.svg"
   },
   "nzelandia": {
-   "name": "Nova Zelândia",
-   "short": "N. Zelândia",
-   "crest": "/teams/novazelandia.svg"
-  },
-  "nzl": {
    "name": "Nova Zelândia",
    "short": "N. Zelândia",
    "crest": "/teams/novazelandia.svg"
@@ -6672,11 +5287,6 @@
    "short": "Osasuna",
    "crest": "/teams/osasuna.png"
   },
-  "osa": {
-   "name": "Osasuna",
-   "short": "Osasuna",
-   "crest": "/teams/osasuna.png"
-  },
   "caosasuna": {
    "name": "Osasuna",
    "short": "Osasuna",
@@ -6697,11 +5307,6 @@
    "short": "Gales",
    "crest": "/teams/paisdegales.png"
   },
-  "wal": {
-   "name": "País de Gales",
-   "short": "Gales",
-   "crest": "/teams/paisdegales.png"
-  },
   "wales": {
    "name": "País de Gales",
    "short": "Gales",
@@ -6717,22 +5322,12 @@
    "short": "Palmeiras",
    "crest": "/teams/palmeiras.png"
   },
-  "pal": {
-   "name": "Palmeiras",
-   "short": "Palmeiras",
-   "crest": "/teams/palmeiras.png"
-  },
   "sepalmeiras": {
    "name": "Palmeiras",
    "short": "Palmeiras",
    "crest": "/teams/palmeiras.png"
   },
   "panama": {
-   "name": "Panamá",
-   "short": "Panamá",
-   "crest": "/teams/panama.svg"
-  },
-  "pan": {
    "name": "Panamá",
    "short": "Panamá",
    "crest": "/teams/panama.svg"
@@ -6777,17 +5372,7 @@
    "short": "Peru",
    "crest": "/teams/peru.png"
   },
-  "per": {
-   "name": "Peru",
-   "short": "Peru",
-   "crest": "/teams/peru.png"
-  },
   "polonia": {
-   "name": "Polônia",
-   "short": "Polônia",
-   "crest": "/teams/polonia.png"
-  },
-  "pol": {
    "name": "Polônia",
    "short": "Polônia",
    "crest": "/teams/polonia.png"
@@ -6807,17 +5392,7 @@
    "short": "Porto",
    "crest": "/teams/porto.png"
   },
-  "fcp": {
-   "name": "Porto",
-   "short": "Porto",
-   "crest": "/teams/porto.png"
-  },
   "portugal": {
-   "name": "Portugal",
-   "short": "Portugal",
-   "crest": "/teams/portugal.png"
-  },
-  "por": {
    "name": "Portugal",
    "short": "Portugal",
    "crest": "/teams/portugal.png"
@@ -6892,11 +5467,6 @@
    "short": "Rayo",
    "crest": "/teams/rayovallecano.png"
   },
-  "ray": {
-   "name": "Rayo Vallecano",
-   "short": "Rayo",
-   "crest": "/teams/rayovallecano.png"
-  },
   "rbbragantino": {
    "name": "Red Bull Bragantino",
    "short": "Bragantino",
@@ -6912,17 +5482,7 @@
    "short": "Bragantino",
    "crest": "/teams/rbbragantino.png"
   },
-  "rbb": {
-   "name": "Red Bull Bragantino",
-   "short": "Bragantino",
-   "crest": "/teams/rbbragantino.png"
-  },
   "rbleipzig": {
-   "name": "RB Leipzig",
-   "short": "RB Leipzig",
-   "crest": "/teams/rbleipzig.png"
-  },
-  "rbl": {
    "name": "RB Leipzig",
    "short": "RB Leipzig",
    "crest": "/teams/rbleipzig.png"
@@ -6957,17 +5517,7 @@
    "short": "Betis",
    "crest": "/teams/realbetis.png"
   },
-  "bet": {
-   "name": "Real Betis",
-   "short": "Betis",
-   "crest": "/teams/realbetis.png"
-  },
   "realmadrid": {
-   "name": "Real Madrid",
-   "short": "Real Madrid",
-   "crest": "/teams/realmadrid.png"
-  },
-  "rma": {
    "name": "Real Madrid",
    "short": "Real Madrid",
    "crest": "/teams/realmadrid.png"
@@ -6983,11 +5533,6 @@
    "crest": "/teams/realoviedo.png"
   },
   "realsociedad": {
-   "name": "Real Sociedad",
-   "short": "Real Sociedad",
-   "crest": "/teams/realsociedad.png"
-  },
-  "rso": {
    "name": "Real Sociedad",
    "short": "Real Sociedad",
    "crest": "/teams/realsociedad.png"
@@ -7022,22 +5567,12 @@
    "short": "River",
    "crest": "/teams/riverplate.png"
   },
-  "riv": {
-   "name": "River Plate",
-   "short": "River",
-   "crest": "/teams/riverplate.png"
-  },
   "cariverplate": {
    "name": "River Plate",
    "short": "River",
    "crest": "/teams/riverplate.png"
   },
   "roma": {
-   "name": "Roma",
-   "short": "Roma",
-   "crest": "/teams/roma.png"
-  },
-  "rom": {
    "name": "Roma",
    "short": "Roma",
    "crest": "/teams/roma.png"
@@ -7087,11 +5622,6 @@
    "short": "Santos",
    "crest": "/teams/santos.png"
   },
-  "san": {
-   "name": "Santos",
-   "short": "Santos",
-   "crest": "/teams/santos.png"
-  },
   "saojosers": {
    "name": "São José-RS",
    "short": "São José-RS",
@@ -7103,11 +5633,6 @@
    "crest": "/teams/saojosers.png"
   },
   "saopaulo": {
-   "name": "São Paulo",
-   "short": "São Paulo",
-   "crest": "/teams/saopaulo.png"
-  },
-  "sao": {
    "name": "São Paulo",
    "short": "São Paulo",
    "crest": "/teams/saopaulo.png"
@@ -7127,17 +5652,7 @@
    "short": "Senegal",
    "crest": "/teams/senegal.png"
   },
-  "sen": {
-   "name": "Senegal",
-   "short": "Senegal",
-   "crest": "/teams/senegal.png"
-  },
   "servia": {
-   "name": "Sérvia",
-   "short": "Sérvia",
-   "crest": "/teams/servia.png"
-  },
-  "srb": {
    "name": "Sérvia",
    "short": "Sérvia",
    "crest": "/teams/servia.png"
@@ -7157,11 +5672,6 @@
    "short": "Sevilla",
    "crest": "/teams/sevilla.png"
   },
-  "sev": {
-   "name": "Sevilla",
-   "short": "Sevilla",
-   "crest": "/teams/sevilla.png"
-  },
   "sheffieldunited": {
    "name": "Sheffield United",
    "short": "Sheffield Utd",
@@ -7172,27 +5682,12 @@
    "short": "Sheffield Utd",
    "crest": "/teams/sheffieldunited.png"
   },
-  "shu": {
-   "name": "Sheffield United",
-   "short": "Sheffield Utd",
-   "crest": "/teams/sheffieldunited.png"
-  },
   "southampton": {
    "name": "Southampton",
    "short": "Southampton",
    "crest": "/teams/southampton.png"
   },
-  "sou": {
-   "name": "Southampton",
-   "short": "Southampton",
-   "crest": "/teams/southampton.png"
-  },
   "sport": {
-   "name": "Sport",
-   "short": "Sport",
-   "crest": "/teams/sport.png"
-  },
-  "spt": {
    "name": "Sport",
    "short": "Sport",
    "crest": "/teams/sport.png"
@@ -7208,11 +5703,6 @@
    "crest": "/teams/sport.png"
   },
   "sporting": {
-   "name": "Sporting",
-   "short": "Sporting",
-   "crest": "/teams/sporting.png"
-  },
-  "scp": {
    "name": "Sporting",
    "short": "Sporting",
    "crest": "/teams/sporting.png"
@@ -7247,11 +5737,6 @@
    "short": "Reims",
    "crest": "/teams/stadedereims.png"
   },
-  "rei": {
-   "name": "Reims",
-   "short": "Reims",
-   "crest": "/teams/stadedereims.png"
-  },
   "stpauli": {
    "name": "St. Pauli",
    "short": "St. Pauli",
@@ -7262,22 +5747,12 @@
    "short": "Stuttgart",
    "crest": "/teams/stuttgart.png"
   },
-  "vfb": {
-   "name": "Stuttgart",
-   "short": "Stuttgart",
-   "crest": "/teams/stuttgart.png"
-  },
   "vfbstuttgart": {
    "name": "Stuttgart",
    "short": "Stuttgart",
    "crest": "/teams/stuttgart.png"
   },
   "suecia": {
-   "name": "Suécia",
-   "short": "Suécia",
-   "crest": "/teams/suecia.svg"
-  },
-  "swe": {
    "name": "Suécia",
    "short": "Suécia",
    "crest": "/teams/suecia.svg"
@@ -7297,11 +5772,6 @@
    "short": "Suíça",
    "crest": "/teams/suica.png"
   },
-  "sui": {
-   "name": "Suíça",
-   "short": "Suíça",
-   "crest": "/teams/suica.png"
-  },
   "switzerland": {
    "name": "Suíça",
    "short": "Suíça",
@@ -7313,11 +5783,6 @@
    "crest": "/teams/suica.png"
   },
   "sunderland": {
-   "name": "Sunderland",
-   "short": "Sunderland",
-   "crest": "/teams/sunderland.png"
-  },
-  "sun": {
    "name": "Sunderland",
    "short": "Sunderland",
    "crest": "/teams/sunderland.png"
@@ -7337,11 +5802,6 @@
    "short": "Tchéquia",
    "crest": "/teams/tchequia.png"
   },
-  "cze": {
-   "name": "Tchéquia",
-   "short": "Tchéquia",
-   "crest": "/teams/tchequia.png"
-  },
   "czechia": {
    "name": "Tchéquia",
    "short": "Tchéquia",
@@ -7357,17 +5817,7 @@
    "short": "Torino",
    "crest": "/teams/torino.png"
   },
-  "tor": {
-   "name": "Torino",
-   "short": "Torino",
-   "crest": "/teams/torino.png"
-  },
   "tottenham": {
-   "name": "Tottenham",
-   "short": "Tottenham",
-   "crest": "/teams/tottenham.png"
-  },
-  "tot": {
    "name": "Tottenham",
    "short": "Tottenham",
    "crest": "/teams/tottenham.png"
@@ -7387,17 +5837,7 @@
    "short": "Tunísia",
    "crest": "/teams/tunisia.svg"
   },
-  "tun": {
-   "name": "Tunísia",
-   "short": "Tunísia",
-   "crest": "/teams/tunisia.svg"
-  },
   "turquia": {
-   "name": "Turquia",
-   "short": "Turquia",
-   "crest": "/teams/turquia.png"
-  },
-  "tur": {
    "name": "Turquia",
    "short": "Turquia",
    "crest": "/teams/turquia.png"
@@ -7413,11 +5853,6 @@
    "crest": "/teams/turquia.png"
   },
   "udinese": {
-   "name": "Udinese",
-   "short": "Udinese",
-   "crest": "/teams/udinese.png"
-  },
-  "udi": {
    "name": "Udinese",
    "short": "Udinese",
    "crest": "/teams/udinese.png"
@@ -7463,11 +5898,6 @@
    "crest": "/teams/union.png"
   },
   "unionberlin": {
-   "name": "Union Berlin",
-   "short": "Union Berlin",
-   "crest": "/teams/unionberlin.png"
-  },
-  "fcu": {
    "name": "Union Berlin",
    "short": "Union Berlin",
    "crest": "/teams/unionberlin.png"
@@ -7552,22 +5982,12 @@
    "short": "Uruguai",
    "crest": "/teams/uruguai.png"
   },
-  "uru": {
-   "name": "Uruguai",
-   "short": "Uruguai",
-   "crest": "/teams/uruguai.png"
-  },
   "uruguay": {
    "name": "Uruguai",
    "short": "Uruguai",
    "crest": "/teams/uruguai.png"
   },
   "uzbequistao": {
-   "name": "Uzbequistão",
-   "short": "Uzbequistão",
-   "crest": "/teams/uzbequistao.svg"
-  },
-  "uzb": {
    "name": "Uzbequistão",
    "short": "Uzbequistão",
    "crest": "/teams/uzbequistao.svg"
@@ -7582,17 +6002,7 @@
    "short": "Valencia",
    "crest": "/teams/valencia.png"
   },
-  "val": {
-   "name": "Valencia",
-   "short": "Valencia",
-   "crest": "/teams/valencia.png"
-  },
   "valladolid": {
-   "name": "Valladolid",
-   "short": "Valladolid",
-   "crest": "/teams/valladolid.png"
-  },
-  "vll": {
    "name": "Valladolid",
    "short": "Valladolid",
    "crest": "/teams/valladolid.png"
@@ -7623,11 +6033,6 @@
    "crest": "/teams/vasco.png"
   },
   "vascodagama": {
-   "name": "Vasco da Gama",
-   "short": "Vasco",
-   "crest": "/teams/vasco.png"
-  },
-  "vas": {
    "name": "Vasco da Gama",
    "short": "Vasco",
    "crest": "/teams/vasco.png"
@@ -7667,11 +6072,6 @@
    "short": "Verona",
    "crest": "/teams/verona.png"
   },
-  "ver": {
-   "name": "Hellas Verona",
-   "short": "Verona",
-   "crest": "/teams/verona.png"
-  },
   "vilanova": {
    "name": "Vila Nova",
    "short": "Vila Nova",
@@ -7682,17 +6082,7 @@
    "short": "Villarreal",
    "crest": "/teams/villarreal.png"
   },
-  "vil": {
-   "name": "Villarreal",
-   "short": "Villarreal",
-   "crest": "/teams/villarreal.png"
-  },
   "vitoria": {
-   "name": "Vitória",
-   "short": "Vitória",
-   "crest": "/teams/vitoria.png"
-  },
-  "vit": {
    "name": "Vitória",
    "short": "Vitória",
    "crest": "/teams/vitoria.png"
@@ -7717,22 +6107,12 @@
    "short": "West Ham",
    "crest": "/teams/westham.png"
   },
-  "whu": {
-   "name": "West Ham",
-   "short": "West Ham",
-   "crest": "/teams/westham.png"
-  },
   "westhamunited": {
    "name": "West Ham",
    "short": "West Ham",
    "crest": "/teams/westham.png"
   },
   "wolfsburg": {
-   "name": "Wolfsburg",
-   "short": "Wolfsburg",
-   "crest": "/teams/wolfsburg.png"
-  },
-  "wob": {
    "name": "Wolfsburg",
    "short": "Wolfsburg",
    "crest": "/teams/wolfsburg.png"
@@ -7748,11 +6128,6 @@
    "crest": "/teams/wolves.png"
   },
   "wolverhampton": {
-   "name": "Wolverhampton",
-   "short": "Wolves",
-   "crest": "/teams/wolves.png"
-  },
-  "wol": {
    "name": "Wolverhampton",
    "short": "Wolves",
    "crest": "/teams/wolves.png"

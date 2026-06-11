@@ -45,6 +45,15 @@ Edite várias entradas no `data/teams-registry.json` (é só JSON), solte os PNG
 - **Nunca** edite `src/lib/teamCrests.ts` nem `data/teams-catalog.json` à mão (são gerados).
 - O app importa `@/data/teams-catalog.json` (= `src/data/`); o gerador mantém as duas cópias iguais.
 - Arquivos dup/typo em `public/teams/` não viram time (sem entrada no registro) — remova-os.
+- **A sigla (`tla`) NÃO é chave de matching do sync** — é só metadado/exibição. Sigla de clube
+  colide com país na ESPN (CAM = Camboja ≠ Atlético-MG; COM/GRE/BOT/BAH idem) e já gravou jogo
+  errado em prod (amistosos pré-Copa 2026). O mapa canônico (`teams-canonical.json`) indexa só
+  slug/nome/short/**aliases**; siglas são tratadas pelos fallbacks `TEAM_PT`/`COUNTRY_EN_PT`
+  dentro do `sync-football`. Se uma API casar um time só pela sigla, **adicione o nome dela aos
+  `aliases`** — não recoloque o TLA como chave.
+- **Seleção que aparece nos amistosos/eliminatórias mas não tem cadastro** passa batida em inglês
+  (ou cai num fallback) — se ela ganhar destaque, cadastre como `kind: "national"` com o alias em
+  inglês da ESPN (ex.: `camboja`/"Cambodia", `comores`/"Comoros", `grecia`/"Greece").
 
 ## Competições (curadoria editável)
 **`data/competitions-registry.json`** — uma entrada por campeonato:
