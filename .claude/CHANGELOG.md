@@ -28,6 +28,13 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   **Todos** → competições. **Coachmark** na 1ª visita explica a aba. As fileiras de abas e de dias
   usam o novo **`ScrollRow`** (componente de UI): **degradê nas bordas** quando há mais conteúdo pra
   arrastar, sumindo no fim do scroll. → [`03`](03-PAGINAS.md).
+- **Anúncio in-app da Gestão do Bolão na home.** Pop-up (`NovidadeBolaoModal`) que aparece **uma
+  vez** na tela de Jogos pra quem já passou do 1º acesso, listando o que dá pra fazer: definir o
+  valor da inscrição, marcar quem pagou, configurar a divisão do prêmio (1º/2º/3º) e ver na
+  classificação quem está levando, com o disclaimer de que o dinheiro continua fora do app. **Não
+  colide com o tour guiado** dos novatos: o tour passou a emitir `resultadismo:tour-done` ao
+  fechar, e o modal só abre depois disso (veteranos, que já têm o flag do tour, veem na hora).
+  CTAs "Ver meus grupos" (→ /grupos) e "Agora não".
 
 ### Alterado
 - **Imagem de palpites junta jogos de DIAS diferentes.** A seleção não se perde ao trocar a aba
@@ -44,6 +51,17 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   já começou há <4h) agora também conta como selecionável, na mesma régua do card.
 
 ### Corrigido
+- **Coachmark da Gestão aponta pra aba certa (não mais pro canto).** Depois que a aba virou a 3ª
+  (com a 4ª "Competições" à direita) e a fileira ganhou rolagem, a seta/balão da dica de novidade
+  miravam o fim da fileira. O `Coachmark` ganhou `caretTargetSelector`: mede o botão alvo
+  (`[data-value='bolao']`), traz ele à vista no trilho rolável e ancora a **seta, o balão (com
+  clamp pra não vazar da tela) e o anel de destaque** sobre a aba **Gestão**, onde quer que ela
+  esteja. O `SegmentedControl` passou a marcar cada botão com `data-value`.
+- **Selo de prêmio (💰) não sobrepõe mais as cravadas no mobile.** Em telas pequenas o valor da
+  premiação encostava na coluna CRA. Agora, quando o jogador leva prêmio, a 2ª linha mostra **só o
+  selo** (esconde "X jogos") e as colunas numéricas do resumo encolhem um tico — o 💰 fica colado à
+  esquerda, longe das cravadas (validado até 320px com nome longo). Quem não leva prêmio segue com
+  "X jogos"; grupos sem bolão não mudam nada.
 - **JogosPage: memoização do `dayMatches` restaurada na ordem certa.** O erro do React Compiler
   ("Existing memoization could not be preserved") era causado pelas funções de compartilhar
   declaradas **antes** do `dayMatches` que elas leem; o hotfix anterior tirou o `useMemo` e deixou

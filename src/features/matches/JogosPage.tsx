@@ -26,6 +26,7 @@ import {
 } from "./api";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import { useMyGroupScopes } from "@/features/leagues/api";
+import { NovidadeBolaoModal } from "@/features/leagues/NovidadeBolaoModal";
 import { LandingSections } from "@/features/landing/LandingSections";
 import { FirstFold } from "@/features/landing/FirstFold";
 
@@ -391,6 +392,10 @@ export function JogosPage() {
         ) : undefined
       }
     >
+      {/* anúncio in-app da Gestão do Bolão: 1x, só pra quem já passou do 1º
+          acesso (não colide com o tour guiado dos novatos). */}
+      <NovidadeBolaoModal enabled={!!session && perso?.personalization_done === true} />
+
       {/* seletor de competição: "Todos" primeiro (padrão) */}
       {loadingComps ? (
         <Skeleton className="mb-3 h-9 w-full" />

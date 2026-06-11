@@ -402,7 +402,7 @@ export function LigaDetailPage() {
           storageKey="resultadismo-coach-gestao-bolao-v1"
           title="Novidade: Gestão do Bolão"
           placement="bottom"
-          align="end"
+          caretTargetSelector="[data-value='bolao']"
           className="mb-4"
           content={
             <>

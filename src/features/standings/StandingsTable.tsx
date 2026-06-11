@@ -17,7 +17,14 @@ export function StandingsTable({
   pot?: { prizeByUserId: Map<string, number> };
 }) {
   const [expanded, setExpanded] = useState(false);
-  const gap = expanded ? "gap-2" : "gap-3";
+  // com selo de prêmio na linha, aperta o espaçamento pra sobrar largura pro
+  // nome+selo e o 💰 nunca encostar na coluna de cravadas (telas pequenas).
+  const hasAnyPrize = !!pot && rows.some((r) => pot.prizeByUserId.has(r.user_id));
+  const gap = expanded ? "gap-2" : hasAnyPrize ? "gap-2" : "gap-3";
+  // com selo, encolhe as colunas numéricas do resumo pra liberar largura pro
+  // nome+💰 (telas pequenas com valores maiores).
+  const numW = hasAnyPrize ? "w-8" : "w-9";
+  const ptsW = hasAnyPrize ? "w-9" : "w-10";
 
   return (
     <div className="overflow-hidden rounded-lg bg-surface shadow-[var(--shadow-soft)] ring-1 ring-border">
@@ -58,11 +65,11 @@ export function StandingsTable({
               </>
             ) : (
               <>
-                <span className="w-9 text-center text-gold-700" title="Cravadas">CRA</span>
-                <span className="w-9 text-center" title="Aproveitamento">%</span>
+                <span className={cn("text-center text-gold-700", numW)} title="Cravadas">CRA</span>
+                <span className={cn("text-center", numW)} title="Aproveitamento">%</span>
               </>
             )}
-            <span className="w-10 text-right">Pts</span>
+            <span className={cn("text-right", ptsW)}>Pts</span>
           </div>
 
           <ul className="divide-y divide-ink-100">
@@ -99,21 +106,26 @@ export function StandingsTable({
                         <span className="ml-1 text-xs font-medium text-brand-600">(você)</span>
                       )}
                     </span>
-                    {/* selo na linha de baixo: não disputa espaço com o nome no mobile */}
-                    {(!expanded || pot?.prizeByUserId.has(row.user_id)) && (
-                      <span className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-ink-400">
-                        {!expanded && (
-                          <>
-                            {row.jogos} {row.jogos === 1 ? "jogo" : "jogos"}
-                          </>
-                        )}
-                        {pot?.prizeByUserId.has(row.user_id) && (
-                          <span className="inline-flex shrink-0 items-center rounded-pill bg-gold-600/15 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-gold-700">
-                            💰 {formatBRL(pot.prizeByUserId.get(row.user_id)!)}
-                          </span>
-                        )}
-                      </span>
-                    )}
+                    {/* 2ª linha: quando o jogador leva prêmio, mostra SÓ o selo
+                        (esconde "X jogos") pra não competir por espaço e o 💰
+                        nunca encostar na coluna de cravadas no mobile. */}
+                    {(() => {
+                      const prize = pot?.prizeByUserId.get(row.user_id);
+                      if (prize == null && expanded) return null;
+                      return (
+                        <span className="flex min-w-0 items-center gap-1.5 whitespace-nowrap text-[11px] text-ink-400">
+                          {prize != null ? (
+                            <span className="inline-flex shrink-0 items-center rounded-pill bg-gold-600/15 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-gold-700">
+                              💰 {formatBRL(prize)}
+                            </span>
+                          ) : (
+                            <>
+                              {row.jogos} {row.jogos === 1 ? "jogo" : "jogos"}
+                            </>
+                          )}
+                        </span>
+                      );
+                    })()}
                   </div>
                   {expanded ? (
                     <>
@@ -135,15 +147,15 @@ export function StandingsTable({
                     </>
                   ) : (
                     <>
-                      <span className="w-9 text-center text-sm font-semibold tabular-nums text-gold-700">
+                      <span className={cn("text-center text-sm font-semibold tabular-nums text-gold-700", numW)}>
                         {row.cravadas}
                       </span>
-                      <span className="w-9 text-center text-xs tabular-nums text-ink-500">
+                      <span className={cn("text-center text-xs tabular-nums text-ink-500", numW)}>
                         {row.aproveitamento}%
                       </span>
                     </>
                   )}
-                  <span className="w-10 text-right text-lg font-extrabold tabular-nums text-ink-950">
+                  <span className={cn("text-right text-lg font-extrabold tabular-nums text-ink-950", ptsW)}>
                     {row.pontos}
                   </span>
                   </Link>

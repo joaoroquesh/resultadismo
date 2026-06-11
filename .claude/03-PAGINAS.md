@@ -49,6 +49,8 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
   Coachmark na 1ª vez explica a aba Grupos. Seletor de dia (hoje → próximo com jogos), resumo do
   dia (pontos + dobros usados na semana), lista de `MatchCard`. As fileiras de abas/dias usam
   `ScrollRow` (degradê nas bordas indicando que dá pra arrastar). Deslogado → seções de landing.
+  Mostra **1x** o `NovidadeBolaoModal` (anúncio da Gestão do Bolão) pra quem já passou do 1º
+  acesso — espera o tour guiado terminar (`resultadismo:tour-done`) pra não sobrepor.
 - **`MatchCard`**: card do jogo — times/escudos, status (horário/ao vivo/encerrado), inputs do
   palpite (auto-save com debounce), botão **2×** (dobro), resultado + tipo de pontuação colorido,
   "Galera" (quem palpitou). Trava ao chegar o `kickoff_at`.

@@ -22,6 +22,7 @@ export function SegmentedControl<T extends string>({
           <button
             key={opt.value}
             type="button"
+            data-value={opt.value}
             onClick={() => onChange(opt.value)}
             className={cn(
               "flex-1 whitespace-nowrap rounded-pill px-3 py-1.5 text-sm font-semibold transition-all",

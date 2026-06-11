@@ -29,7 +29,9 @@ export type AnalyticsEvent =
   | "retro_run_start" // { level, daily: boolean } — mini-jogo Retrô (modos rodada 18)
   | "retro_guess" // { slot, score_type, timeout: boolean }
   | "retro_run_end" // { status, stage_rank, points, daily: boolean }
-  | "retro_share"; // { status } — share da campanha (WhatsApp/clipboard)
+  | "retro_share" // { status } — share da campanha (WhatsApp/clipboard)
+  | "novidade_cta" // { content_type } — clicou no CTA do anúncio de novidade
+  | "novidade_dismiss"; // { content_type } — fechou o anúncio de novidade
 
 /** Dispara um evento no GA4. No-op se o gtag ainda não carregou (ou foi bloqueado). */
 export function track(event: AnalyticsEvent, params?: Record<string, Primitive>): void {

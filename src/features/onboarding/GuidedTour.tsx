@@ -243,6 +243,9 @@ export function GuidedTour() {
     setForced(false);
     setIndex(0);
     setGeom(null);
+    // avisa quem espera o tour terminar (ex.: modal de novidade na home) pra
+    // não aparecerem dois overlays ao mesmo tempo.
+    window.dispatchEvent(new Event("resultadismo:tour-done"));
   }
   const isLast = index === STEPS.length - 1;
   const next = () => (isLast ? finish() : setIndex((i) => i + 1));
