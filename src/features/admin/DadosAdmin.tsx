@@ -351,8 +351,11 @@ function SourcesSection() {
                   <span className="text-sm font-medium text-ink-900">{s.provider}</span>
                   <span className="text-xs text-ink-500">{s.provider_code ?? "—"}</span>
                   {s.last_sync_ok === false && (
-                    <span className="rounded-pill bg-flame-600 px-2 py-0.5 text-[10px] font-semibold text-white">
-                      falhou
+                    <span
+                      title="Esta fonte está instável. Enquanto outra fonte cobrir, os placares continuam atualizando normalmente."
+                      className="rounded-pill bg-gold-500 px-2 py-0.5 text-[10px] font-semibold text-gold-950"
+                    >
+                      instável
                     </span>
                   )}
                   <span className="ml-auto flex items-center gap-2">

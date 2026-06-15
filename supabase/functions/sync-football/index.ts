@@ -733,15 +733,25 @@ Deno.serve(async (req) => {
       goldenUpdated = (gu as number) ?? 0;
     } catch (e) { console.error("golden", e); }
 
-    // saúde da competição: ok se a primary funcionou; senão alerta (degradação:
-    // secundárias podem ter mantido o placar fresco mesmo com a primary fora).
-    if (primaryOk) {
+    // Saúde da competição: SÓ é falha real (alerta + push) quando NENHUMA fonte
+    // entregou dados. Primária cair com a secundária/golden cobrindo é
+    // degradação SILENCIOSA — sem alerta de ação, sem push. O problema da
+    // primária continua visível POR FONTE (competition_sources.last_sync_ok =
+    // false → "aviso amarelo" no painel) e some sozinho quando ela volta. Isso
+    // mata o spam de notificação e o loop de re-alerta (pedido do João).
+    const dataFresh = primaryOk || secMatched > 0 || touched.size > 0 || goldenUpdated > 0;
+    if (dataFresh) {
       await admin.from("competitions").update({ last_synced_at: new Date().toISOString() }).eq("id", comp.id);
       await markSyncResult(admin, comp.id, true, null);
-      await clearApiErrors(admin, comp.id);
-      results.push({ competition: comp.name, ok: true, mode, updated, inserted, alerted, secMatched, golden: goldenUpdated });
+      await clearApiErrors(admin, comp.id); // resolve qualquer api_error pendente
+      results.push({
+        competition: comp.name, ok: true, mode, updated, inserted, alerted, secMatched,
+        golden: goldenUpdated, primaryDegraded: !primaryOk,
+      });
     } else {
-      const msg = primaryErr ?? "fonte primária indisponível";
+      // nada entregue por nenhuma fonte → falha de verdade: alerta + push (1x; o
+      // dedupe por pending evita repetir até resolver).
+      const msg = primaryErr ?? "nenhuma fonte entregou dados";
       await markSyncResult(admin, comp.id, false, msg);
       await alertApiError(admin, comp, msg);
       results.push({ competition: comp.name, ok: false, error: msg, secMatched, golden: goldenUpdated });

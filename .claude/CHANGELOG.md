@@ -47,6 +47,15 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   com o **💰 valor**. `describeTeamScope` em `teamsCatalog`; `payers` propagado ao `StandingsTable`.
 
 ### Corrigido
+- **Sync: fim do spam de alerta pro admin quando o fallback cobre.** A saúde da competição era
+  presa SÓ ao sucesso da API primária — então toda vez que a `football-data` caía (mesmo com o
+  ESPN/golden mantendo os placares atualizados), o admin levava alerta + push, e o alerta ficava
+  preso re-notificando a cada ciclo. Agora o sync só marca falha (e só aí alerta + push) quando
+  **NENHUMA fonte entregou dados** (`dataFresh = primária OU secundária OU golden`); primária cair
+  com fallback cobrindo é **degradação silenciosa** — sem push, sem inflar o badge, e o `api_error`
+  pendente é resolvido sozinho. O problema da fonte continua visível no admin (Dados → Fontes) como
+  **aviso amarelo "instável"** (era "falhou" vermelho), e o admin pode **desativar a fonte** ali
+  mesmo (toggle já existente — o sync só usa fontes `enabled`). Edge function `sync-football`.
 - **Palpites da galera: pontuação dobrada não some mais no encerrado + trovão de 2× por palpite.**
   No jogo encerrado a pontuação de quem usou o Dobro voltava ao valor base (o `ScorePill` não
   recebia `doubled`); agora mostra o valor dobrado (ex.: cravada com 2× = +6). E todo palpite que
