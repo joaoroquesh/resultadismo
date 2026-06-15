@@ -504,7 +504,10 @@ export function JogosPage() {
           className="-mx-4 mb-4"
           innerClassName="px-4 py-1.5"
           centerSelector="[data-day-active]"
-          centerKey={String(scope)}
+          /* re-centraliza quando a LISTA de dias muda (load frio logado em
+             grupo: groupScopes/perso chegam DEPOIS dos jogos e trocam os dias)
+             ou o dia ativo muda — não a cada render/realtime com os mesmos dias. */
+          centerKey={`${scope}|${day ?? ""}|${days.length}|${days[0] ?? ""}|${days[days.length - 1] ?? ""}`}
         >
           {days.map((d) => {
             const isToday = d === dayjs().format("YYYY-MM-DD");

@@ -20,6 +20,26 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+### Adicionado
+- **Bolão: o membro vê o que vale e quem está participando do pago.** (1) Na **Classificação** do
+  grupo, um aviso deixa claro o **recorte de seleções** quando há um ("Neste grupo valem os jogos
+  de X. Você pode palpitar em qualquer jogo, mas só esses contam no ranking aqui.") — some quando o
+  recorte é "Todas", pra não poluir. (2) Na classificação, **todo pagante** do bolão pago agora
+  exibe um selo **🎟️ no bolão** (visível a qualquer membro, não só ao dono); os premiados seguem
+  com o **💰 valor**. `describeTeamScope` em `teamsCatalog`; `payers` propagado ao `StandingsTable`.
+
+### Corrigido
+- **Palpites da galera: pontuação dobrada não some mais no encerrado + trovão de 2× por palpite.**
+  No jogo encerrado a pontuação de quem usou o Dobro voltava ao valor base (o `ScorePill` não
+  recebia `doubled`); agora mostra o valor dobrado (ex.: cravada com 2× = +6). E todo palpite que
+  usou o **Dobro** ganha um **⚡** ao lado na lista da galera — **sempre**, inclusive quando a
+  pessoa não pontuou (ex.: erro com 2×). `ScorePill` ganhou `showZap` pra não duplicar o ícone.
+- **Fileira de dias: hoje agora centraliza DE VERDADE (re-fix).** O fix anterior só centralizava
+  uma vez preso ao escopo; no load frio (logado e em grupo) os jogos/dias chegavam depois e o dia
+  caía à esquerda. Agora a centralização re-roda quando a **lista de dias muda** (`centerKey` com a
+  assinatura dos dias) e a medição é robusta (tenta antes do paint, re-tenta se a largura ainda é 0,
+  re-centra após as fontes carregarem) — sem brigar com o scroll manual depois.
+
 ### Alterado
 - **Palpites da galera: só os SEUS grupos, na ordem dos favoritos, e ranking ao vivo.** O chip
   "Todos" morreu — palpite de quem não está nos seus grupos não aparece (sem grupo, a área convida

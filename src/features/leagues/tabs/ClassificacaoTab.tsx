@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Swords, ChevronRight } from "lucide-react";
+import { Swords, ChevronRight, Target } from "lucide-react";
+import { describeTeamScope } from "@/features/onboarding/teamsCatalog";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Card } from "@/components/ui/Card";
@@ -28,6 +29,7 @@ export function ClassificacaoTab({
     mode: string;
     competition_id: string;
     confronto_state?: string;
+    followed_team_slugs?: string[] | null;
   }[];
   activeLcId?: string;
   onSelect: (id: string) => void;
@@ -101,6 +103,26 @@ export function ClassificacaoTab({
           ))}
         </div>
       )}
+
+      {/* Recorte: deixa CLARO pro MEMBRO quais jogos valem ponto neste grupo
+          (só quando há recorte; "Todas" não polui a tela). Evita a frustração
+          de palpitar um jogo que não conta. */}
+      {(() => {
+        const scope = describeTeamScope(active?.followed_team_slugs);
+        if (scope.kind === "all") return null;
+        return (
+          <div className="mb-3 flex items-start gap-2 rounded-md bg-surface-2 p-3 text-xs leading-relaxed text-ink-600">
+            <Target className="mt-0.5 size-4 shrink-0 text-brand-600" />
+            <p>
+              Neste grupo valem os jogos de{" "}
+              <span className="font-semibold text-ink-900">
+                {scope.kind === "brasil" ? "só o Brasil" : scope.names.join(", ")}
+              </span>
+              . Você pode palpitar em qualquer jogo, mas só esses contam no ranking aqui.
+            </p>
+          </div>
+        );
+      })()}
 
       {/* Tabela do bolão ativo */}
       {loading ? (

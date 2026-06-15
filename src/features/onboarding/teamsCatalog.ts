@@ -150,3 +150,29 @@ export function teamNameMatches(expanded: Set<string>, name: string | null | und
   const k = teamCrestSlug(name);
   return !!k && expanded.has(k);
 }
+
+/** Descreve o recorte de seleções de um bolão (followed_team_slugs) em
+ * linguagem clara pro membro. Espelha a reconstrução do TeamScopeCard:
+ * null/[] = todas; igual ao expandido de ["brasil"] = só o Brasil; senão =
+ * conjunto escolhido (com os nomes). */
+export function describeTeamScope(savedSlugs: string[] | null | undefined): {
+  kind: "all" | "brasil" | "custom";
+  label: string;
+  names: string[];
+} {
+  if (!savedSlugs || savedSlugs.length === 0)
+    return { kind: "all", label: "Todas as seleções", names: [] };
+  const saved = new Set(savedSlugs);
+  const brasilOnly = expandTeamSlugs(["brasil"]);
+  const isBrasil =
+    saved.size === brasilOnly.size && [...brasilOnly].every((s) => saved.has(s));
+  if (isBrasil) return { kind: "brasil", label: "Só o Brasil", names: ["Brasil"] };
+  const names = catalogWcNations()
+    .filter((n) => saved.has(n.id))
+    .map((n) => n.name);
+  return {
+    kind: "custom",
+    label: names.length ? `${names.length} seleções` : "Seleções escolhidas",
+    names,
+  };
+}

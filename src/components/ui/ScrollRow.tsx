@@ -42,13 +42,37 @@ export function ScrollRow({
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el || !centerSelector) return;
-    const target = el.querySelector<HTMLElement>(centerSelector);
-    if (!target) return;
-    const cr = el.getBoundingClientRect();
-    const tr = target.getBoundingClientRect();
-    const delta = tr.left + tr.width / 2 - (cr.left + el.clientWidth / 2);
-    const max = el.scrollWidth - el.clientWidth;
-    el.scrollLeft = Math.max(0, Math.min(el.scrollLeft + delta, max));
+    let raf = 0;
+    let tries = 0;
+    let cancelled = false;
+    const center = () => {
+      if (cancelled) return;
+      const target = el.querySelector<HTMLElement>(centerSelector);
+      // largura 0 (load frio, layout ainda não pronto) ou alvo ausente → re-tenta
+      if (!target || el.clientWidth === 0) {
+        if (tries++ < 12) raf = requestAnimationFrame(center);
+        return;
+      }
+      const cr = el.getBoundingClientRect();
+      const tr = target.getBoundingClientRect();
+      const delta = tr.left + tr.width / 2 - (cr.left + el.clientWidth / 2);
+      const max = el.scrollWidth - el.clientWidth;
+      el.scrollLeft = Math.max(0, Math.min(el.scrollLeft + delta, max));
+    };
+    // tentativa síncrona (antes do paint, sem flash) + retry p/ layout/dados async
+    center();
+    // fontes carregam depois do 1º paint e mudam as larguras → re-centra 1x
+    let fontsDone = false;
+    document.fonts?.ready?.then(() => {
+      if (!cancelled && !fontsDone) {
+        fontsDone = true;
+        center();
+      }
+    });
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+    };
   }, [centerSelector, centerKey]);
 
   useEffect(() => {
