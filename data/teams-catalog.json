@@ -734,7 +734,7 @@
       "Australia",
       "Socceroos"
     ],
-    "crest_file": "australia.svg",
+    "crest_file": "australia.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -1111,7 +1111,7 @@
       "Bosnia & Herzegovina",
       "Bosnia"
     ],
-    "crest_file": "bosniaeherzegovina.svg",
+    "crest_file": "bosniaeherzegovina.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -1538,7 +1538,7 @@
     "aliases": [
       "Qatar"
     ],
-    "crest_file": "catar.svg",
+    "crest_file": "catar.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -2193,7 +2193,7 @@
     "aliases": [
       "Egypt"
     ],
-    "crest_file": "egito.svg",
+    "crest_file": "egito.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -2905,7 +2905,7 @@
     "aliases": [
       "Haiti"
     ],
-    "crest_file": "haiti.svg",
+    "crest_file": "haiti.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -3209,7 +3209,7 @@
       "Iran",
       "IR Iran"
     ],
-    "crest_file": "ira.svg",
+    "crest_file": "ira.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -5748,7 +5748,7 @@
     "aliases": [
       "Tunisia"
     ],
-    "crest_file": "tunisia.svg",
+    "crest_file": "tunisia.png",
     "crest_source": "repo (public/teams)"
   },
   {

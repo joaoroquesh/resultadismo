@@ -433,12 +433,12 @@
   "australia": {
    "name": "Austrália",
    "short": "Austrália",
-   "crest": "/teams/australia.svg"
+   "crest": "/teams/australia.png"
   },
   "socceroos": {
    "name": "Austrália",
    "short": "Austrália",
-   "crest": "/teams/australia.svg"
+   "crest": "/teams/australia.png"
   },
   "austria": {
    "name": "Áustria",
@@ -678,22 +678,22 @@
   "bosniaeherzegovina": {
    "name": "Bósnia e Herzegovina",
    "short": "Bósnia",
-   "crest": "/teams/bosniaeherzegovina.svg"
+   "crest": "/teams/bosniaeherzegovina.png"
   },
   "bosnia": {
    "name": "Bósnia e Herzegovina",
    "short": "Bósnia",
-   "crest": "/teams/bosniaeherzegovina.svg"
+   "crest": "/teams/bosniaeherzegovina.png"
   },
   "bosniaandherzegovina": {
    "name": "Bósnia e Herzegovina",
    "short": "Bósnia",
-   "crest": "/teams/bosniaeherzegovina.svg"
+   "crest": "/teams/bosniaeherzegovina.png"
   },
   "bosniaherzegovina": {
    "name": "Bósnia e Herzegovina",
    "short": "Bósnia",
-   "crest": "/teams/bosniaeherzegovina.svg"
+   "crest": "/teams/bosniaeherzegovina.png"
   },
   "botafogo": {
    "name": "Botafogo",
@@ -923,12 +923,12 @@
   "catar": {
    "name": "Catar",
    "short": "Catar",
-   "crest": "/teams/catar.svg"
+   "crest": "/teams/catar.png"
   },
   "qatar": {
    "name": "Catar",
    "short": "Catar",
-   "crest": "/teams/catar.svg"
+   "crest": "/teams/catar.png"
   },
   "cazaquistao": {
    "name": "Cazaquistão",
@@ -1323,12 +1323,12 @@
   "egito": {
    "name": "Egito",
    "short": "Egito",
-   "crest": "/teams/egito.svg"
+   "crest": "/teams/egito.png"
   },
   "egypt": {
    "name": "Egito",
    "short": "Egito",
-   "crest": "/teams/egito.svg"
+   "crest": "/teams/egito.png"
   },
   "elsalvador": {
    "name": "El Salvador",
@@ -1758,7 +1758,7 @@
   "haiti": {
    "name": "Haiti",
    "short": "Haiti",
-   "crest": "/teams/haiti.svg"
+   "crest": "/teams/haiti.png"
   },
   "heidenheim": {
    "name": "Heidenheim",
@@ -1958,17 +1958,17 @@
   "ira": {
    "name": "Irã",
    "short": "Irã",
-   "crest": "/teams/ira.svg"
+   "crest": "/teams/ira.png"
   },
   "iran": {
    "name": "Irã",
    "short": "Irã",
-   "crest": "/teams/ira.svg"
+   "crest": "/teams/ira.png"
   },
   "iriran": {
    "name": "Irã",
    "short": "Irã",
-   "crest": "/teams/ira.svg"
+   "crest": "/teams/ira.png"
   },
   "iraque": {
    "name": "Iraque",
@@ -3563,7 +3563,7 @@
   "tunisia": {
    "name": "Tunísia",
    "short": "Tunísia",
-   "crest": "/teams/tunisia.svg"
+   "crest": "/teams/tunisia.png"
   },
   "turquia": {
    "name": "Turquia",
@@ -4340,12 +4340,12 @@
   "australia": {
    "name": "Austrália",
    "short": "Austrália",
-   "crest": "/teams/australia.svg"
+   "crest": "/teams/australia.png"
   },
   "socceroos": {
    "name": "Austrália",
    "short": "Austrália",
-   "crest": "/teams/australia.svg"
+   "crest": "/teams/australia.png"
   },
   "austria": {
    "name": "Áustria",
@@ -4555,22 +4555,22 @@
   "bosniaeherzegovina": {
    "name": "Bósnia e Herzegovina",
    "short": "Bósnia",
-   "crest": "/teams/bosniaeherzegovina.svg"
+   "crest": "/teams/bosniaeherzegovina.png"
   },
   "bosnia": {
    "name": "Bósnia e Herzegovina",
    "short": "Bósnia",
-   "crest": "/teams/bosniaeherzegovina.svg"
+   "crest": "/teams/bosniaeherzegovina.png"
   },
   "bosniaandherzegovina": {
    "name": "Bósnia e Herzegovina",
    "short": "Bósnia",
-   "crest": "/teams/bosniaeherzegovina.svg"
+   "crest": "/teams/bosniaeherzegovina.png"
   },
   "bosniaherzegovina": {
    "name": "Bósnia e Herzegovina",
    "short": "Bósnia",
-   "crest": "/teams/bosniaeherzegovina.svg"
+   "crest": "/teams/bosniaeherzegovina.png"
   },
   "botafogo": {
    "name": "Botafogo",
@@ -4755,12 +4755,12 @@
   "catar": {
    "name": "Catar",
    "short": "Catar",
-   "crest": "/teams/catar.svg"
+   "crest": "/teams/catar.png"
   },
   "qatar": {
    "name": "Catar",
    "short": "Catar",
-   "crest": "/teams/catar.svg"
+   "crest": "/teams/catar.png"
   },
   "cazaquistao": {
    "name": "Cazaquistão",
@@ -5115,12 +5115,12 @@
   "egito": {
    "name": "Egito",
    "short": "Egito",
-   "crest": "/teams/egito.svg"
+   "crest": "/teams/egito.png"
   },
   "egypt": {
    "name": "Egito",
    "short": "Egito",
-   "crest": "/teams/egito.svg"
+   "crest": "/teams/egito.png"
   },
   "elsalvador": {
    "name": "El Salvador",
@@ -5500,7 +5500,7 @@
   "haiti": {
    "name": "Haiti",
    "short": "Haiti",
-   "crest": "/teams/haiti.svg"
+   "crest": "/teams/haiti.png"
   },
   "heidenheim": {
    "name": "Heidenheim",
@@ -5690,17 +5690,17 @@
   "ira": {
    "name": "Irã",
    "short": "Irã",
-   "crest": "/teams/ira.svg"
+   "crest": "/teams/ira.png"
   },
   "iran": {
    "name": "Irã",
    "short": "Irã",
-   "crest": "/teams/ira.svg"
+   "crest": "/teams/ira.png"
   },
   "iriran": {
    "name": "Irã",
    "short": "Irã",
-   "crest": "/teams/ira.svg"
+   "crest": "/teams/ira.png"
   },
   "iraque": {
    "name": "Iraque",
@@ -7155,7 +7155,7 @@
   "tunisia": {
    "name": "Tunísia",
    "short": "Tunísia",
-   "crest": "/teams/tunisia.svg"
+   "crest": "/teams/tunisia.png"
   },
   "turquia": {
    "name": "Turquia",
