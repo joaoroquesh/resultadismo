@@ -601,6 +601,39 @@ async function clearApiErrors(admin: SupabaseClient, compId: string): Promise<vo
     .eq("competition_id", compId).eq("kind", "api_error").eq("status", "pending");
 }
 
+// Alerta CRÍTICO: jogos onde as fontes divergem no placar (score_conflict) — isso
+// pode mudar a pontuação dos usuários, então notifica os admins (com push). É
+// ADITIVO (só insere alerta + notificação; não altera nenhum dado de jogo) e tem
+// dedupe POR JOGO (1 alerta pendente por match) p/ não repetir a cada ciclo.
+async function alertConflicts(
+  admin: SupabaseClient, comp: CompetitionRow, matchIds: string[],
+): Promise<number> {
+  if (!matchIds.length) return 0;
+  const { data: conflicted } = await admin.from("matches")
+    .select("id, home_team_name, away_team_name")
+    .in("id", matchIds).eq("score_conflict", true);
+  if (!conflicted?.length) return 0;
+  let novos = 0;
+  for (const m of conflicted as { id: string; home_team_name: string | null; away_team_name: string | null }[]) {
+    const { data: prev } = await admin.from("sync_alerts").select("id")
+      .eq("match_id", m.id).eq("kind", "score_conflict").eq("status", "pending").limit(1);
+    if (prev && prev.length) continue; // já avisado e não resolvido → não repete
+    await admin.from("sync_alerts").insert({
+      competition_id: comp.id, match_id: m.id, kind: "score_conflict", status: "pending",
+      message: `Conflito de placar: ${m.home_team_name ?? "?"} x ${m.away_team_name ?? "?"} (${comp.name}). As fontes divergem — confira antes que afete a pontuação.`.slice(0, 300),
+      payload: { provider: "multi" },
+    });
+    novos++;
+  }
+  if (novos > 0) {
+    await notifyAdmins(
+      admin, "⚠️ Conflito de placar",
+      `${novos} jogo(s) com placar divergente em ${comp.name}. Confira em Dados → Conflitos.`.slice(0, 180),
+    );
+  }
+  return novos;
+}
+
 // Roda um fetcher de fonte (primary ou secundária) e devolve as linhas.
 async function fetchSource(
   admin: SupabaseClient, ctx: SourceCtx, src: SourceRow,
@@ -739,6 +772,13 @@ Deno.serve(async (req) => {
     // primária continua visível POR FONTE (competition_sources.last_sync_ok =
     // false → "aviso amarelo" no painel) e some sozinho quando ela volta. Isso
     // mata o spam de notificação e o loop de re-alerta (pedido do João).
+    // conflito de placar entre fontes nos jogos tocados → alerta crítico (push),
+    // independentemente da saúde das fontes (pode afetar a pontuação).
+    let conflitos = 0;
+    try {
+      conflitos = await alertConflicts(admin, comp, [...touched]);
+    } catch (e) { console.error("conflict-alert", e); }
+
     const dataFresh = primaryOk || secMatched > 0 || touched.size > 0 || goldenUpdated > 0;
     if (dataFresh) {
       await admin.from("competitions").update({ last_synced_at: new Date().toISOString() }).eq("id", comp.id);
@@ -746,7 +786,7 @@ Deno.serve(async (req) => {
       await clearApiErrors(admin, comp.id); // resolve qualquer api_error pendente
       results.push({
         competition: comp.name, ok: true, mode, updated, inserted, alerted, secMatched,
-        golden: goldenUpdated, primaryDegraded: !primaryOk,
+        golden: goldenUpdated, primaryDegraded: !primaryOk, conflitos,
       });
     } else {
       // nada entregue por nenhuma fonte → falha de verdade: alerta + push (1x; o

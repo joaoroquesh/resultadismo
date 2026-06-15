@@ -56,6 +56,11 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   pendente é resolvido sozinho. O problema da fonte continua visível no admin (Dados → Fontes) como
   **aviso amarelo "instável"** (era "falhou" vermelho), e o admin pode **desativar a fonte** ali
   mesmo (toggle já existente — o sync só usa fontes `enabled`). Edge function `sync-football`.
+- **Sync: conflito de placar entre fontes vira alerta crítico (com push) pro admin.** Quando as
+  fontes divergem no placar de um jogo (`matches.score_conflict`), o sync avisa os admins (Dados →
+  Conflitos) — é o tipo de problema que pode afetar a pontuação, então notifica de verdade. Aditivo
+  (só insere alerta + notificação; não altera nenhum dado de jogo) e com dedupe por jogo (1 alerta
+  pendente por partida, sem repetir a cada ciclo).
 - **Palpites da galera: pontuação dobrada não some mais no encerrado + trovão de 2× por palpite.**
   No jogo encerrado a pontuação de quem usou o Dobro voltava ao valor base (o `ScorePill` não
   recebia `doubled`); agora mostra o valor dobrado (ex.: cravada com 2× = +6). E todo palpite que
