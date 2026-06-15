@@ -22,6 +22,10 @@ página pública `/retro/r/:code`.
   `cravada` (rótulo **Vale Saldo**) = ≥2 sempre. (rodada 8: a final deixou de exigir cravada.)
 - **🎲 Fichas de troca:** cada CRAVADA dá 1 ficha; o jogador pode trocar o jogo atual da run
   (RPC `retro_reroll` — re-sorteia, cronômetro renasce; vale na Copa do Dia, ganho por mérito).
+  **Na Seleção do Dia (rodada 20), o reroll troca por OUTRO jogo da MESMA seleção temática** (fora
+  dos 7 do dia, dificuldade mais próxima da do slot). Se a seleção esgota (2 seleções têm exatamente
+  7 jogos), cai num jogo aleatório do catálogo e o payload marca `random_fallback:true` (front avisa
+  "acabaram os jogos dessa seleção"). No Jogo livre o reroll sorteia no catálogo por dificuldade.
 - **Treinos ranqueados:** runs de LOGADO são todas persistentes; ranking de Treino = melhor
   campanha de cada um (`retro_leaderboard(p_board=>'treino')`); melhor campanha do perfil
   considera tudo. Anônimo segue efêmero (purga diária).
@@ -81,7 +85,7 @@ página pública `/retro/r/:code`.
   `retroLocal.ts` = token anônimo + anti-repetição local). Rotas públicas `/retro` e `/retro/r/:code`
   no `App.tsx`; entradas na Sidebar/BottomNav/PublicShell. Vitrine de animações: `/retro?demo=1`
   (**só DEV**).
-- **Banco (migrations `20260610150000–150015`; 150015 = modos amistoso/classico/lenda + fim do Pontos na entrada + difficulty no payload; 150011 = Formato Copa/Pontos + config admin + fix reroll daily; 150008 RESET; 150009 abandono; 150010 final-aceita-saldo + ranking-por-dificuldade + feedback.product):** seed dos **964 jogos** (fonte openfootball CC0,
+- **Banco (migrations `20260610150000–150016`; 150016 = reroll do daily troca por jogo da mesma seleção (+ fallback aleatório com flag); 150015 = modos amistoso/classico/lenda + fim do Pontos na entrada + difficulty no payload; 150011 = Formato Copa/Pontos + config admin + fix reroll daily; 150008 RESET; 150009 abandono; 150010 final-aceita-saldo + ranking-por-dificuldade + feedback.product):** seed dos **964 jogos** (fonte openfootball CC0,
   importador `scripts/gen-retro-seed.mjs` com portões de qualidade; dificuldade 1–7 com 34
   jogos-lenda) + motor (RPCs `retro_start_run`, `retro_next` — serve **sob demanda**, o cronômetro
   nasce no clique —, `retro_answer`, `retro_run_summary`, `retro_leaderboard`, `retro_my_stats`,

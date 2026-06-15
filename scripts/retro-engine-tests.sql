@@ -269,17 +269,62 @@ begin
   perform set_config('request.jwt.claims', '', true);
 end $$;
 
--- ============ T11: reroll na COPA DO DIA troca o jogo (bug reportado) ============
+-- ============ T11: reroll na COPA DO DIA troca por jogo DA MESMA SELEÇÃO (rodada 20) ============
+-- Daily controlado (brasil, 114 jogos) → reroll pega outro jogo do BRASIL, fora dos 7, sem fallback.
 do $$
-declare v_user uuid; v_start jsonb; v_run uuid; v_h int; v_a int; v_ans jsonb; v_old uuid; v_new jsonb;
+declare v_user uuid; v_today date := (now() at time zone 'America/Sao_Paulo')::date;
+  v_ids uuid[]; v_start jsonb; v_run uuid; v_h int; v_a int; v_ans jsonb; v_old uuid; v_new jsonb;
+  v_newmatch uuid; v_is_team boolean;
 begin
   select id into v_user from public.profiles limit 1;
-  delete from public.retro_runs where user_id = v_user and is_daily
-    and daily_date = (now() at time zone 'America/Sao_Paulo')::date and format = 'copa';
   perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+  delete from public.retro_runs where user_id = v_user and is_daily and daily_date = v_today;
+  delete from public.retro_daily where daily_date = v_today;
+  select array_agg(id) into v_ids from (
+    select id from public.retro_matches where home_slug='brasil' or away_slug='brasil'
+    order by difficulty asc, random() limit 7) q;
+  insert into public.retro_daily (daily_date, match_ids, team_slug, team_name_pt)
+  values (v_today, v_ids, 'brasil', 'Brasil');
+
   v_start := public.retro_start_run('acerto', 'sempressa', true, null, '{}');
   v_run := (v_start->>'run_id')::uuid;
-  -- crava o jogo 1 (ganha ficha), serve o 2 e REROLL no daily
+  select m.home_score, m.away_score into v_h, v_a
+    from public.retro_run_matches rm join public.retro_matches m on m.id = rm.match_id
+   where rm.run_id = v_run and rm.slot = 1;
+  v_ans := public.retro_answer(v_run, v_h, v_a, null, '{}'); -- crava → ganha ficha
+  perform public.retro_next(v_run, null, '{}');
+  select match_id into v_old from public.retro_run_matches where run_id = v_run and slot = 2;
+  v_new := public.retro_reroll(v_run, null, '{}');
+  select match_id into v_newmatch from public.retro_run_matches where run_id = v_run and slot = 2;
+  select (home_slug='brasil' or away_slug='brasil') into v_is_team from public.retro_matches where id = v_newmatch;
+  if v_newmatch <> v_old and v_is_team and not (v_new->>'random_fallback')::boolean
+     and not (v_newmatch = any(v_ids)) then
+    raise notice 'T11 reroll no daily: OK (trocou por OUTRO jogo da MESMA seleção, fora dos 7)';
+  else raise exception 'T11 FALHOU: trocou=% mesma_selecao=% fallback=% fora7=%',
+    v_newmatch <> v_old, v_is_team, v_new->>'random_fallback', not (v_newmatch = any(v_ids)); end if;
+  delete from public.retro_runs where user_id = v_user and is_daily and daily_date = v_today;
+  delete from public.retro_daily where daily_date = v_today;
+  perform set_config('request.jwt.claims', '', true);
+end $$;
+
+-- ============ T12: seleção esgotada (7 jogos) → reroll cai em aleatório + flag (rodada 20) ============
+do $$
+declare v_user uuid; v_today date := (now() at time zone 'America/Sao_Paulo')::date;
+  v_ids uuid[]; v_start jsonb; v_run uuid; v_h int; v_a int; v_ans jsonb; v_old uuid; v_new jsonb;
+  v_newmatch uuid; v_is_team boolean;
+begin
+  select id into v_user from public.profiles limit 1;
+  perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+  delete from public.retro_runs where user_id = v_user and is_daily and daily_date = v_today;
+  delete from public.retro_daily where daily_date = v_today;
+  select array_agg(id) into v_ids from (
+    select id from public.retro_matches where home_slug='egito' or away_slug='egito'
+    order by difficulty asc, random() limit 7) q; -- egito tem exatamente 7 → zero sobrando
+  insert into public.retro_daily (daily_date, match_ids, team_slug, team_name_pt)
+  values (v_today, v_ids, 'egito', 'Egito');
+
+  v_start := public.retro_start_run('acerto', 'sempressa', true, null, '{}');
+  v_run := (v_start->>'run_id')::uuid;
   select m.home_score, m.away_score into v_h, v_a
     from public.retro_run_matches rm join public.retro_matches m on m.id = rm.match_id
    where rm.run_id = v_run and rm.slot = 1;
@@ -287,9 +332,14 @@ begin
   perform public.retro_next(v_run, null, '{}');
   select match_id into v_old from public.retro_run_matches where run_id = v_run and slot = 2;
   v_new := public.retro_reroll(v_run, null, '{}');
-  if (select match_id from public.retro_run_matches where run_id = v_run and slot = 2) <> v_old then
-    raise notice 'T11 reroll na Copa do Dia: OK (trocou o jogo — bug corrigido)';
-  else raise exception 'T11 FALHOU: jogo do daily não mudou no reroll'; end if;
+  select match_id into v_newmatch from public.retro_run_matches where run_id = v_run and slot = 2;
+  select (home_slug='egito' or away_slug='egito') into v_is_team from public.retro_matches where id = v_newmatch;
+  if v_newmatch <> v_old and not v_is_team and (v_new->>'random_fallback')::boolean then
+    raise notice 'T12 seleção esgotada: OK (caiu em jogo aleatório de outra Copa, random_fallback=true)';
+  else raise exception 'T12 FALHOU: trocou=% outra_selecao=% fallback=%',
+    v_newmatch <> v_old, not v_is_team, v_new->>'random_fallback'; end if;
+  delete from public.retro_runs where user_id = v_user and is_daily and daily_date = v_today;
+  delete from public.retro_daily where daily_date = v_today;
   perform set_config('request.jwt.claims', '', true);
 end $$;
 

@@ -215,7 +215,13 @@ export function RetroPage() {
         onSuccess: (cur) => {
           retroMarkSeen(cur.match_id);
           setRun({ ...run, current: cur, rerolls: cur.rerolls });
-          toast("Jogo trocado! 🎲", "info");
+          // no daily, se a seleção do dia já não tinha outro jogo, veio um aleatório
+          toast(
+            cur.random_fallback
+              ? "Acabaram os jogos dessa seleção — esse veio de outra Copa 🎲"
+              : "Jogo trocado! 🎲",
+            "info",
+          );
         },
         onError: (e) => toast(e.message, "error"),
       },

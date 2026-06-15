@@ -341,6 +341,15 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   index.html mudar de formato — sem OG errado em silêncio), e o `vercel.json` reescreve `/retro` e
   `/retro/:path*` pra esse arquivo ANTES do catch-all. Bônus: a página pública do share
   (`/retro/r/:code`) também ganha o card do Retrô. SPA intacta (mesmos bundles; router lê a URL).
+  **Rodada 20 (fix do reroll na Seleção do Dia — migration `20260610150016`):** o 🎲 trocar-jogo na
+  Copa do Dia trazia jogo de **outra seleção** (o reroll forçava sorteio no catálogo todo e ainda
+  excluía os 7 do tema). Agora troca por **outro jogo da MESMA seleção do dia** (fora dos 7, com a
+  dificuldade mais próxima da do slot original — mantém a curva fácil→difícil); o Jogo livre segue
+  sorteando no catálogo. **Borda:** se a seleção esgota (Egito e Coreia do Norte têm exatamente 7
+  jogos — zero sobrando), cai num jogo aleatório de outra Copa e o `retro_reroll` devolve
+  `random_fallback:true` → o front mostra "Acabaram os jogos dessa seleção — esse veio de outra Copa
+  🎲". Conserta de brinde um bug latente (sorteio vazio gravava slot com match_id NULL e gastava a
+  ficha). Testes T11 (mesma seleção, daily controlado de Brasil) e T12 (Egito esgota → fallback+flag).
   Histórico completo da construção: Comentários
   do PO processados → [`decisoes-fechadas.md`](../docs/planning/minijogo-historico/decisoes-fechadas.md)
   (espec vigente: nome Resultadismo Retrô, modos Acerto/Só Cravada, ritmos
