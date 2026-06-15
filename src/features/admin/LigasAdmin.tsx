@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, X, Trash2, RotateCcw, Settings, Clock, Search } from "lucide-react";
+import { Check, X, Trash2, RotateCcw, Settings, Clock, Search, Flag } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { dayjs, fromNow } from "@/lib/format";
 import { useDeletedLeagues, useSoftDeleteLeague, useRestoreLeague } from "./moderation";
@@ -12,6 +12,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { SortControl, type SortDir, type SortFieldDef } from "@/components/ui/SortControl";
 import { useToast } from "@/components/ui/Toast";
 import { usePendingLeagues, useApproveLeague, useRejectLeague } from "./api";
+import { useFlagLeagueName } from "@/features/payments/api";
 
 type GroupSortKey = "nome" | "criacao";
 
@@ -27,7 +28,9 @@ export function LigasAdmin() {
   const reject = useRejectLeague();
   const softDelete = useSoftDeleteLeague();
   const restore = useRestoreLeague();
+  const flagName = useFlagLeagueName();
   const { toast } = useToast();
+  const [flaggingId, setFlaggingId] = useState<string | null>(null);
   const [toDelete, setToDelete] = useState<{ id: string; name: string } | null>(null);
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<GroupSortKey>("criacao");
@@ -156,6 +159,30 @@ export function LigasAdmin() {
                 <Badge tone={l.status === "active" ? "grass" : l.status === "rejected" ? "flame" : "neutral"}>
                   {l.status}
                 </Badge>
+                {l.name_approved === false ? (
+                  <Badge tone="flame">nome sinalizado</Badge>
+                ) : (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    aria-label="Sinalizar nome impróprio"
+                    title="Sinalizar nome impróprio (o dono terá que trocar)"
+                    loading={flagName.isPending && flaggingId === l.id}
+                    onClick={() => {
+                      setFlaggingId(l.id);
+                      flagName.mutate(
+                        { leagueId: l.id },
+                        {
+                          onSuccess: () => toast("Nome sinalizado. O dono foi avisado.", "success"),
+                          onError: (e) =>
+                            toast(e instanceof Error ? e.message : "Erro.", "error"),
+                        },
+                      );
+                    }}
+                  >
+                    <Flag className="size-4 text-flame-500" />
+                  </Button>
+                )}
                 <Link to={`/grupos/${l.slug}`} aria-label="Gerir grupo">
                   <Button size="icon" variant="ghost">
                     <Settings className="size-4" />

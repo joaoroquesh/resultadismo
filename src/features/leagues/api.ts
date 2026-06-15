@@ -146,6 +146,8 @@ export function useCreateLeague() {
       mode?: LeagueMode;
       /** recorte do bolão: null/ausente = todas as seleções; senão slugs EXPANDIDOS. */
       followedTeamSlugs?: string[] | null;
+      /** a partir de quando os jogos contam (YYYY-MM-DD); null = conta tudo. */
+      startsOn?: string | null;
     }) => {
       const slug = `${slugify(input.name)}-${Math.random().toString(36).slice(2, 6)}`;
       const { data: league, error } = await supabase
@@ -169,6 +171,7 @@ export function useCreateLeague() {
           name: `Bolão · ${input.name}`,
           mode: input.mode ?? "table",
           followed_team_slugs: input.followedTeamSlugs ?? null,
+          starts_on: input.startsOn ?? null,
         });
         if (lcErr) throw lcErr;
       }

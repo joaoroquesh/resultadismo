@@ -182,6 +182,26 @@ export function useApproveName() {
   });
 }
 
+/** Sinaliza o nome de um grupo ATIVO (moderação reativa): o nome some/vira
+ * genérico e o dono é avisado pra trocar. O grupo segue ativo. (ADR 0010) */
+export function useFlagLeagueName() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { leagueId: string; reason?: string }) => {
+      const { error } = await supabase.rpc("admin_flag_league_name", {
+        p_league_id: input.leagueId,
+        p_reason: input.reason ?? undefined,
+      });
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["league"] });
+      qc.invalidateQueries({ queryKey: ["name-review"] });
+      qc.invalidateQueries({ queryKey: ["admin", "pending-leagues"] });
+    },
+  });
+}
+
 export function useNameReviewLeagues(enabled = true) {
   return useQuery({
     enabled,

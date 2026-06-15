@@ -21,6 +21,18 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
+- **Grupo nasce ATIVO + moderação reativa de nome (ADR [`0010`](decisions/0010-grupo-ativo-moderacao-reativa.md)).**
+  No modo grátis o grupo passa a nascer **ativo na hora**, sem fila de aprovação: o usuário cria e
+  já joga. Os **admins são avisados na criação** ("Novo grupo criado, confira o nome") e podem
+  **sinalizar** um nome impróprio depois (botão na aba Grupos do admin) — aí o nome **some e vira
+  genérico** ("Grupo (nome em revisão)") em todos os lugares e o **dono é avisado** pra trocar; o
+  grupo segue funcionando. Ao renomear, o nome volta a valer. Migration `20260615120000` (trigger
+  de criação ativo + RLS, RPC `admin_flag_league_name`, `update_group_info` libera no rename,
+  backfill dos pendentes). Front: `groupName.ts`, banner no grupo, copy da criação, `useFlagLeagueName`.
+- **Escolher se a pontuação conta os jogos já realizados ou só a partir de hoje.** Na criação do
+  grupo, um toggle "A pontuação conta a partir de quando?" — **A partir de hoje** (padrão) ou
+  **Contar jogos já feitos**. Grava `league_competitions.starts_on` (a classificação já filtrava por
+  ele); a aba Classificação mostra "a pontuação conta a partir de DD/MM" quando aplicável.
 - **Compartilhar a classificação do grupo como imagem.** Botão "Compartilhar classificação" na aba
   Classificação gera uma imagem no estilo da marca (mesmo motor do share de placar) com logo, nome
   do grupo, posição/nome/pontos + cravadas e aproveitamento, pódio em ouro/prata/bronze e o selo

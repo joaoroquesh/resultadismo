@@ -45,10 +45,11 @@ function NameReviewCard() {
   return (
     <Card className="space-y-3 p-4">
       <div className="flex items-center gap-2 text-sm font-bold text-ink-900">
-        <ShieldCheck className="size-4 text-brand-600" /> Nomes a revisar ({list.length})
+        <ShieldCheck className="size-4 text-brand-600" /> Nomes sinalizados ({list.length})
       </div>
       <p className="text-xs text-ink-500">
-        Grupos pagos já entram ativas; aprove o nome (ou exclua na aba Grupos se for impróprio).
+        Estes grupos tiveram o nome sinalizado e estão com nome genérico até o dono trocar. Se na
+        verdade o nome está ok, você pode liberá-lo de volta aqui.
       </p>
       <ul className="space-y-2">
         {list.map((l) => (
@@ -56,15 +57,16 @@ function NameReviewCard() {
             <span className="min-w-0 flex-1 truncate font-semibold text-ink-900">{l.name}</span>
             <Button
               size="sm"
+              variant="outline"
               loading={approve.isPending}
               onClick={() =>
                 approve.mutate(l.id, {
-                  onSuccess: () => toast("Nome aprovado!", "success"),
+                  onSuccess: () => toast("Nome liberado!", "success"),
                   onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
                 })
               }
             >
-              Aprovar nome
+              Liberar nome
             </Button>
           </li>
         ))}

@@ -36,6 +36,7 @@ export function ClassificacaoTab({
     competition_id: string;
     confronto_state?: string;
     followed_team_slugs?: string[] | null;
+    starts_on?: string | null;
   }[];
   activeLcId?: string;
   onSelect: (id: string) => void;
@@ -136,16 +137,34 @@ export function ClassificacaoTab({
           de palpitar um jogo que não conta. */}
       {(() => {
         const scope = describeTeamScope(active?.followed_team_slugs);
-        if (scope.kind === "all") return null;
+        const startsOn = active?.starts_on;
+        const startsLabel = startsOn
+          ? new Date(startsOn + "T00:00:00").toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+            })
+          : null;
+        if (scope.kind === "all" && !startsLabel) return null;
         return (
           <div className="mb-3 flex items-start gap-2 rounded-md bg-surface-2 p-3 text-xs leading-relaxed text-ink-600">
             <Target className="mt-0.5 size-4 shrink-0 text-brand-600" />
             <p>
-              Neste grupo valem os jogos de{" "}
-              <span className="font-semibold text-ink-900">
-                {scope.kind === "brasil" ? "só o Brasil" : scope.names.join(", ")}
-              </span>
-              . Você pode palpitar em qualquer jogo, mas só esses contam no ranking aqui.
+              {scope.kind !== "all" && (
+                <>
+                  Neste grupo valem os jogos de{" "}
+                  <span className="font-semibold text-ink-900">
+                    {scope.kind === "brasil" ? "só o Brasil" : scope.names.join(", ")}
+                  </span>
+                  {startsLabel ? " " : ". "}
+                </>
+              )}
+              {startsLabel && (
+                <>
+                  {scope.kind !== "all" ? "e " : "Neste grupo, "}a pontuação conta{" "}
+                  <span className="font-semibold text-ink-900">a partir de {startsLabel}</span>.{" "}
+                </>
+              )}
+              Você pode palpitar em qualquer jogo, mas só o que conta aqui aparece no ranking.
             </p>
           </div>
         );

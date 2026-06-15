@@ -43,6 +43,9 @@ export function NovaLigaPage() {
   // "Todas" abre marcado de propósito — motivar acompanhar a Copa inteira.
   const [teamScope, setTeamScope] = useState<"all" | "brasil" | "custom">("all");
   const [scopeSel, setScopeSel] = useState<Set<string>>(() => new Set(["brasil"]));
+  // Quando os pontos começam a contar: "today" (a partir de hoje, default) ou
+  // "all" (conta os jogos já realizados também). Decisão do João.
+  const [scoringFrom, setScoringFrom] = useState<"today" | "all">("today");
   function toggleNation(slug: string) {
     setScopeSel((prev) => {
       const n = new Set(prev);
@@ -99,12 +102,16 @@ export function NovaLigaPage() {
             : Array.from(
                 expandTeamSlugs(teamScope === "brasil" ? ["brasil"] : Array.from(scopeSel)),
               ),
+        // "today" → conta a partir de hoje (data local em YYYY-MM-DD); "all" → tudo.
+        startsOn:
+          scoringFrom === "today" ? new Date().toLocaleDateString("en-CA") : null,
       });
       const slug = league.slug;
 
-      // Modo desativado: grupo gratuito (passa pela aprovação do admin, como antes).
+      // Modo desativado (grátis): grupo já nasce ATIVO (sem aprovação). O nome
+      // pode ser sinalizado pela moderação depois, mas o grupo funciona na hora.
       if (payMode === "disabled") {
-        toast("Grupo criado! Aguarde a aprovação para começar.", "success");
+        toast("Grupo criado e já está ativo!", "success");
         navigate(`/grupos/${slug}`);
         return;
       }
@@ -287,6 +294,25 @@ export function NovaLigaPage() {
               Dá pra mudar isso na página do grupo (aba Competições) até a Copa começar.
             </p>
           </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-ink-800">
+              A pontuação conta a partir de quando?
+            </label>
+            <SegmentedControl<"today" | "all">
+              value={scoringFrom}
+              onChange={setScoringFrom}
+              options={[
+                { value: "today", label: "A partir de hoje" },
+                { value: "all", label: "Contar jogos já feitos" },
+              ]}
+            />
+            <p className="text-xs leading-snug text-ink-400">
+              {scoringFrom === "today"
+                ? "Só os jogos de hoje em diante valem pontos neste grupo."
+                : "Os jogos já realizados também contam (quem palpitou neles leva os pontos)."}
+            </p>
+          </div>
         </Card>
 
         {isPaid && (
@@ -328,8 +354,8 @@ export function NovaLigaPage() {
           <p>
             {payMode === "disabled" ? (
               <>
-                Para evitar abusos, novos grupos passam por uma aprovação rápida de um administrador
-                antes de ficarem ativos.
+                Seu grupo fica <strong>ativo na hora</strong>. A moderação só confere o nome depois e,
+                se for impróprio, pede pra você trocar (o grupo segue funcionando).
               </>
             ) : payMode === "test" ? (
               <>

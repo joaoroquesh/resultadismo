@@ -30,6 +30,7 @@ import { ClassificacaoTab } from "./tabs/ClassificacaoTab";
 import { MembrosTab } from "./tabs/MembrosTab";
 import { CompeticoesTab } from "./tabs/CompeticoesTab";
 import { GrupoEditor } from "./tabs/GrupoEditor";
+import { groupDisplayName } from "./groupName";
 import { GestaoBolaoTab } from "./tabs/GestaoBolaoTab";
 import { usePotPayers } from "./api";
 import { computePot, prizeByUser } from "./potMath";
@@ -178,22 +179,29 @@ export function LigaDetailPage() {
 
   return (
     <Page
-      title={league.name}
+      title={groupDisplayName(league)}
       action={
         <Button variant="ghost" size="icon" onClick={() => navigate("/grupos")} aria-label="Voltar">
           <ArrowLeft className="size-5" />
         </Button>
       }
     >
-      {league.status === "active" && league.name_approved === false && (
-          <div className="mb-4 flex items-start gap-2 rounded-md bg-surface-2 p-3 text-sm text-brand-800">
-            <Clock className="mt-0.5 size-4 shrink-0" />
-            <p>
-              Seu grupo está <strong>ativa</strong> e já dá pra jogar! Só o <strong>nome</strong>{" "}
-              está em análise rápida da moderação — se precisar de ajuste, a gente te avisa.
-            </p>
-          </div>
-        )}
+      {league.name_approved === false && (
+        <div className="mb-4 flex items-start gap-2 rounded-md bg-surface-2 p-3 text-sm text-flame-700">
+          <Clock className="mt-0.5 size-4 shrink-0" />
+          <p>
+            O <strong>nome</strong> deste grupo foi sinalizado pela moderação e está escondido.{" "}
+            {isOwner ? (
+              <>
+                Toque em <strong>Editar grupo</strong> e escolha outro nome — o grupo segue ativo o
+                tempo todo.
+              </>
+            ) : (
+              <>O dono vai escolher um novo nome. O grupo segue funcionando normalmente.</>
+            )}
+          </p>
+        </div>
+      )}
 
       {league.payment_status === "pending" && league.status !== "active" ? (
         <div className="mb-4 rounded-md bg-surface-2 p-3 text-sm text-gold-800">

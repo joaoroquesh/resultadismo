@@ -1934,6 +1934,10 @@ export type Database = {
         Args: { p_reason?: string; p_user_id: string }
         Returns: undefined
       }
+      admin_flag_league_name: {
+        Args: { p_league_id: string; p_reason?: string }
+        Returns: undefined
+      }
       admin_broadcast_preview: {
         Args: { p_arg?: Json; p_segment: string }
         Returns: number

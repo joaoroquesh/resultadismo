@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Escudo } from "@/components/ui/Escudo";
 import { track } from "@/lib/analytics";
+import { groupDisplayName } from "./groupName";
 import { shareGroupInvite } from "./inviteShare";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
@@ -261,7 +262,7 @@ function FavoriteGroupSlide({
         <Link to={`/grupos/${league.slug}`} className="flex min-w-0 items-center gap-2">
           <Escudo src={league.logo_url} name={league.name} size="sm" />
           <div className="min-w-0">
-            <p className="truncate text-sm font-bold text-ink-900">{league.name}</p>
+            <p className="truncate text-sm font-bold text-ink-900">{groupDisplayName(league)}</p>
             <p className="text-[11px] text-ink-500">
               {position ? `Você é o ${position.rank}º de ${position.total}` : "Classificação"}
             </p>
@@ -377,7 +378,7 @@ function GroupCard({
         <Escudo src={league.logo_url} name={league.name} size="md" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="truncate font-bold text-ink-900">{league.name}</h3>
+            <h3 className="truncate font-bold text-ink-900">{groupDisplayName(league)}</h3>
             {league.my_role !== "member" && (
               <Badge tone="brand">{league.my_role === "owner" ? "Dono" : "Admin"}</Badge>
             )}
@@ -543,7 +544,7 @@ function PublicGroupsSection() {
               <Link to={`/grupos/${g.slug}`} className="flex min-w-0 flex-1 items-center gap-3">
                 <Escudo src={g.logo_url} name={g.name} size="sm" />
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-ink-900">{g.name}</p>
+                  <p className="truncate text-sm font-semibold text-ink-900">{groupDisplayName(g)}</p>
                   <p className="flex items-center gap-1 text-xs text-ink-500">
                     <Users className="size-3.5" /> {g.member_count}{" "}
                     {g.member_count === 1 ? "membro" : "membros"}
