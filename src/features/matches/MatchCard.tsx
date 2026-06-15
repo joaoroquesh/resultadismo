@@ -669,11 +669,9 @@ function Galera({
             {onStar && p.user?.id && p.user.id !== myId && (
               <FavStar on={isFav(p.user.id)} onClick={() => onStar(p.user!.id)} />
             )}
-            <span className="text-xs font-bold tabular-nums text-ink-600">
-              {p.home_pred} × {p.away_pred}
-            </span>
-            {/* trovão 2×: SEMPRE que a pessoa usou o dobro nessa partida, mesmo
-                que não esteja pontuando (o ⚡ do ScorePill é suprimido p/ não duplicar). */}
+            {/* trovão 2× à ESQUERDA do placar (ao lado da estrela): assim os
+                placares ficam alinhados em coluna. SEMPRE que usou o dobro,
+                mesmo sem pontuar (o ⚡ do ScorePill é suprimido p/ não duplicar). */}
             {p.is_joker && (
               <span
                 title="Usou o Dobro de pontos (2×)"
@@ -682,6 +680,9 @@ function Galera({
                 <Zap className="size-2.5 fill-current" />
               </span>
             )}
+            <span className="text-xs font-bold tabular-nums text-ink-600">
+              {p.home_pred} × {p.away_pred}
+            </span>
             {/* pontuação SEMPRE visível (encerrado: oficial dobrada; ao vivo: prévia) */}
             {finished && p.score_type && (
               <ScorePill type={p.score_type} doubled={!!p.is_joker} showZap={false} />
