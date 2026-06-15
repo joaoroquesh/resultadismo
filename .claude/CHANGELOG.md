@@ -21,6 +21,12 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
+- **Compartilhar a classificação do grupo como imagem.** Botão "Compartilhar classificação" na aba
+  Classificação gera uma imagem no estilo da marca (mesmo motor do share de placar) com logo, nome
+  do grupo, posição/nome/pontos + cravadas e aproveitamento, pódio em ouro/prata/bronze e o selo
+  **💰 do prêmio** quando o bolão paga (top 20). Web Share (WhatsApp) com fallback de download.
+  Novo `standingsShareImage.ts` reaproveitando `C`/`roundRect`/`loadImage`/`shareImageBlob` de
+  `shareImage.ts`; evento GA4 `share { content_type: 'group_standings' }`.
 - **Bolão: o membro vê o que vale e quem está participando do pago.** (1) Na **Classificação** do
   grupo, um aviso deixa claro o **recorte de seleções** quando há um ("Neste grupo valem os jogos
   de X. Você pode palpitar em qualquer jogo, mas só esses contam no ranking aqui.") — some quando o

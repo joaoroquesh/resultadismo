@@ -1,12 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Swords, ChevronRight, Target } from "lucide-react";
+import { Swords, ChevronRight, Target, Share2 } from "lucide-react";
 import { describeTeamScope } from "@/features/onboarding/teamsCatalog";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/lib/utils";
+import { track } from "@/lib/analytics";
 import { StandingsTable } from "@/features/standings/StandingsTable";
+import { shareImageBlob } from "@/features/matches/shareImage";
+import { buildStandingsShareImage } from "../standingsShareImage";
 import { useStandings } from "../api";
 
 // Esta tab agora mostra APENAS Bolões (modo points/table). Confrontos (Liga/
@@ -22,6 +27,7 @@ export function ClassificacaoTab({
   isAdmin,
   confrontoEnabled,
   pot,
+  leagueName,
 }: {
   comps: {
     id: string;
@@ -39,8 +45,29 @@ export function ClassificacaoTab({
   isAdmin: boolean;
   confrontoEnabled: boolean;
   pot?: { payers: Set<string>; prizeByUserId: Map<string, number> };
+  leagueName: string;
 }) {
   const { slug } = useParams<{ slug: string }>();
+  const { toast } = useToast();
+  const [sharing, setSharing] = useState(false);
+
+  async function shareStandings() {
+    if (!standings || standings.length === 0) return;
+    setSharing(true);
+    track("share", { method: "whatsapp", content_type: "group_standings" });
+    try {
+      const blob = await buildStandingsShareImage(standings, {
+        leagueName,
+        prizeByUserId: pot?.prizeByUserId,
+      });
+      const how = await shareImageBlob(blob, "resultadismo-classificacao.png");
+      if (how === "downloaded") toast("Imagem salva! Agora é só compartilhar.", "success");
+    } catch {
+      toast("Não consegui gerar a imagem. Tente de novo.", "error");
+    } finally {
+      setSharing(false);
+    }
+  }
   const isConfronto = (m: string) => m === "liga" || m === "cup";
   const boloes = comps.filter((c) => !isConfronto(c.mode));
   const temConfronto = comps.some(
@@ -128,7 +155,18 @@ export function ClassificacaoTab({
       {loading ? (
         <Skeleton className="h-64 w-full" />
       ) : standings && standings.length > 0 ? (
-        <StandingsTable rows={standings} currentUserId={currentUserId} pot={pot} />
+        <>
+          <StandingsTable rows={standings} currentUserId={currentUserId} pot={pot} />
+          <Button
+            variant="outline"
+            fullWidth
+            className="mt-3"
+            loading={sharing}
+            onClick={shareStandings}
+          >
+            <Share2 className="size-4" /> Compartilhar classificação
+          </Button>
+        </>
       ) : (
         <EmptyState title="Sem pontos ainda" description="A classificação aparece após os jogos." />
       )}

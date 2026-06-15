@@ -22,7 +22,8 @@ export type ShareRow = {
 };
 
 // Paleta da marca em hex (canvas não lê os tokens oklch do CSS).
-const C = {
+// Exportada p/ outros geradores de imagem (ex.: classificação) reaproveitarem.
+export const C = {
   bg: "#101820",
   card: "#1A232C",
   line: "#2A343E",
@@ -42,7 +43,7 @@ const TYPE_COLOR: Record<ScoreType, string> = {
   erro: C.inkPill,
 };
 
-function roundRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+export function roundRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   g.beginPath();
   g.moveTo(x + r, y);
   g.arcTo(x + w, y, x + w, y + h, r);
@@ -52,7 +53,7 @@ function roundRect(g: CanvasRenderingContext2D, x: number, y: number, w: number,
   g.closePath();
 }
 
-function loadImage(src: string): Promise<HTMLImageElement | null> {
+export function loadImage(src: string): Promise<HTMLImageElement | null> {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => resolve(img);

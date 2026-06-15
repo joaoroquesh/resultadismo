@@ -429,6 +429,7 @@ export function LigaDetailPage() {
           isAdmin={isAdmin}
           confrontoEnabled={league.confronto_enabled ?? false}
           pot={potForStandings}
+          leagueName={league.name}
         />
       )}
 
