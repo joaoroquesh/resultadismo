@@ -21,6 +21,32 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
+- **Admin — gestão de campeonatos & APIs repensada (aba Competições) + Visão enxuta.** A aba
+  **Competições** vira a casa de tudo de competição, **agrupada** nos 4 grupos da personalização
+  (Seleções · Ligas e estaduais · Copas · Alternativos, colapsáveis). Cada campeonato mostra sua
+  **pilha de fontes de API** (primária/secundária + saúde de cada uma) e dá pra **ligar/desligar**
+  cada fonte e **definir a primária** (dona do calendário) direto no admin — nada hard-coded, fontes
+  diferentes por campeonato. Nova tela **"Ver jogos / comparar fontes"**: por jogo, o que **cada API**
+  reporta lado a lado (swipe no mobile), divergências em vermelho + override/travar/descongelar. A aba
+  **Visão** perdeu a lista gigante de sincronização e ganhou um **painel curto de KPIs clicáveis**
+  (acessos hoje, ativos 24h, novos, tempo médio, grupos, Gestão do Bolão ativa) com drill-down. A aba
+  **Dados** virou **Qualidade** (times fora do registro + conflitos). RPCs novas (migration
+  `20260615210000`): `admin_usage_stats`, `admin_list_competitions_full`,
+  `admin_match_sources_for_competition`, `admin_set_primary_source`.
+- **Sync à prova de troca de fonte (não perde jogo já palpitado).** `reconcilePrimary` agora **adota**
+  um jogo existente por nome+dia quando o `provider_ref` não casa — então **trocar a fonte primária
+  não duplica** jogos nem interrompe o placar. (O motor já nunca apagava jogos nem regredia um placar
+  real pra vazio; isso continua valendo.)
+- **Catálogo cruzado (anexar fonte, sem criar duplicata).** O catálogo agora agrupa as entradas dos
+  provedores **por campeonato** (cruzando mesmo com nomes diferentes — cross-ref pelo registro +
+  fallback por nome) e cada provedor é **anexado como fonte** ao campeonato certo, **sem digitar
+  código**. Acaba o bug de criar uma 2ª competição igual. Cada fonte mostra **quantos jogos trouxe**.
+  Novo provedor **FIFA WC 2026** (API aberta worldcup26.ir, sem chave) como fonte de validação da Copa.
+- **Excluir campeonato em uso = arquivar preservando placares.** "Excluir" um campeonato com palpites
+  passa a **arquivar** (confirmando o nome): sai das listas e para de sincronizar, mas os jogos e as
+  leituras de cada fonte **ficam no banco**; dá pra **restaurar**. E "voltar" da tela de jogos volta
+  pra aba Competições. Migration `20260615220000` (`admin_archive_competition` /
+  `admin_restore_competition`, contagem por fonte, enum `fifawc`).
 - **Grupo nasce ATIVO + moderação reativa de nome (ADR [`0010`](decisions/0010-grupo-ativo-moderacao-reativa.md)).**
   No modo grátis o grupo passa a nascer **ativo na hora**, sem fila de aprovação: o usuário cria e
   já joga. Os **admins são avisados na criação** ("Novo grupo criado, confira o nome") e podem

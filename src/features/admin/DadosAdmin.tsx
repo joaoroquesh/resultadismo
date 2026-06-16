@@ -1,33 +1,27 @@
-import { useMemo, useState } from "react";
-import { AlertTriangle, Lock, LockOpen, Snowflake, Database, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { AlertTriangle, Lock, LockOpen, Snowflake } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useToast } from "@/components/ui/Toast";
-import { cn } from "@/lib/utils";
-import { Switch } from "@/components/ui/Switch";
 import { fromNow } from "@/lib/format";
 import {
   useMatchConflicts, useOverrideMatch, useSetMatchLock, useUnfreezeMatch,
-  useCompetitionsLite, useCompetitionSources, useUpsertCompetitionSource,
-  useSetSourceEnabled, useRemoveCompetitionSource, useUnmappedTeams,
-  useResolveUnmapped, type MatchConflict,
+  useUnmappedTeams, useResolveUnmapped, type MatchConflict,
 } from "./dataSources";
 
 const STATUSES = ["scheduled", "live", "finished", "postponed", "cancelled"];
-const PROVIDERS = [
-  { v: "espn", label: "ESPN" },
-  { v: "football_data", label: "football-data" },
-  { v: "thesportsdb", label: "TheSportsDB" },
-];
+
+// Gestão de fontes por competição saiu daqui: agora vive na aba Competições,
+// dentro do card de cada campeonato. Esta aba ("Qualidade") foca no que é
+// transversal: times fora do registro + conflitos de placar entre fontes.
 export function DadosAdmin() {
   return (
     <div className="space-y-6">
       <UnmappedSection />
       <ConflictsSection />
-      <SourcesSection />
     </div>
   );
 }
@@ -297,129 +291,3 @@ function ConflictRow({ m }: { m: MatchConflict }) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Fontes por competição
-// ---------------------------------------------------------------------------
-function SourcesSection() {
-  const { data: comps } = useCompetitionsLite();
-  const [compId, setCompId] = useState<string>("");
-  const selected = useMemo(() => (comps ?? []).find((c) => c.id === compId) ?? null, [comps, compId]);
-  const { data: sources, isLoading } = useCompetitionSources(compId || null);
-  const setEnabled = useSetSourceEnabled(compId || null);
-  const upsert = useUpsertCompetitionSource(compId || null);
-  const remove = useRemoveCompetitionSource(compId || null);
-  const { toast } = useToast();
-
-  const [provider, setProvider] = useState("football_data");
-  const [code, setCode] = useState("");
-
-  return (
-    <section className="space-y-2">
-      <div className="flex items-center gap-2">
-        <Database className="size-4 text-brand-600" />
-        <h2 className="text-base font-bold text-ink-950">Fontes por competição</h2>
-      </div>
-      <p className="text-xs text-ink-500">
-        A fonte <strong>primária</strong> é dona do calendário; as <strong>secundárias</strong> só
-        validam o placar (confirmação por 2+ fontes destrava o congelamento do resultado).
-      </p>
-
-      <Card className="space-y-4 p-4">
-        <Select
-          ariaLabel="Competição"
-          value={compId}
-          onChange={setCompId}
-          placeholder="Escolha uma competição…"
-          options={(comps ?? []).map((c) => ({ value: c.id, label: c.name }))}
-        />
-
-        {!compId ? null : isLoading ? (
-          <div className="h-16 animate-pulse rounded-md bg-ink-100" />
-        ) : (
-          <>
-            <ul className="divide-y divide-border">
-              {(sources ?? []).map((s) => (
-                <li key={s.id} className="flex flex-wrap items-center gap-2 py-2.5">
-                  <span
-                    className={cn(
-                      "rounded-pill px-2 py-0.5 text-[11px] font-semibold",
-                      s.role === "primary" ? "bg-brand-600 text-white" : "bg-ink-100 text-ink-600",
-                    )}
-                  >
-                    {s.role === "primary" ? "primária" : "secundária"}
-                  </span>
-                  <span className="text-sm font-medium text-ink-900">{s.provider}</span>
-                  <span className="text-xs text-ink-500">{s.provider_code ?? "—"}</span>
-                  {s.last_sync_ok === false && (
-                    <span
-                      title="Esta fonte está instável. Enquanto outra fonte cobrir, os placares continuam atualizando normalmente."
-                      className="rounded-pill bg-gold-500 px-2 py-0.5 text-[10px] font-semibold text-gold-950"
-                    >
-                      instável
-                    </span>
-                  )}
-                  <span className="ml-auto flex items-center gap-2">
-                    <Switch
-                      checked={s.enabled}
-                      onChange={(v) => setEnabled.mutate({ id: s.id, enabled: v })}
-                      label={s.enabled ? "Desativar fonte" : "Ativar fonte"}
-                    />
-                    {s.role !== "primary" && (
-                      <button
-                        type="button"
-                        onClick={() => remove.mutate(s.id)}
-                        className="text-ink-400 hover:text-flame-600"
-                        aria-label="Remover fonte"
-                      >
-                        <Trash2 className="size-4" />
-                      </button>
-                    )}
-                  </span>
-                </li>
-              ))}
-              {(sources ?? []).length === 0 && (
-                <li className="py-3 text-sm text-ink-400">
-                  Sem fontes. {selected?.provider === "manual" ? "Competição manual." : ""}
-                </li>
-              )}
-            </ul>
-
-            {/* adicionar secundária */}
-            <div className="flex flex-wrap items-end gap-2 border-t border-border pt-3">
-              <div className="flex flex-col gap-1 text-[11px] font-medium text-ink-600">
-                Provedor
-                <Select
-                  ariaLabel="Provedor"
-                  value={provider}
-                  onChange={setProvider}
-                  options={PROVIDERS.map((p) => ({ value: p.v, label: p.label }))}
-                  className="w-44"
-                />
-              </div>
-              <label className="flex flex-1 flex-col gap-1 text-[11px] font-medium text-ink-600">
-                Código (ex.: BSA, PL, fifa.world)
-                <Input value={code} onChange={(e) => setCode(e.target.value)} className="h-10" placeholder="código da liga no provedor" />
-              </label>
-              <Button
-                size="sm"
-                disabled={!code.trim()}
-                loading={upsert.isPending}
-                onClick={() =>
-                  upsert.mutate(
-                    { provider, providerCode: code.trim(), role: "secondary", priority: 50 },
-                    {
-                      onSuccess: () => { setCode(""); toast("Fonte secundária adicionada.", "success"); },
-                      onError: (e) => toast(e instanceof Error ? e.message : "Não rolou.", "error"),
-                    },
-                  )
-                }
-              >
-                <Plus className="size-4" /> Adicionar
-              </Button>
-            </div>
-          </>
-        )}
-      </Card>
-    </section>
-  );
-}

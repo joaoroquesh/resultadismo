@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 
-export type ProviderName = "football_data" | "thesportsdb" | "espn";
+export type ProviderName = "football_data" | "thesportsdb" | "espn" | "fifawc";
 
 export type ProviderCompetition = {
   provider: ProviderName;
@@ -46,10 +46,25 @@ const ESPN_CATALOG: ProviderCompetition[] = (
   season: null,
 }));
 
+// FIFA WC 2026 (API aberta worldcup26.ir, sem chave) — só a Copa. Fonte de
+// validação; no catálogo aparece como 1 entrada que cruza com a Copa do Mundo.
+const FIFA_CATALOG: ProviderCompetition[] = [
+  {
+    provider: "fifawc",
+    code: "worldcup26",
+    name: "Copa do Mundo FIFA",
+    area: "Mundo",
+    country: "Mundo",
+    emblem: null,
+    type: "CUP",
+    season: "2026",
+  },
+];
+
 /**
- * Catálogo de competições do provedor. ESPN vem da lista curada local;
- * football-data e TheSportsDB vêm da edge function `list-provider-competitions`
- * (que segura o token no servidor).
+ * Catálogo de competições do provedor. ESPN e FIFA WC vêm de listas curadas
+ * locais; football-data e TheSportsDB vêm da edge function
+ * `list-provider-competitions` (que segura o token no servidor).
  */
 export function useProviderCompetitions(provider: ProviderName, enabled = true) {
   return useQuery({
@@ -58,6 +73,7 @@ export function useProviderCompetitions(provider: ProviderName, enabled = true) 
     staleTime: 24 * 60 * 60_000, // catálogo muda raramente
     queryFn: async (): Promise<ProviderCompetition[]> => {
       if (provider === "espn") return ESPN_CATALOG;
+      if (provider === "fifawc") return FIFA_CATALOG;
       const { data, error } = await supabase.functions.invoke("list-provider-competitions", {
         body: { provider },
       });

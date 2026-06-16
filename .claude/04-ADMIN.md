@@ -24,16 +24,21 @@
 
 **Dashboard-first**, navegação por **abas na URL** (`?t=`) — rolável (não espreme no mobile);
 voltar de "ver jogos" cai na aba certa. Abas: **Visão · Alertas · Grupos · Competições · Usuários ·
-Pagamento · Avisos · Construa · Dados · Changelog**. Todas as ações chamam RPCs que **revalidam `is_app_admin()` no banco** — o guard de UI
+Pagamento · Avisos · Construa · Qualidade · Changelog**. Todas as ações chamam RPCs que **revalidam `is_app_admin()` no banco** — o guard de UI
 é conveniência, não segurança.
 
-### Aba **Visão** (`AdminDashboard`) — saúde do sistema
-- Strip "ao vivo / hoje / online" (`admin_system_health`, refetch 30s). "Online" = presença real
-  (`profiles.last_active_at` < 90s via `touch_presence`), não a fila de acesso.
-- **Sincronização**: status por competição (verde/vermelho/cinza = último sync ok/erro/nunca),
-  última sync, **Sincronizar** (manual = modo `catalog`) e **ligar/pausar** sync
-  (`admin_set_competition_sync`). "Sincronizar tudo".
-- **Banners de alerta** (Nielsen #1): sync com problema (flame) e pendências (gold) → levam a Alertas.
+### Aba **Visão** (`AdminDashboard`) — saúde e uso (curta, clicável)
+- Strip "ao vivo / hoje / online" (`admin_system_health`, refetch 30s) — cada um **clicável** (jogos →
+  Competições; online → Usuários). "Online" = presença real (`profiles.last_active_at` < 90s via
+  `touch_presence`).
+- **Uso & comunidade** (`admin_usage_stats`, RPC nova): grade **curta** de KPIs **clicáveis**
+  (drill-down) — acessos hoje, ativos 24h, novos hoje, total de pessoas, tempo médio/pessoa, palpites
+  hoje, grupos ativos, **Gestão do Bolão ativa** (`league_competitions.pot_enabled`). Aproximações
+  declaradas (`last_active_at` é sobrescrito; não é série histórica de DAU).
+- **A lista de sincronização por competição SAIU da Visão** (poluía a primeira aba) → agora vive na
+  aba Competições, agrupada.
+- **Banners de alerta** (Nielsen #1): sync com problema (flame → Competições) e pendências (gold →
+  Alertas).
 - **Modo manutenção** (`admin_set_maintenance`): quando ligado, **bloqueia o app** para logados
   não-admin — eles veem a `MaintenanceScreen` (tela cheia turquesa, logo estática, `maintenance_message`
   editável ou texto padrão). O **admin continua usando o app** e vê só a faixa `MaintenanceBanner`
@@ -56,14 +61,34 @@ Pagamento · Avisos · Construa · Dados · Changelog**. Todas as ações chamam
   admin — "Aprovar" não deveria aparecer para elas (causa-raiz registrada de um bug antigo do
   "Pagar agora"). → [`HISTORICO.md`](HISTORICO.md).
 
-### Aba **Comp.** (`CompeticoesAdmin`) — competições reais
-- **Sincronizar todas** (`sync-football`) e por competição.
-- Catálogo por provedor (**ESPN** preferido, football-data, TheSportsDB): buscar e **Adicionar**
-  (nasce como rascunho).
-- Por competição: **Publicar/Despublicar** (`admin_set_competition_published`), **Renomear** PT-BR
-  (`admin_rename_competition`), **Ver jogos** (`/admin/competicoes/:id/jogos`), **Excluir**
-  (`admin_delete_competition`).
-- **NameRulesCard**: prefixos de nome de grupo (Bolão/Liga/Copa) — `admin_set_name_prefixes`.
+### Aba **Competições** (`CompeticoesAdmin`) — casa de tudo de competição
+- **Agrupada** nos 4 grupos da personalização (Seleções · Ligas e estaduais · Copas · Alternativos,
+  colapsáveis), espelhando `data/competitions-registry.json` por `provider_code`
+  (`competitionGroups.ts`; mesma taxonomia de `PersonalizationPage`). Leitura única
+  `admin_list_competitions_full` (competição + pilha de fontes + saúde + contadores).
+- **Cada campeonato** = card expansível: saúde, badges (rascunho/personalização/conflitos/arquivada),
+  **ligar/pausar sync** (`admin_set_competition_sync`), **Sincronizar** (`sync-football`).
+- **Pilha de fontes de API** por campeonato: cada fonte (primária/secundária) com saúde, **ligar/
+  desligar** (`admin_set_competition_source_enabled`), **Tornar primária** (`admin_set_primary_source`
+  — promove/rebaixa; seguro, ver §sync), **adicionar/remover** secundária
+  (`admin_upsert/remove_competition_source`). Fontes editáveis no admin, **nada hard-coded** (fontes
+  diferentes por campeonato).
+- **Ver jogos / comparar fontes** (`/admin/competicoes/:id/jogos`): aba **Jogos** (curar/editar) e aba
+  **Comparar fontes** (`admin_match_sources_for_competition`) — por jogo, o que **cada API** reporta
+  lado a lado (scroll horizontal = swipe no mobile), divergências em vermelho + override/travar/
+  descongelar.
+- **Catálogo cruzado** (ESPN/football-data/TheSportsDB/**FIFA WC**): as APIs do mesmo campeonato
+  aparecem **juntas** (cruzadas por `registryKey` do registro + fallback por nome) e cada uma é
+  **anexada como fonte** (`admin_upsert_competition_source`) ao campeonato certo — **sem digitar
+  código**; cria campeonato novo só quando não há match. Resolve a duplicação (antes "Adicionar"
+  criava uma 2ª competição). Cada fonte exibe **quantos jogos trouxe** (`matches_count` por fonte).
+- Lifecycle: **Publicar/Despublicar** (`admin_set_competition_published`), **Renomear** PT-BR
+  (`admin_rename_competition`), **Excluir** → em uso (com palpites) **arquiva preservando os placares**
+  (`admin_archive_competition`, confirma o nome; jogos + `match_sources` ficam) e dá pra **Restaurar**
+  (`admin_restore_competition`); vazia, exclui de vez (`admin_delete_competition`).
+- **FIFA WC** (`fifawc`, novo no enum `data_provider`): API aberta `worldcup26.ir` (sem chave) —
+  adaptador `syncFifaWc` no `sync-football`, só validação (secundária) da Copa.
+- **NameRulesCard** (prefixos de nome de grupo, `admin_set_name_prefixes`) segue no rodapé desta aba.
 
 ### Aba **Usuários** (`UsuariosAdmin`)
 - Lista todos os perfis **com e-mail** via RPC `admin_list_users` (lê `auth.users`;
@@ -119,22 +144,26 @@ Pagamento · Avisos · Construa · Dados · Changelog**. Todas as ações chamam
   (avisa os app-admins); resolver → insere 1 `notification` (`feedback_reply`) pro autor. Migration
   `20260606000005`.
 
-### Aba **Dados** (`DadosAdmin`) — qualidade dos dados de jogos (multi-fonte) — **2.12.0**
+### Aba **Qualidade** (`DadosAdmin`, chave de URL `?t=dados`) — qualidade transversal dos dados
+> A **gestão de fontes por competição saiu daqui** (era a antiga "Fontes por competição") e foi pra
+> dentro de cada campeonato na aba **Competições**. Esta aba ficou enxuta, só com o que é
+> **transversal** (não-por-campeonato): times sem cadastro + conflitos de placar.
+- **Times fora do registro** (`admin_list_unmapped` / `admin_resolve_unmapped`): times que a API
+  trouxe e não estão no registro canônico — "Aceitar como veio" ou copiar JSON pro registro.
 - **Conflitos e jogos travados** (`admin_list_match_conflicts`): jogos onde as fontes **divergem** no
   placar (`score_conflict`) ou que estão sob edição manual. Mostra **o que cada fonte reporta**
   (`match_sources`), badges (divergente/congelado/manual/Nº fontes) e ações: **override manual** de
   placar/status que **trava contra a API** (`admin_override_match`, decisão #8), **travar/destravar**
-  (`admin_set_match_lock`) e **descongelar** (`admin_unfreeze_match`).
-- **Fontes por competição** (`admin_list_competition_sources`): cada competição tem 1 fonte
-  **primária** (dona do calendário) + N **secundárias** (só validam placar). Liga/desliga
-  (`admin_set_competition_source_enabled`), adiciona secundária (`admin_upsert_competition_source`) e
-  remove secundária (`admin_remove_competition_source`; a primária é protegida).
+  (`admin_set_match_lock`) e **descongelar** (`admin_unfreeze_match`). Os mesmos controles aparecem
+  também por campeonato na aba **Comparar fontes** (`admin_match_sources_for_competition`).
 - Pano de fundo: o placar oficial é o **voto da maioria** das fontes (`resolve_match_golden`, cron a
   cada 10 min); finalizado + ≥2 fontes + >1h → **congelado** (decisão #3). → [`05`](05-DADOS-E-AUTH.md).
 
 ### Tela de jogos por competição (`/admin/competicoes/:id/jogos` — `AdminCompMatchesPage`)
-- Curadoria por jogo: ocultar/mostrar (`matches.hidden`, RPC/`useSetMatchHidden`) e **override
-  manual** de placar/status. Separada da tela de palpites.
+- Duas abas: **Jogos** (curadoria — ocultar/mostrar `matches.hidden`, override manual de placar/status,
+  reabrir palpites) e **Comparar fontes** (`admin_match_sources_for_competition`): por jogo, o que
+  **cada API** reportou lado a lado (scroll horizontal/swipe no mobile), divergências em vermelho, com
+  override/travar/descongelar. Separada da tela de palpites.
 - **Reabrir palpites** (`admin_reopen_match`): emergência (jogo adiado) — empurra o `kickoff_at`
   ~15 min e destrava os palpites.
 - ℹ️ O ideal é a API atualizar sozinha (sync inteligente — §sync abaixo); o override é exceção.

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, RefreshCw, Eye, EyeOff, Pencil, Check, X, ExternalLink, Clock, ChevronDown, ChevronRight } from "lucide-react";
+import { ArrowLeft, RefreshCw, Eye, EyeOff, Pencil, Check, X, ExternalLink, Clock, ChevronDown, ChevronRight, Lock, Unlock, Snowflake, AlertTriangle } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useToast } from "@/components/ui/Toast";
-import { dayjs, formatDayLabel, formatTime } from "@/lib/format";
+import { dayjs, formatDayLabel, formatTime, fromNow } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { MatchStatus } from "@/lib/types";
 import {
@@ -20,6 +20,16 @@ import {
   type AdminMatch,
 } from "./api";
 import { useReopenMatch } from "./sync";
+import { useMatchSourcesForCompetition, type MatchWithSources } from "./competitionsAdmin";
+import { useOverrideMatch, useSetMatchLock, useUnfreezeMatch } from "./dataSources";
+
+const CMP_PROVIDER_LABEL: Record<string, string> = {
+  espn: "ESPN",
+  football_data: "football-data.org",
+  thesportsdb: "TheSportsDB",
+  manual: "Manual",
+};
+const cmpProv = (p: string) => CMP_PROVIDER_LABEL[p] ?? p;
 
 const STATUS_OPTS: { value: MatchStatus; label: string }[] = [
   { value: "scheduled", label: "Agendado" },
@@ -70,6 +80,7 @@ export function AdminCompMatchesPage() {
   const { data: comps } = useAdminCompetitions();
   const { data: matches, isLoading } = useAdminMatches(id);
   const sync = useSyncFootball();
+  const [view, setView] = useState<"jogos" | "comparar">("jogos");
 
   const comp = comps?.find((c) => c.id === id) as
     | { name: string; display_name?: string | null; provider: string }
@@ -103,7 +114,7 @@ export function AdminCompMatchesPage() {
     <Page
       title={compName}
       action={
-        <Button variant="ghost" size="icon" onClick={() => navigate("/admin")} aria-label="Voltar">
+        <Button variant="ghost" size="icon" onClick={() => navigate("/admin?t=competicoes")} aria-label="Voltar para Competições">
           <ArrowLeft className="size-5" />
         </Button>
       }
@@ -134,7 +145,30 @@ export function AdminCompMatchesPage() {
         </Link>
       </Card>
 
-      {isLoading ? (
+      <div className="mb-3 flex gap-1 rounded-pill bg-ink-100 p-1">
+        {(
+          [
+            ["jogos", "Jogos"],
+            ["comparar", "Comparar fontes"],
+          ] as const
+        ).map(([v, label]) => (
+          <button
+            key={v}
+            type="button"
+            onClick={() => setView(v)}
+            className={cn(
+              "flex-1 rounded-pill px-3 py-1.5 text-sm font-semibold transition-all",
+              view === v ? "bg-surface text-ink-950 shadow-[var(--shadow-soft)]" : "text-ink-500 hover:text-ink-700",
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {view === "comparar" ? (
+        <CompareView competitionId={id ?? null} />
+      ) : isLoading ? (
         <div className="space-y-3">
           <Skeleton className="h-24 w-full" />
           <Skeleton className="h-24 w-full" />
@@ -359,6 +393,234 @@ function AdminMatchRow({ match }: { match: AdminMatch }) {
           >
             <Clock className="size-3.5" /> Reabrir palpites por 15 min (jogo adiado)
           </button>
+        </div>
+      )}
+    </Card>
+  );
+}
+
+// ===========================================================================
+// Comparar fontes — todos os jogos com o que CADA API reportou, lado a lado.
+// ===========================================================================
+function CompareView({ competitionId }: { competitionId: string | null }) {
+  const { data, isLoading } = useMatchSourcesForCompetition(competitionId);
+
+  const groups = useMemo(() => {
+    const map = new Map<string, MatchWithSources[]>();
+    for (const m of data ?? []) {
+      const k = dayKey(m.kickoff_at);
+      const arr = map.get(k);
+      if (arr) arr.push(m);
+      else map.set(k, [m]);
+    }
+    return [...map.entries()].sort(([a], [b]) => b.localeCompare(a));
+  }, [data]);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        <Skeleton className="h-28 w-full" />
+        <Skeleton className="h-28 w-full" />
+      </div>
+    );
+  }
+  if (!data || data.length === 0) {
+    return (
+      <EmptyState
+        title="Sem jogos pra comparar"
+        description="Sincronize a competição pra trazer os jogos e o que cada fonte reporta."
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-2.5">
+      <p className="px-1 text-xs leading-snug text-ink-500">
+        Cada cartão mostra o placar final + o que <strong>cada fonte</strong> reportou. Divergências
+        ficam em vermelho. No celular, arraste as fontes pro lado.
+      </p>
+      {groups.map(([key, list]) => (
+        <section key={key} className="overflow-hidden rounded-lg ring-1 ring-border">
+          <div className="bg-surface-2 px-3 py-2.5 text-sm font-bold text-ink-800">
+            {formatDayLabel(list[0]?.kickoff_at ?? null)}{" "}
+            <span className="text-xs font-normal text-ink-400">· {list.length} jogo{list.length === 1 ? "" : "s"}</span>
+          </div>
+          <div className="space-y-2 p-2">
+            {list.map((m) => (
+              <CompareRow key={m.id} match={m} />
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
+}
+
+function CompareRow({ match }: { match: MatchWithSources }) {
+  const { toast } = useToast();
+  const override = useOverrideMatch();
+  const lock = useSetMatchLock();
+  const unfreeze = useUnfreezeMatch();
+  const [editing, setEditing] = useState(false);
+  const [home, setHome] = useState(match.home_score?.toString() ?? "");
+  const [away, setAway] = useState(match.away_score?.toString() ?? "");
+  const [status, setStatus] = useState<MatchStatus>((match.status as MatchStatus) ?? "scheduled");
+
+  const finalHas = match.home_score != null && match.away_score != null;
+  const finalLabel = finalHas ? `${match.home_score} – ${match.away_score}` : "—";
+
+  async function saveOverride() {
+    try {
+      await override.mutateAsync({
+        matchId: match.id,
+        home: home === "" ? 0 : Number(home),
+        away: away === "" ? 0 : Number(away),
+        status,
+        lock: true,
+      });
+      toast("Placar definido e travado contra a API.", "success");
+      setEditing(false);
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Erro.", "error");
+    }
+  }
+
+  return (
+    <Card className="p-3">
+      <div className="flex items-center gap-2">
+        <span className="min-w-0 flex-1 truncate text-sm font-semibold text-ink-900">
+          {match.home_team_name} <span className="text-ink-400">x</span> {match.away_team_name}
+        </span>
+        <span className="shrink-0 text-xs text-ink-400">{formatTime(match.kickoff_at)}</span>
+      </div>
+
+      <div className="mt-1 flex flex-wrap items-center gap-1.5">
+        <span className="rounded bg-ink-100 px-2 py-0.5 text-sm font-bold tabular-nums text-ink-900">
+          final {finalLabel}
+        </span>
+        {match.score_conflict && (
+          <Badge tone="flame" className="gap-1">
+            <AlertTriangle className="size-3" /> divergente
+          </Badge>
+        )}
+        {match.frozen && (
+          <Badge tone="neutral" className="gap-1">
+            <Snowflake className="size-3" /> congelado
+          </Badge>
+        )}
+        {match.manual_lock && (
+          <Badge tone="gold" className="gap-1">
+            <Lock className="size-3" /> travado
+          </Badge>
+        )}
+        <span className="text-[11px] text-ink-400">{match.score_sources_count} fonte(s)</span>
+      </div>
+
+      {/* fontes lado a lado (scroll horizontal = swipe no mobile) */}
+      <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+        {match.sources.length === 0 ? (
+          <span className="text-xs text-ink-400">Nenhuma fonte reportou ainda.</span>
+        ) : (
+          match.sources.map((s) => {
+            const diverges = finalHas && (s.home !== match.home_score || s.away !== match.away_score);
+            return (
+              <div
+                key={s.provider}
+                className={cn(
+                  "min-w-[116px] shrink-0 rounded-md border p-2",
+                  diverges ? "border-flame-400 bg-flame-50" : "border-border",
+                )}
+              >
+                <p className="truncate text-[11px] font-semibold text-ink-600">{cmpProv(s.provider)}</p>
+                <p className={cn("text-sm font-bold tabular-nums", diverges ? "text-flame-700" : "text-ink-900")}>
+                  {s.home != null && s.away != null ? `${s.home} – ${s.away}` : "—"}
+                </p>
+                <p className="truncate text-[11px] text-ink-400">
+                  {s.status ?? "—"}
+                  {s.fetched_at ? ` · ${fromNow(s.fetched_at)}` : ""}
+                </p>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* ações */}
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <Button size="sm" variant={editing ? "secondary" : "ghost"} onClick={() => setEditing((v) => !v)}>
+          <Pencil className="size-4" /> {editing ? "Fechar" : "Definir placar"}
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          loading={lock.isPending}
+          onClick={() =>
+            lock.mutate(
+              { matchId: match.id, locked: !match.manual_lock },
+              {
+                onSuccess: () =>
+                  toast(match.manual_lock ? "Destravado (a API volta a atualizar)." : "Travado contra a API.", "info"),
+              },
+            )
+          }
+        >
+          {match.manual_lock ? <Unlock className="size-4" /> : <Lock className="size-4" />}
+          {match.manual_lock ? "Destravar" : "Travar"}
+        </Button>
+        {match.frozen && (
+          <Button
+            size="sm"
+            variant="ghost"
+            loading={unfreeze.isPending}
+            onClick={() => unfreeze.mutate(match.id, { onSuccess: () => toast("Descongelado.", "info") })}
+          >
+            <Snowflake className="size-4" /> Descongelar
+          </Button>
+        )}
+      </div>
+
+      {editing && (
+        <div className="mt-2 space-y-2 rounded-md bg-ink-50 p-3">
+          <div className="flex items-center justify-center gap-2 text-sm font-semibold text-ink-800">
+            <span className="flex-1 truncate text-right">{match.home_team_name}</span>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={home}
+              onChange={(e) => setHome(e.target.value)}
+              className="size-11 rounded-md border border-ink-200 bg-surface text-center font-bold outline-none focus:border-brand-500"
+            />
+            <span className="text-ink-300">×</span>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={away}
+              onChange={(e) => setAway(e.target.value)}
+              className="size-11 rounded-md border border-ink-200 bg-surface text-center font-bold outline-none focus:border-brand-500"
+            />
+            <span className="flex-1 truncate">{match.away_team_name}</span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {STATUS_OPTS.map((o) => (
+              <button
+                key={o.value}
+                type="button"
+                onClick={() => setStatus(o.value)}
+                className={cn(
+                  "rounded-pill px-3 py-1.5 text-xs font-semibold transition",
+                  status === o.value ? "bg-brand-600 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200",
+                )}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-[11px] text-ink-400">
+            Definir aqui <strong>trava</strong> o jogo contra a API (sua decisão vence a fonte).
+          </p>
+          <Button size="sm" fullWidth loading={override.isPending} onClick={saveOverride}>
+            <Check className="size-4" /> Salvar e travar
+          </Button>
         </div>
       )}
     </Card>

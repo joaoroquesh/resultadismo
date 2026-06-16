@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  RefreshCw,
   AlertTriangle,
   BellRing,
   Inbox,
@@ -11,6 +10,14 @@ import {
   History,
   ChevronRight,
   ChevronDown,
+  LogIn,
+  Activity,
+  UserPlus,
+  Clock,
+  Target,
+  Users,
+  Layers,
+  Wallet,
 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -21,30 +28,30 @@ import { cn } from "@/lib/utils";
 import { fromNow } from "@/lib/format";
 import {
   useSystemHealth,
-  useSyncNow,
-  useSetCompetitionSync,
   useSetMaintenance,
   useSetOnlineThreshold,
   useUpdateAccess,
   useRecentAudit,
   ONLINE_ALERT_THRESHOLD,
-  type CompHealth,
   type AuditEntry,
 } from "./sync";
+import { useUsageStats } from "./competitionsAdmin";
 
 function Stat({
   icon,
   value,
   label,
   accent,
+  onClick,
 }: {
   icon: React.ReactNode;
   value: number;
   label: string;
   accent: "flame" | "brand" | "ink";
+  onClick?: () => void;
 }) {
-  return (
-    <div className="flex flex-1 flex-col items-center gap-0.5 px-2 py-3 text-center">
+  const inner = (
+    <>
       <span
         className={cn(
           "flex items-center gap-1 text-2xl font-extrabold tabular-nums",
@@ -57,31 +64,74 @@ function Stat({
         {value}
       </span>
       <span className="text-[11px] font-medium uppercase tracking-wide text-ink-400">{label}</span>
-    </div>
+    </>
   );
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="flex flex-1 flex-col items-center gap-0.5 px-2 py-3 text-center transition hover:bg-ink-50"
+      >
+        {inner}
+      </button>
+    );
+  }
+  return <div className="flex flex-1 flex-col items-center gap-0.5 px-2 py-3 text-center">{inner}</div>;
+}
+
+// Duração humana a partir de segundos (tempo médio de uso).
+function fmtDuration(seconds: number): string {
+  const s = Math.max(0, Math.round(seconds));
+  if (s < 60) return `${s}s`;
+  const m = Math.round(s / 60);
+  if (m < 60) return `${m} min`;
+  const h = Math.floor(m / 60);
+  const rem = m % 60;
+  return rem ? `${h}h ${rem}min` : `${h}h`;
+}
+
+// Tile de KPI da Visão: clicável → leva à aba relevante; sem onClick = só informa.
+function KpiTile({
+  icon,
+  value,
+  label,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  value: string | number;
+  label: string;
+  onClick?: () => void;
+}) {
+  const body = (
+    <>
+      <span className="flex items-center gap-1.5 text-lg font-extrabold tabular-nums text-ink-900">
+        <span className="text-ink-400">{icon}</span>
+        {value}
+      </span>
+      <span className="text-[11px] font-medium leading-tight text-ink-400">{label}</span>
+    </>
+  );
+  const cls = "flex flex-col items-start gap-0.5 rounded-lg bg-surface p-3 ring-1 ring-border";
+  if (onClick) {
+    return (
+      <button type="button" onClick={onClick} className={cn(cls, "text-left transition hover:bg-ink-50")}>
+        {body}
+      </button>
+    );
+  }
+  return <div className={cls}>{body}</div>;
 }
 
 export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => void }) {
   const { data: health, isLoading } = useSystemHealth();
-  const syncNow = useSyncNow();
-  const { toast } = useToast();
-
-  async function syncAll() {
-    try {
-      const r = await syncNow.mutateAsync({ mode: "catalog" });
-      const failed = r.results.filter((x) => !x.ok);
-      if (failed.length) toast(`Sincronizado com ${failed.length} problema(s).`, "error");
-      else toast(`Sincronizado (${r.synced} competição/ões).`, "success");
-    } catch (e) {
-      toast(e instanceof Error ? e.message : "Erro ao sincronizar.", "error");
-    }
-  }
+  const { data: usage } = useUsageStats();
 
   if (isLoading || !health) {
     return (
       <div className="space-y-3">
         <Skeleton className="h-24 w-full" />
-        <Skeleton className="h-40 w-full" />
+        <Skeleton className="h-32 w-full" />
       </div>
     );
   }
@@ -98,7 +148,7 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => vo
       {hasProblem && (
         <button
           type="button"
-          onClick={() => onNavigate("alertas")}
+          onClick={() => onNavigate("competicoes")}
           className="flex w-full items-center gap-3 rounded-lg bg-surface p-3.5 text-left ring-1 ring-flame-600 transition hover:bg-ink-50"
         >
           <AlertTriangle className="size-5 shrink-0 text-flame-600" />
@@ -107,7 +157,7 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => vo
               {health.sync_problems} competição(ões) com sincronização falhando
             </p>
             <p className="text-xs text-ink-500">
-              A API pode ter mudado ou caído. Toque pra ver os detalhes.
+              A API pode ter mudado ou caído. Toque pra abrir Competições e conferir as fontes.
             </p>
           </div>
           <ChevronRight className="size-4 shrink-0 text-flame-500" />
@@ -162,33 +212,40 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => vo
         </div>
       )}
 
-      {/* Agora — visão de um glance */}
+      {/* Agora — tempo real (clique pra ir ao detalhe) */}
       <Card className="flex items-stretch divide-x divide-border p-0">
-        <Stat icon={<Radio className="size-5" />} value={health.live_now} label="Ao vivo" accent="flame" />
-        <Stat icon={<CalendarClock className="size-5" />} value={health.today} label="Hoje" accent="ink" />
+        <Stat icon={<Radio className="size-5" />} value={health.live_now} label="Ao vivo" accent="flame" onClick={() => onNavigate("competicoes")} />
+        <Stat icon={<CalendarClock className="size-5" />} value={health.today} label="Hoje" accent="ink" onClick={() => onNavigate("competicoes")} />
         <Stat
           icon={<Users2 className="size-5" />}
           value={health.online_now}
           label="Online"
           accent={onlineSpike ? "flame" : "brand"}
+          onClick={() => onNavigate("usuarios")}
         />
       </Card>
 
-      {/* Sincronização */}
+      {/* Uso & comunidade — números centrais pra administrar (clique = mais detalhe) */}
       <section className="space-y-2">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xs font-bold uppercase tracking-wide text-ink-400">Sincronização</h2>
-          <Button size="sm" variant="ghost" loading={syncNow.isPending} onClick={syncAll}>
-            <RefreshCw className="size-4" /> Sincronizar tudo
-          </Button>
-        </div>
-        <Card className="divide-y divide-border p-0">
-          {health.competitions.length === 0 ? (
-            <p className="px-4 py-6 text-center text-sm text-ink-400">Nenhuma competição ativa.</p>
-          ) : (
-            health.competitions.map((c) => <SyncRow key={c.id} comp={c} />)
-          )}
-        </Card>
+        <h2 className="text-xs font-bold uppercase tracking-wide text-ink-400">Uso &amp; comunidade</h2>
+        {!usage ? (
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} className="h-[68px]" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <KpiTile icon={<LogIn className="size-4" />} value={usage.accessed_today} label="Acessos hoje" onClick={() => onNavigate("usuarios")} />
+            <KpiTile icon={<Activity className="size-4" />} value={usage.active_24h} label="Ativos 24h" onClick={() => onNavigate("usuarios")} />
+            <KpiTile icon={<UserPlus className="size-4" />} value={usage.new_users_today} label="Novos hoje" onClick={() => onNavigate("usuarios")} />
+            <KpiTile icon={<Users className="size-4" />} value={usage.total_users} label="Pessoas no total" onClick={() => onNavigate("usuarios")} />
+            <KpiTile icon={<Clock className="size-4" />} value={fmtDuration(usage.usage_seconds_avg)} label="Tempo médio/pessoa" onClick={() => onNavigate("usuarios")} />
+            <KpiTile icon={<Target className="size-4" />} value={usage.predictions_today} label="Palpites hoje" />
+            <KpiTile icon={<Layers className="size-4" />} value={usage.groups_total} label="Grupos ativos" onClick={() => onNavigate("grupos")} />
+            <KpiTile icon={<Wallet className="size-4" />} value={usage.groups_gestao_active} label="Gestão do Bolão ativa" onClick={() => onNavigate("grupos")} />
+          </div>
+        )}
       </section>
 
       <ConfigCard
@@ -336,64 +393,6 @@ function ConfigCard({
         </SettingRow>
       </Card>
     </section>
-  );
-}
-
-function SyncRow({ comp }: { comp: CompHealth }) {
-  const setSync = useSetCompetitionSync();
-  const syncNow = useSyncNow();
-  const { toast } = useToast();
-
-  const dot =
-    comp.last_sync_ok === true
-      ? "bg-grass-500"
-      : comp.last_sync_ok === false
-        ? "bg-flame-500"
-        : "bg-ink-300";
-
-  async function syncOne() {
-    try {
-      await syncNow.mutateAsync({ competitionId: comp.id, mode: "catalog" });
-      toast(`${comp.name} sincronizada.`, "success");
-    } catch (e) {
-      toast(e instanceof Error ? e.message : "Erro.", "error");
-    }
-  }
-
-  return (
-    <div className="flex items-center gap-3 px-3.5 py-3">
-      <span className={cn("size-2.5 shrink-0 rounded-full", dot)} title="Status do último sync" />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-ink-900">{comp.name}</p>
-        <p className="truncate text-xs text-ink-400">
-          {comp.provider}
-          {comp.last_synced_at ? ` · sync ${fromNow(comp.last_synced_at)}` : " · nunca sincronizou"}
-        </p>
-        {comp.last_sync_ok === false && comp.last_sync_error && (
-          <p className="mt-0.5 line-clamp-2 text-xs font-medium text-flame-600">{comp.last_sync_error}</p>
-        )}
-      </div>
-      <Button
-        size="icon"
-        variant="ghost"
-        aria-label={`Sincronizar ${comp.name}`}
-        loading={syncNow.isPending}
-        onClick={syncOne}
-      >
-        <RefreshCw className="size-4" />
-      </Button>
-      <Switch
-        checked={comp.sync_enabled}
-        disabled={setSync.isPending}
-        label={`Sync automático de ${comp.name}`}
-        onChange={(v) =>
-          setSync.mutate(
-            { id: comp.id, value: v },
-            { onSuccess: () => toast(v ? "Sync ligado." : "Sync pausado.", "info") },
-          )
-        }
-      />
-    </div>
   );
 }
 

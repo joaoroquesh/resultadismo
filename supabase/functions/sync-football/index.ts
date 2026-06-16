@@ -29,7 +29,7 @@ import { corsHeaders, timingSafeEqual } from "../_shared/security.ts";
 import canonical from "../_shared/teams-canonical.json" with { type: "json" };
 
 type MatchStatus = "scheduled" | "live" | "finished" | "postponed" | "cancelled";
-type Provider = "manual" | "football_data" | "thesportsdb" | "espn";
+type Provider = "manual" | "football_data" | "thesportsdb" | "espn" | "fifawc";
 type SyncMode = "scores" | "catalog";
 
 interface CompetitionRow {
@@ -196,18 +196,52 @@ async function reconcilePrimary(
 ): Promise<{ updated: number; inserted: number; alerted: number; touched: Set<string> }> {
   const ts = new Date().toISOString();
   const touched = new Set<string>();
+  // Carrega TODOS os jogos da competição (sem filtrar por provider): permite
+  // TROCAR a fonte primária sem duplicar — um jogo já existente (inclusive
+  // inserido por outra fonte ou manualmente, já palpitado) é ADOTADO pela nova
+  // primária via nome+dia em vez de virar jogo novo. Nunca apaga nem regride.
   const { data: existing } = await admin.from("matches")
-    .select("id, provider_ref, status, kickoff_at, home_team_name, away_team_name, home_team_id, away_team_id, frozen, manual_lock")
-    .eq("competition_id", comp.id).eq("provider", comp.provider);
-  const byRef = new Map((existing ?? []).map((m: Record<string, unknown>) => [String(m.provider_ref), m]));
+    .select("id, provider, provider_ref, status, kickoff_at, home_team_name, away_team_name, home_team_id, away_team_id, frozen, manual_lock")
+    .eq("competition_id", comp.id);
+  // 1) casamento forte por provider:ref (a própria fonte reconhece seu jogo)
+  const byRef = new Map(
+    (existing ?? []).map((m: Record<string, unknown>) => [`${m.provider}:${m.provider_ref}`, m]),
+  );
+  // 2) índice por par de nomes normalizados (fallback de adoção por nome+dia)
+  const nameIdx = new Map<string, Record<string, unknown>[]>();
+  for (const m of existing ?? []) {
+    const k = normName(m.home_team_name as string) + "|" + normName(m.away_team_name as string);
+    const arr = nameIdx.get(k);
+    if (arr) arr.push(m); else nameIdx.set(k, [m]);
+  }
+  const usedIds = new Set<string>();
+  const matchByNameDay = (row: MatchRow): Record<string, unknown> | undefined => {
+    // não adota por nome quando o confronto ainda é placeholder ("A definir")
+    if (row.home_team_name === "A definir" || row.away_team_name === "A definir") return undefined;
+    const cands = nameIdx.get(normName(row.home_team_name) + "|" + normName(row.away_team_name));
+    if (!cands || !cands.length) return undefined;
+    const rd = dayKey(row.kickoff_at);
+    let best: Record<string, unknown> | undefined;
+    let bestDiff = 2;
+    for (const c of cands) {
+      if (usedIds.has(String(c.id))) continue;
+      const cd = dayKey(c.kickoff_at as string);
+      const diff = rd != null && cd != null ? Math.abs(rd - cd) : 0;
+      if (diff <= 1 && diff < bestDiff) { best = c; bestDiff = diff; }
+    }
+    return best;
+  };
 
   let updated = 0, inserted = 0, alerted = 0;
 
   for (const row of rows) {
-    const cur = byRef.get(row.provider_ref) as Record<string, unknown> | undefined;
+    // casamento forte (própria fonte) → senão, adota um jogo existente por nome+dia
+    const cur = (byRef.get(`${comp.provider}:${row.provider_ref}`)
+      ?? matchByNameDay(row)) as Record<string, unknown> | undefined;
 
     if (cur) {
       const mid = String(cur.id);
+      usedIds.add(mid);
       // Jogo travado/congelado: registra observação mas NÃO altera o jogo.
       if (cur.frozen === true || cur.manual_lock === true) {
         await recordObservation(admin, mid, row);
@@ -569,6 +603,60 @@ async function syncEspn(supabase: SupabaseClient, ctx: SourceCtx, writeTeams: bo
   });
 }
 
+// ----- FIFA World Cup 2026 (API aberta worldcup26.ir, sem chave) -----
+// SÓ como fonte SECUNDÁRIA da Copa: valida placar dos jogos já existentes
+// (casa por nome+dia em ingestSecondary; nunca insere). Nomes vêm em inglês →
+// PT pelo mesmo caminho da ESPN (canonTeam → COUNTRY_EN_PT).
+function ptCountry(en: string): { name: string; short: string } {
+  const c = canonTeam(en);
+  if (c) return { name: c.name, short: c.short };
+  const m = COUNTRY_EN_PT[en];
+  if (m) return { name: m.name, short: m.short ?? m.name };
+  return { name: en, short: en };
+}
+function mapFifaStatus(timeElapsed: string, finished: string): MatchStatus {
+  const t = (timeElapsed ?? "").toLowerCase();
+  if (t === "live") return "live";
+  if (t === "finished" || (finished ?? "").toUpperCase() === "TRUE") return "finished";
+  return "scheduled";
+}
+async function syncFifaWc(ctx: SourceCtx): Promise<MatchRow[]> {
+  const res = await fetch("https://worldcup26.ir/get/games");
+  if (!res.ok) throw new Error(`FIFA WC API indisponível (${res.status})`);
+  const data = await res.json();
+  const games: unknown[] = Array.isArray(data)
+    ? data
+    : ((data as { games?: unknown[]; data?: unknown[] })?.games ?? (data as { data?: unknown[] })?.data ?? []);
+  if (!Array.isArray(games) || !games.length) throw new Error("FIFA WC API: formato inesperado ou vazio.");
+  const toISO = (s: string): string | null => {
+    const m = /^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/.exec(s ?? "");
+    if (!m) return null;
+    const [, mo, d, y, hh, mm] = m;
+    return `${y}-${mo}-${d}T${hh}:${mm}:00Z`;
+  };
+  const num = (v: unknown) =>
+    v != null && v !== "" && String(v).toLowerCase() !== "null" ? Number(v) : null;
+  return (games as Record<string, unknown>[]).map((g): MatchRow => {
+    const status = mapFifaStatus(String(g.time_elapsed ?? ""), String(g.finished ?? ""));
+    const live = status === "finished" || status === "live";
+    const home = ptCountry(String(g.home_team_name_en ?? "").trim());
+    const away = ptCountry(String(g.away_team_name_en ?? "").trim());
+    return {
+      competition_id: ctx.competitionId,
+      provider: "fifawc",
+      provider_ref: String(g.id ?? g._id ?? ""),
+      home_team_name: home.short,
+      away_team_name: away.short,
+      kickoff_at: toISO(String(g.local_date ?? "")),
+      status,
+      home_score: live ? num(g.home_score) : null,
+      away_score: live ? num(g.away_score) : null,
+      matchday: num(g.matchday),
+      group_name: g.group ? String(g.group) : null,
+    };
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Saúde / alertas de API (igual à versão anterior)
 // ---------------------------------------------------------------------------
@@ -650,6 +738,7 @@ async function fetchSource(
   }
   if (src.provider === "thesportsdb") return await syncTheSportsDb(ctx, secrets.theSportsDbKey);
   if (src.provider === "espn") return await syncEspn(admin, ctx, writeTeams);
+  if (src.provider === "fifawc") return await syncFifaWc(ctx);
   return [];
 }
 

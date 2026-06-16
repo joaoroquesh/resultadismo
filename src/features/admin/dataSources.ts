@@ -41,6 +41,8 @@ export type CompetitionSource = {
   last_sync_ok: boolean | null;
   last_sync_error: string | null;
   last_sync_checked_at: string | null;
+  /** Quantos jogos da competição esta fonte já observou (admin_list_competitions_full). */
+  matches_count?: number | null;
 };
 
 export type CompLite = { id: string; name: string; provider: string; provider_code: string | null };

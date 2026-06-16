@@ -22,7 +22,7 @@ const NAV = [
   { key: "construa", label: "Construa" },
   { key: "grupos", label: "Grupos" },
   { key: "competicoes", label: "Competições" },
-  { key: "dados", label: "Dados" },
+  { key: "dados", label: "Qualidade" },
   { key: "usuarios", label: "Usuários" },
   { key: "pagamento", label: "Pagamento" },
   { key: "changelog", label: "Changelog" },
