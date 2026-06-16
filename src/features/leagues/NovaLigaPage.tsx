@@ -9,9 +9,11 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Coachmark } from "@/components/ui/Coachmark";
 import { useToast } from "@/components/ui/Toast";
 import { useCompetitions, findWorldCupCompetition } from "@/features/matches/api";
-import { useCreateLeague, startLeagueCheckout } from "./api";
+import { useCreateLeague, startLeagueCheckout, useCompetitionPeriod } from "./api";
 import { expandTeamSlugs } from "@/features/onboarding/teamsCatalog";
 import { TeamScopeSelector } from "./TeamScopeSelector";
+import { StartsOnPicker } from "./StartsOnPicker";
+import { clampDate, todayLocal } from "./startsOn";
 import {
   usePaymentSettings,
   useSimulatePayment,
@@ -43,9 +45,9 @@ export function NovaLigaPage() {
   // "Todas" abre marcado de propósito — motivar acompanhar a Copa inteira.
   const [teamScope, setTeamScope] = useState<"all" | "brasil" | "custom">("all");
   const [scopeSel, setScopeSel] = useState<Set<string>>(() => new Set(["brasil"]));
-  // Quando os pontos começam a contar: "today" (a partir de hoje, default) ou
-  // "all" (conta os jogos já realizados também). Decisão do João.
-  const [scoringFrom, setScoringFrom] = useState<"today" | "all">("today");
+  // Data em que a pontuação do bolão começa a valer (default hoje). Limitada ao
+  // período da Copa; o dono pode mudar depois na página do grupo. Decisão do João.
+  const [startsOn, setStartsOn] = useState<string>(() => todayLocal());
   function toggleNation(slug: string) {
     setScopeSel((prev) => {
       const n = new Set(prev);
@@ -58,6 +60,11 @@ export function NovaLigaPage() {
   // Temporada da Copa: todo grupo nasce com o bolão da Copa do Mundo, travado.
   // O banco também enforça (trigger group_eligible). Outros campeonatos chegam depois.
   const worldCup = competitions?.length ? findWorldCupCompetition(competitions) : undefined;
+
+  // Limites do seletor de data: período [1º jogo, último jogo] da Copa (BRT).
+  const { data: cupPeriod } = useCompetitionPeriod(worldCup?.id);
+  // Valor efetivo preso ao período — derivado no render (sem efeito/setState).
+  const boundedStartsOn = clampDate(startsOn, cupPeriod?.data_min, cupPeriod?.data_max);
 
   const payMode = settings?.payment_mode ?? "disabled";
   const baseCents = settings?.league_price_cents ?? 990;
@@ -102,9 +109,8 @@ export function NovaLigaPage() {
             : Array.from(
                 expandTeamSlugs(teamScope === "brasil" ? ["brasil"] : Array.from(scopeSel)),
               ),
-        // "today" → conta a partir de hoje (data local em YYYY-MM-DD); "all" → tudo.
-        startsOn:
-          scoringFrom === "today" ? new Date().toLocaleDateString("en-CA") : null,
+        // Data escolhida (default hoje), presa ao período da Copa.
+        startsOn: boundedStartsOn,
       });
       const slug = league.slug;
 
@@ -299,18 +305,15 @@ export function NovaLigaPage() {
             <label className="text-sm font-medium text-ink-800">
               A pontuação conta a partir de quando?
             </label>
-            <SegmentedControl<"today" | "all">
-              value={scoringFrom}
-              onChange={setScoringFrom}
-              options={[
-                { value: "today", label: "A partir de hoje" },
-                { value: "all", label: "Contar jogos já feitos" },
-              ]}
+            <StartsOnPicker
+              value={boundedStartsOn}
+              onChange={setStartsOn}
+              min={cupPeriod?.data_min}
+              max={cupPeriod?.data_max}
             />
             <p className="text-xs leading-snug text-ink-400">
-              {scoringFrom === "today"
-                ? "Só os jogos de hoje em diante valem pontos neste grupo."
-                : "Os jogos já realizados também contam (quem palpitou neles leva os pontos)."}
+              Só os jogos a partir dessa data valem pontos neste grupo. Pode começar desde o início
+              da Copa (conta tudo) ou mais pra frente — e dá pra mudar depois na página do grupo.
             </p>
           </div>
         </Card>

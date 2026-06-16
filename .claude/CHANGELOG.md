@@ -29,10 +29,24 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   grupo segue funcionando. Ao renomear, o nome volta a valer. Migration `20260615120000` (trigger
   de criação ativo + RLS, RPC `admin_flag_league_name`, `update_group_info` libera no rename,
   backfill dos pendentes). Front: `groupName.ts`, banner no grupo, copy da criação, `useFlagLeagueName`.
-- **Escolher se a pontuação conta os jogos já realizados ou só a partir de hoje.** Na criação do
-  grupo, um toggle "A pontuação conta a partir de quando?" — **A partir de hoje** (padrão) ou
-  **Contar jogos já feitos**. Grava `league_competitions.starts_on` (a classificação já filtrava por
-  ele); a aba Classificação mostra "a pontuação conta a partir de DD/MM" quando aplicável.
+- **Data de início do bolão escolhida e editável pelo dono (ADR [`0011`](decisions/0011-data-inicio-bolao-editavel.md)).**
+  Na criação, o dono escolhe **o dia em que a pontuação começa a valer** (seletor de data, default
+  **hoje**) — qualquer dia dentro do período da Copa, pra trás (incluir quem já vinha jogando) ou
+  pra frente (começar mais tarde). Na **aba Competições** dá pra **mudar** depois, **enquanto a Copa
+  não terminou** (trava no fim); mudar **recalcula** a classificação (com aviso). A data fica
+  **à mostra pra todos** na Classificação ("a pontuação conta a partir de DD/MM"). Correção junto: o
+  corte por data passa a ser pelo **dia em BRT** (não UTC). Migration `20260615190000` (RPCs
+  `competition_period`/`starts_on_window` + trigger `trg_lc_starts_on_window` + `get_league_standings`
+  em BRT); front `StartsOnPicker`/`StartsOnCard`, hooks em `leagues/api.ts`. Substitui o toggle
+  hoje×tudo do ADR 0010.
+- **Gestão do Bolão: chave Pix + o membro sinaliza que pagou (evolução do ADR [`0009`](decisions/0009-gestao-bolao.md)).**
+  O dono cadastra a **chave Pix** da caixinha (`pot_pix_key`) e os membros **veem e copiam** pra
+  pagar. O membro pode **sinalizar "Já paguei"** no app — fica **pendente** até o **dono/admin
+  confirmar** (`league_pot_payers.confirmed`); só confirmado conta no rateio e no selo 💰. A aba
+  Gestão ganhou **visões distintas**: dono = painel pra ajustar (inputs), membro = informação final
+  (copiar Pix, "Já paguei", leitura). O app segue **sem movimentar dinheiro**. Migration
+  `20260615200000` (coluna `pot_pix_key`, coluna `confirmed`, RLS de auto-sinalização do membro);
+  front `GestaoBolaoTab` (OwnerView/MemberView), hooks `useDeclarePaid`/`usePotPayers` em `leagues/api.ts`.
 - **Compartilhar a classificação do grupo como imagem.** Botão "Compartilhar classificação" na aba
   Classificação gera uma imagem no estilo da marca (mesmo motor do share de placar) com logo, nome
   do grupo, posição/nome/pontos + cravadas e aproveitamento, pódio em ouro/prata/bronze e o selo

@@ -497,38 +497,154 @@ export function useUpdateTeamScope() {
   });
 }
 
-// ── Gestão do Bolão (ADR 0008): organização da caixinha PELO grupo. ─────────
-// O app não movimenta dinheiro: registra o combinado e calcula o rateio.
+// ── Data de início do bolão (starts_on): editável pelo dono ─────────────────
 
-export function usePotPayers(lcId: string | null | undefined) {
+/** Período [1º jogo, último jogo] da competição (em BRT) — limites do seletor
+ * de data na criação do grupo. */
+export function useCompetitionPeriod(competitionId: string | undefined) {
   return useQuery({
-    enabled: !!lcId,
-    queryKey: ["pot-payers", lcId],
-    queryFn: async (): Promise<Set<string>> => {
-      const { data, error } = await supabase
-        .from("league_pot_payers")
-        .select("user_id")
-        .eq("lc_id", lcId!);
+    enabled: !!competitionId,
+    queryKey: ["competition-period", competitionId],
+    staleTime: 5 * 60_000,
+    queryFn: async (): Promise<{ data_min: string | null; data_max: string | null }> => {
+      const { data, error } = await rpcCall<{ data_min: string | null; data_max: string | null }[]>(
+        "competition_period",
+        { p_competition_id: competitionId! },
+      );
       if (error) throw new Error(error.message);
-      return new Set((data ?? []).map((r) => r.user_id as string));
+      return data?.[0] ?? { data_min: null, data_max: null };
     },
   });
 }
 
+export type StartsOnWindow = {
+  editable: boolean;
+  reason: string | null;
+  starts_on: string | null;
+  data_min: string | null;
+  data_max: string | null;
+};
+
+/** Janela de edição da data de início: aberta enquanto a Copa não terminou
+ * (RPC starts_on_window; o trigger no banco é quem manda). Traz os limites. */
+export function useStartsOnWindow(lcId: string | undefined) {
+  return useQuery({
+    enabled: !!lcId,
+    queryKey: ["starts-on-window", lcId],
+    queryFn: async (): Promise<StartsOnWindow> => {
+      const { data, error } = await rpcCall<StartsOnWindow[]>("starts_on_window", { p_lc_id: lcId! });
+      if (error) throw new Error(error.message);
+      return (
+        data?.[0] ?? { editable: false, reason: null, starts_on: null, data_min: null, data_max: null }
+      );
+    },
+  });
+}
+
+/** Atualiza a data de início do bolão. RLS: admin do grupo; trigger valida o
+ * período e trava depois que a Copa termina. Recalcula a classificação. */
+export function useUpdateStartsOn() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { leagueId: string; lcId: string; startsOn: string }) => {
+      const { error } = await supabase
+        .from("league_competitions")
+        .update({ starts_on: input.startsOn })
+        .eq("id", input.lcId);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: ["league-competitions", v.leagueId] });
+      qc.invalidateQueries({ queryKey: ["starts-on-window", v.lcId] });
+      qc.invalidateQueries({ queryKey: ["standings"] });
+    },
+  });
+}
+
+// ── Gestão do Bolão (ADR 0009): organização da caixinha PELO grupo. ─────────
+// O app não movimenta dinheiro: registra o combinado e calcula o rateio.
+//
+// league_pot_payers ganhou a coluna `confirmed` e league_competitions ganhou
+// `pot_pix_key` (evolução do ADR 0009). Os tipos gerados (database.ts) ainda não
+// as têm e regenerar conflita entre sessões (doc 09) — então usamos acessores
+// frouxos contidos só aqui.
+type PayerRow = { user_id: string; confirmed: boolean };
+type PayerTable = {
+  select: (s: string) => {
+    eq: (c: string, v: string) => Promise<{ data: PayerRow[] | null; error: { message: string } | null }>;
+  };
+  insert: (v: Record<string, unknown>) => Promise<{ error: { message: string } | null }>;
+  upsert: (
+    v: Record<string, unknown>,
+    o: { onConflict: string },
+  ) => Promise<{ error: { message: string } | null }>;
+  delete: () => {
+    eq: (c: string, v: string) => {
+      eq: (c: string, v: string) => Promise<{ error: { message: string } | null }>;
+    };
+  };
+};
+const payersTable = () => supabase.from("league_pot_payers") as unknown as PayerTable;
+
+export type PotPayers = { confirmed: Set<string>; pending: Set<string> };
+
+/** Pagantes do bolão: confirmados (contam no rateio) e pendentes (o membro
+ * sinalizou que pagou, falta o dono confirmar). */
+export function usePotPayers(lcId: string | null | undefined) {
+  return useQuery({
+    enabled: !!lcId,
+    queryKey: ["pot-payers", lcId],
+    queryFn: async (): Promise<PotPayers> => {
+      const { data, error } = await payersTable().select("user_id, confirmed").eq("lc_id", lcId!);
+      if (error) throw new Error(error.message);
+      const confirmed = new Set<string>();
+      const pending = new Set<string>();
+      for (const r of data ?? []) (r.confirmed ? confirmed : pending).add(r.user_id);
+      return { confirmed, pending };
+    },
+  });
+}
+
+/** Admin/dono marca OU confirma um pagante (confirmed=true) ou remove o registro.
+ * O upsert cobre os dois casos: criar do zero e confirmar uma sinalização pendente. */
 export function useTogglePotPayer() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: { lcId: string; userId: string; paid: boolean; markedBy: string }) => {
       if (input.paid) {
-        const { error } = await supabase.from("league_pot_payers").insert({
+        const { error } = await payersTable().upsert(
+          { lc_id: input.lcId, user_id: input.userId, marked_by: input.markedBy, confirmed: true },
+          { onConflict: "lc_id,user_id" },
+        );
+        if (error) throw new Error(error.message);
+      } else {
+        const { error } = await payersTable()
+          .delete()
+          .eq("lc_id", input.lcId)
+          .eq("user_id", input.userId);
+        if (error) throw new Error(error.message);
+      }
+    },
+    onSuccess: (_d, v) => qc.invalidateQueries({ queryKey: ["pot-payers", v.lcId] }),
+  });
+}
+
+/** Membro sinaliza que pagou (cria a PRÓPRIA linha pendente) ou desfaz. Só vira
+ * "pago" quando o dono/admin confirma. RLS garante: membro só mexe na própria
+ * linha pendente. */
+export function useDeclarePaid() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { lcId: string; userId: string; declare: boolean }) => {
+      if (input.declare) {
+        const { error } = await payersTable().insert({
           lc_id: input.lcId,
           user_id: input.userId,
-          marked_by: input.markedBy,
+          confirmed: false,
         });
         if (error) throw new Error(error.message);
       } else {
-        const { error } = await supabase
-          .from("league_pot_payers")
+        const { error } = await payersTable()
           .delete()
           .eq("lc_id", input.lcId)
           .eq("user_id", input.userId);
@@ -548,17 +664,20 @@ export function useUpdatePotSettings() {
       enabled?: boolean;
       entryCents?: number | null;
       split?: Record<string, number> | null;
+      pixKey?: string | null;
     }) => {
-      const patch: {
-        pot_enabled?: boolean;
-        pot_entry_cents?: number | null;
-        pot_split?: Record<string, number> | null;
-      } = {};
+      const patch: Record<string, unknown> = {};
       if (input.enabled !== undefined) patch.pot_enabled = input.enabled;
       if (input.entryCents !== undefined) patch.pot_entry_cents = input.entryCents;
       if (input.split !== undefined) patch.pot_split = input.split;
-      const { error } = await supabase
-        .from("league_competitions")
+      if (input.pixKey !== undefined) patch.pot_pix_key = input.pixKey;
+      const { error } = await (
+        supabase.from("league_competitions") as unknown as {
+          update: (v: Record<string, unknown>) => {
+            eq: (c: string, v: string) => Promise<{ error: { message: string } | null }>;
+          };
+        }
+      )
         .update(patch)
         .eq("id", input.lcId);
       if (error) throw new Error(error.message);

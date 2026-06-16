@@ -76,7 +76,13 @@ Padrão geral: **app-admin sempre pode**; o resto depende de propriedade/papel/v
 - `compute_score_type(ph,pa,rh,ra)` → enum (`cravada`/`saldo`/`acerto`/`erro`) — IMMUTABLE.
 - `score_points(score_type)` → int (3/2/1/0).
 - `get_league_standings(lc_id)` → classificação com o **desempate fixo** (ver §6). `SECURITY
-  DEFINER`, com guarda de acesso (membro/público/admin).
+  DEFINER`, com guarda de acesso (membro/público/admin). Conta só jogos com kickoff **em BRT** ≥
+  `league_competitions.starts_on` (null = tudo) e dentro do recorte de seleções; `get_my_league_positions`
+  e `get_group_rank_window` **delegam** a ela.
+- `competition_period(competition_id)` → período `[1º jogo, último jogo]` da competição (em BRT) e
+  `starts_on_window(lc_id)` → janela de edição da **data de início do bolão** (editável até a Copa
+  terminar) + limites. Espelham o trigger `trg_lc_starts_on_window` (migration `20260615190000`). →
+  [`06`](06-REGRAS-DE-NEGOCIO.md) §4.
 - `get_confronto_standings` / `get_confronto_ties` / `get_tie_detail` / `get_competition_periods` —
   confronto por período. **Guarda de visibilidade desde 1.1.0** (membro/público/admin — não vazam
   liga privada p/ anon); `ties`/`tie_detail` retornam vazio enquanto o sorteio está `scheduled`. →

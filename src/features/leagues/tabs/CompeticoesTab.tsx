@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/Toast";
 import { useCompetitions, findWorldCupCompetition } from "@/features/matches/api";
 import { useAddLeagueCompetition, useDeleteLeagueCompetition } from "../api";
 import { TeamScopeCard } from "./TeamScopeCard";
+import { StartsOnCard } from "./StartsOnCard";
 import type { LeagueMode } from "@/lib/types";
 
 // Temporada da Copa (ADR 0007): 1 competição por grupo — a Copa do Mundo, fixa
@@ -23,7 +24,13 @@ export function CompeticoesTab({
   confrontoEnabled,
 }: {
   leagueId: string;
-  comps: { id: string; name: string; mode: string; followed_team_slugs?: string[] | null }[];
+  comps: {
+    id: string;
+    name: string;
+    mode: string;
+    followed_team_slugs?: string[] | null;
+    starts_on?: string | null;
+  }[];
   confrontoEnabled: boolean;
 }) {
   const { data: competitions } = useCompetitions();
@@ -126,17 +133,27 @@ export function CompeticoesTab({
         );
       })}
 
-      {/* Recorte de seleções do bolão: editável até o 1º jogo da Copa começar. */}
+      {/* Configurações do bolão (admin): data de início (editável até a Copa
+          terminar) + recorte de seleções (editável até a Copa começar). */}
       {(() => {
         const bolao = comps.find((c) => c.mode === "points" || c.mode === "table");
-        return bolao ? (
-          <TeamScopeCard
-            key={bolao.id}
-            leagueId={leagueId}
-            lcId={bolao.id}
-            savedSlugs={bolao.followed_team_slugs ?? null}
-          />
-        ) : null;
+        if (!bolao) return null;
+        return (
+          <>
+            <StartsOnCard
+              key={`starts-${bolao.id}`}
+              leagueId={leagueId}
+              lcId={bolao.id}
+              savedStartsOn={bolao.starts_on ?? null}
+            />
+            <TeamScopeCard
+              key={bolao.id}
+              leagueId={leagueId}
+              lcId={bolao.id}
+              savedSlugs={bolao.followed_team_slugs ?? null}
+            />
+          </>
+        );
       })()}
 
       {reachedLimit ? (

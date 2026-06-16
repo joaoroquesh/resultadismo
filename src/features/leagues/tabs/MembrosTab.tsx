@@ -31,7 +31,7 @@ export function MembrosTab({
   const list = members ?? [];
   const payers = usePotPayers(potLc?.id ?? null);
   const togglePayer = useTogglePotPayer();
-  const paidSet = payers.data ?? new Set<string>();
+  const paidSet = payers.data?.confirmed ?? new Set<string>();
 
   return (
     <ul className="space-y-2">

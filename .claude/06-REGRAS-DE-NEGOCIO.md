@@ -138,6 +138,18 @@ uma troca de significado proposital.
   o front espelha via RPC `team_scope_window` (estado + motivo). Palpites **não** entram na janela:
   são globais por usuário e o recorte só muda a **contagem** do grupo. Seletor único
   (`TeamScopeSelector`) compartilhado entre criação e edição.
+- **Data de início do bolão é editável pelo dono (2026-06-15 — decisão do João, ADR [`0011`](decisions/0011-data-inicio-bolao-editavel.md)):**
+  `league_competitions.starts_on` define **o dia a partir do qual a pontuação do bolão conta** (a
+  classificação só soma jogos com kickoff **em horário de Brasília** ≥ essa data; `null` = conta
+  tudo). Na **criação** o dono escolhe a data (default **hoje**); na **aba Competições** ele pode
+  **mudar** depois — **qualquer dia dentro do período da Copa** `[1º jogo … último]`, pra trás
+  (incluir quem já vinha jogando) ou pra frente (começar mais tarde). **Editável enquanto a Copa
+  não terminou; trava quando ela acaba** — o oposto do recorte de seleções, que trava no **começo**.
+  Mudar **recalcula** a classificação (o front avisa). Enforçado no banco (trigger
+  `trg_lc_starts_on_window` + RPCs `starts_on_window`/`competition_period`, migration
+  `20260615190000`); o front espelha (`StartsOnPicker`/`StartsOnCard`). Vale **só** pro ranking de
+  pontos do bolão (Confronto e ranking geral não usam). A data fica **à mostra pra todos** na aba
+  Classificação ("a pontuação conta a partir de DD/MM").
 
 ---
 
@@ -160,6 +172,16 @@ Ferramenta **opcional e meramente informativa** pra organizar o bolão que grupo
 - **Quem faz o quê (enforçado no banco, triggers + RLS):** admins ativam, definem valor da
   inscrição (`pot_entry_cents`) e divisão % 1º/2º/3º (`pot_split`), e marcam **quem pagou**;
   **só o DONO trava/destrava** (`pot_locked`, manual — decisão do PO); travado, nada de pot_* muda.
+- **Chave Pix + sinalização do pagamento (2026-06-15, migration `20260615200000`):** o dono/admin
+  cadastra a **chave Pix** (`pot_pix_key`) e os membros **veem e copiam** pra pagar. O membro pode
+  **sinalizar que pagou** — cria a **própria** linha **pendente** (`league_pot_payers.confirmed=false`),
+  mas só **conta no rateio** quando o **dono/admin confirma** (`confirmed=true`). Enforçado no banco
+  (RLS: o membro só insere/desfaz a própria linha pendente; confirmar é admin; a trava do dono segue
+  valendo; o rateio e o selo 💰 contam **só confirmados**).
+- **Visões distintas (UX, regra 13):** o **dono/admin** vê a Gestão como **painel de ajuste** (inputs
+  de valor, Pix e divisão, marcar/confirmar pagantes); o **membro** vê como **informação final**
+  (valor, divisão, Pix pra copiar, botão "Já paguei", "quem pagou" só leitura). `GestaoBolaoTab`
+  ramifica em `OwnerView`/`MemberView`.
 - **Rateio (`potMath.ts`):** prêmio total = pagantes × inscrição; cada prêmio arredonda **pra
   baixo**; % não usados, sobras e colocações sem pagante ficam no "caixa do grupo". **Prêmio só
   entre pagantes**: o rateio cruza a classificação oficial com o conjunto de pagantes (selo 💰 na

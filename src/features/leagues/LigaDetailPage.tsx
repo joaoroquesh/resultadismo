@@ -70,6 +70,7 @@ export function LigaDetailPage() {
           pot_entry_cents?: number | null;
           pot_split?: Record<string, number> | null;
           pot_locked?: boolean | null;
+          pot_pix_key?: string | null;
         })
       | undefined;
   }, [comps]);
@@ -80,10 +81,13 @@ export function LigaDetailPage() {
     if (!potOn || !potLc || !potPayers || activeLcId !== potLc.id || !standings) return undefined;
     const { prizes } = computePot(
       potLc.pot_entry_cents ?? 0,
-      potPayers.size,
+      potPayers.confirmed.size,
       (potLc.pot_split ?? {}) as { 1?: number; 2?: number; 3?: number },
     );
-    return { payers: potPayers, prizeByUserId: prizeByUser(standings, potPayers, prizes) };
+    return {
+      payers: potPayers.confirmed,
+      prizeByUserId: prizeByUser(standings, potPayers.confirmed, prizes),
+    };
   }, [potOn, potLc, potPayers, activeLcId, standings]);
 
   const leave = useLeaveLeague();
