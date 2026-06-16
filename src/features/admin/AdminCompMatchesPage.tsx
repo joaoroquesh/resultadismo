@@ -405,6 +405,7 @@ function AdminMatchRow({ match }: { match: AdminMatch }) {
 function CompareView({ competitionId }: { competitionId: string | null }) {
   const { data, isLoading } = useMatchSourcesForCompetition(competitionId);
 
+  // MESMA estrutura/ordenação da aba Jogos: agrupa por dia ASC e acordeão.
   const groups = useMemo(() => {
     const map = new Map<string, MatchWithSources[]>();
     for (const m of data ?? []) {
@@ -413,7 +414,7 @@ function CompareView({ competitionId }: { competitionId: string | null }) {
       if (arr) arr.push(m);
       else map.set(k, [m]);
     }
-    return [...map.entries()].sort(([a], [b]) => b.localeCompare(a));
+    return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
   }, [data]);
 
   if (isLoading) {
@@ -433,26 +434,58 @@ function CompareView({ competitionId }: { competitionId: string | null }) {
     );
   }
 
+  // Acordeão: só o dia de HOJE aberto (ou o próximo com jogo) — igual a Jogos.
+  const todayKey = dayjs().format("YYYY-MM-DD");
+  const keys = groups.map(([k]) => k);
+  const openKey = keys.includes(todayKey)
+    ? todayKey
+    : (keys.find((k) => k >= todayKey) ?? keys[keys.length - 1]);
+
   return (
     <div className="space-y-2.5">
       <p className="px-1 text-xs leading-snug text-ink-500">
         Cada cartão mostra o placar final + o que <strong>cada fonte</strong> reportou. Divergências
-        ficam em vermelho. No celular, arraste as fontes pro lado.
+        ficam em vermelho; fonte sem placar é ignorada. No celular, arraste as fontes pro lado.
       </p>
       {groups.map(([key, list]) => (
-        <section key={key} className="overflow-hidden rounded-lg ring-1 ring-border">
-          <div className="bg-surface-2 px-3 py-2.5 text-sm font-bold text-ink-800">
-            {formatDayLabel(list[0]?.kickoff_at ?? null)}{" "}
-            <span className="text-xs font-normal text-ink-400">· {list.length} jogo{list.length === 1 ? "" : "s"}</span>
-          </div>
-          <div className="space-y-2 p-2">
-            {list.map((m) => (
-              <CompareRow key={m.id} match={m} />
-            ))}
-          </div>
-        </section>
+        <CompareDaySection key={key} list={list} defaultOpen={key === openKey} />
       ))}
     </div>
+  );
+}
+
+// Seção de um dia, recolhível — espelha DaySection (mesma cara/ordenação) p/ comparar fontes.
+function CompareDaySection({ list, defaultOpen }: { list: MatchWithSources[]; defaultOpen: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
+  const liveCount = list.filter((m) => m.status === "live").length;
+  return (
+    <section className="overflow-hidden rounded-lg ring-1 ring-border">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center gap-2 bg-surface-2 px-3 py-2.5 text-left"
+      >
+        {open ? (
+          <ChevronDown className="size-4 shrink-0 text-ink-400" />
+        ) : (
+          <ChevronRight className="size-4 shrink-0 text-ink-400" />
+        )}
+        <span className="text-sm font-bold text-ink-800">{formatDayLabel(list[0]?.kickoff_at ?? null)}</span>
+        <span className="text-xs text-ink-400">· {list.length} jogo{list.length === 1 ? "" : "s"}</span>
+        {liveCount > 0 && (
+          <span className="ml-auto inline-flex items-center gap-1 rounded-pill bg-flame-600 px-2 py-0.5 text-[11px] font-bold text-white">
+            <span className="size-1.5 animate-pulse rounded-full bg-flame-500" /> {liveCount} ao vivo
+          </span>
+        )}
+      </button>
+      {open && (
+        <div className="space-y-2 p-2">
+          {list.map((m) => (
+            <CompareRow key={m.id} match={m} />
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -522,7 +555,9 @@ function CompareRow({ match }: { match: MatchWithSources }) {
           <span className="text-xs text-ink-400">Nenhuma fonte reportou ainda.</span>
         ) : (
           match.sources.map((s) => {
-            const diverges = finalHas && (s.home !== match.home_score || s.away !== match.away_score);
+            // fonte sem placar é IGNORADA (não conta como divergência) — pedido do João
+            const hasScore = s.home != null && s.away != null;
+            const diverges = finalHas && hasScore && (s.home !== match.home_score || s.away !== match.away_score);
             return (
               <div
                 key={s.provider}

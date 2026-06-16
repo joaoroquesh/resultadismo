@@ -157,7 +157,15 @@ Pagamento · Avisos · Construa · Qualidade · Changelog**. Todas as ações ch
   (`admin_set_match_lock`) e **descongelar** (`admin_unfreeze_match`). Os mesmos controles aparecem
   também por campeonato na aba **Comparar fontes** (`admin_match_sources_for_competition`).
 - Pano de fundo: o placar oficial é o **voto da maioria** das fontes (`resolve_match_golden`, cron a
-  cada 10 min); finalizado + ≥2 fontes + >1h → **congelado** (decisão #3). → [`05`](05-DADOS-E-AUTH.md).
+  cada 10 min); finalizado + ≥2 fontes + >1h → **congelado** (decisão #3). **Fonte sem placar é
+  ignorada** (golden só conta observações com placar). **Resolver na mão encerra o conflito:**
+  `admin_override_match` / `admin_set_match_lock` (ao travar) zeram `score_conflict` e marcam como
+  resolvidos os `sync_alerts` `score_conflict` pendentes do jogo; `alertConflicts` não re-alerta jogo
+  travado. → [`05`](05-DADOS-E-AUTH.md).
+- **Resiliência do sync (anti-spam):** as chamadas de API têm `fetchWithRetry` (retry+timeout) — blip
+  de rede (`SendRequest`) se cura sozinho. O alerta/push de "Sincronização com problema" **só dispara
+  com falha sustentada** (`competitions.sync_fail_streak` ≥ 3 ciclos seguidos sem nenhuma fonte; zera
+  ao voltar). Degradação de uma fonte segue visível por fonte (aviso amarelo), sem notificar à toa.
 
 ### Tela de jogos por competição (`/admin/competicoes/:id/jogos` — `AdminCompMatchesPage`)
 - Duas abas: **Jogos** (curadoria — ocultar/mostrar `matches.hidden`, override manual de placar/status,

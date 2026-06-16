@@ -29,6 +29,18 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   (usuário, semana) sem competição + nova RPC `my_joker_week_counts` pro contador (migration
   `20260615230000`); `competitions.jokers_per_week` virou vestigial. Front: `JogosPage` lê o contador
   global, hook `useMyJokerWeekCounts` em `matches/api.ts`. Decisão do João.
+- **Sincronização mais resiliente + fim do spam de alerta (raiz do problema).** As chamadas de API
+  ganham **retry + timeout** (`fetchWithRetry`): blip de rede (`SendRequest`) se resolve sozinho e
+  não vira "falha". E o alerta/push de sync **só dispara quando a falha é sustentada** (≥ 3 ciclos
+  seguidos sem nenhuma fonte entregar dados; coluna `sync_fail_streak`, zera ao voltar) — acaba o
+  spam de "Sincronização com problema" quando uma fonte oscila.
+- **Conflito resolvido na mão = caso encerrado.** Ao **Definir placar** ou **Travar** um jogo,
+  `score_conflict` zera e os **alertas/notificações de conflito pendentes daquele jogo são
+  resolvidos automaticamente** (sem precisar "Marcar resolvido"). Fonte **sem placar** deixa de
+  contar como divergência (a tela não pinta de vermelho; o golden já ignorava). `alertConflicts`
+  não re-alerta jogo travado. Migration `20260616120000`.
+- **"Comparar fontes" com a mesma cara de "Jogos".** Mesmo **acordeão por dia** e **mesma ordenação**
+  (dia de hoje aberto por padrão), em vez da lista plana invertida.
 - **Admin — gestão de campeonatos & APIs repensada (aba Competições) + Visão enxuta.** A aba
   **Competições** vira a casa de tudo de competição, **agrupada** nos 4 grupos da personalização
   (Seleções · Ligas e estaduais · Copas · Alternativos, colapsáveis). Cada campeonato mostra sua

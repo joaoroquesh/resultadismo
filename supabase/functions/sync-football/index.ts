@@ -39,6 +39,7 @@ interface CompetitionRow {
   provider_code: string | null;
   provider_season: string | null;
   catalog_seeded: boolean;
+  sync_fail_streak?: number;
 }
 
 interface SourceRow {
@@ -85,8 +86,41 @@ interface MatchRow {
 
 const HOUR_MS = 3_600_000;
 const SECONDARY_THROTTLE_MS = 10 * 60_000; // secundárias no modo scores: no máx 1x/10min
+const ALERT_FAIL_STREAK = 3; // só alerta/push após N ciclos seguidos SEM dados (anti-spam)
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 let lastFootballDataFetchAt = 0; // espaça chamadas football-data (limite free 10/min)
+
+// fetch com timeout + retry. A maioria dos erros de rede da Edge (SendRequest /
+// conexão resetada) é TRANSITÓRIA — uma 2ª tentativa numa conexão nova resolve.
+// Assim um blip não vira "falha de sync" (raiz do spam de alerta). 4xx fixo é
+// devolvido pro chamador tratar (não readianta repetir); 5xx/429/timeout repete.
+async function fetchWithRetry(
+  input: string | URL,
+  init: RequestInit = {},
+  opts: { attempts?: number; timeoutMs?: number } = {},
+): Promise<Response> {
+  const attempts = opts.attempts ?? 3;
+  const timeoutMs = opts.timeoutMs ?? 8000;
+  let lastErr: unknown;
+  for (let i = 0; i < attempts; i++) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+      const res = await fetch(input, { ...init, signal: ctrl.signal });
+      clearTimeout(timer);
+      if ((res.status >= 500 || res.status === 429) && i < attempts - 1) {
+        await sleep(500 * (i + 1));
+        continue;
+      }
+      return res;
+    } catch (e) {
+      clearTimeout(timer);
+      lastErr = e; // erro de rede ou abort por timeout → tenta de novo
+      if (i < attempts - 1) await sleep(500 * (i + 1));
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error("falha de rede após várias tentativas");
+}
 
 // Normaliza nome de time pra casar entre fontes (sem acento, minúsculo, sem ruído).
 // ---- registro canônico de times (data/teams-registry.json → gen:teams) ----
@@ -403,7 +437,7 @@ async function syncFootballData(supabase: SupabaseClient, ctx: SourceCtx, token:
   if (!ctx.providerCode) throw new Error("provider_code ausente");
   const url = new URL(`https://api.football-data.org/v4/competitions/${ctx.providerCode}/matches`);
   if (ctx.providerSeason) url.searchParams.set("season", ctx.providerSeason);
-  const res = await fetch(url, { headers: { "X-Auth-Token": token } });
+  const res = await fetchWithRetry(url, { headers: { "X-Auth-Token": token } });
   if (!res.ok) throw new Error(`football-data indisponível (${res.status})`);
   const data = await res.json();
   if (!data || !Array.isArray(data.matches)) throw new Error("football-data: formato inesperado (a API pode ter mudado).");
@@ -458,7 +492,7 @@ async function syncTheSportsDb(ctx: SourceCtx, key: string): Promise<MatchRow[]>
   const base = `https://www.thesportsdb.com/api/v1/json/${key}`;
   const id = ctx.providerCode;
   const [pastRes, nextRes] = await Promise.all([
-    fetch(`${base}/eventspastleague.php?id=${id}`), fetch(`${base}/eventsnextleague.php?id=${id}`),
+    fetchWithRetry(`${base}/eventspastleague.php?id=${id}`), fetchWithRetry(`${base}/eventsnextleague.php?id=${id}`),
   ]);
   if (!pastRes.ok && !nextRes.ok) throw new Error(`thesportsdb erro: past=${pastRes.status} next=${nextRes.status}`);
   const past = pastRes.ok ? ((await pastRes.json()).events ?? []) : [];
@@ -543,7 +577,7 @@ async function syncEspn(supabase: SupabaseClient, ctx: SourceCtx, writeTeams: bo
   const pad = (n: number) => String(n).padStart(2, "0");
   const ymd = (d: Date) => `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}`;
   const today = new Date();
-  const seedRes = await fetch(`${base}?dates=${ymd(today)}`);
+  const seedRes = await fetchWithRetry(`${base}?dates=${ymd(today)}`);
   if (!seedRes.ok) throw new Error(`espn indisponível (${seedRes.status})`);
   const seed = await seedRes.json();
   if (!seed || (!Array.isArray(seed.leagues) && !Array.isArray(seed.events))) throw new Error("ESPN: formato inesperado (a API pode ter mudado).");
@@ -558,7 +592,7 @@ async function syncEspn(supabase: SupabaseClient, ctx: SourceCtx, writeTeams: bo
   collect(seed);
   for (const iso of dates) {
     if (iso === seedISO) continue;
-    const r = await fetch(`${base}?dates=${iso.replaceAll("-", "")}`);
+    const r = await fetchWithRetry(`${base}?dates=${iso.replaceAll("-", "")}`);
     if (r.ok) collect(await r.json());
   }
   const events = [...byId.values()];
@@ -621,7 +655,7 @@ function mapFifaStatus(timeElapsed: string, finished: string): MatchStatus {
   return "scheduled";
 }
 async function syncFifaWc(ctx: SourceCtx): Promise<MatchRow[]> {
-  const res = await fetch("https://worldcup26.ir/get/games");
+  const res = await fetchWithRetry("https://worldcup26.ir/get/games");
   if (!res.ok) throw new Error(`FIFA WC API indisponível (${res.status})`);
   const data = await res.json();
   const games: unknown[] = Array.isArray(data)
@@ -699,7 +733,8 @@ async function alertConflicts(
   if (!matchIds.length) return 0;
   const { data: conflicted } = await admin.from("matches")
     .select("id, home_team_name, away_team_name")
-    .in("id", matchIds).eq("score_conflict", true);
+    .in("id", matchIds).eq("score_conflict", true)
+    .eq("manual_lock", false); // resolvido na mão = caso encerrado, não re-alerta
   if (!conflicted?.length) return 0;
   let novos = 0;
   for (const m of conflicted as { id: string; home_team_name: string | null; away_team_name: string | null }[]) {
@@ -777,7 +812,7 @@ Deno.serve(async (req) => {
   const mode: SyncMode = body.mode === "scores" ? "scores" : "catalog";
 
   let query = admin.from("competitions")
-    .select("id, name, provider, provider_code, provider_season, catalog_seeded")
+    .select("id, name, provider, provider_code, provider_season, catalog_seeded, sync_fail_streak")
     .eq("sync_enabled", true);
   if (body.competitionId) query = query.eq("id", body.competitionId);
   const { data: comps, error } = await query;
@@ -870,7 +905,9 @@ Deno.serve(async (req) => {
 
     const dataFresh = primaryOk || secMatched > 0 || touched.size > 0 || goldenUpdated > 0;
     if (dataFresh) {
-      await admin.from("competitions").update({ last_synced_at: new Date().toISOString() }).eq("id", comp.id);
+      await admin.from("competitions")
+        .update({ last_synced_at: new Date().toISOString(), sync_fail_streak: 0 })
+        .eq("id", comp.id);
       await markSyncResult(admin, comp.id, true, null);
       await clearApiErrors(admin, comp.id); // resolve qualquer api_error pendente
       results.push({
@@ -878,12 +915,16 @@ Deno.serve(async (req) => {
         golden: goldenUpdated, primaryDegraded: !primaryOk, conflitos,
       });
     } else {
-      // nada entregue por nenhuma fonte → falha de verdade: alerta + push (1x; o
-      // dedupe por pending evita repetir até resolver).
+      // nada entregue por NENHUMA fonte. Anti-spam (pedido do João): só alerta +
+      // push quando a falha é SUSTENTADA (>= ALERT_FAIL_STREAK ciclos seguidos).
+      // Um blip transitório (já mitigado pelo retry) não notifica; a falha segue
+      // visível por fonte (aviso amarelo) e o streak zera quando volta.
+      const streak = (comp.sync_fail_streak ?? 0) + 1;
+      await admin.from("competitions").update({ sync_fail_streak: streak }).eq("id", comp.id);
       const msg = primaryErr ?? "nenhuma fonte entregou dados";
       await markSyncResult(admin, comp.id, false, msg);
-      await alertApiError(admin, comp, msg);
-      results.push({ competition: comp.name, ok: false, error: msg, secMatched, golden: goldenUpdated });
+      if (streak >= ALERT_FAIL_STREAK) await alertApiError(admin, comp, msg);
+      results.push({ competition: comp.name, ok: false, error: msg, secMatched, golden: goldenUpdated, failStreak: streak });
     }
   }
 
