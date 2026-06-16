@@ -18,6 +18,8 @@ const EditarPerfilPage = lazy(() => import("@/features/profile/EditarPerfilPage"
 const PersonalizationPage = lazy(() => import("@/features/onboarding/PersonalizationPage").then((m) => ({ default: m.PersonalizationPage })));
 const AdminPage = lazy(() => import("@/features/admin/AdminPage").then((m) => ({ default: m.AdminPage })));
 const AdminCompMatchesPage = lazy(() => import("@/features/admin/AdminCompMatchesPage").then((m) => ({ default: m.AdminCompMatchesPage })));
+const QualidadeTravadosPage = lazy(() => import("@/features/admin/QualidadeTravadosPage").then((m) => ({ default: m.QualidadeTravadosPage })));
+const QualidadeTimesForaPage = lazy(() => import("@/features/admin/QualidadeTimesForaPage").then((m) => ({ default: m.QualidadeTimesForaPage })));
 const PlayerProfilePage = lazy(() => import("@/features/players/PlayerProfilePage").then((m) => ({ default: m.PlayerProfilePage })));
 const ComoFuncionaPage = lazy(() => import("@/features/help/ComoFuncionaPage").then((m) => ({ default: m.ComoFuncionaPage })));
 const PrivacidadePage = lazy(() => import("@/features/legal/PrivacidadePage").then((m) => ({ default: m.PrivacidadePage })));
@@ -102,6 +104,8 @@ export default function App() {
               <Route element={<RequireAdmin />}>
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/admin/competicoes/:id/jogos" element={<AdminCompMatchesPage />} />
+              <Route path="/admin/qualidade/travados" element={<QualidadeTravadosPage />} />
+              <Route path="/admin/qualidade/times-fora" element={<QualidadeTimesForaPage />} />
               <Route path="/admin/retro" element={<RetroAdminPage />} />
               <Route path="/admin/estudos" element={<EstudosAdminPage />} />
               <Route path="/admin/estudos/:slug" element={<EstudoViewerPage />} />

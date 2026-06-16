@@ -148,20 +148,24 @@ Pagamento · Avisos · Construa · Qualidade · Changelog**. Todas as ações ch
 > A **gestão de fontes por competição saiu daqui** (era a antiga "Fontes por competição") e foi pra
 > dentro de cada campeonato na aba **Competições**. Esta aba ficou enxuta, só com o que é
 > **transversal** (não-por-campeonato): times sem cadastro + conflitos de placar.
-- **Times fora do registro** (`admin_list_unmapped` / `admin_resolve_unmapped`): times que a API
-  trouxe e não estão no registro canônico — "Aceitar como veio" ou copiar JSON pro registro.
-- **Conflitos e jogos travados** (`admin_list_match_conflicts`): jogos onde as fontes **divergem** no
-  placar (`score_conflict`) ou que estão sob edição manual. Mostra **o que cada fonte reporta**
-  (`match_sources`), badges (divergente/congelado/manual/Nº fontes) e ações: **override manual** de
-  placar/status que **trava contra a API** (`admin_override_match`, decisão #8), **travar/destravar**
-  (`admin_set_match_lock`) e **descongelar** (`admin_unfreeze_match`). Os mesmos controles aparecem
-  também por campeonato na aba **Comparar fontes** (`admin_match_sources_for_competition`).
+- **Conflitos pra resolver** (destaque, `admin_list_match_conflicts`): só os jogos com divergência
+  **não resolvida** (`score_conflict && !manual_lock`), encerrados primeiro. **Resolução em 1 toque:**
+  cada fonte vira um botão ("Vale ESPN 1–0" → `admin_override_match` trava aquele placar) + opção de
+  placar na mão. A **notificação** de conflito só dispara **após o jogo terminar** (ver pano de fundo).
+- **Travados por você** (resumo → subpágina `/admin/qualidade/travados`): contador + "ver todos"; lista
+  o que você travou (`manual_lock`), com **destravar**/editar (`admin_set_match_lock`,
+  `admin_override_match`) e **descongelar** (`admin_unfreeze_match`).
+- **Times fora do registro** (resumo → subpágina `/admin/qualidade/times-fora`,
+  `admin_list_unmapped` / `admin_resolve_unmapped`): contador + "ver todos"; "Aceitar como veio" ou
+  copiar JSON pro registro. Os mesmos controles de placar aparecem por campeonato na aba **Comparar
+  fontes** (`admin_match_sources_for_competition`).
 - Pano de fundo: o placar oficial é o **voto da maioria** das fontes (`resolve_match_golden`, cron a
   cada 10 min); finalizado + ≥2 fontes + >1h → **congelado** (decisão #3). **Fonte sem placar é
   ignorada** (golden só conta observações com placar). **Resolver na mão encerra o conflito:**
   `admin_override_match` / `admin_set_match_lock` (ao travar) zeram `score_conflict` e marcam como
   resolvidos os `sync_alerts` `score_conflict` pendentes do jogo; `alertConflicts` não re-alerta jogo
-  travado. → [`05`](05-DADOS-E-AUTH.md).
+  travado **e só notifica jogo ENCERRADO** (`status='finished'`) — divergência ao vivo é transitória e
+  não gera notificação. → [`05`](05-DADOS-E-AUTH.md).
 - **Resiliência do sync (anti-spam):** as chamadas de API têm `fetchWithRetry` (retry+timeout) — blip
   de rede (`SendRequest`) se cura sozinho. O alerta/push de "Sincronização com problema" **só dispara
   com falha sustentada** (`competitions.sync_fail_streak` ≥ 3 ciclos seguidos sem nenhuma fonte; zera

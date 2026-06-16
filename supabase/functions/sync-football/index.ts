@@ -700,11 +700,11 @@ async function markSyncResult(admin: SupabaseClient, compId: string, ok: boolean
     last_sync_checked_at: new Date().toISOString(),
   }).eq("id", compId);
 }
-async function notifyAdmins(admin: SupabaseClient, title: string, body: string): Promise<void> {
+async function notifyAdmins(admin: SupabaseClient, title: string, body: string, url = "/admin"): Promise<void> {
   const { data: admins } = await admin.from("profiles").select("id").eq("is_app_admin", true);
   if (!admins?.length) return;
   await admin.from("notifications").insert(admins.map((a: { id: string }) => ({
-    user_id: a.id, type: "admin_sync", title, body, data: { url: "/admin" },
+    user_id: a.id, type: "admin_sync", title, body, data: { url },
   })));
 }
 async function alertApiError(admin: SupabaseClient, comp: CompetitionRow, message: string): Promise<boolean> {
@@ -734,7 +734,10 @@ async function alertConflicts(
   const { data: conflicted } = await admin.from("matches")
     .select("id, home_team_name, away_team_name")
     .in("id", matchIds).eq("score_conflict", true)
-    .eq("manual_lock", false); // resolvido na mão = caso encerrado, não re-alerta
+    .eq("manual_lock", false) // resolvido na mão = caso encerrado, não re-alerta
+    .eq("status", "finished"); // SÓ notifica APÓS o jogo terminar — divergência ao
+                               // vivo é transitória (gol entra antes numa fonte) e
+                               // some quando o jogo assenta (pedido do João).
   if (!conflicted?.length) return 0;
   let novos = 0;
   for (const m of conflicted as { id: string; home_team_name: string | null; away_team_name: string | null }[]) {
@@ -751,7 +754,8 @@ async function alertConflicts(
   if (novos > 0) {
     await notifyAdmins(
       admin, "⚠️ Conflito de placar",
-      `${novos} jogo(s) com placar divergente em ${comp.name}. Confira em Dados → Conflitos.`.slice(0, 180),
+      `${novos} jogo(s) encerrado(s) com placar divergente em ${comp.name}. Resolva em Qualidade.`.slice(0, 180),
+      "/admin?t=dados",
     );
   }
   return novos;

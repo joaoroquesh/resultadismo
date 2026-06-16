@@ -21,6 +21,15 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
+- **Conflito de placar só notifica APÓS o jogo terminar.** O alerta/push de conflito entre fontes
+  passa a só disparar para jogos **encerrados** (`alertConflicts` filtra `status='finished'`) — acaba o
+  spam ao vivo (uma fonte registra o gol antes da outra → divergência momentânea que some sozinha). A
+  notificação leva direto pra aba **Qualidade**.
+- **Resolver conflito em 1 toque + aba Qualidade reorganizada.** A aba mostra em **destaque** os
+  conflitos a resolver, cada fonte vira um **botão** ("Vale ESPN 1–0" trava aquele placar na hora) +
+  opção de placar na mão. Embaixo, dois resumos com **"ver todos"** → subpáginas: **Travados por você**
+  (`/admin/qualidade/travados`, com destravar/editar) e **Times fora do registro**
+  (`/admin/qualidade/times-fora`) — em vez de listas gigantes na aba.
 - **Área "📚 Estudos" no admin (só app-admin).** Biblioteca de análises/estudos do produto em HTML
   (gamificação, Retrô, confrontos, planos) reunida em `/admin/estudos`: arquivos num bucket PRIVADO de
   Storage (`estudos`) + metadados em `study_docs`, gated por RLS (`is_app_admin`); visor em
