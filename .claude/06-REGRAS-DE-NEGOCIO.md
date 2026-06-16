@@ -32,9 +32,12 @@
 
 ### Dobro (2×) — o "coringa"
 - Marca `predictions.is_joker`; o palpite vale **em dobro** naquela disputa.
-- **Limite por semana, por competição** (semana civil ancorada em America/Sao_Paulo), garantido por
-  trigger (`enforce_joker_limit`, migrations de joker `…012`/`…014`). O número exato do limite está
-  na migration/competição — **conferir lá** antes de afirmar um valor.
+- **Limite por SEMANA, GLOBAL — somando todas as competições** (2 por semana; semana civil seg–dom
+  ancorada em America/Sao_Paulo), garantido por trigger (`enforce_joker_limit`). Era **por
+  competição** até 2026-06-15 (decisão do João); virou global por semana na migration
+  `20260615230000` (lock + contagem perderam a competição; limite constante 2). A coluna
+  `competitions.jokers_per_week` ficou **vestigial** (o trigger não a lê mais). O badge "X/2 dobros
+  nesta semana" (tela de Jogos, **todas as abas**) lê o contador global via RPC `my_joker_week_counts`.
 
 ---
 

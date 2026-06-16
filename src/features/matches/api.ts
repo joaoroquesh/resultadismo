@@ -3,6 +3,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { track } from "@/lib/analytics";
+import { rpcCall } from "@/lib/rpc";
 import type { Competition, MatchWithTeams, Prediction } from "@/lib/types";
 
 const MATCH_SELECT =
@@ -234,6 +235,25 @@ export function useSetJoker() {
     onSuccess: (_data, input) => {
       track("set_joker", { enabled: input.value });
       qc.invalidateQueries({ queryKey: ["my-predictions"] });
+      qc.invalidateQueries({ queryKey: ["my-joker-week-counts"] });
+    },
+  });
+}
+
+/** Dobros usados por semana (segunda BRT) pelo usuário logado, somando TODAS as
+ * competições — alimenta o badge "X/2 dobros nesta semana" em qualquer aba.
+ * Independe do escopo carregado na tela (RPC própria). */
+export function useMyJokerWeekCounts() {
+  const { user } = useAuth();
+  return useQuery({
+    enabled: !!user,
+    queryKey: ["my-joker-week-counts", user?.id],
+    queryFn: async (): Promise<Map<string, number>> => {
+      const { data, error } = await rpcCall<{ week: string; n: number }[]>("my_joker_week_counts");
+      if (error) throw new Error(error.message);
+      const m = new Map<string, number>();
+      for (const r of data ?? []) m.set(r.week, r.n);
+      return m;
     },
   });
 }

@@ -24,6 +24,7 @@ import {
   useMyPredictions,
   useAllMyPredictions,
   useMatchesRealtime,
+  useMyJokerWeekCounts,
 } from "./api";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import { useMyGroupScopes } from "@/features/leagues/api";
@@ -33,6 +34,10 @@ import { FirstFold } from "@/features/landing/FirstFold";
 
 const ALL = "all" as const;
 type Scope = typeof ALL | string;
+
+// Limite GLOBAL de dobros (2×) por semana — o mesmo número que o banco enforça
+// (enforce_joker_limit). Vale somando TODAS as competições, não por campeonato.
+const WEEKLY_JOKER_LIMIT = 2;
 
 // Dia/semana ancorados no fuso de Brasília (igual ao limite de joker no servidor),
 // pra a tela e a regra de "dobros nesta semana" não divergirem na virada do dia.
@@ -257,24 +262,10 @@ export function JogosPage() {
     setShareSel(null);
   }
 
-  // dobros usados por (competição × semana) — funciona pra um campeonato e pra "Todos"
-  const jokerMax = useMemo(() => {
-    const m = new Map<string, number>();
-    for (const c of competitions ?? []) m.set(c.id, c.jokers_per_week ?? 2);
-    return m;
-  }, [competitions]);
-
-  const jokersByCompWeek = useMemo(() => {
-    const m = new Map<string, number>();
-    if (!matches || !predMap) return m;
-    for (const mt of matches) {
-      if (!predMap.get(mt.id)?.is_joker) continue;
-      const compKey = mt.competition_id ?? "?";
-      const k = `${compKey}:${weekKey(mt.kickoff_at)}`;
-      m.set(k, (m.get(k) ?? 0) + 1);
-    }
-    return m;
-  }, [matches, predMap]);
+  // Dobros usados por SEMANA (global — todas as competições), do usuário logado.
+  // Vem de RPC própria (independe da aba carregada), então o badge "X/2 dobros
+  // nesta semana" funciona em Interesses/Grupos/Todos/campeonato.
+  const jokerWeekCounts = useMyJokerWeekCounts();
 
   const dayPoints = useMemo(() => {
     let sum = 0;
@@ -296,11 +287,8 @@ export function JogosPage() {
     return sum;
   }, [predMap]);
 
-  // resumo de dobros da semana só faz sentido num campeonato (limite é por comp)
-  const selectedComp = isAll ? undefined : competitions?.find((c) => c.id === scope);
-  const maxJokers = selectedComp?.jokers_per_week ?? 2;
-  const jokersUsedThisWeek =
-    !isAll && day ? jokersByCompWeek.get(`${scope}:${weekKey(day)}`) ?? 0 : 0;
+  // Dobros da semana do DIA selecionado (global). Aparece em TODAS as abas.
+  const jokersUsedThisWeek = day ? jokerWeekCounts.data?.get(weekKey(day)) ?? 0 : 0;
 
   const hasComps = (competitions?.length ?? 0) > 0;
 
@@ -316,7 +304,6 @@ export function JogosPage() {
       )}
     >
       {foldGames.map((m) => {
-        const compKey = m.competition_id ?? "?";
         const wk = weekKey(m.kickoff_at);
         const selectable = shareSel != null && isShareable(m);
         const selected = !!shareSel?.has(m.id);
@@ -325,8 +312,8 @@ export function JogosPage() {
             <MatchCard
               match={m}
               prediction={predMap?.get(m.id) ?? null}
-              jokersUsed={jokersByCompWeek.get(`${compKey}:${wk}`) ?? 0}
-              maxJokers={jokerMax.get(compKey) ?? 2}
+              jokersUsed={jokerWeekCounts.data?.get(wk) ?? 0}
+              maxJokers={WEEKLY_JOKER_LIMIT}
               onShare={() => setShareSel(new Set([m.id]))}
             />
             {shareSel != null && (
@@ -555,8 +542,9 @@ export function JogosPage() {
         </ScrollRow>
       )}
 
-      {/* resumo: pontos DO DIA selecionado (escopo atual) + dobros da semana */}
-      {session && (dayScored || !isAll) && (
+      {/* resumo: pontos DO DIA selecionado (escopo atual) + dobros da semana
+          (o badge de dobros aparece em TODAS as abas, pois o limite é por semana). */}
+      {session && (dayScored || day != null) && (
         <div className="mb-3 flex flex-wrap items-center justify-center gap-2 text-xs">
           {dayScored && (
             <span className="inline-flex items-center gap-1 rounded-pill bg-ink-100 px-2.5 py-0.5 font-medium text-ink-600">
@@ -566,7 +554,7 @@ export function JogosPage() {
               </span>
             </span>
           )}
-          {!isAll && (
+          {day != null && (
             <Coachmark
               storageKey="resultadismo-coach-dobro-v1"
               title="Dobro de Pontos"
@@ -574,14 +562,15 @@ export function JogosPage() {
               content={
                 <>
                   Ative o <span className="font-bold text-ink-50">2×</span> num palpite e ele vale o
-                  dobro. Você tem {maxJokers} por semana — use nos jogos que tiver mais confiança.
+                  dobro. Você tem {WEEKLY_JOKER_LIMIT} por semana (somando todos os campeonatos) —
+                  use nos jogos que tiver mais confiança.
                 </>
               }
               defaultOpen={user ? undefined : false}
             >
               <span className="inline-flex items-center gap-1 rounded-pill bg-brand-600 px-2 py-0.5 font-semibold text-white">
-                <Zap className="size-3 fill-brand-600" /> {jokersUsedThisWeek}/{maxJokers} dobros
-                nesta semana
+                <Zap className="size-3 fill-brand-600" /> {jokersUsedThisWeek}/{WEEKLY_JOKER_LIMIT}{" "}
+                dobros nesta semana
               </span>
             </Coachmark>
           )}

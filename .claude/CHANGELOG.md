@@ -21,6 +21,14 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
+- **Dobro (2×) agora é por SEMANA, global — não mais por campeonato.** O limite de 2 dobros deixou
+  de ser por competição e passou a valer **por semana civil (seg–dom, BRT), somando todas as
+  competições**: usou 2 na Copa, não dá pra dobrar num amistoso na mesma semana. O aviso
+  **"X/2 dobros nesta semana"** passou a aparecer em **todas as abas** da tela de Jogos (Interesses,
+  Grupos, Todos e campeonato), não só num campeonato. Banco: `enforce_joker_limit` recontado por
+  (usuário, semana) sem competição + nova RPC `my_joker_week_counts` pro contador (migration
+  `20260615230000`); `competitions.jokers_per_week` virou vestigial. Front: `JogosPage` lê o contador
+  global, hook `useMyJokerWeekCounts` em `matches/api.ts`. Decisão do João.
 - **Admin — gestão de campeonatos & APIs repensada (aba Competições) + Visão enxuta.** A aba
   **Competições** vira a casa de tudo de competição, **agrupada** nos 4 grupos da personalização
   (Seleções · Ligas e estaduais · Copas · Alternativos, colapsáveis). Cada campeonato mostra sua
