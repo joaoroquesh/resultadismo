@@ -176,6 +176,18 @@ Pagamento · Avisos · Construa · Qualidade · Changelog**. Todas as ações ch
   ~15 min e destrava os palpites.
 - ℹ️ O ideal é a API atualizar sozinha (sync inteligente — §sync abaixo); o override é exceção.
 
+### 📚 Estudos (`/admin/estudos` — `features/estudos/`, chip no topo do `/admin`)
+Biblioteca de **análises/estudos do produto em HTML, só para app-admin** (gamificação, Retrô,
+confrontos, planos). Cada estudo é um HTML num **bucket PRIVADO de Storage** (`estudos`) + metadados
+em **`study_docs`**; tudo gated por **RLS via `is_app_admin()`** (migration `20260616130000`). O visor
+(`EstudoViewerPage`, `/admin/estudos/:slug`) **baixa o HTML pelo client autenticado** e o renderiza num
+`<iframe srcdoc>` (sem URL pública), **seguindo o tema do app** (dark/light), responsivo, com "voltar".
+A lista (`EstudosAdminPage`) agrupa por categoria e tem **upload** (qualquer app-admin publica um
+`.html` novo). Substitui o vazamento anterior em `public/planos/*.html` (removido). **Fonte no repo:**
+`docs/` (versionado); o app serve a cópia no bucket. **Publicar em prod:** subir cada HTML pelo botão
+**Adicionar** (ou `scripts/seed-estudos.mjs` com credenciais de prod) — a migration cria a infra, mas
+o bucket nasce **vazio**.
+
 ## 3. Admin de grupo (dentro de `LigaDetailPage`)
 
 Quem é `owner`/`admin` de um grupo pode:

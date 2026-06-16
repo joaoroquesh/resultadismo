@@ -21,6 +21,12 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
+- **Área "📚 Estudos" no admin (só app-admin).** Biblioteca de análises/estudos do produto em HTML
+  (gamificação, Retrô, confrontos, planos) reunida em `/admin/estudos`: arquivos num bucket PRIVADO de
+  Storage (`estudos`) + metadados em `study_docs`, gated por RLS (`is_app_admin`); visor em
+  `<iframe srcdoc>` (HTML baixado pelo client autenticado) seguindo o tema do app (dark/light),
+  responsivo no mobile, com upload e "voltar". Remove o vazamento público em `public/planos/*.html`.
+  (migration `20260616130000`; `features/estudos/`)
 - **Dobro (2×) agora é por SEMANA, global — não mais por campeonato.** O limite de 2 dobros deixou
   de ser por competição e passou a valer **por semana civil (seg–dom, BRT), somando todas as
   competições**: usou 2 na Copa, não dá pra dobrar num amistoso na mesma semana. O aviso
