@@ -31,6 +31,8 @@ const RetroSharePage = lazy(() => import("@/features/retro/RetroSharePage").then
 const RetroShell = lazy(() => import("@/features/retro/RetroShell").then((m) => ({ default: m.RetroShell })));
 const RetroRulesPage = lazy(() => import("@/features/retro/RetroRulesPage").then((m) => ({ default: m.RetroRulesPage })));
 const RetroAdminPage = lazy(() => import("@/features/retro/RetroAdminPage").then((m) => ({ default: m.RetroAdminPage })));
+const EstudosAdminPage = lazy(() => import("@/features/estudos/EstudosAdminPage").then((m) => ({ default: m.EstudosAdminPage })));
+const EstudoViewerPage = lazy(() => import("@/features/estudos/EstudoViewerPage").then((m) => ({ default: m.EstudoViewerPage })));
 
 // Redireciona links antigos /ligas/:slug para /grupos/:slug (rename Liga -> Grupo)
 function FederacaoSlugRedirect() {
@@ -101,6 +103,8 @@ export default function App() {
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/admin/competicoes/:id/jogos" element={<AdminCompMatchesPage />} />
               <Route path="/admin/retro" element={<RetroAdminPage />} />
+              <Route path="/admin/estudos" element={<EstudosAdminPage />} />
+              <Route path="/admin/estudos/:slug" element={<EstudoViewerPage />} />
               </Route>
             </Route>
           </Route>

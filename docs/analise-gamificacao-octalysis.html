@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Resultadismo — Análise de Gamificação (Octalysis) & UX</title>
+<style>
+  :root{
+    /* paleta real do app (src/index.css) */
+    --brand-50:oklch(0.97 0.02 182); --brand-100:oklch(0.93 0.05 182); --brand-200:oklch(0.88 0.08 182);
+    --brand-500:oklch(0.69 0.13 182); --brand-600:oklch(0.64 0.12 183); --brand-700:oklch(0.55 0.10 185);
+    --brand-800:oklch(0.46 0.08 187); --brand-900:oklch(0.39 0.06 189);
+    --gold-100:oklch(0.95 0.07 95); --gold-400:oklch(0.85 0.16 93); --gold-500:oklch(0.83 0.16 92);
+    --gold-600:oklch(0.73 0.15 90); --gold-700:oklch(0.62 0.13 88);
+    --grass-100:oklch(0.93 0.07 145); --grass-500:oklch(0.66 0.16 143); --grass-600:oklch(0.58 0.14 143); --grass-700:oklch(0.50 0.12 144);
+    --aqua-100:oklch(0.93 0.05 210); --aqua-500:oklch(0.66 0.12 211); --aqua-600:oklch(0.59 0.11 213); --aqua-700:oklch(0.52 0.10 215);
+    --flame-100:oklch(0.93 0.05 25); --flame-500:oklch(0.64 0.22 27); --flame-600:oklch(0.58 0.21 27); --flame-700:oklch(0.50 0.19 27);
+    --ink-50:oklch(0.985 0.003 220); --ink-100:oklch(0.96 0.004 220); --ink-200:oklch(0.91 0.005 220);
+    --ink-300:oklch(0.84 0.006 220); --ink-400:oklch(0.70 0.008 220); --ink-500:oklch(0.58 0.01 221);
+    --ink-600:oklch(0.50 0.011 222); --ink-700:oklch(0.42 0.012 224); --ink-800:oklch(0.34 0.012 226);
+    --ink-900:oklch(0.27 0.012 228); --ink-950:oklch(0.20 0.012 230);
+    --bg:oklch(0.975 0.004 220); --surface:oklch(0.995 0.0015 220); --surface-2:oklch(0.965 0.004 220);
+    --maxw:980px;
+  }
+  /* Tema controlado pelo app (o visor injeta data-theme=light|dark seguindo a
+     escolha do usuário no Resultadismo). Fallback: claro. */
+  :root[data-theme="dark"]{
+    --bg:oklch(0.18 0.014 240); --surface:oklch(0.22 0.015 237); --surface-2:oklch(0.26 0.015 235);
+    --ink-50:oklch(0.23 0.014 235); --ink-100:oklch(0.27 0.014 233); --ink-200:oklch(0.33 0.014 231);
+    --ink-300:oklch(0.42 0.013 229); --ink-400:oklch(0.56 0.012 227); --ink-500:oklch(0.66 0.011 225);
+    --ink-600:oklch(0.74 0.009 223); --ink-700:oklch(0.82 0.007 221); --ink-800:oklch(0.88 0.005 219);
+    --ink-900:oklch(0.93 0.004 217); --ink-950:oklch(0.97 0.003 215);
+    --brand-600:oklch(0.70 0.13 182); --brand-700:oklch(0.62 0.12 183); --brand-800:oklch(0.74 0.10 183);
+  }
+  /* desktop largo: o estudo aproveita mais a largura do visor do admin */
+  @media (min-width:1200px){ :root{ --maxw:1180px } }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bg);color:var(--ink-900);
+    font:16px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px 96px}
+  header.hero{
+    background:linear-gradient(135deg,var(--brand-700),var(--brand-900));
+    color:white;padding:56px 0 48px;margin-bottom:8px;
+  }
+  header.hero .wrap{padding-bottom:0}
+  .kicker{text-transform:uppercase;letter-spacing:.14em;font-size:12px;font-weight:700;opacity:.8;margin:0 0 10px}
+  h1{font-size:clamp(28px,5vw,42px);line-height:1.1;margin:0 0 14px;font-weight:800;letter-spacing:-.02em}
+  header.hero p{font-size:18px;max-width:62ch;margin:0 0 8px;opacity:.95}
+  header.hero .meta{font-size:13px;opacity:.75;margin-top:18px}
+  h2{font-size:26px;margin:56px 0 6px;font-weight:800;letter-spacing:-.01em;color:var(--ink-950);scroll-margin-top:20px}
+  h2 .num{color:var(--brand-600);font-variant-numeric:tabular-nums}
+  h3{font-size:19px;margin:28px 0 8px;font-weight:700;color:var(--ink-950)}
+  h4{font-size:15px;margin:18px 0 6px;font-weight:700;color:var(--ink-800);text-transform:uppercase;letter-spacing:.04em}
+  p{margin:10px 0}
+  a{color:var(--brand-700)}
+  .lead{font-size:18px;color:var(--ink-800)}
+  code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86em;background:var(--ink-100);color:var(--ink-800);padding:1px 6px;border-radius:6px;}
+  .card{background:var(--surface);border:1px solid var(--ink-200);border-radius:16px;padding:22px 24px;margin:16px 0;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  .card.tight{padding:16px 18px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media (max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+  .scorebanner{display:flex;gap:18px;flex-wrap:wrap;margin-top:26px}
+  .scorebanner .pill{flex:1 1 230px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);border-radius:16px;padding:18px 20px;backdrop-filter:blur(2px)}
+  .scorebanner .pill .lbl{font-size:13px;text-transform:uppercase;letter-spacing:.08em;opacity:.85;font-weight:700}
+  .scorebanner .pill .big{font-size:40px;font-weight:800;line-height:1;margin:8px 0 2px;font-variant-numeric:tabular-nums}
+  .scorebanner .pill .sub{font-size:13px;opacity:.85}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;letter-spacing:.03em;vertical-align:middle}
+  .tag.white{background:var(--brand-100);color:var(--brand-800)}
+  .tag.black{background:var(--flame-100);color:var(--flame-700)}
+  .tag.neutral{background:var(--aqua-100);color:var(--aqua-700)}
+  .tag.alta{background:var(--flame-600);color:#fff}
+  .tag.media{background:var(--gold-600);color:var(--ink-950)}
+  .tag.baixa{background:var(--ink-200);color:var(--ink-700)}
+  .tag.norm{background:var(--brand-600);color:#fff}
+  .tag.retro{background:var(--ink-900);color:var(--ink-50)}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;margin:14px 0}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--ink-200);vertical-align:top}
+  th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-600);font-weight:700;background:var(--surface-2)}
+  td.num,th.num{text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .bar{height:9px;border-radius:999px;background:var(--ink-200);overflow:hidden;min-width:90px}
+  .bar > span{display:block;height:100%;border-radius:999px}
+  .barwrap{display:flex;align-items:center;gap:8px}
+  .barwrap .v{font-variant-numeric:tabular-nums;font-weight:700;font-size:13px;min-width:30px;text-align:right}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--ink-700);margin:6px 0 0}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block}
+  ul{margin:8px 0;padding-left:20px}
+  li{margin:5px 0}
+  .toc{columns:2;column-gap:30px;font-size:14.5px}
+  @media (max-width:600px){.toc{columns:1}}
+  .toc a{display:block;padding:3px 0;text-decoration:none;color:var(--ink-700)}
+  .toc a:hover{color:var(--brand-700)}
+  .radars{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .radarbox{flex:1 1 360px;max-width:440px;text-align:center}
+  .radarbox h3{margin:0 0 2px}
+  .radarbox .total{font-size:13px;color:var(--ink-600)}
+  svg .axis{stroke:var(--ink-300);stroke-width:1}
+  svg .grid{fill:none;stroke:var(--ink-200);stroke-width:1}
+  svg .label{font:600 11px -apple-system,sans-serif;fill:var(--ink-600)}
+  .callout{border-left:4px solid var(--brand-600);background:var(--surface-2);border-radius:0 12px 12px 0;padding:14px 18px;margin:16px 0}
+  .callout.warn{border-color:var(--flame-600)}
+  .callout.win{border-color:var(--grass-600)}
+  .callout strong{color:var(--ink-950)}
+  .qtag{font-weight:800;color:var(--brand-700);margin-right:6px}
+  .drive{margin:18px 0}
+  .drive .head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .drive .head h3{margin:0}
+  .drive .head .scores{margin-left:auto;font-size:13px;color:var(--ink-600);font-variant-numeric:tabular-nums}
+  .pri{font-weight:800;font-variant-numeric:tabular-nums;color:var(--brand-700)}
+  .matrix{display:grid;grid-template-columns:auto 1fr 1fr;border:1px solid var(--ink-200);border-radius:14px;overflow:hidden;font-size:13.5px}
+  .matrix > div{padding:12px 14px;border-bottom:1px solid var(--ink-200)}
+  .matrix .mh{background:var(--surface-2);font-weight:700;text-align:center;color:var(--ink-700)}
+  .matrix .ml{background:var(--surface-2);font-weight:700;display:flex;align-items:center}
+  .footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--ink-200);font-size:13.5px;color:var(--ink-600)}
+  .star{color:var(--gold-600)}
+  hr.sec{border:none;border-top:1px solid var(--ink-200);margin:40px 0 0}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">Análise de Gamificação · Framework Octalysis (Yu-kai Chou) + UX</p>
+    <h1>Como o Resultadismo motiva hoje — e como otimizar</h1>
+    <p>Auditoria completa dos fluxos reais do app (1º acesso e recorrente), pontuada pelos 8 Core Drives do Octalysis, tratando <strong>Resultadismo (bolão)</strong> e <strong>Resultadismo Retrô</strong> como produtos separados.</p>
+    <div class="scorebanner">
+      <div class="pill">
+        <div class="lbl">Resultadismo (bolão)</div>
+        <div class="big">339<span style="font-size:18px;opacity:.7">/800</span></div>
+        <div class="sub">Esqueleto social/leaderboard forte · camada de celebração e retenção quase ausente</div>
+      </div>
+      <div class="pill">
+        <div class="lbl">Resultadismo Retrô</div>
+        <div class="big">393<span style="font-size:18px;opacity:.7">/800</span></div>
+        <div class="sub">Loop "arcade" equilibrado · usa bem urgência, suspense e perda · já faz o que falta ao bolão</div>
+      </div>
+    </div>
+    <p class="meta">Base: varredura do repositório <code>resultadismo</code> (src/ + supabase/ + .claude/) · 7 frentes de auditoria · 16/06/2026. Pontuação é uma leitura qualitativa de analista (não um número absoluto) — pensada para ser discutida e recalibrada com você.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+<div class="card">
+  <h4 style="margin-top:4px">Índice</h4>
+  <nav class="toc">
+    <a href="#tldr">0 · Resumo executivo (leia primeiro)</a>
+    <a href="#octalysis">1 · Octalysis em 1 minuto</a>
+    <a href="#radar">2 · Os dois octógonos (placar visual)</a>
+    <a href="#tabela">3 · Tabela comparativa dos 8 Core Drives</a>
+    <a href="#drives">4 · Mergulho por Core Drive (1 a 8)</a>
+    <a href="#jornada">5 · Jornada: 1º acesso × recorrente, claro × obscuro</a>
+    <a href="#ux">6 · Problemas de UX priorizados</a>
+    <a href="#ideias">7 · Suas 3 ideias × Octalysis (badges, troféus, confrontos)</a>
+    <a href="#roteiro">8 · Roteiro de otimização (impacto × esforço)</a>
+    <a href="#perguntas">9 · Perguntas para aprofundar</a>
+    <a href="#metodo">10 · Metodologia e ressalvas</a>
+  </nav>
+</div>
+
+<!-- ============================ 0 TLDR ============================ -->
+<h2 id="tldr"><span class="num">0.</span> Resumo executivo</h2>
+<p class="lead">O Resultadismo tem <strong>fundação muito boa</strong>: o loop de palpitar/pontuar é claro, a prévia de pontos <em>ao vivo</em> é excelente, a marca é coerente e o social (grupos + ranking) é o coração certo. O que falta é a <strong>camada emocional e de retenção</strong> — o momento de recompensa, a progressão de longo prazo e os ganchos que trazem o veterano de volta.</p>
+
+<div class="grid2">
+  <div class="card tight">
+    <h4 style="margin-top:2px">O que já é forte</h4>
+    <ul>
+      <li><strong>Pontuação 3/2/1/0</strong> nítida e consistente (cores ouro/verde/ciano) na landing, onboarding e card.</li>
+      <li><strong>Prévia de pontuação ao vivo</strong> — o card mostra "Saldo +2" mudando conforme os gols. É a melhor mecânica de suspense/feedback do produto.</li>
+      <li><strong>Social bem ancorado</strong>: grupos, classificação com "(você)", ranking global "The Best", convite por WhatsApp, cutucar.</li>
+      <li><strong>O Retrô é um pequeno relógio suíço</strong> de gamificação: cronômetro, mata-mata, reveal "fliperama" com confete, selos raros, streak 🔥, share viral sem spoiler.</li>
+    </ul>
+  </div>
+  <div class="card tight">
+    <h4 style="margin-top:2px">As 4 maiores alavancas</h4>
+    <ul>
+      <li><strong>Não há celebração no acerto/cravada</strong> no bolão. A Cravada (+3, o pico do jogo) renderiza igual a um Erro 0. O confete já existe no repo — só no Retrô.</li>
+      <li><strong>Conquistas são fantasmas</strong>: o perfil mostra 3 badges com cadeado "em breve" que nunca abrem. Promete e frustra.</li>
+      <li><strong>Confronto (duelo entre usuários)</strong> — a mecânica social mais rica — está <em>desligada</em> atrás de um gate de admin do app. "Em breve" para quase todos.</li>
+      <li><strong>Zero retenção do veterano</strong>: nenhuma notificação de progresso ("você subiu pra 2º"), streak inerte, nada para colecionar/possuir.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="callout win">
+  <strong>A tese central da análise:</strong> o Retrô <em>já resolveu</em> quase tudo o que falta ao bolão — celebração (reveal + confete), streak com risco, desafio diário, recompensa rara (selos), feedback instantâneo. A otimização mais barata e de maior retorno é <strong>portar a alma do Retrô para o jogo Normal</strong>. As suas três ideias (badges, troféus, confrontos) atacam exatamente os três buracos certos.
+</div>
+
+<!-- ============================ 1 OCTALYSIS ============================ -->
+<h2 id="octalysis"><span class="num">1.</span> Octalysis em 1 minuto</h2>
+<p>O Octalysis diz que toda motivação humana vem de <strong>8 Core Drives</strong>. Um jogo "completo" aciona vários, e de forma equilibrada. Dois eixos importam:</p>
+<div class="grid2">
+  <div class="card tight">
+    <h4 style="margin-top:2px">White Hat × Black Hat</h4>
+    <p><span class="tag white">White Hat</span> motivação positiva, faz sentir-se poderoso (significado, maestria, criatividade). Engaja, mas pode não ter urgência.</p>
+    <p><span class="tag black">Black Hat</span> motivação por urgência/ansiedade (escassez, curiosidade, medo de perder). Vicia, mas se exagerada cansa/repele.</p>
+    <p><span class="tag neutral">Neutros</span> posse e social — puxam para os dois lados.</p>
+    <p style="font-size:13.5px;color:var(--ink-600)">Bom design usa White Hat para o sentido e Black Hat (com moderação e ética) para o ritmo.</p>
+  </div>
+  <div class="card tight">
+    <h4 style="margin-top:2px">As 4 fases da jornada</h4>
+    <ul>
+      <li><strong>Descoberta</strong> — por que a pessoa entra? (landing, share, indicação)</li>
+      <li><strong>Onboarding</strong> — aprende as regras e as ferramentas.</li>
+      <li><strong>Scaffolding</strong> — o loop repetido do dia a dia (a maior parte da vida do jogador).</li>
+      <li><strong>Endgame</strong> — o que segura o veterano depois de já saber tudo.</li>
+    </ul>
+    <p style="font-size:13.5px;color:var(--ink-600)">É aqui que entra o seu pedido "o que aparece no 1º acesso × depois" — mapeado na seção 5.</p>
+  </div>
+</div>
+<p style="font-size:14px;color:var(--ink-600)">Os 8 Core Drives: <strong>CD1</strong> Significado &amp; Chamado · <strong>CD2</strong> Desenvolvimento &amp; Conquista · <strong>CD3</strong> Criatividade &amp; Feedback · <strong>CD4</strong> Posse &amp; Propriedade · <strong>CD5</strong> Influência Social · <strong>CD6</strong> Escassez &amp; Impaciência · <strong>CD7</strong> Imprevisibilidade &amp; Curiosidade · <strong>CD8</strong> Perda &amp; Evitação.</p>
+
+<!-- ============================ 2 RADAR ============================ -->
+<h2 id="radar"><span class="num">2.</span> Os dois octógonos</h2>
+<p>Cada eixo vai de 0 (centro) a 100 (ponta). Quanto mais "preenchido e redondo", mais completo e equilibrado o design. Veja como o Retrô é visivelmente mais "cheio" na metade de baixo (Black Hat: escassez, curiosidade, perda).</p>
+
+<div class="card">
+  <div class="radars">
+    <!-- ============ NORMAL ============ -->
+    <div class="radarbox">
+      <h3><span class="tag norm">Bolão</span> Resultadismo</h3>
+      <div class="total">Total: <strong>339/800</strong> · índice 42/100</div>
+      <svg viewBox="0 0 400 360" width="100%" role="img" aria-label="Octógono Octalysis do Resultadismo bolão">
+        <!-- grids -->
+        <polygon class="grid" points="200,65 281.3,98.7 315,180 281.3,261.3 200,295 118.7,261.3 85,180 118.7,98.7"/>
+        <polygon class="grid" points="200,93.75 261,119 286.25,180 261,241 200,266.25 139,241 113.75,180 139,119"/>
+        <polygon class="grid" points="200,122.5 240.7,139.3 257.5,180 240.7,220.7 200,237.5 159.3,220.7 142.5,180 159.3,139.3"/>
+        <polygon class="grid" points="200,151.25 220.3,159.7 228.75,180 220.3,200.3 200,208.75 179.7,200.3 171.25,180 179.7,159.7"/>
+        <!-- axes -->
+        <line class="axis" x1="200" y1="180" x2="200" y2="65"/>
+        <line class="axis" x1="200" y1="180" x2="281.3" y2="98.7"/>
+        <line class="axis" x1="200" y1="180" x2="315" y2="180"/>
+        <line class="axis" x1="200" y1="180" x2="281.3" y2="261.3"/>
+        <line class="axis" x1="200" y1="180" x2="200" y2="295"/>
+        <line class="axis" x1="200" y1="180" x2="118.7" y2="261.3"/>
+        <line class="axis" x1="200" y1="180" x2="85" y2="180"/>
+        <line class="axis" x1="200" y1="180" x2="118.7" y2="98.7"/>
+        <!-- data -->
+        <polygon points="200,145.5 240.7,139.3 248.3,180 228.5,208.5 200,228.3 171.5,208.5 136.8,180 159.3,139.3"
+          fill="oklch(0.64 0.12 183 / .28)" stroke="oklch(0.64 0.12 183)" stroke-width="2.5"/>
+        <!-- labels -->
+        <text class="label" x="200" y="40" text-anchor="middle">1 Significado</text>
+        <text class="label" x="305" y="80" text-anchor="start">2 Conquista</text>
+        <text class="label" x="322" y="184" text-anchor="start">4 Posse</text>
+        <text class="label" x="305" y="288" text-anchor="start">6 Escassez</text>
+        <text class="label" x="200" y="330" text-anchor="middle">8 Perda</text>
+        <text class="label" x="95" y="288" text-anchor="end">7 Curiosidade</text>
+        <text class="label" x="78" y="184" text-anchor="end">5 Social</text>
+        <text class="label" x="95" y="80" text-anchor="end">3 Criatividade</text>
+      </svg>
+    </div>
+    <!-- ============ RETRÔ ============ -->
+    <div class="radarbox">
+      <h3><span class="tag retro">Retrô</span> Resultadismo Retrô</h3>
+      <div class="total">Total: <strong>393/800</strong> · índice 49/100</div>
+      <svg viewBox="0 0 400 360" width="100%" role="img" aria-label="Octógono Octalysis do Resultadismo Retrô">
+        <polygon class="grid" points="200,65 281.3,98.7 315,180 281.3,261.3 200,295 118.7,261.3 85,180 118.7,98.7"/>
+        <polygon class="grid" points="200,93.75 261,119 286.25,180 261,241 200,266.25 139,241 113.75,180 139,119"/>
+        <polygon class="grid" points="200,122.5 240.7,139.3 257.5,180 240.7,220.7 200,237.5 159.3,220.7 142.5,180 159.3,139.3"/>
+        <polygon class="grid" points="200,151.25 220.3,159.7 228.75,180 220.3,200.3 200,208.75 179.7,200.3 171.25,180 179.7,159.7"/>
+        <line class="axis" x1="200" y1="180" x2="200" y2="65"/>
+        <line class="axis" x1="200" y1="180" x2="281.3" y2="98.7"/>
+        <line class="axis" x1="200" y1="180" x2="315" y2="180"/>
+        <line class="axis" x1="200" y1="180" x2="281.3" y2="261.3"/>
+        <line class="axis" x1="200" y1="180" x2="200" y2="295"/>
+        <line class="axis" x1="200" y1="180" x2="118.7" y2="261.3"/>
+        <line class="axis" x1="200" y1="180" x2="85" y2="180"/>
+        <line class="axis" x1="200" y1="180" x2="118.7" y2="98.7"/>
+        <polygon points="200,136.3 247.2,132.8 234.5,180 248.8,228.8 200,243.3 151.2,228.8 151.7,180 159.3,139.3"
+          fill="oklch(0.73 0.15 90 / .30)" stroke="oklch(0.73 0.15 90)" stroke-width="2.5"/>
+        <text class="label" x="200" y="40" text-anchor="middle">1 Significado</text>
+        <text class="label" x="305" y="80" text-anchor="start">2 Conquista</text>
+        <text class="label" x="322" y="184" text-anchor="start">4 Posse</text>
+        <text class="label" x="305" y="288" text-anchor="start">6 Escassez</text>
+        <text class="label" x="200" y="330" text-anchor="middle">8 Perda</text>
+        <text class="label" x="95" y="288" text-anchor="end">7 Curiosidade</text>
+        <text class="label" x="78" y="184" text-anchor="end">5 Social</text>
+        <text class="label" x="95" y="80" text-anchor="end">3 Criatividade</text>
+      </svg>
+    </div>
+  </div>
+  <div class="legend" style="justify-content:center;margin-top:10px">
+    <span><span class="dot" style="background:var(--brand-600)"></span> topo = White Hat (positivo)</span>
+    <span><span class="dot" style="background:var(--gold-600)"></span> base = Black Hat (urgência)</span>
+    <span>laterais = posse (dir.) e social (esq.)</span>
+  </div>
+</div>
+
+<!-- ============================ 3 TABELA ============================ -->
+<h2 id="tabela"><span class="num">3.</span> Tabela comparativa dos 8 Core Drives</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Core Drive</th><th>Tipo</th>
+      <th>Bolão</th><th>Retrô</th>
+      <th>Leitura curta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>1 · Significado &amp; Chamado</strong></td><td><span class="tag white">White</span></td>
+      <td><div class="barwrap"><div class="bar"><span style="width:30%;background:var(--brand-600)"></span></div><span class="v">30</span></div></td>
+      <td><div class="barwrap"><div class="bar"><span style="width:38%;background:var(--gold-600)"></span></div><span class="v">38</span></div></td>
+      <td>"Ser o melhor Resultadista" e a Copa dão um norte; falta narrativa/missão maior.</td>
+    </tr>
+    <tr>
+      <td><strong>2 · Desenvolvimento &amp; Conquista</strong></td><td><span class="tag white">White</span></td>
+      <td><div class="barwrap"><div class="bar"><span style="width:50%;background:var(--brand-600)"></span></div><span class="v">50</span></div></td>
+      <td><div class="barwrap"><div class="bar"><span style="width:58%;background:var(--gold-600)"></span></div><span class="v">58</span></div></td>
+      <td>Leaderboards sólidos. Falta celebração, marcos, badges e progressão percebida.</td>
+    </tr>
+    <tr>
+      <td><strong>3 · Criatividade &amp; Feedback</strong></td><td><span class="tag white">White</span></td>
+      <td><div class="barwrap"><div class="bar"><span style="width:50%;background:var(--brand-600)"></span></div><span class="v">50</span></div></td>
+      <td><div class="barwrap"><div class="bar"><span style="width:50%;background:var(--gold-600)"></span></div><span class="v">50</span></div></td>
+      <td>Palpite + coringa = estratégia. Prévia ao vivo (bolão) e reveal (Retrô) são ótimos.</td>
+    </tr>
+    <tr>
+      <td><strong>4 · Posse &amp; Propriedade</strong></td><td><span class="tag neutral">Neutro</span></td>
+      <td><div class="barwrap"><div class="bar"><span style="width:42%;background:var(--aqua-600)"></span></div><span class="v">42</span></div></td>
+      <td><div class="barwrap"><div class="bar"><span style="width:30%;background:var(--aqua-600)"></span></div><span class="v">30</span></div></td>
+      <td>Escudo e "meu grupo" existem, mas <em>nada se coleciona ou se ganha</em>. O buraco dos dois.</td>
+    </tr>
+    <tr>
+      <td><strong>5 · Influência Social</strong></td><td><span class="tag neutral">Neutro</span></td>
+      <td><div class="barwrap"><div class="bar"><span style="width:55%;background:var(--aqua-600)"></span></div><span class="v">55</span></div></td>
+      <td><div class="barwrap"><div class="bar"><span style="width:42%;background:var(--aqua-600)"></span></div><span class="v">42</span></div></td>
+      <td>Bolão é social por natureza (mas confronto desligado). Retrô é viral por fora, fraco por dentro.</td>
+    </tr>
+    <tr>
+      <td><strong>6 · Escassez &amp; Impaciência</strong></td><td><span class="tag black">Black</span></td>
+      <td><div class="barwrap"><div class="bar"><span style="width:35%;background:var(--flame-600)"></span></div><span class="v">35</span></div></td>
+      <td><div class="barwrap"><div class="bar"><span style="width:60%;background:var(--flame-600)"></span></div><span class="v">60</span></div></td>
+      <td>Coringa 2/semana é o único forte no bolão. No Retrô, o cronômetro + diário brilham.</td>
+    </tr>
+    <tr>
+      <td><strong>7 · Imprevisibilidade &amp; Curiosidade</strong></td><td><span class="tag black">Black</span></td>
+      <td><div class="barwrap"><div class="bar"><span style="width:35%;background:var(--flame-600)"></span></div><span class="v">35</span></div></td>
+      <td><div class="barwrap"><div class="bar"><span style="width:60%;background:var(--flame-600)"></span></div><span class="v">60</span></div></td>
+      <td>O futebol já é suspense puro — o bolão não o dramatiza; o Retrô (sorteio + reveal) sim.</td>
+    </tr>
+    <tr>
+      <td><strong>8 · Perda &amp; Evitação</strong></td><td><span class="tag black">Black</span></td>
+      <td><div class="barwrap"><div class="bar"><span style="width:42%;background:var(--flame-600)"></span></div><span class="v">42</span></div></td>
+      <td><div class="barwrap"><div class="bar"><span style="width:55%;background:var(--flame-600)"></span></div><span class="v">55</span></div></td>
+      <td>Prazo que trava é bom nos dois. Falta "progresso a perder" (streak/posição) no bolão.</td>
+    </tr>
+    <tr style="border-top:2px solid var(--ink-300)">
+      <td><strong>TOTAL</strong></td><td></td>
+      <td class="num"><strong>339/800</strong></td>
+      <td class="num"><strong>393/800</strong></td>
+      <td>Retrô é mais equilibrado; bolão pende ao White Hat + social e é fraco no Black Hat.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================ 4 DRIVES ============================ -->
+<h2 id="drives"><span class="num">4.</span> Mergulho por Core Drive</h2>
+<p>Para cada Core Drive: o que aciona hoje em cada produto, a nota, a evidência no código e a oportunidade.</p>
+
+<!-- CD1 -->
+<div class="drive card">
+  <div class="head"><h3>CD1 · Significado &amp; Chamado <span class="tag white">White Hat</span></h3><div class="scores">Bolão <strong>30</strong> · Retrô <strong>38</strong></div></div>
+  <p><strong>Hoje:</strong> o bolão tem o <em>"Resultadismo The Best"</em> (ser o melhor de todos), o contexto da Copa do Mundo, o <em>"Construa com a gente"</em> (co-criar o produto) e a promessa de marca "diversão/zoeira saudável, não é aposta". O Retrô tem narrativa mais forte: <em>"encare a sua própria Copa"</em>, reviver a história (1930–2022), <em>"CAMPEÃO DO MUNDO!"</em>, a Copa do Dia temática (cada dia uma seleção).</p>
+  <p><strong>Oportunidade:</strong> dar um "porquê maior". Ex.: posicionar o The Best como uma temporada com começo/fim e um "Hall da Fama" (liga com a ideia de troféus, CD2/CD4); dar à zoeira um manifesto ("o bolão de quem leva futebol na esportiva"). É o drive mais barato de elevar via <em>copy</em> e enquadramento, sem código novo.</p>
+</div>
+
+<!-- CD2 -->
+<div class="drive card">
+  <div class="head"><h3>CD2 · Desenvolvimento &amp; Conquista <span class="tag white">White Hat</span></h3><div class="scores">Bolão <strong>50</strong> · Retrô <strong>58</strong></div></div>
+  <p><strong>Hoje (bolão):</strong> é a espinha dorsal — pontos 3/2/1/0, classificação do grupo com medalhas e "(você)", ranking global com recortes, estatísticas (pontos, cravadas, aproveitamento, acertividade, sequência), desempate justo. <strong>Mas</strong> não há badges (são placeholders travados <code>FUTURE_BADGES</code>), níveis/títulos, marcos ("seu melhor dia"), nem <em>celebração no acerto</em>: a Cravada (+3) renderiza igual a um Erro (<code>animate-rise</code> genérico em <code>MatchCard.tsx</code>).</p>
+  <p><strong>Hoje (Retrô):</strong> mais "redondo" — trilha de campanha (G1·G2·G3│8ª·4ª·SF·F), sobreviver aos 7 = campeão, rampa de dificuldade (Amistoso→Clássico→Lenda) e <em>selos raros</em> de verdade: <span class="star">HISTÓRICA 📜</span> e <span class="star">ZEROU O GAME 👾</span> (com chuva dourada).</p>
+  <div class="callout warn"><strong>Achado de confiança:</strong> as "Conquistas · em breve" com cadeado no perfil (<code>PlayerProfilePage.tsx:119</code>) nunca desbloqueiam. Mostrar uma promessa inerte toda vez que alguém abre um perfil <em>corrói</em> a credibilidade. Entregar ao menos 1 badge real (Primeira cravada é trivial de detectar) ou esconder a seção.</p>
+</div>
+
+<!-- CD3 -->
+<div class="drive card">
+  <div class="head"><h3>CD3 · Criatividade &amp; Feedback <span class="tag white">White Hat</span></h3><div class="scores">Bolão <strong>50</strong> · Retrô <strong>50</strong></div></div>
+  <p><strong>Hoje:</strong> o palpite é uma escolha criativa e o <strong>coringa 2×</strong> é uma decisão estratégica clássica ("guarde para os certeiros"). O ponto mais forte do bolão é a <strong>prévia de pontuação ao vivo</strong> (<code>provisionalScoreType</code>): a borda e o selo "Saldo +2" mudam em tempo real conforme os gols. No Retrô, o feedback é <em>instantâneo</em> via reveal "fliperama" (placar vira + carimbo do veredito).</p>
+  <p><strong>Oportunidade:</strong> fechar o loop com mais força — micro-animação quando o tipo <em>muda</em> ao vivo (seu palpite cai de Cravada para Acerto), e feedback construtivo no erro ("faltou 1 gol pra cravar") em vez de só um selo cinza.</p>
+</div>
+
+<!-- CD4 -->
+<div class="drive card">
+  <div class="head"><h3>CD4 · Posse &amp; Propriedade <span class="tag neutral">Neutro</span></h3><div class="scores">Bolão <strong>42</strong> · Retrô <strong>30</strong></div></div>
+  <p><strong>Hoje:</strong> existe identidade via <strong>escudo</strong> customizável (forma+cor+padrão+foto), "meu grupo", time do coração/seleção, favoritar. <strong>Mas</strong> o escudo é <em>um</em> item editável à vontade — não uma coleção: todas as 17 formas já estão liberadas desde o 1º acesso, sem desbloqueio nem raridade. No Retrô, o único "possuível" é a ficha de reroll, e ela é efêmera (gasta na run).</p>
+  <div class="callout"><strong>O maior buraco compartilhado.</strong> Nada se <em>acumula</em>, <em>coleciona</em> ou se <em>ganha</em> jogando. É exatamente aqui que entram as suas duas ideias (badges colecionáveis + estante de troféus) — ver seção 7. Possuir um histórico de conquistas é o que segura o veterano (endgame).</p>
+</div>
+
+<!-- CD5 -->
+<div class="drive card">
+  <div class="head"><h3>CD5 · Influência Social <span class="tag neutral">Neutro</span></h3><div class="scores">Bolão <strong>55</strong> · Retrô <strong>42</strong></div></div>
+  <p><strong>Hoje (bolão):</strong> é o coração — grupos, classificação comparativa, convite viral por WhatsApp (com <code>?convite=</code>), cutucar (nudge), comparar palpites com a galera ao vivo ("zoeira pura"), perfis para "stalkear" o rival, escudos dos membros empilhados. <strong>Mas:</strong> o <strong>Confronto</strong> (duelo nominal, palpite do rival escondido até o apito, W.O.) — a mecânica social mais rica — está <em>desligada</em> atrás de gate de admin do app; a presença ("online") é coletada mas nunca exibida; não há feed de atividade nem histórico de rivalidade (head-to-head).</p>
+  <p><strong>Hoje (Retrô):</strong> o share é excelente (card-imagem + grade de emoji sem spoiler + "Acha que faz melhor?"), mas <em>dentro</em> do jogo o social é fraco (ranking global anônimo; sem "meu grupo", sem desafiar amigo).</p>
+</div>
+
+<!-- CD6 -->
+<div class="drive card">
+  <div class="head"><h3>CD6 · Escassez &amp; Impaciência <span class="tag black">Black Hat</span></h3><div class="scores">Bolão <strong>35</strong> · Retrô <strong>60</strong></div></div>
+  <p><strong>Hoje (bolão):</strong> o <strong>coringa 2/semana</strong> (reset semanal = "use ou perca") é a única escassez bem feita e <em>saudável</em> (é ponto de jogo, não dinheiro — alinhado à Lei 14.790). A promoção de preço tem prazo (<code>promo_until</code>) mas <strong>nunca mostra a data-limite</strong> nem contagem; o cupom tem <code>max_uses</code>/validade mas não exibe "restam X". Pagamento desligado hoje zera a pressão de preço.</p>
+  <p><strong>Hoje (Retrô):</strong> brilha — o <strong>cronômetro</strong> por jogo (milissegundos nos 3s finais) é impaciência pura; a <strong>Seleção do Dia</strong> (1×/dia, estilo Wordle) é appointment; e há raridade real (jogos nível-7 são pouquíssimos no catálogo; o 21/21 é dificílimo).</p>
+</div>
+
+<!-- CD7 -->
+<div class="drive card">
+  <div class="head"><h3>CD7 · Imprevisibilidade &amp; Curiosidade <span class="tag black">Black Hat</span></h3><div class="scores">Bolão <strong>35</strong> · Retrô <strong>60</strong></div></div>
+  <p><strong>Hoje:</strong> o futebol já é o gerador de curiosidade ("será que dá?"). O bolão tem isso de graça via prévia ao vivo, mas <strong>não dramatiza</strong>: a transição ao-vivo→encerrado não tem nenhum "momento". O Retrô explora de propósito: você <em>não sabe</em> qual jogo histórico vem (sorteio), e o reveal é o pico dopaminérgico.</p>
+  <p><strong>Oportunidade:</strong> trazer um "momento" para o encerramento do jogo no bolão (a tal celebração) e pequenas surpresas (ex.: "jogo do dia" em destaque — a flag <code>is_featured</code> já existe no banco e está sem uso).</p>
+</div>
+
+<!-- CD8 -->
+<div class="drive card">
+  <div class="head"><h3>CD8 · Perda &amp; Evitação <span class="tag black">Black Hat</span></h3><div class="scores">Bolão <strong>42</strong> · Retrô <strong>55</strong></div></div>
+  <p><strong>Hoje:</strong> nos dois, o <strong>palpite trava no apito</strong> ("você não palpitou" + cadeado) — appointment + aversão à perda bem aplicados. O bolão tem ainda o W.O. ao sair de um confronto e o prêmio da caixinha ligado à posição. O Retrô tem o <strong>mata-mata</strong> (morte súbita) e o <strong>streak 🔥</strong>.</p>
+  <div class="callout warn"><strong>O CD8 mais barato está parado:</strong> a "sequência" do bolão só guarda o <em>recorde histórico</em> (nunca a sequência <em>atual em risco</em>); e o streak do Retrô é <em>exibido mas nunca defendido</em> (não há "seu 🔥 acaba hoje", sem lembrete). Expor a sequência atual + avisar do risco é quase de graça (o dado já existe em <code>stats.ts</code>) e é o gancho de retorno mais forte.</p>
+</div>
+
+<!-- ============================ 5 JORNADA ============================ -->
+<h2 id="jornada"><span class="num">5.</span> Jornada: 1º acesso × recorrente, claro × obscuro</h2>
+
+<h3>Resultadismo (bolão) — primeiro acesso</h3>
+<p>O visitante deslogado cai numa <strong>landing híbrida</strong> inteligente: vê jogos reais (teaser) <em>antes</em> de logar. Login é só Google (1 toque). Depois do login, vem uma sequência <strong>longa</strong>:</p>
+<div class="callout warn"><strong>Atrito alto antes do "aha":</strong> wizard de personalização (<strong>6 telas</strong>: escudo, time do coração, seleção, campeonatos, código de convite, notificações) → carrossel de boas-vindas (<strong>3 slides</strong>) → tour guiado (<strong>3 coach-marks</strong>). São até <strong>12 telas entre o login e o primeiro palpite</strong>. O novato escolhe escudo antes de entender o jogo, e quem chega por convite passa por tudo isso antes de cair no grupo que o chamou.</div>
+<p><strong>Bugs/atritos concretos achados:</strong></p>
+<ul>
+  <li><span class="tag baixa">bug</span> <code>NovidadeBolaoModal</code> escuta o evento <code>resultadismo:tour-done</code> que <em>ninguém dispara</em> (o <code>GuidedTour.finish()</code> não faz dispatch) — a novidade só aparece após recarregar a página.</li>
+  <li>O modal de login diz "você topa as regras" <strong>sem link</strong> para Termos/Privacidade.</li>
+  <li>Permissão de notificação/instalação é pedida no <em>fim do wizard</em> (antes de qualquer valor) — receita para "denied" permanente.</li>
+  <li>Concordância de gênero pós-rename: "Grupo não encontrad<strong>a</strong>", "Grupo liberad<strong>a</strong>".</li>
+</ul>
+
+<h3>Resultadismo (bolão) — uso recorrente</h3>
+<table>
+  <thead><tr><th>O que aparece</th><th class="num">Claro?</th><th>Observação</th></tr></thead>
+  <tbody>
+    <tr><td>Pontuação 3/2/1/0 com cor (ouro/verde/ciano)</td><td class="num">✅ claro</td><td>Cor é intuitiva; mas o "porquê" só está no onboarding (skipável). "Saldo" é jargão.</td></tr>
+    <tr><td>Prévia de pontos ao vivo no card</td><td class="num">✅ claro</td><td>Excelente — mas o pico (encerrar) não vira recompensa.</td></tr>
+    <tr><td>Coringa 2× e quantos restam</td><td class="num">⚠️ parcial</td><td>Contador "X/2 dobros" some nas abas padrão (Grupos/Interesses/Todos); só aparece por competição.</td></tr>
+    <tr><td>Palpites da galera / cutucar</td><td class="num">⚠️ obscuro</td><td>Forte CD5, mas nasce dentro de um acordeão fechado — não aparece de cara.</td></tr>
+    <tr><td>Ranking global "The Best"</td><td class="num">⚠️ obscuro</td><td>É o endgame competitivo e <em>não está na navegação</em> — só num link afundado em /grupos.</td></tr>
+    <tr><td>Favoritar grupo (estrela)</td><td class="num">⚠️ obscuro</td><td>Valor (prévia no topo) só aparece após favoritar <em>e</em> o grupo pontuar — duplo gate.</td></tr>
+    <tr><td>Confronto (duelo)</td><td class="num">🔒 escondido</td><td>"Em breve" para quase todos (gate de admin do app).</td></tr>
+    <tr><td>Conquistas no perfil</td><td class="num">🔒 fantasma</td><td>3 cadeados "em breve" que nunca abrem.</td></tr>
+    <tr><td>Simulador / Construa</td><td class="num">⚠️ órfãos</td><td>Só alcançáveis na "gaveta" do Perfil.</td></tr>
+  </tbody>
+</table>
+
+<h3>Resultadismo Retrô — primeiro acesso × recorrente</h3>
+<p>O Retrô faz o oposto do bolão e acerta: <strong>atrito quase zero</strong>. Um modal <code>RetroIntro</code> de 4 linhas (vale até para anônimo) e já se joga, <em>sem login</em>. O recorrente escolhe Seleção do Dia (diário, ranqueado) ou Jogo livre (dificuldade Amistoso/Clássico/Lenda).</p>
+<div class="callout warn"><strong>O ponto cego do Retrô:</strong> a Seleção do Dia tem appointment (diário) e streak — mas <strong>nenhum lembrete</strong> traz a pessoa de volta amanhã; o "Volte amanhã" é 100% passivo. E o anônimo joga tudo (até zerar o Lenda) e só descobre no fim, num banner passivo, que <em>nada entra no ranking</em> — o melhor instante de conversão é desperdiçado.</div>
+
+<!-- ============================ 6 UX ============================ -->
+<h2 id="ux"><span class="num">6.</span> Problemas de UX priorizados</h2>
+<table>
+  <thead><tr><th>Sev.</th><th>Problema</th><th>Onde</th><th>Sugestão</th></tr></thead>
+  <tbody>
+    <tr><td><span class="tag alta">alta</span></td><td>Sem celebração no acerto/cravada — o pico do jogo passa em branco</td><td><code>MatchCard.tsx</code> (estado encerrado)</td><td>Micro-celebração proporcional ao tipo; confete (já existe no repo) só para Cravada e Dobro acertado.</td></tr>
+    <tr><td><span class="tag alta">alta</span></td><td>Confronto (a mecânica social mais rica) desligado para o público</td><td><code>LigaDetailPage.tsx:354</code> / <code>ConfrontosPage.tsx</code></td><td>Permitir que o dono do grupo ative (beta); usar o /simulador como isca de descoberta.</td></tr>
+    <tr><td><span class="tag alta">alta</span></td><td>Conquistas fantasmas (cadeados que nunca abrem) corroem confiança</td><td><code>PlayerProfilePage.tsx:119</code></td><td>Entregar ≥1 badge real ou esconder a seção até existir.</td></tr>
+    <tr><td><span class="tag alta">alta</span></td><td>Nenhum feedback de progresso entre rodadas — veterano some</td><td>notificações só "palpite agora"</td><td>Notificação de resultado: "Rodada fechada: 7 pts, subiu pra 2º no Grupo X".</td></tr>
+    <tr><td><span class="tag alta">alta</span></td><td>Onboarding longo (até 12 telas) antes do 1º palpite</td><td>wizard→carrossel→tour</td><td>Wizard obrigatório de 2–3 telas; adiar o resto para depois do 1º palpite.</td></tr>
+    <tr><td><span class="tag alta">alta</span></td><td>Seleção do Dia/streak sem lembrete — appointment morre fora da sessão</td><td><code>RetroPage.tsx</code></td><td>Lembrete diário opt-in (push); mostrar "nova seleção em Xh" e streak em risco.</td></tr>
+    <tr><td><span class="tag alta">alta</span></td><td>Funil cego: sem evento de 1º palpite, fim de onboarding, 1ª pontuação, mudança de posição</td><td><code>analytics.ts</code></td><td>Instrumentar os marcos psicológicos — não dá pra otimizar o que não se mede.</td></tr>
+    <tr><td><span class="tag media">média</span></td><td>Ranking "The Best" fora da navegação persistente</td><td>Sidebar/BottomNav</td><td>Promover a destino de 1ª classe (atalho fixo / cartão no topo de /grupos).</td></tr>
+    <tr><td><span class="tag media">média</span></td><td>Presença ("online") coletada e nunca exibida</td><td><code>PresenceTracker.tsx</code></td><td>"X amigos online" no grupo / ponto verde no avatar — dado já existe.</td></tr>
+    <tr><td><span class="tag media">média</span></td><td>Streak do bolão só mostra recorde, não a sequência atual em risco</td><td><code>stats.ts:62</code></td><td>Expor "Sequência atual" + aviso de risco; marcos (5/10/20).</td></tr>
+    <tr><td><span class="tag media">média</span></td><td>Conversão anônimo→login no pico desperdiçada (Retrô)</td><td><code>ResultView.tsx:106</code></td><td>CTA contextual no feito ("trave esse recorde no ranking") + preservar a run ao logar.</td></tr>
+    <tr><td><span class="tag media">média</span></td><td>"Premiação/pote" na Gestão × "não tem prêmio em dinheiro" na landing</td><td>Gestão × FAQ/Termos</td><td>Alinhar copy ("caixinha combinada do grupo, fora do app") — coerência e blindagem legal.</td></tr>
+    <tr><td><span class="tag baixa">baixa</span></td><td>Sem "Já paguei" self-service nem chave Pix na Gestão</td><td><code>GestaoBolaoTab.tsx</code></td><td>Botão "Avisar que paguei" (admin confirma) + campo de chave Pix com copiar — app não toca no dinheiro.</td></tr>
+    <tr><td><span class="tag baixa">baixa</span></td><td>"Por que ganhei 3/2/1?" não está no card</td><td><code>ScorePill.tsx</code></td><td>Tooltip "Cravada = placar exato, +3" sempre disponível no loop.</td></tr>
+    <tr><td><span class="tag baixa">baixa</span></td><td>Promoção de preço sem data-limite/contagem visível</td><td><code>NovaLigaPage.tsx:343</code></td><td>"Promoção até DD/MM" + countdown (quando o pagamento ligar).</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================ 7 IDEIAS ============================ -->
+<h2 id="ideias"><span class="num">7.</span> Suas 3 ideias × Octalysis</h2>
+<p>As três ideias que você já tinha atacam, juntas, os <strong>exatos três buracos</strong> da análise: posse/coleção (CD4), conquista/celebração (CD2) e o social mais rico (CD5/CD7/CD8). Abaixo, como cada uma se encaixa e um caminho de implementação enxuto.</p>
+
+<div class="card">
+  <h3>💠 Ideia 1 — Badges de conquistas <span class="tag white">CD2</span> <span class="tag neutral">CD4</span> <span class="tag black">CD6</span></h3>
+  <p><strong>Encaixe:</strong> preenche o maior vazio do bolão (conquista + posse colecionável) <em>e</em> conserta uma ferida ativa — hoje existem 3 badges fantasmas travadas que nunca abrem. Implementar badges reais resolve as duas coisas.</p>
+  <p><strong>Caminho enxuto (MVP com dados que já existem):</strong></p>
+  <ul>
+    <li><strong>Primeira cravada</strong> (trivial — já está nos stats).</li>
+    <li><strong>Sequência de N cravadas</strong> / <strong>X cravadas na vida</strong> (a contagem já existe).</li>
+    <li><strong>Top-3 num grupo</strong> ao fim de uma competição.</li>
+    <li>Raridade visível ("só 4% têm essa") puxa CD6; conquista no <em>momento</em> (toast + animação) puxa CD2/CD7.</li>
+  </ul>
+  <p style="font-size:13.5px;color:var(--ink-600)">Regra de ouro: nunca mais mostrar cadeado que não abre. Ou entrega, ou esconde.</p>
+</div>
+
+<div class="card">
+  <h3>🏆 Ideia 2 — Área de troféus (1º lugar em competições) <span class="tag neutral">CD4</span> <span class="tag white">CD2</span> <span class="tag neutral">CD5</span> <span class="tag white">CD1</span></h3>
+  <p><strong>Encaixe:</strong> é a <strong>camada de posse durável</strong> que falta nos dois produtos — o que se "tem para mostrar" depois de jogar. Vira o <em>endgame</em> (motivo de o veterano continuar) e dá sentido ao ranking (CD1: "entrar para a história do grupo").</p>
+  <p><strong>Caminho:</strong> uma "estante de troféus" no perfil (o lugar onde hoje moram as conquistas fantasmas). Ao encerrar uma temporada/competição, o 1º (e 2º/3º) ganha um troféu carimbado com o nome da competição e a data. Exibir no <em>perfil público</em> (status, CD5) e como destaque no grupo ("Campeão da Copa 2026: Fulano"). Isso exige fechar a noção de "fim de temporada" (hoje há <code>starts_on</code>; falta um marco de "encerrada").</p>
+</div>
+
+<div class="card">
+  <h3>⚔️ Ideia 3 — Confrontos entre usuários (hoje "só teste") <span class="tag neutral">CD5</span> <span class="tag black">CD7</span> <span class="tag black">CD8</span> <span class="tag white">CD2</span></h3>
+  <p><strong>Encaixe:</strong> é a mecânica com <em>mais</em> Core Drives ativados do app inteiro — rival com nome, palpite do oponente <strong>escondido até o apito</strong> (suspense, CD7), W.O. e "você está ganhando/perdendo" (perda, CD8), chaveamento (conquista, CD2). E ela <strong>já está construída</strong> (sorteio, Liga 3/1/0, Copa mata-mata, simulador, agendamento, opt-in) — só está atrás de um gate de admin do app (<code>confronto_enabled</code>).</p>
+  <p><strong>Caminho de maior retorno por menor esforço:</strong></p>
+  <ul>
+    <li>Dar ao <strong>dono do grupo</strong> um caminho para ativar (mesmo com selo "beta"), em vez de depender de você ligar grupo a grupo.</li>
+    <li>Usar o <strong>/simulador</strong> (que já existe e roda sem o gate) como <em>isca de descoberta</em>: "veja como ficaria um duelo na sua Copa".</li>
+    <li>Adicionar uma entrada visível (CTA na classificação ou no perfil) — hoje a feature mais "brilhante" é invisível.</li>
+  </ul>
+  <p style="font-size:13.5px;color:var(--ink-600)">É, provavelmente, a alavanca de maior impacto imediato: alto retorno social, baixo esforço (a estrutura está pronta), e cria a rivalidade 1:1 que falta.</p>
+</div>
+
+<!-- ============================ 8 ROTEIRO ============================ -->
+<h2 id="roteiro"><span class="num">8.</span> Roteiro de otimização (impacto × esforço)</h2>
+<p>Ordenado por retorno. As três primeiras já dão um salto de gamificação e atacam os três buracos centrais.</p>
+<table>
+  <thead><tr><th class="num">#</th><th>Movimento</th><th>Drives</th><th class="num">Impacto</th><th class="num">Esforço</th></tr></thead>
+  <tbody>
+    <tr><td class="num pri">1</td><td><strong>Celebração no acerto/cravada</strong> (portar o confete/reveal do Retrô para o card do bolão)</td><td>CD2·CD7</td><td class="num">★★★</td><td class="num">baixo</td></tr>
+    <tr><td class="num pri">2</td><td><strong>Ligar o Confronto self-service</strong> + isca via /simulador (ideia 3)</td><td>CD5·CD7·CD8</td><td class="num">★★★</td><td class="num">baixo</td></tr>
+    <tr><td class="num pri">3</td><td><strong>Sequência atual + risco</strong> no bolão (portar streak do Retrô) e <strong>defender o streak</strong> do Retrô</td><td>CD8·CD2</td><td class="num">★★★</td><td class="num">baixo</td></tr>
+    <tr><td class="num pri">4</td><td><strong>Badges reais</strong> (ideia 1) — começar com 3 dos dados existentes; matar os fantasmas</td><td>CD2·CD4·CD6</td><td class="num">★★★</td><td class="num">médio</td></tr>
+    <tr><td class="num pri">5</td><td><strong>Estante de troféus</strong> no perfil + "fim de temporada" (ideia 2)</td><td>CD4·CD2·CD5·CD1</td><td class="num">★★★</td><td class="num">médio</td></tr>
+    <tr><td class="num pri">6</td><td><strong>Notificação de progresso</strong> ("subiu pra 2º", recap da rodada)</td><td>CD2·CD8</td><td class="num">★★★</td><td class="num">médio</td></tr>
+    <tr><td class="num pri">7</td><td><strong>Encurtar o onboarding</strong>: levar ao 1º palpite rápido, adiar o resto</td><td>—</td><td class="num">★★★</td><td class="num">médio</td></tr>
+    <tr><td class="num pri">8</td><td><strong>Lembrete diário do Retrô</strong> (Seleção do Dia / streak)</td><td>CD6·CD8</td><td class="num">★★☆</td><td class="num">baixo</td></tr>
+    <tr><td class="num pri">9</td><td><strong>Acender sinais sociais</strong>: presença "X online", cutucar visível, vizinhos no ranking</td><td>CD5</td><td class="num">★★☆</td><td class="num">baixo</td></tr>
+    <tr><td class="num pri">10</td><td><strong>Instrumentar o funil</strong> (1º palpite, fim de onboarding, 1ª pontuação, mudança de rank)</td><td>medição</td><td class="num">★★☆</td><td class="num">baixo</td></tr>
+    <tr><td class="num pri">11</td><td><strong>Conversão anônimo→login no pico</strong> do Retrô + preservar a run</td><td>CD2·CD8</td><td class="num">★★☆</td><td class="num">médio</td></tr>
+    <tr><td class="num pri">12</td><td><strong>Promover o "The Best"</strong> a destino de 1ª classe + tooltip "como pontua" no card</td><td>CD5·CD2</td><td class="num">★★☆</td><td class="num">baixo</td></tr>
+    <tr><td class="num pri">13</td><td><strong>Polir</strong>: bug do <code>tour-done</code>, concordância de gênero, links no login, copy Gestão×landing</td><td>confiança</td><td class="num">★☆☆</td><td class="num">baixo</td></tr>
+  </tbody>
+</table>
+
+<h3>Matriz rápida (faça primeiro o canto "alto impacto / baixo esforço")</h3>
+<div class="matrix">
+  <div class="mh"></div><div class="mh">Baixo esforço</div><div class="mh">Médio/alto esforço</div>
+  <div class="ml">Alto<br>impacto</div>
+  <div><strong>FAÇA JÁ →</strong> #1 celebração · #2 confronto · #3 streak · #8 lembrete Retrô · #9 sinais sociais · #10 analytics · #12 The Best</div>
+  <div><strong>PLANEJE →</strong> #4 badges · #5 troféus · #6 notif. progresso · #7 onboarding · #11 conversão Retrô</div>
+  <div class="ml">Menor<br>impacto</div>
+  <div>#13 polimentos (faça em paralelo, são quase de graça)</div>
+  <div>—</div>
+</div>
+
+<!-- ============================ 9 PERGUNTAS ============================ -->
+<h2 id="perguntas"><span class="num">9.</span> Perguntas para aprofundar</h2>
+<p>Para afinar o roteiro com a sua visão (responda direto no documento ou me diga):</p>
+<ul>
+  <li><span class="qtag">Q1</span> <strong>Foco temporal:</strong> a prioridade é maximizar a <em>Copa 2026</em> (aquisição/viral agora) ou construir <em>retenção de longo prazo</em> (badges/troféus que valem pós-Copa)? Isso muda a ordem do roteiro.</li>
+  <li><span class="qtag">Q2</span> <strong>Confronto:</strong> topa ligar self-service (dono ativa) com selo "beta" já na Copa, ou prefere manter o gate e só usar o /simulador como vitrine por enquanto?</li>
+  <li><span class="qtag">Q3</span> <strong>Troféus:</strong> a "temporada" que gera troféu é a <em>Copa inteira</em> (1 troféu de campeão no fim) ou também por <em>fase/semana</em> (mais troféus, mais frequentes)?</li>
+  <li><span class="qtag">Q4</span> <strong>Badges:</strong> você quer badges puramente de <em>maestria</em> (cravadas, sequências, top-3) ou também de <em>engajamento</em> (convidou amigos, X dias seguidos, jogou o Retrô)?</li>
+  <li><span class="qtag">Q5</span> <strong>Notificações:</strong> qual o apetite por push? Lembrete de prazo já existe; topa "progresso/resultado" (subiu de posição, recap) e "streak em risco"?</li>
+  <li><span class="qtag">Q6</span> <strong>Retrô × bolão:</strong> o Retrô é uma <em>isca</em> para o bolão (priorizar a ponte de conversão) ou um <em>produto próprio</em> a crescer em paralelo (ranking/streak/coleção próprios)?</li>
+  <li><span class="qtag">Q7</span> <strong>Ética Black Hat:</strong> até onde quer ir em urgência (contagens, FOMO)? A marca é "diversão saudável" — sugiro Black Hat sempre <em>opt-in</em> e nunca punitivo.</li>
+</ul>
+
+<!-- ============================ 10 METODO ============================ -->
+<h2 id="metodo"><span class="num">10.</span> Metodologia e ressalvas</h2>
+<div class="card tight">
+  <p><strong>Como foi feito:</strong> varredura do repositório em 7 frentes (Descoberta &amp; Onboarding, Loop central, Social &amp; Competição, Progressão &amp; Retenção, Retrô, Monetização &amp; Escassez, Navegação &amp; Analytics), lendo o código real (<code>src/</code>, <code>supabase/</code>) e as constituições internas (<code>.claude/06-REGRAS-DE-NEGOCIO.md</code>, <code>.claude/12-RETRO-MINIJOGO.md</code>). Cada mecânica foi marcada por Core Drive, fase da jornada e clareza.</p>
+  <p><strong>Sobre a pontuação:</strong> o Octalysis não é uma régua exata — é uma leitura estruturada de analista. Os números (0–100 por drive) são a minha estimativa <em>calibrada e ancorada no código</em>, feita para <strong>comparar os dois produtos e priorizar</strong>, não para ser um valor absoluto. Espero que você discorde de alguns e os recalibre — é justamente o tipo de conversa que o documento quer provocar.</p>
+  <p><strong>Importante:</strong> isto é um diagnóstico. Nada aqui foi implementado. Qualquer mudança de código seguirá o protocolo do repositório (plano técnico + leigo, seu OK, homologação local, deploy) antes de subir.</p>
+</div>
+
+<div class="footer">
+  Resultadismo · Análise de Gamificação (Octalysis) &amp; UX · gerado em 16/06/2026 · referências: <a href="https://yukaichou.com/gamification-examples/octalysis-gamification-framework/">Octalysis (Yu-kai Chou)</a>.
+  <br>Cores e tokens espelham a identidade do app (turquesa <code>brand</code>; ouro=cravada, verde=saldo, ciano=acerto).
+</div>
+
+</div>
+</body>
+</html>
