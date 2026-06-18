@@ -21,6 +21,15 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
+- **Classificação AO VIVO + setas de movimentação.** Durante jogos ao vivo, a aba Classificação
+  passa a projetar os **pontos ao vivo** (roda `compute_score_type` no placar corrente, com pesos da
+  liga e joker) e **reordena sozinha** (Realtime de matches + repoll 30s). Cada linha ganha uma seta
+  discreta ↑/↓/— comparando a posição com o **placar-base** (antes do **bloco** de jogos atual —
+  jogos que se sobrepõem no tempo formam um bloco; quando o bloco inteiro termina, as setas congelam
+  a movimentação daquele bloco). Selo **AO VIVO** no topo e pontos em destaque pra quem tem jogo
+  rolando. Nova RPC `get_league_standings_live` (migration `20260616140000`); a `get_league_standings`
+  segue oficial — **prêmio/pote, confronto e ranking global continuam no placar FINAL** (o ao vivo é
+  só exibição). [Corrige de passagem: a nova RPC volta a excluir jogos `hidden` do cálculo.]
 - **Conflito de placar só notifica APÓS o jogo terminar.** O alerta/push de conflito entre fontes
   passa a só disparar para jogos **encerrados** (`alertConflicts` filtra `status='finished'`) — acaba o
   spam ao vivo (uma fonte registra o gol antes da outra → divergência momentânea que some sozinha). A

@@ -11,6 +11,7 @@ import type {
   MemberStatus,
   Profile,
   StandingRow,
+  LiveStandingRow,
 } from "@/lib/types";
 
 export type MyLeague = League & { my_role: MemberRole; my_status: MemberStatus };
@@ -103,6 +104,27 @@ export function useStandings(lcId: string | undefined) {
     queryKey: ["standings", lcId],
     queryFn: async (): Promise<StandingRow[]> => {
       const { data, error } = await supabase.rpc("get_league_standings", { p_lc_id: lcId! });
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    },
+  });
+}
+
+// Classificação AO VIVO (exibição): inclui jogos status='live' projetados +
+// rank_anterior (placar-base = antes do bloco atual) p/ as setas. Enquanto há
+// jogo ao vivo, repolla a cada 30s (além do Realtime de matches que invalida
+// ["standings-live"]). NÃO substitui useStandings (oficial p/ prêmio/pote/share).
+export function useStandingsLive(lcId: string | undefined) {
+  return useQuery({
+    enabled: !!lcId,
+    queryKey: ["standings-live", lcId],
+    // Reconsulta sozinha: 15s com jogo ao vivo, 45s parado (rede de segurança caso
+    // um evento de realtime escape — assim o modo AO VIVO aparece mesmo sem ele).
+    refetchInterval: (query) => (query.state.data?.some((r) => r.ao_vivo) ? 15_000 : 45_000),
+    queryFn: async (): Promise<LiveStandingRow[]> => {
+      const { data, error } = await rpcCall<LiveStandingRow[]>("get_league_standings_live", {
+        p_lc_id: lcId!,
+      });
       if (error) throw new Error(error.message);
       return data ?? [];
     },
@@ -421,6 +443,7 @@ export function useDeleteLeagueCompetition() {
     onSuccess: (_d, v) => {
       qc.invalidateQueries({ queryKey: ["league-competitions", v.leagueId] });
       qc.invalidateQueries({ queryKey: ["standings"] });
+      qc.invalidateQueries({ queryKey: ["standings-live"] });
     },
   });
 }
@@ -493,6 +516,7 @@ export function useUpdateTeamScope() {
     onSuccess: (_d, v) => {
       qc.invalidateQueries({ queryKey: ["league-competitions", v.leagueId] });
       qc.invalidateQueries({ queryKey: ["standings"] });
+      qc.invalidateQueries({ queryKey: ["standings-live"] });
     },
   });
 }
@@ -557,6 +581,7 @@ export function useUpdateStartsOn() {
       qc.invalidateQueries({ queryKey: ["league-competitions", v.leagueId] });
       qc.invalidateQueries({ queryKey: ["starts-on-window", v.lcId] });
       qc.invalidateQueries({ queryKey: ["standings"] });
+      qc.invalidateQueries({ queryKey: ["standings-live"] });
     },
   });
 }

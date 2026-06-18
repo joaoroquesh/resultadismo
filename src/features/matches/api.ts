@@ -325,6 +325,7 @@ export function useMatchesRealtime(competitionId: string | undefined) {
         qc.invalidateQueries({ queryKey: ["matches"] });
         qc.invalidateQueries({ queryKey: ["my-predictions"] });
         qc.invalidateQueries({ queryKey: ["standings"] });
+        qc.invalidateQueries({ queryKey: ["standings-live"] });
       }, 1200);
     };
     // Sem competição (visão "Todos") assina a tabela inteira; com competição,

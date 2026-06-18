@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ArrowUp, ArrowDown, Minus } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar";
 import { cn } from "@/lib/utils";
 import { formatBRL } from "@/lib/pricing";
@@ -11,13 +11,17 @@ export function StandingsTable({
   currentUserId,
   pot,
 }: {
-  rows: StandingRow[];
+  rows: (StandingRow & { rank_anterior?: number; ao_vivo?: boolean; live_scoring?: boolean })[];
   currentUserId?: string | null;
   /** Gestão do Bolão: selo de quem está levando prêmio (cents por user) e o
    * conjunto de pagantes (todos veem quem participa do bolão pago). */
   pot?: { prizeByUserId: Map<string, number>; payers?: Set<string> };
 }) {
   const [expanded, setExpanded] = useState(false);
+  // ao vivo (algum jogador com pontos de jogo em andamento) + houve movimentação
+  // de posição vs o placar-base (só então mostramos as setas; senão, nada).
+  const anyLive = rows.some((r) => r.ao_vivo);
+  const movementActive = rows.some((r) => r.rank_anterior != null && r.rank_anterior !== r.rank);
   // com selo de prêmio/participação na linha, aperta o espaçamento pra sobrar
   // largura pro nome+selo e o marcador nunca encostar na coluna de cravadas.
   const hasAnyPot =
@@ -32,8 +36,13 @@ export function StandingsTable({
   return (
     <div className="overflow-hidden rounded-lg bg-surface shadow-[var(--shadow-soft)] ring-1 ring-border">
       <div className="flex items-center justify-between border-b border-ink-100 px-3 py-1.5">
-        <span className="text-[11px] font-semibold text-ink-400">
-          {rows.length} {rows.length === 1 ? "jogador" : "jogadores"}
+        <span className="flex items-center gap-2 text-[11px] font-semibold text-ink-400">
+          <span>{rows.length} {rows.length === 1 ? "jogador" : "jogadores"}</span>
+          {anyLive && (
+            <span className="inline-flex items-center gap-1 rounded-pill bg-flame-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+              <span className="size-1.5 animate-pulse rounded-full bg-white" /> AO VIVO
+            </span>
+          )}
         </span>
         <button
           type="button"
@@ -56,7 +65,7 @@ export function StandingsTable({
               gap,
             )}
           >
-            <span className="w-5 text-center">#</span>
+            <span className="w-7 text-center">#</span>
             <span className="min-w-0 flex-1">Jogador</span>
             {expanded ? (
               <>
@@ -92,7 +101,7 @@ export function StandingsTable({
                   >
                   <span
                     className={cn(
-                      "flex w-5 justify-center text-sm font-bold tabular-nums",
+                      "flex w-7 items-center justify-center gap-0.5 text-sm font-bold tabular-nums",
                       row.rank === 1 && "text-gold-600",
                       row.rank === 2 && "text-ink-400",
                       row.rank === 3 && "text-[#b08d57]",
@@ -100,6 +109,14 @@ export function StandingsTable({
                     )}
                   >
                     {row.rank}
+                    {movementActive &&
+                      (row.rank_anterior == null || row.rank_anterior === row.rank ? (
+                        <Minus className="size-3 text-ink-300" aria-label="manteve a posição" />
+                      ) : row.rank_anterior > row.rank ? (
+                        <ArrowUp className="size-3 text-grass-600" aria-label="subiu" />
+                      ) : (
+                        <ArrowDown className="size-3 text-flame-600" aria-label="desceu" />
+                      ))}
                   </span>
                   <Avatar src={row.avatar_url} name={row.display_name} size="sm" />
                   <div className="flex min-w-0 flex-1 flex-col">
@@ -163,7 +180,7 @@ export function StandingsTable({
                       </span>
                     </>
                   )}
-                  <span className={cn("text-right text-lg font-extrabold tabular-nums text-ink-950", ptsW)}>
+                  <span className={cn("text-right text-lg font-extrabold tabular-nums", ptsW, row.live_scoring ? "text-flame-600" : "text-ink-950")}>
                     {row.pontos}
                   </span>
                   </Link>

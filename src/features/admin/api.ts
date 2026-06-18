@@ -191,6 +191,7 @@ export function useSaveMatchResult() {
       qc.invalidateQueries({ queryKey: ["admin", "matches"] });
       qc.invalidateQueries({ queryKey: ["matches"] });
       qc.invalidateQueries({ queryKey: ["standings"] });
+      qc.invalidateQueries({ queryKey: ["standings-live"] });
     },
   });
 }

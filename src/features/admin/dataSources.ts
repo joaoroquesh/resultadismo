@@ -52,6 +52,8 @@ function useInvalidateData() {
   return () => {
     qc.invalidateQueries({ queryKey: ["admin", "match-conflicts"] });
     qc.invalidateQueries({ queryKey: ["matches"] });
+    qc.invalidateQueries({ queryKey: ["standings"] });
+    qc.invalidateQueries({ queryKey: ["standings-live"] });
   };
 }
 

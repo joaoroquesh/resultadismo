@@ -12,7 +12,8 @@ import { track } from "@/lib/analytics";
 import { StandingsTable } from "@/features/standings/StandingsTable";
 import { shareImageBlob } from "@/features/matches/shareImage";
 import { buildStandingsShareImage } from "../standingsShareImage";
-import { useStandings } from "../api";
+import { useStandings, useStandingsLive } from "../api";
+import { useMatchesRealtime } from "@/features/matches/api";
 
 // Esta tab agora mostra APENAS Bolões (modo points/table). Confrontos (Liga/
 // Copa) viraram página dedicada em /grupos/:slug/confrontos. Quando o grupo
@@ -80,6 +81,14 @@ export function ClassificacaoTab({
   useEffect(() => {
     if (active && active.id !== activeLcId) onSelect(active.id);
   }, [active, activeLcId, onSelect]);
+
+  // Classificação AO VIVO + realtime: enquanto houver jogo rolando, a tabela
+  // recalcula/reordena sozinha e as setas de movimentação se mexem. O Realtime
+  // de matches (mesma competição) invalida ["standings-live"]. Para exibição;
+  // o compartilhar/prêmio continuam no placar FINAL (prop `standings`).
+  const liveStandings = useStandingsLive(active?.id);
+  useMatchesRealtime(active?.competition_id);
+  const rows = liveStandings.data ?? standings ?? [];
 
   if (boloes.length === 0) {
     return (
@@ -170,12 +179,12 @@ export function ClassificacaoTab({
         );
       })()}
 
-      {/* Tabela do bolão ativo */}
-      {loading ? (
+      {/* Tabela do bolão ativo (AO VIVO quando há jogo rolando) */}
+      {(loading || liveStandings.isLoading) && rows.length === 0 ? (
         <Skeleton className="h-64 w-full" />
-      ) : standings && standings.length > 0 ? (
+      ) : rows.length > 0 ? (
         <>
-          <StandingsTable rows={standings} currentUserId={currentUserId} pot={pot} />
+          <StandingsTable rows={rows} currentUserId={currentUserId} pot={pot} />
           <Button
             variant="outline"
             fullWidth

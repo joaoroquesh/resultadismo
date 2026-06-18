@@ -72,6 +72,14 @@ Métricas exibidas: jogos, pontos, cravadas, saldos, **aproveitamento** (% de po
 possível) e **acertividade** (% de palpites que pontuaram). Detalhe da fórmula em
 [`05`](05-DADOS-E-AUTH.md) §6.
 
+**Classificação AO VIVO (só exibição).** Durante jogos `live`, a aba Classificação usa
+`get_league_standings_live`: projeta os pontos do jogo em andamento (`compute_score_type` no placar
+corrente, mesmos pesos + joker) e reordena ao vivo, com **setas ↑/↓/—** comparando com o **placar-base**
+= a posição **antes do bloco atual** (jogos que se sobrepõem no tempo = um bloco; gaps-and-islands,
+novo bloco quando o intervalo entre kickoffs > 150 min; o bloco "congela" o movimento ao terminar).
+**É só visual** — `get_league_standings` (finished-only) segue sendo a oficial; **prêmio/pote,
+confronto e ranking global usam sempre o placar FINAL**, nunca o ao vivo.
+
 ### Resultadismo The Best (classificação geral) — recortes
 Ranking de **todos os Resultadistas, todas as competições** (3/2/1 × dobro; ignora jogos ocultos;
 opt-out por `show_in_global_ranking`). Na `/ranking`, o recorte é **por abas** (sem select, sem ano):

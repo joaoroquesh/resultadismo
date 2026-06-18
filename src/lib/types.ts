@@ -26,6 +26,17 @@ export type DataProvider = Enums["data_provider"];
 
 export type StandingRow = Functions["get_league_standings"]["Returns"][number];
 
+/** Classificação AO VIVO (get_league_standings_live): StandingRow + rank_anterior
+ * (posição no placar-base, p/ a seta de movimentação) + ao_vivo (pontos incluem
+ * jogo ao vivo). RPC nova, ainda fora dos tipos gerados → tipada à mão. */
+export type LiveStandingRow = StandingRow & {
+  rank_anterior: number;
+  /** Tem jogo ao vivo na conta dele (liga o selo AO VIVO + repoll). */
+  ao_vivo: boolean;
+  /** Está GANHANDO ponto de jogo ao vivo agora (erro no ao vivo = false). Pinta os pontos. */
+  live_scoring: boolean;
+};
+
 /** Jogo enriquecido com escudos dos times e o palpite do usuário. */
 export type MatchWithTeams = Match & {
   home_team: Team | null;

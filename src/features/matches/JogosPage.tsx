@@ -11,7 +11,7 @@ import { TeamCrest } from "@/components/TeamCrest";
 import { cn } from "@/lib/utils";
 import { dayjs } from "@/lib/format";
 import { MatchCard } from "./MatchCard";
-import { provisionalScoreType } from "@/lib/score";
+import { provisionalScoreType, provisionalPoints } from "@/lib/score";
 import { teamCrestPath } from "@/lib/teamCrests";
 import { buildScoreShareImage, shareImageBlob, type ShareRow } from "./shareImage";
 import { useToast } from "@/components/ui/Toast";
@@ -271,13 +271,23 @@ export function JogosPage() {
     let sum = 0;
     for (const m of dayMatches) {
       const p = predMap?.get(m.id);
-      if (p?.points != null) sum += p.points * (p.is_joker ? 2 : 1);
+      if (!p) continue;
+      const mult = p.is_joker ? 2 : 1;
+      if (p.points != null) {
+        sum += p.points * mult; // jogo encerrado → pontuação oficial
+      } else if (m.status === "live" && m.home_score != null && m.away_score != null) {
+        // jogo ao vivo → projeta com o placar corrente (mesma regra 3/2/1 do banco)
+        sum += provisionalPoints(provisionalScoreType(p.home_pred, p.away_pred, m.home_score, m.away_score)) * mult;
+      }
     }
     return sum;
   }, [dayMatches, predMap]);
 
-  // o resumo de pontos do dia só faz sentido quando há jogo encerrado no dia
-  const dayScored = useMemo(() => dayMatches.some((m) => m.status === "finished"), [dayMatches]);
+  // o resumo de pontos do dia aparece quando há jogo encerrado OU ao vivo no dia
+  const dayScored = useMemo(
+    () => dayMatches.some((m) => m.status === "finished" || m.status === "live"),
+    [dayMatches],
+  );
 
   const totalPoints = useMemo(() => {
     let sum = 0;

@@ -15,3 +15,10 @@ export function provisionalScoreType(
   if (Math.sign(homePred - awayPred) === Math.sign(homeScore - awayScore)) return "acerto";
   return "erro";
 }
+
+/** Pontos-base de um tipo (3/2/1/0, sem joker) — espelha score_points do banco.
+ * Usado na prévia ao vivo (ex.: "Neste dia" somando jogos em andamento). */
+const PROVISIONAL_POINTS: Record<ScoreType, number> = { cravada: 3, saldo: 2, acerto: 1, erro: 0 };
+export function provisionalPoints(t: ScoreType): number {
+  return PROVISIONAL_POINTS[t];
+}
