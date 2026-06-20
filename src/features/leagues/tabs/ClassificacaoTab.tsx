@@ -13,6 +13,7 @@ import { StandingsTable } from "@/features/standings/StandingsTable";
 import { shareImageBlob } from "@/features/matches/shareImage";
 import { buildStandingsShareImage } from "../standingsShareImage";
 import { useStandings, useStandingsLive } from "../api";
+import { prizeByUser, type PotPrize } from "../potMath";
 import { useMatchesRealtime } from "@/features/matches/api";
 
 // Esta tab agora mostra APENAS Bolões (modo points/table). Confrontos (Liga/
@@ -46,7 +47,7 @@ export function ClassificacaoTab({
   currentUserId?: string;
   isAdmin: boolean;
   confrontoEnabled: boolean;
-  pot?: { payers: Set<string>; prizeByUserId: Map<string, number> };
+  pot?: { payers: Set<string>; prizeByUserId: Map<string, number>; prizes?: PotPrize[] };
   leagueName: string;
 }) {
   const { slug } = useParams<{ slug: string }>();
@@ -89,6 +90,19 @@ export function ClassificacaoTab({
   const liveStandings = useStandingsLive(active?.id);
   useMatchesRealtime(active?.competition_id);
   const rows = liveStandings.data ?? standings ?? [];
+
+  // 💰 acompanha a posição AO VIVO: recalcula quem leva o prêmio sobre as linhas
+  // EXIBIDAS (live quando há jogo rolando) — prévia "se acabasse agora". O
+  // compartilhar segue no prêmio FINAL (pot.prizeByUserId, placar encerrado).
+  const livePot = pot
+    ? {
+        payers: pot.payers,
+        prizeByUserId:
+          pot.prizes && pot.prizes.length > 0
+            ? prizeByUser(rows, pot.payers, pot.prizes)
+            : pot.prizeByUserId,
+      }
+    : undefined;
 
   if (boloes.length === 0) {
     return (
@@ -184,7 +198,7 @@ export function ClassificacaoTab({
         <Skeleton className="h-64 w-full" />
       ) : rows.length > 0 ? (
         <>
-          <StandingsTable rows={rows} currentUserId={currentUserId} pot={pot} />
+          <StandingsTable rows={rows} currentUserId={currentUserId} pot={livePot} />
           <Button
             variant="outline"
             fullWidth

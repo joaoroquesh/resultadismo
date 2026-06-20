@@ -326,6 +326,11 @@ export function useMatchesRealtime(competitionId: string | undefined) {
         qc.invalidateQueries({ queryKey: ["my-predictions"] });
         qc.invalidateQueries({ queryKey: ["standings"] });
         qc.invalidateQueries({ queryKey: ["standings-live"] });
+        // AO VIVO em todo lugar: ranking global + previews da aba Grupos.
+        qc.invalidateQueries({ queryKey: ["rtb-standings-live"] });
+        qc.invalidateQueries({ queryKey: ["rtb-my-rank-live"] });
+        qc.invalidateQueries({ queryKey: ["my-league-positions-live"] });
+        qc.invalidateQueries({ queryKey: ["group-rank-window-live"] });
       }, 1200);
     };
     // Sem competição (visão "Todos") assina a tabela inteira; com competição,

@@ -72,13 +72,19 @@ Métricas exibidas: jogos, pontos, cravadas, saldos, **aproveitamento** (% de po
 possível) e **acertividade** (% de palpites que pontuaram). Detalhe da fórmula em
 [`05`](05-DADOS-E-AUTH.md) §6.
 
-**Classificação AO VIVO (só exibição).** Durante jogos `live`, a aba Classificação usa
+**AO VIVO (só exibição) — em todo o app.** Durante jogos `live`, a aba Classificação usa
 `get_league_standings_live`: projeta os pontos do jogo em andamento (`compute_score_type` no placar
 corrente, mesmos pesos + joker) e reordena ao vivo, com **setas ↑/↓/—** comparando com o **placar-base**
 = a posição **antes do bloco atual** (jogos que se sobrepõem no tempo = um bloco; gaps-and-islands,
 novo bloco quando o intervalo entre kickoffs > 150 min; o bloco "congela" o movimento ao terminar).
-**É só visual** — `get_league_standings` (finished-only) segue sendo a oficial; **prêmio/pote,
-confronto e ranking global usam sempre o placar FINAL**, nunca o ao vivo.
+O **mesmo ao vivo** vale para o **Resultadismo The Best** (`get_global_standings_live` /
+`get_my_global_rank_live`), os **previews da aba Grupos** (`get_my_league_positions_live` e
+`get_group_rank_window_live`, que derivam da `get_league_standings_live`) e o **valor do bolão (💰)**,
+que segue a posição ao vivo na tabela (prévia "se acabasse agora"; o **share** usa o prêmio FINAL).
+Nas telas globais o **placar-base das setas é o consolidado** (só jogos encerrados). Pontos em
+**vermelho só para quem está pontuando** ao vivo (`live_scoring`); quem palpitou mas está em erro
+segue branco. **É só visual** — as RPCs `*_live` são aditivas e as oficiais (finished-only) não mudam:
+**prêmio PAGO, confronto e o número OFICIAL/consolidado usam sempre o placar FINAL**, nunca o ao vivo.
 
 ### Resultadismo The Best (classificação geral) — recortes
 Ranking de **todos os Resultadistas, todas as competições** (3/2/1 × dobro; ignora jogos ocultos;

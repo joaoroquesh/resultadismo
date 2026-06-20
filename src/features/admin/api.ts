@@ -192,6 +192,11 @@ export function useSaveMatchResult() {
       qc.invalidateQueries({ queryKey: ["matches"] });
       qc.invalidateQueries({ queryKey: ["standings"] });
       qc.invalidateQueries({ queryKey: ["standings-live"] });
+      // AO VIVO: ranking global + previews da aba Grupos acompanham a edição.
+      qc.invalidateQueries({ queryKey: ["rtb-standings-live"] });
+      qc.invalidateQueries({ queryKey: ["rtb-my-rank-live"] });
+      qc.invalidateQueries({ queryKey: ["my-league-positions-live"] });
+      qc.invalidateQueries({ queryKey: ["group-rank-window-live"] });
     },
   });
 }

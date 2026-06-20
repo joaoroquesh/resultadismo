@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Trophy, Globe2, BarChart3 } from "lucide-react";
+import { ArrowLeft, Trophy, Globe2, BarChart3, ArrowUp, ArrowDown, Minus } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -9,12 +9,12 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/AuthProvider";
-import { useCompetitions } from "@/features/matches/api";
+import { useCompetitions, useMatchesRealtime } from "@/features/matches/api";
 import {
-  useGlobalStandings,
-  useMyGlobalRank,
+  useGlobalStandingsLive,
+  useMyGlobalRankLive,
   useMyPlayedCompetitionIds,
-  type RTBRow,
+  type RTBLiveRow,
   type RTBFilter,
 } from "./api";
 
@@ -38,8 +38,15 @@ export function RankingPage() {
     return { competitionId: recorte };
   }, [recorte, playedIds]);
 
-  const { data: rows, isLoading } = useGlobalStandings(filter, 50);
-  const { data: myRank } = useMyGlobalRank(filter);
+  const { data: rows, isLoading } = useGlobalStandingsLive(filter, 50);
+  const { data: myRank } = useMyGlobalRankLive(filter);
+  // Realtime de TODAS as competições (sem filtro): placar muda → ranking ao vivo
+  // se mexe na hora. Reforçado pelo repoll (15s ao vivo / 45s parado) dos hooks.
+  useMatchesRealtime(undefined);
+  const anyLive = rows?.some((r) => r.ao_vivo) ?? false;
+  // setas só quando houve movimento vs o consolidado (durante o ao vivo); senão
+  // a coluna fica limpa, igual à classificação dos grupos.
+  const movementActive = rows?.some((r) => r.rank_anterior !== r.rank) ?? false;
 
   return (
     <Page
@@ -89,8 +96,20 @@ export function RankingPage() {
                 Você é o{" "}
                 <span className="font-extrabold text-ink-950 tabular-nums">{myRank.rank}º</span>{" "}
                 Resultadista <span className="text-ink-300">·</span>{" "}
-                <span className="font-bold tabular-nums">{myRank.pontos} pts</span>{" "}
+                <span
+                  className={cn(
+                    "font-bold tabular-nums",
+                    myRank.live_scoring && "text-flame-600",
+                  )}
+                >
+                  {myRank.pontos} pts
+                </span>{" "}
                 <span className="text-ink-400">de {myRank.total_resultadistas}</span>
+                {myRank.ao_vivo && (
+                  <span className="ml-1.5 inline-flex items-center gap-1 rounded-pill bg-flame-600 px-1.5 py-0.5 align-middle text-[10px] font-bold text-white">
+                    <span className="size-1.5 animate-pulse rounded-full bg-white" /> AO VIVO
+                  </span>
+                )}
               </p>
             ) : (
               <p className="mt-1 text-sm text-ink-600">
@@ -106,7 +125,16 @@ export function RankingPage() {
 
       {/* Toggle métrica */}
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-ink-400">Classificação</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-ink-400">
+            Classificação
+          </h2>
+          {anyLive && (
+            <span className="inline-flex items-center gap-1 rounded-pill bg-flame-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+              <span className="size-1.5 animate-pulse rounded-full bg-white" /> AO VIVO
+            </span>
+          )}
+        </div>
         <button
           type="button"
           onClick={() => setMetric((m) => (m === "pontos" ? "detalhe" : "pontos"))}
@@ -132,7 +160,13 @@ export function RankingPage() {
       ) : (
         <div className="space-y-1.5">
           {rows.map((r) => (
-            <RankRow key={r.user_id} row={r} isMe={r.user_id === user?.id} metric={metric} />
+            <RankRow
+              key={r.user_id}
+              row={r}
+              isMe={r.user_id === user?.id}
+              metric={metric}
+              movementActive={movementActive}
+            />
           ))}
         </div>
       )}
@@ -166,7 +200,17 @@ function Tab({
   );
 }
 
-function RankRow({ row, isMe, metric }: { row: RTBRow; isMe: boolean; metric: Metric }) {
+function RankRow({
+  row,
+  isMe,
+  metric,
+  movementActive,
+}: {
+  row: RTBLiveRow;
+  isMe: boolean;
+  metric: Metric;
+  movementActive: boolean;
+}) {
   const medal = row.rank === 1 ? "🥇" : row.rank === 2 ? "🥈" : row.rank === 3 ? "🥉" : null;
   const aproveitamento = row.jogos > 0 ? Math.round((row.pontos / (row.jogos * 3)) * 100) : 0;
   return (
@@ -176,8 +220,16 @@ function RankRow({ row, isMe, metric }: { row: RTBRow; isMe: boolean; metric: Me
         isMe && "bg-surface-2 ring-brand-600",
       )}
     >
-      <span className="grid size-8 shrink-0 place-items-center text-sm font-bold tabular-nums text-ink-700">
-        {medal ?? row.rank}
+      <span className="flex w-9 shrink-0 items-center justify-center gap-0.5 text-sm font-bold tabular-nums text-ink-700">
+        <span>{medal ?? row.rank}</span>
+        {movementActive &&
+          (row.rank_anterior === row.rank ? (
+            <Minus className="size-3 text-ink-300" aria-label="manteve a posição" />
+          ) : row.rank_anterior > row.rank ? (
+            <ArrowUp className="size-3 text-grass-600" aria-label="subiu" />
+          ) : (
+            <ArrowDown className="size-3 text-flame-600" aria-label="desceu" />
+          ))}
       </span>
       <Avatar src={row.avatar_url} name={row.display_name} size="sm" />
       <div className="min-w-0 flex-1">
@@ -204,7 +256,12 @@ function RankRow({ row, isMe, metric }: { row: RTBRow; isMe: boolean; metric: Me
         )}
       </div>
       <div className="text-right tabular-nums">
-        <p className="text-base font-extrabold text-ink-950">
+        <p
+          className={cn(
+            "text-base font-extrabold",
+            metric !== "detalhe" && row.live_scoring ? "text-flame-600" : "text-ink-950",
+          )}
+        >
           {metric === "detalhe" ? `${aproveitamento}%` : row.pontos}
         </p>
         <p className="text-[10px] uppercase tracking-wide text-ink-400">

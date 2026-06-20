@@ -86,6 +86,9 @@ export function LigaDetailPage() {
     );
     return {
       payers: potPayers.confirmed,
+      // prizes (cents por colocação) seguem pra ClassificacaoTab recalcular o
+      // prêmio sobre a classificação AO VIVO; prizeByUserId é o FINAL (share).
+      prizes,
       prizeByUserId: prizeByUser(standings, potPayers.confirmed, prizes),
     };
   }, [potOn, potLc, potPayers, activeLcId, standings]);

@@ -98,6 +98,69 @@ export type MyRTBRank = {
   total_resultadistas: number;
 };
 
+// ── Resultadismo The Best AO VIVO ──────────────────────────────────────────
+// Espelha os hooks acima, mas projeta os jogos em andamento (RPCs *_live).
+// rank_anterior = posição no consolidado (só encerrados) → setas durante o ao
+// vivo. ao_vivo = tenho jogo rolando no recorte; live_scoring = estou marcando
+// ponto agora (pinta em vermelho). É SÓ exibição — o oficial segue no final.
+export type RTBLiveRow = RTBRow & {
+  rank_anterior: number;
+  ao_vivo: boolean;
+  live_scoring: boolean;
+};
+export type MyRTBLiveRank = MyRTBRank & {
+  rank_anterior: number;
+  ao_vivo: boolean;
+  live_scoring: boolean;
+};
+
+// Unifica o recorte num array (null = todos): "que eu jogo" já é array; um
+// campeonato vira [id]; "Todos" → null.
+function resolveCompIds(filter: RTBFilter): string[] | null {
+  if (Array.isArray(filter.competitionIds)) return filter.competitionIds;
+  if (filter.competitionId) return [filter.competitionId];
+  return null;
+}
+
+/** Top N do Resultadismo The Best, AO VIVO (com setas + selo ao vivo). */
+export function useGlobalStandingsLive(filter: RTBFilter = {}, limit = 50) {
+  const ids = resolveCompIds(filter);
+  return useQuery({
+    queryKey: ["rtb-standings-live", filter, limit],
+    staleTime: 15_000,
+    refetchInterval: (query) =>
+      (query.state.data as RTBLiveRow[] | undefined)?.some((r) => r.ao_vivo) ? 15_000 : 45_000,
+    queryFn: async (): Promise<RTBLiveRow[]> => {
+      const { data, error } = await rpcCall<RTBLiveRow[]>("get_global_standings_live", {
+        p_competition_ids: ids,
+        p_limit: limit,
+      });
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    },
+  });
+}
+
+/** Minha posição no Resultadismo The Best, AO VIVO. */
+export function useMyGlobalRankLive(filter: RTBFilter = {}) {
+  const { user } = useAuth();
+  const ids = resolveCompIds(filter);
+  return useQuery({
+    enabled: !!user,
+    queryKey: ["rtb-my-rank-live", user?.id, filter],
+    staleTime: 15_000,
+    refetchInterval: (query) =>
+      (query.state.data as MyRTBLiveRank | null | undefined)?.ao_vivo ? 15_000 : 45_000,
+    queryFn: async (): Promise<MyRTBLiveRank | null> => {
+      const { data, error } = await rpcCall<MyRTBLiveRank[]>("get_my_global_rank_live", {
+        p_competition_ids: ids,
+      });
+      if (error) throw new Error(error.message);
+      return (data ?? [])[0] ?? null;
+    },
+  });
+}
+
 /** Posição do Resultadista logado num recorte (default: tudo). */
 export function useMyGlobalRank(
   filter: { competitionId?: string | null; year?: number | null; competitionIds?: string[] | null } = {},
@@ -138,7 +201,9 @@ export function useSetGlobalRankingVisibility() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["rtb-standings"] });
+      qc.invalidateQueries({ queryKey: ["rtb-standings-live"] });
       qc.invalidateQueries({ queryKey: ["rtb-my-rank"] });
+      qc.invalidateQueries({ queryKey: ["rtb-my-rank-live"] });
       qc.invalidateQueries({ queryKey: ["profile-me"] });
     },
   });

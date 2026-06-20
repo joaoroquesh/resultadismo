@@ -34,14 +34,15 @@ import {
   useJoinByCode,
   usePublicLeagues,
   useJoinPublicLeague,
-  useMyLeaguePositions,
+  useMyLeaguePositionsLive,
   useLeaguesMembersPreview,
   type MyLeague,
   type PublicLeague,
   type LeaguePosition,
   type MemberAvatar,
 } from "./api";
-import { useMyGlobalRank } from "@/features/ranking/api";
+import { useMyGlobalRankLive } from "@/features/ranking/api";
+import { useMatchesRealtime } from "@/features/matches/api";
 import {
   useFavoriteGroups,
   useToggleFavoriteGroup,
@@ -57,8 +58,11 @@ export function LigasPage() {
   const [code, setCode] = useState<string>(() => getStoredInvite());
 
   const leagueIds = useMemo(() => (leagues ?? []).map((l) => l.id), [leagues]);
-  const { data: positions } = useMyLeaguePositions(leagueIds);
+  const { data: positions } = useMyLeaguePositionsLive(leagueIds);
   const { data: membersPreview } = useLeaguesMembersPreview(leagueIds);
+  // Realtime de todas as competições: o preview (posição/pontos) e o card do RTB
+  // se mexem AO VIVO junto com o placar. Repoll de 15s reforça enquanto há jogo.
+  useMatchesRealtime(undefined);
   const { data: favIds = [] } = useFavoriteGroups();
   const toggleFav = useToggleFavoriteGroup();
   const favSet = useMemo(() => new Set(favIds), [favIds]);
@@ -263,8 +267,15 @@ function FavoriteGroupSlide({
           <Escudo src={league.logo_url} name={league.name} size="sm" />
           <div className="min-w-0">
             <p className="truncate text-sm font-bold text-ink-900">{groupDisplayName(league)}</p>
-            <p className="text-[11px] text-ink-500">
-              {position ? `Você é o ${position.rank}º de ${position.total}` : "Classificação"}
+            <p className="flex items-center gap-1.5 text-[11px] text-ink-500">
+              <span className="truncate">
+                {position ? `Você é o ${position.rank}º de ${position.total}` : "Classificação"}
+              </span>
+              {position?.ao_vivo && (
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-pill bg-flame-600 px-1.5 py-0.5 text-[9px] font-bold uppercase text-white">
+                  <span className="size-1 animate-pulse rounded-full bg-white" /> ao vivo
+                </span>
+              )}
             </p>
           </div>
         </Link>
@@ -302,7 +313,14 @@ function GroupRankRowMini({ row }: { row: GroupRankRow }) {
         {row.is_me && <Badge tone="brand" className="text-[10px]">você</Badge>}
       </p>
       <div className="shrink-0 text-right tabular-nums">
-        <span className="text-base font-extrabold text-ink-950">{row.pontos}</span>
+        <span
+          className={cn(
+            "text-base font-extrabold",
+            row.live_scoring ? "text-flame-600" : "text-ink-950",
+          )}
+        >
+          {row.pontos}
+        </span>
         <span className="ml-0.5 text-[10px] uppercase tracking-wide text-ink-400">pts</span>
       </div>
     </li>
@@ -312,7 +330,7 @@ function GroupRankRowMini({ row }: { row: GroupRankRow }) {
 // Resultadismo The Best COMPACTO — só título + "ver ranking" + minha posição
 // geral (sem pontuação, a pedido). A classificação completa fica em /ranking.
 function RTBMiniCard() {
-  const { data: myRank } = useMyGlobalRank({});
+  const { data: myRank } = useMyGlobalRankLive({});
   return (
     <Card className="mb-2 mt-3 flex items-center justify-between gap-3 p-3.5">
       <div className="flex min-w-0 items-center gap-2.5">
@@ -321,14 +339,22 @@ function RTBMiniCard() {
         </span>
         <div className="min-w-0">
           <p className="text-sm font-extrabold tracking-tight text-ink-950">Resultadismo The Best</p>
-          <p className="truncate text-xs text-ink-500">
+          <p className="flex items-center gap-1.5 text-xs text-ink-500">
             {myRank ? (
               <>
-                Você é o <span className="font-bold tabular-nums text-ink-800">{myRank.rank}º</span> de{" "}
-                {myRank.total_resultadistas}
+                <span className="truncate">
+                  Você é o{" "}
+                  <span className="font-bold tabular-nums text-ink-800">{myRank.rank}º</span> de{" "}
+                  {myRank.total_resultadistas}
+                </span>
+                {myRank.ao_vivo && (
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-pill bg-flame-600 px-1.5 py-0.5 text-[9px] font-bold uppercase text-white">
+                    <span className="size-1 animate-pulse rounded-full bg-white" /> ao vivo
+                  </span>
+                )}
               </>
             ) : (
-              "Faça seu primeiro palpite e entre na disputa."
+              <span className="truncate">Faça seu primeiro palpite e entre na disputa.</span>
             )}
           </p>
         </div>
@@ -403,14 +429,7 @@ function GroupCard({
             )}
           </p>
         </div>
-        {position && !pending && (
-          <div className="shrink-0 rounded-md bg-brand-600 px-2 py-1 text-right leading-none">
-            <span className="text-base font-extrabold tabular-nums text-white">
-              {position.rank}º
-            </span>
-            <span className="ml-0.5 text-[10px] text-white/70">/{position.total}</span>
-          </div>
-        )}
+        {position && !pending && <GroupPositionBadge position={position} />}
       </Link>
 
       <div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-3">
@@ -455,6 +474,25 @@ function GroupCard({
         </div>
       </div>
     </Card>
+  );
+}
+
+// Badge "Nº/total" do grupo. AO VIVO → vira flame + ponto pulsante (a posição
+// está mudando agora com o placar ao vivo).
+function GroupPositionBadge({ position }: { position: LeaguePosition }) {
+  return (
+    <div
+      className={cn(
+        "relative shrink-0 rounded-md px-2 py-1 text-right leading-none",
+        position.ao_vivo ? "bg-flame-600" : "bg-brand-600",
+      )}
+    >
+      {position.ao_vivo && (
+        <span className="absolute -right-1 -top-1 size-2 animate-pulse rounded-full bg-flame-500 ring-2 ring-surface" />
+      )}
+      <span className="text-base font-extrabold tabular-nums text-white">{position.rank}º</span>
+      <span className="ml-0.5 text-[10px] text-white/70">/{position.total}</span>
+    </div>
   );
 }
 

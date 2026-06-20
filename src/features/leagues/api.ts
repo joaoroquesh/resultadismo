@@ -326,7 +326,7 @@ export function useJoinPublicLeague() {
  * Minha posição em cada grupo (batch), exata porque o RPC delega ao
  * get_league_standings. Retorna um mapa league_id → {rank, total, pontos}.
  */
-export type LeaguePosition = { rank: number; total: number; pontos: number };
+export type LeaguePosition = { rank: number; total: number; pontos: number; ao_vivo?: boolean };
 
 export function useMyLeaguePositions(leagueIds: string[]) {
   const { user } = useAuth();
@@ -343,6 +343,33 @@ export function useMyLeaguePositions(leagueIds: string[]) {
       const out: Record<string, LeaguePosition> = {};
       for (const r of data ?? []) {
         out[r.league_id] = { rank: r.rank, total: r.total, pontos: r.pontos };
+      }
+      return out;
+    },
+  });
+}
+
+/** Posições dos meus grupos AO VIVO (preview da aba Grupos). Mesma forma do
+ * hook acima + ao_vivo por grupo; projeta os jogos em andamento (placar live). */
+export function useMyLeaguePositionsLive(leagueIds: string[]) {
+  const { user } = useAuth();
+  const key = [...leagueIds].sort().join(",");
+  return useQuery({
+    enabled: !!user && leagueIds.length > 0,
+    queryKey: ["my-league-positions-live", user?.id, key],
+    staleTime: 15_000,
+    refetchInterval: (query) => {
+      const data = query.state.data as Record<string, LeaguePosition> | undefined;
+      return data && Object.values(data).some((p) => p.ao_vivo) ? 15_000 : false;
+    },
+    queryFn: async (): Promise<Record<string, LeaguePosition>> => {
+      const { data, error } = await rpcCall<
+        { league_id: string; rank: number; total: number; pontos: number; ao_vivo: boolean }[]
+      >("get_my_league_positions_live", { p_league_ids: leagueIds });
+      if (error) throw new Error(error.message);
+      const out: Record<string, LeaguePosition> = {};
+      for (const r of data ?? []) {
+        out[r.league_id] = { rank: r.rank, total: r.total, pontos: r.pontos, ao_vivo: r.ao_vivo };
       }
       return out;
     },

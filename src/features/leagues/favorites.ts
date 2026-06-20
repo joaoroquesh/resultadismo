@@ -18,12 +18,16 @@ export type GroupRankRow = {
   saldos: number;
   acertos: number;
   is_me: boolean;
+  /** AO VIVO: este jogador tem jogo rolando; live_scoring = está pontuando agora. */
+  ao_vivo?: boolean;
+  live_scoring?: boolean;
 };
 
 export type GroupRankWindow = { leagueId: string; rows: GroupRankRow[] };
 
 const FAV_KEY = "favorite-groups";
-const WINDOW_KEY = "group-rank-window";
+// chave AO VIVO: a invalidação central (realtime/admin) mira ["group-rank-window-live"].
+const WINDOW_KEY = "group-rank-window-live";
 
 /** IDs dos grupos favoritados, na ordem de favoritar. */
 export function useFavoriteGroups() {
@@ -82,9 +86,13 @@ export function useGroupRankWindows(leagueIds: string[]) {
     queries: leagueIds.map((leagueId) => ({
       enabled: !!user && !!leagueId,
       queryKey: [WINDOW_KEY, leagueId, user?.id],
-      staleTime: 30_000,
+      staleTime: 15_000,
+      // enquanto algum jogo do grupo está rolando, repoll de 15s (além do
+      // realtime); parado, sem poll (realtime/staleTime cuidam).
+      refetchInterval: (query: { state: { data?: GroupRankWindow } }) =>
+        query.state.data?.rows.some((r) => r.ao_vivo) ? 15_000 : false,
       queryFn: async (): Promise<GroupRankWindow> => {
-        const { data, error } = await rpcCall<GroupRankRow[]>("get_group_rank_window", {
+        const { data, error } = await rpcCall<GroupRankRow[]>("get_group_rank_window_live", {
           p_league_id: leagueId,
           p_radius: 1,
         });

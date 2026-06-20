@@ -21,6 +21,17 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ## [Não lançado]
 
 ### Adicionado
+- **AO VIVO consistente em todo o app** (estende a Classificação ao vivo). Agora o **Resultadismo
+  The Best** (ranking global) e os **previews da aba Grupos** (carrossel de favoritos, badge de
+  posição "Nº/total" e o card do RTB) também projetam pontos/posições **ao vivo**, com **setas
+  ↑/↓/—**, selo **AO VIVO** e pontos em vermelho **só pra quem está pontuando** no ao vivo (quem
+  palpitou mas está em erro segue branco). E o **valor do bolão (💰)** passa a **acompanhar a posição
+  ao vivo** (prévia "se acabasse agora" — na tabela; o compartilhar segue no prêmio FINAL). Novas
+  RPCs **aditivas** (migration `20260619120000`): `get_global_standings_live`,
+  `get_my_global_rank_live`, `get_my_league_positions_live`, `get_group_rank_window_live` (as duas de
+  grupo derivam da `get_league_standings_live`; as globais projetam finished+live com `rank_anterior`
+  = consolidado encerrado). Realtime central (todas as competições) + repoll 15/45s. **Segue só
+  exibição:** prêmio pago, confronto e número oficial continuam no **placar FINAL**.
 - **Classificação AO VIVO + setas de movimentação.** Durante jogos ao vivo, a aba Classificação
   passa a projetar os **pontos ao vivo** (roda `compute_score_type` no placar corrente, com pesos da
   liga e joker) e **reordena sozinha** (Realtime de matches + repoll 30s). Cada linha ganha uma seta
