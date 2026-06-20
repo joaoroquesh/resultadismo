@@ -9,9 +9,10 @@ Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 > **Como usar:** toda mudança que sobe ganha uma entrada (passo 7 do protocolo em
 > [`MESTRE.md`](MESTRE.md) §5 / [`08-PROCESSO.md`](08-PROCESSO.md)). Acumule em **[Não lançado]**
 > enquanto desenvolve; ao subir, mova para uma versão datada e atualize o `package.json`.
-> Numeração (ADR 0003): legado = **v0**, **1.x = soft-launch** (última: 1.11.0), **2.0 = Copa** (atual: 2.0.0). As
+> Numeração (ADR 0003): legado = **v0**, **1.x = soft-launch** (última: 1.11.0), **2.0 = Copa** (atual: **2.4.0**; **[Não lançado]** acumula o ao vivo em todo o app → próximo corte **2.5.0**). As
 > versões abaixo foram **relabel 2.x → 1.x** (só o dígito MAJOR; detalhe preservado). A versão **só
-> sobe em release deliberado**, não a cada commit. Evolução anterior em [`HISTORICO.md`](HISTORICO.md).
+> sobe em release deliberado**, não a cada commit. **MAJOR** = marco/overhaul · **MINOR** = recurso
+> perceptível · **PATCH** = correção/refino (ADR 0003). Evolução anterior em [`HISTORICO.md`](HISTORICO.md).
 
 Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **Segurança**,
 **Depreciado**.
@@ -32,6 +33,12 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   grupo derivam da `get_league_standings_live`; as globais projetam finished+live com `rank_anterior`
   = consolidado encerrado). Realtime central (todas as competições) + repoll 15/45s. **Segue só
   exibição:** prêmio pago, confronto e número oficial continuam no **placar FINAL**.
+
+## [2.4.0] — 2026-06-18
+
+> Classificação ao vivo na aba Classificação dos grupos.
+
+### Adicionado
 - **Classificação AO VIVO + setas de movimentação.** Durante jogos ao vivo, a aba Classificação
   passa a projetar os **pontos ao vivo** (roda `compute_score_type` no placar corrente, com pesos da
   liga e joker) e **reordena sozinha** (Realtime de matches + repoll 30s). Cada linha ganha uma seta
@@ -41,6 +48,12 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   rolando. Nova RPC `get_league_standings_live` (migration `20260616140000`); a `get_league_standings`
   segue oficial — **prêmio/pote, confronto e ranking global continuam no placar FINAL** (o ao vivo é
   só exibição). [Corrige de passagem: a nova RPC volta a excluir jogos `hidden` do cálculo.]
+
+## [2.3.0] — 2026-06-16
+
+> Sync resiliente, aba Qualidade e a área de Estudos do admin.
+
+### Adicionado
 - **Conflito de placar só notifica APÓS o jogo terminar.** O alerta/push de conflito entre fontes
   passa a só disparar para jogos **encerrados** (`alertConflicts` filtra `status='finished'`) — acaba o
   spam ao vivo (uma fonte registra o gol antes da outra → divergência momentânea que some sozinha). A
@@ -76,6 +89,12 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   não re-alerta jogo travado. Migration `20260616120000`.
 - **"Comparar fontes" com a mesma cara de "Jogos".** Mesmo **acordeão por dia** e **mesma ordenação**
   (dia de hoje aberto por padrão), em vez da lista plana invertida.
+
+## [2.2.0] — 2026-06-15
+
+> Grupos & Bolão (ondas A/B/C) + admin de campeonatos repensado.
+
+### Adicionado
 - **Admin — gestão de campeonatos & APIs repensada (aba Competições) + Visão enxuta.** A aba
   **Competições** vira a casa de tudo de competição, **agrupada** nos 4 grupos da personalização
   (Seleções · Ligas e estaduais · Copas · Alternativos, colapsáveis). Cada campeonato mostra sua
@@ -169,219 +188,12 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   recebia `doubled`); agora mostra o valor dobrado (ex.: cravada com 2× = +6). E todo palpite que
   usou o **Dobro** ganha um **⚡** ao lado na lista da galera — **sempre**, inclusive quando a
   pessoa não pontuou (ex.: erro com 2×). `ScorePill` ganhou `showZap` pra não duplicar o ícone.
-- **Fileira de dias: hoje agora centraliza DE VERDADE (re-fix).** O fix anterior só centralizava
-  uma vez preso ao escopo; no load frio (logado e em grupo) os jogos/dias chegavam depois e o dia
-  caía à esquerda. Agora a centralização re-roda quando a **lista de dias muda** (`centerKey` com a
-  assinatura dos dias) e a medição é robusta (tenta antes do paint, re-tenta se a largura ainda é 0,
-  re-centra após as fontes carregarem) — sem brigar com o scroll manual depois.
 
-### Alterado
-- **Como Funciona: cada tipo de pontuação agora MOSTRA o exemplo (palpite → resultado).** Em vez de
-  só explicar entre parênteses, cada card ganhou a tira **"Você palpita [2×1] e o jogo termina
-  [2×1]"** em chips tabulares no padrão da landing — cravada (2×1→2×1), saldo (2×0→3×1, com a nota
-  do empate 1×1→2×2), acerto (2×0→1×0) e erro (2×0→0×1); as descrições foram enxugadas. Só front
-  (`features/help/ComoFuncionaPage.tsx`), sem migration. Complementa a "Como funciona reescrita" do
-  2.0.0, que tratou só da reestruturação das seções. (commit `98c2336`)
-- **Palpites da galera: só os SEUS grupos, na ordem dos favoritos, e ranking ao vivo.** O chip
-  "Todos" morreu — palpite de quem não está nos seus grupos não aparece (sem grupo, a área convida
-  a entrar num). Os chips seguem a MESMA ordem da página /grupos (favoritos primeiro, na ordem de
-  favoritar; a estrela ao lado favorita/desfavorita o grupo ativo) e o primeiro abre por padrão.
-  Com o jogo ROLANDO, a lista ordena pela pontuação em curso e mostra só o número colorido ao lado
-  (+6 dourado, +2 verde, +1 azul, 0 cinza) — sem o selo de fundo, que segue só no encerrado.
-  Desempate: vitória do mandante → empate → vitória do visitante; dentro, mais gols do lado
-  decisivo, depois do outro. Encerrado ordena pela mesma régua (pontuação oficial).
+## [2.1.0] — 2026-06-11
 
-### Corrigido
-- **Fileira de dias: hoje nasce CENTRALIZADO e a bolinha de "ao vivo" não corta mais.** (1) Ao
-  abrir/atualizar a página, o dia selecionado (hoje) vem centralizado na fileira, com clamp: se ele
-  está numa ponta, encosta na borda (1º dia → à esquerda, último → à direita) em vez de forçar; a
-  rolagem manual do usuário não é mais desfeita (só re-centra ao trocar de aba de escopo, não a cada
-  toque num dia). `ScrollRow` ganhou `centerSelector`/`centerKey`. (2) O ponto vermelho de jogo ao
-  vivo no tab do dia era cortado no topo pelo `overflow` da fileira; agora há respiro vertical
-  (`py-1.5`) e ele aparece inteiro.
-- **Sync: sigla (TLA) deixou de ser chave de matching de time — "Camboja 2×0 Hong Kong" não vira
-  mais "Atlético-MG 2×0 Hong Kong".** O gerador do mapa canônico (`gen-teams-catalog.mjs`)
-  indexava também o TLA de cada time; a abreviação da ESPN pra países sem cadastro colidia com
-  sigla de clube e o sync gravava o clube no lugar da seleção (auditoria: Camboja→Atlético-MG e
-  Comores→Como **já em prod** nos amistosos pré-Copa; Grécia→Grêmio, Botswana→Botafogo e
-  Bahamas→Bahia eram minas armadas). Agora só slug/nome/short/aliases viram chave (sigla fica
-  para os fallbacks `TEAM_PT`/`COUNTRY_EN_PT` do sync) e **Camboja, Comores e Grécia** entraram
-  no registro como seleções (Grécia casou o `grecia.svg` que já existia). Auditoria pós-fix:
-  182 seleções da ESPN, zero caem em clube; nenhuma chave existente mudou de dono. Migration
-  `20260611150000` corrige os dados já gravados (2 times + 3 jogos; placar/pontuação intactos).
-- **Seleções de amistoso sem cadastro apareciam em inglês e sem escudo ("Argentina × Iceland").**
-  O registro tinha só 69 seleções; o que a ESPN mandava fora dele ficava com o nome cru em inglês
-  no banco e o escudo caía no quadradinho de sigla (`teamCrestPath("Iceland")` → slug "iceland"
-  não existe; o arquivo é `islandia.svg`). Varredura contra os dados reais de prod (REST anônimo:
-  tabela `teams` + nomes dos 180 jogos): **77 seleções novas** no `data/teams-registry.json` com
-  os aliases em inglês exatos das APIs (Iceland, Slovakia, Kazakhstan, "Cent Afr Rep",
-  "Trin & Tob"…); 20 casaram escudo que já existia (`islandia.svg`, `russia.svg`, `hungria.svg`…).
-  Pós-`gen:all`: todos os nomes de prod resolvem (sobram só clubes — fora do escopo — e o
-  placeholder "Time"); nenhuma chave existente do canônico mudou de dono. Jogos já gravados em
-  inglês se corrigem sozinhos no próximo sync em modo `catalog` (modo `scores` não toca nome).
-  Obs.: Guam e Guatemala têm a mesma sigla (GUA) — cadastrá-los só ficou seguro com o fix do TLA
-  acima, que subiu primeiro. Efeito colateral: o seletor de "seleção que torce"
-  (perfil/onboarding) passa de 69 pra 146 opções, 59 sem bandeira.
-- **Competições apagadas por engano no admin RESTAURADAS (com os "seguindo" intactos).** O João
-  apagou 16 campeonatos em rascunho (Copa América, Eurocopa, Nations League, as 5 Eliminatórias,
-  Saudi Pro League, Primeira Liga, Eredivisie, Süper Lig, Pro League BEL, Premiership SCO, Super
-  League GR) sem saber que o delete é HARD e que rascunho aparece na personalização — eles sumiram
-  da tela de campeonatos. A migration `20260611200000` recria cada um **com o MESMO id de antes**
-  (fonte: `admin_audit_log`, que guarda id+nome de cada exclusão): como `followed_competition_ids`
-  (uuid[]) e `followed_teams` (jsonb) não têm FK, os IDs ficaram nos perfis e **religam sozinhos**
-  — ninguém perde o que tinha selecionado (única perda: `favorite_competition_id`, FK SET NULL,
-  irrecuperável sem backup). Idempotente, só-INSERT com guardas (id/provider_code/slug), validada
-  na simulação local (restaura + religa + lista na personalização + no-op na 2ª execução).
-- **Imagem de palpites: selo da pontuação alinhado e raio visível na cravada.** O ⚡ era um emoji
-  no canvas: métrica própria desalinhava/"quebrava" a linha do selo e, amarelo sobre o fundo
-  dourado da cravada, ele sumia. Agora o raio do 2× é **desenhado** (polígono) na mesma baseline
-  do texto, escuro no dourado e branco nos demais. De quebra: o escudo passa a ser buscado pelo
-  **nome completo** do time (o curto abreviado tipo "Á. do Sul" caía no quadradinho de sigla) e o
-  nome completo vira o rótulo quando cabe — África do Sul com bandeira e por extenso.
+> Pós-lançamento da Copa: o mini-jogo Resultadismo Retrô e a base de Grupos & Bolão.
 
 ### Adicionado
-- **Grupo aguardando aprovação agora avisa os admins** (sininho + push, link direto pra
-  `Admin → Grupos`). Lacuna confirmada em produção: no modo grátis o grupo nasce `pending`
-  esperando liberação, mas nenhum trigger cobria esse caminho — 3 grupos foram aprovados sem
-  ninguém ser avisado (o alerta `name_review` pertence só ao fluxo de pagamento). Trigger novo
-  `notify_admins_group_pending` com dedupe padrão de 6h por grupo. Validado em transação no banco
-  local (INSERT como o front faz → 1 alerta por admin → rollback). → [`04`](04-ADMIN.md).
-- **Painel de Avisos mostra o alcance real do push**: "Push no aparelho: N aparelhos (M pessoas) —
-  o resto recebe só no sininho" (RPC nova `admin_push_stats`, só app-admin). Evita a impressão de
-  que o aviso vira push pra todo o segmento.
-- **`send-push` não engole mais erro de entrega**: cada falha vira log no dashboard (status +
-  motivo + sufixo do endpoint) e a resposta passa a ser `{sent, total, failed[]}` — consultável em
-  `net._http_response` pra diagnóstico definitivo (o silêncio de 10–11/06 ficou sem causa exata
-  justamente por falta disso; a investigação confirmou criação/envio/exibição funcionando hoje).
-- **Aba "Grupos" na página de jogos: os palpites que valem ponto nunca somem.** Quem personalizou
-  "só Brasil" mas está num grupo que conta outras seleções vê os jogos do grupo numa aba própria.
-  Ordem das abas: **Interesses** (encurtada; só personalização) → **Grupos** (união dos recortes dos
-  meus grupos, inclusive pendentes de aprovação; é o **padrão** quando a pessoa tem grupo) →
-  **Todos** → competições. **Coachmark** na 1ª visita explica a aba. As fileiras de abas e de dias
-  usam o novo **`ScrollRow`** (componente de UI): **degradê nas bordas** quando há mais conteúdo pra
-  arrastar, sumindo no fim do scroll. → [`03`](03-PAGINAS.md).
-- **Anúncio in-app da Gestão do Bolão na home.** Pop-up (`NovidadeBolaoModal`) que aparece **uma
-  vez** na tela de Jogos pra quem já passou do 1º acesso, listando o que dá pra fazer: definir o
-  valor da inscrição, marcar quem pagou, configurar a divisão do prêmio (1º/2º/3º) e ver na
-  classificação quem está levando, com o disclaimer de que o dinheiro continua fora do app. **Não
-  colide com o tour guiado** dos novatos: o tour passou a emitir `resultadismo:tour-done` ao
-  fechar, e o modal só abre depois disso (veteranos, que já têm o flag do tour, veem na hora).
-  CTAs "Ver meus grupos" (→ /grupos) e "Agora não".
-
-### Alterado
-- **Imagem de palpites junta jogos de DIAS diferentes.** A seleção não se perde ao trocar a aba
-  de dia: marca o de ontem, troca a aba, marca o de hoje e gera UMA imagem — em ordem de horário e
-  com a **data pequenininha** em cada jogo ("QUA 10/06") pra dar o contexto. A barra ensina ("1
-  jogo — toque em mais (até de outro dia)"); trocar de escopo zera a seleção. No caminho, corrigido
-  um crash de tela branca pra usuário logado que existia só no working tree de hoje (estado da
-  seleção lido antes de declarar) — nunca chegou em produção.
-- **Compartilhar vários jogos ficou achável.** O ícone no card ganhou o rótulo "compartilhar"
-  e **abre o modo de seleção já com aquele jogo marcado** — a barra ("1 jogo — toque em mais
-  pra juntar" → "Gerar imagem") ensina o gesto; tocar nos outros cards soma na mesma imagem.
-  Antes, o único jeito de juntar jogos era um botão no fim da fileira de dias (segue lá como
-  atalho), que podia ficar fora da tela. De quebra, jogo no "ao vivo automático" (agendado que
-  já começou há <4h) agora também conta como selecionável, na mesma régua do card.
-
-### Corrigido
-- **Coachmark da Gestão aponta pra aba certa (não mais pro canto).** Depois que a aba virou a 3ª
-  (com a 4ª "Competições" à direita) e a fileira ganhou rolagem, a seta/balão da dica de novidade
-  miravam o fim da fileira. O `Coachmark` ganhou `caretTargetSelector`: mede o botão alvo
-  (`[data-value='bolao']`), traz ele à vista no trilho rolável e ancora a **seta, o balão (com
-  clamp pra não vazar da tela) e o anel de destaque** sobre a aba **Gestão**, onde quer que ela
-  esteja. O `SegmentedControl` passou a marcar cada botão com `data-value`.
-- **Selo de prêmio (💰) não sobrepõe mais as cravadas no mobile.** Em telas pequenas o valor da
-  premiação encostava na coluna CRA. Agora, quando o jogador leva prêmio, a 2ª linha mostra **só o
-  selo** (esconde "X jogos") e as colunas numéricas do resumo encolhem um tico — o 💰 fica colado à
-  esquerda, longe das cravadas (validado até 320px com nome longo). Quem não leva prêmio segue com
-  "X jogos"; grupos sem bolão não mudam nada.
-- **JogosPage: memoização do `dayMatches` restaurada na ordem certa.** O erro do React Compiler
-  ("Existing memoization could not be preserved") era causado pelas funções de compartilhar
-  declaradas **antes** do `dayMatches` que elas leem; o hotfix anterior tirou o `useMemo` e deixou
-  2 avisos de deps. Agora o bloco de share vem **depois** da declaração e o `useMemo` voltou —
-  lint zerou no arquivo (sobrou só o aviso de complexidade do backlog).
-- **Abas do grupo não quebram mais no mobile (aba Gestão).** Com 4 abas, o `SegmentedControl`
-  estourava a largura da tela em celulares. Agora o conteúdo **rola lateralmente DENTRO da
-  pílula** (labels nunca quebram linha) com o **degradê do `ScrollRow`** na cor da pílula
-  avisando que tem mais aba pra arrastar — mesmo padrão das fileiras de Jogos (regra 9). O
-  `ScrollRow` ganhou a prop `fadeClassName` pra usar o fade fora do fundo da página. Vale pros
-  9 usos do componente (Retrô, Nova Liga, admin etc.): quando as opções cabem, nada muda
-  (continuam esticando); quando não cabem, rola em vez de quebrar.
-- **Link de convite pra quem já é de casa.** Quem abre um link `?convite=` e **já concluiu** o
-  1º acesso vai direto pra **/grupos com o código preenchido** (só na visita do clique — flag de
-  sessão consumida; visitas normais seguem nos Jogos). Quem ainda não concluiu continua caindo no
-  wizard, que já preenche o convite.
-- **Onboarding: dois bugs do fluxo.** (1) O campo de convite aparecia com um **UUID aleatório** —
-  era o `?code=` do **callback do OAuth do Google** sendo capturado como convite; agora só `?convite=`
-  conta, com formato validado (`A–Z0–9`, 3–12) e auto-limpeza do lixo já salvo no aparelho.
-  (2) **Concluir voltava pra primeira tela**: corrida entre o navegar e o `done=true` chegar — o
-  cache agora é marcado otimisticamente no Concluir/Pular tudo, o gate nunca mais lê estado velho.
-- **Listagens da Copa só com as 48 classificadas (Itália fora).** O recorte do grupo e a lista de
-  times da Copa na personalização mostravam o catálogo inteiro de seleções (66) — incluindo quem
-  não se classificou (Itália etc.). Agora há `WC2026_SLUGS` no `teamsCatalog` com as **48
-  classificadas**, extraídas dos **próprios jogos da Copa em produção** (104 partidas, 48/48
-  mapeadas pros slugs do catálogo, fonte: o banco): `catalogWcNations()` no seletor do recorte e
-  `teamsForCompetition` filtrando os códigos da Copa (`WC`/`fifa.world`). **Amistosos e a "seleção
-  da torcida" seguem com as 66** (a Itália joga amistosos e pode ser a seleção do coração).
-
-### Adicionado
-- **Favoritar grupo → prévia da classificação no topo da /grupos.** O usuário marca a **estrela**
-  num grupo e a **prévia da classificação dele** (janela de 3: você + vizinhos de cima e de baixo)
-  sobe pro topo, no lugar do Resultadismo The Best. Favoritou vários → vira um **carrossel** (com
-  bolinhas), na ordem que favoritou. A prévia de um grupo **só aparece quando ele já tem pontuação**
-  na competição-bolão dele (antes da Copa, fica de fora). O **Resultadismo The Best** virou um
-  **card pequeno**: só título + "ver ranking" + **minha posição geral (sem pontuação)**. Banco:
-  `profiles.favorite_group_ids` (ordenado) + RPCs `toggle_favorite_group` (valida ser membro) e
-  `get_group_rank_window` (janela por grupo, visão Pontos, com o gate de pontuação); hooks isolados
-  em `features/leagues/favorites.ts`. Migration `20260610190000`. → [`03`](03-PAGINAS.md),
-  [`06`](06-REGRAS-DE-NEGOCIO.md) §4.
-- **Pontuação prévia AO VIVO + compartilhar placar como imagem.** (1) Com o jogo rolando, o
-  palpite mostra como está pontuando: borda do placar na cor do tipo (dourado/verde/azul; cinza no
-  erro) + texto plano ("Cravada +3"), sem o chip de resultado final — volta da v0, mais suave.
-  (2) Botão de **compartilhar** no card (live/encerrado) gera uma **imagem da marca** (escudos,
-  placar, palpite, selo da pontuação e total) via Web Share/download; e dá pra **selecionar vários
-  jogos do dia** ("Compartilhar" na fileira de dias → toca nos cards → Gerar imagem).
-- **Gestão do Bolão — organize o bolão do grupo dentro do app (sem dinheiro no app).** Nova aba
-  **Gestão** na página do grupo (ADR [`0009`](decisions/0009-gestao-bolao.md)): o admin ativa,
-  define o **valor da inscrição** e a **divisão do prêmio** (% pro 1º/2º/3º, com presets), e marca
-  **quem pagou** (botão $ na aba Membros); o app calcula o prêmio total (pagantes × valor) e mostra
-  na classificação o **selo 💰** de quem está levando o quê — prêmio disputado **só entre
-  pagantes**, sobras ficam no "caixa do grupo". O **dono** trava/destrava as definições quando o
-  combinado fechar (dica: antes de a Copa começar). Tudo enforçado **no banco** (migration
-  `20260610200000`: colunas `pot_*` em `league_competitions` + tabela `league_pot_payers`, RLS
-  só-membros, triggers de trava/dono). **Nenhum dinheiro passa pelo app** — disclaimers fixos na
-  aba, cláusula nova nos **Termos** (§5) e seção no **Como Funciona**; anúncio por broadcast +
-  coachmark na página do grupo. → [`06`](06-REGRAS-DE-NEGOCIO.md) §5, [`03`](03-PAGINAS.md).
-- **Tour guiado de 1º acesso (coach-marks na UI real).** Depois da personalização **e** do carrossel
-  de boas-vindas, um **tour guiado** (`GuidedTour`) acende, em sequência, os pontos reais da tela: a
-  **barra de filtros de Jogos** (Meus interesses × Todos), a aba **Grupos** (criar grupo + o
-  **Resultadismo The Best**, ranking de todo mundo) e a aba **Perfil**. Roda inteiro em `/`, mede o
-  alvo **visível** (mobile: nav de baixo → balão acima / desktop: sidebar → balão ao lado) e reusa a
-  linguagem do `Coachmark` (anel turquesa + balão escuro). Aparece **uma vez** (`localStorage`
-  `resultadismo-tour-v1`), refazível pelo admin (Perfil → "Rever tour"). De brinde, o **carrossel de
-  boas-vindas foi enxugado para 3 slides** (o slide "Dispute em grupos" virou o **passo 2 do tour**,
-  sem avisar de Grupos duas vezes). Alvos marcados com `data-tour` em
-  `JogosPage`/`BottomNav`/`Sidebar`; só frontend (sem migration). → [`03`](03-PAGINAS.md) §3.
-- **Aba "Grupos" na página de jogos: os palpites que valem ponto nunca somem.** Quem personalizou
-  "só Brasil" mas está num grupo que conta outras seleções vê os jogos do grupo numa aba própria.
-  Ordem das abas: **Interesses** (encurtada; só personalização) → **Grupos** (união dos recortes dos
-  meus grupos, inclusive pendentes de aprovação; é o **padrão** quando a pessoa tem grupo) →
-  **Todos** → competições. **Coachmark** na 1ª visita explica a aba. As fileiras de abas e de dias
-  usam o novo **`ScrollRow`** (componente de UI): **degradê nas bordas** quando há mais conteúdo pra
-  arrastar, sumindo no fim do scroll. → [`03`](03-PAGINAS.md).
-- **Recorte de seleções do grupo editável até a Copa começar.** Quem criou o grupo sem reparar no
-  recorte ("Todas" × "Só o Brasil" × escolhidas) agora pode **ajustar na aba Competições** (card
-  "Seleções que valem ponto", só admin) enquanto **nenhum jogo da Copa tiver começado** — depois
-  do 1º jogo trava (mudar no meio retroagiria o ranking). Trava **no banco** (trigger
-  `trg_lc_team_scope_window`, migration `20260610180000`) + RPC `team_scope_window` pro front
-  mostrar o estado; seletor único `TeamScopeSelector` compartilhado entre a criação e a edição
-  (a criação agora avisa "dá pra mudar até a Copa começar"). → [`06`](06-REGRAS-DE-NEGOCIO.md) §4.
-- **Convite de grupo com o texto de divulgação completo.** O compartilhamento do código (card do
-  grupo em `/grupos` e botão da página do grupo) agora usa o **pitch de marketing aprovado pelo
-  João** ("🏆 Achei o melhor bolão pra Copa do Mundo!" + benefícios) fechando com **"Entre no meu
-  grupo \"nome\"" + código + link parametrizado** (`?convite=CÓDIGO`, que preenche o campo sozinho
-  no 1º acesso). Texto unificado em `features/leagues/inviteShare.ts` (regra 9: os dois pontos de
-  share falam a mesma coisa); grupo público compartilhado da vitrine sai sem código, apontando
-  `/grupos`. Corrigido o typo "Entra na meu grupo" e o card passou a registrar o evento `share`.
 - **Mini-jogo Resultadismo Retrô — EM PRODUÇÃO em `/retro` (2026-06-10, teste com amigos
   autorizado pelo João).** Fases 1–3 + rodada 1 de homologação + Fase 4. Pós-deploy/Fase 4:
   correção de contraste (placar eletrônico **sempre escuro** nos dois temas, tokens
@@ -512,8 +324,204 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   `retro_my_stats` na migration `20260610150002`); rotas públicas no `App.tsx`; validado com
   typecheck + lint zerado + check:arch + E2E Playwright (Chrome real, run anônima completa, zero
   erros de console). Ao subir: atualizar `.claude/05` §2 e criar `.claude/12-RETRO-MINIJOGO.md`.
+- **Gestão do Bolão — organize o bolão do grupo dentro do app (sem dinheiro no app).** Nova aba
+  **Gestão** na página do grupo (ADR [`0009`](decisions/0009-gestao-bolao.md)): o admin ativa,
+  define o **valor da inscrição** e a **divisão do prêmio** (% pro 1º/2º/3º, com presets), e marca
+  **quem pagou** (botão $ na aba Membros); o app calcula o prêmio total (pagantes × valor) e mostra
+  na classificação o **selo 💰** de quem está levando o quê — prêmio disputado **só entre
+  pagantes**, sobras ficam no "caixa do grupo". O **dono** trava/destrava as definições quando o
+  combinado fechar (dica: antes de a Copa começar). Tudo enforçado **no banco** (migration
+  `20260610200000`: colunas `pot_*` em `league_competitions` + tabela `league_pot_payers`, RLS
+  só-membros, triggers de trava/dono). **Nenhum dinheiro passa pelo app** — disclaimers fixos na
+  aba, cláusula nova nos **Termos** (§5) e seção no **Como Funciona**; anúncio por broadcast +
+  coachmark na página do grupo. → [`06`](06-REGRAS-DE-NEGOCIO.md) §5, [`03`](03-PAGINAS.md).
+- **Favoritar grupo → prévia da classificação no topo da /grupos.** O usuário marca a **estrela**
+  num grupo e a **prévia da classificação dele** (janela de 3: você + vizinhos de cima e de baixo)
+  sobe pro topo, no lugar do Resultadismo The Best. Favoritou vários → vira um **carrossel** (com
+  bolinhas), na ordem que favoritou. A prévia de um grupo **só aparece quando ele já tem pontuação**
+  na competição-bolão dele (antes da Copa, fica de fora). O **Resultadismo The Best** virou um
+  **card pequeno**: só título + "ver ranking" + **minha posição geral (sem pontuação)**. Banco:
+  `profiles.favorite_group_ids` (ordenado) + RPCs `toggle_favorite_group` (valida ser membro) e
+  `get_group_rank_window` (janela por grupo, visão Pontos, com o gate de pontuação); hooks isolados
+  em `features/leagues/favorites.ts`. Migration `20260610190000`. → [`03`](03-PAGINAS.md),
+  [`06`](06-REGRAS-DE-NEGOCIO.md) §4.
+- **Pontuação prévia AO VIVO + compartilhar placar como imagem.** (1) Com o jogo rolando, o
+  palpite mostra como está pontuando: borda do placar na cor do tipo (dourado/verde/azul; cinza no
+  erro) + texto plano ("Cravada +3"), sem o chip de resultado final — volta da v0, mais suave.
+  (2) Botão de **compartilhar** no card (live/encerrado) gera uma **imagem da marca** (escudos,
+  placar, palpite, selo da pontuação e total) via Web Share/download; e dá pra **selecionar vários
+  jogos do dia** ("Compartilhar" na fileira de dias → toca nos cards → Gerar imagem).
+- **Tour guiado de 1º acesso (coach-marks na UI real).** Depois da personalização **e** do carrossel
+  de boas-vindas, um **tour guiado** (`GuidedTour`) acende, em sequência, os pontos reais da tela: a
+  **barra de filtros de Jogos** (Meus interesses × Todos), a aba **Grupos** (criar grupo + o
+  **Resultadismo The Best**, ranking de todo mundo) e a aba **Perfil**. Roda inteiro em `/`, mede o
+  alvo **visível** (mobile: nav de baixo → balão acima / desktop: sidebar → balão ao lado) e reusa a
+  linguagem do `Coachmark` (anel turquesa + balão escuro). Aparece **uma vez** (`localStorage`
+  `resultadismo-tour-v1`), refazível pelo admin (Perfil → "Rever tour"). De brinde, o **carrossel de
+  boas-vindas foi enxugado para 3 slides** (o slide "Dispute em grupos" virou o **passo 2 do tour**,
+  sem avisar de Grupos duas vezes). Alvos marcados com `data-tour` em
+  `JogosPage`/`BottomNav`/`Sidebar`; só frontend (sem migration). → [`03`](03-PAGINAS.md) §3.
+- **Aba "Grupos" na página de jogos: os palpites que valem ponto nunca somem.** Quem personalizou
+  "só Brasil" mas está num grupo que conta outras seleções vê os jogos do grupo numa aba própria.
+  Ordem das abas: **Interesses** (encurtada; só personalização) → **Grupos** (união dos recortes dos
+  meus grupos, inclusive pendentes de aprovação; é o **padrão** quando a pessoa tem grupo) →
+  **Todos** → competições. **Coachmark** na 1ª visita explica a aba. As fileiras de abas e de dias
+  usam o novo **`ScrollRow`** (componente de UI): **degradê nas bordas** quando há mais conteúdo pra
+  arrastar, sumindo no fim do scroll. → [`03`](03-PAGINAS.md).
+- **Recorte de seleções do grupo editável até a Copa começar.** Quem criou o grupo sem reparar no
+  recorte ("Todas" × "Só o Brasil" × escolhidas) agora pode **ajustar na aba Competições** (card
+  "Seleções que valem ponto", só admin) enquanto **nenhum jogo da Copa tiver começado** — depois
+  do 1º jogo trava (mudar no meio retroagiria o ranking). Trava **no banco** (trigger
+  `trg_lc_team_scope_window`, migration `20260610180000`) + RPC `team_scope_window` pro front
+  mostrar o estado; seletor único `TeamScopeSelector` compartilhado entre a criação e a edição
+  (a criação agora avisa "dá pra mudar até a Copa começar"). → [`06`](06-REGRAS-DE-NEGOCIO.md) §4.
+- **Convite de grupo com o texto de divulgação completo.** O compartilhamento do código (card do
+  grupo em `/grupos` e botão da página do grupo) agora usa o **pitch de marketing aprovado pelo
+  João** ("🏆 Achei o melhor bolão pra Copa do Mundo!" + benefícios) fechando com **"Entre no meu
+  grupo \"nome\"" + código + link parametrizado** (`?convite=CÓDIGO`, que preenche o campo sozinho
+  no 1º acesso). Texto unificado em `features/leagues/inviteShare.ts` (regra 9: os dois pontos de
+  share falam a mesma coisa); grupo público compartilhado da vitrine sai sem código, apontando
+  `/grupos`. Corrigido o typo "Entra na meu grupo" e o card passou a registrar o evento `share`.
+- **Grupo aguardando aprovação agora avisa os admins** (sininho + push, link direto pra
+  `Admin → Grupos`). Lacuna confirmada em produção: no modo grátis o grupo nasce `pending`
+  esperando liberação, mas nenhum trigger cobria esse caminho — 3 grupos foram aprovados sem
+  ninguém ser avisado (o alerta `name_review` pertence só ao fluxo de pagamento). Trigger novo
+  `notify_admins_group_pending` com dedupe padrão de 6h por grupo. Validado em transação no banco
+  local (INSERT como o front faz → 1 alerta por admin → rollback). → [`04`](04-ADMIN.md).
+- **Painel de Avisos mostra o alcance real do push**: "Push no aparelho: N aparelhos (M pessoas) —
+  o resto recebe só no sininho" (RPC nova `admin_push_stats`, só app-admin). Evita a impressão de
+  que o aviso vira push pra todo o segmento.
+- **`send-push` não engole mais erro de entrega**: cada falha vira log no dashboard (status +
+  motivo + sufixo do endpoint) e a resposta passa a ser `{sent, total, failed[]}` — consultável em
+  `net._http_response` pra diagnóstico definitivo (o silêncio de 10–11/06 ficou sem causa exata
+  justamente por falta disso; a investigação confirmou criação/envio/exibição funcionando hoje).
+- **Anúncio in-app da Gestão do Bolão na home.** Pop-up (`NovidadeBolaoModal`) que aparece **uma
+  vez** na tela de Jogos pra quem já passou do 1º acesso, listando o que dá pra fazer: definir o
+  valor da inscrição, marcar quem pagou, configurar a divisão do prêmio (1º/2º/3º) e ver na
+  classificação quem está levando, com o disclaimer de que o dinheiro continua fora do app. **Não
+  colide com o tour guiado** dos novatos: o tour passou a emitir `resultadismo:tour-done` ao
+  fechar, e o modal só abre depois disso (veteranos, que já têm o flag do tour, veem na hora).
+  CTAs "Ver meus grupos" (→ /grupos) e "Agora não".
+
+### Alterado
+- **Como Funciona: cada tipo de pontuação agora MOSTRA o exemplo (palpite → resultado).** Em vez de
+  só explicar entre parênteses, cada card ganhou a tira **"Você palpita [2×1] e o jogo termina
+  [2×1]"** em chips tabulares no padrão da landing — cravada (2×1→2×1), saldo (2×0→3×1, com a nota
+  do empate 1×1→2×2), acerto (2×0→1×0) e erro (2×0→0×1); as descrições foram enxugadas. Só front
+  (`features/help/ComoFuncionaPage.tsx`), sem migration. Complementa a "Como funciona reescrita" do
+  2.0.0, que tratou só da reestruturação das seções. (commit `98c2336`)
+- **Palpites da galera: só os SEUS grupos, na ordem dos favoritos, e ranking ao vivo.** O chip
+  "Todos" morreu — palpite de quem não está nos seus grupos não aparece (sem grupo, a área convida
+  a entrar num). Os chips seguem a MESMA ordem da página /grupos (favoritos primeiro, na ordem de
+  favoritar; a estrela ao lado favorita/desfavorita o grupo ativo) e o primeiro abre por padrão.
+  Com o jogo ROLANDO, a lista ordena pela pontuação em curso e mostra só o número colorido ao lado
+  (+6 dourado, +2 verde, +1 azul, 0 cinza) — sem o selo de fundo, que segue só no encerrado.
+  Desempate: vitória do mandante → empate → vitória do visitante; dentro, mais gols do lado
+  decisivo, depois do outro. Encerrado ordena pela mesma régua (pontuação oficial).
+- **Imagem de palpites junta jogos de DIAS diferentes.** A seleção não se perde ao trocar a aba
+  de dia: marca o de ontem, troca a aba, marca o de hoje e gera UMA imagem — em ordem de horário e
+  com a **data pequenininha** em cada jogo ("QUA 10/06") pra dar o contexto. A barra ensina ("1
+  jogo — toque em mais (até de outro dia)"); trocar de escopo zera a seleção. No caminho, corrigido
+  um crash de tela branca pra usuário logado que existia só no working tree de hoje (estado da
+  seleção lido antes de declarar) — nunca chegou em produção.
+- **Compartilhar vários jogos ficou achável.** O ícone no card ganhou o rótulo "compartilhar"
+  e **abre o modo de seleção já com aquele jogo marcado** — a barra ("1 jogo — toque em mais
+  pra juntar" → "Gerar imagem") ensina o gesto; tocar nos outros cards soma na mesma imagem.
+  Antes, o único jeito de juntar jogos era um botão no fim da fileira de dias (segue lá como
+  atalho), que podia ficar fora da tela. De quebra, jogo no "ao vivo automático" (agendado que
+  já começou há <4h) agora também conta como selecionável, na mesma régua do card.
 
 ### Corrigido
+- **Fileira de dias: hoje agora centraliza DE VERDADE (re-fix).** O fix anterior só centralizava
+  uma vez preso ao escopo; no load frio (logado e em grupo) os jogos/dias chegavam depois e o dia
+  caía à esquerda. Agora a centralização re-roda quando a **lista de dias muda** (`centerKey` com a
+  assinatura dos dias) e a medição é robusta (tenta antes do paint, re-tenta se a largura ainda é 0,
+  re-centra após as fontes carregarem) — sem brigar com o scroll manual depois.
+- **Fileira de dias: hoje nasce CENTRALIZADO e a bolinha de "ao vivo" não corta mais.** (1) Ao
+  abrir/atualizar a página, o dia selecionado (hoje) vem centralizado na fileira, com clamp: se ele
+  está numa ponta, encosta na borda (1º dia → à esquerda, último → à direita) em vez de forçar; a
+  rolagem manual do usuário não é mais desfeita (só re-centra ao trocar de aba de escopo, não a cada
+  toque num dia). `ScrollRow` ganhou `centerSelector`/`centerKey`. (2) O ponto vermelho de jogo ao
+  vivo no tab do dia era cortado no topo pelo `overflow` da fileira; agora há respiro vertical
+  (`py-1.5`) e ele aparece inteiro.
+- **Sync: sigla (TLA) deixou de ser chave de matching de time — "Camboja 2×0 Hong Kong" não vira
+  mais "Atlético-MG 2×0 Hong Kong".** O gerador do mapa canônico (`gen-teams-catalog.mjs`)
+  indexava também o TLA de cada time; a abreviação da ESPN pra países sem cadastro colidia com
+  sigla de clube e o sync gravava o clube no lugar da seleção (auditoria: Camboja→Atlético-MG e
+  Comores→Como **já em prod** nos amistosos pré-Copa; Grécia→Grêmio, Botswana→Botafogo e
+  Bahamas→Bahia eram minas armadas). Agora só slug/nome/short/aliases viram chave (sigla fica
+  para os fallbacks `TEAM_PT`/`COUNTRY_EN_PT` do sync) e **Camboja, Comores e Grécia** entraram
+  no registro como seleções (Grécia casou o `grecia.svg` que já existia). Auditoria pós-fix:
+  182 seleções da ESPN, zero caem em clube; nenhuma chave existente mudou de dono. Migration
+  `20260611150000` corrige os dados já gravados (2 times + 3 jogos; placar/pontuação intactos).
+- **Seleções de amistoso sem cadastro apareciam em inglês e sem escudo ("Argentina × Iceland").**
+  O registro tinha só 69 seleções; o que a ESPN mandava fora dele ficava com o nome cru em inglês
+  no banco e o escudo caía no quadradinho de sigla (`teamCrestPath("Iceland")` → slug "iceland"
+  não existe; o arquivo é `islandia.svg`). Varredura contra os dados reais de prod (REST anônimo:
+  tabela `teams` + nomes dos 180 jogos): **77 seleções novas** no `data/teams-registry.json` com
+  os aliases em inglês exatos das APIs (Iceland, Slovakia, Kazakhstan, "Cent Afr Rep",
+  "Trin & Tob"…); 20 casaram escudo que já existia (`islandia.svg`, `russia.svg`, `hungria.svg`…).
+  Pós-`gen:all`: todos os nomes de prod resolvem (sobram só clubes — fora do escopo — e o
+  placeholder "Time"); nenhuma chave existente do canônico mudou de dono. Jogos já gravados em
+  inglês se corrigem sozinhos no próximo sync em modo `catalog` (modo `scores` não toca nome).
+  Obs.: Guam e Guatemala têm a mesma sigla (GUA) — cadastrá-los só ficou seguro com o fix do TLA
+  acima, que subiu primeiro. Efeito colateral: o seletor de "seleção que torce"
+  (perfil/onboarding) passa de 69 pra 146 opções, 59 sem bandeira.
+- **Competições apagadas por engano no admin RESTAURADAS (com os "seguindo" intactos).** O João
+  apagou 16 campeonatos em rascunho (Copa América, Eurocopa, Nations League, as 5 Eliminatórias,
+  Saudi Pro League, Primeira Liga, Eredivisie, Süper Lig, Pro League BEL, Premiership SCO, Super
+  League GR) sem saber que o delete é HARD e que rascunho aparece na personalização — eles sumiram
+  da tela de campeonatos. A migration `20260611200000` recria cada um **com o MESMO id de antes**
+  (fonte: `admin_audit_log`, que guarda id+nome de cada exclusão): como `followed_competition_ids`
+  (uuid[]) e `followed_teams` (jsonb) não têm FK, os IDs ficaram nos perfis e **religam sozinhos**
+  — ninguém perde o que tinha selecionado (única perda: `favorite_competition_id`, FK SET NULL,
+  irrecuperável sem backup). Idempotente, só-INSERT com guardas (id/provider_code/slug), validada
+  na simulação local (restaura + religa + lista na personalização + no-op na 2ª execução).
+- **Imagem de palpites: selo da pontuação alinhado e raio visível na cravada.** O ⚡ era um emoji
+  no canvas: métrica própria desalinhava/"quebrava" a linha do selo e, amarelo sobre o fundo
+  dourado da cravada, ele sumia. Agora o raio do 2× é **desenhado** (polígono) na mesma baseline
+  do texto, escuro no dourado e branco nos demais. De quebra: o escudo passa a ser buscado pelo
+  **nome completo** do time (o curto abreviado tipo "Á. do Sul" caía no quadradinho de sigla) e o
+  nome completo vira o rótulo quando cabe — África do Sul com bandeira e por extenso.
+- **Coachmark da Gestão aponta pra aba certa (não mais pro canto).** Depois que a aba virou a 3ª
+  (com a 4ª "Competições" à direita) e a fileira ganhou rolagem, a seta/balão da dica de novidade
+  miravam o fim da fileira. O `Coachmark` ganhou `caretTargetSelector`: mede o botão alvo
+  (`[data-value='bolao']`), traz ele à vista no trilho rolável e ancora a **seta, o balão (com
+  clamp pra não vazar da tela) e o anel de destaque** sobre a aba **Gestão**, onde quer que ela
+  esteja. O `SegmentedControl` passou a marcar cada botão com `data-value`.
+- **Selo de prêmio (💰) não sobrepõe mais as cravadas no mobile.** Em telas pequenas o valor da
+  premiação encostava na coluna CRA. Agora, quando o jogador leva prêmio, a 2ª linha mostra **só o
+  selo** (esconde "X jogos") e as colunas numéricas do resumo encolhem um tico — o 💰 fica colado à
+  esquerda, longe das cravadas (validado até 320px com nome longo). Quem não leva prêmio segue com
+  "X jogos"; grupos sem bolão não mudam nada.
+- **JogosPage: memoização do `dayMatches` restaurada na ordem certa.** O erro do React Compiler
+  ("Existing memoization could not be preserved") era causado pelas funções de compartilhar
+  declaradas **antes** do `dayMatches` que elas leem; o hotfix anterior tirou o `useMemo` e deixou
+  2 avisos de deps. Agora o bloco de share vem **depois** da declaração e o `useMemo` voltou —
+  lint zerou no arquivo (sobrou só o aviso de complexidade do backlog).
+- **Abas do grupo não quebram mais no mobile (aba Gestão).** Com 4 abas, o `SegmentedControl`
+  estourava a largura da tela em celulares. Agora o conteúdo **rola lateralmente DENTRO da
+  pílula** (labels nunca quebram linha) com o **degradê do `ScrollRow`** na cor da pílula
+  avisando que tem mais aba pra arrastar — mesmo padrão das fileiras de Jogos (regra 9). O
+  `ScrollRow` ganhou a prop `fadeClassName` pra usar o fade fora do fundo da página. Vale pros
+  9 usos do componente (Retrô, Nova Liga, admin etc.): quando as opções cabem, nada muda
+  (continuam esticando); quando não cabem, rola em vez de quebrar.
+- **Link de convite pra quem já é de casa.** Quem abre um link `?convite=` e **já concluiu** o
+  1º acesso vai direto pra **/grupos com o código preenchido** (só na visita do clique — flag de
+  sessão consumida; visitas normais seguem nos Jogos). Quem ainda não concluiu continua caindo no
+  wizard, que já preenche o convite.
+- **Onboarding: dois bugs do fluxo.** (1) O campo de convite aparecia com um **UUID aleatório** —
+  era o `?code=` do **callback do OAuth do Google** sendo capturado como convite; agora só `?convite=`
+  conta, com formato validado (`A–Z0–9`, 3–12) e auto-limpeza do lixo já salvo no aparelho.
+  (2) **Concluir voltava pra primeira tela**: corrida entre o navegar e o `done=true` chegar — o
+  cache agora é marcado otimisticamente no Concluir/Pular tudo, o gate nunca mais lê estado velho.
+- **Listagens da Copa só com as 48 classificadas (Itália fora).** O recorte do grupo e a lista de
+  times da Copa na personalização mostravam o catálogo inteiro de seleções (66) — incluindo quem
+  não se classificou (Itália etc.). Agora há `WC2026_SLUGS` no `teamsCatalog` com as **48
+  classificadas**, extraídas dos **próprios jogos da Copa em produção** (104 partidas, 48/48
+  mapeadas pros slugs do catálogo, fonte: o banco): `catalogWcNations()` no seletor do recorte e
+  `teamsForCompetition` filtrando os códigos da Copa (`WC`/`fifa.world`). **Amistosos e a "seleção
+  da torcida" seguem com as 66** (a Itália joga amistosos e pode ser a seleção do coração).
 - **"Permissão negada" nas notificações agora ensina a liberar.** Quando o navegador/celular está
   com as notificações BLOQUEADAS (não dá pra abrir as configurações pela pessoa), aparece um guia
   passo a passo por plataforma (Android no navegador → cadeado/Permissões; Android com app →
