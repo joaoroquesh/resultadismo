@@ -33,6 +33,36 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   grupo derivam da `get_league_standings_live`; as globais projetam finished+live com `rank_anterior`
   = consolidado encerrado). Realtime central (todas as competições) + repoll 15/45s. **Segue só
   exibição:** prêmio pago, confronto e número oficial continuam no **placar FINAL**.
+- **Cutucada diz QUAL jogo (times) e quando começa.** A notificação de cutucada passa a citar os
+  times ("Fulano quer seu palpite em Portugal × Alemanha que começa em Xh"), com o tempo pro apito
+  calculado **dinamicamente** na leitura. Agora **não dá pra cutucar jogo sem times definidos**
+  (mata-mata com marcação): o botão fica travado e o banco recusa. Migration aditiva
+  `20260620120000_nudge_times_e_jogo` (evolui `nudge_for_match`: guarda times/kickoff no `data`).
+- **Personalização obrigatória em qualquer 1º acesso.** O gate passa a forçar o wizard vindo de
+  **qualquer rota** (antes só pela home "/"), pegando quem entra por deep-link/convite. O convite é
+  preservado (fica no `localStorage`) e o palpite/join é retomado no fim, sem perder o grupo.
+
+### Alterado
+- **"Gestão do Bolão" → "Bolão valendo".** A aba e a feature de bolão pago entre amigos foram
+  renomeadas pra deixar explícito que é a organização do **dinheiro** (Pix entre amigos), separada
+  da gestão que o app já faz sozinho. (Internamente o conceito segue "Gestão do Bolão", ADR 0009.)
+- **Dobro (2×) mais claro.** Borda do card com dobro ativo agora é **turquesa** (cor primária, igual
+  ao ícone), não mais dourada (que confundia com "ainda não palpitou"). O selo mostra **"X/2 dobros
+  até DD/MM"** (domingo da semana) e o "Como funciona"/coachmark deixam explícito que o limite
+  **zera toda segunda** e que os dobros **não acumulam**.
+- **Onboarding enxuto.** Carrossel de boas-vindas mais curto, tour com o passo 1 apontando o **menu
+  Jogos** (antes mirava a barra de filtros) e a "Como funciona" reorganizada (o **Retrô** foi pro
+  fim, depois do bolão principal).
+- **Copy gênero-neutro e tom humano.** "Bem-vindo" → "Boas-vindas" e afins; alertas com intenção
+  amigável e saída (sem "Erro" seco), incluindo a cutucada repetida e o palpite que não salva.
+
+### Corrigido
+- **Travessões (—) fora do texto exibido.** Varredura trocando "—" por vírgula/dois-pontos/
+  parênteses em todo o app (grupos, confronto, páginas legais, onboarding, notificações, landing e
+  admin), conforme a regra de copy do projeto. (O Retrô fica pra um passe à parte.)
+- **Removida a cópia de pagamento/aprovação do app.** Some o "aguardando aprovação"/cobrança pra
+  criar grupo (decisão de negócio: pagamento removido); fica só a política de entrada do grupo
+  (aberta/aprovação/convite) e o Bolão valendo.
 
 ## [2.4.0] — 2026-06-18
 
