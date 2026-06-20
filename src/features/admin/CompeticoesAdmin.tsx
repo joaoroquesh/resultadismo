@@ -113,7 +113,7 @@ function SourceRow({ comp, s }: { comp: CompFull; s: CompetitionSource }) {
                   await setPrimary.mutateAsync({ competitionId: comp.id, sourceId: s.id });
                   toast(`${provLabel(s.provider)} agora é a fonte primária (dona do calendário).`, "success");
                 } catch (e) {
-                  toast(e instanceof Error ? e.message : "Erro.", "error");
+                  toast(e instanceof Error ? e.message : "Não deu pra trocar a fonte agora. Tenta de novo?", "error");
                 } finally {
                   setConfirming(false);
                 }
@@ -191,7 +191,7 @@ function CompCard({ comp, onDanger }: { comp: CompFull; onDanger: (d: Competitio
       toast("Nome atualizado.", "success");
       setEditing(false);
     } catch (e) {
-      toast(e instanceof Error ? e.message : "Erro.", "error");
+      toast(e instanceof Error ? e.message : "Não deu pra salvar o nome agora. Tenta de novo?", "error");
     }
   }
 
@@ -480,17 +480,17 @@ function CatalogSection({ comps }: { comps: CompFull[] }) {
       }
       qc.invalidateQueries({ queryKey: ["admin", "competitions-full"] });
     } catch (err) {
-      toast(err instanceof Error ? err.message : "Erro.", "error");
+      toast(err instanceof Error ? err.message : "Não rolou agora. Tenta de novo?", "error");
     }
   }
 
   return (
     <Card className="space-y-3 p-4">
       <div>
-        <p className="text-sm font-semibold text-ink-900">Catálogo — anexar fontes a um campeonato</p>
+        <p className="text-sm font-semibold text-ink-900">Catálogo: anexar fontes a um campeonato</p>
         <p className="text-xs text-ink-500">
           As APIs que oferecem cada campeonato aparecem juntas (cruzadas mesmo com nomes diferentes).
-          Anexe cada uma como fonte — sem digitar código. Campeonato novo nasce como rascunho.
+          Anexe cada uma como fonte (sem digitar código). Campeonato novo nasce como rascunho.
         </p>
       </div>
       <input
@@ -611,7 +611,7 @@ export function CompeticoesAdmin() {
               const failed = r.results.filter((x) => !x.ok);
               toast(failed.length ? `Sincronizado com ${failed.length} problema(s).` : `Sincronizado (${r.synced}).`, failed.length ? "error" : "success");
             })
-            .catch((e) => toast(e instanceof Error ? e.message : "Erro no sync.", "error"))
+            .catch((e) => toast(e instanceof Error ? e.message : "Não rolou sincronizar agora. Tenta de novo daqui a pouco.", "error"))
         }
       >
         <RefreshCw className="size-4" /> Sincronizar todas

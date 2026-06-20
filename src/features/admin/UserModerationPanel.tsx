@@ -51,7 +51,7 @@ export function UserModerationPanel({
             toast("Conta suspensa. O login fica bloqueado.", "success");
             setPending(null);
           },
-          onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
+          onError: (e) => toast(e instanceof Error ? e.message : "Não deu pra suspender agora. Tenta de novo?", "error"),
         },
       );
     } else {
@@ -63,7 +63,7 @@ export function UserModerationPanel({
             setPending(null);
             onDeleted();
           },
-          onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
+          onError: (e) => toast(e instanceof Error ? e.message : "Não deu pra concluir agora. Tenta de novo?", "error"),
         },
       );
     }
@@ -117,7 +117,7 @@ export function UserModerationPanel({
 
         {mod?.suspended && (
           <div className="rounded-md bg-surface-2 px-3 py-2 text-sm font-medium text-flame-700 ring-1 ring-flame-600">
-            Conta suspensa — login bloqueado.
+            Conta suspensa: login bloqueado.
           </div>
         )}
 

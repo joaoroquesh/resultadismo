@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
 import { useToast } from "@/components/ui/Toast";
 import { track } from "@/lib/analytics";
@@ -42,7 +43,7 @@ export function LoginModal({ open, onClose }: { open: boolean; onClose: () => vo
     track("login", { method: "google" });
     const { error } = await signInWithGoogle();
     if (error) {
-      toast(error, "error");
+      toast("Não rolou entrar com o Google agora. Tenta de novo? ⚽", "error");
       setBusy(false);
     }
     // sucesso: o OAuth redireciona; não precisa mexer no estado aqui
@@ -103,7 +104,22 @@ export function LoginModal({ open, onClose }: { open: boolean; onClose: () => vo
         </div>
 
         <p className="mt-6 text-xs text-ink-400">
-          Ao continuar, você topa as regras da diversão. ⚽
+          Ao continuar, você topa as{" "}
+          <Link
+            to="/termos"
+            onClick={onClose}
+            className="font-medium text-ink-500 underline transition-colors hover:text-brand-700"
+          >
+            regras
+          </Link>{" "}
+          e a{" "}
+          <Link
+            to="/privacidade"
+            onClick={onClose}
+            className="font-medium text-ink-500 underline transition-colors hover:text-brand-700"
+          >
+            privacidade
+          </Link>. ⚽
         </p>
       </div>
     </Modal>

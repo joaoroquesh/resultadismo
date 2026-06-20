@@ -127,7 +127,7 @@ export function GestaoBolaoTab({
     return (
       <div className="space-y-3">
         <p className="rounded-md bg-surface-2 px-3 py-4 text-center text-sm text-ink-500">
-          O grupo ainda não ativou a Gestão do Bolão. Fala com o admin!
+          O grupo ainda não ativou o Bolão valendo. Fala com o admin!
         </p>
         <Disclaimer />
       </div>
@@ -181,7 +181,8 @@ function OwnerView({
   const updatePot = useUpdatePotSettings();
   const togglePayer = useTogglePotPayer();
   const toggleLock = useTogglePotLock();
-  const onError = (e: unknown) => toast(e instanceof Error ? e.message : "Erro.", "error");
+  const onError = (e: unknown) =>
+    toast(e instanceof Error ? e.message : "Não rolou agora. Tenta de novo?", "error");
 
   const enabled = lc.pot_enabled === true;
   const locked = lc.pot_locked === true;
@@ -211,16 +212,16 @@ function OwnerView({
       <Card className="flex items-center gap-3 p-4">
         <HandCoins className="size-5 shrink-0 text-brand-600" />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-ink-900">Gestão do Bolão</p>
+          <p className="text-sm font-semibold text-ink-900">Bolão valendo</p>
           <p className="text-xs text-ink-500">
-            Registre o valor, a chave Pix e marque quem pagou — o app calcula o rateio.
+            Bolão valendo grana? Registre o valor, a chave Pix e marque quem pagou: o app calcula o rateio.
           </p>
         </div>
         <Switch
           checked={enabled}
           onChange={(v) => updatePot.mutate({ leagueId, lcId: lc.id, enabled: v }, { onError })}
           disabled={locked}
-          label="Ativar Gestão do Bolão"
+          label="Ativar Bolão valendo"
         />
       </Card>
 
@@ -267,7 +268,7 @@ function OwnerView({
                 className="h-11 w-full rounded-md border border-ink-200 bg-surface px-3 text-ink-950 outline-none focus:border-brand-500 disabled:opacity-50"
               />
               <p className="text-[11px] leading-snug text-ink-400">
-                Os membros veem e copiam essa chave pra fazer o Pix. O app não recebe nada — é só o
+                Os membros veem e copiam essa chave pra fazer o Pix. O app não recebe nada: é só o
                 contato do recebedor.
               </p>
             </div>
@@ -393,7 +394,7 @@ function OwnerView({
             {pending.size > 0 && canEdit && (
               <p className="text-[11px] leading-snug text-ink-400">
                 <strong>{pending.size}</strong> {pending.size === 1 ? "pessoa sinalizou" : "pessoas sinalizaram"} que
-                pagou. Confira o Pix e toque em <strong>confirmar</strong> — só então conta no rateio.
+                pagou. Confira o Pix e toque em <strong>confirmar</strong>: só então conta no rateio.
               </p>
             )}
           </Card>
@@ -446,7 +447,8 @@ function MemberView({
 }) {
   const { toast } = useToast();
   const declare = useDeclarePaid();
-  const onError = (e: unknown) => toast(e instanceof Error ? e.message : "Erro.", "error");
+  const onError = (e: unknown) =>
+    toast(e instanceof Error ? e.message : "Não rolou agora. Tenta de novo?", "error");
 
   const entryCents = lc.pot_entry_cents ?? 0;
   const split = (lc.pot_split ?? {}) as Partial<PotSplit>;
@@ -504,7 +506,7 @@ function MemberView({
               <Copy className="size-4 shrink-0 text-brand-600" />
             </button>
             <p className="text-[11px] leading-snug text-ink-400">
-              Toque pra copiar e pague pelo seu banco. O dinheiro vai direto pro organizador — o app
+              Toque pra copiar e pague pelo seu banco. O dinheiro vai direto pro organizador: o app
               não recebe nada.
             </p>
           </>
@@ -534,7 +536,7 @@ function MemberView({
         ) : (
           <>
             <p className="text-sm text-ink-600">
-              Já fez o Pix? Avise o grupo — o dono confirma depois e você entra no rateio.
+              Já fez o Pix? Avise o grupo: o dono confirma depois e você entra no rateio.
             </p>
             <Button fullWidth disabled={locked} loading={declare.isPending} onClick={() => setMine(true)}>
               <Check className="size-4" /> Já paguei

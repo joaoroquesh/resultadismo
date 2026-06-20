@@ -83,7 +83,7 @@ function ConflictResolveCard({ m }: { m: MatchConflict }) {
       { matchId: m.id, home: h, away: a, status: m.status, lock: true },
       {
         onSuccess: () => toast(`Resolvido: ${label}. Travado contra a API.`, "success"),
-        onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
+        onError: (e) => toast(e instanceof Error ? e.message : "Não deu agora. Tenta de novo?", "error"),
       },
     );
   }

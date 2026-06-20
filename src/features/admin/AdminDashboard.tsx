@@ -190,9 +190,11 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => vo
           <Inbox className="size-5 shrink-0 text-brand-700" />
           <div className="min-w-0 flex-1">
             <p className="text-sm font-bold text-brand-800">
-              {health.pending_leagues} grupo(s) aguardando aprovação
+              {health.pending_leagues} grupo(s) legado(s) pendente(s)
             </p>
-            <p className="text-xs text-brand-700/80">Toque pra revisar e aprovar/rejeitar.</p>
+            <p className="text-xs text-brand-700/80">
+              Grupo novo nasce ativo. Estes ficaram parados de uma versão antiga: toque pra resolver.
+            </p>
           </div>
           <ChevronRight className="size-4 shrink-0 text-brand-600" />
         </button>
@@ -243,7 +245,7 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (tab: string) => vo
             <KpiTile icon={<Clock className="size-4" />} value={fmtDuration(usage.usage_seconds_avg)} label="Tempo médio/pessoa" onClick={() => onNavigate("usuarios")} />
             <KpiTile icon={<Target className="size-4" />} value={usage.predictions_today} label="Palpites hoje" />
             <KpiTile icon={<Layers className="size-4" />} value={usage.groups_total} label="Grupos ativos" onClick={() => onNavigate("grupos")} />
-            <KpiTile icon={<Wallet className="size-4" />} value={usage.groups_gestao_active} label="Gestão do Bolão ativa" onClick={() => onNavigate("grupos")} />
+            <KpiTile icon={<Wallet className="size-4" />} value={usage.groups_gestao_active} label="Bolão valendo ativo" onClick={() => onNavigate("grupos")} />
           </div>
         )}
       </section>

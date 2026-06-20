@@ -78,7 +78,7 @@ export function DrawnView({
                       : "Sem próxima rodada agora (suíço completo ou rodada em andamento).",
                     r.created > 0 ? "success" : "info",
                   ),
-                onError: (e) => toast(e instanceof Error ? e.message : "Erro ao gerar rodada.", "error"),
+                onError: (e) => toast(e instanceof Error ? e.message : "Não consegui gerar a rodada agora. Tenta de novo?", "error"),
               },
             )
           }
@@ -126,7 +126,7 @@ export function DrawnView({
               { lcId, leagueId },
               {
                 onSuccess: () => toast("Sorteio desfeito. Você pode ajustar e sortear de novo.", "info"),
-                onError: (e) => toast(e instanceof Error ? e.message : "Erro ao desfazer.", "error"),
+                onError: (e) => toast(e instanceof Error ? e.message : "Não deu pra desfazer agora. Tenta de novo daqui a pouco.", "error"),
               },
             )
           }

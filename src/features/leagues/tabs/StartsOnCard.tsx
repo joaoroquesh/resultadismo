@@ -60,7 +60,8 @@ function StartsOnCardInner({
       { leagueId, lcId, startsOn: clampDate(value, min, max) },
       {
         onSuccess: () => toast("Data de início atualizada!", "success"),
-        onError: (e) => toast(e instanceof Error ? e.message : "Erro ao salvar.", "error"),
+        onError: (e) =>
+          toast(e instanceof Error ? e.message : "Não deu pra salvar agora. Tenta de novo?", "error"),
       },
     );
   }

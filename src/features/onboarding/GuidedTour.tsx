@@ -28,18 +28,17 @@ interface Step {
   body: ReactNode;
 }
 
-// Os passos miram elementos REAIS da UI (data-tour). Todos vivem na tela de Jogos
-// ("/"): a barra de filtros (na página) e os itens Grupos/Perfil (na navegação,
-// que é fixa) — por isso o tour roda inteiro em "/" sem precisar navegar.
+// Os passos miram itens REAIS da navegação (data-tour), que é fixa: Jogos,
+// Grupos e Perfil. Por isso o tour roda inteiro em "/" sem precisar navegar.
 const STEPS: Step[] = [
   {
-    target: "jogos-filtros",
+    target: "nav-jogos",
     title: "Aqui é onde você palpita",
     body: (
       <>
-        Cada card abaixo é um jogo: crave o placar e ganhe pontos. No topo, alterne entre{" "}
-        <b className="text-ink-50">Meus interesses</b> (os times e campeonatos que você escolheu) e{" "}
-        <b className="text-ink-50">Todos</b> os jogos disponíveis.
+        Em <b className="text-ink-50">Jogos</b> cada partida é um card: toque, crave o placar e ganhe
+        pontos. No topo dá pra filtrar entre os <b className="text-ink-50">seus interesses</b> e{" "}
+        <b className="text-ink-50">todos</b> os jogos.
       </>
     ),
   },
@@ -48,9 +47,9 @@ const STEPS: Step[] = [
     title: "Crie seu grupo",
     body: (
       <>
-        Em <b className="text-ink-50">Grupos</b> você cria o seu e chama a galera pra disputar. Lá
-        também fica o <b className="text-ink-50">Resultadismo The Best</b>: o ranking de todo mundo
-        que joga, somando todos os grupos.
+        Em <b className="text-ink-50">Grupos</b> você monta a sua turma e chama a galera. E o{" "}
+        <b className="text-ink-50">Resultadismo The Best</b> junta todos os resultadistas num pódio
+        só, onde dá pra provar que você entende mais de bola que o Brasil inteiro.
       </>
     ),
   },

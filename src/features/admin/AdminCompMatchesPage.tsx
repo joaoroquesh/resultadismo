@@ -106,7 +106,7 @@ export function AdminCompMatchesPage() {
       if (failed.length) toast(`Sync parcial: ${failed[0]!.error}`, "error");
       else toast("Jogos sincronizados.", "success");
     } catch (e) {
-      toast(e instanceof Error ? e.message : "Erro no sync.", "error");
+      toast(e instanceof Error ? e.message : "Não consegui sincronizar agora. Tenta de novo?", "error");
     }
   }
 
@@ -272,7 +272,7 @@ function AdminMatchRow({ match }: { match: AdminMatch }) {
       toast("Resultado salvo.", "success");
       setEditing(false);
     } catch (e) {
-      toast(e instanceof Error ? e.message : "Erro ao salvar.", "error");
+      toast(e instanceof Error ? e.message : "Não deu pra salvar agora. Tenta de novo?", "error");
     }
   }
 
@@ -281,7 +281,7 @@ function AdminMatchRow({ match }: { match: AdminMatch }) {
       await setHidden.mutateAsync({ matchId: match.id, hidden: !match.hidden });
       toast(match.hidden ? "Jogo visível de novo." : "Jogo ocultado do bolão.", "success");
     } catch (e) {
-      toast(e instanceof Error ? e.message : "Erro.", "error");
+      toast(e instanceof Error ? e.message : "Não deu agora. Tenta de novo?", "error");
     }
   }
 
@@ -385,7 +385,7 @@ function AdminMatchRow({ match }: { match: AdminMatch }) {
                 { matchId: match.id, minutes: 15 },
                 {
                   onSuccess: () => toast("Palpites reabertos por 15 min.", "success"),
-                  onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
+                  onError: (e) => toast(e instanceof Error ? e.message : "Não deu pra reabrir agora. Tenta de novo?", "error"),
                 },
               )
             }
@@ -514,7 +514,7 @@ function CompareRow({ match }: { match: MatchWithSources }) {
       toast("Placar definido e travado contra a API.", "success");
       setEditing(false);
     } catch (e) {
-      toast(e instanceof Error ? e.message : "Erro.", "error");
+      toast(e instanceof Error ? e.message : "Não deu pra salvar agora. Tenta de novo?", "error");
     }
   }
 

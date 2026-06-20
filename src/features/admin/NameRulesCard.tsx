@@ -65,7 +65,7 @@ export function NameRulesCard() {
             },
             {
               onSuccess: () => toast("Regras de nome salvas.", "success"),
-              onError: (e) => toast(e instanceof Error ? e.message : "Erro ao salvar.", "error"),
+              onError: (e) => toast(e instanceof Error ? e.message : "Não deu pra salvar agora. Tenta de novo?", "error"),
             },
           )
         }

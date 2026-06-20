@@ -18,7 +18,7 @@ export function ScrollCue({
     <button
       type="button"
       onClick={onClick}
-      aria-label={`${label} — rolar para ver mais`}
+      aria-label={`${label}: rolar para ver mais`}
       className={cn(
         "group flex flex-col items-center gap-1.5 rounded-pill px-4 py-1.5 text-ink-400 transition-colors hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50",
         className,

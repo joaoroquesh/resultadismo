@@ -78,7 +78,7 @@ export function RefundFederationButton({
       <ConfirmDialog
         open={open}
         title="Cancelar grupo e reembolsar?"
-        message="Você vai cancelar este grupo e receber o valor pago de volta — no Pix, cai na sua conta; no cartão, é estornado na fatura em alguns dias. O grupo será arquivado e os membros perdem o acesso."
+        message="Você vai cancelar este grupo e receber o valor pago de volta: no Pix, cai na sua conta; no cartão, é estornado na fatura em alguns dias. O grupo será arquivado e os membros perdem o acesso."
         step2Message="Confirmação final: cancelar o grupo e pedir o reembolso?"
         confirmLabel="Cancelar e reembolsar"
         loading={refund.isPending}

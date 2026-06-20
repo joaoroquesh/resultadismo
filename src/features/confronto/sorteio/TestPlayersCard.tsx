@@ -39,7 +39,7 @@ export function TestPlayersCard({
       </button>
       {testOpen && (
         <div className="space-y-2 border-t border-ink-100 px-4 py-3">
-          <p className="text-xs text-ink-500">Só simulação — não altera o sorteio real.</p>
+          <p className="text-xs text-ink-500">Só simulação: não altera o sorteio real.</p>
           <div className="flex items-center gap-3">
             <input
               type="range"

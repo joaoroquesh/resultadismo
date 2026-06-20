@@ -62,7 +62,8 @@ export function TeamScopeCard({
       { leagueId, lcId, slugs },
       {
         onSuccess: () => toast("Recorte de seleções atualizado!", "success"),
-        onError: (e) => toast(e instanceof Error ? e.message : "Erro ao salvar.", "error"),
+        onError: (e) =>
+          toast(e instanceof Error ? e.message : "Não deu pra salvar agora. Tenta de novo?", "error"),
       },
     );
   }

@@ -47,16 +47,16 @@ export function NovidadeBolaoModal({ enabled }: { enabled: boolean }) {
   };
 
   return (
-    <Modal open={open} onClose={close} label="Novidade: Gestão do Bolão">
+    <Modal open={open} onClose={close} label="Novidade: Bolão valendo">
       <div className="p-5 sm:p-6">
         <span className="mb-3 inline-flex size-12 items-center justify-center rounded-pill bg-gold-600/15 text-gold-700">
           <HandCoins className="size-6" strokeWidth={2.2} />
         </span>
         <p className="text-[11px] font-bold uppercase tracking-wide text-gold-700">Novidade</p>
-        <h2 className="mt-0.5 text-xl font-extrabold text-ink-950">Gestão do Bolão</h2>
+        <h2 className="mt-0.5 text-xl font-extrabold text-ink-950">Bolão valendo</h2>
         <p className="mt-1.5 text-sm leading-relaxed text-ink-600">
-          Seu grupo combina um bolão entre amigos? Agora dá pra organizar tudo dentro do app, na
-          aba <span className="font-semibold text-ink-900">Gestão</span> do grupo:
+          Seu grupo combina um bolão valendo grana entre amigos? Agora dá pra organizar tudo dentro do app, na
+          aba <span className="font-semibold text-ink-900">Bolão valendo</span> do grupo:
         </p>
 
         <ul className="mt-4 space-y-2.5">

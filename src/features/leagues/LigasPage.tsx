@@ -72,7 +72,10 @@ export function LigasPage() {
       toast("Você entrou no grupo!", "success");
       setCode("");
     } catch (err) {
-      toast(err instanceof Error ? err.message : "Não foi possível entrar.", "error");
+      toast(
+        err instanceof Error ? err.message : "Código não confere. Confira com quem te convidou.",
+        "error",
+      );
     }
   }
 
@@ -361,7 +364,9 @@ function GroupCard({
 }) {
   const isAdmin = league.my_role === "owner" || league.my_role === "admin";
   const isPublic = league.visibility === "public";
-  const pending = league.status === "pending" || league.my_status === "pending";
+  // "Pendente" aqui é só a ENTRADA do membro por aprovação (dono aceita o pedido);
+  // grupo não fica mais pendente: nasce ativo, sem aprovação do app.
+  const pending = league.my_status === "pending";
   const count = preview?.count ?? 0;
 
   function share() {
@@ -387,7 +392,7 @@ function GroupCard({
             {pending ? (
               <span className="flex items-center gap-1 text-gold-700">
                 <Clock className="size-3.5" />
-                {league.status === "pending" ? "aguardando aprovação" : "entrada pendente"}
+                entrada pendente
               </span>
             ) : (
               <>
@@ -507,7 +512,7 @@ function PublicGroupsSection() {
         "success",
       );
     } catch (err) {
-      toast(err instanceof Error ? err.message : "Não foi possível entrar.", "error");
+      toast(err instanceof Error ? err.message : "Não rolou entrar agora. Tenta de novo?", "error");
     }
   }
 

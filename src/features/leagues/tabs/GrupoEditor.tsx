@@ -56,7 +56,7 @@ export function GrupoEditor({
       );
       onClose();
     } catch (e) {
-      toast(e instanceof Error ? e.message : "Erro ao salvar.", "error");
+      toast(e instanceof Error ? e.message : "Não rolou salvar agora. Tenta de novo?", "error");
     }
   }
 
@@ -103,7 +103,7 @@ export function GrupoEditor({
       {nameChanged && (
         <p className="rounded-md bg-surface-2 px-3 py-2 text-xs text-gold-800">
           Ao trocar o nome, ele passa por uma <strong>revisão rápida</strong> antes de aparecer
-          publicamente — o grupo segue funcionando normalmente.
+          publicamente. O grupo segue funcionando normalmente.
         </p>
       )}
 

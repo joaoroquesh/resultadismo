@@ -161,11 +161,11 @@ export function ComoFuncionaPage() {
               você palpitar. Tocou no card, ele vira{" "}
               <span className="font-bold text-ink-900">0×0</span> e aparecem os botões{" "}
               <span className="font-bold text-ink-900">+</span> e{" "}
-              <span className="font-bold text-ink-900">−</span> pra ajustar cada lado — sem teclado.
+              <span className="font-bold text-ink-900">−</span> pra ajustar cada lado, sem teclado.
             </p>
             <p className="text-sm leading-relaxed text-ink-600">
               O palpite <span className="font-semibold text-ink-900">salva sozinho</span> e dá pra
-              mudar à vontade até a bola rolar. Depois disso, trava — e aí é torcer.
+              mudar à vontade até a bola rolar. Depois disso, trava, e aí é torcer.
             </p>
           </Card>
         </Section>
@@ -210,7 +210,7 @@ export function ComoFuncionaPage() {
             <ScoreRow
               pts="0"
               title="Errou"
-              desc="O resultado foi diferente do que você palpitou. Faz parte — bola pra frente."
+              desc="O resultado foi diferente do que você palpitou. Faz parte, bola pra frente."
               pill="bg-ink-200"
               text="text-ink-500"
               icon={<Goal className="size-4 text-ink-400" strokeWidth={2.4} />}
@@ -240,35 +240,12 @@ export function ComoFuncionaPage() {
             </div>
             <p className="rounded-md bg-surface-2 px-3 py-2 text-xs font-medium text-brand-700">
               Atenção: você tem no máximo{" "}
-              <span className="font-bold">2 dobros por semana</span> (de segunda a domingo). Use com
-              estratégia — e cuidado, se errar o jogo dobrado você não perde pontos, mas perde a
-              chance de multiplicar.
+              <span className="font-bold">2 dobros por semana</span> (de segunda a domingo), e o
+              contador reinicia toda segunda. Os dobros{" "}
+              <span className="font-bold">não acumulam</span>: o que você não usar na semana não passa
+              pra próxima. Use com estratégia. E cuidado: se errar o jogo dobrado você não perde
+              pontos, mas perde a chance de multiplicar.
             </p>
-          </Card>
-        </Section>
-
-        {/* Resultadismo Retrô (mini-jogo) */}
-        <Section icon={<Gamepad2 className="size-4" strokeWidth={2.4} />} title="Resultadismo Retrô">
-          <Card className="space-y-2 p-4">
-            <p className="text-sm leading-relaxed text-ink-600">
-              O <span className="font-bold text-ink-900">Retrô</span> é o nosso mini-jogo de{" "}
-              <span className="font-bold text-ink-900">placares históricos</span>: 7 jogos reais de
-              Copas do Mundo (1930–2022) e poucos segundos para cravar cada um. A pontuação é a
-              mesma do Resultadismo (cravada +3, saldo +2, acerto +1) — pontuou, avança na sua
-              própria Copa; errou no mata-mata, caiu. Vale o placar final com prorrogação; pênaltis
-              não contam.
-            </p>
-            <p className="text-sm leading-relaxed text-ink-600">
-              Dá pra jogar <span className="font-bold text-ink-900">sem conta</span>. Logado, você
-              entra no <span className="font-bold text-ink-900">ranking da Copa do Dia</span> (uma
-              tentativa por dia, os mesmos 7 jogos para todo mundo) e acumula a sua sequência 🔥.
-            </p>
-            <Link
-              to="/retro"
-              className="block rounded-md bg-brand-600 px-3 py-2 text-center text-sm font-bold text-white"
-            >
-              Jogar a Copa Retrô de hoje 🕹️
-            </Link>
           </Card>
         </Section>
 
@@ -287,7 +264,7 @@ export function ComoFuncionaPage() {
                 O modo da temporada: todo mundo palpita nos mesmos jogos, os pontos somam e{" "}
                 <span className="font-semibold text-ink-900">quem somou mais lidera</span>. Todo
                 grupo joga o <span className="font-semibold text-ink-900">bolão da Copa do Mundo
-                2026</span> — você entra quando quiser, sem ficar de fora.
+                2026</span>: você entra quando quiser, sem ficar de fora.
               </p>
             </Card>
             <Card className="space-y-1.5 p-4">
@@ -333,7 +310,7 @@ export function ComoFuncionaPage() {
               </ol>
               <p className="text-xs leading-relaxed text-ink-500">
                 Também mostramos a <span className="font-semibold">acertividade</span> (em quantos
-                palpites você pontuou) — ótima pra estatística e pra zoeira no grupo.
+                palpites você pontuou): ótima pra estatística e pra zoeira no grupo.
               </p>
             </div>
           </Card>
@@ -345,12 +322,12 @@ export function ComoFuncionaPage() {
             O <span className="font-semibold text-ink-900">grupo</span> é o espaço onde você e seus
             amigos jogam. Nesta temporada, todo grupo joga o{" "}
             <span className="font-semibold text-ink-900">bolão da Copa do Mundo 2026</span>. Depois
-            da Copa chegam outros campeonatos — Brasileirão, top 5 da Europa, Série B, Libertadores
+            da Copa chegam outros campeonatos: Brasileirão, top 5 da Europa, Série B, Libertadores
             e Copa do Brasil.
           </p>
           <p className="text-sm leading-relaxed text-ink-600">
             Jogar, participar e <span className="font-semibold text-ink-900">criar grupos</span> é{" "}
-            <span className="font-semibold text-grass-700">100% grátis</span> — sem taxa, sem
+            <span className="font-semibold text-grass-700">100% grátis</span>: sem taxa, sem
             mensalidade, sem anúncio. Ao criar, você define quem pode{" "}
             <span className="font-semibold text-ink-900">ver</span> e quem pode{" "}
             <span className="font-semibold text-ink-900">entrar</span> no grupo.
@@ -358,13 +335,13 @@ export function ComoFuncionaPage() {
 
           <div>
             <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wide text-ink-400">
-              Visibilidade — quem enxerga o grupo
+              Visibilidade: quem enxerga o grupo
             </h3>
             <Card className="divide-y divide-border">
               <OptionRow
                 icon={<EyeOff className="size-4" strokeWidth={2.2} />}
                 title="Privada"
-                desc="Só aparece para quem é membro. Ninguém de fora encontra o grupo — ideal para a turma fechada de amigos."
+                desc="Só aparece para quem é membro. Ninguém de fora encontra o grupo: ideal para a turma fechada de amigos."
               />
               <OptionRow
                 icon={<Eye className="size-4" strokeWidth={2.2} />}
@@ -376,13 +353,13 @@ export function ComoFuncionaPage() {
 
           <div>
             <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wide text-ink-400">
-              Forma de entrada — quem pode participar
+              Forma de entrada: quem pode participar
             </h3>
             <Card className="divide-y divide-border">
               <OptionRow
                 icon={<Mail className="size-4" strokeWidth={2.2} />}
                 title="Convite"
-                desc="Só entra quem recebe o código ou o link de convite do grupo — quem abre o link já chega com o código preenchido. O controle é todo seu."
+                desc="Só entra quem recebe o código ou o link de convite do grupo. Quem abre o link já chega com o código preenchido. O controle é todo seu."
               />
               <OptionRow
                 icon={<UserCheck className="size-4" strokeWidth={2.2} />}
@@ -403,7 +380,7 @@ export function ComoFuncionaPage() {
             </span>
             <p className="text-sm leading-relaxed text-ink-600">
               Em cada jogo, abra <span className="font-semibold text-ink-900">"Quem já palpitou"</span>{" "}
-              pra ver quem do grupo está em dia — e{" "}
+              pra ver quem do grupo está em dia e{" "}
               <span className="font-semibold text-ink-900">cutucar</span> quem está devendo. Está em
               mais de um grupo? Filtre a lista por grupo e use a{" "}
               <Star className="inline size-3.5 -translate-y-px text-gold-500" aria-label="estrela" />{" "}
@@ -416,21 +393,21 @@ export function ComoFuncionaPage() {
             <p>
               Seu grupo fica <span className="font-semibold">ativo na hora</span>. Só o{" "}
               <span className="font-semibold">nome</span> passa por uma revisão rápida da moderação (pra
-              evitar nomes ofensivos) — e você já joga normalmente enquanto isso.
+              evitar nomes ofensivos), e você já joga normalmente enquanto isso.
             </p>
           </div>
         </Section>
 
-        {/* Gestão do Bolão */}
-        <Section icon={<HandCoins className="size-4" strokeWidth={2.4} />} title="Gestão do Bolão">
+        {/* Bolão valendo (ADR 0009: gestão do bolão pago) */}
+        <Section icon={<HandCoins className="size-4" strokeWidth={2.4} />} title="Bolão valendo">
           <Card className="space-y-2 p-4">
             <p className="text-sm leading-relaxed text-ink-600">
-              Seu grupo já combina um bolão entre amigos? A aba{" "}
-              <span className="font-semibold text-ink-900">Gestão</span> do grupo ajuda a organizar:
+              Seu grupo já combina um bolão valendo grana entre amigos? A aba{" "}
+              <span className="font-semibold text-ink-900">Bolão valendo</span> do grupo ajuda a organizar:
               o admin marca <span className="font-semibold text-ink-900">quem pagou</span>, registra
               o <span className="font-semibold text-ink-900">valor da inscrição</span> e define a{" "}
               <span className="font-semibold text-ink-900">divisão do prêmio</span> (1º, 2º e 3º).
-              Na classificação, um selo mostra quem está levando o quê — contando só quem
+              Na classificação, um selo mostra quem está levando o quê, contando só quem
               participa do bolão.
             </p>
             <p className="text-sm leading-relaxed text-ink-600">
@@ -455,9 +432,12 @@ export function ComoFuncionaPage() {
             <p className="text-sm leading-relaxed text-ink-600">
               Além dos seus grupos, existe a{" "}
               <span className="font-semibold text-ink-900">classificação geral</span> do
-              Resultadismo: o <span className="font-semibold text-brand-700">The Best</span>, com
-              todo mundo que topa participar. Você escolhe se aparece — e pode entrar ou sair quando
-              quiser, lá no seu perfil.
+              Resultadismo: o <span className="font-semibold text-brand-700">The Best</span>, o
+              pódio de quem mais entende de bola, com todo mundo que topa participar. Você escolhe se
+              aparece, e pode entrar ou sair quando quiser, lá no seu perfil.
+            </p>
+            <p className="mt-2 text-xs font-medium text-ink-400">
+              The Best 2026 <span className="text-ink-300">·</span> de 01/01 a 31/12
             </p>
           </Card>
         </Section>
@@ -477,9 +457,34 @@ export function ComoFuncionaPage() {
             </p>
             <p className="text-sm leading-relaxed text-ink-600">
               Dica: <span className="font-semibold text-ink-900">ative as notificações</span> pra
-              ser lembrado antes dos jogos — e{" "}
+              receber o lembrete antes dos jogos e{" "}
               <span className="font-semibold text-ink-900">instale o app</span> pra abrir num toque.
             </p>
+          </Card>
+        </Section>
+
+        {/* Resultadismo Retrô (mini-jogo) — fica no fim: é o atalho pro mini-jogo, depois do bolão principal */}
+        <Section icon={<Gamepad2 className="size-4" strokeWidth={2.4} />} title="Resultadismo Retrô">
+          <Card className="space-y-2 p-4">
+            <p className="text-sm leading-relaxed text-ink-600">
+              O <span className="font-bold text-ink-900">Retrô</span> é o nosso mini-jogo de{" "}
+              <span className="font-bold text-ink-900">placares históricos</span>: 7 jogos reais de
+              Copas do Mundo (1930–2022) e poucos segundos para cravar cada um. A pontuação é a
+              mesma do Resultadismo (cravada +3, saldo +2, acerto +1): pontuou, avança na sua
+              própria Copa; errou no mata-mata, caiu. Vale o placar final com prorrogação; pênaltis
+              não contam.
+            </p>
+            <p className="text-sm leading-relaxed text-ink-600">
+              Dá pra jogar <span className="font-bold text-ink-900">sem conta</span>. Com a conta,
+              você entra no <span className="font-bold text-ink-900">ranking da Copa do Dia</span> (uma
+              tentativa por dia, os mesmos 7 jogos para todo mundo) e acumula a sua sequência 🔥.
+            </p>
+            <Link
+              to="/retro"
+              className="block rounded-md bg-brand-600 px-3 py-2 text-center text-sm font-bold text-white"
+            >
+              Jogar a Copa Retrô de hoje 🕹️
+            </Link>
           </Card>
         </Section>
 

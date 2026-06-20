@@ -17,7 +17,7 @@ export function MaintenanceBanner() {
     <div className="sticky top-0 z-[60] flex items-center justify-center gap-2 bg-gold-500 px-4 py-2 text-center text-sm font-semibold text-ink-950">
       <Wrench className="size-4 shrink-0" />
       <span>
-        Manutenção LIGADA — só você (admin) vê o app.{" "}
+        Manutenção LIGADA: só você (admin) vê o app.{" "}
         {data.maintenance_message
           ? `Mensagem: "${data.maintenance_message}"`
           : "Sem mensagem custom."}

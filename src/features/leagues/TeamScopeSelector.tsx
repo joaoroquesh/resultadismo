@@ -40,7 +40,7 @@ export function TeamScopeSelector({
       />
       <p className="text-xs leading-snug text-ink-500">
         {scope === "all"
-          ? "A Copa inteira vale ponto — a disputa mais completa (recomendado)."
+          ? "A Copa inteira vale ponto: a disputa mais completa (recomendado)."
           : scope === "brasil"
             ? "Só os jogos do Brasil valem ponto no ranking do grupo."
             : "Só os jogos das seleções marcadas valem ponto no ranking."}

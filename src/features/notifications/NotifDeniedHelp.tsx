@@ -38,7 +38,7 @@ export function NotifDeniedHelp({
         As notificações estão bloqueadas
       </p>
       <p className="mt-1 text-xs text-ink-500">
-        O bloqueio foi feito no {ios || android ? "celular/navegador" : "navegador"} — só você
+        O bloqueio foi feito no {ios || android ? "celular/navegador" : "navegador"}, e só você
         consegue liberar. É rápido:
       </p>
 
@@ -104,7 +104,7 @@ export function NotifDeniedHelp({
 
       {!compact && (
         <Button variant="outline" size="sm" className="mt-3" loading={busy} onClick={retry}>
-          <RefreshCw className="size-4" /> Já liberei — tentar de novo
+          <RefreshCw className="size-4" /> Já liberei, tentar de novo
         </Button>
       )}
     </div>

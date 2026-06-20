@@ -140,7 +140,7 @@ export function TieRow({
       ) : tie.walkover ? (
         <span
           className="shrink-0 rounded-pill bg-flame-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white"
-          title="Vitória por W.O. — o adversário saiu do grupo"
+          title="Vitória por W.O.: o adversário saiu do grupo"
         >
           W.O.
         </span>

@@ -10,6 +10,14 @@ const styles: Record<ScoreType, string> = {
   erro: "bg-ink-200 text-ink-500",
 };
 
+/** Tooltip "como pontua" — explica o que cada tipo vale, ao passar o mouse. */
+const SCORE_HINT: Record<ScoreType, string> = {
+  cravada: "Cravada = placar exato, +3",
+  saldo: "Saldo = vencedor + diferença de gols, +2",
+  acerto: "Acerto = só quem venceu, +1",
+  erro: "Erro = não pontuou",
+};
+
 /** Selo +3/+2/+1 colorido pelo tipo de acerto. `doubled` aplica o Joker (2×).
  * `showZap=false` esconde o raio interno (quando já há um ⚡ 2× ao lado). */
 export function ScorePill({
@@ -28,6 +36,7 @@ export function ScorePill({
   const pts = SCORE_POINTS[type] * (doubled ? 2 : 1);
   return (
     <span
+      title={SCORE_HINT[type]}
       className={cn(
         "inline-flex items-center gap-1 rounded-pill px-2 py-0.5 text-xs font-bold tabular-nums",
         styles[type],

@@ -114,7 +114,7 @@ function LockedRow({ m }: { m: MatchConflict }) {
           onClick={() =>
             setLock.mutate(
               { matchId: m.id, locked: false },
-              { onSuccess: () => toast("Destravado — a API volta a decidir.", "success") },
+              { onSuccess: () => toast("Destravado: a API volta a decidir.", "success") },
             )
           }
         >
@@ -148,7 +148,7 @@ function LockedRow({ m }: { m: MatchConflict }) {
                 { matchId: m.id, home: Number(home) || 0, away: Number(away) || 0, status: m.status, lock: true },
                 {
                   onSuccess: () => { toast("Placar atualizado e travado.", "success"); setEditing(false); },
-                  onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
+                  onError: (e) => toast(e instanceof Error ? e.message : "Não deu pra salvar agora. Tenta de novo?", "error"),
                 },
               )
             }

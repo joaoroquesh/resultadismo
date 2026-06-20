@@ -36,7 +36,10 @@ export function LigasAdmin() {
   const [sort, setSort] = useState<GroupSortKey>("criacao");
   const [dir, setDir] = useState<SortDir>("desc");
 
-  // grupos já excluídas (soft) saem das listas normais e vão pra Lixeira
+  // grupos já excluídas (soft) saem das listas normais e vão pra Lixeira.
+  // Grupo não fica mais "pending" (nasce ativo, sem aprovação do app); a fila de
+  // pendentes some sozinha por ficar sempre vazia, mas o trecho segue aqui caso
+  // algum grupo legado ainda esteja nesse estado.
   const live = (leagues ?? []).filter((l) => !l.deleted_at);
   const pending = live.filter((l) => l.status === "pending");
   const others = live.filter((l) => l.status !== "pending");
@@ -72,18 +75,16 @@ export function LigasAdmin() {
         toast("Grupo excluído. Você tem 10 min para desfazer na Lixeira.", "success");
         setToDelete(null);
       },
-      onError: (e) => toast(e instanceof Error ? e.message : "Erro ao excluir.", "error"),
+      onError: (e) => toast(e instanceof Error ? e.message : "Não deu pra excluir agora. Tenta de novo?", "error"),
     });
   }
 
   return (
     <div className="space-y-4">
-      <section className="space-y-2">
-        <h2 className="text-xs font-bold uppercase tracking-wide text-ink-400">Aguardando aprovação</h2>
-        {pending.length === 0 ? (
-          <EmptyState title="Nada pendente" description="Novos grupos aparecerão aqui para aprovação." />
-        ) : (
-          pending.map((l) => (
+      {pending.length > 0 && (
+        <section className="space-y-2">
+          <h2 className="text-xs font-bold uppercase tracking-wide text-ink-400">Grupos legados pendentes</h2>
+          {pending.map((l) => (
             <Card key={l.id} className="p-4">
               <div className="mb-1 flex items-center justify-between">
                 <h3 className="font-bold text-ink-900">{l.name}</h3>
@@ -115,9 +116,9 @@ export function LigasAdmin() {
                 </Button>
               </div>
             </Card>
-          ))
-        )}
-      </section>
+          ))}
+        </section>
+      )}
 
       {others.length > 0 && (
         <section className="space-y-2">
@@ -175,7 +176,7 @@ export function LigasAdmin() {
                         {
                           onSuccess: () => toast("Nome sinalizado. O dono foi avisado.", "success"),
                           onError: (e) =>
-                            toast(e instanceof Error ? e.message : "Erro.", "error"),
+                            toast(e instanceof Error ? e.message : "Não deu agora. Tenta de novo?", "error"),
                         },
                       );
                     }}
@@ -225,7 +226,7 @@ export function LigasAdmin() {
                   onClick={() =>
                     restore.mutate(d.id, {
                       onSuccess: () => toast("Grupo restaurado!", "success"),
-                      onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
+                      onError: (e) => toast(e instanceof Error ? e.message : "Não deu pra restaurar agora. Tenta de novo?", "error"),
                     })
                   }
                 >

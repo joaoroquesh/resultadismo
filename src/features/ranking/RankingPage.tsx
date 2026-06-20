@@ -50,6 +50,11 @@ export function RankingPage() {
         </Button>
       }
     >
+      {/* Rótulo estático do período anual (só texto — não filtra a lista). */}
+      <p className="-mt-1 mb-4 text-xs font-medium text-ink-400">
+        The Best 2026 <span className="text-ink-300">·</span> de 01/01 a 31/12
+      </p>
+
       {/* Tabs de campeonato (recorte) */}
       <div className="no-scrollbar -mx-4 mb-4 flex gap-2 overflow-x-auto px-4">
         <Tab active={recorte === "todos"} onClick={() => setRecorte("todos")}>

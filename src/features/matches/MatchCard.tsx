@@ -168,7 +168,7 @@ export function MatchCard({
         finished ? "bg-ink-100 ring-border" : "bg-surface ring-border shadow-[var(--shadow-soft)]",
         live && "ring-2 ring-flame-400",
         pending && "ring-2 ring-gold-300",
-        isJoker && !pending && "ring-2 ring-gold-400",
+        isJoker && !pending && "ring-2 ring-brand-500",
       )}
     >
       {/* label */}
@@ -273,7 +273,9 @@ export function MatchCard({
                 <Check className="size-3" /> salvo
               </span>
             )}
-            {saveState === "error" && <span className="text-flame-600">erro</span>}
+            {saveState === "error" && (
+              <span className="text-flame-600">não salvou, tente de novo</span>
+            )}
             {saveState === "idle" &&
               (pending ? (
                 <span className="text-gold-700">faça seu palpite</span>
@@ -287,7 +289,17 @@ export function MatchCard({
               onClick={() =>
                 joker.mutate(
                   { matchId: match.id, value: !isJoker },
-                  { onError: (e) => toast(e instanceof Error ? e.message : "Erro no dobro", "error") },
+                  {
+                    onError: (e) => {
+                      const msg = e instanceof Error ? e.message : "";
+                      toast(
+                        /dobros? (desta|nesta) semana/i.test(msg)
+                          ? "Você já usou seus 2 dobros nesta semana. Zera na próxima segunda. 😉"
+                          : "Não rolou ativar o dobro agora. Tenta de novo daqui a pouco.",
+                        "error",
+                      );
+                    },
+                  },
                 )
               }
               className={cn(
@@ -300,8 +312,8 @@ export function MatchCard({
               aria-label="Dobrar pontos (2x)"
               title={
                 !isJoker && jokersUsed >= maxJokers
-                  ? "Você já usou seus dobros desta semana"
-                  : "Dobrar os pontos deste jogo"
+                  ? "Você já usou seus 2 dobros desta semana. Zera na próxima segunda."
+                  : "Dobrar os pontos deste jogo (2 por semana, seg a dom)"
               }
             >
               <Zap className={cn("size-3.5", isJoker && "fill-white")} /> 2×
@@ -343,6 +355,7 @@ export function MatchCard({
               live={live}
               liveHome={liveHome}
               liveAway={liveAway}
+              teamsDefined={!!match.home_team && !!match.away_team}
             />
           )}
         </>
@@ -457,6 +470,7 @@ function GaleraArea({
   live,
   liveHome,
   liveAway,
+  teamsDefined,
 }: {
   matchId: string;
   locked: boolean;
@@ -464,6 +478,7 @@ function GaleraArea({
   live: boolean;
   liveHome: number;
   liveAway: number;
+  teamsDefined: boolean;
 }) {
   const { session, user } = useAuth();
   const { data: leagues } = useMyLeagues();
@@ -544,7 +559,13 @@ function GaleraArea({
           myId={user?.id ?? null}
         />
       ) : (
-        <PredictStatus matchId={matchId} memberIds={memberIds} isFav={isFav} onStar={star} />
+        <PredictStatus
+          matchId={matchId}
+          memberIds={memberIds}
+          isFav={isFav}
+          onStar={star}
+          teamsDefined={teamsDefined}
+        />
       )}
     </div>
   );
@@ -701,17 +722,54 @@ function Galera({
   );
 }
 
+/**
+ * Traduz o erro cru do backend da cutucada em recado curto e amigável.
+ * A regra é toda validada no banco (nudge_for_match): anti-spam de ~30 min por
+ * par, jogo precisa estar aberto, alvo ainda sem palpite, par compartilha grupo.
+ * Aqui a gente só dá um tom boleiro e nunca deixa escapar um "Erro" seco.
+ */
+function nudgeErrorMessage(e: unknown): string {
+  const raw = e instanceof Error ? e.message : "";
+  const msg = raw.toLowerCase();
+
+  // Anti-spam: segunda cutucada no mesmo par dentro de ~30 min.
+  if (msg.includes("já cutucou") || msg.includes("ha pouco") || msg.includes("há pouco"))
+    return "Você já cutucou essa pessoa faz pouco. 😄 Espera um tiquinho.";
+
+  // Jogo já começou: não dá mais pra cobrar palpite.
+  if (msg.includes("já começou") || msg.includes("apito"))
+    return "A bola já rolou nesse jogo. Cutucada é só antes do apito. ⏱️";
+
+  // Times ainda não saíram (mata-mata com marcação): sem cutucada.
+  if (msg.includes("times definidos") || msg.includes("times saírem"))
+    return "Esse jogo ainda não tem os times. Dá pra cutucar quando eles saírem. ⏳";
+
+  // O alvo já mandou o palpite dele.
+  if (msg.includes("já palpitou"))
+    return "Relaxa, essa pessoa já cravou o palpite. 👍";
+
+  // Não compartilham grupo que dispute esse jogo.
+  if (msg.includes("compartilham") || msg.includes("federação"))
+    return "Vocês não estão no mesmo grupo nesse campeonato. Sem cutucada por aqui. 🤝";
+
+  // Qualquer outra causa: recado genérico, mas ainda gente boa.
+  return "Não rolou a cutucada agora. Tenta de novo daqui a pouco. 😉";
+}
+
 /** Antes do kickoff: membros do grupo e quem já palpitou (sem revelar o placar). */
 function PredictStatus({
   matchId,
   memberIds,
   isFav,
   onStar,
+  teamsDefined = true,
 }: {
   matchId: string;
   memberIds: Set<string> | null;
   isFav: (id: string) => boolean;
   onStar: (id: string) => void;
+  /** Times já saíram? Sem times definidos (mata-mata com marcação) não dá pra cutucar. */
+  teamsDefined?: boolean;
 }) {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -760,17 +818,18 @@ function PredictStatus({
               <span className="text-[11px] font-semibold text-gold-700">falta você!</span>
             ) : (
               <button
-                disabled={nudge.isPending}
+                disabled={nudge.isPending || !teamsDefined}
+                title={teamsDefined ? undefined : "Dá pra cutucar quando os times saírem"}
                 onClick={() =>
                   nudge.mutate(
                     { matchId, toUser: m.user_id },
                     {
                       onSuccess: () => toast("Cutucada enviada! 👉", "success"),
-                      onError: (e) => toast(e instanceof Error ? e.message : "Erro", "error"),
+                      onError: (e) => toast(nudgeErrorMessage(e), "info"),
                     },
                   )
                 }
-                className="flex items-center gap-1 rounded-pill px-2 py-0.5 text-[11px] font-semibold text-gold-700 transition-colors hover:bg-ink-100 disabled:opacity-50"
+                className="flex items-center gap-1 rounded-pill px-2 py-0.5 text-[11px] font-semibold text-gold-700 transition-colors hover:bg-ink-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Hand className="size-3.5" /> cutucar
               </button>

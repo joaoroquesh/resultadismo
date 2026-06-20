@@ -25,10 +25,10 @@ const SEGMENTS: { key: SegmentKey; label: string; hint: string }[] = [
   {
     key: "no_prediction",
     label: "Não palpitou hoje",
-    hint: "Quem tem jogo de hoje numa federação e ainda não palpitou.",
+    hint: "Quem tem jogo de hoje num grupo e ainda não palpitou.",
   },
   { key: "online", label: "Online agora", hint: "Quem está com o app aberto neste momento." },
-  { key: "group", label: "Um grupo", hint: "Os membros de uma federação." },
+  { key: "group", label: "Um grupo", hint: "Os membros de um grupo." },
   { key: "group_top", label: "Topo de um grupo", hint: "Os primeiros da classificação de uma competição." },
 ];
 
@@ -284,7 +284,7 @@ function PushStatsLine({ stats }: { stats?: { devices: number; users: number } }
   const pessoas = stats.users === 1 ? "pessoa" : "pessoas";
   return (
     <p className="text-xs text-ink-400">
-      Push no aparelho: {stats.devices} {aparelhos} ({stats.users} {pessoas}) — o resto recebe só
+      Push no aparelho: {stats.devices} {aparelhos} ({stats.users} {pessoas}). O resto recebe só
       no sininho.
     </p>
   );
