@@ -62,7 +62,7 @@ function NameReviewCard() {
               onClick={() =>
                 approve.mutate(l.id, {
                   onSuccess: () => toast("Nome liberado!", "success"),
-                  onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
+                  onError: (e) => toast(e instanceof Error ? e.message : "Não deu pra liberar agora. Tenta de novo?", "error"),
                 })
               }
             >
@@ -129,7 +129,7 @@ function PaymentSettingsCard() {
       },
       {
         onSuccess: () => toast("Configuração de pagamento salva.", "success"),
-        onError: (e) => toast(e instanceof Error ? e.message : "Erro ao salvar.", "error"),
+        onError: (e) => toast(e instanceof Error ? e.message : "Não deu pra salvar agora. Tenta de novo?", "error"),
       },
     );
   }
@@ -156,9 +156,9 @@ function PaymentSettingsCard() {
         />
         <p className="text-xs leading-snug text-ink-500">
           {mode === "disabled"
-            ? "Criar grupo é grátis (passa pela aprovação do admin, como antes)."
+            ? "Criar grupo é grátis: o grupo já nasce ativo, sem aprovação."
             : mode === "test"
-              ? "Cobrança simulada (sem dinheiro real) — para testar o fluxo de ponta a ponta."
+              ? "Cobrança simulada (sem dinheiro real): para testar o fluxo de ponta a ponta."
               : "Cobrança real via Mercado Pago (Pix/cartão). Requer os secrets configurados."}
         </p>
       </div>
@@ -205,7 +205,7 @@ function PaymentSettingsCard() {
             )}
             <p className="text-xs leading-snug text-ink-500">
               {promoLive
-                ? `Preço vigente agora: ${formatBRL(effectivePriceCents(settings))} — promoção ativa.`
+                ? `Preço vigente agora: ${formatBRL(effectivePriceCents(settings))} (promoção ativa).`
                 : promoOn
                   ? "A promoção passa a valer ao salvar, até a data escolhida (fim do dia, horário de Brasília)."
                   : `Preço vigente agora: ${formatBRL(effectivePriceCents(settings))}.`}
@@ -255,7 +255,7 @@ function DiscountCodesCard() {
           setValue("");
           setMaxUses("");
         },
-        onError: (e) => toast(e instanceof Error ? e.message : "Erro ao criar cupom.", "error"),
+        onError: (e) => toast(e instanceof Error ? e.message : "Não deu pra criar o cupom agora. Tenta de novo?", "error"),
       },
     );
   }
@@ -339,7 +339,7 @@ function DiscountCodesCard() {
                 onClick={() =>
                   toggle.mutate(
                     { id: d.id, active: !d.active },
-                    { onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error") },
+                    { onError: (e) => toast(e instanceof Error ? e.message : "Não deu pra mudar agora. Tenta de novo?", "error") },
                   )
                 }
               >

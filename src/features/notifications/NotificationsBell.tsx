@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { fromNow } from "@/lib/format";
+import { fromNow, dayjs } from "@/lib/format";
 import {
   useNotifications,
   useUnreadCount,
@@ -25,6 +25,22 @@ function notificationUrl(n: Notification): string {
     default:
       return "/"; // nudge/deadline/broadcast → palpitar nos Jogos
   }
+}
+
+// Cutucada: tempo que falta pro jogo, calculado AGORA (na leitura), não no envio.
+function kickoffHint(n: Notification): string | null {
+  if (n.type !== "nudge") return null;
+  const iso = typeof n.data?.kickoff_at === "string" ? (n.data.kickoff_at as string) : null;
+  if (!iso) return null;
+  const ko = dayjs(iso);
+  if (!ko.isValid()) return null;
+  const mins = ko.diff(dayjs(), "minute");
+  if (mins <= 0) return null; // jogo já começou
+  if (mins < 60) return `começa em ${mins} min`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `começa em ${hours}h`;
+  const days = Math.round(hours / 24);
+  return `começa em ${days} ${days === 1 ? "dia" : "dias"}`;
 }
 
 export function NotificationsBell({ className }: { className?: string }) {
@@ -100,7 +116,17 @@ export function NotificationsBell({ className }: { className?: string }) {
                         className="w-full px-4 py-3 text-left transition hover:bg-ink-50 active:bg-ink-100"
                       >
                         <p className="text-sm font-semibold text-ink-900">{n.title}</p>
-                        {n.body && <p className="mt-0.5 text-xs text-ink-500">{n.body}</p>}
+                        {(() => {
+                          const hint = kickoffHint(n); // "começa em 6h" | null
+                          const text = n.body
+                            ? hint
+                              ? `${n.body} que ${hint}`
+                              : n.body
+                            : null;
+                          return text ? (
+                            <p className="mt-0.5 text-xs text-ink-500">{text}</p>
+                          ) : null;
+                        })()}
                         <p className="mt-1 text-[10px] text-ink-400">{fromNow(n.created_at)}</p>
                       </button>
                     </li>

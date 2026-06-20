@@ -92,7 +92,7 @@ export function CompeticoesTab({
       setOpen(false);
       setCompetitionId("");
     } catch (err) {
-      toast(err instanceof Error ? err.message : "Erro ao adicionar.", "error");
+      toast(err instanceof Error ? err.message : "Não deu pra adicionar agora. Tenta de novo?", "error");
     }
   }
 
@@ -103,7 +103,7 @@ export function CompeticoesTab({
       toast(`Competição "${toDelete.name}" removida.`, "success");
       setToDelete(null);
     } catch (err) {
-      toast(err instanceof Error ? err.message : "Erro ao remover.", "error");
+      toast(err instanceof Error ? err.message : "Não deu pra remover agora. Tenta de novo?", "error");
     }
   }
 
@@ -234,7 +234,7 @@ export function CompeticoesTab({
             </div>
           ) : (
             <p className="text-xs leading-snug text-ink-500">
-              Bolão: corrida de pontos — quem soma mais lidera. Outros modos chegam em breve.
+              Bolão: corrida de pontos, quem soma mais lidera. Outros modos chegam em breve.
             </p>
           )}
           <div className="flex gap-2">

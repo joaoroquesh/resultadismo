@@ -165,7 +165,7 @@ export function ChangelogTab() {
   return (
     <div className="min-w-0 max-w-full">
       <p className="mb-3 text-sm text-ink-500">
-        O que mudou em cada versão — toque para abrir. Do mais recente ao mais antigo.
+        O que mudou em cada versão: toque para abrir. Do mais recente ao mais antigo.
       </p>
       <div className="overflow-hidden rounded-lg border border-border bg-surface">
         {BLOCKS.map((b, i) => {

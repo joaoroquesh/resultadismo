@@ -33,7 +33,7 @@ export function EscudoStudio({
       toast("Flâmula salva!", "success");
       onClose();
     } catch (e) {
-      toast(e instanceof Error ? e.message : "Erro ao salvar flâmula.", "error");
+      toast(e instanceof Error ? e.message : "Não deu pra salvar a flâmula agora. Tenta de novo?", "error");
     }
   }
 
@@ -43,7 +43,7 @@ export function EscudoStudio({
       toast("Flâmula voltou para o automático.", "info");
       onClose();
     } catch (e) {
-      toast(e instanceof Error ? e.message : "Erro ao resetar.", "error");
+      toast(e instanceof Error ? e.message : "Não deu pra resetar agora. Tenta de novo?", "error");
     }
   }
 
@@ -57,7 +57,7 @@ export function EscudoStudio({
         <div className="min-w-0">
           <p className="truncate font-bold text-ink-900">{leagueName}</p>
           <p className="text-xs text-ink-500">
-            Pré-visualização — a flâmula aparece no grupo e na classificação.
+            Pré-visualização: a flâmula aparece no grupo e na classificação.
           </p>
         </div>
       </div>

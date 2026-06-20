@@ -161,7 +161,7 @@ export function SorteioPanel({
           );
           setConfirm(false);
         },
-        onError: (e) => toast(e instanceof Error ? e.message : "Erro ao sortear.", "error"),
+        onError: (e) => toast(e instanceof Error ? e.message : "Não consegui sortear agora. Confere e tenta de novo.", "error"),
       },
     );
   };
@@ -251,7 +251,7 @@ export function SorteioPanel({
             toggleOptin.mutate(lcId, {
               onSuccess: (joined) =>
                 toast(joined ? "Você está dentro! Boa sorte." : "Inscrição cancelada.", joined ? "success" : "info"),
-              onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
+              onError: (e) => toast(e instanceof Error ? e.message : "Não deu pra atualizar agora. Tenta de novo?", "error"),
             })
           }
         >

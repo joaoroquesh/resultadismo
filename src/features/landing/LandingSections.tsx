@@ -247,14 +247,14 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
       <section>
         <Reveal className="rounded-xl bg-brand-600 px-6 py-9 text-center shadow-[var(--shadow-brand)] sm:px-8 sm:py-12">
           <span className="inline-flex items-center gap-1.5 rounded-pill bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
-            <Sparkles className="size-3.5" /> palpite e zoeira
+            <Sparkles className="size-3.5" /> o bolão da esportiva
           </span>
           <h1 className="mx-auto mt-4 max-w-md text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl">
-            Crave o placar. Dispute com os amigos.
+            Crave o placar. Prove que entende de bola.
           </h1>
           <p className="mx-auto mt-3 max-w-sm text-[15px] leading-relaxed text-white/90">
-            Palpite nos jogos de verdade, some pontos a cada acerto e veja quem manda no grupo.
-            Sem planilha, só futebol e rivalidade boa.
+            Aqui ponto se ganha cravando, não apostando. Palpite nos jogos de verdade, monte sua
+            turma e veja quem entende mais de futebol. É ser resultadista.
           </p>
           <div className="mt-6 flex flex-col items-center gap-4">
             <Button
@@ -292,7 +292,7 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
           <Reveal delay={60}>
             <FeatureRow icon={Users} title="Criar ou entrar em grupos">
               Monte um grupo privado e chame a galera com um link. Trabalho, família, panela de
-              amigos — você decide quem entra.
+              amigos: você decide quem entra.
             </FeatureRow>
           </Reveal>
           <Reveal delay={120}>
@@ -393,7 +393,7 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
             <CompetitionPill name="Copa do Brasil" status="em breve" />
           </div>
           <p className="mt-3 text-center text-xs text-ink-400">
-            Começamos pela Copa. As outras vêm chegando — fique de olho.
+            Começamos pela Copa. As outras vêm chegando, fique de olho.
           </p>
         </Reveal>
       </section>
@@ -411,7 +411,7 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
             Criar a conta, cravar os placares e montar seus{" "}
             <span className="font-semibold text-ink-700">grupos</span> com a galera é{" "}
             <span className="font-semibold text-grass-700">100% grátis</span>. Sem taxa, sem
-            mensalidade, sem anúncio — é só entrar e disputar.
+            mensalidade, sem anúncio. É só entrar e disputar.
           </p>
           <div className="mt-6">
             <Button
@@ -451,8 +451,8 @@ export function LandingSections({ onOpenLogin }: { onOpenLogin: () => void }) {
             família ou panela de amigos: você decide quem entra.
           </FaqItem>
           <FaqItem q="Isso é site de aposta?">
-            Não. Não tem aposta, pote nem prêmio em dinheiro. É disputa e zoeira entre amigos pelo
-            orgulho de cravar mais placares que eles.
+            Não. Aqui ponto se ganha cravando, não apostando: sem pote, sem prêmio em dinheiro. A
+            disputa é entre amigos, pelo orgulho de provar que entende mais de bola que eles.
           </FaqItem>
         </Reveal>
       </section>

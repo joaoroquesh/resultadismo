@@ -103,7 +103,7 @@ export function FeedbackPage({ product = "classico" }: { product?: "classico" | 
             {isRetro ? "Ajude a melhorar o Retrô! 🕹️" : "Construa o Resultadismo com a gente! 🛠️⚽"}
           </h2>
           <p className="mt-1 text-sm text-brand-900/80">
-            Achou um erro ou tem uma ideia? Conta pra gente — a gente lê tudo e te avisa aqui quando
+            Achou um erro ou tem uma ideia? Conta pra gente: a gente lê tudo e te avisa aqui quando
             resolver.
           </p>
         </Card>

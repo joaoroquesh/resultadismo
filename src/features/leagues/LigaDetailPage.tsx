@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { track } from "@/lib/analytics";
 import { shareGroupInvite } from "./inviteShare";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Copy, Clock, LogOut, Pencil, Sparkles, MessageCircle } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { ArrowLeft, Copy, LogOut, Pencil, Sparkles, MessageCircle } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -22,9 +21,7 @@ import {
   useLeagueCompetitions,
   useLeaveLeague,
   useSetConfrontoEnabled,
-  useLeagueCheckout,
 } from "./api";
-import { usePaymentSettings, useSimulatePayment, useCompLeague } from "@/features/payments/api";
 import { RefundFederationButton } from "./RefundFederationButton";
 import { ClassificacaoTab } from "./tabs/ClassificacaoTab";
 import { MembrosTab } from "./tabs/MembrosTab";
@@ -95,47 +92,14 @@ export function LigaDetailPage() {
 
   const leave = useLeaveLeague();
   const setConfronto = useSetConfrontoEnabled();
-  const checkout = useLeagueCheckout();
-  const simulate = useSimulatePayment();
-  const comp = useCompLeague();
-  const { data: paySettings } = usePaymentSettings();
-  const payMode = paySettings?.payment_mode ?? "disabled";
-  const qc = useQueryClient();
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  // Enquanto o pagamento estiver pendente, atualiza o grupo periodicamente
-  // (a webhook do Mercado Pago a ativa em segundos).
-  useEffect(() => {
-    if (league?.payment_status !== "pending") return;
-    let ticks = 0;
-    const t = setInterval(() => {
-      ticks += 1;
-      qc.invalidateQueries({ queryKey: ["league", slug] });
-      if (ticks >= 36) clearInterval(t); // para após ~3 min (evita poll indefinido)
-    }, 5000);
-    return () => clearInterval(t);
-  }, [league?.payment_status, slug, qc]);
-
-  // Mensagem ao voltar do checkout do Mercado Pago.
-  useEffect(() => {
-    const pag = searchParams.get("pagamento");
-    if (!pag) return;
-    if (pag === "sucesso") toast("Pagamento recebido! Ativando seu grupo…", "success");
-    else if (pag === "processando")
-      toast("Pagamento em processamento. O grupo será ativado em instantes.", "info");
-    else if (pag === "falhou")
-      toast("O pagamento não foi concluído. Você pode tentar de novo.", "error");
-    searchParams.delete("pagamento");
-    setSearchParams(searchParams, { replace: true });
-  }, [searchParams, setSearchParams, toast]);
 
   const tabs = useMemo(() => {
     const base: { value: Tab; label: string }[] = [
       { value: "classificacao", label: "Classificação" },
       { value: "membros", label: `Membros${members ? ` (${members.length})` : ""}` },
     ];
-    // Gestão antes de Competições: dá destaque à funcionalidade nova do bolão.
-    if (potLc && (potLc.pot_enabled || isAdmin)) base.push({ value: "bolao", label: "Gestão" });
+    // Bolão valendo antes de Competições: dá destaque à funcionalidade nova do bolão pago.
+    if (potLc && (potLc.pot_enabled || isAdmin)) base.push({ value: "bolao", label: "Bolão valendo" });
     if (isAdmin) base.push({ value: "competicoes", label: "Competições" });
     return base;
   }, [members, isAdmin, potLc]);
@@ -150,7 +114,7 @@ export function LigaDetailPage() {
   if (!league) {
     return (
       <Page title="Grupo">
-        <EmptyState title="Grupo não encontrada" description="Verifique o link ou o código." />
+        <EmptyState title="Grupo não encontrado" description="Verifique o link ou o código." />
       </Page>
     );
   }
@@ -180,7 +144,7 @@ export function LigaDetailPage() {
       toast("Você saiu do grupo.", "info");
       navigate("/grupos");
     } catch (err) {
-      toast(err instanceof Error ? err.message : "Erro ao sair.", "error");
+      toast(err instanceof Error ? err.message : "Não rolou sair agora. Tenta de novo?", "error");
     }
   }
 
@@ -193,110 +157,6 @@ export function LigaDetailPage() {
         </Button>
       }
     >
-      {league.name_approved === false && (
-        <div className="mb-4 flex items-start gap-2 rounded-md bg-surface-2 p-3 text-sm text-flame-700">
-          <Clock className="mt-0.5 size-4 shrink-0" />
-          <p>
-            O <strong>nome</strong> deste grupo foi sinalizado pela moderação e está escondido.{" "}
-            {isOwner ? (
-              <>
-                Toque em <strong>Editar grupo</strong> e escolha outro nome — o grupo segue ativo o
-                tempo todo.
-              </>
-            ) : (
-              <>O dono vai escolher um novo nome. O grupo segue funcionando normalmente.</>
-            )}
-          </p>
-        </div>
-      )}
-
-      {league.payment_status === "pending" && league.status !== "active" ? (
-        <div className="mb-4 rounded-md bg-surface-2 p-3 text-sm text-gold-800">
-          <div className="flex items-start gap-2">
-            <Clock className="mt-0.5 size-4 shrink-0" />
-            <p>
-              {payMode === "test"
-                ? "Modo de teste: conclua o pagamento simulado para ativar este grupo."
-                : "Este grupo será ativado assim que o pagamento for confirmado. Acabou de pagar? Pode levar alguns segundos."}
-            </p>
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {isOwner && payMode === "test" && (
-              <Button
-                size="sm"
-                loading={simulate.isPending}
-                onClick={() =>
-                  simulate.mutate(
-                    { leagueId: league.id },
-                    {
-                      onSuccess: () => toast("Pagamento simulado — grupo ativo!", "success"),
-                      onError: (e) => toast(e instanceof Error ? e.message : "Erro ao simular.", "error"),
-                    },
-                  )
-                }
-              >
-                Simular pagamento
-              </Button>
-            )}
-            {isOwner && payMode === "live" && (
-              <Button
-                size="sm"
-                loading={checkout.isPending}
-                onClick={() =>
-                  checkout.mutate(league.id, {
-                    onError: (e) =>
-                      toast(
-                        e instanceof Error ? e.message : "Não foi possível abrir o pagamento. Tente recarregar a página.",
-                        "error",
-                      ),
-                  })
-                }
-              >
-                Pagar agora
-              </Button>
-            )}
-            {isAppAdmin && (
-              <Button
-                size="sm"
-                variant="outline"
-                loading={comp.isPending}
-                onClick={() =>
-                  comp.mutate(league.id, {
-                    onSuccess: () => toast("Grupo liberada sem pagamento.", "success"),
-                    onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
-                  })
-                }
-              >
-                Liberar sem pagamento
-              </Button>
-            )}
-          </div>
-        </div>
-      ) : league.status === "pending" ? (
-        <div className="mb-4 rounded-md bg-surface-2 p-3 text-sm text-gold-800">
-          <div className="flex items-start gap-2">
-            <Clock className="mt-0.5 size-4 shrink-0" />
-            <p>Este grupo aguarda aprovação de um administrador para ficar ativa.</p>
-          </div>
-          {isAppAdmin && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="mt-3"
-              loading={comp.isPending}
-              onClick={() =>
-                comp.mutate(league.id, {
-                  onSuccess: () => toast("Grupo liberada.", "success"),
-                  onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
-                })
-              }
-            >
-              Liberar sem pagamento
-            </Button>
-          )}
-        </div>
-      ) : null}
-
       {/* Card 1 — Identidade: escudo + descrição + Editar */}
       <Card className="mb-4 p-4">
         <div className="flex items-start gap-3">
@@ -400,7 +260,7 @@ export function LigaDetailPage() {
                         "success",
                       ),
                     onError: (e) =>
-                      toast(e instanceof Error ? e.message : "Erro ao atualizar.", "error"),
+                      toast(e instanceof Error ? e.message : "Não deu pra atualizar agora. Tenta de novo?", "error"),
                   },
                 )
               }
@@ -411,18 +271,18 @@ export function LigaDetailPage() {
         </Card>
       )}
 
-      {/* Anúncio da Gestão do Bolão: só pra quem vê a aba (admin sempre; membro com pot ativo). */}
+      {/* Anúncio do Bolão valendo: só pra quem vê a aba (admin sempre; membro com pot ativo). */}
       {tabs.some((t) => t.value === "bolao") ? (
         <Coachmark
           storageKey="resultadismo-coach-gestao-bolao-v1"
-          title="Novidade: Gestão do Bolão"
+          title="Novidade: Bolão valendo"
           placement="bottom"
           caretTargetSelector="[data-value='bolao']"
           className="mb-4"
           content={
             <>
-              Na aba <span className="font-bold text-ink-50">Gestão</span> o grupo organiza o
-              bolão: quem pagou, valor da inscrição e divisão do prêmio. O dinheiro continua
+              Na aba <span className="font-bold text-ink-50">Bolão valendo</span> o grupo organiza o
+              bolão pago: quem pagou, valor da inscrição e divisão do prêmio. O dinheiro continua
               entre vocês, fora do Resultadismo.
             </>
           }
@@ -499,7 +359,7 @@ export function LigaDetailPage() {
         title="Sair do grupo?"
         message={
           confrontoEnabled
-            ? "Você vai sair deste grupo. Não vai mais participar e precisará ser convidado de novo para voltar. Se houver uma Liga ou Copa em andamento, você perde os confrontos restantes por W.O. e não volta a essas disputas — nem reentrando no grupo."
+            ? "Você vai sair deste grupo. Não vai mais participar e precisará ser convidado de novo para voltar. Se houver uma Liga ou Copa em andamento, você perde os confrontos restantes por W.O. e não volta a essas disputas, nem reentrando no grupo."
             : "Você vai sair deste grupo. Não vai mais participar e precisará ser convidado de novo para voltar."
         }
         step2Message={

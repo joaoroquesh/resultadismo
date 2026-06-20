@@ -61,7 +61,7 @@ export function ScheduledView({
               { lcId, leagueId },
               {
                 onSuccess: () => toast("Agendamento desfeito. Você pode reconfigurar.", "info"),
-                onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
+                onError: (e) => toast(e instanceof Error ? e.message : "Não deu pra desfazer agora. Tenta de novo daqui a pouco.", "error"),
               },
             )
           }

@@ -84,7 +84,7 @@ function FeedbackCard({ f }: { f: AdminFeedback }) {
           toast(msg ?? "Atualizado.", "success");
           setReplying(false);
         },
-        onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
+        onError: (e) => toast(e instanceof Error ? e.message : "Não deu agora. Tenta de novo?", "error"),
       },
     );
   }

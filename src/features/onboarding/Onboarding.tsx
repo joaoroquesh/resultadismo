@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Trophy, Target, Zap, ChevronRight, ChevronLeft } from "lucide-react";
+import { Trophy, Target, ChevronRight, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useFirstSeen } from "@/lib/useFirstSeen";
@@ -64,11 +64,11 @@ const SLIDES: Slide[] = [
   {
     icon: <Trophy className="size-9" />,
     iconWrap: "bg-surface-2 text-brand-600",
-    title: "Bem-vindo ao Resultadismo!",
+    title: "Boas-vindas, Resultadista! ⚽",
     body: (
       <p className="text-sm leading-relaxed text-ink-600">
-        Palpite nos placares dos jogos, dispute com a galera e veja quem manja mais de futebol.
-        Vamos te mostrar como funciona em 30 segundos.
+        Aqui ponto se ganha <span className="font-bold text-ink-900">cravando placar</span>, não
+        apostando. Dispute com a sua turma e prove que entende de bola. Bora ver como pontua?
       </p>
     ),
   },
@@ -100,21 +100,6 @@ const SLIDES: Slide[] = [
           desc="Foi no time certo, mas errou o saldo de gols."
         />
       </div>
-    ),
-  },
-  {
-    icon: <Zap className="size-9 fill-current" />,
-    iconWrap: "bg-surface-2 text-brand-600",
-    title: "Dobro de Pontos",
-    body: (
-      <p className="text-sm leading-relaxed text-ink-600">
-        Confiante num jogo? Ative o{" "}
-        <span className="inline-flex items-center gap-0.5 rounded-pill bg-brand-600 px-1.5 align-middle text-[11px] font-bold text-white">
-          <Zap className="size-2.5 fill-white" /> 2×
-        </span>{" "}
-        no palpite e ele vale <span className="font-bold text-ink-900">o dobro</span>. Mas calma: são
-        poucos por semana, então guarde para os palpites mais certeiros.
-      </p>
     ),
   },
 ];

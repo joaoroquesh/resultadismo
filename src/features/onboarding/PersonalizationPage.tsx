@@ -600,7 +600,7 @@ export function PersonalizationPage() {
             icon={<Heart className="size-5" />}
             tone="bg-surface-2 text-flame-600"
             title="Qual é o seu time do coração?"
-            subtitle="Escolha um. Pra deixar o Resultadismo com a sua cara — muda quando quiser."
+            subtitle="Escolha um. Pra deixar o Resultadismo com a sua cara (muda quando quiser)."
             teams={clubs}
             value={favoriteTeamId}
             onChange={setFavoriteTeamId}
@@ -613,7 +613,7 @@ export function PersonalizationPage() {
             icon={<Flag className="size-5" />}
             tone="bg-surface-2 text-grass-700"
             title="Pra que seleção você torce?"
-            subtitle="É Copa do Mundo! Escolha a sua — o Brasil abre a lista."
+            subtitle="É Copa do Mundo! Escolha a sua: o Brasil abre a lista."
             teams={nationals}
             value={nationalId}
             onChange={setNationalId}
@@ -667,8 +667,8 @@ export function PersonalizationPage() {
             <SplitSection
               icon={<Globe2 className="size-5" />}
               tone="bg-surface-2 text-brand-600"
-              title="Bora pro ranking geral?"
-              desc="O Resultadismo The Best junta todo mundo numa classificação só."
+              title="Bora disputar com o Brasil todo?"
+              desc="O Resultadismo The Best reúne todos os resultadistas numa classificação só: o pódio de quem mais entende de bola."
             >
               <div className="flex w-full items-center justify-between gap-3 rounded-md border border-ink-200 bg-surface p-4">
                 <div className="min-w-0">
@@ -791,7 +791,7 @@ function NotifSection({
       icon={<Bell className="size-5" />}
       tone="bg-surface-2 text-brand-600"
       title="Ative as notificações"
-      desc="Pra não esquecer de palpitar — a gente te lembra antes dos jogos."
+      desc="Pra não esquecer de palpitar, a gente te lembra antes dos jogos."
     >
       {push?.supported && push.permission === "denied" ? (
         <NotifDeniedHelp
@@ -800,7 +800,7 @@ function NotifSection({
             const res = await subscribePush(userId);
             qc.invalidateQueries({ queryKey: ["onboarding-push"] });
             onToast(
-              res.ok ? "Notificações ativadas! 🔔" : "Ainda bloqueado por aqui — confira o passo a passo.",
+              res.ok ? "Notificações ativadas! 🔔" : "Ainda bloqueado por aqui. Confira o passo a passo.",
               res.ok ? "success" : "error",
             );
             return res.ok;
@@ -814,7 +814,7 @@ function NotifSection({
       ) : (
         <p className="rounded-md border border-ink-200 bg-surface p-4 text-sm leading-relaxed text-ink-500">
           {isIOS()
-            ? "No iPhone, instale o app na tela inicial primeiro (abaixo) — aí as notificações funcionam."
+            ? "No iPhone, instale o app na tela inicial primeiro (abaixo); aí as notificações funcionam."
             : "Seu navegador não suporta notificações por aqui. Tente pelo Chrome do celular."}
         </p>
       )}

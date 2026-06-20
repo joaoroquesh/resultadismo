@@ -9,7 +9,7 @@ export function PrivacidadePage() {
         Esta Política explica como o <strong>Resultadismo</strong> ("nós", "app") coleta, usa e
         protege seus dados quando você usa o site e o aplicativo em{" "}
         <strong>resultadismo.com</strong>. O Resultadismo é um jogo de palpites de futebol entre
-        amigos — <strong>gratuito para jogar, participar e criar grupos</strong>. Não há apostas nem
+        amigos: <strong>gratuito para jogar, participar e criar grupos</strong>. Não há apostas nem
         dinheiro real em jogo. Ao usar o app, você concorda com esta Política, em conformidade com a Lei Geral
         de Proteção de Dados (LGPD, Lei nº 13.709/2018).
       </p>
@@ -84,20 +84,20 @@ export function PrivacidadePage() {
         </p>
         <ul className="list-disc space-y-1 pl-5">
           <li>
-            <strong>Supabase</strong> — banco de dados, autenticação e backend.
+            <strong>Supabase</strong>: banco de dados, autenticação e backend.
           </li>
           <li>
-            <strong>Vercel</strong> — hospedagem do site.
+            <strong>Vercel</strong>: hospedagem do site.
           </li>
           <li>
-            <strong>Google</strong> — login (OAuth) com sua conta Google.
+            <strong>Google</strong>: login (OAuth) com sua conta Google.
           </li>
           <li>
-            <strong>Serviços de push do navegador</strong> (Google, Apple, Mozilla) — apenas se você
+            <strong>Serviços de push do navegador</strong> (Google, Apple, Mozilla): apenas se você
             ativar notificações, para entregá-las ao seu dispositivo.
           </li>
           <li>
-            <strong>Google Analytics 4</strong> — métricas de uso agregadas e anonimizadas, apenas
+            <strong>Google Analytics 4</strong>: métricas de uso agregadas e anonimizadas, apenas
             se você aceitar no banner de consentimento. Não usamos para publicidade.
           </li>
         </ul>

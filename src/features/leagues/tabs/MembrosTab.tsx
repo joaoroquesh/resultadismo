@@ -99,7 +99,10 @@ export function MembrosTab({
                       },
                       {
                         onError: (e) =>
-                          toast(e instanceof Error ? e.message : "Erro.", "error"),
+                          toast(
+                            e instanceof Error ? e.message : "Não deu pra atualizar o pagamento. Tenta de novo?",
+                            "error",
+                          ),
                       },
                     )
                   }

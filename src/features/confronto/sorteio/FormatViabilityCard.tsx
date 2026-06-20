@@ -105,7 +105,7 @@ export function FormatViabilityCard({
       {!viavel && P > 0 && (
         <p className="mt-3 rounded-md bg-surface-2 px-3 py-2 text-xs leading-relaxed text-flame-700">
           {isLiga
-            ? `Reduza as rodadas — a competição só tem ${P} períodos.`
+            ? `Reduza as rodadas: a competição só tem ${P} períodos.`
             : `A Copa precisa de ${realRounds} fases e a competição só tem ${P} períodos. Use uma competição com mais rodadas.`}
         </p>
       )}

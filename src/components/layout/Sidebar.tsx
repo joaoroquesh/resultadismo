@@ -13,7 +13,7 @@ export function Sidebar() {
   const { open: openLogin } = useLoginModal();
 
   const items: { to: string; label: string; icon: LucideIcon; end: boolean; tour?: string }[] = [
-    { to: "/", label: "Jogos", icon: Goal, end: true },
+    { to: "/", label: "Jogos", icon: Goal, end: true, tour: "nav-jogos" },
     ...(session
       ? [
           { to: "/grupos", label: "Grupos", icon: Trophy, end: false, tour: "nav-grupos" },

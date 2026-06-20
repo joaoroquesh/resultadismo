@@ -126,9 +126,9 @@ export function NovaLigaPage() {
       if (payMode === "test") {
         try {
           await simulate.mutateAsync({ leagueId: league.id, code: appliedCode });
-          toast("Pagamento simulado aprovado — grupo ativo!", "success");
+          toast("Pagamento simulado aprovado. Grupo ativo!", "success");
         } catch {
-          toast("Grupo criado. Conclua o pagamento de teste na página dele.", "info");
+          toast("Grupo criado e já está ativo!", "info");
         }
         navigate(`/grupos/${slug}`);
         return;
@@ -156,7 +156,7 @@ export function NovaLigaPage() {
         navigate(`/grupos/${slug}`);
       }
     } catch (err) {
-      toast(err instanceof Error ? err.message : "Erro ao criar grupo.", "error");
+      toast(err instanceof Error ? err.message : "Não rolou criar o grupo agora. Tenta de novo?", "error");
       setRedirecting(false); // deu erro ao criar: libera o botão de novo
     }
   }
@@ -204,7 +204,7 @@ export function NovaLigaPage() {
               <span className="font-bold text-ink-50">Privado</span> só entra com o código de
               convite e ninguém de fora encontra.{" "}
               <span className="font-bold text-ink-50">Público</span> aparece pra todo mundo na lista
-              de grupos — e você escolhe se a entrada é{" "}
+              de grupos, e você escolhe se a entrada é{" "}
               <span className="font-bold text-ink-50">aberta</span> (entra na hora) ou{" "}
               <span className="font-bold text-ink-50">por aprovação</span> (você libera cada pedido).
             </>
@@ -312,8 +312,7 @@ export function NovaLigaPage() {
               max={cupPeriod?.data_max}
             />
             <p className="text-xs leading-snug text-ink-400">
-              Só os jogos a partir dessa data valem pontos neste grupo. Pode começar desde o início
-              da Copa (conta tudo) ou mais pra frente — e dá pra mudar depois na página do grupo.
+              Só os jogos a partir dessa data valem pontos neste grupo. Dá pra mudar depois.
             </p>
           </div>
         </Card>
@@ -345,7 +344,7 @@ export function NovaLigaPage() {
             </div>
             {discount?.valid && (
               <p className="text-xs font-medium text-grass-700">
-                Cupom {discount.code} aplicado — você paga {formatBRL(effectiveCents)}
+                Cupom {discount.code} aplicado: você paga {formatBRL(effectiveCents)}
                 {effectiveCents === 0 && " (grátis!)"}.
               </p>
             )}
@@ -372,8 +371,8 @@ export function NovaLigaPage() {
                 {promoActive && (
                   <>
                     {" "}
-                    <span className="text-brand-700/70 line-through">{formatBRL(baseCents)}</span> —
-                    promoção da Copa
+                    <span className="text-brand-700/70 line-through">{formatBRL(baseCents)}</span>{" "}
+                    (promoção da Copa)
                   </>
                 )}
                 , paga via Pix ou cartão no Mercado Pago. Ativa automaticamente após a confirmação.
@@ -389,8 +388,8 @@ export function NovaLigaPage() {
 
         <div className="rounded-md border border-border bg-surface p-3 text-xs leading-relaxed text-ink-500">
           <strong className="text-ink-700">O que é um grupo?</strong> É o espaço onde você e seus
-          amigos jogam o <strong>bolão da Copa</strong>. Depois da Copa chegam outros campeonatos —
-          Brasileirão, top 5 da Europa, Série B, Libertadores e Copa do Brasil — e o modo
+          amigos jogam o <strong>bolão da Copa</strong>. Depois da Copa chegam outros campeonatos:
+          Brasileirão, top 5 da Europa, Série B, Libertadores e Copa do Brasil, mais o modo
           confronto (em breve).
         </div>
 

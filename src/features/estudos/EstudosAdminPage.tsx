@@ -63,7 +63,7 @@ export function EstudosAdminPage() {
     >
       <div className="mb-4 flex items-center justify-between gap-3">
         <p className="text-sm text-ink-500">
-          Análises e estudos do produto — visíveis só para administradores.
+          Análises e estudos do produto, visíveis só para administradores.
         </p>
         <Button size="sm" onClick={() => setAdding((v) => !v)}>
           <Plus className="size-4" /> Adicionar

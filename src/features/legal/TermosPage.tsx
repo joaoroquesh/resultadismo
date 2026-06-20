@@ -6,7 +6,7 @@ export function TermosPage() {
   return (
     <LegalLayout title="Termos de Serviço" updatedAt="10 de junho de 2026">
       <p>
-        Bem-vindo ao <strong>Resultadismo</strong>. Estes Termos regem o uso do site e do aplicativo em{" "}
+        Boas-vindas ao <strong>Resultadismo</strong>. Estes Termos regem o uso do site e do aplicativo em{" "}
         <strong>resultadismo.com</strong>. Ao acessar ou usar o app, você concorda com estes Termos. Se
         não concordar, não use o serviço.
       </p>
@@ -44,18 +44,20 @@ export function TermosPage() {
 
       <LegalSection title="4. Grupos e moderação">
         <p>
-          Você pode criar e administrar grupos. A criação de grupos pode passar por aprovação. O
-          administrador do grupo gere seus membros e competições. O administrador geral do Resultadismo
-          pode <strong>moderar, aprovar, recusar ou excluir</strong> grupos e conteúdos que violem estes
-          Termos, a fim de manter a integridade do jogo.
+          Você pode criar e administrar grupos. Criar um grupo é livre e ele já nasce ativo: o{" "}
+          <strong>nome</strong> passa por uma revisão rápida e, se for impróprio, pedimos que você
+          troque (o grupo segue funcionando). O administrador do grupo gere seus membros e
+          competições. O administrador geral do Resultadismo pode{" "}
+          <strong>moderar, aprovar nomes, recusar ou excluir</strong> grupos e conteúdos que violem
+          estes Termos, a fim de manter a integridade do jogo.
         </p>
       </LegalSection>
 
-      <LegalSection title="5. Gestão do Bolão (organização entre membros)">
+      <LegalSection title="5. Bolão valendo (organização entre membros)">
         <p>
-          Grupos podem ativar a <strong>Gestão do Bolão</strong>, uma ferramenta{" "}
+          Grupos podem ativar o <strong>Bolão valendo</strong>, uma ferramenta{" "}
           <strong>opcional e meramente organizacional</strong> para grupos de amigos que, por conta
-          própria, combinam um bolão entre si. Nela, os administradores do grupo registram quem
+          própria, combinam um bolão com dinheiro entre si. Nela, os administradores do grupo registram quem
           contribuiu, o valor combinado e a divisão do prêmio.
         </p>
         <ul className="list-disc space-y-1 pl-5">
@@ -145,12 +147,12 @@ export function TermosPage() {
 
       <LegalSection title="13. Pagamentos">
         <p>
-          Hoje, <strong>criar e participar de grupos é totalmente gratuito</strong> — sem taxa, sem
+          Hoje, <strong>criar e participar de grupos é totalmente gratuito</strong>: sem taxa, sem
           mensalidade e sem cobrança de qualquer tipo. Não há aposta de dinheiro nem prêmios em dinheiro.
         </p>
         <p>
           Se, no futuro, oferecermos recursos pagos, o valor e as condições serão{" "}
-          <strong>apresentados com clareza antes de qualquer cobrança</strong> — você só paga se optar por
+          <strong>apresentados com clareza antes de qualquer cobrança</strong>: você só paga se optar por
           eles. Em qualquer dúvida, fale com a gente em <strong>{CONTATO}</strong>.
         </p>
       </LegalSection>

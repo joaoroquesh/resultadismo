@@ -28,7 +28,6 @@ import {
 } from "./api";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import { useMyGroupScopes } from "@/features/leagues/api";
-import { NovidadeBolaoModal } from "@/features/leagues/NovidadeBolaoModal";
 import { LandingSections } from "@/features/landing/LandingSections";
 import { FirstFold } from "@/features/landing/FirstFold";
 
@@ -51,6 +50,13 @@ const weekKey = (iso: string | null) => {
   const d = dayjs(iso).tz(TZ);
   const dow = (d.day() + 6) % 7; // 0=seg … 6=dom
   return d.subtract(dow, "day").format("YYYY-MM-DD");
+};
+
+// domingo (último dia da semana seg–dom, antes do reset na segunda) no formato DD/MM
+const weekEndLabel = (iso: string | null) => {
+  const monday = weekKey(iso);
+  if (monday === "sem-data") return "";
+  return dayjs(monday).add(6, "day").format("DD/MM");
 };
 
 // dia inicial sugerido: hoje, senão o próximo com jogos, senão o último (ou null se vazio)
@@ -299,6 +305,7 @@ export function JogosPage() {
 
   // Dobros da semana do DIA selecionado (global). Aparece em TODAS as abas.
   const jokersUsedThisWeek = day ? jokerWeekCounts.data?.get(weekKey(day)) ?? 0 : 0;
+  const jokerWeekEnd = day ? weekEndLabel(day) : "";
 
   const hasComps = (competitions?.length ?? 0) > 0;
 
@@ -366,7 +373,7 @@ export function JogosPage() {
           {shareSel.size === 0
             ? "Toque nos jogos"
             : shareSel.size === 1
-              ? "1 jogo — toque em mais (até de outro dia)"
+              ? "1 jogo: toque em mais (até de outro dia)"
               : `${shareSel.size} jogos na imagem`}
         </p>
         <button
@@ -400,10 +407,6 @@ export function JogosPage() {
         ) : undefined
       }
     >
-      {/* anúncio in-app da Gestão do Bolão: 1x, só pra quem já passou do 1º
-          acesso (não colide com o tour guiado dos novatos). */}
-      <NovidadeBolaoModal enabled={!!session && perso?.personalization_done === true} />
-
       {/* seletor de competição: "Todos" primeiro (padrão) */}
       {loadingComps ? (
         <Skeleton className="mb-3 h-9 w-full" />
@@ -572,15 +575,16 @@ export function JogosPage() {
               content={
                 <>
                   Ative o <span className="font-bold text-ink-50">2×</span> num palpite e ele vale o
-                  dobro. Você tem {WEEKLY_JOKER_LIMIT} por semana (somando todos os campeonatos) —
-                  use nos jogos que tiver mais confiança.
+                  dobro. Você tem {WEEKLY_JOKER_LIMIT} por semana (de segunda a domingo, somando
+                  todos os campeonatos), e o limite <span className="font-bold text-ink-50">zera toda
+                  segunda</span>. Use nos jogos de mais confiança.
                 </>
               }
               defaultOpen={user ? undefined : false}
             >
               <span className="inline-flex items-center gap-1 rounded-pill bg-brand-600 px-2 py-0.5 font-semibold text-white">
                 <Zap className="size-3 fill-brand-600" /> {jokersUsedThisWeek}/{WEEKLY_JOKER_LIMIT}{" "}
-                dobros nesta semana
+                dobros até {jokerWeekEnd}
               </span>
             </Coachmark>
           )}
@@ -596,11 +600,11 @@ export function JogosPage() {
       ) : dayMatches.length === 0 ? (
         <EmptyState
           icon={<CalendarClock className="size-7" />}
-          title="Sem jogos"
+          title="Bola parada por enquanto"
           description={
             isAll
-              ? "Quando rolar algum jogo nas competições ativas, ele aparece aqui por dia."
-              : "Quando houver jogos nesta competição, eles aparecem aqui por dia."
+              ? "Assim que rolar jogo nas competições ativas, ele aparece aqui pra você cravar o placar e provar que entende de bola."
+              : "Assim que rolar jogo nesta competição, ele aparece aqui pra você cravar o placar."
           }
         />
       ) : !session ? (

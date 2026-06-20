@@ -34,7 +34,7 @@ export function QualidadeTimesForaPage() {
       2,
     );
     void navigator.clipboard.writeText(snippet);
-    toast("JSON copiado — cole no data/teams-registry.json e rode npm run gen:all.", "info");
+    toast("JSON copiado: cole no data/teams-registry.json e rode npm run gen:all.", "info");
   };
 
   return (
@@ -85,7 +85,7 @@ export function QualidadeTimesForaPage() {
                 onClick={() =>
                   resolve.mutate(u.id, {
                     onSuccess: () => toast("Aceito como veio da API.", "success"),
-                    onError: (e) => toast(e instanceof Error ? e.message : "Erro", "error"),
+                    onError: (e) => toast(e instanceof Error ? e.message : "Não deu agora. Tenta de novo?", "error"),
                   })
                 }
               >

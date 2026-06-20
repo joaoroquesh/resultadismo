@@ -9,7 +9,7 @@ function Frame({ children }: { children: ReactNode }) {
         {children}
       </div>
       <p className="text-xs font-medium text-white/80">
-        Resultadismo — segurando a fila pra ninguém ficar na mão
+        Resultadismo: segurando a fila pra ninguém ficar na mão
       </p>
     </div>
   );
@@ -36,7 +36,7 @@ export function WaitingRoom({ info }: { info: AccessResult | null }) {
       <Spinner className="mx-auto mb-4 size-7" />
       <h1 className="text-lg font-extrabold text-ink-900">Tem muita gente junto agora! ⚽</h1>
       <p className="mt-2 text-sm text-ink-500">
-        Segura aí — assim que abrir uma vaga você entra automaticamente.
+        Segura aí: assim que abrir uma vaga você entra automaticamente.
         Não precisa atualizar a página.
       </p>
       {position != null && (

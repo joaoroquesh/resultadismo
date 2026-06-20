@@ -138,7 +138,7 @@ export function CompetitionDangerDialog({
             {archiveMode ? (
               <div className="rounded-md bg-surface-2 p-3 text-sm text-ink-800">
                 <p className="flex items-center gap-1.5 font-semibold text-gold-700">
-                  <AlertTriangle className="size-4" /> Em uso — vai arquivar (não apaga)
+                  <AlertTriangle className="size-4" /> Em uso: vai arquivar (não apaga)
                 </p>
                 <p className="mt-1 text-ink-600">
                   {u?.predictions ?? 0} palpite(s) e {u?.groups ?? 0} grupo(s) dependem dela. Em vez de

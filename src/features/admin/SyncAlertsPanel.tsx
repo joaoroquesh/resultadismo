@@ -46,7 +46,7 @@ function PendingAlert({ alert }: { alert: SyncAlert }) {
       {
         onSuccess: () =>
           toast(action === "approve" ? "Feito!" : "Alerta dispensado.", "success"),
-        onError: (e) => toast(e instanceof Error ? e.message : "Erro.", "error"),
+        onError: (e) => toast(e instanceof Error ? e.message : "Não deu agora. Tenta de novo?", "error"),
       },
     );
   }
