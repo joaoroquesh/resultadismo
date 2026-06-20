@@ -142,6 +142,14 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   com o **💰 valor**. `describeTeamScope` em `teamsCatalog`; `payers` propagado ao `StandingsTable`.
 
 ### Corrigido
+- **Bandeiras corrigidas de 7 seleções (Irã, Haiti, Egito, Tunísia, Austrália, Bósnia e
+  Herzegovina, Catar).** Os escudos **SVG antigos (errados/desatualizados)** desses países foram
+  trocados por **PNGs corretos** (enviados pelo João) — aparecem certos em todo o app (cards de jogo,
+  classificação, imagens de share). Slugs alinhados ao catálogo (`qatar`→`catar`,
+  `bosnia`→`bosniaeherzegovina`); `teamCrests` + `teams-catalog` (data **e** src) + `teams-canonical`
+  regenerados via `gen:all`. Sem migration (só assets + catálogos). Distinto das "77 seleções sem
+  cadastro" / "seleções em inglês sem escudo" — lá faltava escudo; aqui o escudo existia, mas estava
+  errado. (commit `64e6086`)
 - **Sync: fim do spam de alerta pro admin quando o fallback cobre.** A saúde da competição era
   presa SÓ ao sucesso da API primária — então toda vez que a `football-data` caía (mesmo com o
   ESPN/golden mantendo os placares atualizados), o admin levava alerta + push, e o alerta ficava
@@ -168,6 +176,12 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   re-centra após as fontes carregarem) — sem brigar com o scroll manual depois.
 
 ### Alterado
+- **Como Funciona: cada tipo de pontuação agora MOSTRA o exemplo (palpite → resultado).** Em vez de
+  só explicar entre parênteses, cada card ganhou a tira **"Você palpita [2×1] e o jogo termina
+  [2×1]"** em chips tabulares no padrão da landing — cravada (2×1→2×1), saldo (2×0→3×1, com a nota
+  do empate 1×1→2×2), acerto (2×0→1×0) e erro (2×0→0×1); as descrições foram enxugadas. Só front
+  (`features/help/ComoFuncionaPage.tsx`), sem migration. Complementa a "Como funciona reescrita" do
+  2.0.0, que tratou só da reestruturação das seções. (commit `98c2336`)
 - **Palpites da galera: só os SEUS grupos, na ordem dos favoritos, e ranking ao vivo.** O chip
   "Todos" morreu — palpite de quem não está nos seus grupos não aparece (sem grupo, a área convida
   a entrar num). Os chips seguem a MESMA ordem da página /grupos (favoritos primeiro, na ordem de
