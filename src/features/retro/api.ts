@@ -127,11 +127,14 @@ export type RetroBoardRow = {
   is_me: boolean;
 };
 
+export type RetroScope = "global" | "amigos";
 export type RetroBoard = {
   daily_date: string;
   level?: RetroLevel;
+  scope?: RetroScope;
   rows: RetroBoardRow[];
   me: { pos: number; stage_reached: string; points: number; total_ms: number } | null;
+  me_window?: { pos: number; display_name: string; avatar_url: string | null; stage_reached: string; points: number; is_me: boolean }[] | null;
 };
 
 export type RetroMyStats = {
@@ -263,17 +266,36 @@ export function useRetroNext() {
   });
 }
 
-export function useRetroLeaderboard(level: RetroLevel, board: "daily" | "treino" = "daily") {
+export function useRetroLeaderboard(
+  level: RetroLevel,
+  board: "daily" | "treino" = "daily",
+  scope: RetroScope = "global",
+) {
   return useQuery({
-    queryKey: ["retro-board", board, level],
+    queryKey: ["retro-board", board, level, scope],
     queryFn: async (): Promise<RetroBoard> => {
       const { data, error } = await supabase.rpc("retro_leaderboard", {
         p_level: level,
         p_limit: 50,
         p_board: board,
+        p_scope: scope,
       });
       if (error) throw new Error(error.message);
       return data as unknown as RetroBoard;
+    },
+  });
+}
+
+// Apelido + escudo do anônimo (pro card de share ter rosto)
+export function useSetAnonIdentity() {
+  return useMutation({
+    mutationFn: async (input: { anonToken: string; nickname: string; crest?: string | null }) => {
+      const { error } = await supabase.rpc("retro_set_anon_identity", {
+        p_anon_token: input.anonToken,
+        p_nickname: input.nickname,
+        p_crest: input.crest ?? undefined,
+      });
+      if (error) throw new Error(error.message);
     },
   });
 }

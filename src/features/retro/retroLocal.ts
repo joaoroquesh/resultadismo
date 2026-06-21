@@ -4,7 +4,25 @@
 
 const TOKEN_KEY = "rd_retro_anon";
 const SEEN_KEY = "rd_retro_seen";
+const NAME_KEY = "rd_retro_anon_name";
 const SEEN_MAX = 30;
+
+// Apelido do anônimo (pro card de share ter rosto). Guardado localmente; sincronizado
+// no banco via retro_set_anon_identity pra aparecer também na página pública do link.
+export function retroAnonName(): string {
+  try {
+    return localStorage.getItem(NAME_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
+export function setRetroAnonName(name: string) {
+  try {
+    localStorage.setItem(NAME_KEY, name);
+  } catch {
+    /* sem storage — segue sem apelido salvo */
+  }
+}
 
 export function retroAnonToken(): string {
   try {

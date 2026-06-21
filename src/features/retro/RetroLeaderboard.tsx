@@ -4,16 +4,22 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { cn } from "@/lib/utils";
-import { LEVEL_EMOJI, LEVEL_LABEL, useRetroLeaderboard, type RetroLevel } from "./api";
+import { useAuth } from "@/features/auth/AuthProvider";
+import { LEVEL_EMOJI, LEVEL_LABEL, useRetroLeaderboard, type RetroLevel, type RetroScope } from "./api";
 import { fmtMs } from "./share";
 
 // Ranking da Seleção do Dia (fase alcançada → pontos → tempo). Só entra quem jogou
 // logado no ritmo Resultadista — a comparação de tempo precisa ser justa.
 // No Jogo livre, o ranking é POR MODO (Amistoso/Clássico/Lenda) — sem misturar.
+// Logado pode ver SÓ os amigos (grafo dos grupos) + a própria vizinhança.
 export function RetroLeaderboard() {
+  const { user } = useAuth();
   const [level, setLevel] = useState<RetroLevel>("classico");
   const [board, setBoard] = useState<"daily" | "treino">("daily");
-  const { data, isLoading } = useRetroLeaderboard(level, board);
+  const [scope, setScope] = useState<RetroScope>("global");
+  const { data, isLoading } = useRetroLeaderboard(level, board, scope);
+  // só mostra a vizinhança quando o jogador está FORA do top exibido
+  const meOutsideTop = data?.me && !data.rows.some((r) => r.is_me);
 
   return (
     <Card className="space-y-3 p-4">
@@ -39,6 +45,17 @@ export function RetroLeaderboard() {
             }))}
             value={level}
             onChange={setLevel}
+          />
+        )}
+        {user && (
+          <SegmentedControl<RetroScope>
+            className="w-full"
+            options={[
+              { value: "global", label: "🌎 Todos" },
+              { value: "amigos", label: "👥 Meus grupos" },
+            ]}
+            value={scope}
+            onChange={setScope}
           />
         )}
       </div>
@@ -96,10 +113,39 @@ export function RetroLeaderboard() {
           Lidera quem <b>chega mais longe</b>. Empatou na fase? Decidem os <b>pontos</b>; depois, o <b>tempo</b>.
         </p>
       )}
-      {data?.me && !data.rows.some((r) => r.is_me) && (
-        <p className="text-center text-xs text-ink-500">
-          Você: {data.me.pos}º · {data.me.stage_reached} · {data.me.points} pts
-        </p>
+      {/* sua vizinhança: 2 acima / 2 abaixo + quantos pts faltam pro de cima */}
+      {meOutsideTop && data?.me_window && data.me_window.length > 0 && (
+        <div className="space-y-1 border-t border-border pt-2">
+          <p className="text-center text-[11px] font-semibold uppercase tracking-wide text-ink-400">
+            Você por aqui
+          </p>
+          <ol className="divide-y divide-border">
+            {data.me_window.map((r, i) => {
+              const above = data.me_window![i - 1];
+              const gap = r.is_me && above ? above.points - r.points : null;
+              return (
+                <li
+                  key={r.pos}
+                  className={cn(
+                    "flex items-center gap-3 py-1.5 text-sm",
+                    r.is_me && "rounded-md bg-brand-500/10 px-2 font-semibold",
+                  )}
+                >
+                  <span className="w-6 text-right font-bold tabular-nums text-ink-500">{r.pos}º</span>
+                  <span className="min-w-0 flex-1 truncate">
+                    {r.display_name}
+                    {gap != null && gap > 0 && (
+                      <span className="ml-1 text-[11px] font-normal text-flame-600">
+                        (faltam {gap} pt{gap > 1 ? "s" : ""} pro {r.pos - 1}º)
+                      </span>
+                    )}
+                  </span>
+                  <span className="shrink-0 text-right text-xs font-bold text-brand-800">{r.stage_reached}</span>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
       )}
     </Card>
   );

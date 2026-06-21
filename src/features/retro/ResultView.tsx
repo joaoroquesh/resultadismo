@@ -11,7 +11,16 @@ import { Confetti, RetroStripes, ZerouFx } from "./RetroFx";
 import { fmtMs, modeLabel, type FinishedRun } from "./share";
 import { isPenaltyOut, stageEmoji, verdictBadge, verdictHeadline } from "./verdict";
 import { shareCampaign } from "./shareImage";
-import { useClaimAchievements, useRetroAchievements, useRetroRankEstimate, useRetroRunRecords, type RetroAchievement } from "./api";
+import {
+  useClaimAchievements,
+  useRetroAchievements,
+  useRetroRankEstimate,
+  useRetroRunRecords,
+  useRetroSummary,
+  useSetAnonIdentity,
+  type RetroAchievement,
+} from "./api";
+import { retroAnonName, retroAnonToken, setRetroAnonName } from "./retroLocal";
 
 // Tela final: o "card" agora espelha a imagem do share (placar eletrônico escuro +
 // listras retrô), pra ser igual ao que a pessoa compartilha. Embaixo, o convite pro
@@ -19,11 +28,13 @@ import { useClaimAchievements, useRetroAchievements, useRetroRankEstimate, useRe
 export function ResultView({
   run,
   streak,
+  challengeCode,
   onPlayTraining,
   onBackHome,
 }: {
   run: FinishedRun;
   streak?: number;
+  challengeCode?: string | null;
   onPlayTraining: () => void;
   onBackHome: () => void;
 }) {
@@ -50,6 +61,19 @@ export function ResultView({
   const records = useRetroRunRecords(run.shareCode, !!user);
   const [newAch, setNewAch] = useState<RetroAchievement[]>([]);
   const claimed = useRef(false);
+
+  // apelido do anônimo (pro card de share ter rosto)
+  const setAnon = useSetAnonIdentity();
+  const [anonName, setAnonName] = useState(retroAnonName);
+  const sharePlayer = profile
+    ? { avatarUrl: profile.avatar_url, displayName: profile.display_name }
+    : anonName.trim()
+      ? { avatarUrl: null, displayName: anonName.trim() }
+      : undefined;
+
+  // duelo: comparar com a campanha de quem mandou o desafio (mesma Seleção do Dia)
+  const rival = useRetroSummary(challengeCode ?? undefined);
+  const rivalData = challengeCode ? rival.data : null;
   useEffect(() => {
     if (!user || claimed.current) return;
     claimed.current = true;
@@ -116,10 +140,59 @@ export function ResultView({
         </div>
       </div>
 
+      {/* duelo: você vs quem te desafiou (mesma Seleção do Dia) */}
+      {rivalData && (
+        <Card className="border-2 border-brand-500 p-3 text-center">
+          <p className="text-xs font-bold uppercase tracking-wide text-ink-500">Duelo</p>
+          <p className="mt-1 text-lg font-bold">
+            Você <span className="tabular-nums text-brand-700">{run.points}</span>
+            {" × "}
+            <span className="tabular-nums text-ink-700">{rivalData.points}</span>{" "}
+            {rivalData.player?.display_name ?? "rival"}
+          </p>
+          <p className="text-sm font-semibold">
+            {run.points > rivalData.points
+              ? "🏆 Você venceu o desafio!"
+              : run.points < rivalData.points
+                ? "😬 Ficou pra trás — bora a revanche!"
+                : "🤝 Empate técnico!"}
+          </p>
+        </Card>
+      )}
+
       {records.data?.record && (
         <p className="animate-retro-stamp rounded-md bg-gold-500/15 px-3 py-2 text-center text-sm font-bold text-gold-700 ring-1 ring-gold-500/40">
           🏅 NOVO RECORDE pessoal!
         </p>
+      )}
+
+      {/* apelido do anônimo: dá rosto ao card de share */}
+      {!user && (
+        <Card className="p-3">
+          <label className="text-xs font-semibold text-ink-600">Seu apelido no card (sem conta)</label>
+          <div className="mt-1 flex gap-2">
+            <input
+              value={anonName}
+              onChange={(e) => setAnonName(e.target.value)}
+              maxLength={24}
+              placeholder="Ex.: Zé da Várzea"
+              className="min-w-0 flex-1 rounded-md border border-ink-200 bg-surface px-3 py-1.5 text-sm outline-none focus:border-brand-500"
+            />
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={!anonName.trim()}
+              onClick={() => {
+                const name = anonName.trim();
+                setRetroAnonName(name);
+                setAnon.mutate({ anonToken: retroAnonToken(), nickname: name });
+                toast("Apelido salvo! Aparece no seu card 😎", "success");
+              }}
+            >
+              Salvar
+            </Button>
+          </div>
+        </Card>
       )}
 
       {newAch.length > 0 && (
@@ -142,9 +215,6 @@ export function ResultView({
         className="w-full font-bold"
         onClick={() => {
           track("retro_share", { status: run.status });
-          const sharePlayer = profile
-            ? { avatarUrl: profile.avatar_url, displayName: profile.display_name }
-            : undefined;
           void shareCampaign(run, streak, (m) => toast(m, "success"), sharePlayer);
         }}
       >
