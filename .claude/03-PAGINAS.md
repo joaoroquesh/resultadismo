@@ -53,7 +53,10 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
   acesso — espera o tour guiado terminar (`resultadismo:tour-done`) pra não sobrepor.
 - **`MatchCard`**: card do jogo — times/escudos, status (horário/ao vivo/encerrado), inputs do
   palpite (auto-save com debounce), botão **2×** (dobro), resultado + tipo de pontuação colorido,
-  "Galera" (quem palpitou). Trava ao chegar o `kickoff_at`.
+  "Galera" (quem palpitou). Trava ao chegar o `kickoff_at`. Depois do apito, respeita a preferência
+  local `resultadismo-match-card-score-layout-v1`: **Meu palpite** (padrão) mantém o palpite como
+  destaque e o resultado real em linha secundária; **Placar real** destaca o placar do jogo e leva o
+  palpite para uma linha "Seu palpite".
 
 ### Grupos — `features/leagues`
 - **`LigasPage`** (`/grupos`): topo com a **prévia da classificação dos grupos favoritados**
@@ -90,8 +93,8 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
 
 ### Perfil & jogadores — `features/profile`, `features/players`
 - **`PerfilPage`** (`/perfil`): avatar/escudo, stats globais, menu (Admin/Simulador/tour se
-  app-admin; grupos; como funciona), Aparência (tema), Instalar app (PWA), Notificações
-  (push), Sair.
+  app-admin; grupos; como funciona), Aparência (tema + formato do card após o apito), Instalar app
+  (PWA), Notificações (push), Sair.
 - **`EditarPerfilPage`** (`/perfil/editar`): **HUB** do perfil — escudo (`CrestEditor`) + nome + email
   + UF (chips); linhas de preferência (time do coração / seleção / campeonatos) com **preview** que
   abrem o editor focado (`/perfil/personalizar?only=…`, com Salvar); **The Best** no fim. Sem convite.

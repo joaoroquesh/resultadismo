@@ -16,6 +16,7 @@ import { useGamesScroll } from "./useGamesScroll";
 import { useDaySwipe } from "./useDaySwipe";
 import { provisionalScoreType, provisionalPoints } from "@/lib/score";
 import { teamCrestPath } from "@/lib/teamCrests";
+import { useMatchCardScoreLayout } from "@/lib/matchCardPreference";
 import { buildScoreShareImage, shareImageBlob, type ShareRow } from "./shareImage";
 import { useToast } from "@/components/ui/Toast";
 import { usePersonalizationState } from "@/features/onboarding/personalizationApi";
@@ -317,6 +318,7 @@ export function JogosPage() {
   // Teaser deslogado: no máximo 2 linhas (4 no desktop, 2 no mobile). Limita o que
   // renderiza — sem overflow/clip, pra não cortar o anel (ring) dos cards ao vivo.
   const foldGames = session ? dayMatches : dayMatches.slice(0, 4);
+  const [scoreLayout] = useMatchCardScoreLayout();
 
   // Ao TOCAR a aba do dia (ou abrir a tela), leva até o AO VIVO (ou o próximo a
   // começar) parando com um pedaço do card de cima à mostra. No SWIPE não rola —
@@ -377,6 +379,7 @@ export function JogosPage() {
               prediction={predMap?.get(m.id) ?? null}
               jokersUsed={jokerWeekCounts.data?.get(wk) ?? 0}
               maxJokers={WEEKLY_JOKER_LIMIT}
+              scoreLayout={scoreLayout}
               onShare={() => setShareSel(new Set([m.id]))}
             />
             {center && shareSel != null && (

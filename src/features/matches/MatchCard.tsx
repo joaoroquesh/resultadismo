@@ -17,6 +17,7 @@ import { useMyFavorites, useToggleFavorite } from "@/features/players/api";
 import type { MatchWithTeams, Prediction, ScoreType } from "@/lib/types";
 import { SCORE_LABEL, SCORE_POINTS } from "@/lib/types";
 import { provisionalScoreType } from "@/lib/score";
+import type { MatchCardScoreLayout } from "@/lib/matchCardPreference";
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 
@@ -55,12 +56,14 @@ export function MatchCard({
   prediction,
   jokersUsed = 0,
   maxJokers = 99,
+  scoreLayout = "prediction",
   onShare,
 }: {
   match: MatchWithTeams;
   prediction: Prediction | null;
   jokersUsed?: number;
   maxJokers?: number;
+  scoreLayout?: MatchCardScoreLayout;
   /** abre o modo de seleção da imagem já com este jogo marcado (página Jogos). */
   onShare?: () => void;
 }) {
@@ -260,6 +263,7 @@ export function MatchCard({
         : null;
 
   const shareType = scoreType ?? liveType;
+  const showRealScoreAsHero = (finished || live) && scoreLayout === "real";
 
   return (
     <div
@@ -309,31 +313,74 @@ export function MatchCard({
         )}
       </div>
 
-      {/* resultado: time + palpite + time */}
-      <div className="flex items-center justify-center gap-1.5 px-2 py-2.5">
-        <TeamSide name={match.home_team?.short_name ?? match.home_team_name} team={match.home_team} align="right" />
-        <div className="flex items-center gap-1.5">
-          {canEdit && !active ? (
-            <button
-              type="button"
-              onClick={startPredicting}
-              aria-label={home === "" ? "Fazer palpite" : "Editar palpite"}
-              className="flex items-center gap-1.5 rounded-md px-1 py-0.5 transition hover:bg-ink-50"
-            >
-              <ScoreBox value={home} onChange={() => {}} editable={false} scoreType={null} live={false} mine={home !== ""} />
-              <span className="text-sm font-bold text-ink-300">×</span>
-              <ScoreBox value={away} onChange={() => {}} editable={false} scoreType={null} live={false} mine={away !== ""} />
-            </button>
-          ) : (
-            <>
-              <ScoreBox value={home} onChange={setHomeScore} editable={canEdit && active} scoreType={scoreType} live={live} liveType={liveType} />
-              <span className="text-sm font-bold text-ink-300">×</span>
-              <ScoreBox value={away} onChange={setAwayScore} editable={canEdit && active} scoreType={scoreType} live={live} liveType={liveType} />
-            </>
+      {showRealScoreAsHero ? (
+        <>
+          <div className="flex items-center justify-center gap-2 px-2 py-3">
+            <TeamSide name={match.home_team?.short_name ?? match.home_team_name} team={match.home_team} align="right" />
+            <div className="flex items-center gap-2">
+              <RealScore value={live ? liveHome : match.home_score} live={live} />
+              <span className="text-xl font-bold text-ink-300">×</span>
+              <RealScore value={live ? liveAway : match.away_score} live={live} />
+            </div>
+            <TeamSide name={match.away_team?.short_name ?? match.away_team_name} team={match.away_team} align="left" />
+          </div>
+          {finished && isKnockout && match.home_pen != null && match.away_pen != null && (
+            <div className="-mt-2 pb-1 text-center text-[10px] text-ink-400">
+              pên. {match.home_pen}×{match.away_pen}
+            </div>
           )}
+          {prediction && (
+            <div className="flex flex-wrap items-center justify-center gap-2 border-t border-border px-3 py-1.5 text-xs">
+              <span className="text-ink-400">Seu palpite</span>
+              <span className="font-bold tabular-nums text-ink-700">
+                {prediction.home_pred} × {prediction.away_pred}
+              </span>
+              {finished && scoreType && <ScorePill type={scoreType} withLabel doubled={isJoker} />}
+              {live && liveType && (
+                <span className={cn("font-semibold tabular-nums", liveTextByType[liveType])}>
+                  {SCORE_LABEL[liveType]}{" "}
+                  {liveType === "erro" ? "0" : `+${SCORE_POINTS[liveType] * (isJoker ? 2 : 1)}`}
+                </span>
+              )}
+              {shareType && onShare && (
+                <button
+                  type="button"
+                  onClick={onShare}
+                  aria-label="Compartilhar resultado como imagem"
+                  className="flex h-6 shrink-0 items-center gap-1 rounded px-1.5 text-[11px] font-semibold text-ink-400 transition hover:bg-ink-100 hover:text-brand-700"
+                >
+                  <Share2 className="size-3.5" /> compartilhar
+                </button>
+              )}
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="flex items-center justify-center gap-1.5 px-2 py-2.5">
+          <TeamSide name={match.home_team?.short_name ?? match.home_team_name} team={match.home_team} align="right" />
+          <div className="flex items-center gap-1.5">
+            {canEdit && !active ? (
+              <button
+                type="button"
+                onClick={startPredicting}
+                aria-label={home === "" ? "Fazer palpite" : "Editar palpite"}
+                className="flex items-center gap-1.5 rounded-md px-1 py-0.5 transition hover:bg-ink-50"
+              >
+                <ScoreBox value={home} onChange={() => {}} editable={false} scoreType={null} live={false} mine={home !== ""} />
+                <span className="text-sm font-bold text-ink-300">×</span>
+                <ScoreBox value={away} onChange={() => {}} editable={false} scoreType={null} live={false} mine={away !== ""} />
+              </button>
+            ) : (
+              <>
+                <ScoreBox value={home} onChange={setHomeScore} editable={canEdit && active} scoreType={scoreType} live={live} liveType={liveType} />
+                <span className="text-sm font-bold text-ink-300">×</span>
+                <ScoreBox value={away} onChange={setAwayScore} editable={canEdit && active} scoreType={scoreType} live={live} liveType={liveType} />
+              </>
+            )}
+          </div>
+          <TeamSide name={match.away_team?.short_name ?? match.away_team_name} team={match.away_team} align="left" />
         </div>
-        <TeamSide name={match.away_team?.short_name ?? match.away_team_name} team={match.away_team} align="left" />
-      </div>
+      )}
 
       {/* mata-mata: quem passa de fase (+1). Vitória = travado pelo placar; empate = escolha. */}
       {canEdit &&
@@ -395,7 +442,7 @@ export function MatchCard({
         })()}
 
       {/* resultado real (ao vivo mostra 0×0 enquanto a API não confirma) */}
-      {(finished || live) && (
+      {(finished || live) && !showRealScoreAsHero && (
         <div className="flex items-center justify-center gap-2 border-t border-border py-1.5 text-xs">
           <span className="text-ink-400">{live ? "Ao vivo" : "Resultado"}</span>
           <span className={cn("font-extrabold tabular-nums", live ? "text-flame-600" : "text-ink-800")}>
@@ -663,6 +710,19 @@ function ScoreBox({
       )}
     >
       {display}
+    </span>
+  );
+}
+
+function RealScore({ value, live }: { value: number | null; live: boolean }) {
+  return (
+    <span
+      className={cn(
+        "min-w-[1.75rem] text-center text-[28px] font-extrabold leading-none tabular-nums",
+        live ? "text-flame-600" : "text-ink-950",
+      )}
+    >
+      {value ?? 0}
     </span>
   );
 }

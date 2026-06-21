@@ -27,6 +27,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/components/ui/Toast";
 import {
   subscribePush,
@@ -45,6 +46,10 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useSetGlobalRankingVisibility } from "@/features/ranking/api";
 import { Switch } from "@/components/ui/Switch";
+import {
+  MATCH_CARD_SCORE_LAYOUT_OPTIONS,
+  useMatchCardScoreLayout,
+} from "@/lib/matchCardPreference";
 
 function Stat({ value, label, accent }: { value: string | number; label: string; accent?: string }) {
   return (
@@ -59,6 +64,7 @@ export function PerfilPage() {
   const { profile, user, isAppAdmin, signOut } = useAuth();
   const { data: stats } = usePlayerStats();
   const { toast } = useToast();
+  const [matchCardScoreLayout, setMatchCardScoreLayout] = useMatchCardScoreLayout();
 
   // --- Instalação do app (PWA) ---
   const installState = useInstallState();
@@ -302,9 +308,25 @@ export function PerfilPage() {
           </Link>
         </Card>
 
-        <Card className="flex items-center justify-between p-4">
-          <span className="font-medium text-ink-900">Aparência</span>
-          <ThemeToggle />
+        <Card className="space-y-4 p-4">
+          <div className="flex items-center justify-between gap-4">
+            <span className="font-medium text-ink-900">Aparência</span>
+            <ThemeToggle />
+          </div>
+          <div className="border-t border-border pt-4">
+            <div className="mb-3">
+              <p className="font-medium text-ink-900">Card após o apito</p>
+              <p className="mt-0.5 text-xs text-ink-500">
+                Escolha o destaque quando o jogo estiver ao vivo ou encerrado.
+              </p>
+            </div>
+            <SegmentedControl
+              options={MATCH_CARD_SCORE_LAYOUT_OPTIONS}
+              value={matchCardScoreLayout}
+              onChange={setMatchCardScoreLayout}
+              className="w-full"
+            />
+          </div>
         </Card>
 
         {/* Instalar o app (PWA) — sempre visível */}

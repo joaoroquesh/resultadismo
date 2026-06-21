@@ -21,6 +21,12 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+### Adicionado
+- **Preferência de formato do card após o apito.** Em Perfil > Aparência, o usuário pode escolher
+  entre manter **Meu palpite** como destaque (padrão atual) ou destacar o **Placar real** quando o
+  jogo estiver ao vivo/encerrado, levando o palpite para uma linha "Seu palpite". Preferência local
+  do dispositivo, sem mudança de banco nem pontuação.
+
 ## [2.6.0] — 2026-06-27
 
 ### Corrigido
