@@ -29,7 +29,7 @@ import {
   type RetroStart,
 } from "./api";
 import { dailyEdition } from "./share";
-import { retroMarkSeen, warmRetroFlags } from "./retroLocal";
+import { anonStreak, recordAnonDaily, retroMarkSeen, warmRetroFlags } from "./retroLocal";
 import { RetroCrest } from "./RetroCrest";
 import { RunView } from "./RunView";
 import { RevealCard } from "./RevealCard";
@@ -191,6 +191,10 @@ export function RetroPage() {
               points: ans.run.points,
               daily: run?.isDaily ?? false,
             });
+            // anônimo: registra a sequência local da Seleção do Dia (gancho de login)
+            if (!user && run?.isDaily && today.data?.daily_date) {
+              recordAnonDaily(today.data.daily_date);
+            }
           }
           setRun((r) =>
             r && r.current
@@ -520,6 +524,14 @@ function Home({
             {streak > 0 && <>🔥 {streak} dia{streak > 1 ? "s" : ""}{streakAtRisco && " — não perca hoje!"}</>}
             {streak > 0 && best && " · "}
             {best && <>melhor: {best.stage_reached}</>}
+          </p>
+        )}
+        {!isLogged && anonStreak() > 0 && (
+          <p className="mt-2 text-xs font-semibold text-white/95">
+            🔥 {anonStreak()} dia{anonStreak() > 1 ? "s" : ""} seguidos ·{" "}
+            <button type="button" className="underline" onClick={onLogin}>
+              crie conta pra não perder
+            </button>
           </p>
         )}
       </Card>

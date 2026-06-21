@@ -9,6 +9,34 @@ const SEEN_MAX = 30;
 
 // Apelido do anônimo (pro card de share ter rosto). Guardado localmente; sincronizado
 // no banco via retro_set_anon_identity pra aparecer também na página pública do link.
+// Streak local do anônimo: dias seguidos jogando a Seleção do Dia. Gancho pra logar
+// ("crie conta pra não perder sua sequência"). Guardado só no localStorage.
+const STREAK_KEY = "rd_retro_anon_streak";
+type AnonStreak = { last: string; count: number };
+export function anonStreak(): number {
+  try {
+    const s = JSON.parse(localStorage.getItem(STREAK_KEY) ?? "null") as AnonStreak | null;
+    return s?.count ?? 0;
+  } catch {
+    return 0;
+  }
+}
+// registra que o anônimo jogou a Seleção do Dia de `dateStr` (YYYY-MM-DD) e devolve o streak.
+export function recordAnonDaily(dateStr: string): number {
+  try {
+    const s = JSON.parse(localStorage.getItem(STREAK_KEY) ?? "null") as AnonStreak | null;
+    if (s?.last === dateStr) return s.count; // já contou hoje
+    const yesterday = new Date(`${dateStr}T00:00:00Z`);
+    yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+    const yStr = yesterday.toISOString().slice(0, 10);
+    const count = s && s.last === yStr ? s.count + 1 : 1;
+    localStorage.setItem(STREAK_KEY, JSON.stringify({ last: dateStr, count }));
+    return count;
+  } catch {
+    return 0;
+  }
+}
+
 export function retroAnonName(): string {
   try {
     return localStorage.getItem(NAME_KEY) ?? "";

@@ -456,6 +456,30 @@ export function useRetroDailyExtras() {
   });
 }
 
+// Lembrete diário da Seleção do Dia (push opt-in, default off)
+export function useRetroReminder(enabled = true) {
+  return useQuery({
+    enabled,
+    queryKey: ["retro-reminder"],
+    queryFn: async (): Promise<boolean> => {
+      const { data, error } = await supabase.rpc("retro_get_daily_reminder");
+      if (error) throw new Error(error.message);
+      return (data as unknown as boolean) ?? false;
+    },
+  });
+}
+export function useSetRetroReminder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (on: boolean) => {
+      const { error } = await supabase.rpc("retro_set_daily_reminder", { p_on: on });
+      if (error) throw new Error(error.message);
+      return on;
+    },
+    onSuccess: (on) => qc.setQueryData(["retro-reminder"], on),
+  });
+}
+
 // A Copa do Dia de hoje é de qual seleção?
 export function useRetroToday() {
   return useQuery({
