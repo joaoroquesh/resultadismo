@@ -1,13 +1,22 @@
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { Switch } from "@/components/ui/Switch";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Escudo } from "@/components/ui/Escudo";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
+import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/lib/utils";
 import { RetroStripes } from "./RetroFx";
-import { useRetroAchievements, useRetroCollection, useRetroMyStats } from "./api";
+import {
+  useRetroAchievements,
+  useRetroCollection,
+  useRetroMyStats,
+  useRetroReminder,
+  useSetRetroReminder,
+} from "./api";
+import { subscribePush } from "@/features/notifications/push";
 import { fmtMs } from "./share";
 
 // "Minha Copa Retrô" (/retro/eu): identidade e progressão próprias do jogador —
@@ -17,9 +26,12 @@ export function RetroProfilePage() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const { open: openLogin } = useLoginModal();
+  const { toast } = useToast();
   const stats = useRetroMyStats();
   const ach = useRetroAchievements(!!user);
   const col = useRetroCollection(!!user);
+  const reminder = useRetroReminder(!!user);
+  const setReminder = useSetRetroReminder();
 
   if (!user) {
     return (
@@ -72,6 +84,25 @@ export function RetroProfilePage() {
       ) : (
         <Skeleton className="h-20 w-full" />
       )}
+
+      {/* lembrete diário (push opt-in) */}
+      <Card className="flex items-center justify-between gap-3 p-4">
+        <div>
+          <p className="text-sm font-bold">🔔 Me lembra da Seleção do Dia</p>
+          <p className="text-xs text-ink-500">Um aviso por dia pra não perder a sequência.</p>
+        </div>
+        <Switch
+          checked={reminder.data ?? false}
+          label="Lembrete diário"
+          onChange={(on) => {
+            if (on && user) void subscribePush(user.id);
+            setReminder.mutate(on, {
+              onSuccess: () => toast(on ? "Lembrete ligado! 🔔" : "Lembrete desligado.", "success"),
+              onError: (e) => toast(e.message, "error"),
+            });
+          }}
+        />
+      </Card>
 
       {/* melhor campanha */}
       {s?.best && (

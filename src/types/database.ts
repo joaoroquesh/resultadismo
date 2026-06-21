@@ -1367,6 +1367,7 @@ export type Database = {
           national_team_id: string | null
           notif_prefs: Json
           personalization_done: boolean
+          retro_daily_reminder: boolean
           retro_last_active_at: string | null
           retro_usage_seconds: number
           show_in_global_ranking: boolean
@@ -1392,6 +1393,7 @@ export type Database = {
           national_team_id?: string | null
           notif_prefs?: Json
           personalization_done?: boolean
+          retro_daily_reminder?: boolean
           retro_last_active_at?: string | null
           retro_usage_seconds?: number
           show_in_global_ranking?: boolean
@@ -1417,6 +1419,7 @@ export type Database = {
           national_team_id?: string | null
           notif_prefs?: Json
           personalization_done?: boolean
+          retro_daily_reminder?: boolean
           retro_last_active_at?: string | null
           retro_usage_seconds?: number
           show_in_global_ranking?: boolean
@@ -3109,9 +3112,11 @@ export type Database = {
       }
       retro_best_streak: { Args: { p_user: string }; Returns: number }
       retro_claim_achievements: { Args: never; Returns: Json }
+      retro_create_daily_reminders: { Args: never; Returns: number }
       retro_daily_count: { Args: never; Returns: number }
       retro_fact_is_spoiler: { Args: { p_fact: string }; Returns: boolean }
       retro_get_config: { Args: never; Returns: Json }
+      retro_get_daily_reminder: { Args: never; Returns: boolean }
       retro_leaderboard: {
         Args: {
           p_board?: string
@@ -3176,6 +3181,7 @@ export type Database = {
         Args: { p_anon_token: string; p_crest?: string; p_nickname: string }
         Returns: undefined
       }
+      retro_set_daily_reminder: { Args: { p_on: boolean }; Returns: undefined }
       retro_slot_label: { Args: { p_slot: number }; Returns: string }
       retro_start_run: {
         Args: {
