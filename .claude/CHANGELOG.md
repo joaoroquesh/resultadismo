@@ -9,7 +9,7 @@ Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 > **Como usar:** toda mudança que sobe ganha uma entrada (passo 7 do protocolo em
 > [`MESTRE.md`](MESTRE.md) §5 / [`08-PROCESSO.md`](08-PROCESSO.md)). Acumule em **[Não lançado]**
 > enquanto desenvolve; ao subir, mova para uma versão datada e atualize o `package.json`.
-> Numeração (ADR 0003): legado = **v0**, **1.x = soft-launch** (última: 1.11.0), **2.0 = Copa** (atual: **2.4.0**; **[Não lançado]** acumula o ao vivo em todo o app → próximo corte **2.5.0**). As
+> Numeração (ADR 0003): legado = **v0**, **1.x = soft-launch** (última: 1.11.0), **2.0 = Copa** (atual: **2.5.0**). As
 > versões abaixo foram **relabel 2.x → 1.x** (só o dígito MAJOR; detalhe preservado). A versão **só
 > sobe em release deliberado**, não a cada commit. **MAJOR** = marco/overhaul · **MINOR** = recurso
 > perceptível · **PATCH** = correção/refino (ADR 0003). Evolução anterior em [`HISTORICO.md`](HISTORICO.md).
@@ -20,6 +20,12 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 ---
 
 ## [Não lançado]
+
+_(vazio — as próximas mudanças se acumulam aqui até o próximo corte de versão)_
+
+## [2.5.0] — 2026-06-20
+
+> Ao vivo em **todo** o app (ranking global, previews dos grupos e o valor do bolão acompanham os jogos em andamento) + uma passada de **copy/UX** (Bolão valendo, dobro mais claro, cutucada com o jogo, personalização obrigatória).
 
 ### Adicionado
 - **AO VIVO consistente em todo o app** (estende a Classificação ao vivo). Agora o **Resultadismo
