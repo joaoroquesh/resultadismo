@@ -33,6 +33,7 @@ const RetroSharePage = lazy(() => import("@/features/retro/RetroSharePage").then
 const RetroShell = lazy(() => import("@/features/retro/RetroShell").then((m) => ({ default: m.RetroShell })));
 const RetroRulesPage = lazy(() => import("@/features/retro/RetroRulesPage").then((m) => ({ default: m.RetroRulesPage })));
 const RetroAdminPage = lazy(() => import("@/features/retro/RetroAdminPage").then((m) => ({ default: m.RetroAdminPage })));
+const RetroProfilePage = lazy(() => import("@/features/retro/RetroProfilePage").then((m) => ({ default: m.RetroProfilePage })));
 const EstudosAdminPage = lazy(() => import("@/features/estudos/EstudosAdminPage").then((m) => ({ default: m.EstudosAdminPage })));
 const EstudoViewerPage = lazy(() => import("@/features/estudos/EstudoViewerPage").then((m) => ({ default: m.EstudoViewerPage })));
 
@@ -75,6 +76,7 @@ export default function App() {
           {/* mini-jogo Retrô: casca própria, separada do app (rodada 6) */}
           <Route element={<RetroShell />}>
             <Route path="/retro" element={<RetroPage />} />
+            <Route path="/retro/eu" element={<RetroProfilePage />} />
             <Route path="/retro/regras" element={<RetroRulesPage />} />
             <Route path="/retro/r/:code" element={<RetroSharePage />} />
             <Route element={<RequireAuth />}>
