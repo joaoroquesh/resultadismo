@@ -38,7 +38,14 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   requisição, sem a varredura de 30 datas — essa fica no catálogo 1x/dia). Migration
   `20260620210000` (aditiva: coluna `match_sources.score_changed_at`, RPCs `record_observation`,
   `live_competition_ids`, `try_claim_sync_lock`/`release_sync_lock`, `resolve_match_golden` v2) +
-  edge `sync-football`. (Etapa 2, a seguir: ESPN liderar a velocidade do ao vivo.)
+  edge `sync-football`.
+- **Placar ao vivo — Etapa 2: a fonte mais RÁPIDA lidera o ao vivo.** Durante o jogo (`status =
+  'live'`), o placar exibido passa a ser o da fonte que **mudou o placar por último** (a que viu o
+  gol primeiro — em geral a ESPN), com fallback autoridade → maioria. O **final continua decidido
+  pela autoridade** (football-data) + auto-freeze da Etapa 1. Assim o gol aparece na hora e o
+  resultado fecha certo. Só muda a seleção do placar exibido em `resolve_match_golden` (migration
+  `20260621120000`); freeze, conflito (só sem autoridade) e a infra (cron 25s, poll das duas,
+  `score_changed_at`) vêm da Etapa 1.
 
 ## [2.5.0] — 2026-06-20
 
