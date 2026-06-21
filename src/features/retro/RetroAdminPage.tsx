@@ -7,7 +7,18 @@ import { Switch } from "@/components/ui/Switch";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
-import { useRetroAdminStats, useRetroConfig, useRetroSetConfig, type RetroConfig } from "./api";
+import { cn } from "@/lib/utils";
+import {
+  useRetroAdminStats,
+  useRetroConfig,
+  useRetroFactCoverage,
+  useRetroMatchFacts,
+  useRetroSetConfig,
+  useSetMatchFact,
+  type AdminMatchFact,
+  type FactFilter,
+  type RetroConfig,
+} from "./api";
 import { FeedbackAdmin } from "@/features/feedback/FeedbackAdmin";
 
 type Min = "acerto" | "saldo" | "cravada";
@@ -27,6 +38,8 @@ export function RetroAdminPage() {
       <div className="mx-auto w-full max-w-md space-y-4">
         <StatsPanel />
         {cfg.data ? <ConfigForm initial={cfg.data} /> : <Skeleton className="h-48 w-full" />}
+
+        <FactsPanel />
 
         <div>
           <h2 className="mb-2 mt-2 text-sm font-bold uppercase tracking-wide text-ink-500">
@@ -92,6 +105,125 @@ function ConfigForm({ initial }: { initial: RetroConfig }) {
         Salvar
       </Button>
     </Card>
+  );
+}
+
+const FACT_FILTERS: { value: FactFilter; label: string }[] = [
+  { value: "sem_dica", label: "Sem dica" },
+  { value: "rascunho", label: "Rascunhos" },
+  { value: "publicada", label: "Publicadas" },
+  { value: "todos", label: "Todas" },
+];
+
+// Curadoria das DICAS por jogo (curiosidade sem spoiler). Modelo híbrido: a IA
+// rascunha (fica como rascunho), o admin revisa e publica. Só dica publicada desce
+// pro jogador (gate em retro_match_payload). O placar aparece SÓ aqui pra conferência.
+function FactsPanel() {
+  const [filter, setFilter] = useState<FactFilter>("sem_dica");
+  const [search, setSearch] = useState("");
+  const coverage = useRetroFactCoverage();
+  const list = useRetroMatchFacts(filter, search);
+
+  return (
+    <Card className="space-y-3 p-4">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-sm font-bold uppercase tracking-wide text-ink-500">💡 Curiosidades (dicas)</h2>
+        {coverage.data && (
+          <span className="text-[11px] font-semibold text-ink-400">
+            {coverage.data.publicadas}/{coverage.data.total} publicadas
+            {coverage.data.rascunhos > 0 && ` · ${coverage.data.rascunhos} rascunho${coverage.data.rascunhos > 1 ? "s" : ""}`}
+          </span>
+        )}
+      </div>
+      <p className="rounded-md bg-gold-100 px-2 py-1 text-[11px] font-semibold text-gold-800">
+        ⚠️ A dica é sobre o <b>JOGO</b> (sede, público, história), nunca sobre o <b>PLACAR</b>.
+      </p>
+
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Buscar por seleção ou ano…"
+        className="w-full rounded-md border border-ink-200 bg-surface px-3 py-1.5 text-sm outline-none focus:border-brand-500"
+      />
+      <div className="no-scrollbar flex gap-1.5 overflow-x-auto">
+        {FACT_FILTERS.map((f) => (
+          <button
+            key={f.value}
+            type="button"
+            onClick={() => setFilter(f.value)}
+            className={cn(
+              "shrink-0 rounded-pill px-2.5 py-1 text-xs font-semibold transition",
+              filter === f.value ? "bg-brand-600 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200",
+            )}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      {list.isLoading ? (
+        <Skeleton className="h-32 w-full" />
+      ) : (list.data ?? []).length === 0 ? (
+        <p className="py-4 text-center text-sm text-ink-400">Nenhum jogo neste filtro.</p>
+      ) : (
+        <div className="space-y-2">
+          {list.data!.map((m) => (
+            <FactRow key={m.id} m={m} />
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function FactRow({ m }: { m: AdminMatchFact }) {
+  const { toast } = useToast();
+  const save = useSetMatchFact();
+  const [text, setText] = useState(m.fact_pt ?? "");
+
+  function run(reviewed: boolean) {
+    save.mutate(
+      { matchId: m.id, fact: text.trim() || null, reviewed },
+      {
+        onSuccess: () => toast(reviewed ? "Publicada! ✅" : "Rascunho salvo.", "success"),
+        onError: (e) => toast(e.message, "error"),
+      },
+    );
+  }
+
+  return (
+    <div className="rounded-md border border-border p-2.5">
+      <div className="flex items-center justify-between gap-2 text-xs">
+        <span className="font-semibold text-ink-700">
+          {m.home_name_pt} <span className="text-ink-400">×</span> {m.away_name_pt}
+        </span>
+        <span className="shrink-0 text-ink-400">
+          {m.wc_year} · {m.stage_label_pt} · <b className="text-ink-600">{m.score}</b>
+        </span>
+      </div>
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        rows={2}
+        maxLength={160}
+        placeholder="Curiosidade de contexto (sem placar)…"
+        className="mt-1.5 w-full resize-none rounded-md border border-ink-200 bg-surface p-2 text-sm outline-none focus:border-brand-500"
+      />
+      <div className="mt-1.5 flex items-center justify-between gap-2">
+        <span className="text-[11px] text-ink-400">
+          {m.fact_reviewed ? "✅ publicada" : m.fact_pt ? "✏️ rascunho" : "—"}
+          {text.length > 0 && ` · ${text.length}/160`}
+        </span>
+        <div className="flex gap-1.5">
+          <Button size="sm" variant="outline" loading={save.isPending} onClick={() => run(false)}>
+            Rascunho
+          </Button>
+          <Button size="sm" loading={save.isPending} onClick={() => run(true)}>
+            Publicar
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
 

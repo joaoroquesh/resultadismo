@@ -34,6 +34,7 @@ export type RetroMatchInfo = {
   stage_label_pt: string;
   is_knockout: boolean;
   difficulty: number;
+  fact: string | null; // curiosidade do jogo (só de contexto, sem spoiler) — pode ser null
   home_name_pt: string;
   away_name_pt: string;
   home_slug: string;
@@ -292,6 +293,67 @@ export function useRetroAdminStats() {
       return data as unknown as RetroAdminStats;
     },
     refetchInterval: 30_000,
+  });
+}
+
+// ---------- Admin: curadoria de DICAS por jogo (modelo híbrido IA→revisão) ----------
+export type FactFilter = "todos" | "sem_dica" | "rascunho" | "publicada";
+export type AdminMatchFact = {
+  id: string;
+  wc_year: number;
+  stage_label_pt: string;
+  home_name_pt: string;
+  away_name_pt: string;
+  home_slug: string;
+  away_slug: string;
+  score: string; // só o admin vê o placar (pra conferir anti-spoiler)
+  difficulty: number;
+  fact_pt: string | null;
+  fact_source: "manual" | "ia" | null;
+  fact_reviewed: boolean;
+};
+
+export function useRetroFactCoverage() {
+  return useQuery({
+    queryKey: ["retro-fact-coverage"],
+    queryFn: async (): Promise<{ total: number; publicadas: number; rascunhos: number }> => {
+      const { data, error } = await supabase.rpc("admin_fact_coverage");
+      if (error) throw new Error(error.message);
+      return data as unknown as { total: number; publicadas: number; rascunhos: number };
+    },
+  });
+}
+
+export function useRetroMatchFacts(filter: FactFilter, search: string) {
+  return useQuery({
+    queryKey: ["retro-match-facts", filter, search],
+    queryFn: async (): Promise<AdminMatchFact[]> => {
+      const { data, error } = await supabase.rpc("admin_list_match_facts", {
+        p_filter: filter,
+        p_search: search || undefined,
+      });
+      if (error) throw new Error(error.message);
+      return (data as unknown as AdminMatchFact[]) ?? [];
+    },
+  });
+}
+
+export function useSetMatchFact() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { matchId: string; fact: string | null; reviewed: boolean }) => {
+      const { error } = await supabase.rpc("admin_set_match_fact", {
+        p_match_id: input.matchId,
+        p_fact: input.fact ?? "", // "" → a RPC trata como null (limpa a dica)
+        p_reviewed: input.reviewed,
+        p_source: "manual",
+      });
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["retro-match-facts"] });
+      qc.invalidateQueries({ queryKey: ["retro-fact-coverage"] });
+    },
   });
 }
 
