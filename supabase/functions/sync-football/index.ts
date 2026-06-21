@@ -17,9 +17,10 @@
 //   • OVERRIDE/LOCK (decisão #8): jogo com manual_lock=true não é tocado pela API.
 //
 // MODOS:
-//   • scores  — placar/status frequente. Primary atualiza; secundárias só com
-//               throttle (>=10min desde o último check, pra respeitar rate limit);
-//               golden recalcula sempre (barato, no banco).
+//   • scores  — placar/status frequente (cron 25s, só comps com jogo ao vivo).
+//               TODAS as fontes são consultadas a cada tick; o resolver decide o
+//               placar exibido (autoridade vence; secundária confirma); golden
+//               recalcula sempre (barato, no banco). Trava anti-sobreposição.
 //   • catalog — reconcilia o calendário (primary) + roda TODAS as secundárias.
 //
 // Auth: cron (service key ou CRON_SECRET) ou usuário app_admin. verify_jwt=false.
@@ -85,7 +86,6 @@ interface MatchRow {
 }
 
 const HOUR_MS = 3_600_000;
-const SECONDARY_THROTTLE_MS = 10 * 60_000; // secundárias no modo scores: no máx 1x/10min
 const ALERT_FAIL_STREAK = 3; // só alerta/push após N ciclos seguidos SEM dados (anti-spam)
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 let lastFootballDataFetchAt = 0; // espaça chamadas football-data (limite free 10/min)
@@ -206,18 +206,19 @@ async function alertInfo(admin: SupabaseClient, comp: CompetitionRow, matchId: s
 // match_sources — grava a observação de uma fonte para um jogo
 // ---------------------------------------------------------------------------
 async function recordObservation(admin: SupabaseClient, matchId: string, row: MatchRow): Promise<void> {
-  await admin.from("match_sources").upsert({
-    match_id: matchId,
-    provider: row.provider,
-    provider_ref: row.provider_ref,
-    status: row.status,
-    home_score: row.home_score,
-    away_score: row.away_score,
-    home_pen: row.home_pen ?? null,
-    away_pen: row.away_pen ?? null,
-    kickoff_at: row.kickoff_at,
-    fetched_at: new Date().toISOString(),
-  }, { onConflict: "match_id,provider" });
+  // Via RPC pra marcar score_changed_at (quando ESTA fonte mudou de placar) —
+  // base da regra de estabilidade no freeze pela autoridade.
+  await admin.rpc("record_observation", {
+    p_match_id: matchId,
+    p_provider: row.provider,
+    p_provider_ref: row.provider_ref,
+    p_status: row.status,
+    p_home_score: row.home_score,
+    p_away_score: row.away_score,
+    p_home_pen: row.home_pen ?? null,
+    p_away_pen: row.away_pen ?? null,
+    p_kickoff_at: row.kickoff_at,
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -278,6 +279,18 @@ async function reconcilePrimary(
       usedIds.add(mid);
       // Jogo travado/congelado: registra observação mas NÃO altera o jogo.
       if (cur.frozen === true || cur.manual_lock === true) {
+        await recordObservation(admin, mid, row);
+        touched.add(mid);
+        continue;
+      }
+      // Modo scores (ao vivo): o PLACAR é decidido pelo resolver (autoridade
+      // vence; secundária confirma). Aqui a primary só ajusta o STATUS, e só
+      // quando muda — evita gravar matches a cada tick (Realtime sem ruído).
+      if (mode === "scores") {
+        if (cur.status !== row.status) {
+          await admin.from("matches").update({ status: row.status, last_synced_at: ts }).eq("id", mid);
+          updated++;
+        }
         await recordObservation(admin, mid, row);
         touched.add(mid);
         continue;
@@ -571,7 +584,7 @@ function mapEspnStatus(state: string, name: string): MatchStatus {
   if (state === "in") return "live";
   return "scheduled";
 }
-async function syncEspn(supabase: SupabaseClient, ctx: SourceCtx, writeTeams: boolean): Promise<MatchRow[]> {
+async function syncEspn(supabase: SupabaseClient, ctx: SourceCtx, writeTeams: boolean, scoresOnly = false): Promise<MatchRow[]> {
   if (!ctx.providerCode) throw new Error("provider_code ausente (slug ESPN)");
   const base = `https://site.api.espn.com/apis/site/v2/sports/soccer/${ctx.providerCode}/scoreboard`;
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -581,19 +594,24 @@ async function syncEspn(supabase: SupabaseClient, ctx: SourceCtx, writeTeams: bo
   if (!seedRes.ok) throw new Error(`espn indisponível (${seedRes.status})`);
   const seed = await seedRes.json();
   if (!seed || (!Array.isArray(seed.leagues) && !Array.isArray(seed.events))) throw new Error("ESPN: formato inesperado (a API pode ter mudado).");
-  const lo = new Date(today); lo.setUTCDate(lo.getUTCDate() - 3);
-  const hi = new Date(today); hi.setUTCDate(hi.getUTCDate() + 28);
-  const cal: string[] = ((seed?.leagues?.[0]?.calendar ?? []) as unknown[]).map((c) => String(c).slice(0, 10))
-    .filter((iso) => { const d = new Date(`${iso}T00:00:00Z`); return d >= lo && d <= hi; });
-  const seedISO = `${today.getUTCFullYear()}-${pad(today.getUTCMonth() + 1)}-${pad(today.getUTCDate())}`;
-  const dates = (cal.length ? cal : [seedISO]).slice(0, 30);
   const byId = new Map<string, any>();
   const collect = (data: any) => { for (const e of data?.events ?? []) if (e?.id) byId.set(String(e.id), e); };
   collect(seed);
-  for (const iso of dates) {
-    if (iso === seedISO) continue;
-    const r = await fetchWithRetry(`${base}?dates=${iso.replaceAll("-", "")}`);
-    if (r.ok) collect(await r.json());
+  // Modo scores (ao vivo): só o dia de HOJE (1 requisição). A varredura do
+  // calendário (até 30 datas, em rajada) é descoberta de jogos futuros — papel
+  // do catalog (1x/dia), não do ao vivo. Evita pico contra a API da ESPN.
+  if (!scoresOnly) {
+    const lo = new Date(today); lo.setUTCDate(lo.getUTCDate() - 3);
+    const hi = new Date(today); hi.setUTCDate(hi.getUTCDate() + 28);
+    const cal: string[] = ((seed?.leagues?.[0]?.calendar ?? []) as unknown[]).map((c) => String(c).slice(0, 10))
+      .filter((iso) => { const d = new Date(`${iso}T00:00:00Z`); return d >= lo && d <= hi; });
+    const seedISO = `${today.getUTCFullYear()}-${pad(today.getUTCMonth() + 1)}-${pad(today.getUTCDate())}`;
+    const dates = (cal.length ? cal : [seedISO]).slice(0, 30);
+    for (const iso of dates) {
+      if (iso === seedISO) continue;
+      const r = await fetchWithRetry(`${base}?dates=${iso.replaceAll("-", "")}`);
+      if (r.ok) collect(await r.json());
+    }
   }
   const events = [...byId.values()];
 
@@ -764,7 +782,7 @@ async function alertConflicts(
 // Roda um fetcher de fonte (primary ou secundária) e devolve as linhas.
 async function fetchSource(
   admin: SupabaseClient, ctx: SourceCtx, src: SourceRow,
-  secrets: { footballDataToken: string; theSportsDbKey: string }, writeTeams: boolean,
+  secrets: { footballDataToken: string; theSportsDbKey: string }, writeTeams: boolean, mode: SyncMode,
 ): Promise<MatchRow[]> {
   if (src.provider === "football_data") {
     if (!secrets.footballDataToken) throw new Error("FOOTBALL_DATA_TOKEN não configurado");
@@ -776,7 +794,7 @@ async function fetchSource(
     return await syncFootballData(admin, ctx, secrets.footballDataToken, writeTeams);
   }
   if (src.provider === "thesportsdb") return await syncTheSportsDb(ctx, secrets.theSportsDbKey);
-  if (src.provider === "espn") return await syncEspn(admin, ctx, writeTeams);
+  if (src.provider === "espn") return await syncEspn(admin, ctx, writeTeams, mode === "scores");
   if (src.provider === "fifawc") return await syncFifaWc(ctx);
   return [];
 }
@@ -822,9 +840,25 @@ Deno.serve(async (req) => {
   const { data: comps, error } = await query;
   if (error) return json({ error: error.message }, 500);
 
+  // Modo scores (ao vivo): trava anti-sobreposição (cadência de 25s). Se outra
+  // execução está em andamento, sai. A trava expira sozinha em 60s (anti-deadlock).
+  if (mode === "scores") {
+    const { data: claimed, error: lockErr } = await admin.rpc("try_claim_sync_lock", { p_name: "sync-scores", p_ttl_seconds: 60 });
+    if (!lockErr && claimed === false) return json({ skipped: "locked" });
+  }
+
+  // Modo scores: só processa competições com jogo AO VIVO/iminente (a menos que
+  // um competitionId específico seja pedido). Bound nas requisições às APIs.
+  let compList = (comps ?? []) as CompetitionRow[];
+  if (mode === "scores" && !body.competitionId) {
+    const { data: liveIds } = await admin.rpc("live_competition_ids");
+    const live = new Set(((liveIds ?? []) as { competition_id: string }[]).map((r) => r.competition_id));
+    compList = compList.filter((c) => live.has(c.id));
+  }
+
   const results: Record<string, unknown>[] = [];
 
-  for (const comp of (comps ?? []) as CompetitionRow[]) {
+  for (const comp of compList) {
     // fontes desta competição (primary primeiro, depois prioridade)
     const { data: srcData } = await admin.from("competition_sources")
       .select("id, competition_id, provider, provider_code, provider_season, role, priority, enabled, last_sync_checked_at")
@@ -844,21 +878,17 @@ Deno.serve(async (req) => {
     let primaryOk = false;
     let primaryErr: string | null = null;
     let inserted = 0, updated = 0, alerted = 0, secMatched = 0;
-    const nowMs = Date.now();
 
     for (const src of sources) {
       const isPrimary = src.role === "primary";
-      // throttle de secundária no modo scores (respeita rate limit)
-      if (!isPrimary && mode === "scores") {
-        const last = src.last_sync_checked_at ? new Date(src.last_sync_checked_at).getTime() : 0;
-        if (nowMs - last < SECONDARY_THROTTLE_MS) continue;
-      }
+      // Etapa 1: no modo scores as DUAS (ou mais) fontes rodam a cada tick (25s)
+      // — a secundária confirma o placar; o resolver decide o exibido.
       const ctx: SourceCtx = {
         competitionId: comp.id, competitionName: comp.name, provider: src.provider,
         providerCode: src.provider_code, providerSeason: src.provider_season, catalogSeeded: comp.catalog_seeded,
       };
       try {
-        const rows = await fetchSource(admin, ctx, src, secrets, isPrimary);
+        const rows = await fetchSource(admin, ctx, src, secrets, isPrimary, mode);
         if (isPrimary) {
           // a primary "é" a competição (mesmo provider) → reconcile estrutural
           const compForPrimary: CompetitionRow = { ...comp, provider: src.provider, provider_code: src.provider_code, provider_season: src.provider_season };
@@ -932,5 +962,8 @@ Deno.serve(async (req) => {
     }
   }
 
+  if (mode === "scores") {
+    try { await admin.rpc("release_sync_lock", { p_name: "sync-scores" }); } catch { /* trava expira sozinha */ }
+  }
   return json({ synced: results.length, results });
 });

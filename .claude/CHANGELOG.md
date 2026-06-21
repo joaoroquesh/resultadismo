@@ -21,7 +21,24 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
-_(vazio — as próximas mudanças se acumulam aqui até o próximo corte de versão)_
+### Alterado
+- **Placar ao vivo — Etapa 1: a AUTORIDADE decide o final + cadência de 25s.** Evidência do dono na
+  Copa: a ESPN trava antes do fim (Canadá 6-0 / ESPN 5-0; Gana 1-0 / ESPN 0-0) e, como o
+  congelamento exigia DUAS fontes concordando, todo jogo caía na fila "Travados por você" pra travar
+  na mão. Agora o **congelamento automático acontece na fonte primária (autoridade, hoje a
+  football-data)** quando o placar dela está estável (todas concordam, ou ≥10min sem mudar) e o jogo
+  acabou há >1h — **sem exigir a ESPN**. O **placar exibido no ao vivo segue a autoridade**; as
+  secundárias (ESPN, FIFA WC) **confirmam**. `score_conflict` só é marcado quando **não há
+  autoridade** pra confiar (nenhuma primária reportou e as fontes divergem) — compõe com o
+  `alertConflicts`, que já só notifica jogo encerrado, então acaba o falso-conflito do lag normal.
+  Cadência do cron de placares **1 min → 25 s** (pg_cron 1.6 aceita segundos; fallback 1min), **só
+  nas competições com jogo ao vivo/iminente** (`live_competition_ids`), com **trava
+  anti-sobreposição** (`sync_locks`) e **gravação só-na-mudança** (Realtime sem ruído). No modo ao
+  vivo **todas as fontes são consultadas a cada tick** (a ESPN busca **só o dia de hoje**, 1
+  requisição, sem a varredura de 30 datas — essa fica no catálogo 1x/dia). Migration
+  `20260620210000` (aditiva: coluna `match_sources.score_changed_at`, RPCs `record_observation`,
+  `live_competition_ids`, `try_claim_sync_lock`/`release_sync_lock`, `resolve_match_golden` v2) +
+  edge `sync-football`. (Etapa 2, a seguir: ESPN liderar a velocidade do ao vivo.)
 
 ## [2.5.0] — 2026-06-20
 
