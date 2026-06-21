@@ -110,13 +110,16 @@ export function RetroPage() {
   const config = useRetroConfig();
   useEffect(() => warmRetroFlags(teamCrestPath), []);
 
-  // veio de um link-desafio (/retro?play=daily): cai direto na MESMA Seleção do Dia
+  // veio de um link-desafio (/retro?play=daily&vs=CODE): cai direto na MESMA Seleção
+  // do Dia e guarda o código do rival (ref — lido só no fim da run, sem re-render).
+  const challengeCodeRef = useRef<string | null>(null);
   const autoStarted = useRef(false);
   useEffect(() => {
     if (autoStarted.current) return;
     const params = new URLSearchParams(window.location.search);
     if (params.get("play") === "daily" && phase === "home" && !startMut.isPending) {
       autoStarted.current = true;
+      challengeCodeRef.current = params.get("vs");
       window.history.replaceState({}, "", "/retro");
       start(true);
     }
@@ -346,6 +349,7 @@ export function RetroPage() {
         <ResultView
           run={finished}
           streak={user ? stats.streak : undefined}
+          challengeCode={challengeCodeRef.current}
           onPlayTraining={() => {
             setRun(null);
             start(false);

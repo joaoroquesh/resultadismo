@@ -1521,6 +1521,27 @@ export type Database = {
         }
         Relationships: []
       }
+      retro_anon: {
+        Row: {
+          anon_token: string
+          crest: string | null
+          nickname: string | null
+          updated_at: string
+        }
+        Insert: {
+          anon_token: string
+          crest?: string | null
+          nickname?: string | null
+          updated_at?: string
+        }
+        Update: {
+          anon_token?: string
+          crest?: string | null
+          nickname?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       retro_config: {
         Row: {
           enforce_knockout_bar: boolean
@@ -3097,6 +3118,7 @@ export type Database = {
           p_daily_date?: string
           p_level?: string
           p_limit?: number
+          p_scope?: string
         }
         Returns: Json
       }
@@ -3148,6 +3170,10 @@ export type Database = {
           p_seen: string[]
           p_slot: number
         }
+        Returns: undefined
+      }
+      retro_set_anon_identity: {
+        Args: { p_anon_token: string; p_crest?: string; p_nickname: string }
         Returns: undefined
       }
       retro_slot_label: { Args: { p_slot: number }; Returns: string }

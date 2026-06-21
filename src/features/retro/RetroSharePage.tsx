@@ -104,7 +104,7 @@ export function RetroSharePage() {
           <Button
             size="lg"
             className="mt-3 w-full font-bold"
-            onClick={() => navigate(data?.is_daily ? "/retro?play=daily" : "/retro")}
+            onClick={() => navigate(data?.is_daily ? `/retro?play=daily&vs=${code}` : "/retro")}
           >
             {data?.is_daily ? "Topar o desafio →" : "Jogar a minha Copa →"}
           </Button>
