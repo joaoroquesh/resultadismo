@@ -183,6 +183,30 @@ próprias** (Onda 1) em vez de só emprestar o perfil do bolão — as duas deci
 4. **Escopo da branch:** trabalho tudo na `feat/retro-melhorias`; só vai pra `main` (deploy) com OK
    por onda.
 
-> **Status (11/06):** infra de Dicas construída na branch (migrations `150017`/`150018`, painel admin,
-> pílula no jogo, 5 apelidos-exemplo). **Pendente:** lote de rascunhos via IA (apelido/lance) pros
-> jogos notáveis → revisão no admin; Onda 0 (quick wins); subdomínio + login único.
+> **Status (11/06) — TODAS as ondas executadas na branch `feat/retro-melhorias`** (migrations
+> `150017`–`150023`):
+> - **Onda 0** ✅ topo sem link de saída; SFX som+vibração; Seleção do Dia com #edição/time, countdown,
+>   streak em risco, prova social, campeão de ontem; share "#N · TIME"; "você seria ~Nº"; desafio cai
+>   na mesma Copa; campeão > cravada.
+> - **Onda 1** ✅ conquistas persistentes (12) + estante; perfil `/retro/eu`; coleção de seleções;
+>   recordes + "NOVO RECORDE"; XP/títulos.
+> - **Onda 2** ✅ ranking "Meus grupos" + vizinhança; duelo fechado (placar lado a lado); apelido do
+>   anônimo.
+> - **Onda 3** ✅ lembrete diário push opt-in (cron) + streak local do anônimo.
+> - **Onda 4** ✅ pílula de pista no jogo + painel admin de curadoria + 5 publicadas + 23 rascunhos IA
+>   (finais/clássicos) p/ aprovar.
+> - **Pendente (não codado, decisão/infra):** lote de pistas → publicar no admin; **subdomínio +
+>   login único** (cutover abaixo). Nada disso foi pra `main`.
+
+### Cutover do subdomínio `retro.resultadismo.com` + login único (quando subir)
+1. **Vercel:** adicionar `retro.resultadismo.com` ao projeto; rewrite por host servindo `retro.html`
+   na raiz do subdomínio (o `build-retro-html.mjs` já gera o HTML com OG do Retrô).
+2. **Login único (SSO entre subdomínios):** trocar o storage de sessão do `supabase-js` (hoje
+   `localStorage`, por-origem) por **cookie com `domain=.resultadismo.com`** — compartilhado por
+   `www`, `retro` e jogos futuros. ⚠️ É um switch que desloga todos uma vez (migração de storage) e
+   precisa de fallback `localStorage` no localhost; por isso NÃO foi ligado agora.
+3. **Supabase Auth:** adicionar `https://retro.resultadismo.com/auth/callback` às Redirect URLs.
+4. **PWA/GA próprios:** manifest + service worker e stream GA4 condicionados ao host.
+5. **SEO:** 301 de `/retro*` → subdomínio; canonical e URLs de share (`/retro/r/:code`) atualizados.
+6. **OG dinâmico por resultado** (Onda 2 pendente): edge/SSR que renderiza `og:image` por `share_code`
+   no subdomínio — encaixa aqui.
