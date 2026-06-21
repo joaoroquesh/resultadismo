@@ -1,9 +1,12 @@
+import { useEffect } from "react";
 import { cn, formatScore } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { ScorePill } from "@/components/ScorePill";
 import type { ScoreType } from "@/lib/types";
 import type { RetroAnswerResult } from "./api";
 import { Confetti } from "./RetroFx";
+import { sfxChampion, sfxScore, sfxToken, sfxZerou } from "./retroSfx";
+import { verdictBadge } from "./verdict";
 
 const VERDICT: Record<ScoreType, { label: string; cls: string }> = {
   cravada: { label: "CRAVADA!", cls: "bg-gold-500 text-gold-950" },
@@ -30,9 +33,22 @@ export function RevealCard({
   const finished = run.status !== "playing";
   const penaltyOut = run.status === "eliminated" && r.score_type === "acerto" && run.slot >= 6;
 
+  // som + vibração no reveal: acerto, ficha ganha e fanfarra de campeão/zerou
+  useEffect(() => {
+    sfxScore(r.timeout ? "erro" : r.score_type);
+    if (r.reroll_earned) window.setTimeout(sfxToken, 320);
+    if (run.status === "champion") {
+      const zerou = verdictBadge({ level: run.level, points: run.points }) === "zerou";
+      window.setTimeout(zerou ? sfxZerou : sfxChampion, 280);
+    }
+    // só no mount deste reveal (1 jogo)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="relative">
-      {r.score_type === "cravada" && <Confetti />}
+      {/* campeão = celebração maior (confete denso) que uma cravada qualquer */}
+      {run.status === "champion" ? <Confetti tall /> : r.score_type === "cravada" && <Confetti />}
       <div className={cn("space-y-4 text-center", r.score_type === "erro" && "animate-retro-shake")}>
         <div
           className={cn(

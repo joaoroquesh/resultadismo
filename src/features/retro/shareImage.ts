@@ -11,7 +11,7 @@ import {
   parseCrest,
   type CrestConfig,
 } from "@/lib/crest";
-import { buildShareText, fmtMs, modeLabel, type FinishedRun } from "./share";
+import { buildShareText, fmtMs, modeLabel, shareSubtitle, type FinishedRun } from "./share";
 import { isPenaltyOut, stageEmoji, verdictBadge, verdictHeadline } from "./verdict";
 
 const W = 1080;
@@ -310,8 +310,7 @@ export async function buildShareImage(
   ctx.fillText("RESULTADISMO RETRÔ", W / 2, 130);
   ctx.fillStyle = "rgba(255,255,255,0.65)";
   ctx.font = font(34, 500);
-  const sub = `${run.isDaily ? "Seleção do Dia" : "Jogo livre"}${run.format === "pontos" ? " · Pontos" : ""}`;
-  ctx.fillText(sub, W / 2, 190);
+  ctx.fillText(shareSubtitle(run), W / 2, 190);
 
   drawModePill(ctx, run, cores, brand, font);
   drawVerdict(ctx, run, cores, digit, font);

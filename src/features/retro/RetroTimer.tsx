@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { sfxTick } from "./retroSfx";
 
 // Cronômetro da rodada: barra encolhendo; nos 3s finais mostra MILÉSIMOS e muda de
 // cor (pedido do PO, D5). Âncora = montagem do componente (o pai remonta por jogo
@@ -23,9 +24,15 @@ export function RetroTimer({
     const startedAt = performance.now();
     let fired = false;
     let raf = 0;
+    let lastTick = -1; // último segundo "ticado" (som só nos 3s finais)
     const tick = () => {
       const left = totalSeconds * 1000 - (performance.now() - startedAt);
       setLeftMs(Math.max(0, left));
+      const sec = Math.ceil(left / 1000);
+      if (left > 0 && sec <= 3 && sec !== lastTick) {
+        lastTick = sec;
+        sfxTick();
+      }
       if (left <= 0) {
         if (!fired) {
           fired = true;
