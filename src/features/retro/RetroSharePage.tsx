@@ -7,7 +7,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Escudo } from "@/components/ui/Escudo";
 import { LEVEL_EMOJI, LEVEL_LABEL, useRetroSummary } from "./api";
 import { CampaignTrail, type TrailSlot } from "./CampaignTrail";
-import { fmtMs } from "./share";
+import { dailyEdition, fmtMs } from "./share";
 import { stageEmoji, verdictBadge, verdictHeadline } from "./verdict";
 
 // O card da campanha compartilhada: veredito + modo + selos da Lenda + trilha.
@@ -26,6 +26,12 @@ function ShareCard({ data }: { data: NonNullable<ReturnType<typeof useRetroSumma
             <Escudo src={data.player.avatar_url} name={data.player.display_name} size="sm" />
             <span className="font-semibold">{data.player.display_name}</span>
           </div>
+        )}
+        {data.is_daily && (
+          <p className="text-xs font-bold uppercase tracking-wide text-brand-700">
+            Seleção do Dia{dailyEdition(data.daily_date) ? ` #${dailyEdition(data.daily_date)}` : ""}
+            {data.team_name_pt ? ` · ${data.team_name_pt}` : ""}
+          </p>
         )}
         <p className="text-sm text-ink-500">
           {data.player?.display_name ?? "Alguém"} jogou{" "}
@@ -91,10 +97,16 @@ export function RetroSharePage() {
         <Card className="p-4 text-center">
           <p className="text-base font-bold">Acha que faz melhor? 😏</p>
           <p className="mt-1 text-sm text-ink-500">
-            7 placares históricos, poucos segundos cada. Jogue de graça, sem cadastro.
+            {data?.is_daily
+              ? "Encare a MESMA Seleção do Dia e veja se supera essa campanha. De graça, sem cadastro."
+              : "7 placares históricos, poucos segundos cada. Jogue de graça, sem cadastro."}
           </p>
-          <Button size="lg" className="mt-3 w-full font-bold" onClick={() => navigate("/retro")}>
-            Jogar a minha Copa →
+          <Button
+            size="lg"
+            className="mt-3 w-full font-bold"
+            onClick={() => navigate(data?.is_daily ? "/retro?play=daily" : "/retro")}
+          >
+            {data?.is_daily ? "Topar o desafio →" : "Jogar a minha Copa →"}
           </Button>
         </Card>
 

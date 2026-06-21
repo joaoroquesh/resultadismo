@@ -5,7 +5,27 @@ import { RetroCrest } from "./RetroCrest";
 import { CampaignTrail, type TrailSlot } from "./CampaignTrail";
 import { RetroTimer } from "./RetroTimer";
 import { ScoreWheels } from "./ScoreWheels";
+import { isRetroMuted, setRetroMuted } from "./retroSfx";
 import type { RetroCurrent } from "./api";
+
+// Liga/desliga o som do Retrô (persiste em localStorage via retroSfx).
+function MuteToggle() {
+  const [muted, setMuted] = useState(isRetroMuted);
+  return (
+    <button
+      type="button"
+      aria-label={muted ? "Ligar som" : "Desligar som"}
+      onClick={() => {
+        const next = !muted;
+        setRetroMuted(next);
+        setMuted(next);
+      }}
+      className="text-sm leading-none text-ink-400"
+    >
+      {muted ? "🔇" : "🔊"}
+    </button>
+  );
+}
 
 // Texto curto da regra da fase atual (acima do card). Só fala de saldo/cravada se o
 // admin tiver ligado a barra (enforce).
@@ -78,9 +98,10 @@ export function RunView({
   const [valendo, setValendo] = useState(current.timer_seconds == null);
   useEffect(() => {
     if (current.timer_seconds == null) return;
-    const t = window.setTimeout(() => setValendo(true), 1200);
+    // respiro de leitura menor no 1º jogo (acelera o time-to-fun); cheio nos demais
+    const t = window.setTimeout(() => setValendo(true), current.slot === 1 ? 600 : 1200);
     return () => window.clearTimeout(t);
-  }, [current.timer_seconds]);
+  }, [current.timer_seconds, current.slot]);
   const m = current.match;
   const decisao = enforce && current.slot >= 6; // só com barra ligada
 
@@ -90,9 +111,12 @@ export function RunView({
       <div className="flex items-center justify-between gap-2">
         <CampaignTrail slots={slots} currentSlot={current.slot} />
         <span className="rounded-pill bg-ink-100 px-2.5 py-0.5 text-xs font-bold tabular-nums">{points} pts</span>
-        <button type="button" onClick={onExit} className="text-[11px] font-semibold text-ink-400">
-          sair ✕
-        </button>
+        <div className="flex items-center gap-2">
+          <MuteToggle />
+          <button type="button" onClick={onExit} className="text-[11px] font-semibold text-ink-400">
+            sair ✕
+          </button>
+        </div>
       </div>
 
       {/* bloco do jogo: compacto e centrado (gap fixo, não estica em telas grandes) */}

@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { track } from "@/lib/analytics";
-import { useEffect } from "react";
 import { teamCrestPath } from "@/lib/teamCrests";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -16,6 +15,7 @@ import {
   LEVEL_LABEL,
   useRetroAbandon,
   useRetroAnswer,
+  useRetroDailyExtras,
   useRetroMyStats,
   useRetroNext,
   useRetroReroll,
@@ -28,6 +28,7 @@ import {
   type RetroPace,
   type RetroStart,
 } from "./api";
+import { dailyEdition } from "./share";
 import { retroMarkSeen, warmRetroFlags } from "./retroLocal";
 import { RetroCrest } from "./RetroCrest";
 import { RunView } from "./RunView";
@@ -64,12 +65,16 @@ function viewStats(d: ReturnType<typeof useRetroMyStats>["data"]) {
   };
 }
 
-function toFinishedRun(run: ActiveRun | null): FinishedRun | null {
+function toFinishedRun(
+  run: ActiveRun | null,
+  today: { daily_date: string; team_name_pt: string } | null,
+): FinishedRun | null {
   const ans = run?.lastAnswer;
   if (!run || !ans || ans.run.status === "playing") return null;
   return {
     status: ans.run.status,
     stageReached: ans.run.stage_reached,
+    stageRank: ans.run.stage_rank,
     points: ans.run.points,
     totalMs: ans.run.total_ms,
     shareCode: run.shareCode,
@@ -77,6 +82,8 @@ function toFinishedRun(run: ActiveRun | null): FinishedRun | null {
     format: "copa",
     level: run.level,
     pace: run.pace,
+    dailyDate: run.isDaily ? today?.daily_date ?? null : null,
+    dailyTeam: run.isDaily ? today?.team_name_pt ?? null : null,
     slots: run.slots,
   };
 }
@@ -99,8 +106,22 @@ export function RetroPage() {
   const [startKind, setStartKind] = useState<"daily" | "training" | null>(null);
   const myStats = useRetroMyStats();
   const today = useRetroToday();
+  const dailyExtras = useRetroDailyExtras();
   const config = useRetroConfig();
   useEffect(() => warmRetroFlags(teamCrestPath), []);
+
+  // veio de um link-desafio (/retro?play=daily): cai direto na MESMA Seleção do Dia
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (autoStarted.current) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("play") === "daily" && phase === "home" && !startMut.isPending) {
+      autoStarted.current = true;
+      window.history.replaceState({}, "", "/retro");
+      start(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
 
   function start(daily: boolean) {
     if (startMut.isPending) return;
@@ -250,7 +271,7 @@ export function RetroPage() {
     );
   }
 
-  const finished = toFinishedRun(run);
+  const finished = toFinishedRun(run, today.data ?? null);
   const stats = viewStats(myStats.data);
 
   if (import.meta.env.DEV && new URLSearchParams(window.location.search).has("demo")) {
@@ -264,6 +285,8 @@ export function RetroPage() {
           level={level}
           setLevel={setLevel}
           todayTeam={today.data ?? null}
+          edition={dailyEdition(today.data?.daily_date)}
+          dailyExtras={dailyExtras.data ?? null}
           startingDaily={startKind === "daily"}
           startingTraining={startKind === "training"}
           anyStarting={startMut.isPending}
@@ -334,10 +357,114 @@ export function RetroPage() {
   );
 }
 
+// Conta regressiva até a próxima Seleção do Dia (meia-noite de São Paulo, UTC-3).
+function Countdown() {
+  const [left, setLeft] = useState(msToSpMidnight);
+  useEffect(() => {
+    const id = window.setInterval(() => setLeft(msToSpMidnight()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  const h = Math.floor(left / 3_600_000);
+  const m = Math.floor((left % 3_600_000) / 60_000);
+  const s = Math.floor((left % 60_000) / 1000);
+  return (
+    <span className="tabular-nums">
+      {String(h).padStart(2, "0")}:{String(m).padStart(2, "0")}:{String(s).padStart(2, "0")}
+    </span>
+  );
+}
+function msToSpMidnight(): number {
+  const now = new Date();
+  const sp = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+  const next = new Date(sp);
+  next.setHours(24, 0, 0, 0);
+  return Math.max(0, next.getTime() - sp.getTime());
+}
+
+type DailyExtras = {
+  champion: { display_name: string; avatar_url: string | null; team_name_pt: string | null; points: number } | null;
+  playedToday: number;
+} | null;
+
+// O card da Seleção do Dia: edição + time, countdown, streak em risco/protegida,
+// prova social (quantos jogaram), e a coroação do campeão de ontem.
+function DailyCard({
+  todayTeam,
+  edition,
+  dailyExtras,
+  playedToday,
+  streak,
+  streakAtRisco,
+  startingDaily,
+  anyStarting,
+  onStart,
+}: {
+  todayTeam: { team_slug: string; team_name_pt: string } | null;
+  edition: number | null;
+  dailyExtras: DailyExtras;
+  playedToday: boolean;
+  streak: number;
+  streakAtRisco: boolean;
+  startingDaily: boolean;
+  anyStarting: boolean;
+  onStart: (daily: boolean) => void;
+}) {
+  return (
+    <Card className="space-y-2 border-2 border-brand-500 p-4">
+      {todayTeam && (
+        <div className="flex items-center justify-center gap-2">
+          <RetroCrest slug={todayTeam.team_slug} name={todayTeam.team_name_pt} size={30} />
+          <p className="text-sm font-bold text-brand-800">
+            Seleção do Dia{edition ? ` #${edition}` : ""}:{" "}
+            <span className="uppercase">{todayTeam.team_name_pt}</span>
+          </p>
+        </div>
+      )}
+      {playedToday ? (
+        <div className="space-y-1 rounded-lg bg-ink-100 p-3 text-center text-sm">
+          <p>✅ Você já fez a de hoje{streak > 0 && <> · 🔥 {streak} dia{streak > 1 ? "s" : ""}</>}</p>
+          <p className="text-xs text-ink-500">
+            Nova Seleção em <b className="text-ink-700"><Countdown /></b> — ou jogue à vontade abaixo.
+          </p>
+        </div>
+      ) : (
+        <>
+          {streakAtRisco && (
+            <p className="rounded-md bg-flame-50 px-3 py-1.5 text-center text-xs font-bold text-flame-700 ring-1 ring-flame-200">
+              🔥 Sua sequência de {streak} dia{streak > 1 ? "s" : ""} acaba à meia-noite — jogue pra manter!
+            </p>
+          )}
+          <Button
+            size="lg"
+            className="w-full text-base font-bold"
+            loading={startingDaily}
+            disabled={anyStarting}
+            onClick={() => onStart(true)}
+          >
+            Jogar a Seleção do Dia ⚽
+          </Button>
+          <p className="text-center text-[11px] text-ink-400">
+            Nova seleção em <Countdown />
+            {dailyExtras && dailyExtras.playedToday > 0 && ` · ${dailyExtras.playedToday} já jogaram hoje`}
+          </p>
+        </>
+      )}
+      {dailyExtras?.champion && (
+        <p className="border-t border-border pt-2 text-center text-[11px] text-ink-500">
+          🏆 Ontem: <b className="text-ink-700">{dailyExtras.champion.display_name}</b> levou a{" "}
+          {dailyExtras.champion.team_name_pt ?? "Seleção do Dia"} com {dailyExtras.champion.points} pts
+        </p>
+      )}
+    </Card>
+  );
+}
+
 function Home({
   level,
   setLevel,
   todayTeam,
+  edition,
+  dailyExtras,
   startingDaily,
   startingTraining,
   anyStarting,
@@ -356,6 +483,8 @@ function Home({
   level: RetroLevel;
   setLevel: (l: RetroLevel) => void;
   todayTeam: { team_slug: string; team_name_pt: string } | null;
+  edition: number | null;
+  dailyExtras: DailyExtras;
   startingDaily: boolean;
   startingTraining: boolean;
   anyStarting: boolean;
@@ -371,6 +500,7 @@ function Home({
   onRules: () => void;
   onAdmin: () => void;
 }) {
+  const streakAtRisco = streak > 0 && !playedToday;
   return (
     <div className="mx-auto w-full max-w-md space-y-3">
       {/* modal de 1º acesso: como o jogo funciona, em 4 linhas */}
@@ -383,39 +513,24 @@ function Home({
         <p className="mt-0.5 text-sm text-white/90">7 jogos de Copas antigas, segundos pra cravar cada um.</p>
         {isLogged && (streak > 0 || best) && (
           <p className="mt-2 text-xs font-semibold text-white/95">
-            {streak > 0 && <>🔥 {streak} dia{streak > 1 ? "s" : ""}</>}
+            {streak > 0 && <>🔥 {streak} dia{streak > 1 ? "s" : ""}{streakAtRisco && " — não perca hoje!"}</>}
             {streak > 0 && best && " · "}
             {best && <>melhor: {best.stage_reached}</>}
           </p>
         )}
       </Card>
 
-      {/* SELEÇÃO DO DIA — desafio diário ranqueado (Copa) */}
-      <Card className="space-y-2 border-2 border-brand-500 p-4">
-        {todayTeam && (
-          <div className="flex items-center justify-center gap-2">
-            <RetroCrest slug={todayTeam.team_slug} name={todayTeam.team_name_pt} size={30} />
-            <p className="text-sm font-bold text-brand-800">
-              Seleção do Dia: <span className="uppercase">{todayTeam.team_name_pt}</span>
-            </p>
-          </div>
-        )}
-        {playedToday ? (
-          <div className="rounded-lg bg-ink-100 p-3 text-center text-sm">
-            ✅ Já jogou a de hoje. <b>Volte amanhã</b> — ou jogue à vontade abaixo.
-          </div>
-        ) : (
-          <Button
-            size="lg"
-            className="w-full text-base font-bold"
-            loading={startingDaily}
-            disabled={anyStarting}
-            onClick={() => onStart(true)}
-          >
-            Jogar a Seleção do Dia ⚽
-          </Button>
-        )}
-      </Card>
+      <DailyCard
+        todayTeam={todayTeam}
+        edition={edition}
+        dailyExtras={dailyExtras}
+        playedToday={playedToday}
+        streak={streak}
+        streakAtRisco={streakAtRisco}
+        startingDaily={startingDaily}
+        anyStarting={anyStarting}
+        onStart={onStart}
+      />
 
       {/* JOGO LIVRE — o jogo do dia a dia; 3 modos de dificuldade, ranking por modo */}
       <Card className="space-y-2 p-4">

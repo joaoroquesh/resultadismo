@@ -14,6 +14,7 @@ export const SCORE_EMOJI: Record<ScoreType, string> = {
 export type FinishedRun = {
   status: "eliminated" | "champion" | "finished";
   stageReached: string | null;
+  stageRank: number | null;
   points: number;
   totalMs: number | null;
   shareCode: string;
@@ -21,6 +22,8 @@ export type FinishedRun = {
   format: RetroFormat;
   level: RetroLevel | null;
   pace: RetroPace;
+  dailyDate: string | null;
+  dailyTeam: string | null;
   slots: { slot: number; scoreType: ScoreType }[];
 };
 
@@ -28,6 +31,29 @@ export type FinishedRun = {
 export function modeLabel(run: Pick<FinishedRun, "isDaily" | "level">): string | null {
   if (run.isDaily || !run.level) return null;
   return `${LEVEL_LABEL[run.level]} ${LEVEL_EMOJI[run.level]}`;
+}
+
+// Nº de edição da Seleção do Dia (estilo Wordle do dia). Dia 0 = 2026-06-10 = ed. #1.
+const RETRO_EPOCH = Date.UTC(2026, 5, 10);
+export function dailyEdition(dailyDate: string | null | undefined): number | null {
+  if (!dailyDate) return null;
+  const d = Date.parse(`${dailyDate}T00:00:00Z`);
+  if (Number.isNaN(d)) return null;
+  return Math.floor((d - RETRO_EPOCH) / 86_400_000) + 1;
+}
+
+// "Seleção do Dia #12 · BRASIL" / "Jogo livre" — etiqueta do topo do share. withMode
+// inclui o modo no Jogo livre (texto, que não tem pílula; na imagem a pílula já mostra).
+export function shareSubtitle(
+  run: Pick<FinishedRun, "isDaily" | "level" | "dailyDate" | "dailyTeam">,
+  withMode = false,
+): string {
+  if (run.isDaily) {
+    const ed = dailyEdition(run.dailyDate);
+    const team = run.dailyTeam ? ` · ${run.dailyTeam.toUpperCase()}` : "";
+    return `Seleção do Dia${ed ? ` #${ed}` : ""}${team}`;
+  }
+  return `Jogo livre${withMode && run.level ? ` · ${LEVEL_LABEL[run.level]}` : ""}`;
 }
 
 export function fmtMs(ms: number | null): string {
@@ -59,11 +85,9 @@ export function buildShareText(run: FinishedRun, streak: number | undefined): st
         : run.status === "champion"
           ? `${emoji} CAMPEÃO da minha Copa Retrô!`
           : `${emoji} Caí: ${run.stageReached}`;
-  const mode = modeLabel(run);
-  const fmtLabel = run.format === "pontos" ? " · Pontos" : mode ? ` · ${mode}` : "";
   const badgeLine = badge === "historico" ? "📜 Campanha HISTÓRICA no modo Lenda!" : null;
   return [
-    `⚽ Resultadismo Retrô — ${run.isDaily ? "Seleção do Dia" : "Jogo livre"}${fmtLabel}`,
+    `⚽ Resultadismo Retrô — ${shareSubtitle(run, true)}`,
     `Grupos ${groups}${ko ? ` · ${ko}` : ""}`,
     `${headline} · ${run.points} pts · ${fmtMs(run.totalMs)}${streak ? ` · 🔥 ${streak} dia${streak > 1 ? "s" : ""}` : ""}`,
     ...(badgeLine ? [badgeLine] : []),

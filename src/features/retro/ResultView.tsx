@@ -10,6 +10,7 @@ import { Confetti, RetroStripes, ZerouFx } from "./RetroFx";
 import { fmtMs, modeLabel, type FinishedRun } from "./share";
 import { isPenaltyOut, stageEmoji, verdictBadge, verdictHeadline } from "./verdict";
 import { shareCampaign } from "./shareImage";
+import { useRetroRankEstimate } from "./api";
 
 // Tela final: o "card" agora espelha a imagem do share (placar eletrônico escuro +
 // listras retrô), pra ser igual ao que a pessoa compartilha. Embaixo, o convite pro
@@ -35,6 +36,12 @@ export function ResultView({
   const v = { status: run.status, stageReached: run.stageReached, points: run.points, format: run.format, level: run.level };
   const badge = verdictBadge(v);
   const mode = modeLabel(run);
+  // gancho de login pro anônimo: "você seria ~Nº no ranking de hoje" (só Seleção do Dia)
+  const rankEst = useRetroRankEstimate(
+    !user && run.isDaily
+      ? { stageRank: run.stageRank, points: run.points, totalMs: run.totalMs }
+      : null,
+  );
 
   return (
     <div className="mx-auto w-full max-w-md space-y-4">
@@ -105,9 +112,16 @@ export function ResultView({
 
       {!user && (
         <Card className="p-4 text-center">
-          <p className="text-sm">
-            Jogando sem conta — seu resultado <b>não entra no ranking</b>.
-          </p>
+          {run.isDaily && rankEst.data ? (
+            <p className="text-sm">
+              Com essa campanha você seria <b className="text-brand-700">~{rankEst.data.pos}º</b> no
+              ranking de hoje. <b>Entre pra valer</b> e guarde seu escudo e sua sequência 🔥
+            </p>
+          ) : (
+            <p className="text-sm">
+              Jogando sem conta — seu resultado <b>não entra no ranking</b>.
+            </p>
+          )}
           <Button variant="outline" className="mt-2" onClick={openLogin}>
             Entrar com Google e competir
           </Button>

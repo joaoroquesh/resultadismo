@@ -2633,6 +2633,23 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_global_standings_live: {
+        Args: { p_competition_ids?: string[]; p_limit?: number }
+        Returns: {
+          acertos: number
+          ao_vivo: boolean
+          avatar_url: string
+          cravadas: number
+          display_name: string
+          jogos: number
+          live_scoring: boolean
+          pontos: number
+          rank: number
+          rank_anterior: number
+          saldos: number
+          user_id: string
+        }[]
+      }
       get_global_standings_multi: {
         Args: { p_competition_ids: string[]; p_limit?: number }
         Returns: {
@@ -2656,6 +2673,23 @@ export type Database = {
           display_name: string
           is_me: boolean
           jogos: number
+          pontos: number
+          rank: number
+          saldos: number
+          user_id: string
+        }[]
+      }
+      get_group_rank_window_live: {
+        Args: { p_league_id: string; p_radius?: number }
+        Returns: {
+          acertos: number
+          ao_vivo: boolean
+          avatar_url: string
+          cravadas: number
+          display_name: string
+          is_me: boolean
+          jogos: number
+          live_scoring: boolean
           pontos: number
           rank: number
           saldos: number
@@ -2719,6 +2753,18 @@ export type Database = {
           total_resultadistas: number
         }[]
       }
+      get_my_global_rank_live: {
+        Args: { p_competition_ids?: string[] }
+        Returns: {
+          ao_vivo: boolean
+          jogos: number
+          live_scoring: boolean
+          pontos: number
+          rank: number
+          rank_anterior: number
+          total_resultadistas: number
+        }[]
+      }
       get_my_global_rank_multi: {
         Args: { p_competition_ids: string[] }
         Returns: {
@@ -2731,6 +2777,16 @@ export type Database = {
       get_my_league_positions: {
         Args: { p_league_ids: string[] }
         Returns: {
+          league_id: string
+          pontos: number
+          rank: number
+          total: number
+        }[]
+      }
+      get_my_league_positions_live: {
+        Args: { p_league_ids: string[] }
+        Returns: {
+          ao_vivo: boolean
           league_id: string
           pontos: number
           rank: number
@@ -2973,6 +3029,7 @@ export type Database = {
         }
         Returns: Json
       }
+      retro_daily_count: { Args: never; Returns: number }
       retro_fact_is_spoiler: { Args: { p_fact: string }; Returns: boolean }
       retro_get_config: { Args: never; Returns: Json }
       retro_leaderboard: {
@@ -3007,6 +3064,10 @@ export type Database = {
         Returns: string
       }
       retro_purge_ephemeral: { Args: never; Returns: number }
+      retro_rank_estimate: {
+        Args: { p_points: number; p_stage_rank: number; p_total_ms: number }
+        Returns: Json
+      }
       retro_reroll: {
         Args: { p_anon_token?: string; p_run_id: string; p_seen?: string[] }
         Returns: Json
@@ -3047,6 +3108,7 @@ export type Database = {
       retro_today: { Args: never; Returns: Json }
       retro_touch: { Args: { p_seconds: number }; Returns: undefined }
       retro_touch_anon: { Args: { p_seconds: number }; Returns: undefined }
+      retro_yesterday_champion: { Args: never; Returns: Json }
       run_football_sync:
         | { Args: never; Returns: undefined }
         | { Args: { p_mode?: string }; Returns: undefined }

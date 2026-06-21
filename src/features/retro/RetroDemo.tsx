@@ -41,6 +41,7 @@ function fakeAnswer(scoreType: ScoreType, points: number): RetroAnswerResult {
 const CHAMPION: FinishedRun = {
   status: "champion",
   stageReached: "Campeão 🏆",
+  stageRank: 6,
   points: 17,
   totalMs: 83_000,
   shareCode: "demo",
@@ -48,6 +49,8 @@ const CHAMPION: FinishedRun = {
   format: "copa",
   level: "classico",
   pace: "resultadista",
+  dailyDate: "2026-06-21",
+  dailyTeam: "Brasil",
   slots: [
     { slot: 1, scoreType: "cravada" },
     { slot: 2, scoreType: "saldo" },
