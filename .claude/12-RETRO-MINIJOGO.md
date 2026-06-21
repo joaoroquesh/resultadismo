@@ -155,8 +155,24 @@ página pública `/retro/r/:code`.
   `fill`/`stroke`/`style` da raiz do SVG — sem isso, bandeiras que definem a cor no `<svg>` raiz
   (Honduras etc.) renderizavam em preto. Re-baixadas e auditadas por COR (não só decode): 60/60 ok.
 
-## 5. Backlog conhecido (fase 2 do Retrô)
+## 5. Roadmap de viralização (branch `feat/retro-melhorias`)
 
-Curiosidades por jogo (`fact_pt`), card-imagem de share + OG dinâmica, subdomínio, modo Sem Pressa
-com ranking separado?, auto-calibração da dificuldade por `shown_count`/`scored_count`, PostHog
-(se mídia), expansão de pools (Euro, Libertadores, Brasileirão — modelo de dados já genérico).
+Análise completa em [`docs/planning/minijogo-historico/roadmap-viral-v1.md`](../docs/planning/minijogo-historico/roadmap-viral-v1.md)
+(auditoria multiagente, 2026-06-11). Decisões do PO: separar o **envelope** (subdomínio
+`retro.resultadismo.com`, login por host) · começar por **Quick wins + Dicas** · dicas **híbridas**
+(IA rascunha → admin aprova). Furos-chave: CD4 Posse/coleção (30/100) e CD5 Social interno (sem
+ranking de amigos / desafio 1-a-1); retenção diária sem lembrete/streak defendida.
+
+- **Dicas por partida (rodada 21 — EM CONSTRUÇÃO na branch, migration `20260610150017`):**
+  curiosidade de **contexto** (sem placar/vencedor) por jogo. Reusa `retro_matches.fact_pt`;
+  `fact_source`/`fact_reviewed` pra curadoria; **só dica revisada desce** (gate no
+  `retro_match_payload`, herda o anti-cheat); `fact:null` → UI não mostra nada. Anti-spoiler em
+  camadas: `retro_fact_is_spoiler()` barra placar (4×1, 4 a 1) e verbos de resultado + curadoria
+  humana. Admin `admin_set_match_fact`/`admin_list_match_facts`/`admin_fact_coverage` + painel
+  "Curiosidades" no `/admin/retro` (lista/filtro/busca, rascunho×publicar, contador). Pílula
+  "💡 Você sabia?" no `RunView` antes do cronômetro. Set inicial: 5 dicas de Copas icônicas.
+  Falta: **lote de rascunhos via IA** pros 964 (modelo híbrido → revisão do João).
+
+Backlog restante: card-imagem de share + **OG dinâmico** por resultado, subdomínio próprio,
+auto-calibração da dificuldade por `shown_count`/`scored_count`, expansão de pools (Euro,
+Libertadores, Brasileirão — modelo de dados já genérico).

@@ -343,4 +343,43 @@ begin
   perform set_config('request.jwt.claims', '', true);
 end $$;
 
+-- ============ T13: dicas por partida — fact no payload só se revisada; anti-spoiler (rodada 21) ============
+do $$
+declare v_token uuid := gen_random_uuid(); v_today date := (now() at time zone 'America/Sao_Paulo')::date;
+  v_ids uuid[]; v_mid uuid; v_start jsonb; v_run uuid; v_fact text; v_user uuid;
+begin
+  -- monta um daily controlado cujo slot 1 é um jogo COM dica publicada (1950 uru x bra)
+  select id into v_mid from public.retro_matches where wc_year=1950 and home_slug='uruguai' and away_slug='brasil';
+  if v_mid is null or (select fact_pt from public.retro_matches where id=v_mid) is null then
+    raise exception 'T13 FALHOU: seed de dica ausente'; end if;
+  select array_agg(id) into v_ids from (
+    select v_mid as id
+    union all
+    select id from (
+      select id from public.retro_matches
+       where (home_slug='brasil' or away_slug='brasil') and id<>v_mid
+       order by random() limit 6) r) q;
+  select id into v_user from public.profiles limit 1;
+  perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role','authenticated')::text, true);
+  delete from public.retro_runs where user_id=v_user and is_daily and daily_date=v_today;
+  delete from public.retro_daily where daily_date=v_today;
+  insert into public.retro_daily (daily_date, match_ids, team_slug, team_name_pt) values (v_today, v_ids, 'brasil', 'Brasil');
+  v_start := public.retro_start_run('acerto','sempressa',true,null,'{}');
+  v_fact := v_start->'current'->'match'->>'fact';
+  if v_fact is null or v_fact not ilike '%Maracanã%' then raise exception 'T13 FALHOU: dica revisada não veio no payload: %', v_fact; end if;
+  raise notice 'T13a dica revisada desce no payload: OK';
+
+  -- despublica → fact some do payload
+  perform public.admin_set_match_fact(v_mid, (select fact_pt from public.retro_matches where id=v_mid), false);
+  delete from public.retro_runs where user_id=v_user and is_daily and daily_date=v_today;
+  v_start := public.retro_start_run('acerto','sempressa',true,null,'{}');
+  if (v_start->'current'->'match'->>'fact') is not null then raise exception 'T13 FALHOU: rascunho vazou no payload'; end if;
+  raise notice 'T13b rascunho (não revisado) NÃO desce: OK';
+  -- restaura
+  perform public.admin_set_match_fact(v_mid, (select fact_pt from public.retro_matches where id=v_mid), true);
+  delete from public.retro_runs where user_id=v_user and is_daily and daily_date=v_today;
+  delete from public.retro_daily where daily_date=v_today;
+  perform set_config('request.jwt.claims', '', true);
+end $$;
+
 select '=== TODOS OS TESTES PASSARAM ===';

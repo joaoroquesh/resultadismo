@@ -285,6 +285,7 @@ export type Database = {
           slug: string
           status: string
           sync_enabled: boolean
+          sync_fail_streak: number
           type: string
           updated_at: string
         }
@@ -316,6 +317,7 @@ export type Database = {
           slug: string
           status?: string
           sync_enabled?: boolean
+          sync_fail_streak?: number
           type?: string
           updated_at?: string
         }
@@ -347,6 +349,7 @@ export type Database = {
           slug?: string
           status?: string
           sync_enabled?: boolean
+          sync_fail_streak?: number
           type?: string
           updated_at?: string
         }
@@ -652,6 +655,7 @@ export type Database = {
           pot_enabled: boolean
           pot_entry_cents: number | null
           pot_locked: boolean
+          pot_pix_key: string | null
           pot_split: Json | null
           scheduled_draw_at: string | null
           settings: Json
@@ -675,6 +679,7 @@ export type Database = {
           pot_enabled?: boolean
           pot_entry_cents?: number | null
           pot_locked?: boolean
+          pot_pix_key?: string | null
           pot_split?: Json | null
           scheduled_draw_at?: string | null
           settings?: Json
@@ -698,6 +703,7 @@ export type Database = {
           pot_enabled?: boolean
           pot_entry_cents?: number | null
           pot_locked?: boolean
+          pot_pix_key?: string | null
           pot_split?: Json | null
           scheduled_draw_at?: string | null
           settings?: Json
@@ -835,6 +841,7 @@ export type Database = {
       }
       league_pot_payers: {
         Row: {
+          confirmed: boolean
           id: string
           lc_id: string
           marked_at: string
@@ -842,6 +849,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          confirmed?: boolean
           id?: string
           lc_id: string
           marked_at?: string
@@ -849,6 +857,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          confirmed?: boolean
           id?: string
           lc_id?: string
           marked_at?: string
@@ -982,6 +991,7 @@ export type Database = {
           match_id: string
           provider: Database["public"]["Enums"]["data_provider"]
           provider_ref: string | null
+          score_changed_at: string | null
           status: string | null
         }
         Insert: {
@@ -995,6 +1005,7 @@ export type Database = {
           match_id: string
           provider: Database["public"]["Enums"]["data_provider"]
           provider_ref?: string | null
+          score_changed_at?: string | null
           status?: string | null
         }
         Update: {
@@ -1008,6 +1019,7 @@ export type Database = {
           match_id?: string
           provider?: Database["public"]["Enums"]["data_provider"]
           provider_ref?: string | null
+          score_changed_at?: string | null
           status?: string | null
         }
         Relationships: [
@@ -1022,6 +1034,7 @@ export type Database = {
       }
       matches: {
         Row: {
+          advanced_team_id: string | null
           away_pen: number | null
           away_score: number | null
           away_team_id: string | null
@@ -1037,6 +1050,7 @@ export type Database = {
           home_team_id: string | null
           home_team_name: string | null
           id: string
+          is_knockout: boolean
           kickoff_at: string | null
           last_synced_at: string | null
           manual_lock: boolean
@@ -1054,6 +1068,7 @@ export type Database = {
           winner: string | null
         }
         Insert: {
+          advanced_team_id?: string | null
           away_pen?: number | null
           away_score?: number | null
           away_team_id?: string | null
@@ -1069,6 +1084,7 @@ export type Database = {
           home_team_id?: string | null
           home_team_name?: string | null
           id?: string
+          is_knockout?: boolean
           kickoff_at?: string | null
           last_synced_at?: string | null
           manual_lock?: boolean
@@ -1086,6 +1102,7 @@ export type Database = {
           winner?: string | null
         }
         Update: {
+          advanced_team_id?: string | null
           away_pen?: number | null
           away_score?: number | null
           away_team_id?: string | null
@@ -1101,6 +1118,7 @@ export type Database = {
           home_team_id?: string | null
           home_team_name?: string | null
           id?: string
+          is_knockout?: boolean
           kickoff_at?: string | null
           last_synced_at?: string | null
           manual_lock?: boolean
@@ -1118,6 +1136,13 @@ export type Database = {
           winner?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "matches_advanced_team_id_fkey"
+            columns: ["advanced_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "matches_away_team_id_fkey"
             columns: ["away_team_id"]
@@ -1255,6 +1280,8 @@ export type Database = {
       }
       predictions: {
         Row: {
+          advance_bonus: number | null
+          advance_team_id: string | null
           away_pred: number
           created_at: string
           home_pred: number
@@ -1268,6 +1295,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          advance_bonus?: number | null
+          advance_team_id?: string | null
           away_pred: number
           created_at?: string
           home_pred: number
@@ -1281,6 +1310,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          advance_bonus?: number | null
+          advance_team_id?: string | null
           away_pred?: number
           created_at?: string
           home_pred?: number
@@ -1294,6 +1325,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "predictions_advance_team_id_fkey"
+            columns: ["advance_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "predictions_match_id_fkey"
             columns: ["match_id"]
@@ -1317,6 +1355,7 @@ export type Database = {
           display_name: string
           favorite_competition_id: string | null
           favorite_group_id: string | null
+          favorite_group_ids: string[]
           favorite_team: string | null
           favorite_team_id: string | null
           followed_competition_ids: string[]
@@ -1341,6 +1380,7 @@ export type Database = {
           display_name?: string
           favorite_competition_id?: string | null
           favorite_group_id?: string | null
+          favorite_group_ids?: string[]
           favorite_team?: string | null
           favorite_team_id?: string | null
           followed_competition_ids?: string[]
@@ -1365,6 +1405,7 @@ export type Database = {
           display_name?: string
           favorite_competition_id?: string | null
           favorite_group_id?: string | null
+          favorite_group_ids?: string[]
           favorite_team?: string | null
           favorite_team_id?: string | null
           followed_competition_ids?: string[]
@@ -1512,6 +1553,8 @@ export type Database = {
           created_at: string
           difficulty: number
           fact_pt: string | null
+          fact_reviewed: boolean
+          fact_source: string | null
           home_name_pt: string
           home_score: number
           home_slug: string
@@ -1536,6 +1579,8 @@ export type Database = {
           created_at?: string
           difficulty: number
           fact_pt?: string | null
+          fact_reviewed?: boolean
+          fact_source?: string | null
           home_name_pt: string
           home_score: number
           home_slug: string
@@ -1560,6 +1605,8 @@ export type Database = {
           created_at?: string
           difficulty?: number
           fact_pt?: string | null
+          fact_reviewed?: boolean
+          fact_source?: string | null
           home_name_pt?: string
           home_score?: number
           home_slug?: string
@@ -1740,6 +1787,53 @@ export type Database = {
         }
         Relationships: []
       }
+      study_docs: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          slug: string
+          sort: number
+          storage_path: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          slug: string
+          sort?: number
+          storage_path: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          slug?: string
+          sort?: number
+          storage_path?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_docs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sync_alerts: {
         Row: {
           competition_id: string | null
@@ -1803,6 +1897,21 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sync_locks: {
+        Row: {
+          locked_until: string
+          name: string
+        }
+        Insert: {
+          locked_until: string
+          name: string
+        }
+        Update: {
+          locked_until?: string
+          name?: string
+        }
+        Relationships: []
       }
       sync_unmapped: {
         Row: {
@@ -1930,12 +2039,12 @@ export type Database = {
         Args: { p_league_id: string }
         Returns: undefined
       }
-      admin_block_email: {
-        Args: { p_reason?: string; p_user_id: string }
+      admin_archive_competition: {
+        Args: { p_confirm_name: string; p_id: string }
         Returns: undefined
       }
-      admin_flag_league_name: {
-        Args: { p_league_id: string; p_reason?: string }
+      admin_block_email: {
+        Args: { p_reason?: string; p_user_id: string }
         Returns: undefined
       }
       admin_broadcast_preview: {
@@ -1988,6 +2097,11 @@ export type Database = {
         Returns: undefined
       }
       admin_delete_user: { Args: { p_user_id: string }; Returns: undefined }
+      admin_fact_coverage: { Args: never; Returns: Json }
+      admin_flag_league_name: {
+        Args: { p_league_id: string; p_reason?: string }
+        Returns: undefined
+      }
       admin_list_broadcasts: {
         Args: { p_limit?: number }
         Returns: {
@@ -2017,6 +2131,7 @@ export type Database = {
           role: string
         }[]
       }
+      admin_list_competitions_full: { Args: never; Returns: Json }
       admin_list_deleted_leagues: {
         Args: never
         Returns: {
@@ -2074,6 +2189,23 @@ export type Database = {
           status: Database["public"]["Enums"]["match_status"]
         }[]
       }
+      admin_list_match_facts: {
+        Args: { p_filter?: string; p_limit?: number; p_search?: string }
+        Returns: {
+          away_name_pt: string
+          away_slug: string
+          difficulty: number
+          fact_pt: string
+          fact_reviewed: boolean
+          fact_source: string
+          home_name_pt: string
+          home_slug: string
+          id: string
+          score: string
+          stage_label_pt: string
+          wc_year: number
+        }[]
+      }
       admin_list_sync_alerts: {
         Args: { p_limit?: number }
         Returns: {
@@ -2126,6 +2258,10 @@ export type Database = {
           usage_seconds: number
         }[]
       }
+      admin_match_sources_for_competition: {
+        Args: { p_competition_id: string; p_limit?: number }
+        Returns: Json
+      }
       admin_override_match: {
         Args: {
           p_away_score: number
@@ -2135,6 +2271,13 @@ export type Database = {
           p_status?: string
         }
         Returns: undefined
+      }
+      admin_push_stats: {
+        Args: never
+        Returns: {
+          devices: number
+          users: number
+        }[]
       }
       admin_recent_audit: {
         Args: { p_limit?: number }
@@ -2147,13 +2290,6 @@ export type Database = {
           entity_label: string
           entity_type: string
           id: string
-        }[]
-      }
-      admin_push_stats: {
-        Args: never
-        Returns: {
-          devices: number
-          users: number
         }[]
       }
       admin_remove_competition_source: {
@@ -2173,6 +2309,7 @@ export type Database = {
         Returns: undefined
       }
       admin_resolve_unmapped: { Args: { p_id: string }; Returns: undefined }
+      admin_restore_competition: { Args: { p_id: string }; Returns: undefined }
       admin_restore_league: {
         Args: { p_league_id: string }
         Returns: undefined
@@ -2207,6 +2344,15 @@ export type Database = {
         Args: { p_message?: string; p_on: boolean }
         Returns: undefined
       }
+      admin_set_match_fact: {
+        Args: {
+          p_fact: string
+          p_match_id: string
+          p_reviewed?: boolean
+          p_source?: string
+        }
+        Returns: undefined
+      }
       admin_set_match_lock: {
         Args: { p_locked: boolean; p_match_id: string }
         Returns: undefined
@@ -2217,6 +2363,10 @@ export type Database = {
       }
       admin_set_online_threshold: {
         Args: { p_value: number }
+        Returns: undefined
+      }
+      admin_set_primary_source: {
+        Args: { p_competition_id: string; p_source_id: string }
         Returns: undefined
       }
       admin_set_promo: {
@@ -2297,7 +2447,19 @@ export type Database = {
         }
         Returns: string
       }
+      admin_usage_stats: { Args: never; Returns: Json }
       admin_user_moderation: { Args: { p_user_id: string }; Returns: Json }
+      advance_bonus: {
+        Args: {
+          p_away_pred: number
+          p_away_team: string
+          p_home_pred: number
+          p_home_team: string
+          p_pred_advance: string
+          p_real_advance: string
+        }
+        Returns: number
+      }
       advance_confronto_cup: { Args: { p_lc_id: string }; Returns: number }
       append_confronto_ties: {
         Args: { p_lc_id: string; p_ties: Json }
@@ -2335,6 +2497,13 @@ export type Database = {
         }
       }
       can_settle_leagues: { Args: never; Returns: boolean }
+      competition_period: {
+        Args: { p_competition_id: string }
+        Returns: {
+          data_max: string
+          data_min: string
+        }[]
+      }
       compute_score_type: {
         Args: { pa: number; ph: number; ra: number; rh: number }
         Returns: Database["public"]["Enums"]["score_type"]
@@ -2478,6 +2647,21 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_group_rank_window: {
+        Args: { p_league_id: string; p_radius?: number }
+        Returns: {
+          acertos: number
+          avatar_url: string
+          cravadas: number
+          display_name: string
+          is_me: boolean
+          jogos: number
+          pontos: number
+          rank: number
+          saldos: number
+          user_id: string
+        }[]
+      }
       get_league_standings: {
         Args: { p_lc_id: string }
         Returns: {
@@ -2495,6 +2679,26 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_league_standings_live: {
+        Args: { p_lc_id: string }
+        Returns: {
+          acertividade: number
+          acertos: number
+          ao_vivo: boolean
+          aproveitamento: number
+          avatar_url: string
+          cravadas: number
+          display_name: string
+          erros: number
+          jogos: number
+          live_scoring: boolean
+          pontos: number
+          rank: number
+          rank_anterior: number
+          saldos: number
+          user_id: string
+        }[]
+      }
       get_match_predict_status: {
         Args: { p_match_id: string }
         Returns: {
@@ -2505,6 +2709,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_my_favorite_groups: { Args: never; Returns: string[] }
       get_my_global_rank: {
         Args: { p_competition_id?: string; p_year?: number }
         Returns: {
@@ -2590,6 +2795,7 @@ export type Database = {
       get_unread_count: { Args: never; Returns: number }
       heartbeat_access: { Args: { p_token: string }; Returns: Json }
       is_app_admin: { Args: never; Returns: boolean }
+      is_knockout_stage: { Args: { p_stage: string }; Returns: boolean }
       is_league_admin: { Args: { p_league_id: string }; Returns: boolean }
       is_league_member: { Args: { p_league_id: string }; Returns: boolean }
       join_league_by_code: {
@@ -2652,6 +2858,12 @@ export type Database = {
           slug: string
         }[]
       }
+      live_competition_ids: {
+        Args: never
+        Returns: {
+          competition_id: string
+        }[]
+      }
       log_unmapped_teams: {
         Args: { p_provider: string; p_rows: Json }
         Returns: undefined
@@ -2668,6 +2880,13 @@ export type Database = {
         Returns: boolean
       }
       match_is_locked: { Args: { p_match_id: string }; Returns: boolean }
+      my_joker_week_counts: {
+        Args: never
+        Returns: {
+          n: number
+          week: string
+        }[]
+      }
       nudge_for_match: {
         Args: { p_match_id: string; p_to_user: string }
         Returns: undefined
@@ -2675,6 +2894,20 @@ export type Database = {
       rate_limit_hit: {
         Args: { p_bucket: string; p_max: number; p_window_seconds: number }
         Returns: boolean
+      }
+      record_observation: {
+        Args: {
+          p_away_pen: number
+          p_away_score: number
+          p_home_pen: number
+          p_home_score: number
+          p_kickoff_at: string
+          p_match_id: string
+          p_provider: string
+          p_provider_ref: string
+          p_status: string
+        }
+        Returns: undefined
       }
       refund_league: { Args: { p_league_id: string }; Returns: boolean }
       reject_league: {
@@ -2711,10 +2944,15 @@ export type Database = {
       release_access: { Args: { p_token: string }; Returns: undefined }
       release_confronto_if_due: { Args: { p_lc_id: string }; Returns: boolean }
       release_scheduled_confrontos: { Args: never; Returns: number }
+      release_sync_lock: { Args: { p_name: string }; Returns: undefined }
       request_access: { Args: { p_token?: string }; Returns: Json }
       resolve_match_golden: {
         Args: { p_match_ids?: string[] }
         Returns: number
+      }
+      resolved_advancer: {
+        Args: { m: Database["public"]["Tables"]["matches"]["Row"] }
+        Returns: string
       }
       retro_abandon: {
         Args: { p_anon_token?: string; p_run_id: string }
@@ -2735,6 +2973,7 @@ export type Database = {
         }
         Returns: Json
       }
+      retro_fact_is_spoiler: { Args: { p_fact: string }; Returns: boolean }
       retro_get_config: { Args: never; Returns: Json }
       retro_leaderboard: {
         Args: {
@@ -2878,6 +3117,16 @@ export type Database = {
         }
       }
       skip_personalization: { Args: never; Returns: undefined }
+      starts_on_window: {
+        Args: { p_lc_id: string }
+        Returns: {
+          data_max: string
+          data_min: string
+          editable: boolean
+          reason: string
+          starts_on: string
+        }[]
+      }
       submit_feedback: {
         Args: {
           p_app_version?: string
@@ -2920,7 +3169,15 @@ export type Database = {
       }
       team_slug: { Args: { p: string }; Returns: string }
       toggle_confronto_optin: { Args: { p_lc_id: string }; Returns: boolean }
+      toggle_favorite_group: {
+        Args: { p_league_id: string }
+        Returns: string[]
+      }
       touch_presence: { Args: never; Returns: undefined }
+      try_claim_sync_lock: {
+        Args: { p_name: string; p_ttl_seconds: number }
+        Returns: boolean
+      }
       undo_confronto_draw: { Args: { p_lc_id: string }; Returns: undefined }
       update_group_info: {
         Args: { p_description: string; p_league_id: string; p_name: string }
@@ -2960,7 +3217,12 @@ export type Database = {
       }
     }
     Enums: {
-      data_provider: "manual" | "football_data" | "thesportsdb" | "espn"
+      data_provider:
+        | "manual"
+        | "football_data"
+        | "thesportsdb"
+        | "espn"
+        | "fifawc"
       join_policy: "open" | "approval" | "invite"
       league_mode: "table" | "cup" | "points" | "liga"
       league_status: "pending" | "active" | "rejected" | "archived"
@@ -3106,7 +3368,13 @@ export const Constants = {
   },
   public: {
     Enums: {
-      data_provider: ["manual", "football_data", "thesportsdb", "espn"],
+      data_provider: [
+        "manual",
+        "football_data",
+        "thesportsdb",
+        "espn",
+        "fifawc",
+      ],
       join_policy: ["open", "approval", "invite"],
       league_mode: ["table", "cup", "points", "liga"],
       league_status: ["pending", "active", "rejected", "archived"],

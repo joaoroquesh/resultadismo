@@ -142,6 +142,13 @@ export function RunView({
           <TeamSide slug={m.away_slug} name={m.away_name_pt} />
         </div>
 
+        {/* dica de contexto do jogo (curiosidade sem spoiler) — só quando existe */}
+        {m.fact && (
+          <p className="mx-auto max-w-[19rem] rounded-md bg-gold-100/70 px-3 py-1.5 text-center text-[11px] leading-snug text-gold-900 ring-1 ring-gold-300">
+            💡 <span className="font-semibold">Você sabia?</span> {m.fact}
+          </p>
+        )}
+
         {rerolls > 0 && (
           <button
             type="button"
