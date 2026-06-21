@@ -1497,6 +1497,30 @@ export type Database = {
         }
         Relationships: []
       }
+      retro_achievements: {
+        Row: {
+          code: string
+          description: string
+          emoji: string
+          label: string
+          sort: number
+        }
+        Insert: {
+          code: string
+          description: string
+          emoji: string
+          label: string
+          sort?: number
+        }
+        Update: {
+          code?: string
+          description?: string
+          emoji?: string
+          label?: string
+          sort?: number
+        }
+        Relationships: []
+      }
       retro_config: {
         Row: {
           enforce_knockout_bar: boolean
@@ -1625,6 +1649,39 @@ export type Database = {
           went_extra_time?: boolean
         }
         Relationships: []
+      }
+      retro_player_achievements: {
+        Row: {
+          code: string
+          earned_at: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          earned_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          earned_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "retro_player_achievements_code_fkey"
+            columns: ["code"]
+            isOneToOne: false
+            referencedRelation: "retro_achievements"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "retro_player_achievements_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       retro_run_matches: {
         Row: {
@@ -3029,6 +3086,8 @@ export type Database = {
         }
         Returns: Json
       }
+      retro_best_streak: { Args: { p_user: string }; Returns: number }
+      retro_claim_achievements: { Args: never; Returns: Json }
       retro_daily_count: { Args: never; Returns: number }
       retro_fact_is_spoiler: { Args: { p_fact: string }; Returns: boolean }
       retro_get_config: { Args: never; Returns: Json }
@@ -3050,6 +3109,7 @@ export type Database = {
         Returns: Json
       }
       retro_min_points: { Args: { p_label: string }; Returns: number }
+      retro_my_collection: { Args: never; Returns: Json }
       retro_my_stats: { Args: never; Returns: Json }
       retro_next: {
         Args: { p_anon_token?: string; p_run_id: string; p_seen?: string[] }
@@ -3079,6 +3139,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      retro_run_records: { Args: { p_share_code: string }; Returns: Json }
       retro_run_summary: { Args: { p_share_code: string }; Returns: Json }
       retro_serve_slot: {
         Args: {

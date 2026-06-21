@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { ConsentBanner } from "@/features/consent/ConsentBanner";
+import { Escudo } from "@/components/ui/Escudo";
+import { useAuth } from "@/features/auth/AuthProvider";
 import { track } from "@/lib/analytics";
 import { RetroStripes } from "./RetroFx";
 
@@ -9,6 +11,7 @@ import { RetroStripes } from "./RetroFx";
 // sem Sidebar/BottomNav/header do Resultadismo e SEM link de saída no topo. As
 // referências ao bolão ficam nos CTAs do conteúdo, não numa porta no cabeçalho.
 export function RetroShell() {
+  const { user, profile } = useAuth();
   // funil: marca a abertura do Retrô (origem inferida pelo referrer) uma vez por sessão
   useEffect(() => {
     const ref = document.referrer || "";
@@ -33,10 +36,19 @@ export function RetroShell() {
     <div className="min-h-dvh bg-background text-ink-900">
       <header className="sticky top-0 z-30 border-b border-border bg-surface/90 backdrop-blur-md">
         <RetroStripes />
-        <div className="mx-auto flex h-11 w-full max-w-md items-center justify-center px-4">
+        <div className="mx-auto flex h-11 w-full max-w-md items-center justify-between px-4">
+          {/* espaçador pra manter a marca centralizada quando há escudo à direita */}
+          <span aria-hidden className="w-7" />
           <Link to="/retro" className="text-sm font-bold tracking-tight">
             🕹️ Resultadismo <span className="text-brand-700">Retrô</span>
           </Link>
+          {user ? (
+            <Link to="/retro/eu" aria-label="Minha Copa Retrô" className="shrink-0">
+              <Escudo src={profile?.avatar_url} name={profile?.display_name} size="sm" className="size-7" />
+            </Link>
+          ) : (
+            <span aria-hidden className="w-7" />
+          )}
         </div>
       </header>
       <main className="mx-auto w-full max-w-md px-4 py-4">

@@ -111,6 +111,8 @@ export type RetroSummary = {
   is_daily: boolean;
   daily_date: string | null;
   finished_at: string;
+  team_name_pt: string | null;
+  team_slug: string | null;
   player: { display_name: string; avatar_url: string | null } | null;
   slots: RetroSlotSummary[];
 };
@@ -142,7 +144,23 @@ export type RetroMyStats = {
     level: RetroLevel;
     daily_date: string;
   } | null;
+  best_streak?: number;
+  xp?: number;
+  title?: string;
+  runs?: number;
+  champions?: number;
+  cravadas?: number;
 };
+
+export type RetroAchievement = {
+  code: string;
+  label: string;
+  emoji: string;
+  description: string;
+  earned: boolean;
+  earned_at?: string | null;
+};
+export type RetroCollection = { total: number; jogadas: number; vencidas: string[] };
 
 // ---------- hooks ----------
 
@@ -374,6 +392,48 @@ export function useRetroSetConfig() {
   });
 }
 
+// "Você seria ~Nº no ranking de hoje" (gancho de login pro anônimo no fim da run)
+export function useRetroRankEstimate(
+  campaign: { stageRank: number | null; points: number; totalMs: number | null } | null,
+) {
+  return useQuery({
+    enabled: !!campaign,
+    queryKey: ["retro-rank-estimate", campaign?.stageRank, campaign?.points, campaign?.totalMs],
+    queryFn: async (): Promise<{ pos: number; total: number }> => {
+      const { data, error } = await supabase.rpc("retro_rank_estimate", {
+        p_stage_rank: campaign?.stageRank ?? 0,
+        p_points: campaign?.points ?? 0,
+        p_total_ms: campaign?.totalMs ?? 0,
+      });
+      if (error) throw new Error(error.message);
+      return data as unknown as { pos: number; total: number };
+    },
+  });
+}
+
+// Campeão da Seleção do Dia de ONTEM (coroação na home) + quantos jogaram hoje
+export function useRetroDailyExtras() {
+  return useQuery({
+    queryKey: ["retro-daily-extras"],
+    queryFn: async () => {
+      const [champ, count] = await Promise.all([
+        supabase.rpc("retro_yesterday_champion"),
+        supabase.rpc("retro_daily_count"),
+      ]);
+      return {
+        champion: (champ.data as unknown as {
+          display_name: string;
+          avatar_url: string | null;
+          team_name_pt: string | null;
+          points: number;
+        } | null) ?? null,
+        playedToday: (count.data as unknown as number) ?? 0,
+      };
+    },
+    staleTime: 5 * 60_000,
+  });
+}
+
 // A Copa do Dia de hoje é de qual seleção?
 export function useRetroToday() {
   return useQuery({
@@ -395,6 +455,56 @@ export function useRetroMyStats() {
       const { data, error } = await supabase.rpc("retro_my_stats");
       if (error) throw new Error(error.message);
       return data as unknown as RetroMyStats;
+    },
+  });
+}
+
+// Concede as conquistas merecidas e devolve a estante + as recém-conquistadas.
+export function useClaimAchievements() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (): Promise<{ all: RetroAchievement[]; new: string[] }> => {
+      const { data, error } = await supabase.rpc("retro_claim_achievements");
+      if (error) throw new Error(error.message);
+      return data as unknown as { all: RetroAchievement[]; new: string[] };
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["retro-achievements"] }),
+  });
+}
+
+// Estante de conquistas (pra página de perfil) — claim idempotente, então pode ler aqui.
+export function useRetroAchievements(enabled = true) {
+  return useQuery({
+    enabled,
+    queryKey: ["retro-achievements"],
+    queryFn: async (): Promise<{ all: RetroAchievement[]; new: string[] }> => {
+      const { data, error } = await supabase.rpc("retro_claim_achievements");
+      if (error) throw new Error(error.message);
+      return data as unknown as { all: RetroAchievement[]; new: string[] };
+    },
+  });
+}
+
+export function useRetroCollection(enabled = true) {
+  return useQuery({
+    enabled,
+    queryKey: ["retro-collection"],
+    queryFn: async (): Promise<RetroCollection> => {
+      const { data, error } = await supabase.rpc("retro_my_collection");
+      if (error) throw new Error(error.message);
+      return data as unknown as RetroCollection;
+    },
+  });
+}
+
+export function useRetroRunRecords(shareCode: string | null, enabled: boolean) {
+  return useQuery({
+    enabled: enabled && !!shareCode,
+    queryKey: ["retro-run-records", shareCode],
+    queryFn: async (): Promise<{ record: boolean; best_points?: boolean }> => {
+      const { data, error } = await supabase.rpc("retro_run_records", { p_share_code: shareCode ?? "" });
+      if (error) throw new Error(error.message);
+      return data as unknown as { record: boolean; best_points?: boolean };
     },
   });
 }

@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
@@ -10,7 +11,7 @@ import { Confetti, RetroStripes, ZerouFx } from "./RetroFx";
 import { fmtMs, modeLabel, type FinishedRun } from "./share";
 import { isPenaltyOut, stageEmoji, verdictBadge, verdictHeadline } from "./verdict";
 import { shareCampaign } from "./shareImage";
-import { useRetroRankEstimate } from "./api";
+import { useClaimAchievements, useRetroAchievements, useRetroRankEstimate, useRetroRunRecords, type RetroAchievement } from "./api";
 
 // Tela final: o "card" agora espelha a imagem do share (placar eletrônico escuro +
 // listras retrô), pra ser igual ao que a pessoa compartilha. Embaixo, o convite pro
@@ -42,6 +43,25 @@ export function ResultView({
       ? { stageRank: run.stageRank, points: run.points, totalMs: run.totalMs }
       : null,
   );
+
+  // logado: concede conquistas merecidas (1x) e detecta recorde pessoal
+  const claim = useClaimAchievements();
+  const achCatalog = useRetroAchievements(false);
+  const records = useRetroRunRecords(run.shareCode, !!user);
+  const [newAch, setNewAch] = useState<RetroAchievement[]>([]);
+  const claimed = useRef(false);
+  useEffect(() => {
+    if (!user || claimed.current) return;
+    claimed.current = true;
+    claim.mutate(undefined, {
+      onSuccess: (res) => {
+        const byCode = new Map(res.all.map((a) => [a.code, a]));
+        setNewAch(res.new.map((c) => byCode.get(c)).filter((a): a is RetroAchievement => !!a));
+        achCatalog.refetch?.();
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   return (
     <div className="mx-auto w-full max-w-md space-y-4">
@@ -95,6 +115,27 @@ export function ResultView({
           </p>
         </div>
       </div>
+
+      {records.data?.record && (
+        <p className="animate-retro-stamp rounded-md bg-gold-500/15 px-3 py-2 text-center text-sm font-bold text-gold-700 ring-1 ring-gold-500/40">
+          🏅 NOVO RECORDE pessoal!
+        </p>
+      )}
+
+      {newAch.length > 0 && (
+        <Card className="border-gold-300 bg-gold-50 p-3">
+          <p className="text-center text-xs font-bold uppercase tracking-wide text-gold-700">
+            Conquista{newAch.length > 1 ? "s" : ""} desbloqueada{newAch.length > 1 ? "s" : ""}!
+          </p>
+          <div className="mt-2 flex flex-wrap justify-center gap-2">
+            {newAch.map((a) => (
+              <span key={a.code} className="inline-flex items-center gap-1 rounded-pill bg-white px-2.5 py-1 text-xs font-bold ring-1 ring-gold-300" title={a.description}>
+                <span className="text-base leading-none">{a.emoji}</span> {a.label}
+              </span>
+            ))}
+          </div>
+        </Card>
+      )}
 
       <Button
         size="lg"
