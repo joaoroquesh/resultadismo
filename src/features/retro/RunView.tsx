@@ -142,10 +142,10 @@ export function RunView({
           <TeamSide slug={m.away_slug} name={m.away_name_pt} />
         </div>
 
-        {/* dica de contexto do jogo (curiosidade sem spoiler) — só quando existe */}
+        {/* pista do jogo: apelido/lance que ajuda a lembrar o placar, sem entregá-lo */}
         {m.fact && (
-          <p className="mx-auto max-w-[19rem] rounded-md bg-gold-100/70 px-3 py-1.5 text-center text-[11px] leading-snug text-gold-900 ring-1 ring-gold-300">
-            💡 <span className="font-semibold">Você sabia?</span> {m.fact}
+          <p className="mx-auto max-w-[19rem] rounded-md bg-gold-100/70 px-3 py-1 text-center text-xs font-semibold leading-snug text-gold-900 ring-1 ring-gold-300">
+            💡 {m.fact}
           </p>
         )}
 

@@ -115,17 +115,18 @@ palpite. É exatamente onde a dica entra.
 2. **Entrega no payload:** `retro_match_payload` passa a incluir `fact: m.fact_pt`. Herda toda a
    proteção anti-cheat. `fact = null` → a UI não mostra nada (degradação graciosa: **não precisa
    cobrir os 964 antes de lançar**).
-3. **UX (RunView):** pílula discreta "💡 Você sabia?" abaixo do confronto e **antes** do cronômetro,
+   > **Refino do PO (rodada 21.1):** a dica NÃO é curiosidade aleatória — é uma **pista curtíssima
+   > (1 linha)** que ajuda a **reconhecer o jogo e puxar a memória do placar**: apelido ou lance
+   > marcante. Ex.: "Gol de mão do Maradona", "Maracanazzo", "Mineiraço". Limite **90 chars**.
+3. **UX (RunView):** pílula discreta "💡 {pista}" abaixo do confronto e **antes** do cronômetro,
    durante o respiro "Valendo…" — não rouba foco das roletas, não consome o tempo (o deadline já tem
    folga). Curtíssima pra caber no mobile.
-4. **Anti-spoiler (o ponto delicado — a dica aparece ANTES do palpite):**
-   - **Origem:** a dica fala de *contexto* (sede, estádio, público, primeira-vez, técnico, calor,
-     rivalidade, o que estava em jogo) e **nunca** do resultado. Pra IA, o prompt **não recebe o
-     placar** — não há o que vazar.
-   - **Validação automática** (defesa em profundidade): rejeitar dica com dígitos que formem placar
-     ("4 a 1", "4x1", "4-1") ou palavras de resultado (venceu/goleou/eliminou/campeão) ligadas a um
-     time. Regex pega ~90%; o resto na revisão.
-   - **Curadoria humana** é o backstop: ler imaginando que não sabe o placar.
+4. **Anti-spoiler (a dica aparece ANTES do palpite):** o apelido PODE evocar o jogo (é o objetivo:
+   lembrar o placar) — o que não pode é **dar o placar de forma literal**.
+   - **Validação automática** (`retro_fact_is_spoiler`): rejeita ao **publicar** dígitos que formem
+     placar ("4 a 1", "4x1", "4-1") ou verbos literais de resultado (venceu/goleou/campeão). Apelidos
+     ("Maracanazzo") passam. Rascunho de IA pode entrar mesmo assim, pra revisão.
+   - **Curadoria humana** é o backstop.
 5. **Fonte das dicas (recomendado: híbrido):** IA gera **rascunho** em lote (recebendo só
    ano/sede/fase/times) → você **revisa/aprova no admin** antes de publicar. Cobre os 964 rápido com
    sua voz e veracidade conferida. (openfootball é CC0 mas só dá dado seco; Wikipedia é CC BY-SA, só
@@ -141,11 +142,18 @@ palpite. É exatamente onde a dica entra.
 
 ## 6. Separação: Retrô vs app-mãe & `retro.resultadismo.com`
 
-**Recomendação:** **separar o ENVELOPE, não a identidade.** Ou seja: marca, OG, PWA, analytics e URL
-próprios (`retro.resultadismo.com`), mas **banco e `profiles` continuam únicos** e o login é tratado
-como **independente por host** (mesma conta/escudo, sessão por device) — sem perseguir SSO
-cross-origin (o supabase-js guarda sessão em `localStorage`, que é por-origem; SSO entre apex e
-subdomínio é esforço G e fricção alta, e o Retrô já brilha jogando **sem** login).
+**Recomendação (atualizada — decisão do PO, rodada 21.1): separar o ENVELOPE COM login único.**
+Marca, OG, PWA, analytics e URL próprios (`retro.resultadismo.com`), banco e `profiles` únicos, **e
+LOGIN ÚNICO entre os dois jogos (e jogos futuros)**. O PO quer favorecer a UX de uma plataforma
+multi-jogo: logou em um, está logado em todos.
+
+**Como (viável e padrão de mercado):** trocar o storage de sessão do supabase-js de `localStorage`
+(por-origem) para um **cookie de sessão com escopo `domain=.resultadismo.com`** (domínio-pai),
+compartilhado por `www`, `retro` e qualquer `*.resultadismo.com` futuro. Isso dá SSO real entre os
+subdomínios **sem** postMessage/hand-off — esforço **M**, e vira a fundação do login único da
+plataforma. (Pré-requisito: todos os jogos vivem em subdomínios de `resultadismo.com`. Domínio
+totalmente distinto exigiria OAuth/redirect — fora de escopo.) O Retrô segue jogável **sem** login;
+o SSO só beneficia quem loga (ranking/escudo/coleção).
 
 **O que já está separado** (a fronteira existe): UI (`RetroShell`), presença/tempo (`retro_touch`),
 OG/SEO em conteúdo (`build-retro-html.mjs` + rewrite). **O que falta** é só o "envelope".
@@ -158,20 +166,23 @@ OG/SEO em conteúdo (`build-retro-html.mjs` + rewrite). **O que falta** é só o
   como app próprio) com esforço contido.
 - **Fase 2 (só com tração):** avaliar build/deploy separado do slice Retrô.
 
-**O que NÃO fazer agora:** reabsorver o Retrô no AppShell (anda contra a tese), nem perseguir
-"logado num = logado no outro" entre os hosts.
+**O que NÃO fazer agora:** reabsorver o Retrô no AppShell (anda contra a tese).
 
 **Implicação pro roadmap:** se vamos separar, faz mais sentido o Retrô ter **identidade/coleção
-próprias** (Onda 1) em vez de só emprestar o perfil do bolão — as duas decisões se reforçam.
+próprias** (Onda 1) em vez de só emprestar o perfil do bolão — as duas decisões se reforçam. E o
+**login único** (cookie de domínio-pai) é a base de plataforma pra esse e os próximos jogos.
 
 ---
 
-## 7. Decisões que preciso de você (Portão A)
-1. **Separação:** topa o subdomínio `retro.resultadismo.com` (Fase 1, envelope-only)? Login
-   independente por host (recomendado) ou quer SSO de verdade (mais caro)?
-2. **Prioridade:** começar pelas Quick wins (Onda 0) + **Dicas** (§5) — as de maior retorno por
-   esforço — e depois Identidade/Coleção (Onda 1)? Ou outra ordem?
-3. **Dicas:** método de geração — **híbrido** (IA rascunha → você aprova no admin) é o recomendado;
-   confirma? Lançar com subconjunto + degradação graciosa (null não mostra nada)?
-4. **Escopo da branch:** trabalho tudo nesta `feat/retro-melhorias` e só subo pra `main` (deploy) com
-   seu OK por onda, certo?
+## 7. Decisões (Portão A) — ✅ tomadas em 11/06
+1. **Separação:** ✅ subdomínio `retro.resultadismo.com` (envelope) **com LOGIN ÚNICO** entre os
+   jogos (cookie de sessão escopo `.resultadismo.com`).
+2. **Prioridade:** ✅ Quick wins (Onda 0) + **Dicas** (§5) primeiro.
+3. **Dicas:** ✅ **híbrido** (IA rascunha → admin aprova). Dica = **pista curta/apelido** (rodada
+   21.1). Lançar com subconjunto + degradação graciosa (null não mostra nada).
+4. **Escopo da branch:** trabalho tudo na `feat/retro-melhorias`; só vai pra `main` (deploy) com OK
+   por onda.
+
+> **Status (11/06):** infra de Dicas construída na branch (migrations `150017`/`150018`, painel admin,
+> pílula no jogo, 5 apelidos-exemplo). **Pendente:** lote de rascunhos via IA (apelido/lance) pros
+> jogos notáveis → revisão no admin; Onda 0 (quick wins); subdomínio + login único.

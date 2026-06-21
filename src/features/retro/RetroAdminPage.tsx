@@ -136,7 +136,8 @@ function FactsPanel() {
         )}
       </div>
       <p className="rounded-md bg-gold-100 px-2 py-1 text-[11px] font-semibold text-gold-800">
-        ⚠️ A dica é sobre o <b>JOGO</b> (sede, público, história), nunca sobre o <b>PLACAR</b>.
+        💡 Uma <b>pista curta</b> (1 linha) que ajuda a lembrar QUE jogo é esse — apelido ou lance
+        marcante. Ex.: <i>“Gol de mão do Maradona”</i>, <i>“Maracanazzo”</i>. Sem dizer o <b>placar</b>.
       </p>
 
       <input
@@ -205,14 +206,14 @@ function FactRow({ m }: { m: AdminMatchFact }) {
         value={text}
         onChange={(e) => setText(e.target.value)}
         rows={2}
-        maxLength={160}
-        placeholder="Curiosidade de contexto (sem placar)…"
+        maxLength={90}
+        placeholder="Pista curta (apelido/lance) — ex.: Gol de mão do Maradona"
         className="mt-1.5 w-full resize-none rounded-md border border-ink-200 bg-surface p-2 text-sm outline-none focus:border-brand-500"
       />
       <div className="mt-1.5 flex items-center justify-between gap-2">
         <span className="text-[11px] text-ink-400">
           {m.fact_reviewed ? "✅ publicada" : m.fact_pt ? "✏️ rascunho" : "—"}
-          {text.length > 0 && ` · ${text.length}/160`}
+          {text.length > 0 && ` · ${text.length}/90`}
         </span>
         <div className="flex gap-1.5">
           <Button size="sm" variant="outline" loading={save.isPending} onClick={() => run(false)}>
