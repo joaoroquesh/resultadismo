@@ -366,7 +366,7 @@ begin
   insert into public.retro_daily (daily_date, match_ids, team_slug, team_name_pt) values (v_today, v_ids, 'brasil', 'Brasil');
   v_start := public.retro_start_run('acerto','sempressa',true,null,'{}');
   v_fact := v_start->'current'->'match'->>'fact';
-  if v_fact is null or v_fact not ilike '%Maracanã%' then raise exception 'T13 FALHOU: dica revisada não veio no payload: %', v_fact; end if;
+  if v_fact is null or v_fact not ilike '%Maracana%' then raise exception 'T13 FALHOU: dica revisada não veio no payload: %', v_fact; end if;
   raise notice 'T13a dica revisada desce no payload: OK';
 
   -- despublica → fact some do payload
