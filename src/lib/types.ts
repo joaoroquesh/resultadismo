@@ -42,6 +42,8 @@ export type MatchWithTeams = Match & {
   home_team: Team | null;
   away_team: Team | null;
   competition?: Pick<Competition, "id" | "name" | "slug" | "emblem_url"> | null;
+  /** Fase do jogo AO VIVO (1t/intervalo/2t/prorrogacao/penaltis); coluna nova, fora dos tipos gerados. */
+  live_phase?: string | null;
 };
 
 export const SCORE_POINTS: Record<ScoreType, number> = {

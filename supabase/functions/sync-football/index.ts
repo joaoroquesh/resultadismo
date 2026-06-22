@@ -83,6 +83,8 @@ interface MatchRow {
   away_score: number | null;
   home_pen?: number | null;
   away_pen?: number | null;
+  /** Fase do jogo AO VIVO (só a ESPN reporta): 1t | intervalo | 2t | prorrogacao | penaltis. */
+  phase?: string | null;
 }
 
 const HOUR_MS = 3_600_000;
@@ -218,6 +220,7 @@ async function recordObservation(admin: SupabaseClient, matchId: string, row: Ma
     p_home_pen: row.home_pen ?? null,
     p_away_pen: row.away_pen ?? null,
     p_kickoff_at: row.kickoff_at,
+    p_live_phase: row.phase ?? null,
   });
 }
 
@@ -584,6 +587,21 @@ function mapEspnStatus(state: string, name: string): MatchStatus {
   if (state === "in") return "live";
   return "scheduled";
 }
+// Fase do jogo AO VIVO a partir do status da ESPN (só quando state='in').
+// status.type.name (STATUS_FIRST_HALF/HALFTIME/SECOND_HALF/..._EXTRA.../SHOOTOUT)
+// + status.period (1=1ºT, 2=2ºT, 3/4=prorrogação). Fora do ao vivo → null.
+function espnPhase(espnStatus: any): string | null {
+  const t = espnStatus?.type ?? {};
+  if (String(t.state ?? "") !== "in") return null;
+  const name = String(t.name ?? "").toUpperCase();
+  const period = Number(espnStatus?.period ?? 0);
+  if (name.includes("SHOOTOUT") || name.includes("PENALT")) return "penaltis";
+  if (name.includes("HALFTIME") || name.includes("HALF_TIME")) return "intervalo";
+  if (name.includes("EXTRA") || period >= 3) return "prorrogacao";
+  if (name.includes("SECOND") || period === 2) return "2t";
+  if (name.includes("FIRST") || period === 1) return "1t";
+  return null;
+}
 async function syncEspn(supabase: SupabaseClient, ctx: SourceCtx, writeTeams: boolean, scoresOnly = false): Promise<MatchRow[]> {
   if (!ctx.providerCode) throw new Error("provider_code ausente (slug ESPN)");
   const base = `https://site.api.espn.com/apis/site/v2/sports/soccer/${ctx.providerCode}/scoreboard`;
@@ -651,6 +669,7 @@ async function syncEspn(supabase: SupabaseClient, ctx: SourceCtx, writeTeams: bo
       away_team_name: away.team ? ptEspnTeam(away.team).short : "A definir",
       kickoff_at: e.date ?? null, status,
       home_score: live ? num(home.score) : null, away_score: live ? num(away.score) : null,
+      phase: espnPhase(c0.status),
     };
   });
 }

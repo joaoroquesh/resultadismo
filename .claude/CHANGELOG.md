@@ -21,6 +21,16 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+### Adicionado
+- **Fase do jogo ao lado do "AO VIVO" no card** (1º tempo / intervalo / 2º tempo / prorrogação /
+  pênaltis). Vem da **ESPN** (única fonte grátis com isso: `status.period` + `status.type.name`), que
+  o sync já consulta a cada 25s — antes esse dado era descartado. Nova coluna `matches.live_phase`
+  (e `match_sources.live_phase`), alimentada pela ESPN via `record_observation` e propagada por
+  `resolve_match_golden` (só enquanto `status='live'`; encerrado limpa). **Não mostra o minuto
+  corrido** de propósito: o sync roda a cada ~25s e ticar no cliente desincronizaria do jogo real; a
+  fase é estável e 100% confiável. Migration `20260621130000` + edge `sync-football` (parser
+  `espnPhase`) + card.
+
 ### Alterado
 - **Placar ao vivo — Etapa 1: a AUTORIDADE decide o final + cadência de 25s.** Evidência do dono na
   Copa: a ESPN trava antes do fim (Canadá 6-0 / ESPN 5-0; Gana 1-0 / ESPN 0-0) e, como o

@@ -34,6 +34,15 @@ const liveTextByType: Record<ScoreType, string> = {
   erro: "text-ink-400",
 };
 
+// Fase do jogo ao vivo (vem da ESPN via matches.live_phase) → rótulo no card.
+const PHASE_LABEL: Record<string, string> = {
+  "1t": "1º tempo",
+  intervalo: "Intervalo",
+  "2t": "2º tempo",
+  prorrogacao: "Prorrogação",
+  penaltis: "Pênaltis",
+};
+
 const scoreBoxByType: Record<ScoreType, string> = {
   cravada: "bg-gold-500 text-gold-950 border-gold-500",
   saldo: "bg-grass-600 text-white border-grass-600",
@@ -176,6 +185,9 @@ export function MatchCard({
         {live ? (
           <span className="flex items-center gap-1 font-bold text-flame-600">
             <span className="size-1.5 animate-pulse-live rounded-full bg-flame-500" /> AO VIVO
+            {match.live_phase && PHASE_LABEL[match.live_phase] && (
+              <span className="font-semibold">· {PHASE_LABEL[match.live_phase]}</span>
+            )}
           </span>
         ) : (
           <span className="font-semibold text-ink-600">{formatTime(match.kickoff_at)}</span>
