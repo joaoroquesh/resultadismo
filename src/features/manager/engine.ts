@@ -8,6 +8,10 @@
 // e retomável. A UI (manager) e o managerLocal só consomem este módulo.
 // =====================================================================
 import type {
+  BracketMatch,
+  BracketRound,
+  BracketSlot,
+  BracketView,
   Campaign,
   ChanceKind,
   CmdState,
@@ -21,11 +25,15 @@ import type {
   GroupsStageState,
   HistoryEntry,
   KnockoutOutcome,
+  PenKick,
+  PenResult,
+  Shootout,
   KnockoutStageState,
   Marcacao,
   MatchEvent,
   MatchKind,
   MatchState,
+  MatchStats,
   Postura,
   PossessionState,
   ProgressStep,
@@ -93,7 +101,7 @@ function gammaSample(rnd: () => number, k: number): number {
 // ---------------------------------------------------------------------
 export const P = {
   RAW_CHANCES_PER_HALF: 4.7,
-  CONV_BASE: 0.255,
+  CONV_BASE: 0.246,
   SHARE_SOFT: 1.55,
   CONV_DEF_PULL: 0.95,
   CONV_SPAN_FACTOR: 0.8,
@@ -104,18 +112,27 @@ export const P = {
   W_ATK: 0.6,
   W_MID: 0.4,
   // v4: 5 estilos · 5 posturas · 3 marcações · 8 formações
-  STYLE_CROSS_BONUS: 0.055,
-  MARK_CROSS_EDGE: 0.045,
-  STYLE_VS_STYLE: 0.025,
-  POSTURE_EDGE_OFF: 0.03,
-  POSTURE_EDGE_EXT: 0.05,
-  COHERENCE_SYNERGY: 0.03,
+  // item 8: pesos dos componentes táticos ELEVADOS de forma equilibrada (~1.8×) pra
+  // que tática+formação COERENTES possam sobrepor a força base — sem ignorá-la (gap
+  // grande ainda manda). Calibrado com simulateFull (média de gols ~2.5–2.8 mantida).
+  STYLE_CROSS_BONUS: 0.1,
+  MARK_CROSS_EDGE: 0.08,
+  STYLE_VS_STYLE: 0.045,
+  POSTURE_EDGE_OFF: 0.05,
+  POSTURE_EDGE_EXT: 0.085,
+  COHERENCE_SYNERGY: 0.05,
   COHERENCE_PENALTY: 0.45,
   LAT_AMP: 1.25,
   LAT_NEG: 0.9,
-  CENTER_DENS: 0.04,
-  FORM_EDGE_CAP: 0.06,
-  EDGE_CAP: 0.1,
+  CENTER_DENS: 0.06,
+  // tetos do edge tático elevados moderadamente (item 8): formação ±0.11, total ±0.20.
+  FORM_EDGE_CAP: 0.11,
+  EDGE_CAP: 0.2,
+  // item 8: o netEdge agora é BIDIRECIONAL — além do ataque (tacMul), também pesa na
+  // defesa e na conversão. kDef/kConv calibram quanto do edge vaza pra esses canais
+  // (frações do edge), pra um plano coerente render um swing real ~±20% no resultado.
+  EDGE_DEF_K: 0.78,
+  EDGE_CONV_K: 0.32,
   OD_GAMMA_K: 8.0,
   OD_VOL_EXP: 0.55,
   OD_CONV_EXP: 0.3,
@@ -149,6 +166,9 @@ export const P = {
   CMD_COOLDOWN_MIN: 6,
   OPEN_RECENTER: 1.0,
   MAX_GOALS_PER_SIDE: 7,
+  // item 7: cooldown próprio do AJUSTE TÁTICO ao vivo (estilo/postura/marcação),
+  // separado do press/recuo — evita "metralhar" os eixos. ~8' de relógio.
+  LIVETAC_COOLDOWN_MIN: 8,
 } as const;
 
 // 5 POSTURAS (multiplicador interno)
@@ -243,6 +263,59 @@ function styleVsStyle(my: Estilo, opp: Estilo): number {
   if (STYLE_RING[my] === opp) return P.STYLE_VS_STYLE;
   if (STYLE_RING[opp] === my) return -P.STYLE_VS_STYLE;
   return 0;
+}
+
+// ===== TRANSPARÊNCIA DO CONFRONTO (item 8) =====
+// "O que vence o que", legível, SEM número cru — só o anel pedra-papel-tesoura dos
+// estilos. A UI mostra isto na seleção de tática (anel geral, às cegas) e badges de
+// vantagem no intervalo (quando a tática do rival é revelada).
+export const STYLE_BEATS: Record<Estilo, Estilo> = { ...STYLE_RING };
+// rótulo curto de cada estilo (espelha ESTILO_NM da ui, mas o engine não importa ui).
+const ESTILO_SHORT: Record<Estilo, string> = {
+  passes: "Troca de Passes",
+  meio: "Pelo Meio",
+  lados: "Pelos Lados",
+  longas: "Bolas Longas",
+  contra: "Contra-ataque",
+};
+// quem o estilo X "supera" e por quem é "superado" no anel não-transitivo.
+export function styleMatchup(e: Estilo): { beats: Estilo; beatsLabel: string; losesTo: Estilo; losesToLabel: string } {
+  const beats = STYLE_RING[e];
+  let losesTo: Estilo = e;
+  (Object.keys(STYLE_RING) as Estilo[]).forEach((k) => {
+    if (STYLE_RING[k] === e) losesTo = k;
+  });
+  return { beats, beatsLabel: ESTILO_SHORT[beats], losesTo, losesToLabel: ESTILO_SHORT[losesTo] };
+}
+
+// Vantagens CONCRETAS do meu plano contra o do rival (usado no intervalo, com a
+// tática da IA revelada). Devolve sinais legíveis — sem expor o netEdge numérico.
+// Regras data-driven (espelham styleCross/markCross), avaliadas em sequência.
+export type MatchupSignal = { kind: "good" | "bad" | "neutral"; text: string };
+type MatchupRule = { when: (my: Tactic, opp: Tactic) => boolean; kind: MatchupSignal["kind"]; text: string };
+const inSet = <T,>(v: T, ...xs: T[]) => xs.indexOf(v) >= 0;
+const MATCHUP_RULES: MatchupRule[] = [
+  { when: (m, o) => m.estilo === "passes" && o.marcacao === "baixa", kind: "good", text: "Troca de passes fura o bloco baixo deles." },
+  { when: (m, o) => m.estilo === "passes" && o.marcacao === "alta", kind: "bad", text: "A pressão alta deles atrapalha sua troca de passes." },
+  { when: (m, o) => m.estilo === "longas" && o.marcacao === "alta", kind: "good", text: "Bolas longas passam por cima da pressão alta deles." },
+  { when: (m, o) => m.estilo === "longas" && o.marcacao === "baixa", kind: "bad", text: "Bola longa rende pouco contra o bloco baixo deles." },
+  { when: (m, o) => m.estilo === "meio" && o.marcacao === "alta", kind: "good", text: "Jogar pelo meio quebra a marcação alta deles." },
+  { when: (m, o) => m.estilo === "contra" && inSet(o.postura, "atk", "all_in"), kind: "good", text: "Eles se lançam — seu contra-ataque acha o espaço nas costas." },
+  { when: (m, o) => m.marcacao === "alta" && inSet(o.estilo, "passes", "meio"), kind: "good", text: "Pressão alta sufoca a saída de bola deles." },
+  { when: (m, o) => m.marcacao === "alta" && inSet(o.estilo, "contra", "longas"), kind: "bad", text: "Marcar alto deixa espaço pro contra/bola longa deles." },
+  { when: (m, o) => m.marcacao === "baixa" && inSet(o.estilo, "contra", "lados"), kind: "good", text: "Bloco baixo fecha o contra-ataque e as pontas deles." },
+  { when: (m, o) => inSet(o.postura, "retranca", "def") && inSet(m.postura, "atk", "all_in"), kind: "neutral", text: "Eles se fecham e você vai pra cima — paciência pra furar." },
+];
+export function matchupHints(my: Tactic, opp: Tactic): MatchupSignal[] {
+  const out: MatchupSignal[] = [];
+  // estilo × estilo (anel não-transitivo)
+  const sv = styleVsStyle(my.estilo, opp.estilo);
+  if (sv > 0) out.push({ kind: "good", text: `Seu ${ESTILO_SHORT[my.estilo]} leva a melhor sobre o ${ESTILO_SHORT[opp.estilo]} deles.` });
+  else if (sv < 0) out.push({ kind: "bad", text: `O ${ESTILO_SHORT[opp.estilo]} deles neutraliza seu ${ESTILO_SHORT[my.estilo]}.` });
+  MATCHUP_RULES.forEach((r) => {
+    if (r.when(my, opp)) out.push({ kind: r.kind, text: r.text });
+  });
+  return out;
 }
 
 // 3 MARCAÇÕES
@@ -414,8 +487,13 @@ export function sideStrength(team: Team, tac: Tactic, oppTac: Tactic): SideStren
   let tacMul = 1 + netEdge;
   if (tacMul < 0.55) tacMul = 0.55;
   const off = baseOff * postAtk * styleOff * tacMul;
-  const defEff = team.d * fw.def * postDef * mc.defEff;
-  const convMod = postConv * st.conv * sc.conv;
+  // item 8: edge BIDIRECIONAL — um plano coerente (netEdge>0) também endurece a minha
+  // defesa e qualifica minha conversão; um plano furado (netEdge<0) cobra nos dois. Sem
+  // ignorar a base: a força (team.d, baseOff) segue dominando o gap grande.
+  const defEdge = 1 + netEdge * P.EDGE_DEF_K;
+  const convEdge = 1 + netEdge * P.EDGE_CONV_K;
+  const defEff = team.d * fw.def * postDef * mc.defEff * defEdge;
+  const convMod = postConv * st.conv * sc.conv * convEdge;
   const aggressive = tac.postura === "atk" || tac.postura === "all_in";
   return {
     off,
@@ -441,6 +519,55 @@ export function sideStrength(team: Team, tac: Tactic, oppTac: Tactic): SideStren
               ? -P.POSS_SWING * 0.8
               : 0,
   };
+}
+
+// ITEM 7: recomputa as forças de AMBOS os lados quando uma tática muda DURANTE a
+// partida (meu ajuste ao vivo, ou a reação da IA). Recalcula SA/SB e o share de
+// chances, SEM tocar gols/minuto/comandos. `tacA`/`tacB` viram as táticas correntes.
+// Preserva o determinismo do resto (não consome o rnd da partida).
+export function recomputeStrengths(state: MatchState, tacA: Tactic, tacB: Tactic): void {
+  const SA = sideStrength(state.teamA, tacA, tacB);
+  const SB = sideStrength(state.teamB, tacB, tacA);
+  state.SA = SA;
+  state.SB = SB;
+  state.tacA = tacA;
+  state.tacB = tacB;
+  const ftA = Math.pow(SA.ft, P.SHARE_SOFT);
+  const ftB = Math.pow(SB.ft, P.SHARE_SOFT);
+  state.shareA = ftA / (ftA + ftB);
+}
+
+// ITEM 14 (reativo, ligado ao item 7): a IA ajusta a MENTALIDADE conforme o placar
+// ao vivo. Mantém forma/estilo/marcação do plano inicial; só a POSTURA reage ao
+// contexto (gap de força + diferença de gols + minuto). Regra dura herdada do item
+// 14: um time MUITO mais forte que está perdendo vai pra cima (nunca retranca); um
+// time que ganha e é mais fraco fecha pra segurar. Determinístico (sem rnd).
+export function reactiveAiPosture(
+  base: Tactic,
+  aiStrength: number,
+  oppStrength: number,
+  aiGoals: number,
+  oppGoals: number,
+  minute: number,
+): Postura {
+  if (minute < 25) return base.postura; // cedo demais pra reagir
+  const gap = aiStrength - oppStrength; // + = IA mais forte
+  const diff = aiGoals - oppGoals; // + = IA na frente
+  const late = minute >= 65;
+  // IA perdendo → sobe a mentalidade (mais ainda se for favorita / se for tarde).
+  if (diff < 0) {
+    if (gap >= 5 || late) return diff <= -2 ? "all_in" : "atk";
+    return "atk";
+  }
+  // IA ganhando → segura, proporcional à vantagem e ao relógio (mas favorita não retranca).
+  if (diff > 0) {
+    if (late && diff >= 2) return gap >= 12 ? "def" : "retranca";
+    if (late) return "def";
+    return diff >= 2 ? "def" : base.postura;
+  }
+  // empate tarde: favorito propõe, azarão segura o ponto/pênalti.
+  if (late) return gap >= 8 ? "atk" : gap <= -8 ? "def" : base.postura;
+  return base.postura;
 }
 
 // ---------- COMANDOS COM TIMING POR POSSE (v4) ----------
@@ -753,6 +880,74 @@ export function simulateFull(
 }
 
 // =====================================================================
+// ITEM 12 — ESTATÍSTICAS DA PARTIDA (derivação determinística)
+// Não é simulação nova: lê os EVENTOS reais do motor + as forças, e produz uma
+// leitura plausível e coerente. Ancorada nos eventos (finalizações/chutes ao gol),
+// o resto sai de posse × ritmo × força com jitter SEMEADO por state.seed — então o
+// MESMO jogo mostra SEMPRE os mesmos números (importante p/ "copiar resultado").
+// =====================================================================
+export function deriveMatchStats(state: MatchState): MatchStats {
+  // jitter próprio, semeado pela partida (NÃO consome o state.rnd — não afeta o jogo).
+  const rnd = mulberry32((state.seed ^ 0x5f3759df) >>> 0);
+  const jit = (base: number, spread: number) => base + (rnd() * 2 - 1) * spread;
+
+  // ---- finalizações e chutes ao gol: a partir dos EVENTOS reais ----
+  let finA = 0, finB = 0, sotA = 0, sotB = 0;
+  state.events.forEach((ev) => {
+    const isA = ev.ownerSide === "A";
+    if (isA) finA++; else finB++;
+    // no alvo = gol + defesa do goleiro + metade dos "quase" (trave/raspando)
+    const onTarget = ev.kind === "goal" || ev.kind === "defesa" || (ev.kind === "quase" && rnd() < 0.5);
+    if (onTarget) { if (isA) sotA++; else sotB++; }
+  });
+  // todo gol é, por definição, chute ao gol (garante coerência narrativa).
+  if (sotA < state.gA) sotA = state.gA;
+  if (sotB < state.gB) sotB = state.gB;
+  // finalizações nunca menores que os chutes ao gol.
+  if (finA < sotA) finA = sotA;
+  if (finB < sotB) finB = sotB;
+
+  // ---- posse de bola: shareA (share de CHANCES) puxado pro meio + jitter ----
+  // converte pra uma % "humana" (raramente abaixo de 32 / acima de 68), coerente com
+  // quem mandou no jogo. Goleada com posse baixa fica implausível → ancora no placar.
+  let possA = 50 + (state.shareA - 0.5) * 64; // ±32 em torno de 50
+  const gd = state.gA - state.gB;
+  possA += Math.max(-8, Math.min(8, gd * 2.2)); // quem fez mais gol tende a ter tido a bola
+  possA = jit(possA, 3);
+  possA = Math.max(32, Math.min(68, possA));
+  const pA = Math.round(possA);
+  const pB = 100 - pA;
+
+  // ---- passes: ~ posse × ritmo do jogo (gameVol). força de meio refina a precisão ----
+  const tempo = 880 * state.gameVol; // total aproximado de passes no jogo
+  const passA = Math.round(jit((tempo * pA) / 100, 30));
+  const passB = Math.round(jit((tempo * pB) / 100, 30));
+  const accFromMid = (m: number) => Math.max(64, Math.min(91, 64 + (m - 60) * 0.62));
+  const accA = Math.round(Math.max(60, Math.min(93, jit(accFromMid(state.teamA.m), 3))));
+  const accB = Math.round(Math.max(60, Math.min(93, jit(accFromMid(state.teamB.m), 3))));
+
+  // ---- faltas: quem corre MAIS atrás da bola (menos posse) comete mais. ----
+  const foulsFrom = (poss: number) => 8 + (50 - poss) * 0.22;
+  const foulA = Math.max(4, Math.round(jit(foulsFrom(pA), 2)));
+  const foulB = Math.max(4, Math.round(jit(foulsFrom(pB), 2)));
+
+  // ---- desarmes: quem defende mais (menos posse) + força defensiva desarma mais. ----
+  const tackFrom = (poss: number, d: number) => 9 + (50 - poss) * 0.2 + (d - 70) * 0.12;
+  const tackA = Math.max(3, Math.round(jit(tackFrom(pA, state.teamA.d), 2)));
+  const tackB = Math.max(3, Math.round(jit(tackFrom(pB, state.teamB.d), 2)));
+
+  return {
+    poss: { a: pA, b: pB },
+    fin: { a: finA, b: finB },
+    sot: { a: sotA, b: sotB },
+    passes: { a: passA, b: passB },
+    passAcc: { a: accA, b: accB },
+    fouls: { a: foulA, b: foulB },
+    tackles: { a: tackA, b: tackB },
+  };
+}
+
+// =====================================================================
 // DADOS + RUNNER GENÉRICO DE TORNEIO
 // =====================================================================
 export function teamBySlug(year: number, slug: string): Team | null {
@@ -839,35 +1034,90 @@ export function stageLong(stage: Stage): string {
   return stage.type;
 }
 
-// A IA escolhe uma tática plausível e coerente da formação sorteada (uso INTERNO do bot,
-// NÃO é mostrado ao jogador como "ideal"). 8 formações · vocabulário v4.
-const FORM_KEYS: Form[] = ["433", "442", "352", "4231", "532", "4312", "343", "424"];
-const AI_PRESET: Record<Form, Omit<Tactic, "form">> = {
-  "433": { estilo: "lados", postura: "atk", marcacao: "alta" },
-  "442": { estilo: "lados", postura: "eq", marcacao: "media" },
-  "352": { estilo: "meio", postura: "eq", marcacao: "alta" },
-  "4231": { estilo: "contra", postura: "def", marcacao: "baixa" },
-  "532": { estilo: "contra", postura: "def", marcacao: "baixa" },
-  "4312": { estilo: "meio", postura: "eq", marcacao: "media" },
-  "343": { estilo: "lados", postura: "atk", marcacao: "alta" },
-  "424": { estilo: "lados", postura: "atk", marcacao: "alta" },
+// A IA escolhe uma tática plausível e coerente (uso INTERNO do bot, NÃO é mostrado
+// ao jogador como "ideal"). Mentalidade por ARQUÉTIPO de gap de força (item 14).
+// ===== ARQUÉTIPOS DA IA POR GAP DE FORÇA (item 14) =====
+// A mentalidade INICIAL do bot agora vem do gap = minhaForça − forçaDoRival, não da
+// força absoluta. Regra dura: GIGANTE e FAVORITO NUNCA retrancam contra um fraco; o
+// AZARÃO/UNDERDOG se fecha contra um gigante. Cada arquétipo sorteia de subconjuntos
+// COERENTES (formação ↔ postura ↔ marcação) pra não cair nos combos penalizados por
+// coherence() (ex.: 532+all_in, 343+retranca).
+type Archetype = {
+  forms: Form[];
+  estilos: Estilo[];
+  posturas: Postura[];
+  marcacoes: Marcacao[];
 };
-export function aiTactic(rnd: () => number, strength: number): Tactic {
-  const f = FORM_KEYS[Math.floor(rnd() * FORM_KEYS.length)];
-  const base = AI_PRESET[f];
-  const tac: Tactic = { form: f, estilo: base.estilo, postura: base.postura, marcacao: base.marcacao };
-  // leve variação: time forte tende ofensivo; fraco tende a se fechar
-  if (strength >= 84 && rnd() < 0.35) {
-    tac.postura = rnd() < 0.4 ? "all_in" : "atk";
-  } else if (strength <= 64 && rnd() < 0.45) {
-    tac.postura = "retranca";
-    tac.marcacao = "baixa";
-    tac.estilo = "contra";
-  } else if (rnd() < 0.25) {
-    const ps: Postura[] = ["eq", "atk", "def"];
-    tac.postura = ps[Math.floor(rnd() * 3)];
-  }
-  return tac;
+const AI_ARCHETYPES: { min: number; arch: Archetype }[] = [
+  // GIGANTE (gap ≥ +12): propõe o jogo, vai pra cima, nunca recua.
+  {
+    min: 12,
+    arch: {
+      forms: ["433", "343", "424", "4312", "352"],
+      estilos: ["lados", "meio", "passes"],
+      posturas: ["atk", "all_in", "eq"],
+      marcacoes: ["alta", "media"],
+    },
+  },
+  // FAVORITO (+5..+12): ofensivo/equilibrado, sem retranca.
+  {
+    min: 5,
+    arch: {
+      forms: ["433", "442", "352", "4312", "343"],
+      estilos: ["lados", "meio", "passes", "longas"],
+      posturas: ["atk", "eq"],
+      marcacoes: ["alta", "media"],
+    },
+  },
+  // EQUILIBRADO (|gap| < 5): leque completo, o jogo decide no detalhe.
+  {
+    min: -5,
+    arch: {
+      forms: ["433", "442", "352", "4231", "4312", "343"],
+      estilos: ["lados", "meio", "passes", "longas", "contra"],
+      posturas: ["eq", "atk", "def"],
+      marcacoes: ["alta", "media", "baixa"],
+    },
+  },
+  // AZARÃO (-12..-5): cauteloso, contra-ataque, bloco mais baixo.
+  {
+    min: -12,
+    arch: {
+      forms: ["442", "4231", "532", "352"],
+      estilos: ["contra", "longas", "lados"],
+      posturas: ["eq", "def"],
+      marcacoes: ["media", "baixa"],
+    },
+  },
+  // UNDERDOG EXTREMO (gap ≤ -12): se fecha, joga no erro do gigante.
+  {
+    min: -Infinity,
+    arch: {
+      forms: ["532", "4231", "442"],
+      estilos: ["contra", "longas"],
+      posturas: ["retranca", "def"],
+      marcacoes: ["baixa", "media"],
+    },
+  },
+];
+function archetypeFor(gap: number): Archetype {
+  for (const a of AI_ARCHETYPES) if (gap >= a.min) return a.arch;
+  return AI_ARCHETYPES[AI_ARCHETYPES.length - 1].arch;
+}
+function pickFrom<T>(rnd: () => number, arr: T[]): T {
+  return arr[Math.floor(rnd() * arr.length)];
+}
+// myStrength/oppStrength = forças base (overall) dos dois times. Se oppStrength não
+// for passado, cai no EQUILIBRADO (gap 0) — compatível com chamadas antigas.
+export function aiTactic(rnd: () => number, myStrength: number, oppStrength?: number): Tactic {
+  const gap = myStrength - (oppStrength ?? myStrength);
+  const arch = archetypeFor(gap);
+  return {
+    form: pickFrom(rnd, arch.forms),
+    estilo: pickFrom(rnd, arch.estilos),
+    postura: pickFrom(rnd, arch.posturas),
+    marcacao: pickFrom(rnd, arch.marcacoes),
+  };
 }
 
 // simula uma partida headless (IA x IA). mode 'alt' = uma rodada do motor com toda
@@ -880,8 +1130,8 @@ export function simAIvsAI(
 ): { gA: number; gB: number } {
   function one(s: number): { gA: number; gB: number } {
     const r = rngFrom(s);
-    const tacA = aiTactic(r, teamA.o);
-    const tacB = aiTactic(r, teamB.o);
+    const tacA = aiTactic(r, teamA.o, teamB.o);
+    const tacB = aiTactic(r, teamB.o, teamA.o);
     const res = simulateFull(teamA, teamB, tacA, tacB, s, defaultAiPolicy);
     return { gA: res.gA, gB: res.gB };
   }
@@ -902,7 +1152,84 @@ export function simAIvsAI(
   return best as { gA: number; gB: number };
 }
 
-// resolve confronto de mata-mata (empate -> pênaltis simples ponderados pela força)
+// ITEM 10: disputa de pênaltis cobrança a cobrança. DETERMINÍSTICA (semeada por
+// `seed`), o vencedor EMERGE das cobranças. Conversão por chute = base alta puxada
+// pela qualidade do BATEDOR (ataque) e pela defesa do GOLEIRO adversário, mantendo
+// um VIÉS LEVE pela força (realista) > 50/50. Regra FIFA: 5 cada, parada antecipada
+// quando matematicamente decidido, depois morte súbita par a par.
+export function simulatePenalties(teamA: Team, teamB: Team, seed: number): Shootout {
+  const r = rngFrom((seed ^ 0x9e3779b9) >>> 0);
+  // probabilidade de conversão do lado que bate, vs o goleiro do outro lado.
+  function convProb(shooter: Team, keeper: Team): number {
+    // base ~0.76; ataque forte sobe, defesa (goleiro) forte desce. viés leve.
+    const p = 0.76 + (shooter.a - 78) * 0.004 - (keeper.d - 78) * 0.0035;
+    return Math.max(0.58, Math.min(0.9, p));
+  }
+  const pcA = convProb(teamA, teamB);
+  const pcB = convProb(teamB, teamA);
+  const kicks: PenKick[] = [];
+  let scoreA = 0;
+  let scoreB = 0;
+  let idxA = 0;
+  let idxB = 0;
+
+  function outcome(p: number): PenResult {
+    // converte? senão, distribui o erro entre defesa/trave/fora (defesa mais comum).
+    if (r() < p) return "gol";
+    const e = r();
+    if (e < 0.5) return "defesa";
+    if (e < 0.78) return "fora";
+    return "trave";
+  }
+  // gols restantes possíveis pro time, dado quantas das 5 ainda não bateu.
+  const remaining = (taken: number) => Math.max(0, 5 - taken);
+  function decidedInRegulation(): boolean {
+    // A não alcança B nem com todos os restantes, ou vice-versa.
+    if (scoreA > scoreB + remaining(idxB)) return true;
+    if (scoreB > scoreA + remaining(idxA)) return true;
+    return false;
+  }
+
+  // ---- 5 cobranças cada, alternando A,B,A,B... com parada antecipada ----
+  for (let round = 0; round < 5; round++) {
+    // A bate
+    {
+      const res = outcome(pcA);
+      if (res === "gol") scoreA++;
+      idxA++;
+      kicks.push({ side: "A", index: idxA, result: res, scoreA, scoreB });
+      if (decidedInRegulation()) break;
+    }
+    // B bate
+    {
+      const res = outcome(pcB);
+      if (res === "gol") scoreB++;
+      idxB++;
+      kicks.push({ side: "B", index: idxB, result: res, scoreA, scoreB });
+      if (decidedInRegulation()) break;
+    }
+  }
+
+  // ---- morte súbita: pares completos até alguém abrir vantagem ----
+  let guard = 0;
+  while (scoreA === scoreB && guard < 40) {
+    guard++;
+    const resA = outcome(pcA);
+    if (resA === "gol") scoreA++;
+    idxA++;
+    kicks.push({ side: "A", index: idxA, result: resA, scoreA, scoreB });
+    const resB = outcome(pcB);
+    if (resB === "gol") scoreB++;
+    idxB++;
+    kicks.push({ side: "B", index: idxB, result: resB, scoreA, scoreB });
+  }
+
+  const winner: "A" | "B" = scoreA >= scoreB ? "A" : "B";
+  return { kicks, winner, scoreA, scoreB, pens: scoreA + "×" + scoreB };
+}
+
+// resolve confronto de mata-mata. No empate, a disputa de pênaltis (item 10) decide:
+// o vencedor e a string `pens` saem da MESMA simulação — coerentes por construção.
 export function knockoutResult(
   teamA: Team,
   teamB: Team,
@@ -912,16 +1239,8 @@ export function knockoutResult(
 ): KnockoutOutcome {
   if (gA > gB) return { winner: "A", pens: null };
   if (gB > gA) return { winner: "B", pens: null };
-  const r = rngFrom(seed ^ 0x9e3779b9);
-  let pA = 0.5 + (teamA.o - teamB.o) * 0.006;
-  pA = Math.max(0.32, Math.min(0.68, pA));
-  const win: "A" | "B" = r() < pA ? "A" : "B";
-  const loserGoals = 2 + Math.floor(r() * 3);
-  const winnerGoals = loserGoals + 1 + Math.floor(r() * 2);
-  return {
-    winner: win,
-    pens: win === "A" ? winnerGoals + "×" + loserGoals : loserGoals + "×" + winnerGoals,
-  };
+  const so = simulatePenalties(teamA, teamB, seed);
+  return { winner: so.winner, pens: so.pens };
 }
 
 // ---------- standings helper (pontos corridos) ----------
@@ -1117,6 +1436,73 @@ function currentGroupOpp(camp: Campaign): Team | null {
   if (s.myMatchIdx >= s.myOpps.length) return null;
   return s.myOpps[s.myMatchIdx];
 }
+// chave estável de um par IA×IA num grupo (i<j índices no array do grupo).
+function pairKey(gIdx: number, i: number, j: number): string {
+  return gIdx + ":" + i + ":" + j;
+}
+// semente determinística de um confronto IA×IA — IDÊNTICA à usada no fim, pra a
+// tabela apurada rodada a rodada bater 100% com a apuração final (determinismo).
+function groupPairSeed(camp: Campaign, gIdx: number, i: number, j: number): number {
+  const A = (camp.state as GroupsStageState).groups[gIdx][i];
+  const B = (camp.state as GroupsStageState).groups[gIdx][j];
+  return (camp.seed ^ (A.o * 7919 + B.o * 104729 + gIdx * 131 + i * 17 + j * 31)) >>> 0;
+}
+// aplica UM par IA×IA ao standings do grupo, 1x só (idempotente via playedPairs).
+function playGroupPair(camp: Campaign, gIdx: number, i: number, j: number): void {
+  const s = camp.state as GroupsStageState;
+  const key = pairKey(gIdx, i, j);
+  const played = (s.playedPairs = s.playedPairs ?? []);
+  if (played.indexOf(key) >= 0) return;
+  const grp = s.groups[gIdx];
+  const A = grp[i];
+  const B = grp[j];
+  // nunca apura aqui um jogo MEU — esse passa pelo resolveGroupMatch (placar real).
+  if (gIdx === s.myG && (A.s === camp.myKey || B.s === camp.myKey)) return;
+  const sd = groupPairSeed(camp, gIdx, i, j);
+  const r = simAIvsAI(A, B, sd, camp.worldMode);
+  applyResultToStanding(findStanding(s.standings[gIdx], A.s), r.gA, r.gB, camp.threePts);
+  applyResultToStanding(findStanding(s.standings[gIdx], B.s), r.gB, r.gA, camp.threePts);
+  played.push(key);
+}
+// calendário round-robin do MEU grupo pelo método do círculo. rounds[r] = lista de
+// pares [i,j] que jogam na rodada r (inclui o meu confronto). Como cada rodada é um
+// emparelhamento perfeito, após N rodadas todo time do grupo jogou N vezes — a tabela
+// avança balanceada com a minha sequência de jogos. (Independe da minha ordem exata:
+// o conjunto de pares e as sementes por par são fixos, então o final é idêntico.)
+function myGroupRounds(teams: Team[]): [number, number][][] {
+  const n = teams.length;
+  const idx = teams.map((_, i) => i);
+  // método do círculo precisa de nº par; com ímpar entra um "fantasma" (-1 = folga).
+  const arr = n % 2 === 0 ? idx.slice() : idx.concat([-1]);
+  const m = arr.length;
+  const rounds: [number, number][][] = [];
+  let order = arr.slice();
+  for (let r = 0; r < m - 1; r++) {
+    const round: [number, number][] = [];
+    for (let k = 0; k < m / 2; k++) {
+      const a = order[k];
+      const b = order[m - 1 - k];
+      if (a === -1 || b === -1) continue; // folga (grupo ímpar)
+      round.push(a < b ? [a, b] : [b, a]);
+    }
+    rounds.push(round);
+    // rotaciona mantendo o primeiro fixo
+    const fixed = order[0];
+    const rest = order.slice(1);
+    rest.unshift(rest.pop() as number);
+    order = [fixed, ...rest];
+  }
+  return rounds;
+}
+// apura os IA×IA do MEU grupo até a rodada `roundsPlayed` (= nº de jogos que já fiz),
+// mantendo a tabela do hub coerente jogo a jogo. Idempotente.
+function catchUpMyGroup(camp: Campaign, roundsPlayed: number): void {
+  const s = camp.state as GroupsStageState;
+  const rounds = myGroupRounds(s.groups[s.myG]);
+  for (let r = 0; r < roundsPlayed && r < rounds.length; r++) {
+    rounds[r].forEach(([i, j]) => playGroupPair(camp, s.myG, i, j));
+  }
+}
 export function resolveGroupMatch(camp: Campaign, gf: number, ga: number): void {
   const s = camp.state as GroupsStageState;
   const opp = s.myOpps[s.myMatchIdx];
@@ -1136,23 +1522,20 @@ export function resolveGroupMatch(camp: Campaign, gf: number, ga: number): void 
     ptsLabel,
   });
   s.myMatchIdx++;
+  // após a minha rodada, avança os IA×IA do meu grupo na mesma rodada — a tabela do
+  // hub deixa de mostrar adversários parados em 0/0/0 (item 1).
+  catchUpMyGroup(camp, s.myMatchIdx);
 }
 
 export function finishGroupsStage(camp: Campaign): boolean {
   const s = camp.state as GroupsStageState;
-  // simula os jogos restantes dos grupos que NÃO sou eu (IA x IA)
-  s.standings.forEach((grpStand, gIdx) => {
-    const grp = s.groups[gIdx];
+  // apura todos os IA×IA ainda não jogados, de TODOS os grupos. playGroupPair é
+  // idempotente: o que a tabela do hub já apurou rodada a rodada (item 1) não conta
+  // de novo, e o resultado final é IDÊNTICO (mesma semente por par).
+  s.groups.forEach((grp, gIdx) => {
     for (let i = 0; i < grp.length; i++)
       for (let j = i + 1; j < grp.length; j++) {
-        const A = grp[i];
-        const B = grp[j];
-        const iAmIn = gIdx === s.myG && (A.s === camp.myKey || B.s === camp.myKey);
-        if (iAmIn) continue;
-        const sd = (camp.seed ^ (A.o * 7919 + B.o * 104729 + gIdx * 131 + i * 17 + j * 31)) >>> 0;
-        const r = simAIvsAI(A, B, sd, camp.worldMode);
-        applyResultToStanding(findStanding(grpStand, A.s), r.gA, r.gB, camp.threePts);
-        applyResultToStanding(findStanding(grpStand, B.s), r.gB, r.gA, camp.threePts);
+        playGroupPair(camp, gIdx, i, j);
       }
   });
   const qualified: Team[] = [];
@@ -1282,6 +1665,12 @@ function initKnockout(camp: Campaign, stage: Stage): void {
   }
   camp.state = { kind: "knockout", stage, pairs, myPair, myOpp, done: false };
   if (myOpp == null) (camp.state as KnockoutStageState).bye = true;
+  // ITEM 17: na PRIMEIRA rodada de mata-mata, congela a ordem do chaveamento (já com
+  // o sorteio do camp.rnd aplicado). projectBracket reconstrói a árvore inteira a
+  // partir daqui — de forma determinística e reproduzível numa campanha recarregada.
+  if (!camp.koBracketOrder) {
+    camp.koBracketOrder = pairs.flatMap((pr) => [pr[0]?.s ?? "", pr[1]?.s ?? ""]);
+  }
 }
 export function resolveKnockoutMatch(
   camp: Campaign,
@@ -1349,6 +1738,245 @@ export function finishKnockoutStage(camp: Campaign, myWon: boolean): Team[] {
   s.winners = winners;
   s.done = true;
   return winners;
+}
+
+// =====================================================================
+// ITEM 17 — PROJEÇÃO DO CHAVEAMENTO (árvore inteira do mata-mata)
+// Reconstrói a árvore de mata-mata da edição (R32/R16/QF/SF + Final), reunindo:
+//   • os MEUS confrontos REAIS já jogados (de camp.history), e
+//   • todos os IA×IA simulados com a MESMA sementagem de finishKnockoutStage —
+// preenchendo até a Final e revelando o campeão MESMO após a eliminação. Função
+// PURA e determinística (semeada por camp.seed + koBracketOrder congelado): o que
+// se vê aqui é o que aconteceria/aconteceu. Não muta a campanha.
+// =====================================================================
+
+// Sementes IDÊNTICAS às do fluxo real (finishKnockoutStage), por rodada de chave.
+function koPairSeed(seed: number, A: Team, B: Team, idx: number, round: string): number {
+  return (seed ^ (A.o * 7919 + B.o * 104729 + idx * 911 + (round || "").length * 13)) >>> 0;
+}
+
+// rótulos da rodada por nº de confrontos (cobre R32..Final independe do `round`).
+function koRoundMeta(nMatches: number, isFinal: boolean): { label: string; short: string; round: BracketRound["round"] } {
+  if (isFinal || nMatches === 1) return { label: "Final", short: "Final", round: "FINAL" };
+  if (nMatches === 2) return { label: "Semifinais", short: "Semis", round: "SF" };
+  if (nMatches <= 4) return { label: "Quartas de final", short: "Quartas", round: "QF" };
+  if (nMatches <= 8) return { label: "Oitavas de final", short: "Oitavas", round: "R16" };
+  return { label: "32-avos de final", short: "32-avos", round: "R32" };
+}
+
+// chaveamento por força (snake) + leve embaralhada — MESMA regra do initKnockout. O
+// real usa camp.rnd (não-reproduzível ao recarregar); aqui o rnd é derivado de
+// camp.seed+roundIdx, deixando a projeção 100% determinística e save-safe.
+function snakeSeedOrder(teams: Team[], rnd: () => number): Team[] {
+  const ranked = teams.slice().sort((a, b) => b.o - a.o);
+  const n = ranked.length;
+  const bracket: Team[] = [];
+  let lo = 0;
+  let hi = n - 1;
+  while (lo <= hi) {
+    if (lo === hi) {
+      bracket.push(ranked[lo]);
+      lo++;
+    } else {
+      bracket.push(ranked[lo]);
+      bracket.push(ranked[hi]);
+      lo++;
+      hi--;
+    }
+  }
+  for (let t = 0; t < bracket.length - 1; t += 2) {
+    if (rnd() < 0.18) {
+      const tmp = bracket[t];
+      bracket[t] = bracket[t + 1];
+      bracket[t + 1] = tmp;
+    }
+  }
+  return bracket;
+}
+
+// monta a ordem do 1º mata-mata (slugs congelados) em Times reais; se a campanha
+// foi salva antes do item 17 (sem koBracketOrder), reconstrói pela mesma regra do
+// initKnockout, porém com rnd derivado de camp.seed (determinístico e save-safe).
+function firstKoOrder(camp: Campaign): Team[] {
+  const year = camp.edition.year;
+  if (camp.koBracketOrder && camp.koBracketOrder.length) {
+    return camp.koBracketOrder.map((slug) => (slug ? teamBySlug(year, slug) : null)).filter(Boolean) as Team[];
+  }
+  // fallback determinístico (campanhas antigas): replica o snake de initKnockout.
+  // Sem a ordem real do camp.rnd não há como bater 100%, mas fica estável e plausível.
+  const st = camp.state;
+  let entry: Team[] = [];
+  if (st && st.kind === "knockout") entry = st.pairs.flatMap((p) => p.filter(Boolean) as Team[]);
+  else if (camp.carryTeams) entry = camp.carryTeams.slice();
+  return snakeSeedOrder(entry, rngFrom((camp.seed ^ 0x5bd1e995) >>> 0));
+}
+
+// procura, no histórico, o MEU confronto de mata-mata contra `opp` (resultado real).
+function myKoHistoryVs(camp: Campaign, opp: Team): HistoryEntry | null {
+  for (const h of camp.history) {
+    if (h.ko && h.opp.s === opp.s) return h;
+  }
+  return null;
+}
+
+// reordena, in-place, a rodada `seeded` pra colar meu adversário REAL ao meu lado,
+// se eu estou presente e já joguei contra ele neste mata-mata. Mantém a paridade do
+// par (índice par ↔ ímpar) e não duplica ninguém. Só atua quando há histórico real.
+function anchorMyPair(camp: Campaign, seeded: Team[]): void {
+  const meIdx = seeded.findIndex((t) => t.s === camp.myKey);
+  if (meIdx < 0) return; // não estou nesta rodada
+  // qual o meu adversário real aqui? procuro no histórico um KO contra alguém que
+  // também esteja nesta rodada (e que eu ainda não tenha "consumido" em rodada anterior).
+  const oppIdx = seeded.findIndex(
+    (t, i) => i !== meIdx && t.s !== camp.myKey && myKoHistoryVs(camp, t) != null,
+  );
+  if (oppIdx < 0) return; // confronto futuro/projeção — deixa o sorteio decidir
+  // posição do par do meu slot: pares são (2k, 2k+1).
+  const pairBase = meIdx - (meIdx % 2);
+  const partnerIdx = pairBase + (meIdx % 2 === 0 ? 1 : -1);
+  if (partnerIdx === oppIdx) return; // já está colado
+  const tmp = seeded[partnerIdx];
+  seeded[partnerIdx] = seeded[oppIdx];
+  seeded[oppIdx] = tmp;
+}
+
+export function projectBracket(camp: Campaign): BracketView | null {
+  const order = firstKoOrder(camp);
+  if (order.length < 2) return null; // edição sem chaveamento (ex.: quadrangular 1950)
+
+  const seed = camp.seed;
+  const rounds: BracketRound[] = [];
+  let champion: Team | null = null;
+  let myExitRound: number | null = null;
+
+  // confronto -> {winner, slot a, slot b}. Meu jogo usa o placar real; IA×IA usa
+  // a simulação determinística. Bye = uma vaga vazia (avança sem jogar).
+  function resolve(a: Team | null, b: Team | null, idx: number, round: string): {
+    match: BracketMatch;
+    winner: Team | null;
+  } {
+    const mine = (a?.s === camp.myKey || b?.s === camp.myKey) && !!a && !!b;
+    // bye (uma vaga só)
+    if (!a || !b) {
+      const present = a || b;
+      const isMe = present?.s === camp.myKey;
+      const slotPresent: BracketSlot = {
+        team: present,
+        score: null,
+        pens: null,
+        winner: true,
+        isMe,
+        champion: false,
+      };
+      const slotEmpty: BracketSlot = { team: null, score: null, pens: null, winner: false, isMe: false, champion: false };
+      const match: BracketMatch = {
+        a: a ? slotPresent : slotEmpty,
+        b: b ? slotPresent : slotEmpty,
+        bye: true,
+        mine: false,
+        real: false,
+        pens: null,
+      };
+      return { match, winner: present };
+    }
+
+    // MEU confronto: usa o placar real do histórico, se já joguei.
+    if (mine) {
+      const opp = a.s === camp.myKey ? b : a;
+      const h = myKoHistoryVs(camp, opp);
+      if (h) {
+        // h.gf/h.ga são SEMPRE do meu ponto de vista; mapeia pros lados a/b.
+        const meIsA = a.s === camp.myKey;
+        const myGoals = h.gf;
+        const oppGoals = h.ga;
+        const aScore = meIsA ? myGoals : oppGoals;
+        const bScore = meIsA ? oppGoals : myGoals;
+        const iWon = h.win;
+        const winnerTeam = iWon ? camp.myTeam : opp;
+        const aWon = a.s === winnerTeam.s;
+        const slotA: BracketSlot = { team: a, score: aScore, pens: h.pens, winner: aWon, isMe: meIsA, champion: false };
+        const slotB: BracketSlot = { team: b, score: bScore, pens: h.pens, winner: !aWon, isMe: !meIsA, champion: false };
+        return {
+          match: { a: slotA, b: slotB, bye: false, mine: true, real: true, pens: h.pens },
+          winner: winnerTeam,
+        };
+      }
+      // meu confronto ainda NÃO jogado (projeção do futuro): simula como IA×IA.
+    }
+
+    // IA×IA (ou meu jogo ainda não disputado): simulação determinística.
+    const sd = koPairSeed(seed, a, b, idx, round);
+    const r = simAIvsAI(a, b, sd, camp.worldMode);
+    const kr = knockoutResult(a, b, r.gA, r.gB, sd);
+    const aWon = kr.winner === "A";
+    const slotA: BracketSlot = {
+      team: a,
+      score: r.gA,
+      pens: kr.pens,
+      winner: aWon,
+      isMe: a.s === camp.myKey,
+      champion: false,
+    };
+    const slotB: BracketSlot = {
+      team: b,
+      score: r.gB,
+      pens: kr.pens,
+      winner: !aWon,
+      isMe: b.s === camp.myKey,
+      champion: false,
+    };
+    return {
+      match: { a: slotA, b: slotB, bye: false, mine, real: false, pens: kr.pens },
+      winner: aWon ? a : b,
+    };
+  }
+
+  // varre rodada a rodada até sobrar 1 (o campeão). A cada rodada o real RE-SORTEIA
+  // os vencedores por força (initKnockout re-ranqueia carryTeams) — a projeção faz
+  // o mesmo com snakeSeedOrder, então não é um bracket fixo: cada fase é redesenhada.
+  let current: Team[] = order.slice();
+  let roundIdx = 0;
+  let guard = 0;
+  while (current.length > 1 && guard < 12) {
+    guard++;
+    // a 1ª rodada já vem na ordem real congelada; as seguintes re-sorteiam.
+    const seeded =
+      roundIdx === 0 ? current : snakeSeedOrder(current, rngFrom((seed ^ (0x9e3779b9 + roundIdx * 2654435761)) >>> 0));
+    // âncora do MEU caminho: se eu joguei esta rodada (histórico real), garanto que
+    // meu adversário real fique colado a mim no par — assim a árvore mostra o
+    // confronto que de fato aconteceu, não um par re-sorteado divergente.
+    anchorMyPair(camp, seeded);
+    const nMatches = Math.ceil(seeded.length / 2);
+    const isFinal = nMatches === 1;
+    const meta = koRoundMeta(nMatches, isFinal);
+    const matches: BracketMatch[] = [];
+    const winners: Team[] = [];
+    for (let i = 0; i < seeded.length; i += 2) {
+      const a = seeded[i] ?? null;
+      const b = seeded[i + 1] ?? null;
+      const { match, winner } = resolve(a, b, i / 2, meta.round);
+      // detecta a rodada da minha eliminação (joguei e perdi este confronto).
+      if (match.mine && match.real) {
+        const iAdvanced = winner?.s === camp.myKey;
+        if (!iAdvanced) myExitRound = roundIdx;
+      }
+      matches.push(match);
+      if (winner) winners.push(winner);
+    }
+    if (isFinal) {
+      champion = winners[0] ?? null;
+      // marca o campeão no slot vencedor da final.
+      const fm = matches[0];
+      if (fm.a.winner) fm.a.champion = true;
+      else if (fm.b.winner) fm.b.champion = true;
+    }
+    rounds.push({ label: meta.label, short: meta.short, round: meta.round, matches });
+    current = winners;
+    roundIdx++;
+  }
+
+  const iAmChampion = !!champion && champion.s === camp.myKey;
+  return { rounds, champion, myExitRound, iAmChampion };
 }
 
 // ---------------- THIRD PLACE ----------------
@@ -1595,13 +2223,24 @@ export function campaignScore(camp: Campaign) {
     gd += h.gf - h.ga;
   });
   base += wins * 45 + draws * 15 + Math.max(0, gd) * 8;
-  const fb = camp.myTeam.o;
-  let mult = 1 + Math.max(0, 92 - fb) / 42;
+  // Bônus de dificuldade por TIER (decisão do João): zebra escala, gigante não
+  // ganha bônus. S/A = sem bônus; B/C/D crescem. Mantém o teto 2.4×.
+  let mult = TIER_DIFFICULTY_MULT[camp.myTeam.t] ?? 1;
   mult = Math.max(1, Math.min(2.4, mult));
   const pctExtra = Math.round((mult - 1) * 100);
   const total = Math.round(base * mult);
   return { base, mult, total, pctExtra, rank, wins, draws };
 }
+
+// multiplicador de dificuldade por tier do time comandado (item 18).
+// S/A = elite, sem bônus; B leve; C médio; D (zebra) alto.
+export const TIER_DIFFICULTY_MULT: Record<Tier, number> = {
+  S: 1.0,
+  A: 1.0,
+  B: 1.15,
+  C: 1.45,
+  D: 1.9,
+};
 
 // histórico utilitário p/ a UI: tipos já estão em ./types
 export type { HistoryEntry };

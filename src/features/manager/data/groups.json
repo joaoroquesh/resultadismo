@@ -473,7 +473,8 @@
 "teams": [
 "holanda",
 "suecia",
-"bulgaria"
+"bulgaria",
+"uruguai"
 ]
 },
 {
@@ -507,7 +508,7 @@
 }
 ],
 "seeding_rules": "1a fase: 4 cabecas de chave (Alemanha Ocidental anfitria, Brasil campeao, Uruguai, Italia) distribuidas; demais por potes. Top 2 -> 2 segundos-grupos de 4. Vencedor de cada segundo-grupo ia a FINAL; os vices disputavam o 3o lugar. Sem semifinais classicas.",
-"real_results_note": "Campeao real: Alemanha Ocidental. GAP DE FIDELIDADE: na Copa real de 1974 o Grupo 3 tinha 4 times (Holanda, Suecia, Bulgaria, URUGUAI), mas o _embed-data-v3.json so traz 15 selecoes em 1974 e NAO inclui o Uruguai. Por isso o Grupo 3 aqui ficou com 3 times (Holanda, Suecia, Bulgaria). A 2a fase (Grupos A e B) esta confirmada (Wikipedia): Grupo A = Holanda, Brasil, Alemanha Oriental, Argentina; Grupo B = Alemanha Ocidental, Polonia, Suecia, Iugoslavia. Para fidelidade total ao 1974 real, adicionar 'uruguai' ao dataset de 1974 e recolocar no Grupo 3.",
+"real_results_note": "Campeao real: Alemanha Ocidental. CORRIGIDO (item 9 / Manager v5): o Grupo 3 voltou a ter 4 times com a inclusao do URUGUAI (Holanda, Suecia, Bulgaria, Uruguai), batendo o formato de 16 selecoes. O Uruguai 1974 foi adicionado ao ratings.json (tier C, o=72 — saiu na 1a fase como na historia real). A 2a fase (Grupos A e B) esta confirmada (Wikipedia): Grupo A = Holanda, Brasil, Alemanha Oriental, Argentina; Grupo B = Alemanha Ocidental, Polonia, Suecia, Iugoslavia.",
 "confidence": "high"
 },
 {

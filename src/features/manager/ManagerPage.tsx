@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useFirstSeen } from "@/lib/useFirstSeen";
 import { Button } from "@/components/ui/Button";
-import type { Campaign, Edition, MatchKind, Tactic, Team, WorldMode } from "./types";
+import type { Campaign, Edition, MatchKind, MatchStats, Tactic, Team, WorldMode } from "./types";
 import {
   FORMATS,
   advanceCampaign,
@@ -16,6 +16,7 @@ import {
   knockoutResult,
   myNextMatch,
   poolForYear,
+  projectBracket,
   resolveFinalGroupMatch,
   resolveGroupMatch,
   resolveKnockoutMatch,
@@ -43,8 +44,11 @@ import {
   POSTMATCH,
   mulberryUi,
 } from "./ui";
-import { Flag, FormGrid, HistoryRow, SegBlock, StandingsTable, Stars, TeamName } from "./components";
+import { ManagerCrest, FormGrid, HistoryRow, MatchStatsPanel, SegBlock, StandingsTable, Stars, StyleRing, TeamName } from "./components";
+import { BracketBody, BracketModal } from "./Bracket";
 import { LiveMatch, PlanSummary } from "./LiveMatch";
+import { PenaltyShootout } from "./PenaltyShootout";
+import { teamColors } from "./teamColors";
 import {
   clearCampaign,
   defaultTactic,
@@ -64,6 +68,7 @@ type Screen =
   | "groupClassif"
   | "tactics"
   | "live"
+  | "penalties"
   | "result"
   | "end";
 
@@ -93,7 +98,13 @@ export function ManagerPage() {
   const [matchKind, setMatchKind] = useState<MatchKind>("groups");
   const [aiTac, setAiTac] = useState<Tactic | null>(null);
   const [matchSeed, setMatchSeed] = useState(0);
-  const [matchResult, setMatchResult] = useState<{ gf: number; ga: number; opp: Team } | null>(null);
+  const [matchResult, setMatchResult] = useState<{
+    gf: number;
+    ga: number;
+    opp: Team;
+    goals?: { side: "A" | "B"; m: number }[];
+    stats?: MatchStats;
+  } | null>(null);
 
   // commit: persiste e publica a campanha mutada como NOVA referência em state
   // (dispara o re-render sem ler o ref durante o render).
@@ -184,7 +195,8 @@ export function ManagerPage() {
       const r = rngFrom(seed);
       setMatchOpp(opp);
       setMatchKind(kind);
-      setAiTac(aiTactic(r, opp.o));
+      // a IA é o adversário: gap = força DELE − minha força (item 14)
+      setAiTac(aiTactic(r, opp.o, camp.myTeam.o));
       setMatchSeed(seed);
       go("tactics");
     },
@@ -198,12 +210,16 @@ export function ManagerPage() {
 
   // -------- fim da partida ao vivo --------
   const onLiveFinish = useCallback(
-    (gA: number, gB: number) => {
+    (gA: number, gB: number, goals: { side: "A" | "B"; m: number }[], stats: MatchStats) => {
       if (!matchOpp) return;
-      setMatchResult({ gf: gA, ga: gB, opp: matchOpp });
-      go("result");
+      setMatchResult({ gf: gA, ga: gB, opp: matchOpp, goals, stats });
+      // ITEM 10: mata-mata empatado entra na disputa de pênaltis cobrança a cobrança
+      // (só no MEU jogo); senão segue direto pro resultado.
+      const isKO = matchKind === "knockout" || matchKind === "third_place" || matchKind === "final";
+      if (isKO && gA === gB) go("penalties");
+      else go("result");
     },
-    [go, matchOpp],
+    [go, matchKind, matchOpp],
   );
 
   // -------- fechar estágio sem meu jogo (simular IA) --------
@@ -382,6 +398,16 @@ export function ManagerPage() {
         matchSeed={matchSeed}
         onMyTacChange={onMyTacChange}
         onFinish={onLiveFinish}
+      />
+    );
+
+  if (screen === "penalties" && camp && matchOpp)
+    return (
+      <PenaltyShootout
+        myTeam={camp.myTeam}
+        opp={matchOpp}
+        seed={matchSeed}
+        onDone={() => go("result")}
       />
     );
 
@@ -643,7 +669,7 @@ function DraftView({
               <TierBadge tier={t.t} label={BAND[i] ?? TIER_LABEL[t.t]} />
             </span>
             <div className="flex items-center gap-2 text-xl font-black text-ink-950">
-              <Flag name={t.n} />
+              <ManagerCrest slug={t.s} name={t.n} size={22} />
               {t.n} <span className="text-[13px] font-bold text-ink-500">{t.y}</span>
             </div>
             <div className="my-1.5 text-[13px] italic text-ink-600">
@@ -653,7 +679,7 @@ function DraftView({
             <Rate lab="MEI" v={t.m} color="var(--color-aqua-500)" />
             <Rate lab="DEF" v={t.d} color="var(--color-grass-500)" />
             <div className="mt-2 flex items-center gap-2 text-[12px] font-bold text-brand-700">
-              <Stars o={t.o} /> Força base {t.o} • Escolher ›
+              <Stars o={t.o} /> {TIER_LABEL[t.t]} • Escolher ›
             </div>
           </button>
         ))}
@@ -687,14 +713,15 @@ function TierBadge({ tier, label }: { tier: Team["t"]; label: string }) {
     </span>
   );
 }
+// ITEM 13: no JOGO, ATK/MID/DEF viram só BARRA (sem número cru). A barra já
+// codifica a força via barPct; o motor segue lendo o valor exato internamente.
 function Rate({ lab, v, color }: { lab: string; v: number; color: string }) {
   return (
-    <div className="my-1 grid grid-cols-[30px_1fr_26px] items-center gap-2">
+    <div className="my-1 grid grid-cols-[30px_1fr] items-center gap-2">
       <span className="text-[10.5px] font-extrabold tracking-wide text-ink-500">{lab}</span>
       <span className="h-2 overflow-hidden rounded-full bg-ink-200">
         <span className="block h-full rounded-full" style={{ width: `${barPct(v)}%`, background: color }} />
       </span>
-      <span className="text-right text-[13px] font-extrabold tabular-nums">{v}</span>
     </div>
   );
 }
@@ -718,6 +745,10 @@ function TournamentHub({
   const camp = campaign;
   const mt = camp.myTeam;
   const steps = campaignProgress(camp);
+  const [bracketOpen, setBracketOpen] = useState(false);
+  // o botão "Ver chaveamento" só aparece quando a edição tem mata-mata (projeção
+  // não-nula). É puro e barato; memoiza por referência da campanha.
+  const hasBracket = useMemo(() => projectBracket(camp) != null, [camp]);
 
   if (!camp.alive) {
     return <CampaignEnd campaign={camp} edition={edition} onNewCampaign={onNewCampaign} onReplay={onReplay} />;
@@ -734,11 +765,11 @@ function TournamentHub({
       </div>
       <div className="mt-1.5 flex items-center gap-2.5">
         <div className="flex items-center gap-1.5 text-[22px] font-black text-ink-950">
-          <Flag name={mt.n} />
+          <ManagerCrest slug={mt.s} name={mt.n} size={24} />
           {mt.n}
         </div>
         <span className="ml-auto">
-          <TierBadge tier={mt.t} label={`${TIER_LABEL[mt.t]} · FB ${mt.o}`} />
+          <TierBadge tier={mt.t} label={TIER_LABEL[mt.t]} />
         </span>
       </div>
 
@@ -754,6 +785,17 @@ function TournamentHub({
         ))}
       </div>
 
+      {/* ITEM 17: abre a árvore inteira do mata-mata a qualquer momento. */}
+      {hasBracket && (
+        <button
+          type="button"
+          onClick={() => setBracketOpen(true)}
+          className="mt-2.5 inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-[12px] border border-border bg-surface-2 px-3 text-[13px] font-bold text-ink-700 transition-colors hover:bg-surface"
+        >
+          <span aria-hidden>🏆</span> Ver chaveamento
+        </button>
+      )}
+
       {nm ? (
         <>
           <div className="relative mt-3.5 overflow-hidden rounded-[18px] bg-gradient-to-br from-brand-700 to-brand-900 p-4 text-white">
@@ -763,20 +805,18 @@ function TournamentHub({
                 ` · seu jogo ${(st as GroupsStageState).myMatchIdx + 1}`}
             </div>
             <div className="my-2.5 flex items-center justify-center gap-3">
-              <span className="flex-1 text-center text-[17px] font-black">
-                <Flag name={mt.n} />
-                <br />
+              <span className="flex flex-1 flex-col items-center gap-1 text-center text-[17px] font-black">
+                <ManagerCrest slug={mt.s} name={mt.n} size={34} />
                 {mt.n}
               </span>
               <span className="text-[12px] font-extrabold opacity-70">VS</span>
-              <span className="flex-1 text-center text-[17px] font-black">
-                <Flag name={nm.opp.n} />
-                <br />
+              <span className="flex flex-1 flex-col items-center gap-1 text-center text-[17px] font-black">
+                <ManagerCrest slug={nm.opp.s} name={nm.opp.n} size={34} />
                 {nm.opp.n}
               </span>
             </div>
-            <div className="text-center text-[12px] opacity-90">
-              {TIER_LABEL[nm.opp.t]} · força {nm.opp.o} · <Stars o={nm.opp.o} light />
+            <div className="flex items-center justify-center gap-1.5 text-center text-[12px] opacity-90">
+              {TIER_LABEL[nm.opp.t]} · <Stars o={nm.opp.o} light />
             </div>
           </div>
           <Button
@@ -836,6 +876,10 @@ function TournamentHub({
             ))}
           </div>
         </>
+      )}
+
+      {bracketOpen && (
+        <BracketModal campaign={camp} edition={edition} onClose={() => setBracketOpen(false)} />
       )}
     </div>
   );
@@ -957,6 +1001,7 @@ function TacticPicker({
       <SegBlock label="Postura" opts={POSTURA_OPTS} value={myTac.postura} onPick={(v) => onMyTac({ ...myTac, postura: v })} />
       <SegBlock label="Marcação" opts={MARC_OPTS} value={myTac.marcacao} onPick={(v) => onMyTac({ ...myTac, marcacao: v })} />
       <PlanSummary tac={myTac} />
+      <StyleRing estilo={myTac.estilo} />
 
       <Button
         size="lg"
@@ -979,7 +1024,13 @@ function MatchResult({
   onContinue,
 }: {
   campaign: Campaign;
-  result: { gf: number; ga: number; opp: Team };
+  result: {
+    gf: number;
+    ga: number;
+    opp: Team;
+    goals?: { side: "A" | "B"; m: number }[];
+    stats?: MatchStats;
+  };
   kind: MatchKind;
   matchSeed: number;
   onContinue: () => void;
@@ -987,37 +1038,31 @@ function MatchResult({
   const camp = campaign;
   const { gf, ga, opp } = result;
   const stage = camp.stages[camp.stageIdx];
-  let koInfo: { winner: "A" | "B"; pens: string | null } | null = null;
-  let outcome: "win" | "draw" | "lose";
-  if (kind === "knockout" || kind === "third_place" || kind === "final") {
-    koInfo = knockoutResult(camp.myTeam, opp, gf, ga, matchSeed);
-    outcome = koInfo.winner === "A" ? "win" : "lose";
-  } else {
-    outcome = gf > ga ? "win" : gf === ga ? "draw" : "lose";
-  }
+  const isKO = kind === "knockout" || kind === "third_place" || kind === "final";
+  const koInfo: { winner: "A" | "B"; pens: string | null } | null = isKO
+    ? knockoutResult(camp.myTeam, opp, gf, ga, matchSeed)
+    : null;
+  const outcome: "win" | "draw" | "lose" = koInfo
+    ? koInfo.winner === "A"
+      ? "win"
+      : "lose"
+    : gf > ga
+      ? "win"
+      : gf === ga
+        ? "draw"
+        : "lose";
 
   const blurb = useMemo(() => {
-    const key = postMatchBank(gf, ga, camp.myTeam.o, opp.o);
+    // No mata-mata, empate (resolvido nos pênaltis) NÃO usa vocabulário de tabela.
+    let key = postMatchBank(gf, ga, camp.myTeam.o, opp.o);
+    if (isKO && gf === ga) key = outcome === "win" ? "ko_passou_penaltis" : "ko_caiu_penaltis";
     const bank = POSTMATCH[key] ?? POSTMATCH.vitoria_normal;
     const r = mulberryUi(matchSeed >>> 0);
     return bank[Math.floor(r() * bank.length)];
-  }, [camp.myTeam.o, gf, ga, matchSeed, opp.o]);
+  }, [camp.myTeam.o, gf, ga, isKO, matchSeed, opp.o, outcome]);
 
   const hint = TACTICAL_HINTS_SUBTLE[(matchSeed >>> 0) % TACTICAL_HINTS_SUBTLE.length];
-
-  let badge: { txt: string; tone: string };
-  if (kind === "groups" || kind === "final_group") {
-    const pts = outcome === "win" ? (camp.threePts ? 3 : 2) : outcome === "draw" ? 1 : 0;
-    badge = {
-      txt: `${pts > 0 ? "+" : ""}${pts} ponto${pts === 1 ? "" : "s"}`,
-      tone: outcome === "win" ? "bg-grass-100 text-grass-700" : outcome === "draw" ? "bg-surface-2 text-ink-700" : "bg-flame-100 text-flame-700",
-    };
-  } else {
-    badge =
-      outcome === "win"
-        ? { txt: "✓ Classificado", tone: "bg-grass-100 text-grass-700" }
-        : { txt: "✕ Eliminado", tone: "bg-flame-100 text-flame-700" };
-  }
+  const badge = resultBadge(kind, outcome, camp.threePts);
 
   return (
     <div className="flex flex-col">
@@ -1028,17 +1073,26 @@ function MatchResult({
         className="relative my-2.5 overflow-hidden rounded-[18px] border border-white/10 p-4 text-white"
         style={{ background: "var(--color-board)" }}
       >
-        <div className="flex justify-between gap-2 text-[12px] font-extrabold uppercase tracking-wide text-white/80">
-          <span className="max-w-[42%] truncate">{camp.myTeam.n}</span>
-          <span className="max-w-[42%] truncate">{opp.n}</span>
-        </div>
-        <div className="flex items-center justify-center gap-5 font-mono text-[52px] font-extrabold tabular-nums leading-none text-gold-400">
-          <span>{gf}</span>
-          <span className="text-[22px] text-white/40">×</span>
-          <span>{ga}</span>
+        <div className="flex items-center justify-between gap-2">
+          <ResultTeamCard name={camp.myTeam.n} slug={camp.myTeam.s} align="left" />
+          <div
+            className="flex shrink-0 items-center justify-center gap-3 px-1 text-[54px] font-black tabular-nums leading-none text-gold-400"
+            style={{ fontWeight: 900 }}
+          >
+            <span>{gf}</span>
+            <span className="text-[22px] font-bold text-white/35">×</span>
+            <span>{ga}</span>
+          </div>
+          <ResultTeamCard name={opp.n} slug={opp.s} align="right" />
         </div>
         {koInfo?.pens && (
-          <div className="text-center text-[13px] text-gold-400">Pênaltis {koInfo.pens}</div>
+          <div className="mt-1 text-center text-[13px] font-bold text-gold-400">Pênaltis {koInfo.pens}</div>
+        )}
+        {result.goals && result.goals.length > 0 && (
+          <div className="mt-2 grid grid-cols-2 gap-x-3 border-t border-white/10 pt-2" aria-label="Gols da partida">
+            <GoalsCol goals={result.goals} side="A" dot="🟢" align="left" />
+            <GoalsCol goals={result.goals} side="B" dot="⚪" align="right" />
+          </div>
         )}
       </div>
       <div className="text-[20px] font-black text-ink-950">
@@ -1050,6 +1104,11 @@ function MatchResult({
           {badge.txt}
         </span>
       </div>
+      {result.stats && (
+        <div className="mt-3">
+          <MatchStatsPanel stats={result.stats} myName={camp.myTeam.n} oppName={opp.n} />
+        </div>
+      )}
       <div className="mt-3 rounded-[14px] border border-border bg-surface p-3.5">
         <div className="mb-1 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
           No banco
@@ -1062,6 +1121,74 @@ function MatchResult({
     </div>
   );
 }
+
+// Card de time no placar do resultado: escudo + pílula com cores da seleção (itens 3/5).
+function ResultTeamCard({ name, slug, align }: { name: string; slug?: string; align: "left" | "right" }) {
+  const c = teamColors(slug, name);
+  return (
+    <div className={`flex min-w-0 flex-1 items-center gap-1.5 ${align === "right" ? "flex-row-reverse" : ""}`}>
+      <ManagerCrest slug={slug} name={name} size={28} />
+      <span
+        className="max-w-full truncate rounded-md px-2 py-0.5 text-[12px] font-black uppercase tracking-wide"
+        style={{ background: c.bg, color: c.text }}
+      >
+        {name}
+      </span>
+    </div>
+  );
+}
+
+// ITEM 16: coluna de gols (minuto) de um lado, no placar do resultado.
+function GoalsCol({
+  goals,
+  side,
+  dot,
+  align,
+}: {
+  goals: { side: "A" | "B"; m: number }[];
+  side: "A" | "B";
+  dot: string;
+  align: "left" | "right";
+}) {
+  const gs = goals.filter((g) => g.side === side).sort((x, y) => x.m - y.m);
+  if (gs.length === 0) return <div />;
+  return (
+    <div
+      className={`flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] font-bold tabular-nums text-white/70 ${
+        align === "right" ? "justify-end" : "justify-start"
+      }`}
+    >
+      {gs.map((g, i) => (
+        <span key={`${g.m}-${i}`} className="inline-flex items-center gap-0.5">
+          <span aria-hidden>{dot}</span>
+          {g.m}&apos;
+        </span>
+      ))}
+    </div>
+  );
+}
+
+// badge de pontos (grupos) / classificação (mata-mata) do resultado.
+function resultBadge(
+  kind: MatchKind,
+  outcome: "win" | "draw" | "lose",
+  threePts: boolean,
+): { txt: string; tone: string } {
+  if (kind === "groups" || kind === "final_group") {
+    const pts = outcome === "win" ? (threePts ? 3 : 2) : outcome === "draw" ? 1 : 0;
+    const tone =
+      outcome === "win"
+        ? "bg-grass-100 text-grass-700"
+        : outcome === "draw"
+          ? "bg-surface-2 text-ink-700"
+          : "bg-flame-100 text-flame-700";
+    return { txt: `${pts > 0 ? "+" : ""}${pts} ponto${pts === 1 ? "" : "s"}`, tone };
+  }
+  return outcome === "win"
+    ? { txt: "✓ Classificado", tone: "bg-grass-100 text-grass-700" }
+    : { txt: "✕ Eliminado", tone: "bg-flame-100 text-flame-700" };
+}
+
 function headlineFor(
   outcome: "win" | "draw" | "lose",
   gf: number,
@@ -1070,8 +1197,13 @@ function headlineFor(
   kind: MatchKind,
 ): string {
   if (kind === "final") return outcome === "win" ? "🏆 CAMPEÃO DO MUNDO!" : "Vice. Doeu, mas chegou à Final.";
+  const isKnockout = kind === "knockout" || kind === "third_place";
   if (outcome === "win") {
     if (koInfo?.pens) return "Nos pênaltis! Coração na boca, mas passou.";
+    if (isKnockout) {
+      if (gf - ga >= 3) return "Goleou e passou!";
+      return ["Classificou!", "Passou de fase!", "Avançou no sufoco!"][gf % 3];
+    }
     if (gf - ga >= 3) return "Atropelo!";
     return ["Vitória!", "Ganhou e levou.", "Três pontos no bolso."][gf % 3];
   }
@@ -1097,6 +1229,11 @@ function CampaignEnd({
   const champ = camp.champion;
   const shareText = buildShareText(camp, sc);
   const [copied, setCopied] = useState(false);
+  // ITEM 17: no fim de campanha, mostra OBRIGATORIAMENTE a árvore inteira do
+  // mata-mata preenchida — inclusive os cruzamentos/resultados das IAs simulados
+  // até a final depois da minha eliminação, revelando o campeão. Só nas edições
+  // com mata-mata (projeção não-nula).
+  const bracketView = useMemo(() => projectBracket(camp), [camp]);
 
   function copy() {
     if (navigator.clipboard?.writeText) {
@@ -1123,8 +1260,9 @@ function CampaignEnd({
           </h2>
         </>
       )}
-      <p className="mt-0.5 text-center text-sm text-ink-600">
-        <Flag name={camp.myTeam.n} /> {camp.myTeam.n} {camp.myTeam.y} · Copa {edition.year}
+      <p className="mt-0.5 inline-flex w-full items-center justify-center gap-1.5 text-center text-sm text-ink-600">
+        <ManagerCrest slug={camp.myTeam.s} name={camp.myTeam.n} /> {camp.myTeam.n} {camp.myTeam.y} · Copa{" "}
+        {edition.year}
       </p>
 
       {camp.eliminated && (
@@ -1144,11 +1282,25 @@ function CampaignEnd({
           {sc.total.toLocaleString("pt-BR")}
         </div>
         <div className="text-[12px]">
-          {sc.pctExtra > 0
-            ? `+${sc.pctExtra}% por levar um time fraco (×${sc.mult.toFixed(2)})`
-            : "time forte — sem bônus de dificuldade"}
+          {difficultyLabel(camp.myTeam.t, sc)}
         </div>
       </div>
+
+      {bracketView && (
+        <>
+          <div className="mt-5 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
+            Chaveamento da Copa {edition.year}
+          </div>
+          <p className="mb-2.5 mt-0.5 text-[11.5px] text-ink-600">
+            {camp.champion
+              ? "Você levantou a taça — a árvore inteira do mata-mata."
+              : camp.eliminated
+                ? "Como terminou o mata-mata depois que você caiu — até a final."
+                : "A árvore completa do mata-mata desta Copa."}
+          </p>
+          <BracketBody view={bracketView} />
+        </>
+      )}
 
       {camp.history.length > 0 && (
         <>
@@ -1180,6 +1332,12 @@ function CampaignEnd({
       </Button>
     </div>
   );
+}
+// rótulo do bônus de dificuldade — deriva do TIER (item 18), nunca chama elite de "fraco".
+function difficultyLabel(tier: Team["t"], sc: ReturnType<typeof campaignScore>): string {
+  if (sc.pctExtra <= 0) return "Seleção de elite — sem bônus de dificuldade";
+  const noun = tier === "D" ? "uma zebra" : tier === "C" ? "um azarão" : "uma seleção sem favoritismo";
+  return `+${sc.pctExtra}% por comandar ${noun} (×${sc.mult.toFixed(2)})`;
 }
 function nearMissMsg(camp: Campaign): string {
   const last = camp.history[camp.history.length - 1];

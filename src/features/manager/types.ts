@@ -134,6 +134,20 @@ export interface MatchState {
   schedule: number[];
 }
 
+// ITEM 12: painel de estatísticas pós-jogo. Derivado DETERMINISTICAMENTE dos eventos
+// + forças (deriveMatchStats), não é um novo sistema de simulação — é uma "leitura"
+// plausível e coerente da partida (quem teve a bola finaliza mais; quem goleou não
+// aparece com 30% de posse). Um lado por campo, pares {a,b}.
+export interface MatchStats {
+  poss: { a: number; b: number }; // posse de bola (%) — soma 100
+  fin: { a: number; b: number }; // finalizações totais
+  sot: { a: number; b: number }; // chutes ao gol (no alvo)
+  passes: { a: number; b: number }; // passes tentados
+  passAcc: { a: number; b: number }; // precisão de passe (%)
+  fouls: { a: number; b: number }; // faltas cometidas
+  tackles: { a: number; b: number }; // desarmes
+}
+
 export interface StepResult {
   minute: number;
   half: number;
@@ -191,6 +205,25 @@ export interface KnockoutOutcome {
   pens: string | null;
 }
 
+// ITEM 10: disputa de pênaltis cobrança a cobrança. Cada chute é determinístico
+// (semeado por matchSeed), e o vencedor EMERGE das cobranças — a string `pens` passa
+// a ser a contagem real, eliminando a incoerência placar≠vencedor do sorteio antigo.
+export type PenResult = "gol" | "defesa" | "trave" | "fora";
+export interface PenKick {
+  side: "A" | "B";
+  index: number; // ordem da cobrança do time (1..N)
+  result: PenResult;
+  scoreA: number; // placar acumulado da disputa após a cobrança
+  scoreB: number;
+}
+export interface Shootout {
+  kicks: PenKick[];
+  winner: "A" | "B";
+  scoreA: number; // total convertido
+  scoreB: number;
+  pens: string; // "5×4" coerente com o total real
+}
+
 // estado do estágio corrente — união discriminada por `kind`
 export interface GroupsStageState {
   kind: "groups";
@@ -205,6 +238,9 @@ export interface GroupsStageState {
   advance: number;
   bestThirds: number;
   done: boolean;
+  // item 1: pares IA×IA já apurados, por "gIdx:i:j" (i<j índices no grupo). Garante
+  // idempotência — a tabela avança rodada a rodada sem dupla contagem no fim.
+  playedPairs?: string[];
   sortedStandings?: Standing[][];
   qualified?: Team[];
   myAdvanced?: boolean;
@@ -280,6 +316,10 @@ export interface Campaign {
   finalists?: Team[];
   skipThird?: boolean;
   pendingAdvance?: boolean;
+  // ITEM 17: ordem REALIZADA do 1º mata-mata (pós-sorteio do chaveamento, que usa
+  // camp.rnd — não-reproduzível depois de recarregar). Guardar a ordem como slugs
+  // deixa projectBracket reconstruir a árvore EXATA mesmo numa campanha salva.
+  koBracketOrder?: string[];
 }
 
 export interface CampaignScore {
@@ -290,6 +330,39 @@ export interface CampaignScore {
   rank: number;
   wins: number;
   draws: number;
+}
+
+// ITEM 17: visualização do chaveamento (árvore do mata-mata). projectBracket()
+// reúne os confrontos REAIS já jogados por mim + simula os IA×IA restantes (mesma
+// sementagem determinística de finishKnockoutStage), preenchendo a árvore inteira
+// até a final mesmo após a eliminação — e revelando o campeão. Tudo puro.
+export interface BracketSlot {
+  team: Team | null; // null = bye / vaga ainda não definida
+  score: number | null; // gols no confronto (null se bye ou não jogado)
+  pens: string | null; // string de pênaltis ("5×4") se decidiu nos pênaltis
+  winner: boolean; // venceu o confronto e avança
+  isMe: boolean; // é o time que eu comando
+  champion: boolean; // marca o campeão na coluna final
+}
+export interface BracketMatch {
+  a: BracketSlot;
+  b: BracketSlot;
+  bye: boolean; // confronto com uma vaga vazia (passou direto)
+  mine: boolean; // este é o MEU confronto nesta rodada
+  real: boolean; // resultado veio do meu jogo real (não de simulação)
+  pens: string | null; // pênaltis do confronto, se houve
+}
+export interface BracketRound {
+  label: string; // "Oitavas", "Quartas", "Semis", "Final"…
+  short: string;
+  round: KnockoutRound | "FINAL";
+  matches: BracketMatch[];
+}
+export interface BracketView {
+  rounds: BracketRound[];
+  champion: Team | null;
+  myExitRound: number | null; // índice da rodada onde eu fui eliminado (se foi)
+  iAmChampion: boolean;
 }
 
 export interface ProgressStep {

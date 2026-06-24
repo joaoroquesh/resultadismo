@@ -14,6 +14,27 @@ import { rngFrom } from "./engine";
 const TAC_KEY = "rd_manager_tactic_v1";
 const CAMP_KEY = "rd_manager_campaign_v1";
 const TROPHY_KEY = "rd_manager_trophies_v1";
+const SPEED_KEY = "rd_manager_speed_v1";
+
+// ---------- velocidade da transmissão ao vivo (item 2) ----------
+// 1 = ritmo normal, 2 = dobrado. Persistida pra valer na próxima partida.
+export type LiveSpeed = 1 | 2;
+
+export function loadSpeed(): LiveSpeed {
+  try {
+    return localStorage.getItem(SPEED_KEY) === "2" ? 2 : 1;
+  } catch {
+    return 1;
+  }
+}
+
+export function saveSpeed(s: LiveSpeed): void {
+  try {
+    localStorage.setItem(SPEED_KEY, String(s));
+  } catch {
+    /* ignora falha de escrita */
+  }
+}
 
 // ---------- tática persistida ----------
 const VALID_FORM = new Set(["433", "442", "352", "4231", "532", "4312", "343", "424"]);

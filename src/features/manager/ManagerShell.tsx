@@ -25,8 +25,14 @@ export function ManagerShell() {
       <header className="sticky top-0 z-30 border-b border-border bg-surface/90 backdrop-blur-md">
         <ManagerStripes />
         <div className="mx-auto flex h-11 w-full max-w-[480px] items-center justify-between px-4">
-          <Link to="/manager" className="text-sm font-bold tracking-tight">
-            ⚽ Resultadismo <span className="text-brand-700">Manager</span>
+          <Link to="/manager" className="flex items-center gap-1.5 text-sm font-bold tracking-tight">
+            <span>⚽ Resultadismo <span className="text-brand-700">Manager</span></span>
+            <span
+              className="rounded border border-gold-500/45 bg-gold-500/20 px-1.5 py-px text-[10px] font-black uppercase leading-none tracking-wider text-gold-700"
+              title="Em fase de testes"
+            >
+              beta
+            </span>
           </Link>
           <Link
             to="/"
