@@ -37,6 +37,14 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   `20260624020000`.
 
 ### Adicionado
+- **Jogos: rolagem e arraste do dia repensados.** Ao entrar num dia, a lista vai até o jogo **AO
+  VIVO** (ou o próximo a começar, quando há encerrados e ele está abaixo da dobra), parando com um
+  **pedaço do card de cima à mostra** (deixa claro que há jogos pra cima). **Arrastar pro lado** troca
+  de dia deslizando como carrossel, com vão entre as páginas (e **sem auto-rolar no swipe**, pra a
+  página vizinha não "subir"). O cabeçalho de contexto virou uma **barra sticky de altura fixa** que
+  não pisca: no topo o resumo do dia (pontos + dobros), ao grudar mostra competição · dia · pontos ·
+  dobros, e tocar nela volta ao topo pra escolher competição/dia. Arquivos: `MatchesStickyHeader`,
+  `useDaySwipe`, `useGamesScroll`, `JogosPage`.
 - **Fase do jogo ao lado do "AO VIVO" no card** (1º tempo / intervalo / 2º tempo / prorrogação /
   pênaltis). Vem da **ESPN** (única fonte grátis com isso: `status.period` + `status.type.name`), que
   o sync já consulta a cada 25s — antes esse dado era descartado. Nova coluna `matches.live_phase`
