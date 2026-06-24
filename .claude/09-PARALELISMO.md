@@ -63,6 +63,37 @@ enum `'espn'` que não entrou).
   do Supabase, **só leitura**, navegador autenticado do João) e ajuste a sua numeração para casar.
 - Combine **faixas de numeração** com as outras sessões quando der.
 
+## 3.1. Banco de teste LOCAL é COMPARTILHADO — coordene antes de resetar
+
+> **Decisão do João (2026-06-22): a convenção é COMPARTILHAR e COORDENAR**, não isolar.
+
+Existe **um único stack Supabase local** (Docker, `project_id = "resultadismo"`, portas **5442x**),
+e **todo worktree/sessão aponta pra ele** (via `VITE_SUPABASE_URL` no `.env.local`, gitignored). Logo,
+**`supabase db reset` / `npm run db:reset` é destrutivo pra TODO MUNDO**: apaga os dados de todas as
+sessões, **reaplica o conjunto de migrations do SEU worktree** e recria o seed (os UUIDs dos usuários
+mudam → tokens viram inválidos, relogue pelo DevPanel).
+
+**Regras de teste local:**
+- **NÃO resete por impulso.** Se outra sessão pode estar testando, **avise/combine antes** de
+  `db reset`. Prefira **inserir os dados que você precisa** (additivo) a resetar tudo.
+- Se **precisar** resetar, faça do worktree com as migrations **atuais** (`git fetch` → seu branch
+  sobre `origin/main`); senão você reaplica um conjunto **defasado** e derruba migrations que só
+  existem no worktree de outra sessão (elas somem do banco → o PostgREST devolve `42703` por cache;
+  reaplique e `notify pgrst, 'reload schema';`).
+- Depois de qualquer reset, **relogue pelo DevPanel** (tokens antigos = `Invalid Refresh Token`,
+  benigno) e limpe `localStorage` se preciso.
+- **Seed maior = menos reset.** Quanto mais dados simulados o seed/banco já tiver (vários dias de
+  jogos, ao vivo, palpites, grupos com Pix), menos motivo pra resetar — então **prefira enriquecer o
+  seed** a recriar do zero.
+- `npm run db:types` (gen types `--local`) e `homolog:pull` operam **nesse mesmo stack** — garanta que
+  ele está com as migrations atuais antes de gerar tipos.
+
+**Por que não isolamos por worktree?** Dá pra rodar **um stack por worktree** (cada um com
+`project_id` + portas diferentes no `config.toml` → containers `supabase_<svc>_<project_id>`
+separados), mas são **~10 containers por stack** (pesado em paralelo). Avaliado e **descartado por ora**
+em favor de coordenar. (`config.toml` só aceita `env()` em secrets, não em portas/`project_id`; a
+isolação exigiria patch local + `git update-index --skip-worktree`.)
+
 ## 4. Commit cirúrgico
 
 - **Stage explícito por arquivo.** **Nunca `git add -A`** — varre trabalho de outra sessão.
