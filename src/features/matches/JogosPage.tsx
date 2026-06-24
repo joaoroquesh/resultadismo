@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { CalendarClock, Trophy, Zap, LayoutGrid, Sparkles, Users, Share2, Check, X } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { CalendarClock, Trophy, Zap, LayoutGrid, Sparkles, Users, Share2, Check, X, ChevronDown } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { ScrollRow } from "@/components/ui/ScrollRow";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -11,6 +11,9 @@ import { TeamCrest } from "@/components/TeamCrest";
 import { cn } from "@/lib/utils";
 import { dayjs } from "@/lib/format";
 import { MatchCard } from "./MatchCard";
+import { MatchesStickyHeader } from "./MatchesStickyHeader";
+import { useGamesScroll } from "./useGamesScroll";
+import { useDaySwipe } from "./useDaySwipe";
 import { provisionalScoreType, provisionalPoints } from "@/lib/score";
 import { teamCrestPath } from "@/lib/teamCrests";
 import { buildScoreShareImage, shareImageBlob, type ShareRow } from "./shareImage";
@@ -313,19 +316,61 @@ export function JogosPage() {
   // Teaser deslogado: no máximo 2 linhas (4 no desktop, 2 no mobile). Limita o que
   // renderiza — sem overflow/clip, pra não cortar o anel (ring) dos cards ao vivo.
   const foldGames = session ? dayMatches : dayMatches.slice(0, 4);
-  const gamesGrid = (
+
+  // Ao TOCAR a aba do dia (ou abrir a tela), leva até o AO VIVO (ou o próximo a
+  // começar) parando com um pedaço do card de cima à mostra. No SWIPE não rola —
+  // seria uma subida vertical durante o deslize horizontal (estranho); o swipe
+  // marca skipAutoScroll pra pular. resetKey re-dispara ao trocar aba/dia.
+  const skipAutoScroll = useRef(false);
+  const { setRef } = useGamesScroll({
+    games: foldGames.map((m) => ({ id: m.id, status: m.status })),
+    resetKey: `${scope}|${day ?? ""}`,
+    enabled: !!session,
+    skipRef: skipAutoScroll,
+  });
+
+  // Arrastar pro lado troca de dia, deslizando (carrossel de 3 painéis no
+  // useDaySwipe). idx/vizinhos alimentam o gesto e os painéis de preview.
+  const dayIdx = day ? days.indexOf(day) : -1;
+  const prevDay = dayIdx > 0 ? days[dayIdx - 1]! : null;
+  const nextDay = dayIdx >= 0 && dayIdx < days.length - 1 ? days[dayIdx + 1]! : null;
+  const { railRef, active: swiping } = useDaySwipe({
+    enabled: !!session && days.length >= 2,
+    index: dayIdx,
+    count: days.length,
+    onPick: (dir) => {
+      const target = days[dayIdx + dir];
+      if (target) {
+        skipAutoScroll.current = true; // swipe não auto-rola (evita a "subida")
+        setPicked(target);
+      }
+    },
+  });
+
+  // jogos de um dia vizinho (só calculado durante o arraste, pros painéis de preview).
+  const matchesOfDay = (d: string) =>
+    (matches ?? [])
+      .filter((m) => dayKey(m.kickoff_at) === d)
+      .sort((a, b) => dayjs(a.kickoff_at ?? 0).valueOf() - dayjs(b.kickoff_at ?? 0).valueOf());
+
+  // Uma grade de jogos (central = interativa com refs/seleção; preview = só visual).
+  const renderDayGrid = (list: typeof foldGames, center: boolean) => (
     <div
       className={cn(
         "grid grid-cols-1 gap-3 lg:grid-cols-2",
         !session && "max-lg:[&>*:nth-child(n+3)]:hidden", // mobile: só 2 (2 linhas)
       )}
     >
-      {foldGames.map((m) => {
+      {list.map((m) => {
         const wk = weekKey(m.kickoff_at);
-        const selectable = shareSel != null && isShareable(m);
-        const selected = !!shareSel?.has(m.id);
+        const selectable = center && shareSel != null && isShareable(m);
+        const selected = center && !!shareSel?.has(m.id);
         return (
-          <div key={m.id} className="relative">
+          <div
+            key={m.id}
+            ref={center ? setRef(m.id) : undefined}
+            className="relative scroll-mt-28"
+          >
             <MatchCard
               match={m}
               prediction={predMap?.get(m.id) ?? null}
@@ -333,7 +378,7 @@ export function JogosPage() {
               maxJokers={WEEKLY_JOKER_LIMIT}
               onShare={() => setShareSel(new Set([m.id]))}
             />
-            {shareSel != null && (
+            {center && shareSel != null && (
               <button
                 type="button"
                 onClick={() => selectable && toggleShare(m.id)}
@@ -366,6 +411,30 @@ export function JogosPage() {
     </div>
   );
 
+  // Viewport do carrossel: SANGRA até a borda da tela (-mx-4) e o respiro lateral
+  // (px-4) vai DENTRO de cada página. Assim o clip corta nas bordas da tela (longe
+  // dos cards → não corta o anel dos ao vivo) e nasce um VÃO entre as páginas
+  // (16+16px), dando a sensação de rolar pro dia ao lado. O trilho (railRef) segue
+  // o dedo via translateX; os vizinhos só existem durante o arraste. No desktop
+  // (lg) volta ao normal (sem sangria/clip; gesto é só mobile).
+  const gamesGrid = (
+    <div className="-mx-4 overflow-x-clip lg:mx-0 lg:overflow-visible">
+      <div ref={railRef} className="relative will-change-transform">
+        {swiping && prevDay && (
+          <div className="absolute inset-x-0 top-0 -translate-x-full px-4">
+            {renderDayGrid(matchesOfDay(prevDay), false)}
+          </div>
+        )}
+        <div className="px-4 lg:px-0">{renderDayGrid(foldGames, true)}</div>
+        {swiping && nextDay && (
+          <div className="absolute inset-x-0 top-0 translate-x-full px-4">
+            {renderDayGrid(matchesOfDay(nextDay), false)}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   const shareBar =
     shareSel != null ? (
       <div className="fixed inset-x-3 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-50 mx-auto flex max-w-sm items-center gap-2 rounded-lg bg-surface p-3 shadow-[var(--shadow-pop)] ring-1 ring-border lg:bottom-6">
@@ -395,6 +464,109 @@ export function JogosPage() {
       </div>
     ) : null;
 
+  // Rótulos da barra de contexto condensada (competição + dia ativos).
+  const activeComp = isAll ? undefined : competitions?.find((c) => c.id === scope);
+  const scopeLabel = isMine
+    ? "Interesses"
+    : isGroups
+      ? "Grupos"
+      : scope === ALL
+        ? "Todos"
+        : activeComp?.short_name ?? activeComp?.name ?? "Jogos";
+  const dayLabel = day
+    ? day === dayjs().format("YYYY-MM-DD")
+      ? `Hoje ${dayjs(day).format("DD/MM")}`
+      : dayjs(day).format("ddd DD/MM").replace(".", "")
+    : "";
+
+  // Barra fininha que assume quando o cabeçalho condensa. Competição E data num
+  // único botão: toque volta ao topo pra ver/mudar os filtros (competição e dia).
+  const compactBar = (
+    <div className="flex w-full items-center gap-2 text-sm">
+      <button
+        type="button"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        aria-label="Voltar ao topo pra escolher competição e dia"
+        className="flex min-w-0 items-center gap-1.5"
+      >
+        <span className="truncate font-semibold text-ink-900">{scopeLabel}</span>
+        <ChevronDown className="size-3.5 shrink-0 text-ink-400" />
+        {dayLabel && (
+          <>
+            <span className="text-ink-300">·</span>
+            <span className="shrink-0 font-medium text-ink-600">{dayLabel}</span>
+          </>
+        )}
+      </button>
+      {session && (dayScored || day != null) && (
+        <span className="ml-auto flex shrink-0 items-center gap-1.5">
+          {dayScored && (
+            <span className="shrink-0 rounded-pill bg-ink-100 px-2 py-0.5 text-xs font-bold text-brand-700">
+              Neste dia: {dayPoints} pts
+            </span>
+          )}
+          {day != null && (
+            <Coachmark
+              storageKey="resultadismo-coach-dobro-v1"
+              title="Dobro de Pontos"
+              placement="bottom"
+              content={
+                <>
+                  Ative o <span className="font-bold text-ink-50">2×</span> num palpite e ele vale o
+                  dobro. Você tem {WEEKLY_JOKER_LIMIT} por semana (de segunda a domingo, somando
+                  todos os campeonatos), e o limite <span className="font-bold text-ink-50">zera toda
+                  segunda</span>. Use nos jogos de mais confiança.
+                </>
+              }
+              defaultOpen={user ? undefined : false}
+            >
+              <span className="inline-flex items-center gap-1 rounded-pill bg-brand-600 px-2 py-0.5 text-xs font-semibold text-white">
+                <Zap className="size-3 fill-white" /> {jokersUsedThisWeek}/{WEEKLY_JOKER_LIMIT}
+              </span>
+            </Coachmark>
+          )}
+        </span>
+      )}
+    </div>
+  );
+
+  // Resumo do dia (no TOPO da barra fina, centralizado): pontos do dia no escopo
+  // atual + dobros da semana. Mesma altura da barra grudada (h-11) → não pisca.
+  const daySummary =
+    session && (dayScored || day != null) ? (
+      <div className="flex w-full items-center justify-center gap-2 text-xs">
+        {dayScored && (
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-pill bg-ink-100 px-2.5 py-0.5 font-medium text-ink-600">
+            Neste dia:{" "}
+            <span className="font-bold text-brand-700">
+              {dayPoints} {dayPoints === 1 ? "pt" : "pts"}
+            </span>
+          </span>
+        )}
+        {day != null && (
+          <Coachmark
+            storageKey="resultadismo-coach-dobro-v1"
+            title="Dobro de Pontos"
+            placement="bottom"
+            content={
+              <>
+                Ative o <span className="font-bold text-ink-50">2×</span> num palpite e ele vale o
+                dobro. Você tem {WEEKLY_JOKER_LIMIT} por semana (de segunda a domingo, somando
+                todos os campeonatos), e o limite <span className="font-bold text-ink-50">zera toda
+                segunda</span>. Use nos jogos de mais confiança.
+              </>
+            }
+            defaultOpen={user ? undefined : false}
+          >
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-pill bg-brand-600 px-2 py-0.5 font-semibold text-white">
+              <Zap className="size-3 fill-brand-600" /> {jokersUsedThisWeek}/{WEEKLY_JOKER_LIMIT}{" "}
+              dobros até {jokerWeekEnd}
+            </span>
+          </Coachmark>
+        )}
+      </div>
+    ) : null;
+
   return (
     <Page
       wide
@@ -407,7 +579,13 @@ export function JogosPage() {
         ) : undefined
       }
     >
-      {/* seletor de competição: "Todos" primeiro (padrão) */}
+      {session && (
+        <MatchesStickyHeader
+        summary={daySummary}
+        stuckBar={compactBar}
+        carousels={
+          <>
+            {/* seletor de competição: "Todos" primeiro (padrão) */}
       {loadingComps ? (
         <Skeleton className="mb-3 h-9 w-full" />
       ) : (
@@ -555,40 +733,9 @@ export function JogosPage() {
         </ScrollRow>
       )}
 
-      {/* resumo: pontos DO DIA selecionado (escopo atual) + dobros da semana
-          (o badge de dobros aparece em TODAS as abas, pois o limite é por semana). */}
-      {session && (dayScored || day != null) && (
-        <div className="mb-3 flex flex-wrap items-center justify-center gap-2 text-xs">
-          {dayScored && (
-            <span className="inline-flex items-center gap-1 rounded-pill bg-ink-100 px-2.5 py-0.5 font-medium text-ink-600">
-              Neste dia:{" "}
-              <span className="font-bold text-brand-700">
-                {dayPoints} {dayPoints === 1 ? "pt" : "pts"}
-              </span>
-            </span>
-          )}
-          {day != null && (
-            <Coachmark
-              storageKey="resultadismo-coach-dobro-v1"
-              title="Dobro de Pontos"
-              placement="bottom"
-              content={
-                <>
-                  Ative o <span className="font-bold text-ink-50">2×</span> num palpite e ele vale o
-                  dobro. Você tem {WEEKLY_JOKER_LIMIT} por semana (de segunda a domingo, somando
-                  todos os campeonatos), e o limite <span className="font-bold text-ink-50">zera toda
-                  segunda</span>. Use nos jogos de mais confiança.
-                </>
-              }
-              defaultOpen={user ? undefined : false}
-            >
-              <span className="inline-flex items-center gap-1 rounded-pill bg-brand-600 px-2 py-0.5 font-semibold text-white">
-                <Zap className="size-3 fill-brand-600" /> {jokersUsedThisWeek}/{WEEKLY_JOKER_LIMIT}{" "}
-                dobros até {jokerWeekEnd}
-              </span>
-            </Coachmark>
-          )}
-        </div>
+          </>
+        }
+        />
       )}
 
       {loadingMatches ? (
