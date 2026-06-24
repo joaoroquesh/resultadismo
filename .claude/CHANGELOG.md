@@ -21,6 +21,21 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+### Corrigido
+- **Sync ao vivo travava em jogos noturnos depois das ~21h BRT.** Bug introduzido na Etapa 1:
+  `syncEspn` no modo scores usava `today` em UTC para decidir o dia a consultar. Após a virada do
+  dia UTC (~21h BRT), a query saía pro DIA SEGUINTE e perdia jogos brasileiros começados em
+  20:00 BRT (23:00Z). Causou Panamá×Croácia (23/06) parar de atualizar; o card mostrava "ESPN ·
+  live · há uma hora" enquanto o jogo seguia 0-1. Fix: no modo scores busca **ontem + hoje +
+  amanhã** em UTC (3 reqs, leve). Cobre qualquer fuso. Edge `sync-football`.
+- **Status do jogo ficava em `scheduled` quando a primária é football-data free.** O free não
+  reporta `IN_PLAY` (live scores é pago), então `reconcilePrimary` nunca promovia o status; e o
+  ramo "fonte mais rápida lidera" da Etapa 2 (que só dispara com `status='live'`) nem acionava.
+  Fix: `resolve_match_golden` v5 promove `matches.status` baseado na observação MAIS RECENTE entre
+  TODAS as fontes (qualquer fonte dizendo `live`/`finished` puxa o jogo). Só promove —
+  **nunca regride** pra scheduled. Continua respeitando `frozen` e `manual_lock`. Migration
+  `20260624020000`.
+
 ### Adicionado
 - **Fase do jogo ao lado do "AO VIVO" no card** (1º tempo / intervalo / 2º tempo / prorrogação /
   pênaltis). Vem da **ESPN** (única fonte grátis com isso: `status.period` + `status.type.name`), que

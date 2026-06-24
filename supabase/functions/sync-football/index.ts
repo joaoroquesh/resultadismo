@@ -615,10 +615,19 @@ async function syncEspn(supabase: SupabaseClient, ctx: SourceCtx, writeTeams: bo
   const byId = new Map<string, any>();
   const collect = (data: any) => { for (const e of data?.events ?? []) if (e?.id) byId.set(String(e.id), e); };
   collect(seed);
-  // Modo scores (ao vivo): só o dia de HOJE (1 requisição). A varredura do
-  // calendário (até 30 datas, em rajada) é descoberta de jogos futuros — papel
-  // do catalog (1x/dia), não do ao vivo. Evita pico contra a API da ESPN.
-  if (!scoresOnly) {
+  // Modo scores (ao vivo): ONTEM + HOJE + AMANHÃ em UTC (3 reqs, leve). Cobre a
+  // virada do dia UTC entre fusos — sem isso, jogo iniciado em 20:00 BRT (23:00Z)
+  // somia da consulta após as 21:00 BRT (quando "today" UTC já é o dia seguinte).
+  // A varredura do calendário (até 30 datas, em rajada) é descoberta de jogos
+  // futuros — papel do catalog (1x/dia), não do ao vivo.
+  if (scoresOnly) {
+    const yest = new Date(today); yest.setUTCDate(yest.getUTCDate() - 1);
+    const tom  = new Date(today); tom.setUTCDate(tom.getUTCDate()  + 1);
+    for (const d of [yest, tom]) {
+      const r = await fetchWithRetry(`${base}?dates=${ymd(d)}`);
+      if (r.ok) collect(await r.json());
+    }
+  } else {
     const lo = new Date(today); lo.setUTCDate(lo.getUTCDate() - 3);
     const hi = new Date(today); hi.setUTCDate(hi.getUTCDate() + 28);
     const cal: string[] = ((seed?.leagues?.[0]?.calendar ?? []) as unknown[]).map((c) => String(c).slice(0, 10))
