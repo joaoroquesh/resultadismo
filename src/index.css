@@ -363,3 +363,18 @@
   --retro-board-dim: oklch(0.52 0.02 230);
   --retro-board-ring: oklch(0.7 0.14 92);
 }
+
+/* ===== Manager (mini-jogo): placar escuro do jogo + "pop" do gol. Token de board
+   próprio (claro/dark levemente distintos); o kill-switch global de reduced-motion
+   zera o pop. Rota oculta /manager. ===== */
+:root {
+  --color-board: oklch(0.2 0.025 232);
+}
+[data-theme="dark"] {
+  --color-board: oklch(0.13 0.02 236);
+}
+@keyframes managerPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.5); color: #fff; }
+  100% { transform: scale(1); }
+}

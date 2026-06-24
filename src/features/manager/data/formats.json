@@ -1,0 +1,724 @@
+[
+{
+"year": 1930,
+"host": "Uruguai",
+"teams": 13,
+"champion_real": "Uruguai",
+"stages": [
+{
+"type": "groups",
+"groups": 4,
+"sizes": [
+4,
+3,
+3,
+3
+],
+"advance": 1,
+"best_thirds": 0
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "final"
+}
+],
+"notes": "Grupo 1 com 4 times (Argentina, Chile, Franca, Mexico); demais com 3. So o 1o de cada grupo avanca para as semifinais. Sem disputa oficial de 3o lugar."
+},
+{
+"year": 1934,
+"host": "Italia",
+"teams": 16,
+"champion_real": "Italia",
+"stages": [
+{
+"type": "knockout",
+"round": "R16"
+},
+{
+"type": "knockout",
+"round": "QF"
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "Mata-mata direto desde os oitavos (16 times). Empates iam a replay/prorrogacao. Teve disputa de 3o lugar."
+},
+{
+"year": 1938,
+"host": "Franca",
+"teams": 15,
+"champion_real": "Italia",
+"stages": [
+{
+"type": "knockout",
+"round": "R16"
+},
+{
+"type": "knockout",
+"round": "QF"
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "15 times apos desistencia da Austria (Anschluss). Suecia avancou por W.O. na R16; Cuba avancou apos replay. Ultima Copa de mata-mata puro. Teve disputa de 3o lugar."
+},
+{
+"year": 1950,
+"host": "Brasil",
+"teams": 13,
+"champion_real": "Uruguai",
+"stages": [
+{
+"type": "groups",
+"groups": 4,
+"sizes": [
+4,
+4,
+3,
+2
+],
+"advance": 1,
+"best_thirds": 0
+},
+{
+"type": "final_group"
+}
+],
+"notes": "13 times (3 desistencias). Grupos irregulares: G1=4, G2=4, G3=3, G4=2. Vencedores (Brasil, Espanha, Suecia, Uruguai) foram a um quadrangular final em pontos corridos. Unica Copa SEM jogo final."
+},
+{
+"year": 1954,
+"host": "Suica",
+"teams": 16,
+"champion_real": "Alemanha Ocidental",
+"stages": [
+{
+"type": "groups",
+"groups": 4,
+"size": 4,
+"advance": 2,
+"best_thirds": 0
+},
+{
+"type": "knockout",
+"round": "QF"
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "Formato atipico de grupos: 2 cabecas-de-chave e 2 nao-cabecas por grupo, apenas 4 jogos/grupo (cada seed x cada nao-seed), prorrogacao na fase de grupos e playoff para definir o 2o em caso de empate. Top 2 -> quartas."
+},
+{
+"year": 1958,
+"host": "Suecia",
+"teams": 16,
+"champion_real": "Brasil",
+"stages": [
+{
+"type": "groups",
+"groups": 4,
+"size": 4,
+"advance": 2,
+"best_thirds": 0
+},
+{
+"type": "knockout",
+"round": "QF"
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "4 grupos de 4, round-robin completo, top 2 -> quartas -> semis -> final + 3o lugar."
+},
+{
+"year": 1962,
+"host": "Chile",
+"teams": 16,
+"champion_real": "Brasil",
+"stages": [
+{
+"type": "groups",
+"groups": 4,
+"size": 4,
+"advance": 2,
+"best_thirds": 0
+},
+{
+"type": "knockout",
+"round": "QF"
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "4 grupos de 4, top 2 -> quartas -> semis -> final + 3o lugar."
+},
+{
+"year": 1966,
+"host": "Inglaterra",
+"teams": 16,
+"champion_real": "Inglaterra",
+"stages": [
+{
+"type": "groups",
+"groups": 4,
+"size": 4,
+"advance": 2,
+"best_thirds": 0
+},
+{
+"type": "knockout",
+"round": "QF"
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "4 grupos de 4, top 2 -> quartas -> semis -> final + 3o lugar."
+},
+{
+"year": 1970,
+"host": "Mexico",
+"teams": 16,
+"champion_real": "Brasil",
+"stages": [
+{
+"type": "groups",
+"groups": 4,
+"size": 4,
+"advance": 2,
+"best_thirds": 0
+},
+{
+"type": "knockout",
+"round": "QF"
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "4 grupos de 4, top 2 -> quartas -> semis -> final + 3o lugar. Primeira com cartoes e substituicoes."
+},
+{
+"year": 1974,
+"host": "Alemanha Ocidental",
+"teams": 16,
+"champion_real": "Alemanha Ocidental",
+"stages": [
+{
+"type": "groups",
+"groups": 4,
+"size": 4,
+"advance": 2,
+"best_thirds": 0
+},
+{
+"type": "second_groups",
+"groups": 2,
+"size": 4,
+"advance": 1
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "Top 2 dos 4 grupos formam 2 segundos-grupos de 4. Vencedor de cada segundo-grupo vai a FINAL; os vices de cada segundo-grupo disputam o 3o lugar. Sem semifinais classicas."
+},
+{
+"year": 1978,
+"host": "Argentina",
+"teams": 16,
+"champion_real": "Argentina",
+"stages": [
+{
+"type": "groups",
+"groups": 4,
+"size": 4,
+"advance": 2,
+"best_thirds": 0
+},
+{
+"type": "second_groups",
+"groups": 2,
+"size": 4,
+"advance": 1
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "Mesmo formato de 1974: top 2 -> 2 segundos-grupos de 4 -> vencedores a FINAL, vices ao 3o lugar. Ultima edicao com este formato."
+},
+{
+"year": 1982,
+"host": "Espanha",
+"teams": 24,
+"champion_real": "Italia",
+"stages": [
+{
+"type": "groups",
+"groups": 6,
+"size": 4,
+"advance": 2,
+"best_thirds": 0
+},
+{
+"type": "second_groups",
+"groups": 4,
+"size": 3,
+"advance": 1
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "Primeira com 24 times. 6 grupos de 4, top 2 (12 times) -> 4 segundos-grupos de 3. Vencedor de cada segundo-grupo (4 times) -> semifinais -> final + 3o lugar. Ultima Copa com duas fases de grupos."
+},
+{
+"year": 1986,
+"host": "Mexico",
+"teams": 24,
+"champion_real": "Argentina",
+"stages": [
+{
+"type": "groups",
+"groups": 6,
+"size": 4,
+"advance": 2,
+"best_thirds": 4
+},
+{
+"type": "knockout",
+"round": "R16"
+},
+{
+"type": "knockout",
+"round": "QF"
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "24 times, 6 grupos de 4. Avancam top 2 de cada (12) + 4 melhores terceiros = 16 -> oitavos. Primeira a usar oitavos de final (R16) e melhores terceiros."
+},
+{
+"year": 1990,
+"host": "Italia",
+"teams": 24,
+"champion_real": "Alemanha Ocidental",
+"stages": [
+{
+"type": "groups",
+"groups": 6,
+"size": 4,
+"advance": 2,
+"best_thirds": 4
+},
+{
+"type": "knockout",
+"round": "R16"
+},
+{
+"type": "knockout",
+"round": "QF"
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "Identica a 1986: 6 grupos de 4, top 2 + 4 melhores terceiros -> R16 -> QF -> SF -> final + 3o lugar."
+},
+{
+"year": 1994,
+"host": "Estados Unidos",
+"teams": 24,
+"champion_real": "Brasil",
+"stages": [
+{
+"type": "groups",
+"groups": 6,
+"size": 4,
+"advance": 2,
+"best_thirds": 4
+},
+{
+"type": "knockout",
+"round": "R16"
+},
+{
+"type": "knockout",
+"round": "QF"
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "Mesmo formato de 1986/1990 (top 2 + 4 melhores terceiros). Diferenca: vitoria passou a valer 3 pontos. Ultima Copa com 24 times."
+},
+{
+"year": 1998,
+"host": "Franca",
+"teams": 32,
+"champion_real": "Franca",
+"stages": [
+{
+"type": "groups",
+"groups": 8,
+"size": 4,
+"advance": 2,
+"best_thirds": 0
+},
+{
+"type": "knockout",
+"round": "R16"
+},
+{
+"type": "knockout",
+"round": "QF"
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "Primeira com 32 times. 8 grupos de 4, top 2 -> oitavos -> quartas -> semis -> final + 3o lugar. Formato classico moderno."
+},
+{
+"year": 2002,
+"host": "Coreia do Sul e Japao",
+"teams": 32,
+"champion_real": "Brasil",
+"stages": [
+{
+"type": "groups",
+"groups": 8,
+"size": 4,
+"advance": 2,
+"best_thirds": 0
+},
+{
+"type": "knockout",
+"round": "R16"
+},
+{
+"type": "knockout",
+"round": "QF"
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "8 grupos de 4, top 2 -> R16 -> QF -> SF -> final + 3o lugar. Primeira sediada na Asia e por dois paises."
+},
+{
+"year": 2006,
+"host": "Alemanha",
+"teams": 32,
+"champion_real": "Italia",
+"stages": [
+{
+"type": "groups",
+"groups": 8,
+"size": 4,
+"advance": 2,
+"best_thirds": 0
+},
+{
+"type": "knockout",
+"round": "R16"
+},
+{
+"type": "knockout",
+"round": "QF"
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "8 grupos de 4, top 2 -> R16 -> QF -> SF -> final + 3o lugar."
+},
+{
+"year": 2010,
+"host": "Africa do Sul",
+"teams": 32,
+"champion_real": "Espanha",
+"stages": [
+{
+"type": "groups",
+"groups": 8,
+"size": 4,
+"advance": 2,
+"best_thirds": 0
+},
+{
+"type": "knockout",
+"round": "R16"
+},
+{
+"type": "knockout",
+"round": "QF"
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "8 grupos de 4, top 2 -> R16 -> QF -> SF -> final + 3o lugar. Primeira na Africa."
+},
+{
+"year": 2014,
+"host": "Brasil",
+"teams": 32,
+"champion_real": "Alemanha",
+"stages": [
+{
+"type": "groups",
+"groups": 8,
+"size": 4,
+"advance": 2,
+"best_thirds": 0
+},
+{
+"type": "knockout",
+"round": "R16"
+},
+{
+"type": "knockout",
+"round": "QF"
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "8 grupos de 4, top 2 -> R16 -> QF -> SF -> final + 3o lugar."
+},
+{
+"year": 2018,
+"host": "Russia",
+"teams": 32,
+"champion_real": "Franca",
+"stages": [
+{
+"type": "groups",
+"groups": 8,
+"size": 4,
+"advance": 2,
+"best_thirds": 0
+},
+{
+"type": "knockout",
+"round": "R16"
+},
+{
+"type": "knockout",
+"round": "QF"
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "8 grupos de 4, top 2 -> R16 -> QF -> SF -> final + 3o lugar. Primeira com VAR."
+},
+{
+"year": 2022,
+"host": "Catar",
+"teams": 32,
+"champion_real": "Argentina",
+"stages": [
+{
+"type": "groups",
+"groups": 8,
+"size": 4,
+"advance": 2,
+"best_thirds": 0
+},
+{
+"type": "knockout",
+"round": "R16"
+},
+{
+"type": "knockout",
+"round": "QF"
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "Ultima edicao com 32 times. 8 grupos de 4, top 2 -> R16 -> QF -> SF -> final + 3o lugar."
+},
+{
+"year": 2026,
+"host": "Canada, Mexico e Estados Unidos",
+"teams": 48,
+"champion_real": null,
+"stages": [
+{
+"type": "groups",
+"groups": 12,
+"size": 4,
+"advance": 2,
+"best_thirds": 8
+},
+{
+"type": "knockout",
+"round": "R32"
+},
+{
+"type": "knockout",
+"round": "R16"
+},
+{
+"type": "knockout",
+"round": "QF"
+},
+{
+"type": "knockout",
+"round": "SF"
+},
+{
+"type": "third_place"
+},
+{
+"type": "final"
+}
+],
+"notes": "Primeira com 48 times. 12 grupos de 4, avancam top 2 (24) + 8 melhores terceiros = 32 -> R32 (32avos) -> R16 -> QF -> SF -> final + 3o lugar. champion_real null (edicao futura)."
+}
+]

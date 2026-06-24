@@ -1,0 +1,1548 @@
+[
+{
+"year": 1930,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo 1",
+"teams": [
+"argentina",
+"chile",
+"franca",
+"mexico"
+]
+},
+{
+"name": "Grupo 2",
+"teams": [
+"iugoslavia",
+"brasil",
+"bolivia"
+]
+},
+{
+"name": "Grupo 3",
+"teams": [
+"uruguai",
+"romenia",
+"peru"
+]
+},
+{
+"name": "Grupo 4",
+"teams": [
+"estadosunidos",
+"paraguai",
+"belgica"
+]
+}
+],
+"seeding_rules": "Sorteio sem potes formais. As 13 selecoes foram distribuidas em 4 grupos (1 grupo de 4, 3 grupos de 3) sem criterio de forca documentado; Uruguai (anfitriao) e Argentina (vice de 1928) foram mantidos em grupos separados. So o 1o de cada grupo avancava a semifinal.",
+"real_results_note": "Campeao real: Uruguai. Composicao confirmada (Wikipedia). Sem disputa oficial de 3o lugar.",
+"confidence": "high"
+},
+{
+"year": 1934,
+"stage_drawn": "knockout_R16",
+"groups": [
+{
+"name": "Oitavas 1",
+"teams": [
+"italia",
+"estadosunidos"
+]
+},
+{
+"name": "Oitavas 2",
+"teams": [
+"espanha",
+"brasil"
+]
+},
+{
+"name": "Oitavas 3",
+"teams": [
+"austria",
+"franca"
+]
+},
+{
+"name": "Oitavas 4",
+"teams": [
+"hungria",
+"egito"
+]
+},
+{
+"name": "Oitavas 5",
+"teams": [
+"suica",
+"holanda"
+]
+},
+{
+"name": "Oitavas 6",
+"teams": [
+"tchecoslovaquia",
+"romenia"
+]
+},
+{
+"name": "Oitavas 7",
+"teams": [
+"alemanha",
+"belgica"
+]
+},
+{
+"name": "Oitavas 8",
+"teams": [
+"suecia",
+"argentina"
+]
+}
+],
+"seeding_rules": "Mata-mata direto desde os oitavos (16 times). Sorteio com cabecas de chave por regiao/forca para evitar choque precoce entre favoritos europeus; Italia (anfitria) protegida. Empate ia a prorrogacao e, persistindo, replay no dia seguinte.",
+"real_results_note": "Campeao real: Italia. As 8 chaves de oitavas estao confirmadas (Wikipedia). Italia 7x1 EUA, Espanha 3x1 Brasil, Austria 3x2 Franca (pror.), Hungria 4x2 Egito, Suica 3x2 Holanda, Tchecoslovaquia 2x1 Romenia, Alemanha 5x2 Belgica, Suecia 3x2 Argentina.",
+"confidence": "high"
+},
+{
+"year": 1938,
+"stage_drawn": "knockout_R16",
+"groups": [
+{
+"name": "Oitavas 1",
+"teams": [
+"suica",
+"alemanha"
+]
+},
+{
+"name": "Oitavas 2",
+"teams": [
+"cuba",
+"romenia"
+]
+},
+{
+"name": "Oitavas 3",
+"teams": [
+"hungria",
+"indiasorientais"
+]
+},
+{
+"name": "Oitavas 4",
+"teams": [
+"franca",
+"belgica"
+]
+},
+{
+"name": "Oitavas 5",
+"teams": [
+"tchecoslovaquia",
+"holanda"
+]
+},
+{
+"name": "Oitavas 6",
+"teams": [
+"brasil",
+"polonia"
+]
+},
+{
+"name": "Oitavas 7",
+"teams": [
+"italia",
+"noruega"
+]
+},
+{
+"name": "Bye (Suecia)",
+"teams": [
+"suecia"
+]
+}
+],
+"seeding_rules": "Ultima Copa de mata-mata puro. Sorteio com cabecas de chave (Italia campea, anfitriao Franca protegidos). Suecia avancou direto as quartas por W.O. apos a desistencia da Austria (Anschluss) — por isso uma chave fica com 1 time so. Empate ia a prorrogacao e replay.",
+"real_results_note": "Campeao real: Italia. So 15 times disputaram: a AUSTRIA desistiu apos o Anschluss e por isso NAO aparece em nenhuma chave (Suecia avancou direto por W.O.). ATENCAO: o _embed-data-v3.json lista 16 selecoes em 1938, INCLUINDO 'austria' — esse e o unico participante do dataset deixado de fora das chaves de propósito, por fidelidade ao bracket real. Chaves confirmadas (Wikipedia): Suica 1x1 Alemanha (replay 4x2 Suica), Cuba 3x3 Romenia (replay 2x1 Cuba), Hungria 6x0 Indias Orientais Holandesas, Franca 3x1 Belgica, Tchecoslovaquia 3x0 Holanda (pror.), Brasil 6x5 Polonia (pror.), Italia 2x1 Noruega (pror.), Suecia bye.",
+"confidence": "high"
+},
+{
+"year": 1950,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo 1",
+"teams": [
+"brasil",
+"iugoslavia",
+"suica",
+"mexico"
+]
+},
+{
+"name": "Grupo 2",
+"teams": [
+"espanha",
+"inglaterra",
+"chile",
+"estadosunidos"
+]
+},
+{
+"name": "Grupo 3",
+"teams": [
+"suecia",
+"italia",
+"paraguai"
+]
+},
+{
+"name": "Grupo 4",
+"teams": [
+"uruguai",
+"bolivia"
+]
+}
+],
+"final_group": {
+"name": "Quadrangular Final",
+"teams": [
+"uruguai",
+"brasil",
+"suecia",
+"espanha"
+]
+},
+"seeding_rules": "Sorteio com cabecas de chave (Brasil anfitriao, Inglaterra, Italia campea, Uruguai). Grupos irregulares por desistencias: India saiu do G3 e Franca/Escocia/Turquia/Portugal/etc. nao compareceram, deixando G1=4, G2=4, G3=3, G4=2. Vencedores dos 4 grupos foram a um quadrangular final em pontos corridos (sem jogo final).",
+"real_results_note": "Campeao real: Uruguai (Maracanazo). Composicao dos grupos confirmada (Wikipedia). Vencedores: Brasil (G1), Espanha (G2), Suecia (G3), Uruguai (G4) -> quadrangular final. Unica Copa sem final em jogo unico.",
+"confidence": "high"
+},
+{
+"year": 1954,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo 1",
+"teams": [
+"brasil",
+"iugoslavia",
+"franca",
+"mexico"
+]
+},
+{
+"name": "Grupo 2",
+"teams": [
+"hungria",
+"alemanhaocidental",
+"turquia",
+"coreiadosul"
+]
+},
+{
+"name": "Grupo 3",
+"teams": [
+"uruguai",
+"austria",
+"tchecoslovaquia",
+"escocia"
+]
+},
+{
+"name": "Grupo 4",
+"teams": [
+"inglaterra",
+"italia",
+"suica",
+"belgica"
+]
+}
+],
+"seeding_rules": "Formato atipico: 2 cabecas-de-chave e 2 nao-cabecas por grupo de 4, mas cada cabeca SO enfrentava as 2 nao-cabecas (4 jogos por grupo, nao 6). Cabecas de chave: Brasil/Franca (G1), Hungria/Turquia (G2 — Turquia herdou a vaga de cabeca da Espanha eliminada), Uruguai/Austria (G3), Inglaterra/Italia (G4). Prorrogacao na fase de grupos; playoff desempatava o 2o lugar. Top 2 -> quartas.",
+"real_results_note": "Campeao real: Alemanha Ocidental (Milagre de Berna). Composicao e cabecas de chave confirmadas (Wikipedia).",
+"confidence": "high"
+},
+{
+"year": 1958,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo 1",
+"teams": [
+"alemanhaocidental",
+"irlandadonorte",
+"tchecoslovaquia",
+"argentina"
+]
+},
+{
+"name": "Grupo 2",
+"teams": [
+"franca",
+"iugoslavia",
+"paraguai",
+"escocia"
+]
+},
+{
+"name": "Grupo 3",
+"teams": [
+"suecia",
+"paisdegales",
+"hungria",
+"mexico"
+]
+},
+{
+"name": "Grupo 4",
+"teams": [
+"brasil",
+"inglaterra",
+"urss",
+"austria"
+]
+}
+],
+"seeding_rules": "Sorteio geografico em 4 potes: cada grupo recebeu 1 selecao da Europa Ocidental, 1 do Leste Europeu, 1 das Ilhas Britanicas e 1 das Americas, evitando choque continental precoce. Round-robin completo; top 2 -> quartas (playoff desempatava o 2o).",
+"real_results_note": "Campeao real: Brasil (1o titulo, Pele/Garrincha). Composicao confirmada (Wikipedia).",
+"confidence": "high"
+},
+{
+"year": 1962,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo 1",
+"teams": [
+"uruguai",
+"urss",
+"iugoslavia",
+"colombia"
+]
+},
+{
+"name": "Grupo 2",
+"teams": [
+"alemanhaocidental",
+"italia",
+"suica",
+"chile"
+]
+},
+{
+"name": "Grupo 3",
+"teams": [
+"brasil",
+"tchecoslovaquia",
+"mexico",
+"espanha"
+]
+},
+{
+"name": "Grupo 4",
+"teams": [
+"inglaterra",
+"hungria",
+"argentina",
+"bulgaria"
+]
+}
+],
+"seeding_rules": "Cabecas de chave: Uruguai, Alemanha Ocidental, Brasil (campeao) e Inglaterra — distribuidos um por grupo. Chile (anfitriao) ficou no Grupo 2. Round-robin completo; top 2 -> quartas.",
+"real_results_note": "Campeao real: Brasil (bicampeao). Composicao confirmada (Wikipedia).",
+"confidence": "high"
+},
+{
+"year": 1966,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo 1",
+"teams": [
+"inglaterra",
+"uruguai",
+"mexico",
+"franca"
+]
+},
+{
+"name": "Grupo 2",
+"teams": [
+"alemanhaocidental",
+"argentina",
+"espanha",
+"suica"
+]
+},
+{
+"name": "Grupo 3",
+"teams": [
+"brasil",
+"portugal",
+"hungria",
+"bulgaria"
+]
+},
+{
+"name": "Grupo 4",
+"teams": [
+"urss",
+"italia",
+"chile",
+"coreiadonorte"
+]
+}
+],
+"seeding_rules": "4 cabecas de chave sorteadas em potes: Inglaterra (anfitria), Alemanha Ocidental, Brasil (campeao) e a URSS encabecaram os 4 grupos. Round-robin completo; top 2 -> quartas.",
+"real_results_note": "Campeao real: Inglaterra (em casa). Composicao confirmada (Wikipedia). Coreia do Norte fez a zebra eliminando a Italia.",
+"confidence": "high"
+},
+{
+"year": 1970,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo 1",
+"teams": [
+"mexico",
+"urss",
+"belgica",
+"elsalvador"
+]
+},
+{
+"name": "Grupo 2",
+"teams": [
+"italia",
+"uruguai",
+"suecia",
+"israel"
+]
+},
+{
+"name": "Grupo 3",
+"teams": [
+"brasil",
+"inglaterra",
+"romenia",
+"tchecoslovaquia"
+]
+},
+{
+"name": "Grupo 4",
+"teams": [
+"alemanhaocidental",
+"peru",
+"bulgaria",
+"marrocos"
+]
+}
+],
+"seeding_rules": "Cabecas de chave: Mexico (anfitriao), Italia, Brasil (campeao) e Inglaterra (campea de 1966) — um por grupo. Demais distribuidos por potes regionais. Round-robin completo; top 2 -> quartas.",
+"real_results_note": "Campeao real: Brasil (tri, Mexico 70). Composicao confirmada (Wikipedia). Grupo 3 (Brasil x Inglaterra) ficou conhecido como 'grupo da morte'.",
+"confidence": "high"
+},
+{
+"year": 1974,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo 1",
+"teams": [
+"alemanhaocidental",
+"alemanhaoriental",
+"chile",
+"australia"
+]
+},
+{
+"name": "Grupo 2",
+"teams": [
+"iugoslavia",
+"brasil",
+"escocia",
+"zaire"
+]
+},
+{
+"name": "Grupo 3",
+"teams": [
+"holanda",
+"suecia",
+"bulgaria"
+]
+},
+{
+"name": "Grupo 4",
+"teams": [
+"polonia",
+"argentina",
+"italia",
+"haiti"
+]
+}
+],
+"second_groups": [
+{
+"name": "Grupo A (2a fase)",
+"teams": [
+"holanda",
+"brasil",
+"alemanhaoriental",
+"argentina"
+]
+},
+{
+"name": "Grupo B (2a fase)",
+"teams": [
+"alemanhaocidental",
+"polonia",
+"suecia",
+"iugoslavia"
+]
+}
+],
+"seeding_rules": "1a fase: 4 cabecas de chave (Alemanha Ocidental anfitria, Brasil campeao, Uruguai, Italia) distribuidas; demais por potes. Top 2 -> 2 segundos-grupos de 4. Vencedor de cada segundo-grupo ia a FINAL; os vices disputavam o 3o lugar. Sem semifinais classicas.",
+"real_results_note": "Campeao real: Alemanha Ocidental. GAP DE FIDELIDADE: na Copa real de 1974 o Grupo 3 tinha 4 times (Holanda, Suecia, Bulgaria, URUGUAI), mas o _embed-data-v3.json so traz 15 selecoes em 1974 e NAO inclui o Uruguai. Por isso o Grupo 3 aqui ficou com 3 times (Holanda, Suecia, Bulgaria). A 2a fase (Grupos A e B) esta confirmada (Wikipedia): Grupo A = Holanda, Brasil, Alemanha Oriental, Argentina; Grupo B = Alemanha Ocidental, Polonia, Suecia, Iugoslavia. Para fidelidade total ao 1974 real, adicionar 'uruguai' ao dataset de 1974 e recolocar no Grupo 3.",
+"confidence": "high"
+},
+{
+"year": 1978,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo 1",
+"teams": [
+"argentina",
+"italia",
+"franca",
+"hungria"
+]
+},
+{
+"name": "Grupo 2",
+"teams": [
+"alemanhaocidental",
+"polonia",
+"tunisia",
+"mexico"
+]
+},
+{
+"name": "Grupo 3",
+"teams": [
+"austria",
+"brasil",
+"espanha",
+"suecia"
+]
+},
+{
+"name": "Grupo 4",
+"teams": [
+"holanda",
+"peru",
+"escocia",
+"ira"
+]
+}
+],
+"second_groups": [
+{
+"name": "Grupo A (2a fase)",
+"teams": [
+"italia",
+"alemanhaocidental",
+"holanda",
+"austria"
+]
+},
+{
+"name": "Grupo B (2a fase)",
+"teams": [
+"argentina",
+"brasil",
+"polonia",
+"peru"
+]
+}
+],
+"seeding_rules": "Mesmo formato de 1974. 1a fase: cabecas de chave (Argentina anfitria, Alemanha Ocidental campea, Brasil, Italia). Top 2 -> 2 segundos-grupos de 4 -> vencedores a FINAL, vices ao 3o lugar.",
+"real_results_note": "Campeao real: Argentina (em casa). Nota: a Tunisia NAO consta no dataset _embed-data-v3 de 1978? — CONFIRMAR. (Conferido: 'tunisia' esta presente na lista de 1978.) Composicao da 2a fase confirmada (Wikipedia): Grupo B reuniu Argentina e Brasil; Argentina venceu o Peru por 6x0 no jogo decisivo. Ultima edicao com este formato.",
+"confidence": "high"
+},
+{
+"year": 1982,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo 1",
+"teams": [
+"italia",
+"polonia",
+"camaroes",
+"peru"
+]
+},
+{
+"name": "Grupo 2",
+"teams": [
+"alemanhaocidental",
+"austria",
+"argelia",
+"chile"
+]
+},
+{
+"name": "Grupo 3",
+"teams": [
+"argentina",
+"belgica",
+"hungria",
+"elsalvador"
+]
+},
+{
+"name": "Grupo 4",
+"teams": [
+"inglaterra",
+"franca",
+"tchecoslovaquia",
+"kuwait"
+]
+},
+{
+"name": "Grupo 5",
+"teams": [
+"espanha",
+"iugoslavia",
+"irlandadonorte",
+"honduras"
+]
+},
+{
+"name": "Grupo 6",
+"teams": [
+"brasil",
+"urss",
+"escocia",
+"novazelandia"
+]
+}
+],
+"second_groups": [
+{
+"name": "Grupo A (2a fase)",
+"teams": [
+"polonia",
+"urss",
+"belgica"
+]
+},
+{
+"name": "Grupo B (2a fase)",
+"teams": [
+"alemanhaocidental",
+"inglaterra",
+"espanha"
+]
+},
+{
+"name": "Grupo C (2a fase)",
+"teams": [
+"italia",
+"brasil",
+"argentina"
+]
+},
+{
+"name": "Grupo D (2a fase)",
+"teams": [
+"franca",
+"austria",
+"irlandadonorte"
+]
+}
+],
+"seeding_rules": "1a fase: 6 cabecas de chave (Italia, Alemanha Ocidental, Argentina campea, Inglaterra, Espanha anfitria, Brasil) — uma por grupo. Top 2 (12 times) -> 4 segundos-grupos de 3 (composicao definida antes do torneio: G-A espelha G-C, G-B espelha G-D). Vencedor de cada segundo-grupo -> semifinais. Ultima Copa com duas fases de grupos.",
+"real_results_note": "Campeao real: Italia. Composicao da 1a e 2a fases confirmada (Wikipedia). Grupo C da 2a fase (Italia, Brasil, Argentina) foi o 'grupo da morte' classico — Italia 3x2 Brasil.",
+"confidence": "high"
+},
+{
+"year": 1986,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo A",
+"teams": [
+"argentina",
+"italia",
+"bulgaria",
+"coreiadosul"
+]
+},
+{
+"name": "Grupo B",
+"teams": [
+"mexico",
+"paraguai",
+"belgica",
+"iraque"
+]
+},
+{
+"name": "Grupo C",
+"teams": [
+"franca",
+"urss",
+"hungria",
+"canada"
+]
+},
+{
+"name": "Grupo D",
+"teams": [
+"brasil",
+"espanha",
+"irlandadonorte",
+"argelia"
+]
+},
+{
+"name": "Grupo E",
+"teams": [
+"alemanhaocidental",
+"uruguai",
+"escocia",
+"dinamarca"
+]
+},
+{
+"name": "Grupo F",
+"teams": [
+"polonia",
+"marrocos",
+"portugal",
+"inglaterra"
+]
+}
+],
+"seeding_rules": "6 cabecas de chave sorteadas em potes (Mexico anfitriao, Argentina, Italia campea, Brasil, Alemanha Ocidental, mais um). 24 times, 6 grupos de 4. Avancam top 2 + 4 melhores terceiros = 16 -> oitavos (R16). Primeira a usar oitavos e melhores terceiros.",
+"real_results_note": "Campeao real: Argentina (Maradona). Composicao confirmada (Wikipedia).",
+"confidence": "high"
+},
+{
+"year": 1990,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo A",
+"teams": [
+"italia",
+"austria",
+"estadosunidos",
+"tchecoslovaquia"
+]
+},
+{
+"name": "Grupo B",
+"teams": [
+"argentina",
+"camaroes",
+"urss",
+"romenia"
+]
+},
+{
+"name": "Grupo C",
+"teams": [
+"brasil",
+"suecia",
+"costarica",
+"escocia"
+]
+},
+{
+"name": "Grupo D",
+"teams": [
+"alemanhaocidental",
+"iugoslavia",
+"emiradosarabes",
+"colombia"
+]
+},
+{
+"name": "Grupo E",
+"teams": [
+"belgica",
+"coreiadosul",
+"uruguai",
+"espanha"
+]
+},
+{
+"name": "Grupo F",
+"teams": [
+"inglaterra",
+"irlanda",
+"holanda",
+"egito"
+]
+}
+],
+"seeding_rules": "6 cabecas de chave (Italia anfitria, Argentina campea, Brasil, Alemanha Ocidental, Belgica, Inglaterra) — uma por grupo. 24 times. Top 2 + 4 melhores terceiros -> R16. Limite informal de equilibrio continental por pote.",
+"real_results_note": "Campeao real: Alemanha Ocidental. Composicao confirmada (Wikipedia). Camaroes (Grupo B) fez historia batendo a Argentina na abertura.",
+"confidence": "high"
+},
+{
+"year": 1994,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo A",
+"teams": [
+"estadosunidos",
+"suica",
+"colombia",
+"romenia"
+]
+},
+{
+"name": "Grupo B",
+"teams": [
+"brasil",
+"russia",
+"camaroes",
+"suecia"
+]
+},
+{
+"name": "Grupo C",
+"teams": [
+"alemanha",
+"bolivia",
+"espanha",
+"coreiadosul"
+]
+},
+{
+"name": "Grupo D",
+"teams": [
+"argentina",
+"grecia",
+"nigeria",
+"bulgaria"
+]
+},
+{
+"name": "Grupo E",
+"teams": [
+"italia",
+"irlanda",
+"noruega",
+"mexico"
+]
+},
+{
+"name": "Grupo F",
+"teams": [
+"belgica",
+"marrocos",
+"holanda",
+"arabiasaudita"
+]
+}
+],
+"seeding_rules": "6 cabecas de chave (EUA anfitriao, Brasil, Alemanha campea, Argentina, Italia, Belgica). 24 times. Top 2 + 4 melhores terceiros -> R16. Vitoria passou a valer 3 pontos. Ultima Copa com 24 times.",
+"real_results_note": "Campeao real: Brasil (tetra, nos penaltis vs Italia). Composicao confirmada (Wikipedia).",
+"confidence": "high"
+},
+{
+"year": 1998,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo A",
+"teams": [
+"brasil",
+"noruega",
+"marrocos",
+"escocia"
+]
+},
+{
+"name": "Grupo B",
+"teams": [
+"italia",
+"chile",
+"austria",
+"camaroes"
+]
+},
+{
+"name": "Grupo C",
+"teams": [
+"franca",
+"dinamarca",
+"africadosul",
+"arabiasaudita"
+]
+},
+{
+"name": "Grupo D",
+"teams": [
+"espanha",
+"nigeria",
+"paraguai",
+"bulgaria"
+]
+},
+{
+"name": "Grupo E",
+"teams": [
+"holanda",
+"mexico",
+"belgica",
+"coreiadosul"
+]
+},
+{
+"name": "Grupo F",
+"teams": [
+"alemanha",
+"iugoslavia",
+"ira",
+"estadosunidos"
+]
+},
+{
+"name": "Grupo G",
+"teams": [
+"romenia",
+"inglaterra",
+"colombia",
+"tunisia"
+]
+},
+{
+"name": "Grupo H",
+"teams": [
+"argentina",
+"japao",
+"jamaica",
+"croacia"
+]
+}
+],
+"seeding_rules": "Primeira com 32 times. 8 cabecas de chave (Franca anfitria, Brasil campeao, Alemanha, Argentina, Italia, Espanha, Holanda, Romenia) — uma por grupo. Potes regionais com limite de 1 sul-americano e equilibrio continental por grupo. Top 2 -> oitavos.",
+"real_results_note": "Campeao real: Franca (em casa). Composicao confirmada (Wikipedia).",
+"confidence": "high"
+},
+{
+"year": 2002,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo A",
+"teams": [
+"franca",
+"senegal",
+"uruguai",
+"dinamarca"
+]
+},
+{
+"name": "Grupo B",
+"teams": [
+"espanha",
+"eslovenia",
+"paraguai",
+"africadosul"
+]
+},
+{
+"name": "Grupo C",
+"teams": [
+"brasil",
+"turquia",
+"china",
+"costarica"
+]
+},
+{
+"name": "Grupo D",
+"teams": [
+"coreiadosul",
+"polonia",
+"estadosunidos",
+"portugal"
+]
+},
+{
+"name": "Grupo E",
+"teams": [
+"alemanha",
+"arabiasaudita",
+"irlanda",
+"camaroes"
+]
+},
+{
+"name": "Grupo F",
+"teams": [
+"argentina",
+"nigeria",
+"inglaterra",
+"suecia"
+]
+},
+{
+"name": "Grupo G",
+"teams": [
+"italia",
+"equador",
+"croacia",
+"mexico"
+]
+},
+{
+"name": "Grupo H",
+"teams": [
+"japao",
+"belgica",
+"russia",
+"tunisia"
+]
+}
+],
+"seeding_rules": "8 cabecas de chave (Franca campea, Brasil, Argentina, Alemanha, Italia, Espanha, mais os co-anfitrioes Coreia do Sul e Japao, que foram cabecas dos Grupos D e H). Potes geograficos com limite continental por grupo. Top 2 -> R16. Primeira na Asia e com dois paises-sede.",
+"real_results_note": "Campeao real: Brasil (penta). Composicao confirmada (Wikipedia). Grupo F (Argentina, Inglaterra, Suecia, Nigeria) foi o 'grupo da morte'. Franca (campea) caiu na 1a fase.",
+"confidence": "high"
+},
+{
+"year": 2006,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo A",
+"teams": [
+"alemanha",
+"costarica",
+"polonia",
+"equador"
+]
+},
+{
+"name": "Grupo B",
+"teams": [
+"inglaterra",
+"paraguai",
+"trinidadetobago",
+"suecia"
+]
+},
+{
+"name": "Grupo C",
+"teams": [
+"argentina",
+"costadomarfim",
+"serviaemontenegro",
+"holanda"
+]
+},
+{
+"name": "Grupo D",
+"teams": [
+"mexico",
+"ira",
+"angola",
+"portugal"
+]
+},
+{
+"name": "Grupo E",
+"teams": [
+"italia",
+"gana",
+"estadosunidos",
+"republicatcheca"
+]
+},
+{
+"name": "Grupo F",
+"teams": [
+"brasil",
+"croacia",
+"australia",
+"japao"
+]
+},
+{
+"name": "Grupo G",
+"teams": [
+"franca",
+"suica",
+"coreiadosul",
+"togo"
+]
+},
+{
+"name": "Grupo H",
+"teams": [
+"espanha",
+"ucrania",
+"tunisia",
+"arabiasaudita"
+]
+}
+],
+"seeding_rules": "8 cabecas de chave (Alemanha anfitria, Brasil campeao, mais 6 por ranking FIFA: Argentina, Italia, Franca, Espanha, Inglaterra, Mexico). Potes geograficos: nao mais de 2 europeus por grupo e nao mais de 1 de cada outra confederacao. Top 2 -> R16.",
+"real_results_note": "Campeao real: Italia (penaltis vs Franca). Composicao confirmada (Wikipedia). 'republicatcheca' = Tchequia no dataset; 'serviaemontenegro' = Servia e Montenegro (ultima Copa como pais unico).",
+"confidence": "high"
+},
+{
+"year": 2010,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo A",
+"teams": [
+"africadosul",
+"mexico",
+"uruguai",
+"franca"
+]
+},
+{
+"name": "Grupo B",
+"teams": [
+"argentina",
+"nigeria",
+"coreiadosul",
+"grecia"
+]
+},
+{
+"name": "Grupo C",
+"teams": [
+"inglaterra",
+"estadosunidos",
+"argelia",
+"eslovenia"
+]
+},
+{
+"name": "Grupo D",
+"teams": [
+"alemanha",
+"australia",
+"servia",
+"gana"
+]
+},
+{
+"name": "Grupo E",
+"teams": [
+"holanda",
+"dinamarca",
+"japao",
+"camaroes"
+]
+},
+{
+"name": "Grupo F",
+"teams": [
+"italia",
+"paraguai",
+"novazelandia",
+"eslovaquia"
+]
+},
+{
+"name": "Grupo G",
+"teams": [
+"brasil",
+"coreiadonorte",
+"costadomarfim",
+"portugal"
+]
+},
+{
+"name": "Grupo H",
+"teams": [
+"espanha",
+"suica",
+"honduras",
+"chile"
+]
+}
+],
+"seeding_rules": "8 cabecas de chave (Africa do Sul anfitria + 7 por ranking FIFA out/2009: Brasil, Espanha, Holanda, Italia campea, Alemanha, Argentina, Inglaterra). Potes geograficos: maximo 2 europeus por grupo, maximo 1 das demais confederacoes. Top 2 -> R16.",
+"real_results_note": "Campeao real: Espanha (1o titulo). Composicao confirmada (Wikipedia). Grupo G (Brasil, Portugal, Costa do Marfim) foi o 'grupo da morte'.",
+"confidence": "high"
+},
+{
+"year": 2014,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo A",
+"teams": [
+"brasil",
+"croacia",
+"mexico",
+"camaroes"
+]
+},
+{
+"name": "Grupo B",
+"teams": [
+"espanha",
+"holanda",
+"chile",
+"australia"
+]
+},
+{
+"name": "Grupo C",
+"teams": [
+"colombia",
+"grecia",
+"costadomarfim",
+"japao"
+]
+},
+{
+"name": "Grupo D",
+"teams": [
+"uruguai",
+"costarica",
+"inglaterra",
+"italia"
+]
+},
+{
+"name": "Grupo E",
+"teams": [
+"suica",
+"equador",
+"franca",
+"honduras"
+]
+},
+{
+"name": "Grupo F",
+"teams": [
+"argentina",
+"bosniaeherzegovina",
+"ira",
+"nigeria"
+]
+},
+{
+"name": "Grupo G",
+"teams": [
+"alemanha",
+"portugal",
+"gana",
+"estadosunidos"
+]
+},
+{
+"name": "Grupo H",
+"teams": [
+"belgica",
+"argelia",
+"russia",
+"coreiadosul"
+]
+}
+],
+"seeding_rules": "8 cabecas de chave (Brasil anfitriao + 7 por ranking FIFA out/2013: Argentina, Alemanha, Espanha campea, Colombia, Uruguai, Belgica, Suica). Potes geograficos: maximo 2 europeus por grupo (excecao tecnica pelo numero de europeus), maximo 1 das demais. Top 2 -> R16.",
+"real_results_note": "Campeao real: Alemanha (7x1 no Brasil na semi). Composicao confirmada (Wikipedia). Grupo D (Uruguai, Italia, Inglaterra) e Grupo G (Alemanha, Portugal, EUA, Gana) foram 'grupos da morte'.",
+"confidence": "high"
+},
+{
+"year": 2018,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo A",
+"teams": [
+"russia",
+"arabiasaudita",
+"egito",
+"uruguai"
+]
+},
+{
+"name": "Grupo B",
+"teams": [
+"portugal",
+"espanha",
+"marrocos",
+"ira"
+]
+},
+{
+"name": "Grupo C",
+"teams": [
+"franca",
+"australia",
+"peru",
+"dinamarca"
+]
+},
+{
+"name": "Grupo D",
+"teams": [
+"argentina",
+"islandia",
+"croacia",
+"nigeria"
+]
+},
+{
+"name": "Grupo E",
+"teams": [
+"brasil",
+"suica",
+"costarica",
+"servia"
+]
+},
+{
+"name": "Grupo F",
+"teams": [
+"alemanha",
+"mexico",
+"suecia",
+"coreiadosul"
+]
+},
+{
+"name": "Grupo G",
+"teams": [
+"belgica",
+"panama",
+"tunisia",
+"inglaterra"
+]
+},
+{
+"name": "Grupo H",
+"teams": [
+"polonia",
+"senegal",
+"colombia",
+"japao"
+]
+}
+],
+"seeding_rules": "Mudanca: potes por ranking FIFA (out/2017), nao mais geograficos para os cabecas. Russia (anfitria) no Pote 1. Restricao: maximo 1 selecao por confederacao por grupo, exceto Europa (maximo 2). Top 2 -> R16. Primeira com VAR.",
+"real_results_note": "Campeao real: Franca. Composicao confirmada (Wikipedia). Alemanha (campea de 2014) caiu na 1a fase no Grupo F.",
+"confidence": "high"
+},
+{
+"year": 2022,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo A",
+"teams": [
+"catar",
+"equador",
+"senegal",
+"holanda"
+]
+},
+{
+"name": "Grupo B",
+"teams": [
+"inglaterra",
+"ira",
+"estadosunidos",
+"paisdegales"
+]
+},
+{
+"name": "Grupo C",
+"teams": [
+"argentina",
+"arabiasaudita",
+"mexico",
+"polonia"
+]
+},
+{
+"name": "Grupo D",
+"teams": [
+"franca",
+"australia",
+"dinamarca",
+"tunisia"
+]
+},
+{
+"name": "Grupo E",
+"teams": [
+"espanha",
+"costarica",
+"alemanha",
+"japao"
+]
+},
+{
+"name": "Grupo F",
+"teams": [
+"belgica",
+"canada",
+"marrocos",
+"croacia"
+]
+},
+{
+"name": "Grupo G",
+"teams": [
+"brasil",
+"servia",
+"suica",
+"camaroes"
+]
+},
+{
+"name": "Grupo H",
+"teams": [
+"portugal",
+"gana",
+"uruguai",
+"coreiadosul"
+]
+}
+],
+"seeding_rules": "Potes por ranking FIFA (mar/2022); Catar (anfitriao) no Pote 1 e fixado em A1. Restricao: maximo 1 por confederacao por grupo, exceto Europa (maximo 2). Vagas de repescagem (eua... ) sorteadas mesmo sem definicao. Top 2 -> R16. Ultima Copa com 32 times.",
+"real_results_note": "Campeao real: Argentina (penaltis vs Franca). Composicao confirmada (Wikipedia). Grupo E (Espanha, Alemanha, Japao) e Grupo H (Portugal, Uruguai, Gana, Coreia do Sul) foram 'grupos da morte'. Marrocos foi 4o lugar (1o africano em semi).",
+"confidence": "high"
+},
+{
+"year": 2026,
+"stage_drawn": "groups",
+"groups": [
+{
+"name": "Grupo A",
+"teams": [
+"mexico2026",
+"uzbequistao2026",
+"jordania2026",
+"haiti2026"
+]
+},
+{
+"name": "Grupo B",
+"teams": [
+"canada2026",
+"capeverde2026",
+"curacao2026",
+"TBD_REPESCAGEM"
+]
+},
+{
+"name": "Grupo C",
+"teams": [
+"eua2026",
+"paraguai2026",
+"australia2026",
+"novazelandia2026"
+]
+},
+{
+"name": "Grupo D",
+"teams": [
+"argentina2026",
+"noruega2026",
+"panama2026",
+"tunisia2026"
+]
+},
+{
+"name": "Grupo E",
+"teams": [
+"franca2026",
+"senegal2026",
+"egito2026",
+"arabiasaudita2026"
+]
+},
+{
+"name": "Grupo F",
+"teams": [
+"espanha2026",
+"colombia2026",
+"iran2026",
+"gana2026"
+]
+},
+{
+"name": "Grupo G",
+"teams": [
+"portugal2026",
+"uruguai2026",
+"costadomarfim2026",
+"coreiadosul2026"
+]
+},
+{
+"name": "Grupo H",
+"teams": [
+"inglaterra2026",
+"croacia2026",
+"argelia2026",
+"catar2026"
+]
+},
+{
+"name": "Grupo I",
+"teams": [
+"brasil2026",
+"belgica2026",
+"nigeria2026",
+"polonia2026"
+]
+},
+{
+"name": "Grupo J",
+"teams": [
+"holanda2026",
+"japao2026",
+"turquia2026",
+"escocia2026"
+]
+},
+{
+"name": "Grupo K",
+"teams": [
+"alemanha2026",
+"equador2026",
+"austria2026",
+"servia2026"
+]
+},
+{
+"name": "Grupo L",
+"teams": [
+"italia2026",
+"marrocos2026",
+"suica2026",
+"dinamarca2026"
+]
+}
+],
+"seeding_rules": "Primeira com 48 times: 12 grupos de 4. Potes por ranking FIFA; os tres anfitrioes (EUA, Mexico, Canada) cabecas fixos (A1=Mexico, B1=Canada, C1=EUA, conforme regulamento divulgado pela FIFA). Restricao continental: maximo 1 por confederacao por grupo, exceto UEFA (maximo 2). Avancam top 2 (24) + 8 melhores terceiros = 32 -> R32.",
+"real_results_note": "PROVISIONAL. O sorteio oficial da Copa 2026 ainda nao foi realizado (ocorre apos a conclusao das repescagens). A composicao acima e uma MONTAGEM PLAUSIVEL respeitando potes/ranking FIFA, anfitrioes fixos (Mexico A1, Canada B1, EUA C1) e o limite continental — NAO e o sorteio real (que nao existe ainda). O dataset _embed-data-v3 traz 47 selecoes; a 48a vaga (repescagem intercontinental) ainda esta indefinida, entao o Grupo B termina com o placeholder 'TBD_REPESCAGEM' (unico slot nao-real do arquivo inteiro). Cada uma das 47 selecoes reais aparece EXATAMENTE UMA VEZ. AJUSTAR esta edicao por completo quando a FIFA divulgar os grupos oficiais e quando a 48a selecao for definida.",
+"confidence": "provisional"
+}
+]

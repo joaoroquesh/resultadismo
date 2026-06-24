@@ -35,6 +35,9 @@ const RetroRulesPage = lazy(() => import("@/features/retro/RetroRulesPage").then
 const RetroAdminPage = lazy(() => import("@/features/retro/RetroAdminPage").then((m) => ({ default: m.RetroAdminPage })));
 const EstudosAdminPage = lazy(() => import("@/features/estudos/EstudosAdminPage").then((m) => ({ default: m.EstudosAdminPage })));
 const EstudoViewerPage = lazy(() => import("@/features/estudos/EstudoViewerPage").then((m) => ({ default: m.EstudoViewerPage })));
+// mini-jogo Manager: rota OCULTA (/manager), casca própria, sem link em lugar nenhum
+const ManagerShell = lazy(() => import("@/features/manager/ManagerShell").then((m) => ({ default: m.ManagerShell })));
+const ManagerPage = lazy(() => import("@/features/manager/ManagerPage").then((m) => ({ default: m.ManagerPage })));
 
 // Redireciona links antigos /ligas/:slug para /grupos/:slug (rename Liga -> Grupo)
 function FederacaoSlugRedirect() {
@@ -80,6 +83,13 @@ export default function App() {
             <Route element={<RequireAuth />}>
               <Route path="/retro/feedback" element={<FeedbackPage product="retro" />} />
             </Route>
+          </Route>
+
+          {/* mini-jogo Manager: ROTA OCULTA — só acessível digitando /manager.
+              Casca própria (sem Sidebar/BottomNav/header/PresenceTracker), client-side
+              puro. NÃO linkado em Sidebar/BottomNav/landing/Perfil/Retrô. */}
+          <Route element={<ManagerShell />}>
+            <Route path="/manager" element={<ManagerPage />} />
           </Route>
 
           <Route element={<AppShell />}>
