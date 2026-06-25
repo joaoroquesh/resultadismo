@@ -116,14 +116,11 @@ function RoundColumn({
           </span>
         )}
       </header>
-      {/* mobile: pares lado a lado pra economizar altura (confronto único ocupa a
-          largura toda); desktop: empilhado e centrado verticalmente pra desenhar a
-          árvore. */}
-      <div className="grid grid-cols-2 gap-2 md:flex md:flex-1 md:flex-col md:justify-around md:gap-3">
+      {/* mobile (BUG 1.2d): LISTA VERTICAL — um confronto embaixo do outro, legível em
+          ~480px. desktop: empilhado e centrado verticalmente pra desenhar a árvore. */}
+      <div className="flex flex-col gap-2 md:flex-1 md:justify-around md:gap-3">
         {matches.map((m, i) => (
-          <div key={i} className={matches.length === 1 ? "col-span-2 md:col-span-1" : ""}>
-            <MatchCard match={m} />
-          </div>
+          <MatchCard key={i} match={m} />
         ))}
       </div>
     </section>
@@ -155,12 +152,15 @@ function ChampionBanner({ champion, iAmChampion }: { champion: Team | null; iAmC
 }
 
 // ---- Corpo do bracket (sem wrapper de modal) ----
-export function BracketBody({ view }: { view: BracketView }) {
+// `footnote` opcional explica a fonte dos confrontos conforme o contexto (durante a
+// campanha vs. fim de campanha). As rodadas mostradas são SÓ as já disputadas — fases
+// futuras ficam ocultas até serem jogadas (sem spoiler).
+export function BracketBody({ view, footnote }: { view: BracketView; footnote?: string }) {
   return (
     <div className="flex flex-col gap-3">
       <ChampionBanner champion={view.champion} iAmChampion={view.iAmChampion} />
       {/* desktop: colunas tipo árvore (scroll horizontal se faltar largura).
-          mobile: rodadas empilhadas verticalmente. */}
+          mobile: rodadas empilhadas verticalmente, confrontos em lista vertical. */}
       <div className="flex flex-col gap-4 md:flex-row md:gap-3 md:overflow-x-auto md:pb-1">
         {view.rounds.map((r, i) => (
           <RoundColumn
@@ -174,8 +174,8 @@ export function BracketBody({ view }: { view: BracketView }) {
         ))}
       </div>
       <p className="text-[11px] leading-snug text-ink-500">
-        Os confrontos que você jogou trazem o placar real; os demais são a simulação
-        determinística das seleções da IA até a final.
+        {footnote ??
+          "Os confrontos que você jogou trazem o placar real do seu jogo; os demais são como o mata-mata desta Copa de fato terminou."}
       </p>
     </div>
   );
@@ -245,10 +245,14 @@ export function BracketModal({
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
           {view ? (
-            <BracketBody view={view} />
+            <BracketBody
+              view={view}
+              footnote="Mostrando só as fases já disputadas — as próximas aparecem conforme você as joga. Seus confrontos trazem o placar real do seu jogo."
+            />
           ) : (
             <div className="py-10 text-center text-[13px] text-ink-500">
-              Esta edição não tem fase de mata-mata.
+              O mata-mata ainda não começou. O chaveamento aparece rodada a rodada,
+              conforme as fases eliminatórias são disputadas.
             </div>
           )}
         </div>

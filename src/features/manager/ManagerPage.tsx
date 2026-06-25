@@ -17,6 +17,8 @@ import {
   myNextMatch,
   poolForYear,
   projectBracket,
+  recordFinalRound,
+  recordThirdRound,
   resolveFinalGroupMatch,
   resolveGroupMatch,
   resolveKnockoutMatch,
@@ -287,6 +289,8 @@ export function ManagerPage() {
         ptsLabel: iWin ? "3º lugar" : "4º lugar",
         ko: true,
       });
+      // BUG 1.2: grava o 3º lugar no chaveamento da campanha.
+      recordThirdRound(c, opp, gf, ga, iWin, kr.pens);
       advanceCampaign(c, iWin);
     } else if (kind === "final") {
       const kr = knockoutResult(c.myTeam, opp, gf, ga, matchSeed);
@@ -302,6 +306,8 @@ export function ManagerPage() {
         ptsLabel: iWin ? "CAMPEÃO" : "Vice",
         ko: true,
       });
+      // BUG 1.2: grava a final no chaveamento da campanha (revela o campeão).
+      recordFinalRound(c, opp, gf, ga, iWin, kr.pens);
       advanceCampaign(c, iWin);
     }
     maybeAwardTrophies(c);
@@ -1233,7 +1239,9 @@ function CampaignEnd({
   // mata-mata preenchida — inclusive os cruzamentos/resultados das IAs simulados
   // até a final depois da minha eliminação, revelando o campeão. Só nas edições
   // com mata-mata (projeção não-nula).
-  const bracketView = useMemo(() => projectBracket(camp), [camp]);
+  // fim de campanha: revela a árvore inteira (inclusive a história real além de onde
+  // eu parei) — aqui já acabou, então não é spoiler.
+  const bracketView = useMemo(() => projectBracket(camp, true), [camp]);
 
   function copy() {
     if (navigator.clipboard?.writeText) {

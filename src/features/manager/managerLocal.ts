@@ -16,13 +16,16 @@ const CAMP_KEY = "rd_manager_campaign_v1";
 const TROPHY_KEY = "rd_manager_trophies_v1";
 const SPEED_KEY = "rd_manager_speed_v1";
 
-// ---------- velocidade da transmissão ao vivo (item 2) ----------
-// 1 = ritmo normal, 2 = dobrado. Persistida pra valer na próxima partida.
-export type LiveSpeed = 1 | 2;
+// ---------- velocidade da transmissão ao vivo (item 2 / melhoria 2.6) ----------
+// 1 = ritmo normal (cada tempo dura ~45s reais), 2 = dobro, 4 = quádruplo.
+// Persistida pra valer na próxima partida. "Pular tempo" é uma AÇÃO (não persiste).
+export type LiveSpeed = 1 | 2 | 4;
+const VALID_SPEED = new Set<LiveSpeed>([1, 2, 4]);
 
 export function loadSpeed(): LiveSpeed {
   try {
-    return localStorage.getItem(SPEED_KEY) === "2" ? 2 : 1;
+    const n = Number(localStorage.getItem(SPEED_KEY)) as LiveSpeed;
+    return VALID_SPEED.has(n) ? n : 1;
   } catch {
     return 1;
   }

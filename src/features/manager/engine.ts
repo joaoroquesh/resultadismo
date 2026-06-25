@@ -25,6 +25,10 @@ import type {
   GroupsStageState,
   HistoryEntry,
   KnockoutOutcome,
+  KnockoutRound,
+  KoMatchRecord,
+  KoRoundRecord,
+  KoSlotRecord,
   PenKick,
   PenResult,
   Shootout,
@@ -50,6 +54,7 @@ import type {
 import RATINGS from "./data/ratings.json";
 import FORMATS_JSON from "./data/formats.json";
 import GROUPS_JSON from "./data/groups.json";
+import RESULTS_JSON from "./data/results.json";
 
 // dados estáticos tipados (importados do slice)
 export const DATA = RATINGS as Team[];
@@ -60,6 +65,132 @@ const WC_GROUPS_BY_YEAR: Record<number, WcGroupsEdition> = {};
 WC_GROUPS.forEach((ed) => {
   WC_GROUPS_BY_YEAR[ed.year] = ed;
 });
+
+// =====================================================================
+// BUG 1.1 — HISTÓRIA REAL FIEL: resultados REAIS de cada Copa (data/results.json).
+// Em worldMode==="real", TODO jogo de fundo (IA×IA: grupos, 2ª fase, quadrangular,
+// mata-mata, terceiro lugar, final, e a projeção do chaveamento) puxa o placar REAL
+// daqui. Só os confrontos que EU jogo divergem da história (efeito borboleta).
+// O lookup é por ano + par de slugs {a,b}, casando os DOIS sentidos; quando o mesmo
+// par se repetiu (replays/2ª fase/reencontros), desempata por CLASSE de fase.
+// =====================================================================
+// um jogo real cru, já orientado a (a,b) com gols ga/gb (pa/pb = pênaltis, se houve).
+interface RealMatchRaw {
+  a: string;
+  b: string;
+  ga: number;
+  gb: number;
+  pa?: number;
+  pb?: number;
+  stage: string;
+}
+type RealResults = Record<string, RealMatchRaw[]>;
+const RESULTS = RESULTS_JSON as RealResults;
+
+// resultado REAL já orientado ao par consultado (teamA, teamB): gA/gB do ponto de
+// vista de teamA, mais os pênaltis (se houve) e quem venceu.
+export interface RealResult {
+  gA: number;
+  gB: number;
+  pensA: number | null;
+  pensB: number | null;
+}
+
+// classe grossa de fase (engine ↔ rótulos en de results.json), p/ desempatar pares
+// que se repetem no mesmo ano. null = "não importa" (casa qualquer fase).
+export type StageClass = "group" | "R32" | "R16" | "QF" | "SF" | "final" | "third";
+
+// rótulo en de results.json → classe grossa. ATENÇÃO à ordem: "Semi-finals" e
+// "Quarter-finals" CONTÊM "final" como substring — testá-los ANTES de "final".
+function classifyRealStage(stage: string): StageClass {
+  const s = stage.toLowerCase();
+  if (s.includes("third") || s.includes("for third place")) return "third";
+  if (s.includes("semi")) return "SF";
+  if (s.includes("quarter")) return "QF";
+  if (s.includes("round of 16")) return "R16";
+  // mata-mata puro de 1934/38: preliminar/1ª rodada = oitavas (R16).
+  if (s.includes("preliminary") || s.includes("first round")) return "R16";
+  if (s.includes("final")) return "final"; // "Final" / "Final Round" (1950)
+  // grupos e play-offs de grupo.
+  return "group";
+}
+
+// normaliza um slug de results.json para o slug usado nas notas (ratings.json):
+// remove sufixo de ano (ex.: "eua2026"→"eua") e aplica aliases pontuais.
+const SLUG_ALIAS: Record<string, string> = { eua: "estadosunidos" };
+function normalizeRealSlug(slug: string): string {
+  const base = slug.replace(/\d{4}$/, "");
+  return SLUG_ALIAS[base] || base;
+}
+function pairKeyUnordered(a: string, b: string): string {
+  return a < b ? a + "~" + b : b + "~" + a;
+}
+
+// índice por ano: pairKey → lista de {classe, raw} (preserva a ordem original p/
+// orientar gols). Construído uma vez (módulo), determinístico e barato.
+interface IndexedReal {
+  cls: StageClass;
+  a: string; // slug normalizado do lado "a" original
+  b: string;
+  ga: number;
+  gb: number;
+  pa?: number;
+  pb?: number;
+}
+const REAL_INDEX: Record<number, Record<string, IndexedReal[]>> = {};
+(function buildRealIndex() {
+  Object.keys(RESULTS).forEach((yKey) => {
+    const year = Number(yKey);
+    const byPair: Record<string, IndexedReal[]> = {};
+    RESULTS[yKey].forEach((m) => {
+      const a = normalizeRealSlug(m.a);
+      const b = normalizeRealSlug(m.b);
+      const key = pairKeyUnordered(a, b);
+      (byPair[key] = byPair[key] || []).push({
+        cls: classifyRealStage(m.stage),
+        a,
+        b,
+        ga: m.ga,
+        gb: m.gb,
+        pa: m.pa,
+        pb: m.pb,
+      });
+    });
+    REAL_INDEX[year] = byPair;
+  });
+})();
+
+// devolve o resultado REAL de teamA × teamB nesta edição (orientado a teamA), ou null
+// se a história não tem esse confronto (ex.: par que nunca se enfrentou de verdade —
+// fruto de um sorteio/efeito borboleta divergente). Se `cls` for passado, prioriza a
+// fase certa quando o par se repetiu no ano; senão casa o 1º registro do par.
+export function realResult(
+  year: number,
+  teamA: Team,
+  teamB: Team,
+  cls?: StageClass,
+): RealResult | null {
+  const byPair = REAL_INDEX[year];
+  if (!byPair) return null;
+  const aSlug = normalizeRealSlug(teamA.s);
+  const bSlug = normalizeRealSlug(teamB.s);
+  const recs = byPair[pairKeyUnordered(aSlug, bSlug)];
+  if (!recs || recs.length === 0) return null;
+  // escolhe o registro: classe igual primeiro; senão o 1º do par.
+  let rec = recs[0];
+  if (cls) {
+    const m = recs.find((r) => r.cls === cls);
+    if (m) rec = m;
+  }
+  // orienta os gols pro ponto de vista de teamA (o "a" do registro pode ser teamB).
+  const aIsRecA = rec.a === aSlug;
+  const gA = aIsRecA ? rec.ga : rec.gb;
+  const gB = aIsRecA ? rec.gb : rec.ga;
+  const hasPens = rec.pa != null && rec.pb != null;
+  const pensA = hasPens ? (aIsRecA ? (rec.pa as number) : (rec.pb as number)) : null;
+  const pensB = hasPens ? (aIsRecA ? (rec.pb as number) : (rec.pa as number)) : null;
+  return { gA, gB, pensA, pensB };
+}
 
 // ---------------------------------------------------------------------
 // PRNG + amostragens
@@ -887,22 +1018,37 @@ export function simulateFull(
 // MESMO jogo mostra SEMPRE os mesmos números (importante p/ "copiar resultado").
 // =====================================================================
 export function deriveMatchStats(state: MatchState): MatchStats {
+  // pós-jogo: lê os eventos do MOTOR (partida inteira).
+  return deriveStatsFromEvents(state, state.events);
+}
+
+// MELHORIA 2.2 / BUG 1.3 — estatísticas a partir de uma LISTA EXPLÍCITA de lances
+// (os JÁ REVELADOS na transmissão). Os gols são contados DESTES eventos — não de
+// state.gA/gB — então as stats batem 100% com o placar visível neste instante (ao
+// vivo, no intervalo e no fim). O ritmo de passes escala pela fração do jogo já
+// transcorrida (maior minuto revelado / 90), pra a posse/passes crescerem de forma
+// plausível minuto a minuto. Jitter SEMEADO por state.seed (determinístico, estável).
+export function deriveStatsFromEvents(state: MatchState, events: MatchEvent[]): MatchStats {
   // jitter próprio, semeado pela partida (NÃO consome o state.rnd — não afeta o jogo).
   const rnd = mulberry32((state.seed ^ 0x5f3759df) >>> 0);
   const jit = (base: number, spread: number) => base + (rnd() * 2 - 1) * spread;
 
-  // ---- finalizações e chutes ao gol: a partir dos EVENTOS reais ----
+  // ---- gols contados DOS EVENTOS passados (fonte única com o placar da UI) ----
+  let goalsA = 0, goalsB = 0, maxMin = 0;
+  // ---- finalizações e chutes ao gol: a partir dos EVENTOS passados ----
   let finA = 0, finB = 0, sotA = 0, sotB = 0;
-  state.events.forEach((ev) => {
+  events.forEach((ev) => {
     const isA = ev.ownerSide === "A";
     if (isA) finA++; else finB++;
+    if (ev.goal) { if (isA) goalsA++; else goalsB++; }
+    if (ev.m > maxMin) maxMin = ev.m;
     // no alvo = gol + defesa do goleiro + metade dos "quase" (trave/raspando)
     const onTarget = ev.kind === "goal" || ev.kind === "defesa" || (ev.kind === "quase" && rnd() < 0.5);
     if (onTarget) { if (isA) sotA++; else sotB++; }
   });
   // todo gol é, por definição, chute ao gol (garante coerência narrativa).
-  if (sotA < state.gA) sotA = state.gA;
-  if (sotB < state.gB) sotB = state.gB;
+  if (sotA < goalsA) sotA = goalsA;
+  if (sotB < goalsB) sotB = goalsB;
   // finalizações nunca menores que os chutes ao gol.
   if (finA < sotA) finA = sotA;
   if (finB < sotB) finB = sotB;
@@ -911,17 +1057,19 @@ export function deriveMatchStats(state: MatchState): MatchStats {
   // converte pra uma % "humana" (raramente abaixo de 32 / acima de 68), coerente com
   // quem mandou no jogo. Goleada com posse baixa fica implausível → ancora no placar.
   let possA = 50 + (state.shareA - 0.5) * 64; // ±32 em torno de 50
-  const gd = state.gA - state.gB;
+  const gd = goalsA - goalsB;
   possA += Math.max(-8, Math.min(8, gd * 2.2)); // quem fez mais gol tende a ter tido a bola
   possA = jit(possA, 3);
   possA = Math.max(32, Math.min(68, possA));
   const pA = Math.round(possA);
   const pB = 100 - pA;
 
-  // ---- passes: ~ posse × ritmo do jogo (gameVol). força de meio refina a precisão ----
-  const tempo = 880 * state.gameVol; // total aproximado de passes no jogo
-  const passA = Math.round(jit((tempo * pA) / 100, 30));
-  const passB = Math.round(jit((tempo * pB) / 100, 30));
+  // ---- passes: ~ posse × ritmo × FRAÇÃO do jogo já transcorrida (cresce ao vivo) ----
+  const elapsed = Math.max(0.06, Math.min(1, maxMin / 90));
+  const tempo = 880 * state.gameVol * elapsed; // total aproximado de passes ATÉ AGORA
+  const passSpread = 30 * elapsed;
+  const passA = Math.round(jit((tempo * pA) / 100, passSpread));
+  const passB = Math.round(jit((tempo * pB) / 100, passSpread));
   const accFromMid = (m: number) => Math.max(64, Math.min(91, 64 + (m - 60) * 0.62));
   const accA = Math.round(Math.max(60, Math.min(93, jit(accFromMid(state.teamA.m), 3))));
   const accB = Math.round(Math.max(60, Math.min(93, jit(accFromMid(state.teamB.m), 3))));
@@ -1120,20 +1268,45 @@ export function aiTactic(rnd: () => number, myStrength: number, oppStrength?: nu
   };
 }
 
-// simula uma partida headless (IA x IA). mode 'alt' = uma rodada do motor com toda
-// a variância; mode 'real' = puxa o resultado pra coerência com a FORÇA real.
+// contexto p/ casar o resultado REAL (bug 1.1): ano da edição + classe de fase.
+export interface RealContext {
+  year: number;
+  cls?: StageClass;
+}
+
+// resultado de uma partida de fundo (IA×IA): gols + pênaltis reais (quando vieram da
+// história e o jogo terminou empatado num confronto eliminatório). `real` marca que
+// o placar saiu de results.json, não da simulação.
+export interface SimResult {
+  gA: number;
+  gB: number;
+  pensA: number | null;
+  pensB: number | null;
+  real: boolean;
+}
+
+// simula uma partida headless (IA x IA). mode 'alt' = uma rodada do motor com toda a
+// variância. mode 'real' = se `ctx` (ano+fase) acha o confronto em results.json, usa o
+// placar REAL FIEL (bug 1.1); senão, cai numa simulação enviesada pela FORÇA real (o
+// par não existe na história — efeito borboleta de um sorteio divergente).
 export function simAIvsAI(
   teamA: Team,
   teamB: Team,
   seed: number,
   mode: WorldMode = "real",
-): { gA: number; gB: number } {
-  function one(s: number): { gA: number; gB: number } {
+  ctx?: RealContext,
+): SimResult {
+  // HISTÓRIA REAL: placar fiel da edição (determinístico — vem de um JSON estático).
+  if (mode === "real" && ctx) {
+    const rr = realResult(ctx.year, teamA, teamB, ctx.cls);
+    if (rr) return { gA: rr.gA, gB: rr.gB, pensA: rr.pensA, pensB: rr.pensB, real: true };
+  }
+  function one(s: number): SimResult {
     const r = rngFrom(s);
     const tacA = aiTactic(r, teamA.o, teamB.o);
     const tacB = aiTactic(r, teamB.o, teamA.o);
     const res = simulateFull(teamA, teamB, tacA, tacB, s, defaultAiPolicy);
-    return { gA: res.gA, gB: res.gB };
+    return { gA: res.gA, gB: res.gB, pensA: null, pensB: null, real: false };
   }
   if (mode !== "real") return one(seed);
   const diff = teamA.o - teamB.o;
@@ -1141,7 +1314,7 @@ export function simAIvsAI(
   if (ad < 6) return one(seed); // forças vizinhas: deixa o jogo decidir
   const want = diff > 0 ? "A" : "B";
   const tries = ad >= 14 ? 5 : ad >= 9 ? 4 : 3;
-  let best: { gA: number; gB: number } | null = null;
+  let best: SimResult | null = null;
   for (let k = 0; k < tries; k++) {
     const res = one((seed ^ (k * 2654435761)) >>> 0);
     const w = res.gA > res.gB ? "A" : res.gB > res.gA ? "B" : "E";
@@ -1149,7 +1322,7 @@ export function simAIvsAI(
     if (w === "E" && best === null) best = res;
     if (best === null) best = res;
   }
-  return best as { gA: number; gB: number };
+  return best as SimResult;
 }
 
 // ITEM 10: disputa de pênaltis cobrança a cobrança. DETERMINÍSTICA (semeada por
@@ -1230,15 +1403,23 @@ export function simulatePenalties(teamA: Team, teamB: Team, seed: number): Shoot
 
 // resolve confronto de mata-mata. No empate, a disputa de pênaltis (item 10) decide:
 // o vencedor e a string `pens` saem da MESMA simulação — coerentes por construção.
+// `realPens` (bug 1.1): se a história tem o placar de pênaltis REAL deste confronto,
+// usa-o (vencedor + string), em vez de re-simular — coerência total com a Copa real.
 export function knockoutResult(
   teamA: Team,
   teamB: Team,
   gA: number,
   gB: number,
   seed: number,
+  realPens?: { a: number | null; b: number | null } | null,
 ): KnockoutOutcome {
   if (gA > gB) return { winner: "A", pens: null };
   if (gB > gA) return { winner: "B", pens: null };
+  if (realPens && realPens.a != null && realPens.b != null) {
+    const pa = realPens.a;
+    const pb = realPens.b;
+    return { winner: pa >= pb ? "A" : "B", pens: pa + "×" + pb };
+  }
   const so = simulatePenalties(teamA, teamB, seed);
   return { winner: so.winner, pens: so.pens };
 }
@@ -1459,7 +1640,7 @@ function playGroupPair(camp: Campaign, gIdx: number, i: number, j: number): void
   // nunca apura aqui um jogo MEU — esse passa pelo resolveGroupMatch (placar real).
   if (gIdx === s.myG && (A.s === camp.myKey || B.s === camp.myKey)) return;
   const sd = groupPairSeed(camp, gIdx, i, j);
-  const r = simAIvsAI(A, B, sd, camp.worldMode);
+  const r = simAIvsAI(A, B, sd, camp.worldMode, { year: camp.edition.year, cls: "group" });
   applyResultToStanding(findStanding(s.standings[gIdx], A.s), r.gA, r.gB, camp.threePts);
   applyResultToStanding(findStanding(s.standings[gIdx], B.s), r.gB, r.gA, camp.threePts);
   played.push(key);
@@ -1606,7 +1787,7 @@ export function finishFinalGroup(camp: Campaign): boolean {
       const B = teams[j];
       if (A.s === camp.myKey || B.s === camp.myKey) continue;
       const sd = (camp.seed ^ (A.o * 7919 + B.o * 104729 + i * 17 + j * 31)) >>> 0;
-      const r = simAIvsAI(A, B, sd, camp.worldMode);
+      const r = simAIvsAI(A, B, sd, camp.worldMode, { year: camp.edition.year, cls: "group" });
       applyResultToStanding(findStanding(s.standings, A.s), r.gA, r.gB, camp.threePts);
       applyResultToStanding(findStanding(s.standings, B.s), r.gB, r.gA, camp.threePts);
     }
@@ -1665,12 +1846,6 @@ function initKnockout(camp: Campaign, stage: Stage): void {
   }
   camp.state = { kind: "knockout", stage, pairs, myPair, myOpp, done: false };
   if (myOpp == null) (camp.state as KnockoutStageState).bye = true;
-  // ITEM 17: na PRIMEIRA rodada de mata-mata, congela a ordem do chaveamento (já com
-  // o sorteio do camp.rnd aplicado). projectBracket reconstrói a árvore inteira a
-  // partir daqui — de forma determinística e reproduzível numa campanha recarregada.
-  if (!camp.koBracketOrder) {
-    camp.koBracketOrder = pairs.flatMap((pr) => [pr[0]?.s ?? "", pr[1]?.s ?? ""]);
-  }
 }
 export function resolveKnockoutMatch(
   camp: Campaign,
@@ -1696,28 +1871,99 @@ export function resolveKnockoutMatch(
   s.myResult = { win: iWin, gf, ga, pens: kr.pens };
   return iWin;
 }
+// classe grossa de uma fase eliminatória do engine (p/ casar o resultado real).
+function koStageClass(stage: Stage): StageClass {
+  const r = stage.round;
+  if (r === "R32") return "R32";
+  if (r === "R16") return "R16";
+  if (r === "QF") return "QF";
+  if (r === "SF") return "SF";
+  return "QF";
+}
+// monta um KoSlotRecord (slug + gols) — null-safe p/ bye.
+function koSlot(team: Team | null, score: number | null): KoSlotRecord {
+  return { slug: team ? team.s : null, score: team ? score : null };
+}
+// anexa (ou substitui, se já existir a mesma rodada) um KoRoundRecord. Idempotente:
+// fechar a mesma rodada duas vezes (ex.: bye + re-commit) não duplica nem diverge.
+function recordKoRound(camp: Campaign, rec: KoRoundRecord): void {
+  const arr = (camp.koRounds = camp.koRounds ?? []);
+  const at = arr.findIndex((r) => r.round === rec.round);
+  if (at >= 0) arr[at] = rec;
+  else arr.push(rec);
+}
 export function finishKnockoutStage(camp: Campaign, myWon: boolean): Team[] {
   const s = camp.state as KnockoutStageState;
   const winners: Team[] = [];
+  const cls = koStageClass(s.stage);
+  const year = camp.edition.year;
+  // BUG 1.2: monta o registro REAL desta rodada (pares + placares + vencedor) pra
+  // projectBracket ler o que de fato aconteceu na campanha — sem recalcular nada.
+  const roundRec: KoRoundRecord = {
+    round: (s.stage.round ?? "FINAL") as KnockoutRound | "FINAL",
+    matches: [],
+  };
   s.pairs.forEach((pair, idx) => {
     const A = pair[0];
     const B = pair[1];
     if (idx === s.myPair) {
-      if (s.bye) winners.push(camp.myTeam);
-      else winners.push(myWon ? camp.myTeam : (s.myOpp as Team));
+      // MEU confronto: usa o resultado REAL do meu jogo (resolveKnockoutMatch) ou bye.
+      if (s.bye) {
+        winners.push(camp.myTeam);
+        roundRec.matches.push({
+          a: koSlot(camp.myTeam, null),
+          b: koSlot(null, null),
+          winnerSide: "A",
+          pens: null,
+          bye: true,
+          mine: false,
+        });
+      } else {
+        const opp = s.myOpp as Team;
+        const mr = s.myResult;
+        const iWon = myWon;
+        winners.push(iWon ? camp.myTeam : opp);
+        roundRec.matches.push({
+          a: koSlot(camp.myTeam, mr ? mr.gf : null),
+          b: koSlot(opp, mr ? mr.ga : null),
+          winnerSide: iWon ? "A" : "B",
+          pens: mr ? mr.pens : null,
+          bye: false,
+          mine: true,
+        });
+      }
       return;
     }
     if (!B) {
       if (A) winners.push(A);
+      roundRec.matches.push({
+        a: koSlot(A, null),
+        b: koSlot(null, null),
+        winnerSide: A ? "A" : null,
+        pens: null,
+        bye: true,
+        mine: false,
+      });
       return;
     }
     const sd =
       (camp.seed ^ (A!.o * 7919 + B.o * 104729 + idx * 911 + (s.stage.round || "").length * 13)) >>>
       0;
-    const r = simAIvsAI(A as Team, B, sd, camp.worldMode);
-    const kr = knockoutResult(A as Team, B, r.gA, r.gB, sd);
+    const r = simAIvsAI(A as Team, B, sd, camp.worldMode, { year, cls });
+    const kr = knockoutResult(A as Team, B, r.gA, r.gB, sd, { a: r.pensA, b: r.pensB });
     winners.push(kr.winner === "A" ? (A as Team) : B);
+    roundRec.matches.push({
+      a: koSlot(A as Team, r.gA),
+      b: koSlot(B, r.gB),
+      winnerSide: kr.winner,
+      pens: kr.pens,
+      bye: false,
+      mine: false,
+    });
   });
+  // anexa a rodada fechada ao histórico de chaveamento da campanha (idempotente: se
+  // já registramos esta rodada — re-fechamento — substitui em vez de duplicar).
+  recordKoRound(camp, roundRec);
   // perdedores das SF (pra eventual third_place)
   if (s.stage.round === "SF") {
     camp.sfLosers = [];
@@ -1730,8 +1976,8 @@ export function finishKnockoutStage(camp: Campaign, myWon: boolean): Team[] {
         return;
       }
       const sd = (camp.seed ^ (A!.o * 7919 + B.o * 104729 + idx * 911 + 2)) >>> 0;
-      const r = simAIvsAI(A as Team, B, sd, camp.worldMode);
-      const kr = knockoutResult(A as Team, B, r.gA, r.gB, sd);
+      const r = simAIvsAI(A as Team, B, sd, camp.worldMode, { year, cls });
+      const kr = knockoutResult(A as Team, B, r.gA, r.gB, sd, { a: r.pensA, b: r.pensB });
       camp.sfLosers!.push(kr.winner === "A" ? B : (A as Team));
     });
   }
@@ -1740,242 +1986,242 @@ export function finishKnockoutStage(camp: Campaign, myWon: boolean): Team[] {
   return winners;
 }
 
+// BUG 1.2: grava a FINAL jogada por mim como uma rodada de chaveamento (o meu
+// confronto É a final inteira — 1v1). `iWon` decide o lado vencedor; `pens` vem do
+// knockoutResult do meu jogo. Idempotente via recordKoRound.
+export function recordFinalRound(
+  camp: Campaign,
+  opp: Team,
+  gf: number,
+  ga: number,
+  iWon: boolean,
+  pens: string | null,
+): void {
+  recordKoRound(camp, {
+    round: "FINAL",
+    matches: [
+      {
+        a: koSlot(camp.myTeam, gf),
+        b: koSlot(opp, ga),
+        winnerSide: iWon ? "A" : "B",
+        pens,
+        bye: false,
+        mine: true,
+      },
+    ],
+  });
+}
+// BUG 1.2: grava a disputa de 3º lugar jogada por mim (desvio do mata-mata).
+export function recordThirdRound(
+  camp: Campaign,
+  opp: Team,
+  gf: number,
+  ga: number,
+  iWon: boolean,
+  pens: string | null,
+): void {
+  recordKoRound(camp, {
+    round: "THIRD",
+    matches: [
+      {
+        a: koSlot(camp.myTeam, gf),
+        b: koSlot(opp, ga),
+        winnerSide: iWon ? "A" : "B",
+        pens,
+        bye: false,
+        mine: true,
+      },
+    ],
+  });
+}
+
 // =====================================================================
-// ITEM 17 — PROJEÇÃO DO CHAVEAMENTO (árvore inteira do mata-mata)
-// Reconstrói a árvore de mata-mata da edição (R32/R16/QF/SF + Final), reunindo:
-//   • os MEUS confrontos REAIS já jogados (de camp.history), e
-//   • todos os IA×IA simulados com a MESMA sementagem de finishKnockoutStage —
-// preenchendo até a Final e revelando o campeão MESMO após a eliminação. Função
-// PURA e determinística (semeada por camp.seed + koBracketOrder congelado): o que
-// se vê aqui é o que aconteceria/aconteceu. Não muta a campanha.
+// BUG 1.2 — CHAVEAMENTO VINCULADO AO HISTÓRICO DA CAMPANHA
+// projectBracket lê ESTRITAMENTE camp.koRounds — as rodadas de mata-mata que de fato
+// foram fechadas na campanha (pares + placares + vencedor reais, gravados por
+// finishKnockoutStage / recordFinalRound / recordThirdRound). NÃO recalcula árvore
+// paralela: o que a campanha jogou é o que aparece. Fases FUTURAS ainda não disputadas
+// simplesmente não estão em koRounds, então ficam OCULTAS (sem spoiler) e o `reveal`
+// só completa a árvore com a HISTÓRIA REAL (results.json) DEPOIS que a campanha acaba.
+// Função pura: não muta a campanha.
 // =====================================================================
 
-// Sementes IDÊNTICAS às do fluxo real (finishKnockoutStage), por rodada de chave.
-function koPairSeed(seed: number, A: Team, B: Team, idx: number, round: string): number {
-  return (seed ^ (A.o * 7919 + B.o * 104729 + idx * 911 + (round || "").length * 13)) >>> 0;
-}
-
-// rótulos da rodada por nº de confrontos (cobre R32..Final independe do `round`).
-function koRoundMeta(nMatches: number, isFinal: boolean): { label: string; short: string; round: BracketRound["round"] } {
-  if (isFinal || nMatches === 1) return { label: "Final", short: "Final", round: "FINAL" };
-  if (nMatches === 2) return { label: "Semifinais", short: "Semis", round: "SF" };
-  if (nMatches <= 4) return { label: "Quartas de final", short: "Quartas", round: "QF" };
-  if (nMatches <= 8) return { label: "Oitavas de final", short: "Oitavas", round: "R16" };
-  return { label: "32-avos de final", short: "32-avos", round: "R32" };
-}
-
-// chaveamento por força (snake) + leve embaralhada — MESMA regra do initKnockout. O
-// real usa camp.rnd (não-reproduzível ao recarregar); aqui o rnd é derivado de
-// camp.seed+roundIdx, deixando a projeção 100% determinística e save-safe.
-function snakeSeedOrder(teams: Team[], rnd: () => number): Team[] {
-  const ranked = teams.slice().sort((a, b) => b.o - a.o);
-  const n = ranked.length;
-  const bracket: Team[] = [];
-  let lo = 0;
-  let hi = n - 1;
-  while (lo <= hi) {
-    if (lo === hi) {
-      bracket.push(ranked[lo]);
-      lo++;
-    } else {
-      bracket.push(ranked[lo]);
-      bracket.push(ranked[hi]);
-      lo++;
-      hi--;
-    }
+// rótulos de exibição por classe de rodada gravada.
+function koRoundLabels(round: KoRoundRecord["round"]): { label: string; short: string } {
+  switch (round) {
+    case "R32":
+      return { label: "32-avos de final", short: "32-avos" };
+    case "R16":
+      return { label: "Oitavas de final", short: "Oitavas" };
+    case "QF":
+      return { label: "Quartas de final", short: "Quartas" };
+    case "SF":
+      return { label: "Semifinais", short: "Semis" };
+    case "THIRD":
+      return { label: "Disputa de 3º lugar", short: "3º lugar" };
+    case "FINAL":
+      return { label: "Final", short: "Final" };
   }
-  for (let t = 0; t < bracket.length - 1; t += 2) {
-    if (rnd() < 0.18) {
-      const tmp = bracket[t];
-      bracket[t] = bracket[t + 1];
-      bracket[t + 1] = tmp;
-    }
-  }
-  return bracket;
 }
 
-// monta a ordem do 1º mata-mata (slugs congelados) em Times reais; se a campanha
-// foi salva antes do item 17 (sem koBracketOrder), reconstrói pela mesma regra do
-// initKnockout, porém com rnd derivado de camp.seed (determinístico e save-safe).
-function firstKoOrder(camp: Campaign): Team[] {
+// converte um KoMatchRecord (gravado) em BracketMatch (UI). Resolve slugs→Team na
+// edição. `champion` é marcado fora, só na final de fato decidida.
+function recordToBracketMatch(camp: Campaign, rec: KoMatchRecord): BracketMatch {
   const year = camp.edition.year;
-  if (camp.koBracketOrder && camp.koBracketOrder.length) {
-    return camp.koBracketOrder.map((slug) => (slug ? teamBySlug(year, slug) : null)).filter(Boolean) as Team[];
-  }
-  // fallback determinístico (campanhas antigas): replica o snake de initKnockout.
-  // Sem a ordem real do camp.rnd não há como bater 100%, mas fica estável e plausível.
-  const st = camp.state;
-  let entry: Team[] = [];
-  if (st && st.kind === "knockout") entry = st.pairs.flatMap((p) => p.filter(Boolean) as Team[]);
-  else if (camp.carryTeams) entry = camp.carryTeams.slice();
-  return snakeSeedOrder(entry, rngFrom((camp.seed ^ 0x5bd1e995) >>> 0));
+  const teamOf = (slug: string | null): Team | null => (slug ? teamBySlug(year, slug) : null);
+  const ta = teamOf(rec.a.slug);
+  const tb = teamOf(rec.b.slug);
+  const aWon = rec.winnerSide === "A";
+  const bWon = rec.winnerSide === "B";
+  const slotA: BracketSlot = {
+    team: ta,
+    score: rec.a.score,
+    pens: rec.pens,
+    winner: aWon,
+    isMe: !!ta && ta.s === camp.myKey,
+    champion: false,
+  };
+  const slotB: BracketSlot = {
+    team: tb,
+    score: rec.b.score,
+    pens: rec.pens,
+    winner: bWon,
+    isMe: !!tb && tb.s === camp.myKey,
+    champion: false,
+  };
+  return { a: slotA, b: slotB, bye: rec.bye, mine: rec.mine, real: rec.mine, pens: rec.pens };
 }
 
-// procura, no histórico, o MEU confronto de mata-mata contra `opp` (resultado real).
-function myKoHistoryVs(camp: Campaign, opp: Team): HistoryEntry | null {
-  for (const h of camp.history) {
-    if (h.ko && h.opp.s === opp.s) return h;
-  }
-  return null;
-}
-
-// reordena, in-place, a rodada `seeded` pra colar meu adversário REAL ao meu lado,
-// se eu estou presente e já joguei contra ele neste mata-mata. Mantém a paridade do
-// par (índice par ↔ ímpar) e não duplica ninguém. Só atua quando há histórico real.
-function anchorMyPair(camp: Campaign, seeded: Team[]): void {
-  const meIdx = seeded.findIndex((t) => t.s === camp.myKey);
-  if (meIdx < 0) return; // não estou nesta rodada
-  // qual o meu adversário real aqui? procuro no histórico um KO contra alguém que
-  // também esteja nesta rodada (e que eu ainda não tenha "consumido" em rodada anterior).
-  const oppIdx = seeded.findIndex(
-    (t, i) => i !== meIdx && t.s !== camp.myKey && myKoHistoryVs(camp, t) != null,
+// edição tem chaveamento? (1950 = quadrangular final, sem mata-mata → false).
+// Detecta pela estrutura REAL da edição (formats.json): existe alguma fase eliminatória
+// (knockout/second_round_knockout/final/third_place) que não seja só grupos.
+function editionHasBracket(camp: Campaign): boolean {
+  return camp.stages.some(
+    (st) =>
+      st.type === "knockout" ||
+      st.type === "second_round_knockout" ||
+      st.type === "final" ||
+      st.type === "third_place",
   );
-  if (oppIdx < 0) return; // confronto futuro/projeção — deixa o sorteio decidir
-  // posição do par do meu slot: pares são (2k, 2k+1).
-  const pairBase = meIdx - (meIdx % 2);
-  const partnerIdx = pairBase + (meIdx % 2 === 0 ? 1 : -1);
-  if (partnerIdx === oppIdx) return; // já está colado
-  const tmp = seeded[partnerIdx];
-  seeded[partnerIdx] = seeded[oppIdx];
-  seeded[oppIdx] = tmp;
 }
 
-export function projectBracket(camp: Campaign): BracketView | null {
-  const order = firstKoOrder(camp);
-  if (order.length < 2) return null; // edição sem chaveamento (ex.: quadrangular 1950)
+// BUG 1.2 (reveal): completa a árvore com a HISTÓRIA REAL além de onde a campanha
+// parou — usado SÓ no fim de campanha, pra revelar o campeão real. Reúne, por classe
+// de rodada (R32→R16→QF→SF→Final), os confrontos de results.json daquela edição que
+// ainda não foram revelados pela campanha. Determinístico (lê JSON estático). Em
+// worldMode==='alt' não há história — então não revela nada (fica "em aberto").
+const KO_CLASS_ORDER: { cls: StageClass; round: KoRoundRecord["round"] }[] = [
+  { cls: "R32", round: "R32" },
+  { cls: "R16", round: "R16" },
+  { cls: "QF", round: "QF" },
+  { cls: "SF", round: "SF" },
+  { cls: "final", round: "FINAL" },
+];
+function realKoRoundsAfter(camp: Campaign, playedRounds: Set<KoRoundRecord["round"]>): BracketRound[] {
+  if (camp.worldMode !== "real") return [];
+  const year = camp.edition.year;
+  const byPair = REAL_INDEX[year];
+  if (!byPair) return [];
+  // agrupa todos os jogos reais por classe de rodada.
+  const byClass: Record<string, IndexedReal[]> = {};
+  Object.values(byPair).forEach((recs) => {
+    recs.forEach((r) => {
+      (byClass[r.cls] = byClass[r.cls] || []).push(r);
+    });
+  });
+  const out: BracketRound[] = [];
+  KO_CLASS_ORDER.forEach(({ cls, round }) => {
+    if (playedRounds.has(round)) return; // a campanha já revelou esta rodada
+    const recs = byClass[cls];
+    if (!recs || recs.length === 0) return;
+    const labels = koRoundLabels(round);
+    const matches: BracketMatch[] = recs.map((r) => {
+      const ta = teamBySlug(year, r.a);
+      const tb = teamBySlug(year, r.b);
+      const aWon = r.ga > r.gb || (r.ga === r.gb && (r.pa ?? 0) >= (r.pb ?? 0));
+      const pens = r.pa != null && r.pb != null ? r.pa + "×" + r.pb : null;
+      const slotA: BracketSlot = { team: ta, score: r.ga, pens, winner: aWon, isMe: false, champion: false };
+      const slotB: BracketSlot = { team: tb, score: r.gb, pens, winner: !aWon, isMe: false, champion: false };
+      return { a: slotA, b: slotB, bye: false, mine: false, real: false, pens };
+    });
+    out.push({ label: labels.label, short: labels.short, round, matches });
+  });
+  return out;
+}
 
-  const seed = camp.seed;
+// `reveal` = true (fim de campanha): completa a árvore com a história real além de
+// onde parei, pra mostrar o campeão real. `reveal` = false (durante a campanha): só
+// as rodadas já jogadas — fases futuras ficam ocultas (sem spoiler).
+export function projectBracket(camp: Campaign, reveal: boolean = false): BracketView | null {
+  if (!editionHasBracket(camp)) return null; // ex.: 1950 (quadrangular final)
+  const played = camp.koRounds ?? [];
+  // ordena terceiro-lugar logo antes da final (estética de árvore); o resto na ordem
+  // em que foi gravado (= ordem real das rodadas da edição).
+  const rank = (r: KoRoundRecord["round"]) =>
+    r === "THIRD" ? 98 : r === "FINAL" ? 99 : 0;
+  const playedSorted = played
+    .map((r, i) => ({ r, i }))
+    .sort((x, y) => rank(x.r.round) - rank(y.r.round) || x.i - y.i)
+    .map((x) => x.r);
+
   const rounds: BracketRound[] = [];
   let champion: Team | null = null;
   let myExitRound: number | null = null;
 
-  // confronto -> {winner, slot a, slot b}. Meu jogo usa o placar real; IA×IA usa
-  // a simulação determinística. Bye = uma vaga vazia (avança sem jogar).
-  function resolve(a: Team | null, b: Team | null, idx: number, round: string): {
-    match: BracketMatch;
-    winner: Team | null;
-  } {
-    const mine = (a?.s === camp.myKey || b?.s === camp.myKey) && !!a && !!b;
-    // bye (uma vaga só)
-    if (!a || !b) {
-      const present = a || b;
-      const isMe = present?.s === camp.myKey;
-      const slotPresent: BracketSlot = {
-        team: present,
-        score: null,
-        pens: null,
-        winner: true,
-        isMe,
-        champion: false,
-      };
-      const slotEmpty: BracketSlot = { team: null, score: null, pens: null, winner: false, isMe: false, champion: false };
-      const match: BracketMatch = {
-        a: a ? slotPresent : slotEmpty,
-        b: b ? slotPresent : slotEmpty,
-        bye: true,
-        mine: false,
-        real: false,
-        pens: null,
-      };
-      return { match, winner: present };
+  playedSorted.forEach((rec) => {
+    const labels = koRoundLabels(rec.round);
+    const matches = rec.matches.map((m) => recordToBracketMatch(camp, m));
+    const roundIdx = rounds.length;
+    // detecta a rodada em que eu caí (joguei e perdi um confronto eliminatório real;
+    // 3º lugar não conta como "queda" — já é um desvio).
+    if (rec.round !== "THIRD") {
+      matches.forEach((m) => {
+        if (m.mine && !m.bye) {
+          const iWonSlot = (m.a.isMe && m.a.winner) || (m.b.isMe && m.b.winner);
+          if (!iWonSlot) myExitRound = roundIdx;
+        }
+      });
     }
-
-    // MEU confronto: usa o placar real do histórico, se já joguei.
-    if (mine) {
-      const opp = a.s === camp.myKey ? b : a;
-      const h = myKoHistoryVs(camp, opp);
-      if (h) {
-        // h.gf/h.ga são SEMPRE do meu ponto de vista; mapeia pros lados a/b.
-        const meIsA = a.s === camp.myKey;
-        const myGoals = h.gf;
-        const oppGoals = h.ga;
-        const aScore = meIsA ? myGoals : oppGoals;
-        const bScore = meIsA ? oppGoals : myGoals;
-        const iWon = h.win;
-        const winnerTeam = iWon ? camp.myTeam : opp;
-        const aWon = a.s === winnerTeam.s;
-        const slotA: BracketSlot = { team: a, score: aScore, pens: h.pens, winner: aWon, isMe: meIsA, champion: false };
-        const slotB: BracketSlot = { team: b, score: bScore, pens: h.pens, winner: !aWon, isMe: !meIsA, champion: false };
-        return {
-          match: { a: slotA, b: slotB, bye: false, mine: true, real: true, pens: h.pens },
-          winner: winnerTeam,
-        };
-      }
-      // meu confronto ainda NÃO jogado (projeção do futuro): simula como IA×IA.
-    }
-
-    // IA×IA (ou meu jogo ainda não disputado): simulação determinística.
-    const sd = koPairSeed(seed, a, b, idx, round);
-    const r = simAIvsAI(a, b, sd, camp.worldMode);
-    const kr = knockoutResult(a, b, r.gA, r.gB, sd);
-    const aWon = kr.winner === "A";
-    const slotA: BracketSlot = {
-      team: a,
-      score: r.gA,
-      pens: kr.pens,
-      winner: aWon,
-      isMe: a.s === camp.myKey,
-      champion: false,
-    };
-    const slotB: BracketSlot = {
-      team: b,
-      score: r.gB,
-      pens: kr.pens,
-      winner: !aWon,
-      isMe: b.s === camp.myKey,
-      champion: false,
-    };
-    return {
-      match: { a: slotA, b: slotB, bye: false, mine, real: false, pens: kr.pens },
-      winner: aWon ? a : b,
-    };
-  }
-
-  // varre rodada a rodada até sobrar 1 (o campeão). A cada rodada o real RE-SORTEIA
-  // os vencedores por força (initKnockout re-ranqueia carryTeams) — a projeção faz
-  // o mesmo com snakeSeedOrder, então não é um bracket fixo: cada fase é redesenhada.
-  let current: Team[] = order.slice();
-  let roundIdx = 0;
-  let guard = 0;
-  while (current.length > 1 && guard < 12) {
-    guard++;
-    // a 1ª rodada já vem na ordem real congelada; as seguintes re-sorteiam.
-    const seeded =
-      roundIdx === 0 ? current : snakeSeedOrder(current, rngFrom((seed ^ (0x9e3779b9 + roundIdx * 2654435761)) >>> 0));
-    // âncora do MEU caminho: se eu joguei esta rodada (histórico real), garanto que
-    // meu adversário real fique colado a mim no par — assim a árvore mostra o
-    // confronto que de fato aconteceu, não um par re-sorteado divergente.
-    anchorMyPair(camp, seeded);
-    const nMatches = Math.ceil(seeded.length / 2);
-    const isFinal = nMatches === 1;
-    const meta = koRoundMeta(nMatches, isFinal);
-    const matches: BracketMatch[] = [];
-    const winners: Team[] = [];
-    for (let i = 0; i < seeded.length; i += 2) {
-      const a = seeded[i] ?? null;
-      const b = seeded[i + 1] ?? null;
-      const { match, winner } = resolve(a, b, i / 2, meta.round);
-      // detecta a rodada da minha eliminação (joguei e perdi este confronto).
-      if (match.mine && match.real) {
-        const iAdvanced = winner?.s === camp.myKey;
-        if (!iAdvanced) myExitRound = roundIdx;
-      }
-      matches.push(match);
-      if (winner) winners.push(winner);
-    }
-    if (isFinal) {
-      champion = winners[0] ?? null;
-      // marca o campeão no slot vencedor da final.
+    // campeão: só quando a FINAL foi de fato decidida na campanha.
+    if (rec.round === "FINAL" && matches[0]) {
       const fm = matches[0];
-      if (fm.a.winner) fm.a.champion = true;
-      else if (fm.b.winner) fm.b.champion = true;
+      if (fm.a.winner && fm.a.team) {
+        champion = fm.a.team;
+        fm.a.champion = true;
+      } else if (fm.b.winner && fm.b.team) {
+        champion = fm.b.team;
+        fm.b.champion = true;
+      }
     }
-    rounds.push({ label: meta.label, short: meta.short, round: meta.round, matches });
-    current = winners;
-    roundIdx++;
+    rounds.push({ label: labels.label, short: labels.short, round: rec.round, matches });
+  });
+
+  // no fim de campanha (reveal), completa com a história real além de onde parei.
+  // SALVAGUARDA anti-spoiler: só revela com a campanha de fato encerrada (!alive) —
+  // assim, mesmo que reveal=true vaze pra uma campanha viva, nada é antecipado.
+  if (reveal && !camp.alive && !champion) {
+    const playedSet = new Set(played.map((r) => r.round));
+    const extra = realKoRoundsAfter(camp, playedSet);
+    extra.forEach((er) => {
+      if (er.round === "FINAL" && er.matches[0]) {
+        const fm = er.matches[0];
+        if (fm.a.winner && fm.a.team) {
+          champion = fm.a.team;
+          fm.a.champion = true;
+        } else if (fm.b.winner && fm.b.team) {
+          champion = fm.b.team;
+          fm.b.champion = true;
+        }
+      }
+      // posiciona o 3º lugar antes da final também na parte revelada.
+      rounds.push(er);
+    });
+    rounds.sort((a, b) => rank(a.round) - rank(b.round));
   }
 
-  const iAmChampion = !!champion && champion.s === camp.myKey;
+  if (rounds.length === 0) return null; // ainda não joguei nenhuma rodada de mata-mata
+
+  const iAmChampion = !!champion && (champion as Team).s === camp.myKey;
   return { rounds, champion, myExitRound, iAmChampion };
 }
 

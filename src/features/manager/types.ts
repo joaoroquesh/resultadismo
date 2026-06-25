@@ -291,6 +291,27 @@ export type StageState =
   | ThirdPlaceStageState
   | FinalStageState;
 
+// BUG 1.2 — confronto de mata-mata REALMENTE jogado na campanha (não recalculado).
+// Persiste pares + placares + vencedor de cada rodada eliminatória conforme ela é
+// fechada, pra projectBracket derivar a árvore ESTRITAMENTE do histórico da campanha
+// (sem cálculo paralelo) e revelar rodada por rodada (fases futuras ficam ocultas).
+export interface KoSlotRecord {
+  slug: string | null; // null = vaga vazia (bye)
+  score: number | null; // gols no confronto (null se bye/não jogado)
+}
+export interface KoMatchRecord {
+  a: KoSlotRecord;
+  b: KoSlotRecord;
+  winnerSide: "A" | "B" | null; // lado que avançou (null se bye/indefinido)
+  pens: string | null; // "5×4" se decidiu nos pênaltis
+  bye: boolean;
+  mine: boolean; // este foi o MEU confronto (placar real do meu jogo)
+}
+export interface KoRoundRecord {
+  round: KnockoutRound | "FINAL" | "THIRD";
+  matches: KoMatchRecord[];
+}
+
 export interface Campaign {
   edition: Edition;
   seed: number;
@@ -316,10 +337,9 @@ export interface Campaign {
   finalists?: Team[];
   skipThird?: boolean;
   pendingAdvance?: boolean;
-  // ITEM 17: ordem REALIZADA do 1º mata-mata (pós-sorteio do chaveamento, que usa
-  // camp.rnd — não-reproduzível depois de recarregar). Guardar a ordem como slugs
-  // deixa projectBracket reconstruir a árvore EXATA mesmo numa campanha salva.
-  koBracketOrder?: string[];
+  // BUG 1.2: rodadas de mata-mata FECHADAS na campanha, em ordem. A fonte única de
+  // verdade do chaveamento — projectBracket lê isto, não recalcula nada.
+  koRounds?: KoRoundRecord[];
 }
 
 export interface CampaignScore {
@@ -353,9 +373,9 @@ export interface BracketMatch {
   pens: string | null; // pênaltis do confronto, se houve
 }
 export interface BracketRound {
-  label: string; // "Oitavas", "Quartas", "Semis", "Final"…
+  label: string; // "Oitavas", "Quartas", "Semis", "3º lugar", "Final"…
   short: string;
-  round: KnockoutRound | "FINAL";
+  round: KnockoutRound | "FINAL" | "THIRD";
   matches: BracketMatch[];
 }
 export interface BracketView {

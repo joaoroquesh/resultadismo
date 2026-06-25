@@ -47,18 +47,23 @@ export function PenaltyShootout({
 
   const finished = skipped || done >= total;
 
+  // MELHORIA 2.4 — cadência com mais suspense: a mira (batedor "vai bater…") segura
+  // mais antes do desfecho, e o desfecho respira antes da próxima cobrança. Com
+  // prefers-reduced-motion, sem suspense (revela quase imediato).
   useEffect(() => {
     if (finished) return;
     const clear = () => {
       if (timerRef.current != null) window.clearTimeout(timerRef.current);
     };
     if (phase === "aim") {
-      timerRef.current = window.setTimeout(() => setPhase("hit"), REDUCED ? 220 : 700);
+      // mira: pausa longa de tensão antes de revelar (cobrança → pausa).
+      timerRef.current = window.setTimeout(() => setPhase("hit"), REDUCED ? 240 : 1250);
     } else {
+      // desfecho: deixa o resultado na tela um tempo antes de seguir (→ desfecho).
       timerRef.current = window.setTimeout(() => {
         setDone((d) => d + 1);
         setPhase("aim");
-      }, REDUCED ? 220 : 650);
+      }, REDUCED ? 240 : 1050);
     }
     return clear;
   }, [phase, finished]);

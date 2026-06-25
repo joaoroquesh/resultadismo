@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Campaign, MatchEvent, MatchState, Tactic } from "./types";
 import {
   applyCommand,
   createMatch,
-  deriveMatchStats,
+  deriveStatsFromEvents,
   possessionState,
   reactiveAiPosture,
   recomputeStrengths,
@@ -27,10 +27,12 @@ import { FormGrid, ManagerCrest, MatchStatsPanel, MatchupBadges, SegBlock } from
 import { ESTILO_OPTS, FORM_OPTS, MARC_OPTS, POSTURA_OPTS, TICKER_ICON } from "./ui";
 import { teamColors } from "./teamColors";
 import { loadSpeed, saveSpeed } from "./managerLocal";
+import type { LiveSpeed } from "./managerLocal";
 import { Button } from "@/components/ui/Button";
 
-// ITEM 3: tempo configurável. ~40s por tempo (80s/jogo). Mude SECONDS_PER_HALF.
-const SECONDS_PER_HALF = 40;
+// MELHORIA 2.6: 1x = cada tempo dura EXATAMENTE 45s reais. 2x/4x dividem; "Pular
+// tempo" é instantâneo (resolve o resto do tempo no motor e abre o intervalo/fim).
+const SECONDS_PER_HALF = 45;
 const TICK_MS = 50;
 
 const REDUCED =
@@ -38,16 +40,15 @@ const REDUCED =
   window.matchMedia &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// 45 minutos de relógio por tempo; um tiquinho mais rápido sem animações.
-// BASE = ritmo 1x. O acelerador (item 2) divide pelo `speed` em runtime.
-const BASE_MS_PER_MIN = (SECONDS_PER_HALF * 1000) / 45 / (REDUCED ? 1 / 0.78 : 1);
-// derivados em função da velocidade (1x ou 2x) — o motor é independente do relógio.
+// BASE = ritmo 1x (45 minutos de relógio em SECONDS_PER_HALF segundos reais). O
+// acelerador divide pelo `speed`; o motor é independente do relógio.
+const BASE_MS_PER_MIN = (SECONDS_PER_HALF * 1000) / 45;
 function msPerMin(speed: number): number {
   return BASE_MS_PER_MIN / speed;
 }
 // suspense entre build-up e desfecho (encolhe junto com a velocidade)
 function buildupDelayMs(speed: number): number {
-  return Math.max(300, Math.min(900, msPerMin(speed) * 1.7));
+  return Math.max(220, Math.min(900, msPerMin(speed) * 1.7));
 }
 
 type TickerKind = "info" | "buildup" | "goal" | "miss" | "cmd";
@@ -62,6 +63,9 @@ interface TickerLine {
   teamName?: string;
 }
 
+// BUG 1.3: um lance em "suspense". Enquanto pendente, mostra só o build-up no ticker
+// e a posse pisca no lado dono. Ao ser REVELADO (no `due` OU num flush antes do
+// intervalo/fim), o desfecho entra na TIMELINE — e SÓ daí o gol conta no placar.
 interface Pending {
   lineId: number;
   ev: MatchEvent;
@@ -104,7 +108,13 @@ export function LiveMatch({
     stats: MatchStats,
   ) => void;
 }) {
-  const stateRef = useRef<MatchState | null>(null);
+  // a partida é criada UMA vez (lazy), antes do 1º render. O objeto MatchState tem
+  // identidade estável (é mutado in-place pelo motor), então pode ser lido na render.
+  // É a fonte de verdade em STATE; `stateRef` espelha p/ os callbacks/loop lerem.
+  const [engine] = useState<MatchState>(() =>
+    createMatch(campaign.myTeam, opp, myTac, aiTac, matchSeed || 1),
+  );
+  const stateRef = useRef<MatchState>(engine);
   const timerRef = useRef<number | null>(null);
   const lastRef = useRef(0);
   const accRef = useRef(0);
@@ -112,12 +122,11 @@ export function LiveMatch({
   const lineSeq = useRef(0);
   const uiRnd = useRef(mulberryUi(20020630 ^ (matchSeed >>> 0)));
   const halftimeShownRef = useRef(false);
-  // ITEM 2: velocidade do relógio (1x/2x), lida via ref dentro do loop pra não
+  // MELHORIA 2.6: velocidade do relógio (1x/2x/4x), lida via ref dentro do loop pra não
   // reiniciar o setInterval ao alternar — o próximo passo já usa o novo ritmo.
-  const [speed, setSpeed] = useState<1 | 2>(() => loadSpeed());
-  const speedRef = useRef<1 | 2>(speed);
+  const [speed, setSpeed] = useState<LiveSpeed>(() => loadSpeed());
+  const speedRef = useRef<LiveSpeed>(speed);
 
-  const [score, setScore] = useState({ a: 0, b: 0 });
   const [minute, setMinute] = useState(0);
   const [pop, setPop] = useState<"A" | "B" | null>(null);
   // ITEM 7: ajuste tático AO VIVO (estilo/postura/marcação; formação travada até o
@@ -133,32 +142,53 @@ export function LiveMatch({
   const [lines, setLines] = useState<TickerLine[]>([]);
   const [phase, setPhase] = useState<"live" | "halftime">("live");
   const [cmdStat, setCmdStat] = useState("Aguarde o apito inicial…");
-  // ITEM 4: posse de bola — pisca no card do time dono da chance em build-up.
+  // MELHORIA 2.1: posse de bola — pisca CONTINUAMENTE no lado dono do ciclo ofensivo,
+  // do build-up até a conclusão da chance; só cessa/troca quando o lance conclui.
   const [possSide, setPossSide] = useState<"A" | "B" | null>(null);
-  // ITEM 16: timeline de gols (minuto + lado), derivada dos eventos de gol.
-  const [goals, setGoals] = useState<{ side: "A" | "B"; m: number }[]>([]);
-  const goalsRef = useRef<{ side: "A" | "B"; m: number }[]>([]);
-  // ITEM 12: snapshot de stats no intervalo (parcial — leitura do 1º tempo).
-  const [halftimeStats, setHalftimeStats] = useState<MatchStats | null>(null);
-  // espelho render-safe do estado do motor (a render NÃO lê stateRef durante o render)
+
+  // BUG 1.3 — TIMELINE ÚNICA: a fonte de verdade do que o usuário JÁ VIU. Cada lance
+  // resolvido (revelado) entra aqui com seu gol/minuto/lado. O PLACAR e os GOLS da UI
+  // derivam ESTRITAMENTE daqui (nunca de um estado paralelo, nunca resetam no intervalo).
+  const [revealed, setRevealed] = useState<MatchEvent[]>([]);
+  const revealedRef = useRef<MatchEvent[]>([]);
+
+  // placar derivado da timeline revelada (única fonte). Atômico: um gol só aparece
+  // quando seu lance é revelado, e nenhum lance é descartado no intervalo/fim.
+  const score = useMemo(() => {
+    let a = 0;
+    let b = 0;
+    for (const ev of revealed) {
+      if (!ev.goal) continue;
+      if (ev.ownerSide === "A") a++;
+      else b++;
+    }
+    return { a, b };
+  }, [revealed]);
+  const goals = useMemo(
+    () => revealed.filter((ev) => ev.goal).map((ev) => ({ side: ev.ownerSide, m: ev.m })),
+    [revealed],
+  );
+  // ITEM 12 / MELHORIA 2.2: estatísticas AO VIVO derivadas SÓ dos lances revelados +
+  // as forças correntes do motor — coerentes com o que está na tela neste instante.
+  const liveStats = useMemo<MatchStats | null>(() => {
+    if (!engine || revealed.length === 0) return null;
+    return deriveStatsFromEvents(engine, revealed);
+  }, [engine, revealed]);
+
+  const [finished, setFinished] = useState(false);
+  // espelho render-safe das forças/volume do motor (a render NÃO lê stateRef no render)
   const [view, setView] = useState({
-    gA: 0,
-    gB: 0,
     shareA: 0.5,
     gameVol: 1,
     cooldownUntilMin: -999,
-    finished: false,
   });
   const syncView = useCallback(() => {
     const st = stateRef.current;
     if (!st) return;
     setView({
-      gA: st.gA,
-      gB: st.gB,
       shareA: st.shareA,
       gameVol: st.gameVol,
       cooldownUntilMin: st.cmdA.cooldownUntilMin,
-      finished: st.finished,
     });
   }, []);
 
@@ -177,14 +207,11 @@ export function LiveMatch({
     [],
   );
 
-  // ITEM 2: alterna 1x/2x a qualquer momento; persiste e atualiza o ref do loop.
-  const toggleSpeed = useCallback(() => {
-    setSpeed((s) => {
-      const next: 1 | 2 = s === 1 ? 2 : 1;
-      speedRef.current = next;
-      saveSpeed(next);
-      return next;
-    });
+  // MELHORIA 2.6: escolhe 1x/2x/4x; persiste e atualiza o ref do loop sem reiniciar.
+  const pickSpeed = useCallback((next: LiveSpeed) => {
+    setSpeed(next);
+    speedRef.current = next;
+    saveSpeed(next);
   }, []);
 
   // ----- relógio do banco (leitura de posse) -----
@@ -274,7 +301,7 @@ export function LiveMatch({
         teamSlug: teamSlugFor(attackerSide),
         teamName: ev.team,
       });
-      // ITEM 4: a posse acende no lado dono da chance e pisca junto do texto.
+      // MELHORIA 2.1: a posse acende no lado dono e pisca CONTINUAMENTE até o desfecho.
       setPossSide(attackerSide);
       const interrupted = ev.kind !== "goal" && uiRnd.current() < 0.38;
       pendingRef.current.push({
@@ -287,15 +314,19 @@ export function LiveMatch({
     [aiTac, myTac, pushLine, teamSlugFor],
   );
 
+  // BUG 1.3: REVELA um lance pendente — escreve o desfecho no ticker E (atomicamente)
+  // entra na TIMELINE, de onde o placar deriva. O gol só conta AQUI, nunca antes.
   const resolveBuildup = useCallback(
     (p: Pending) => {
-      const st = stateRef.current;
-      if (!st) return;
       const ev = p.ev;
-      // ITEM 4: ao resolver, a posse para de piscar (se ainda for deste lance).
+      // MELHORIA 2.1: ao concluir, a posse para de piscar (se ainda for deste lance).
       setPossSide((cur) => (cur === ev.ownerSide ? null : cur));
       const meta = { teamSlug: teamSlugFor(ev.ownerSide), teamName: ev.team };
       const icon = (bankKey: keyof typeof TICKER_ICON) => pickArr(uiRnd.current, TICKER_ICON[bankKey]);
+      // a TIMELINE só conta o gol se o lance NÃO foi interrompido (impedimento etc.).
+      // Um lance interrompido nunca é gol no motor (interrupt só sorteia em ev.kind!=goal).
+      revealedRef.current = [...revealedRef.current, ev];
+      setRevealed(revealedRef.current);
       if (p.interrupted) {
         replaceLine(p.lineId, pickArr(uiRnd.current, TICKER_INTERRUPT), "miss", {
           ...meta,
@@ -306,14 +337,10 @@ export function LiveMatch({
           ...meta,
           icon: "⚽",
         });
-        setScore({ a: st.gA, b: st.gB });
-        // ITEM 16: registra o gol na timeline (minuto + lado).
-        goalsRef.current = [...goalsRef.current, { side: ev.ownerSide, m: ev.m }];
-        setGoals(goalsRef.current);
-        syncView();
         if (!REDUCED) {
-          setPop(ev.team === st.teamA.n ? "A" : "B");
-          window.setTimeout(() => setPop(null), 420);
+          const side = ev.ownerSide;
+          setPop(side);
+          window.setTimeout(() => setPop((c) => (c === side ? null : c)), 420);
         }
       } else {
         const bank = TICKER_CONCLUSION[ev.kind] || TICKER_CONCLUSION.fora;
@@ -323,10 +350,11 @@ export function LiveMatch({
         });
       }
     },
-    [replaceLine, syncView, teamSlugFor],
+    [replaceLine, teamSlugFor],
   );
 
-  const flushPending = useCallback(() => {
+  // revela só os que venceram o suspense (uso normal do loop)
+  const flushDue = useCallback(() => {
     if (!pendingRef.current.length) return;
     const now = nowMs();
     const keep: Pending[] = [];
@@ -335,6 +363,16 @@ export function LiveMatch({
       else keep.push(p);
     }
     pendingRef.current = keep;
+  }, [resolveBuildup]);
+
+  // BUG 1.3: FLUSH atômico — revela TODOS os pendentes JÁ (sem esperar o suspense).
+  // Chamado ANTES de abrir o intervalo e o fim de jogo, garantindo que nenhum gol some
+  // e que o placar do boundary == soma dos gols revelados até ali.
+  const flushAll = useCallback(() => {
+    if (!pendingRef.current.length) return;
+    const all = pendingRef.current;
+    pendingRef.current = [];
+    for (const p of all) resolveBuildup(p);
   }, [resolveBuildup]);
 
   const stopTimer = useCallback(() => {
@@ -348,20 +386,30 @@ export function LiveMatch({
     if (halftimeShownRef.current) return;
     halftimeShownRef.current = true;
     stopTimer();
-    const st = stateRef.current;
-    if (st) setHalftimeStats(deriveMatchStats(st));
+    flushAll(); // BUG 1.3: nenhum gol do 1º tempo pode ficar pra trás.
+    setPossSide(null);
     setPhase("halftime");
-  }, [stopTimer]);
+  }, [flushAll, stopTimer]);
 
   const endMatch = useCallback(() => {
     stopTimer();
+    flushAll(); // BUG 1.3: revela tudo antes de fechar — placar final == soma dos gols.
+    setPossSide(null);
+    setFinished(true);
     const st = stateRef.current;
     if (!st) return;
-    // ITEM 12: deriva as stats do estado FINAL real (inclui comandos/ajustes que o
-    // jogador deu) — batem 100% com o que foi visto na transmissão.
-    onFinish(st.gA, st.gB, goalsRef.current, deriveMatchStats(st));
-  }, [onFinish, stopTimer]);
+    // o placar final é a SOMA dos gols revelados (== st.gA/gB, já que tudo foi revelado).
+    const finalGoals = revealedRef.current
+      .filter((ev) => ev.goal)
+      .map((ev) => ({ side: ev.ownerSide, m: ev.m }));
+    const gA = finalGoals.filter((g) => g.side === "A").length;
+    const gB = finalGoals.filter((g) => g.side === "B").length;
+    // ITEM 12: stats da partida derivadas dos MESMOS lances revelados — batem 100% com
+    // o que foi visto na transmissão (e com o placar).
+    onFinish(gA, gB, finalGoals, deriveStatsFromEvents(st, revealedRef.current));
+  }, [onFinish, stopTimer, flushAll]);
 
+  // roda UM minuto do motor (com a IA reativa antes) e ENFILEIRA os lances do minuto.
   const liveTick = useCallback(() => {
     const st = stateRef.current;
     if (!st) return;
@@ -390,7 +438,7 @@ export function LiveMatch({
   const liveFrame = useCallback(() => {
     const st = stateRef.current;
     if (!st) return;
-    flushPending();
+    flushDue();
     const now = nowMs();
     accRef.current += now - lastRef.current;
     lastRef.current = now;
@@ -414,7 +462,7 @@ export function LiveMatch({
         return;
       }
     }
-  }, [endMatch, flushPending, liveTick, openHalftime]);
+  }, [endMatch, flushDue, liveTick, openHalftime]);
 
   const startTimer = useCallback(() => {
     lastRef.current = nowMs();
@@ -422,10 +470,26 @@ export function LiveMatch({
     timerRef.current = window.setInterval(liveFrame, TICK_MS);
   }, [liveFrame]);
 
-  // ----- bootstrap da partida -----
+  // MELHORIA 2.6: "Pular tempo" — resolve INSTANTANEAMENTE todos os lances restantes do
+  // tempo (motor + flush) e vai direto pro Intervalo (1ºT) ou Fim de Jogo (2ºT). Com a
+  // timeline derivada de eventos, o skip é só avançar o playback até 45'/90'.
+  const skipHalf = useCallback(() => {
+    const st = stateRef.current;
+    if (!st || st.finished) return;
+    stopTimer();
+    if (st.minute < 45 && !halftimeShownRef.current) {
+      while (st.minute < 45 && !st.finished) liveTick();
+      setMinute(st.minute);
+      openHalftime();
+      return;
+    }
+    while (st.minute < 90 && !st.finished) liveTick();
+    setMinute(st.minute);
+    endMatch();
+  }, [endMatch, liveTick, openHalftime, stopTimer]);
+
+  // ----- bootstrap da partida (a partida já foi criada no lazy-init de stateRef) -----
   useEffect(() => {
-    const st = createMatch(campaign.myTeam, opp, myTac, aiTac, matchSeed || 1);
-    stateRef.current = st;
     halftimeShownRef.current = false;
     pushLine(0, `Bola rolando! <strong>${campaign.myTeam.n}</strong> × <strong>${opp.n}</strong>.`, "info", {
       icon: "🟢",
@@ -459,10 +523,17 @@ export function LiveMatch({
     startTimer();
   }, [myTac, pushLine, refreshCmdStat, startTimer, syncView]);
 
-  // render lê só de `view`/`minute`/`phase` (state) — nunca de stateRef durante o render
-  const canCmd = minute < 90 && !view.finished && minute >= view.cooldownUntilMin;
+  // render lê só de state derivado — nunca de stateRef durante o render
+  const canCmd = minute < 90 && !finished && minute >= view.cooldownUntilMin;
   const stage = campaign.stages[campaign.stageIdx];
   const hot = (minute >= 43 && minute <= 45) || minute >= 87;
+  // ITEM 12: snapshot parcial das stats até 45' pro vestiário (deriva da timeline).
+  const halftimeStats = useMemo<MatchStats | null>(() => {
+    if (phase !== "halftime" || !engine) return null;
+    const firstHalf = revealed.filter((ev) => ev.m <= 45);
+    if (firstHalf.length === 0) return null;
+    return deriveStatsFromEvents(engine, firstHalf);
+  }, [phase, engine, revealed]);
 
   // ---- intervalo ----
   if (phase === "halftime") {
@@ -478,8 +549,8 @@ export function LiveMatch({
           oppName={opp.n}
           mySlug={campaign.myTeam.s}
           oppSlug={opp.s}
-          a={view.gA}
-          b={view.gB}
+          a={score.a}
+          b={score.b}
           goals={goals}
           small
         />
@@ -555,38 +626,37 @@ export function LiveMatch({
   // ---- ao vivo ----
   return (
     <div className="flex flex-col">
-      <div className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand-600">
-        {stageLong(stage)}
+      {/* MELHORIA 2.3: placar eletrônico STICKY — fica fixo no topo ao rolar a tela
+          pra mexer em tática/comandos, sempre visível. */}
+      <div className="sticky top-0 z-20 -mx-0.5 bg-surface/85 px-0.5 pb-1 pt-0.5 backdrop-blur-sm">
+        <div className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand-600">
+          {stageLong(stage)}
+        </div>
+        <Scoreboard
+          myName={campaign.myTeam.n}
+          oppName={opp.n}
+          mySlug={campaign.myTeam.s}
+          oppSlug={opp.s}
+          a={score.a}
+          b={score.b}
+          pop={pop}
+          possSide={possSide}
+          goals={goals}
+          clock={fmtClock(minute)}
+          clockHot={hot}
+          progress={Math.min(100, (minute / 90) * 100)}
+        />
+        {/* MELHORIA 2.6: seletor de velocidade + pular tempo */}
+        <SpeedBar
+          speed={speed}
+          onPick={pickSpeed}
+          onSkip={skipHalf}
+          skipLabel={minute < 45 ? "Pular 1º tempo" : "Pular 2º tempo"}
+          disabled={finished}
+        />
       </div>
-      <Scoreboard
-        myName={campaign.myTeam.n}
-        oppName={opp.n}
-        mySlug={campaign.myTeam.s}
-        oppSlug={opp.s}
-        a={score.a}
-        b={score.b}
-        pop={pop}
-        possSide={possSide}
-        goals={goals}
-        speed={speed}
-        onToggleSpeed={toggleSpeed}
-      >
-        <div
-          role="timer"
-          aria-live="off"
-          className={`text-center font-mono text-[13px] tracking-[0.12em] ${hot ? "text-flame-400" : "text-white/60"}`}
-        >
-          {fmtClock(minute)}
-        </div>
-        <div className="mt-2 h-[5px] overflow-hidden rounded-full bg-white/15">
-          <span
-            className="block h-full rounded-full bg-grass-500 transition-[width] duration-100"
-            style={{ width: `${Math.min(100, (minute / 90) * 100)}%` }}
-          />
-        </div>
-      </Scoreboard>
 
-      <div className="mt-1 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
+      <div className="mt-2 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
         Transmissão ao vivo
       </div>
       <div
@@ -616,6 +686,9 @@ export function LiveMatch({
           </div>
         ))}
       </div>
+
+      {/* MELHORIA 2.2: estatísticas AO VIVO (recolhível) — insumo pra ajustar a tática. */}
+      <LiveStats stats={liveStats} myName={campaign.myTeam.n} oppName={opp.n} />
 
       <div className="mb-1.5 mt-3.5 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
         Seu banco — leia posse e placar
@@ -647,9 +720,106 @@ export function LiveMatch({
         open={tacDrawerOpen}
         onToggle={() => setTacDrawerOpen((v) => !v)}
         cooldownLeft={Math.max(0, liveTacCooldownUntil - minute)}
-        disabled={view.finished || minute >= 90}
+        disabled={finished || minute >= 90}
         onChange={applyLiveTac}
       />
+    </div>
+  );
+}
+
+// MELHORIA 2.6: seletor de velocidade (1x/2x/4x) + "Pular tempo". Toque ≥44px, aria.
+function SpeedBar({
+  speed,
+  onPick,
+  onSkip,
+  skipLabel,
+  disabled,
+}: {
+  speed: LiveSpeed;
+  onPick: (s: LiveSpeed) => void;
+  onSkip: () => void;
+  skipLabel: string;
+  disabled: boolean;
+}) {
+  const opts: LiveSpeed[] = [1, 2, 4];
+  return (
+    <div className="mt-2 flex items-center gap-2">
+      <div
+        role="group"
+        aria-label="Velocidade da transmissão"
+        className="flex flex-1 gap-1 rounded-[12px] border border-border bg-surface-2 p-1"
+      >
+        {opts.map((s) => {
+          const on = speed === s;
+          return (
+            <button
+              key={s}
+              type="button"
+              aria-pressed={on}
+              aria-label={`Velocidade ${s} vezes`}
+              disabled={disabled}
+              onClick={() => onPick(s)}
+              className={`flex min-h-[40px] flex-1 items-center justify-center rounded-[9px] text-[13px] font-black tabular-nums transition-colors disabled:opacity-45 ${
+                on ? "bg-brand-600 text-white shadow-sm" : "text-ink-600"
+              }`}
+            >
+              {s}×
+            </button>
+          );
+        })}
+      </div>
+      <button
+        type="button"
+        onClick={onSkip}
+        disabled={disabled}
+        aria-label={skipLabel}
+        className="flex min-h-[40px] items-center gap-1.5 rounded-[12px] border border-border bg-surface px-3 text-[13px] font-bold text-ink-800 transition-colors hover:bg-surface-2 active:scale-[0.98] disabled:opacity-45"
+      >
+        <span aria-hidden>⏭️</span>
+        Pular tempo
+      </button>
+    </div>
+  );
+}
+
+// MELHORIA 2.2: estatísticas ao vivo — recolhível, compacto, abaixo do ticker. Usa o
+// MatchStatsPanel (mesmo visual do pós-jogo), em modo `dense`. Atualiza em tempo real.
+function LiveStats({
+  stats,
+  myName,
+  oppName,
+}: {
+  stats: MatchStats | null;
+  myName: string;
+  oppName: string;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mt-3 overflow-hidden rounded-[14px] border border-border bg-surface">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="flex min-h-[44px] w-full items-center justify-between gap-2 px-3.5 py-2.5 text-left"
+      >
+        <span className="flex items-center gap-2 text-[12.5px] font-extrabold text-ink-900">
+          <span aria-hidden>📊</span> Estatísticas ao vivo
+        </span>
+        <span aria-hidden className={`text-ink-400 transition-transform ${open ? "rotate-180" : ""}`}>
+          ▾
+        </span>
+      </button>
+      {open && (
+        <div className="border-t border-border px-2 pb-2 pt-2">
+          {stats ? (
+            <MatchStatsPanel stats={stats} myName={myName} oppName={oppName} title="ao vivo" dense />
+          ) : (
+            <div className="px-2 py-3 text-center text-[12.5px] text-ink-500">
+              Sem lances ainda — as estatísticas aparecem no primeiro ataque.
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -740,33 +910,33 @@ function tickerToneClass(kind: TickerKind): string {
   }
 }
 
-// Card de time no placar: escudo (item 3) + pílula com as cores da seleção (item 5).
-// Acende e pisca quando é o lado dono da chance em build-up (item 4).
-function TeamCard({
+// MELHORIA 2.5 — PLACAR ELETRÔNICO reciclando a distribuição espacial do Retrô:
+// escudo + nome de UM lado, gols GRANDES no centro, simétrico, com respiro. As cores
+// vêm de teamColors; o board é o token escuro (legível em claro e escuro).
+// Acende e pisca CONTINUAMENTE no lado dono do ciclo ofensivo (melhoria 2.1).
+function TeamPanel({
   name,
   slug,
-  align,
   active,
 }: {
   name: string;
   slug?: string;
-  align: "left" | "right";
   active?: boolean;
 }) {
   const c = teamColors(slug, name);
   return (
     <div
-      className={`flex min-w-0 items-center gap-1.5 ${align === "right" ? "flex-row-reverse" : ""}`}
+      className={`flex min-w-0 flex-1 flex-col items-center gap-1.5 ${
+        active && !REDUCED ? "animate-pulse-live" : ""
+      }`}
     >
-      <ManagerCrest slug={slug} name={name} size={26} className="shrink-0" />
+      <ManagerCrest slug={slug} name={name} size={40} className="shrink-0" />
       <span
-        className={`min-w-0 truncate rounded-md px-1.5 py-0.5 text-[12.5px] font-black leading-tight transition-shadow ${
-          active && !REDUCED ? "animate-pulse-live" : ""
-        }`}
+        className="w-full truncate rounded-md px-2 py-1 text-center text-[12.5px] font-black uppercase leading-tight tracking-wide"
         style={{
           background: c.bg,
           color: c.text,
-          boxShadow: active ? `0 0 0 2px rgba(255,255,255,0.85)` : undefined,
+          boxShadow: active ? "0 0 0 2px rgba(255,255,255,0.85)" : undefined,
         }}
       >
         {name}
@@ -786,9 +956,9 @@ function Scoreboard({
   small,
   possSide,
   goals,
-  speed,
-  onToggleSpeed,
-  children,
+  clock,
+  clockHot,
+  progress,
 }: {
   myName: string;
   oppName: string;
@@ -800,47 +970,55 @@ function Scoreboard({
   small?: boolean;
   possSide?: "A" | "B" | null;
   goals?: { side: "A" | "B"; m: number }[];
-  speed?: 1 | 2;
-  onToggleSpeed?: () => void;
-  children?: React.ReactNode;
+  clock?: string;
+  clockHot?: boolean;
+  progress?: number;
 }) {
   return (
     <div
       className="relative my-2 overflow-hidden rounded-[18px] border border-white/10 p-4 text-white"
       style={{ background: "var(--color-board, oklch(0.2 0.025 232))" }}
     >
-      {onToggleSpeed && (
-        <button
-          type="button"
-          onClick={onToggleSpeed}
-          aria-pressed={speed === 2}
-          aria-label={speed === 2 ? "Velocidade dobrada, toque para voltar ao normal" : "Velocidade normal, toque para dobrar"}
-          className="absolute right-2.5 top-2.5 flex h-7 min-w-[34px] items-center justify-center rounded-full border border-white/20 px-2 text-[12px] font-black tabular-nums text-white/90 transition-colors hover:bg-white/10 active:scale-95"
-          style={speed === 2 ? { background: "var(--color-gold-500, #e8b923)", color: "#1a1a1a", borderColor: "transparent" } : undefined}
-        >
-          {speed === 2 ? "2×" : "1×"}
-        </button>
-      )}
-      <div className={`flex items-center justify-between gap-1.5 ${onToggleSpeed ? "pr-8" : ""}`}>
-        <div className="min-w-0 flex-1">
-          <TeamCard name={myName} slug={mySlug} align="left" active={possSide === "A"} />
+      {/* distribuição do Retrô: lado esquerdo (escudo+nome) · gols grandes no centro ·
+          lado direito (escudo+nome). Simétrico e arejado. */}
+      <div className="flex items-stretch gap-2">
+        <TeamPanel name={myName} slug={mySlug} active={possSide === "A"} />
+        <div className="flex shrink-0 flex-col items-center justify-center px-1">
+          <div
+            className={`flex items-center justify-center gap-3 font-black tabular-nums text-gold-400 ${
+              small ? "text-[40px]" : "text-[52px]"
+            } leading-none`}
+            style={{ fontWeight: 900 }}
+          >
+            <span className={pop === "A" && !REDUCED ? "animate-[managerPop_0.4s_ease]" : undefined}>{a}</span>
+            <span className="text-[20px] font-bold text-white/30">×</span>
+            <span className={pop === "B" && !REDUCED ? "animate-[managerPop_0.4s_ease]" : undefined}>{b}</span>
+          </div>
+          {clock && (
+            <div
+              role="timer"
+              aria-live="off"
+              className={`mt-2 font-mono text-[12px] tracking-[0.12em] ${
+                clockHot ? "text-flame-400" : "text-white/55"
+              }`}
+            >
+              {clock}
+            </div>
+          )}
         </div>
-        <div
-          className={`flex shrink-0 items-center justify-center gap-2 px-0.5 font-black tabular-nums text-gold-400 ${
-            small ? "text-[34px]" : "text-[44px]"
-          } leading-none`}
-          style={{ fontWeight: 900 }}
-        >
-          <span className={pop === "A" && !REDUCED ? "animate-[managerPop_0.4s_ease]" : undefined}>{a}</span>
-          <span className="text-[18px] font-bold text-white/35">×</span>
-          <span className={pop === "B" && !REDUCED ? "animate-[managerPop_0.4s_ease]" : undefined}>{b}</span>
-        </div>
-        <div className="flex min-w-0 flex-1 justify-end">
-          <TeamCard name={oppName} slug={oppSlug} align="right" active={possSide === "B"} />
-        </div>
+        <TeamPanel name={oppName} slug={oppSlug} active={possSide === "B"} />
       </div>
+
       {goals && goals.length > 0 && <GoalTimeline goals={goals} />}
-      <div className="mt-2">{children}</div>
+
+      {progress != null && (
+        <div className="mt-3 h-[5px] overflow-hidden rounded-full bg-white/15">
+          <span
+            className="block h-full rounded-full bg-grass-500 transition-[width] duration-100"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -866,7 +1044,7 @@ function GoalTimeline({ goals }: { goals: { side: "A" | "B"; m: number }[] }) {
       </div>
     );
   return (
-    <div className="mt-2 grid grid-cols-2 gap-x-3 border-t border-white/10 pt-2" aria-label="Gols da partida">
+    <div className="mt-3 grid grid-cols-2 gap-x-3 border-t border-white/10 pt-2" aria-label="Gols da partida">
       {row(mine, "🟢", "left")}
       {row(theirs, "⚪", "right")}
     </div>
