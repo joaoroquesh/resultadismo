@@ -18,6 +18,19 @@ import { useEffect, useRef, useState } from "react";
  */
 const EASE = "transform 0.4s var(--ease-out-expo)";
 
+/** O toque começou DENTRO de um scroller horizontal interno (ex.: os tabs de
+ * grupos em "Palpites da galera")? Aí o arraste-dia não engata — o scroll
+ * lateral nativo daquele elemento é que deve mandar. */
+function startsInHScroller(node: EventTarget | null, stop: Element): boolean {
+  let n = node instanceof Element ? node : null;
+  while (n && n !== stop) {
+    const cs = getComputedStyle(n);
+    if (/(auto|scroll)/.test(cs.overflowX) && n.scrollWidth > n.clientWidth + 1) return true;
+    n = n.parentElement;
+  }
+  return false;
+}
+
 export function useDaySwipe(opts: {
   enabled: boolean;
   index: number;
@@ -43,6 +56,7 @@ export function useDaySwipe(opts: {
     let axis: null | "x" | "y" = null;
     let dragging = false;
     let curOff = 0;
+    let innerScroll = false; // toque começou num scroller horizontal interno (tabs de grupos)
 
     const resist = (dx: number) => {
       const { index, count } = st.current;
@@ -58,11 +72,14 @@ export function useDaySwipe(opts: {
       startY = t.clientY;
       axis = null;
       dragging = false;
+      // se o toque nasceu num scroller horizontal interno (tabs de grupos em
+      // "Palpites da galera"), o arraste-dia fica fora — o scroll nativo manda.
+      innerScroll = startsInHScroller(e.target, el);
     };
 
     const onMove = (e: TouchEvent) => {
       const t = e.touches[0];
-      if (!t) return;
+      if (!t || innerScroll) return;
       const dx = t.clientX - startX;
       const dy = t.clientY - startY;
       if (axis === null) {
