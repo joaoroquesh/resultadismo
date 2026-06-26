@@ -172,8 +172,10 @@ function ShootTeam({
   return (
     <div className={`flex min-w-0 flex-1 items-center gap-1.5 ${align === "right" ? "flex-row-reverse" : ""}`}>
       <ManagerCrest slug={slug} name={name} size={26} className="shrink-0" />
+      {/* ROBUSTEZ (v9): nome longo QUEBRA em até 2 linhas no placar dos pênaltis em vez de
+          truncar — par com o placar do ao vivo e do resultado. */}
       <span
-        className="min-w-0 truncate rounded-md px-1.5 py-0.5 text-[12px] font-black"
+        className="min-w-0 rounded-md px-1.5 py-0.5 text-[12px] font-black leading-[1.08] [overflow-wrap:anywhere]"
         style={{ background: c.bg, color: c.text }}
       >
         {name}

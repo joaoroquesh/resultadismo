@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Campaign, MatchEvent, MatchState, Tactic } from "./types";
 import {
-  applyCommand,
   createMatch,
   deriveStatsFromEvents,
-  possessionState,
   reactiveAiPosture,
+  recomputeFromMinute,
   recomputeStrengths,
   stageLong,
   stepMinute,
@@ -23,7 +22,15 @@ import {
   aiReadHint,
   mulberryUi,
 } from "./ui";
-import { FormGrid, ManagerCrest, MatchStatsPanel, MatchupBadges, SegBlock } from "./components";
+import {
+  ConfirmInline,
+  FormGrid,
+  ManagerCrest,
+  MatchStatsPanel,
+  MatchupBadges,
+  SegBlock,
+  StatsLegend,
+} from "./components";
 import { ESTILO_OPTS, FORM_OPTS, MARC_OPTS, POSTURA_OPTS, TICKER_ICON } from "./ui";
 import { teamColors } from "./teamColors";
 import { loadSpeed, saveSpeed } from "./managerLocal";
@@ -64,13 +71,32 @@ interface TickerLine {
 }
 
 // BUG 1.3: um lance em "suspense". Enquanto pendente, mostra só o build-up no ticker
-// e a posse pisca no lado dono. Ao ser REVELADO (no `due` OU num flush antes do
+// e a posse acende no lado dono. Ao ser REVELADO (no `due` OU num flush antes do
 // intervalo/fim), o desfecho entra na TIMELINE — e SÓ daí o gol conta no placar.
+// ITEM F: `danger` marca o build-up cuja CONCLUSÃO é um lance perigoso (gol, trave ou
+// grande chance defendida) e que NÃO foi interrompido — só esses fazem o card piscar.
 interface Pending {
   lineId: number;
   ev: MatchEvent;
   due: number;
   interrupted: boolean;
+  danger: boolean;
+}
+
+// ITEM F: um lance é "de PERIGO" quando a conclusão pode virar (ou quase virou) gol —
+// gol, bola na trave (quase) ou grande defesa do goleiro (defesa) — e o lance NÃO foi
+// interrompido por impedimento/falta. Fora disso, o ataque é só posse, sem piscar.
+function isDangerKind(kind: MatchEvent["kind"]): boolean {
+  return kind === "goal" || kind === "quase" || kind === "defesa";
+}
+
+// ITEM #5: lado que DOMINA o jogo agora (posse "em repouso", quando não há um build-up
+// ativo). Usa a posse ao vivo já derivada; antes do 1º lance, cai na força-base do motor
+// (shareA). Pura e determinística — extraída pra fora do componente pra manter o corpo do
+// LiveMatch simples.
+function restingPossSide(stats: MatchStats | null, shareA: number): "A" | "B" {
+  if (stats) return stats.poss.a >= stats.poss.b ? "A" : "B";
+  return shareA >= 0.5 ? "A" : "B";
 }
 
 function nowMs(): number {
@@ -94,6 +120,7 @@ export function LiveMatch({
   matchSeed,
   onMyTacChange,
   onFinish,
+  onExit,
 }: {
   campaign: Campaign;
   opp: import("./types").Team;
@@ -107,6 +134,9 @@ export function LiveMatch({
     goals: { side: "A" | "B"; m: number }[],
     stats: MatchStats,
   ) => void;
+  // controle/liberdade (Nielsen #3): sair da partida em andamento (com confirmação na
+  // UI). Descarta o jogo sem registrar resultado — volta pro hub.
+  onExit: () => void;
 }) {
   // a partida é criada UMA vez (lazy), antes do 1º render. O objeto MatchState tem
   // identidade estável (é mutado in-place pelo motor), então pode ser lido na render.
@@ -122,6 +152,12 @@ export function LiveMatch({
   const lineSeq = useRef(0);
   const uiRnd = useRef(mulberryUi(20020630 ^ (matchSeed >>> 0)));
   const halftimeShownRef = useRef(false);
+  // BUG #4: o pontapé inicial ("Bola rolando! A × B") só pode entrar UMA vez no ticker.
+  // O efeito de bootstrap roda DUAS vezes em dev por causa do <StrictMode> (mount →
+  // unmount → mount), e a limpeza para o relógio mas NÃO remove a linha já empilhada —
+  // por isso o kickoff aparecia duplicado. Este guard garante um único evento de
+  // kickoff, independente do StrictMode (determinístico, não depende do ambiente).
+  const kickoffPushedRef = useRef(false);
   // MELHORIA 2.6: velocidade do relógio (1x/2x/4x), lida via ref dentro do loop pra não
   // reiniciar o setInterval ao alternar — o próximo passo já usa o novo ritmo.
   const [speed, setSpeed] = useState<LiveSpeed>(() => loadSpeed());
@@ -136,15 +172,34 @@ export function LiveMatch({
   const liveTacRef = useRef<Tactic>(myTac);
   const liveTacCooldownRef = useRef(-999);
   const [liveTacCooldownUntil, setLiveTacCooldownUntil] = useState(-999);
+  // ITEM #3: confirmação transitória "✓ aplicada" no próprio painel de ajuste ao vivo
+  // (além da linha no ticker) — feedback no lugar onde o usuário agiu, importante no
+  // mobile (o ticker pode estar na outra aba). Some sozinha após ~2,2s.
+  const [liveTacJustApplied, setLiveTacJustApplied] = useState(false);
+  const liveTacAppliedTimer = useRef<number | null>(null);
   const [tacDrawerOpen, setTacDrawerOpen] = useState(false);
   // ITEM 14 reativo: postura corrente da IA (pode mudar conforme o placar ao vivo).
   const aiPostureRef = useRef(aiTac.postura);
   const [lines, setLines] = useState<TickerLine[]>([]);
   const [phase, setPhase] = useState<"live" | "halftime">("live");
-  const [cmdStat, setCmdStat] = useState("Aguarde o apito inicial…");
-  // MELHORIA 2.1: posse de bola — pisca CONTINUAMENTE no lado dono do ciclo ofensivo,
-  // do build-up até a conclusão da chance; só cessa/troca quando o lance conclui.
-  const [possSide, setPossSide] = useState<"A" | "B" | null>(null);
+  // controle/liberdade (Nielsen #3): pausar congela o relógio (para o setInterval) pra
+  // pensar a tática sem usar 1x; sair abre uma confirmação inline antes de descartar.
+  const [paused, setPaused] = useState(false);
+  const [confirmExit, setConfirmExit] = useState(false);
+  // ITEM #5: posse de bola em DOIS níveis, SEMPRE visíveis enquanto o jogo corre.
+  // `activePossSide` = quem detém a bola no ciclo ofensivo CORRENTE (acende no build-up,
+  // apaga na conclusão). Fora de um build-up, a posse não some: cai pro lado que DOMINA
+  // o jogo agora (restPossSide, derivado da posse ao vivo / força do motor). Assim, a
+  // TODO momento dá pra ver quem está com a bola (nível constante). `dangerSide` = só
+  // quando o build-up corrente vai concluir num lance de PERIGO (gol/trave/grande
+  // chance): aí o card AMPLIFICA (pisca em chama). reduced-motion: dois níveis estáticos
+  // distintos (posse = ring calmo; perigo = ring de chama fixo), sem piscar.
+  const [activePossSide, setActivePossSide] = useState<"A" | "B" | null>(null);
+  const [dangerSide, setDangerSide] = useState<"A" | "B" | null>(null);
+  // ITEM E: no MOBILE, abas alternam ticker (Transmissão) × painel de Estatísticas ao
+  // vivo (uma de cada vez). No desktop as duas convivem lado a lado (item C), então a
+  // aba é ignorada lá. Estado efêmero (não persiste).
+  const [liveTab, setLiveTab] = useState<"feed" | "stats">("feed");
 
   // BUG 1.3 — TIMELINE ÚNICA: a fonte de verdade do que o usuário JÁ VIU. Cada lance
   // resolvido (revelado) entra aqui com seu gol/minuto/lado. O PLACAR e os GOLS da UI
@@ -176,20 +231,12 @@ export function LiveMatch({
   }, [engine, revealed]);
 
   const [finished, setFinished] = useState(false);
-  // espelho render-safe das forças/volume do motor (a render NÃO lê stateRef no render)
-  const [view, setView] = useState({
-    shareA: 0.5,
-    gameVol: 1,
-    cooldownUntilMin: -999,
-  });
+  // espelho render-safe do volume do motor (a render NÃO lê stateRef no render).
+  const [view, setView] = useState({ gameVol: 1 });
   const syncView = useCallback(() => {
     const st = stateRef.current;
     if (!st) return;
-    setView({
-      shareA: st.shareA,
-      gameVol: st.gameVol,
-      cooldownUntilMin: st.cmdA.cooldownUntilMin,
-    });
+    setView({ gameVol: st.gameVol });
   }, []);
 
   const pushLine = useCallback(
@@ -214,51 +261,10 @@ export function LiveMatch({
     saveSpeed(next);
   }, []);
 
-  // ----- relógio do banco (leitura de posse) -----
-  const refreshCmdStat = useCallback(() => {
-    const st = stateRef.current;
-    if (!st) return;
-    const m = st.minute;
-    const cs = st.cmdA;
-    let txt = "";
-    if (cs.type && m < cs.untilMin) {
-      txt = (cs.type === "press" ? "Pressionando" : "Recuando") + ` — ${cs.untilMin - m}' restantes`;
-    } else if (m < cs.cooldownUntilMin) {
-      txt = `Banco respirando — ${cs.cooldownUntilMin - m}' p/ reusar`;
-    } else if (m > 0 && m < 90) {
-      const ps = possessionState(st, "A");
-      txt = ps.withBall
-        ? "Com a bola agora — boa hora de pressionar."
-        : ps.without
-          ? "Sem a bola agora — boa hora de recuar."
-          : "Jogo disputado — leia antes de apertar.";
-    }
-    setCmdStat(txt);
-  }, []);
-
-  // ----- comandos do jogador -----
-  const issuePlayerCmd = useCallback(
-    (type: "press" | "recuo") => {
-      const st = stateRef.current;
-      if (!st || st.finished) return;
-      const res = applyCommand(st, "A", type);
-      if (res.ok) {
-        const base =
-          type === "press" ? "PRESSIONA! Sobe a linha pra prensar." : "RECUA! Fecha atrás e cede o campo.";
-        const tag = ` (${res.hint})`;
-        pushLine(st.minute, `<strong>Você</strong> ${base}${tag}`, "cmd", {
-          icon: type === "press" ? "📣" : "🧱",
-        });
-        syncView();
-        refreshCmdStat();
-      }
-    },
-    [pushLine, refreshCmdStat, syncView],
-  );
-
   // ITEM 7: aplica um AJUSTE TÁTICO ao vivo (3 eixos; formação fica travada). Valida
   // o cooldown próprio, recomputa minhas forças do MINUTO SEGUINTE em diante e dá um
-  // micro-feedback no ticker. Não reseta gols/minuto/comandos.
+  // micro-feedback no ticker. Não reseta gols/minuto. (ITEM H: o banco de comandos
+  // Pressionar/Recuar foi removido — este ajuste é o único controle ao vivo.)
   const applyLiveTac = useCallback(
     (patch: Partial<Pick<Tactic, "estilo" | "postura" | "marcacao">>) => {
       const st = stateRef.current;
@@ -268,20 +274,28 @@ export function LiveMatch({
       liveTacRef.current = next;
       setLiveTac(next);
       onMyTacChange(next); // persiste a tática (sem mexer na formação travada)
-      recomputeStrengths(st, next, st.tacB);
+      // BUG #3: o ajuste ao vivo recomputa o FUTURO (do minuto seguinte em diante) com a
+      // nova tática minha vs a do rival — re-semeado de forma estável. O passado fica
+      // intacto; o placar segue derivando só dos gols revelados.
+      recomputeFromMinute(st, next, st.tacB, st.minute);
       const until = st.minute + P.LIVETAC_COOLDOWN_MIN;
       liveTacCooldownRef.current = until;
       setLiveTacCooldownUntil(until);
+      // ITEM #3: deixa CLARO que o ajuste já vale (a partir do minuto seguinte) — o
+      // trecho futuro foi recomputado com a nova tática.
       pushLine(
         st.minute,
-        `<strong>Você</strong> reorganiza: ${ESTILO_NM[next.estilo]} · ${POSTURA_NM[next.postura]} · ${MARC_NM[next.marcacao]}.`,
+        `Tática aplicada (vale do ${Math.min(90, st.minute + 1)}'): ${ESTILO_NM[next.estilo]} · ${POSTURA_NM[next.postura]} · ${MARC_NM[next.marcacao]}.`,
         "cmd",
-        { icon: "🔧" },
+        { icon: "✅" },
       );
+      // confirmação no painel: acende e some sozinha (não persiste).
+      setLiveTacJustApplied(true);
+      if (liveTacAppliedTimer.current != null) window.clearTimeout(liveTacAppliedTimer.current);
+      liveTacAppliedTimer.current = window.setTimeout(() => setLiveTacJustApplied(false), 2200);
       syncView();
-      refreshCmdStat();
     },
-    [onMyTacChange, pushLine, refreshCmdStat, syncView],
+    [onMyTacChange, pushLine, syncView],
   );
 
   // ----- suspense em 2 etapas -----
@@ -301,14 +315,19 @@ export function LiveMatch({
         teamSlug: teamSlugFor(attackerSide),
         teamName: ev.team,
       });
-      // MELHORIA 2.1: a posse acende no lado dono e pisca CONTINUAMENTE até o desfecho.
-      setPossSide(attackerSide);
+      // ITEM #5: o ciclo ofensivo assume a posse ativa (realce no lado que ataca agora).
+      setActivePossSide(attackerSide);
       const interrupted = ev.kind !== "goal" && uiRnd.current() < 0.38;
+      // ITEM F: pisca SÓ se o lance for de perigo E não for interrompido — aí o card do
+      // atacante acende em alerta de chama até a conclusão.
+      const danger = !interrupted && isDangerKind(ev.kind);
+      if (danger) setDangerSide(attackerSide);
       pendingRef.current.push({
         lineId,
         ev,
         due: nowMs() + buildupDelayMs(speedRef.current),
         interrupted,
+        danger,
       });
     },
     [aiTac, myTac, pushLine, teamSlugFor],
@@ -319,8 +338,11 @@ export function LiveMatch({
   const resolveBuildup = useCallback(
     (p: Pending) => {
       const ev = p.ev;
-      // MELHORIA 2.1: ao concluir, a posse para de piscar (se ainda for deste lance).
-      setPossSide((cur) => (cur === ev.ownerSide ? null : cur));
+      // ITEM #5: ao concluir, a POSSE ATIVA do ciclo apaga (a posse exibida volta pro
+      // dono dominante do momento — restPossSide — então nunca fica "sem bola") e o
+      // alerta de perigo cessa, se ainda forem deste lance.
+      setActivePossSide((cur) => (cur === ev.ownerSide ? null : cur));
+      if (p.danger) setDangerSide((cur) => (cur === ev.ownerSide ? null : cur));
       const meta = { teamSlug: teamSlugFor(ev.ownerSide), teamName: ev.team };
       const icon = (bankKey: keyof typeof TICKER_ICON) => pickArr(uiRnd.current, TICKER_ICON[bankKey]);
       // a TIMELINE só conta o gol se o lance NÃO foi interrompido (impedimento etc.).
@@ -387,14 +409,16 @@ export function LiveMatch({
     halftimeShownRef.current = true;
     stopTimer();
     flushAll(); // BUG 1.3: nenhum gol do 1º tempo pode ficar pra trás.
-    setPossSide(null);
+    setActivePossSide(null);
+    setDangerSide(null);
     setPhase("halftime");
   }, [flushAll, stopTimer]);
 
   const endMatch = useCallback(() => {
     stopTimer();
     flushAll(); // BUG 1.3: revela tudo antes de fechar — placar final == soma dos gols.
-    setPossSide(null);
+    setActivePossSide(null);
+    setDangerSide(null);
     setFinished(true);
     const st = stateRef.current;
     if (!st) return;
@@ -432,8 +456,7 @@ export function LiveMatch({
     setMinute(r.minute);
     r.events.forEach((ev) => stageChance(ev));
     syncView();
-    refreshCmdStat();
-  }, [aiTac, campaign.myTeam.o, opp.o, refreshCmdStat, stageChance, syncView]);
+  }, [aiTac, campaign.myTeam.o, opp.o, stageChance, syncView]);
 
   const liveFrame = useCallback(() => {
     const st = stateRef.current;
@@ -491,13 +514,22 @@ export function LiveMatch({
   // ----- bootstrap da partida (a partida já foi criada no lazy-init de stateRef) -----
   useEffect(() => {
     halftimeShownRef.current = false;
-    pushLine(0, `Bola rolando! <strong>${campaign.myTeam.n}</strong> × <strong>${opp.n}</strong>.`, "info", {
-      icon: "🟢",
-    });
+    // BUG #4: empilha o kickoff só na primeira vez (o StrictMode remonta o efeito).
+    if (!kickoffPushedRef.current) {
+      kickoffPushedRef.current = true;
+      pushLine(
+        0,
+        `Bola rolando! <strong>${campaign.myTeam.n}</strong> × <strong>${opp.n}</strong>.`,
+        "info",
+        { icon: "🟢" },
+      );
+    }
     syncView();
-    refreshCmdStat();
     startTimer();
-    return () => stopTimer();
+    return () => {
+      stopTimer();
+      if (liveTacAppliedTimer.current != null) window.clearTimeout(liveTacAppliedTimer.current);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -508,25 +540,71 @@ export function LiveMatch({
     const st = stateRef.current;
     if (!st) return;
     liveTacRef.current = myTac; // sincroniza o ajuste ao vivo com a tática do intervalo
-    recomputeStrengths(st, myTac, st.tacB);
+    // BUG #3: a tática do intervalo (formação + eixos) recomputa o 2º TEMPO inteiro a
+    // partir do minuto 45, re-semeado de forma estável (seed + placar + hash da tática).
+    // Mudar o plano no vestiário REALMENTE muda os lances/placar do 2º tempo. O 1º tempo
+    // (passado) e os gols já revelados ficam intactos.
+    recomputeFromMinute(st, myTac, st.tacB, 45);
     pendingRef.current = [];
-    setPossSide(null);
+    setActivePossSide(null);
+    setDangerSide(null);
+    // ITEM #3: micro-feedback EXPLÍCITO de que a tática do intervalo já vale — o trecho
+    // futuro (2º tempo) foi recomputado com este plano.
     pushLine(
       45,
-      `Começa o 2º tempo. Seu plano: ${FORM_NM[myTac.form]} · ${POSTURA_NM[myTac.postura]}.`,
+      `Tática aplicada a partir do 2º tempo: ${FORM_NM[myTac.form]} · ${ESTILO_NM[myTac.estilo]} · ${POSTURA_NM[myTac.postura]} · ${MARC_NM[myTac.marcacao]}.`,
       "cmd",
-      { icon: "🟢" },
+      { icon: "✅" },
     );
     setPhase("live");
     syncView();
-    refreshCmdStat();
     startTimer();
-  }, [myTac, pushLine, refreshCmdStat, startTimer, syncView]);
+  }, [myTac, pushLine, startTimer, syncView]);
+
+  // ITEM G: pausa/retoma a partida — congela o RELÓGIO, o PLAYBACK e as STATS. Pausar
+  // para o setInterval (o motor não avança, nada é revelado, as stats — derivadas dos
+  // lances revelados — ficam paradas). Ao retomar, deslocamos o `due` de cada lance em
+  // suspense pelo tempo pausado, pra a transmissão continuar EXATAMENTE de onde parou
+  // (sem revelar em rajada o que "venceu" o suspense durante a pausa). Não vale no
+  // intervalo nem com a partida encerrada. Pausa é efêmera (não persiste).
+  const pauseStartRef = useRef(0);
+  const togglePause = useCallback(() => {
+    if (finished || phase === "halftime") return;
+    setPaused((p) => {
+      const next = !p;
+      if (next) {
+        pauseStartRef.current = nowMs();
+        stopTimer();
+      } else {
+        const delta = nowMs() - pauseStartRef.current;
+        if (delta > 0) {
+          for (const pend of pendingRef.current) pend.due += delta;
+        }
+        startTimer();
+      }
+      return next;
+    });
+  }, [finished, phase, startTimer, stopTimer]);
+
+  // sair da partida: para o relógio e devolve o controle ao orquestrador (volta pro
+  // hub sem registrar o resultado). A confirmação acontece na UI antes de chamar isto.
+  const doExit = useCallback(() => {
+    stopTimer();
+    onExit();
+  }, [onExit, stopTimer]);
 
   // render lê só de state derivado — nunca de stateRef durante o render
-  const canCmd = minute < 90 && !finished && minute >= view.cooldownUntilMin;
   const stage = campaign.stages[campaign.stageIdx];
   const hot = (minute >= 43 && minute <= 45) || minute >= 87;
+  // ITEM #5: POSSE CONSTANTE. A bola é sempre de ALGUÉM enquanto o jogo corre. Quando há
+  // um ciclo ofensivo (build-up), a posse ativa é do atacante; fora dele, cai pro lado
+  // que DOMINA o jogo agora — derivado da posse ao vivo (liveStats), e antes do 1º lance
+  // pela força-base do motor (shareA). Assim o realce de posse nunca some entre os lances
+  // (nível constante). A posse só se esconde quando o jogo NÃO está rolando (intervalo,
+  // pausa, fim). reduced-motion não muda esta lógica — só o realce vira estático.
+  const live = phase === "live" && !finished;
+  const possSide: "A" | "B" | null =
+    !live || paused ? null : (activePossSide ?? restingPossSide(liveStats, engine.shareA));
   // ITEM 12: snapshot parcial das stats até 45' pro vestiário (deriva da timeline).
   const halftimeStats = useMemo<MatchStats | null>(() => {
     if (phase !== "halftime" || !engine) return null;
@@ -555,8 +633,10 @@ export function LiveMatch({
           small
         />
         <div className="mt-3 rounded-[14px] border border-border bg-surface p-3.5">
+          {/* ITEM #8: título sem citar o nome do rival; o conteúdo abaixo mostra a tática
+              dele + a leitura da comissão. */}
           <div className="text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
-            🔍 O que o {opp.n} está fazendo
+            🔍 Análise da Comissão técnica
           </div>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {[aiFormLabel, ESTILO_NM[aiTac.estilo], POSTURA_NM[aiTac.postura], MARC_NM[aiTac.marcacao]].map(
@@ -575,7 +655,8 @@ export function LiveMatch({
           <MatchupBadges my={myTac} opp={aiTac} />
         </div>
 
-        {/* ITEM 12: leitura do 1º tempo (parcial) */}
+        {/* ITEM #6: leitura do 1º tempo com as 6 métricas completas (iguais ao ao vivo e
+            ao pós-jogo) — não mais um resumo de 3. */}
         {halftimeStats && (
           <div className="mt-3">
             <MatchStatsPanel
@@ -583,7 +664,6 @@ export function LiveMatch({
               myName={campaign.myTeam.n}
               oppName={opp.n}
               title="1º tempo"
-              dense
             />
           </div>
         )}
@@ -624,10 +704,33 @@ export function LiveMatch({
   }
 
   // ---- ao vivo ----
+  // blocos reutilizados nos dois layouts (mobile empilhado com abas · desktop 2 colunas).
+  const feedPanel = (
+    <Ticker lines={lines} />
+  );
+  const statsPanel = (
+    <LiveStatsPanel stats={liveStats} myName={campaign.myTeam.n} oppName={opp.n} />
+  );
+  const tacPanel = (
+    // ITEM 7 / ITEM H: o único controle ao vivo é o AJUSTE TÁTICO (drawer recolhível).
+    // Formação travada até o intervalo; estilo/postura/marcação mudam a quente, com
+    // cooldown próprio. (O banco de comandos Pressionar/Recuar foi removido — ITEM H.)
+    <LiveTacPanel
+      tac={liveTac}
+      open={tacDrawerOpen}
+      onToggle={() => setTacDrawerOpen((v) => !v)}
+      cooldownLeft={Math.max(0, liveTacCooldownUntil - minute)}
+      justApplied={liveTacJustApplied}
+      disabled={finished || minute >= 90}
+      onChange={applyLiveTac}
+    />
+  );
+
   return (
     <div className="flex flex-col">
-      {/* MELHORIA 2.3: placar eletrônico STICKY — fica fixo no topo ao rolar a tela
-          pra mexer em tática/comandos, sempre visível. */}
+      {/* MELHORIA 2.3 / ITEM G: SÓ o placar eletrônico fica STICKY no topo ao rolar —
+          sempre visível. A fileira de controles (velocidade/pausar/pular) NÃO é sticky
+          (rola junto), pra não roubar altura útil no mobile. */}
       <div className="sticky top-0 z-20 -mx-0.5 bg-surface/85 px-0.5 pb-1 pt-0.5 backdrop-blur-sm">
         <div className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand-600">
           {stageLong(stage)}
@@ -641,102 +744,114 @@ export function LiveMatch({
           b={score.b}
           pop={pop}
           possSide={possSide}
+          dangerSide={dangerSide}
           goals={goals}
           clock={fmtClock(minute)}
           clockHot={hot}
           progress={Math.min(100, (minute / 90) * 100)}
         />
-        {/* MELHORIA 2.6: seletor de velocidade + pular tempo */}
-        <SpeedBar
-          speed={speed}
-          onPick={pickSpeed}
-          onSkip={skipHalf}
-          skipLabel={minute < 45 ? "Pular 1º tempo" : "Pular 2º tempo"}
-          disabled={finished}
-        />
       </div>
 
-      <div className="mt-2 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
-        Transmissão ao vivo
-      </div>
-      <div
-        aria-live="polite"
-        aria-label="Narração da partida"
-        className="mt-1 flex h-40 flex-col justify-start overflow-y-auto rounded-[14px] border border-border bg-surface px-1.5 py-1 text-[13.5px]"
-      >
-        {lines.map((l) => (
-          <div
-            key={l.id}
-            className={`flex items-start gap-2 border-b border-border px-1.5 py-1.5 last:border-b-0 ${tickerToneClass(l.kind)}`}
-          >
-            <span className="mt-px flex shrink-0 items-center gap-1">
-              {l.teamSlug || l.teamName ? (
-                <ManagerCrest slug={l.teamSlug} name={l.teamName ?? ""} size={16} />
-              ) : null}
-              {l.icon ? (
-                <span aria-hidden className="text-[15px] leading-none">
-                  {l.icon}
-                </span>
-              ) : null}
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="mr-1 font-mono text-[11px] font-bold tabular-nums text-ink-400">{l.min}&apos;</span>
-              <span dangerouslySetInnerHTML={{ __html: l.html }} />
-            </span>
-          </div>
-        ))}
-      </div>
-
-      {/* MELHORIA 2.2: estatísticas AO VIVO (recolhível) — insumo pra ajustar a tática. */}
-      <LiveStats stats={liveStats} myName={campaign.myTeam.n} oppName={opp.n} />
-
-      <div className="mb-1.5 mt-3.5 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
-        Seu banco — leia posse e placar
-      </div>
-      <div className="grid grid-cols-2 gap-2">
-        <CmdButton
-          label="Pressionar"
-          sub="sobe a linha · com a bola"
-          icon="⬆️"
-          disabled={!canCmd}
-          onClick={() => issuePlayerCmd("press")}
-        />
-        <CmdButton
-          label="Recuar"
-          sub="fecha atrás · sem a bola"
-          icon="🛡️"
-          disabled={!canCmd}
-          onClick={() => issuePlayerCmd("recuo")}
-        />
-      </div>
-      <div className="mt-2 min-h-[18px] text-center text-[12px] text-ink-600" aria-live="polite">
-        {cmdStat}
-      </div>
-
-      {/* ITEM 7: ajuste tático AO VIVO (drawer recolhível). Formação travada até o
-          intervalo; estilo/postura/marcação mudam a quente, com cooldown próprio. */}
-      <LiveTacPanel
-        tac={liveTac}
-        open={tacDrawerOpen}
-        onToggle={() => setTacDrawerOpen((v) => !v)}
-        cooldownLeft={Math.max(0, liveTacCooldownUntil - minute)}
-        disabled={finished || minute >= 90}
-        onChange={applyLiveTac}
+      {/* ITEM G: controles NÃO-fixos (fora do sticky) — velocidade + pausar + pular. */}
+      <SpeedBar
+        speed={speed}
+        onPick={pickSpeed}
+        onSkip={skipHalf}
+        skipLabel={minute < 45 ? "Pular 1º tempo" : "Pular 2º tempo"}
+        disabled={finished}
+        paused={paused}
+        onTogglePause={togglePause}
       />
+      {paused && (
+        <div
+          role="status"
+          className="mt-1.5 rounded-[10px] bg-brand-500/12 px-3 py-1.5 text-center text-[12px] font-bold text-brand-700"
+        >
+          Partida pausada. Toque em Retomar para continuar.
+        </div>
+      )}
+
+      {/* ITEM E (mobile): abas Transmissão | Estatísticas — uma de cada vez. No lg+ as
+          abas somem (item C as duas convivem lado a lado). */}
+      <div className="mt-3 lg:hidden">
+        <LiveTabs value={liveTab} onChange={setLiveTab} />
+        <div className="mt-2">
+          {liveTab === "feed" ? (
+            <div role="tabpanel" id="live-panel-feed" aria-labelledby="live-tab-feed">
+              {feedPanel}
+            </div>
+          ) : (
+            <div role="tabpanel" id="live-panel-stats" aria-labelledby="live-tab-stats">
+              {statsPanel}
+            </div>
+          )}
+        </div>
+        {/* o ajuste tático fica sempre acessível abaixo das abas (não disputa a aba). */}
+        <div className="mt-3">{tacPanel}</div>
+      </div>
+
+      {/* ITEM C (desktop lg+): DUAS COLUNAS aproveitando a largura — Transmissão à
+          esquerda, Estatísticas ao vivo + Ajuste tático à direita. O placar acima já
+          ocupa a largura inteira. */}
+      <div className="mt-3 hidden gap-4 lg:grid lg:grid-cols-[1.1fr_1fr]">
+        <div className="min-w-0">
+          <div className="mb-1.5 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
+            Transmissão ao vivo
+          </div>
+          {feedPanel}
+        </div>
+        <div className="flex min-w-0 flex-col gap-3">
+          <div>
+            <div className="mb-1.5 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
+              Estatísticas ao vivo
+            </div>
+            {statsPanel}
+          </div>
+          {tacPanel}
+        </div>
+      </div>
+
+      {/* controle/liberdade (Nielsen #3): sair da partida com confirmação. Ao abrir a
+          confirmação, pausa o relógio pra o usuário decidir sem o jogo correndo. */}
+      {!finished &&
+        (confirmExit ? (
+          <ConfirmInline
+            message="Sair agora encerra esta partida sem registrar o resultado. Você volta pro hub e pode jogá-la de novo."
+            confirmLabel="Sair sem salvar"
+            cancelLabel="Continuar jogando"
+            onConfirm={doExit}
+            onCancel={() => setConfirmExit(false)}
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              if (!paused) togglePause();
+              setConfirmExit(true);
+            }}
+            className="mt-3 min-h-[44px] self-center px-3 text-[13px] font-semibold text-ink-500 underline-offset-2 hover:text-flame-700 hover:underline"
+          >
+            Sair da partida
+          </button>
+        ))}
     </div>
   );
 }
 
-// MELHORIA 2.6: seletor de velocidade (1x/2x/4x) + "Pular tempo". Toque ≥44px, aria.
+// MELHORIA 2.6: seletor de velocidade (1x/2x/4x) + Pausar + "Pular tempo". ≥44px, aria.
 function SpeedBar({
   speed,
   onPick,
   onSkip,
   skipLabel,
   disabled,
+  paused,
+  onTogglePause,
 }: {
   speed: LiveSpeed;
   onPick: (s: LiveSpeed) => void;
+  paused: boolean;
+  onTogglePause: () => void;
   onSkip: () => void;
   skipLabel: string;
   disabled: boolean;
@@ -757,10 +872,10 @@ function SpeedBar({
               type="button"
               aria-pressed={on}
               aria-label={`Velocidade ${s} vezes`}
-              disabled={disabled}
+              disabled={disabled || paused}
               onClick={() => onPick(s)}
-              className={`flex min-h-[40px] flex-1 items-center justify-center rounded-[9px] text-[13px] font-black tabular-nums transition-colors disabled:opacity-45 ${
-                on ? "bg-brand-600 text-white shadow-sm" : "text-ink-600"
+              className={`flex min-h-[40px] flex-1 items-center justify-center rounded-[9px] text-[13px] font-black tabular-nums transition-[transform,background-color,color,box-shadow] duration-150 ease-out active:scale-[0.95] disabled:opacity-45 ${
+                on ? "scale-[1.04] bg-brand-600 text-white shadow-sm" : "text-ink-600 hover:text-ink-800"
               }`}
             >
               {s}×
@@ -770,8 +885,23 @@ function SpeedBar({
       </div>
       <button
         type="button"
-        onClick={onSkip}
+        onClick={onTogglePause}
         disabled={disabled}
+        aria-pressed={paused}
+        aria-label={paused ? "Retomar a partida" : "Pausar a partida"}
+        className={`flex min-h-[40px] items-center gap-1.5 rounded-[12px] border px-3 text-[13px] font-bold transition-colors active:scale-[0.98] disabled:opacity-45 ${
+          paused
+            ? "border-brand-500 bg-brand-600 text-white"
+            : "border-border bg-surface text-ink-800 hover:bg-surface-2"
+        }`}
+      >
+        <span aria-hidden>{paused ? "▶︎" : "⏸"}</span>
+        {paused ? "Retomar" : "Pausar"}
+      </button>
+      <button
+        type="button"
+        onClick={onSkip}
+        disabled={disabled || paused}
         aria-label={skipLabel}
         className="flex min-h-[40px] items-center gap-1.5 rounded-[12px] border border-border bg-surface px-3 text-[13px] font-bold text-ink-800 transition-colors hover:bg-surface-2 active:scale-[0.98] disabled:opacity-45"
       >
@@ -782,9 +912,126 @@ function SpeedBar({
   );
 }
 
-// MELHORIA 2.2: estatísticas ao vivo — recolhível, compacto, abaixo do ticker. Usa o
-// MatchStatsPanel (mesmo visual do pós-jogo), em modo `dense`. Atualiza em tempo real.
-function LiveStats({
+// ITEM E — abas Transmissão | Estatísticas ao vivo (mobile). Acessível (role=tablist/
+// tab), pílula com a aba ativa nítida, alvos ≥44px. Anima só transform/cor.
+function LiveTabs({
+  value,
+  onChange,
+}: {
+  value: "feed" | "stats";
+  onChange: (v: "feed" | "stats") => void;
+}) {
+  const tabs: { id: "feed" | "stats"; label: string; icon: string }[] = [
+    { id: "feed", label: "Transmissão", icon: "📺" },
+    { id: "stats", label: "Estatísticas", icon: "📊" },
+  ];
+  return (
+    <div
+      role="tablist"
+      aria-label="Visão da partida"
+      className="flex gap-1 rounded-[13px] border border-border bg-surface-2 p-1"
+    >
+      {tabs.map((t) => {
+        const on = value === t.id;
+        return (
+          <button
+            key={t.id}
+            type="button"
+            role="tab"
+            id={`live-tab-${t.id}`}
+            aria-selected={on}
+            aria-controls={`live-panel-${t.id}`}
+            onClick={() => onChange(t.id)}
+            className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-[10px] text-[13px] font-bold transition-[transform,background-color,color,box-shadow] duration-150 ease-out active:scale-[0.97] ${
+              on ? "scale-[1.02] bg-brand-600 text-white shadow-sm" : "text-ink-600 hover:text-ink-800"
+            }`}
+          >
+            <span aria-hidden>{t.icon}</span>
+            {t.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ITEM 6 — ticker da transmissão (extraído pra ser reutilizado nos dois layouts).
+function Ticker({ lines }: { lines: TickerLine[] }) {
+  return (
+    <div
+      aria-live="polite"
+      aria-label="Narração da partida"
+      className="flex h-40 flex-col justify-start overflow-y-auto rounded-[14px] border border-border bg-surface px-1.5 py-1 text-[13.5px] lg:h-[22rem]"
+    >
+      {lines.map((l) => (
+        <div
+          key={l.id}
+          className={`flex items-start gap-2 border-b border-border px-1.5 py-1.5 last:border-b-0 ${tickerToneClass(l.kind)}`}
+        >
+          <span className="mt-px flex shrink-0 items-center gap-1">
+            {l.teamSlug || l.teamName ? (
+              <ManagerCrest slug={l.teamSlug} name={l.teamName ?? ""} size={16} />
+            ) : null}
+            {l.icon ? (
+              <span aria-hidden className="text-[15px] leading-none">
+                {l.icon}
+              </span>
+            ) : null}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="mr-1 font-mono text-[11px] font-bold tabular-nums text-ink-400">{l.min}&apos;</span>
+            <span dangerouslySetInnerHTML={{ __html: l.html }} />
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ITEM D — número da estatística que TWEENA quando muda: pequeno "bump" (escala+cor)
+// pra o olho perceber a mudança sem o número pular seco. reduced-motion: troca direta.
+function TweenNumber({
+  value,
+  suffix,
+  className,
+}: {
+  value: number;
+  suffix?: string;
+  className?: string;
+}) {
+  const [bump, setBump] = useState(false);
+  const prev = useRef(value);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    if (prev.current === value) return;
+    prev.current = value;
+    if (REDUCED) return; // troca direta, sem animação
+    // O "bump" é um GATILHO de animação disparado pela mudança de valor (não um estado
+    // derivado). Em vez de chamar setState SÍNCRONO dentro do effect (que provoca renders
+    // em cascata), agendamos o ligar via requestAnimationFrame — ele roda fora do commit
+    // do effect, então o React não re-renderiza em cascata. O desligar acontece pelo
+    // onAnimationEnd da própria animação (e o reduced-motion já saiu acima sem ligar nada).
+    rafRef.current = window.requestAnimationFrame(() => setBump(true));
+    return () => window.cancelAnimationFrame(rafRef.current);
+  }, [value]);
+  return (
+    <span
+      onAnimationEnd={() => setBump(false)}
+      className={`inline-block tabular-nums ${bump ? "animate-manager-stat-bump text-brand-700" : ""} ${className ?? ""}`}
+    >
+      {value}
+      {suffix ?? ""}
+    </span>
+  );
+}
+
+// ITEM D — painel de estatísticas AO VIVO com o CONJUNTO COMPLETO (as mesmas 6 do
+// pós-jogo) atualizando à medida do jogo. Cada barra anima a LARGURA (~300ms ease-out)
+// e o número faz um tween curto. O objetivo é o usuário LER o jogo e se adaptar.
+// reduced-motion: sem tween/transição (o kill-switch global zera a animação; a
+// transição de width abaixo respeita o mesmo media query). Sempre visível (sem
+// recolher) — é insumo de leitura, não um detalhe escondido.
+function LiveStatsPanel({
   stats,
   myName,
   oppName,
@@ -793,33 +1040,63 @@ function LiveStats({
   myName: string;
   oppName: string;
 }) {
-  const [open, setOpen] = useState(false);
+  if (!stats) {
+    return (
+      <div className="rounded-[14px] border border-border bg-surface px-3.5 py-6 text-center text-[12.5px] text-ink-500">
+        Sem lances ainda. As estatísticas aparecem no primeiro ataque.
+      </div>
+    );
+  }
+  const rows: { label: string; a: number; b: number; suffix?: string }[] = [
+    { label: "Posse de bola", a: stats.poss.a, b: stats.poss.b, suffix: "%" },
+    { label: "Finalizações", a: stats.fin.a, b: stats.fin.b },
+    { label: "Chutes ao gol", a: stats.sot.a, b: stats.sot.b },
+    { label: "Passes certos", a: stats.passAcc.a, b: stats.passAcc.b, suffix: "%" },
+    { label: "Faltas", a: stats.fouls.a, b: stats.fouls.b },
+    { label: "Desarmes", a: stats.tackles.a, b: stats.tackles.b },
+  ];
   return (
-    <div className="mt-3 overflow-hidden rounded-[14px] border border-border bg-surface">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        className="flex min-h-[44px] w-full items-center justify-between gap-2 px-3.5 py-2.5 text-left"
-      >
-        <span className="flex items-center gap-2 text-[12.5px] font-extrabold text-ink-900">
-          <span aria-hidden>📊</span> Estatísticas ao vivo
-        </span>
-        <span aria-hidden className={`text-ink-400 transition-transform ${open ? "rotate-180" : ""}`}>
-          ▾
-        </span>
-      </button>
-      {open && (
-        <div className="border-t border-border px-2 pb-2 pt-2">
-          {stats ? (
-            <MatchStatsPanel stats={stats} myName={myName} oppName={oppName} title="ao vivo" dense />
-          ) : (
-            <div className="px-2 py-3 text-center text-[12.5px] text-ink-500">
-              Sem lances ainda — as estatísticas aparecem no primeiro ataque.
+    <div className="rounded-[14px] border border-border bg-surface p-3.5">
+      <div className="mb-1 flex items-center justify-between text-[10.5px] font-extrabold uppercase tracking-wide text-ink-500">
+        <span className="truncate text-brand-700">{myName}</span>
+        <span className="shrink-0 px-2">ao vivo</span>
+        <span className="truncate text-right text-ink-700">{oppName}</span>
+      </div>
+      <div className="mt-2 flex flex-col gap-2.5">
+        {rows.map((r) => {
+          const total = r.a + r.b || 1;
+          const pa = Math.round((r.a / total) * 100);
+          const aWins = r.a >= r.b;
+          return (
+            <div key={r.label}>
+              <div className="flex items-center justify-between text-[12.5px] font-bold tabular-nums text-ink-800">
+                <TweenNumber value={r.a} suffix={r.suffix} className={aWins ? "text-brand-700" : undefined} />
+                <span className="text-[10.5px] font-extrabold uppercase tracking-wide text-ink-500">
+                  {r.label}
+                </span>
+                <TweenNumber value={r.b} suffix={r.suffix} className={!aWins ? "text-ink-900" : undefined} />
+              </div>
+              <div
+                className="mt-1 flex h-1.5 overflow-hidden rounded-full bg-surface-2"
+                role="img"
+                aria-label={`${r.label}: ${myName} ${r.a}${r.suffix ?? ""}, ${oppName} ${r.b}${r.suffix ?? ""}`}
+              >
+                {/* ITEM D: a barra ANIMA a largura ~300ms ease-out quando a stat muda. */}
+                <span
+                  className="block h-full rounded-l-full bg-brand-500 transition-[width] duration-300 ease-out"
+                  style={{ width: `${pa}%` }}
+                />
+                <span
+                  className="block h-full rounded-r-full bg-ink-400 transition-[width] duration-300 ease-out"
+                  style={{ width: `${100 - pa}%` }}
+                />
+              </div>
             </div>
-          )}
-        </div>
-      )}
+          );
+        })}
+      </div>
+      {/* ITEM #7: mesma legenda dos demais painéis — finalização × chute ao gol. */}
+      <StatsLegend />
     </div>
   );
 }
@@ -832,6 +1109,7 @@ function LiveTacPanel({
   open,
   onToggle,
   cooldownLeft,
+  justApplied,
   disabled,
   onChange,
 }: {
@@ -839,6 +1117,7 @@ function LiveTacPanel({
   open: boolean;
   onToggle: () => void;
   cooldownLeft: number;
+  justApplied: boolean;
   disabled: boolean;
   onChange: (patch: Partial<Pick<Tactic, "estilo" | "postura" | "marcacao">>) => void;
 }) {
@@ -855,7 +1134,17 @@ function LiveTacPanel({
           <span aria-hidden>🔧</span> Ajuste tático ao vivo
         </span>
         <span className="flex items-center gap-2">
-          {cooldownLeft > 0 && (
+          {/* ITEM #3: confirmação transitória de que o ajuste foi aplicado, no lugar onde
+              o usuário agiu. Tem prioridade visual sobre o cooldown nos ~2s iniciais. */}
+          {justApplied && (
+            <span
+              role="status"
+              className="flex items-center gap-1 rounded-md bg-grass-500/15 px-2 py-0.5 text-[11px] font-extrabold text-grass-700"
+            >
+              <span aria-hidden>✓</span> aplicada
+            </span>
+          )}
+          {!justApplied && cooldownLeft > 0 && (
             <span className="rounded-md bg-surface-2 px-2 py-0.5 text-[11px] font-bold tabular-nums text-ink-500">
               {cooldownLeft}&apos; p/ reusar
             </span>
@@ -866,9 +1155,9 @@ function LiveTacPanel({
         </span>
       </button>
       {open && (
-        <div className={`border-t border-border px-3.5 pb-3.5 pt-1 ${locked ? "opacity-55" : ""}`}>
+        <div className={`animate-rise border-t border-border px-3.5 pb-3.5 pt-1 ${locked ? "opacity-55" : ""}`}>
           <div className="mt-1.5 text-[11px] text-ink-500">
-            A <b>formação</b> só muda no intervalo. Mexa em estilo, postura e marcação — vale do
+            A <b>formação</b> só muda no intervalo. Mexa em estilo, postura e marcação: vale do
             minuto seguinte.
           </div>
           <SegBlock
@@ -913,33 +1202,69 @@ function tickerToneClass(kind: TickerKind): string {
 // MELHORIA 2.5 — PLACAR ELETRÔNICO reciclando a distribuição espacial do Retrô:
 // escudo + nome de UM lado, gols GRANDES no centro, simétrico, com respiro. As cores
 // vêm de teamColors; o board é o token escuro (legível em claro e escuro).
-// Acende e pisca CONTINUAMENTE no lado dono do ciclo ofensivo (melhoria 2.1).
+// ITEM #5 — posse em DOIS níveis, SEMPRE distinguíveis:
+//  • `active` (posse normal) = este lado está com a bola → realce ESTÁVEL e claro:
+//    ring branco fixo + indicador "● com a bola" sob o nome (sem piscar). Mostrado
+//    constantemente enquanto o jogo corre, mesmo entre os lances.
+//  • `danger` (perigo) = o lance corrente vai concluir num lance de perigo → realce
+//    AMPLIFICADO: ring de chama mais grosso/brilhante. Com motion, ele PULSA; em
+//    reduced-motion, fica um ring de chama ESTÁTICO (distinto do branco da posse normal)
+//    e o indicador vira "▲ ataque perigoso". Os dois níveis nunca se confundem.
+const POSS_RING = "0 0 0 2px rgba(255,255,255,0.92)";
+const DANGER_RING_STATIC =
+  "0 0 0 3px oklch(0.69 0.2 27 / 1), 0 0 16px 2px oklch(0.64 0.22 27 / 0.7)";
 function TeamPanel({
   name,
   slug,
   active,
+  danger,
 }: {
   name: string;
   slug?: string;
   active?: boolean;
+  danger?: boolean;
 }) {
   const c = teamColors(slug, name);
+  const dangerBlink = danger && !REDUCED;
+  // box-shadow base por nível. A animação managerDanger define o box-shadow inteiro nos
+  // keyframes, então só aplicamos um boxShadow inline quando NÃO estamos animando.
+  const baseShadow = danger ? DANGER_RING_STATIC : active ? POSS_RING : undefined;
   return (
-    <div
-      className={`flex min-w-0 flex-1 flex-col items-center gap-1.5 ${
-        active && !REDUCED ? "animate-pulse-live" : ""
-      }`}
-    >
+    <div className="flex min-w-0 flex-1 flex-col items-center gap-1.5">
       <ManagerCrest slug={slug} name={name} size={40} className="shrink-0" />
+      {/* CLAREZA/ROBUSTEZ (v9): nome longo (ex.: "Coreia do Sul", "Estados Unidos")
+          QUEBRA em até 2 linhas em vez de truncar com "…" — o nome da seleção é a
+          identidade do placar, não pode sumir. overflow-wrap:anywhere só parte a palavra
+          em último caso (nome de uma palavra gigante); o normal quebra entre palavras.
+          leading apertado mantém o respiro do board. */}
       <span
-        className="w-full truncate rounded-md px-2 py-1 text-center text-[12.5px] font-black uppercase leading-tight tracking-wide"
+        className={`w-full rounded-md px-2 py-1 text-center text-[12.5px] font-black uppercase leading-[1.08] tracking-wide [overflow-wrap:anywhere] transition-shadow duration-150 ease-out ${
+          dangerBlink ? "animate-manager-danger" : ""
+        }`}
         style={{
           background: c.bg,
           color: c.text,
-          boxShadow: active ? "0 0 0 2px rgba(255,255,255,0.85)" : undefined,
+          boxShadow: dangerBlink ? undefined : baseShadow,
         }}
       >
         {name}
+      </span>
+      {/* indicador textual do nível de posse — reforça os DOIS níveis sem depender só de
+          cor/anim (acessível): "com a bola" (constante) × "ataque perigoso" (amplificado).
+          Altura reservada sempre, pra não empurrar o layout ao acender/apagar. */}
+      <span
+        className="flex h-3 items-center gap-1 text-[9px] font-extrabold uppercase tracking-wide leading-none"
+        aria-hidden
+      >
+        {danger ? (
+          <span className="flex items-center gap-1 text-flame-300">
+            <span>▲</span> ataque perigoso
+          </span>
+        ) : active ? (
+          <span className="flex items-center gap-1 text-white/70">
+            <span>●</span> com a bola
+          </span>
+        ) : null}
       </span>
     </div>
   );
@@ -955,6 +1280,7 @@ function Scoreboard({
   pop,
   small,
   possSide,
+  dangerSide,
   goals,
   clock,
   clockHot,
@@ -969,6 +1295,7 @@ function Scoreboard({
   pop?: "A" | "B" | null;
   small?: boolean;
   possSide?: "A" | "B" | null;
+  dangerSide?: "A" | "B" | null;
   goals?: { side: "A" | "B"; m: number }[];
   clock?: string;
   clockHot?: boolean;
@@ -982,7 +1309,7 @@ function Scoreboard({
       {/* distribuição do Retrô: lado esquerdo (escudo+nome) · gols grandes no centro ·
           lado direito (escudo+nome). Simétrico e arejado. */}
       <div className="flex items-stretch gap-2">
-        <TeamPanel name={myName} slug={mySlug} active={possSide === "A"} />
+        <TeamPanel name={myName} slug={mySlug} active={possSide === "A"} danger={dangerSide === "A"} />
         <div className="flex shrink-0 flex-col items-center justify-center px-1">
           <div
             className={`flex items-center justify-center gap-3 font-black tabular-nums text-gold-400 ${
@@ -1006,7 +1333,7 @@ function Scoreboard({
             </div>
           )}
         </div>
-        <TeamPanel name={oppName} slug={oppSlug} active={possSide === "B"} />
+        <TeamPanel name={oppName} slug={oppSlug} active={possSide === "B"} danger={dangerSide === "B"} />
       </div>
 
       {goals && goals.length > 0 && <GoalTimeline goals={goals} />}
@@ -1048,35 +1375,6 @@ function GoalTimeline({ goals }: { goals: { side: "A" | "B"; m: number }[] }) {
       {row(mine, "🟢", "left")}
       {row(theirs, "⚪", "right")}
     </div>
-  );
-}
-
-function CmdButton({
-  label,
-  sub,
-  icon,
-  disabled,
-  onClick,
-}: {
-  label: string;
-  sub: string;
-  icon: string;
-  disabled: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={onClick}
-      className="flex min-h-[60px] flex-col items-center justify-center gap-0.5 rounded-[14px] border border-border bg-surface px-2 py-2 text-center font-bold text-ink-900 transition-all active:scale-[0.98] disabled:opacity-45"
-    >
-      <span aria-hidden className="text-base">
-        {icon}
-      </span>
-      <span className="text-[13px]">{label}</span>
-      <span className="text-[10px] font-medium text-ink-500">{sub}</span>
-    </button>
   );
 }
 

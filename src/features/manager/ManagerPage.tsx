@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFirstSeen } from "@/lib/useFirstSeen";
 import { Button } from "@/components/ui/Button";
 import type { Campaign, Edition, MatchKind, MatchStats, Tactic, Team, WorldMode } from "./types";
@@ -12,10 +12,16 @@ import {
   finishFinalGroup,
   finishGroupsStage,
   finishKnockoutStage,
+  finalGroupRoundResults,
   fraseFor,
+  groupRoundResults,
   knockoutResult,
+  koRoundView,
+  lastGroupRoundPlayed,
+  lastKoRoundId,
   myNextMatch,
   poolForYear,
+  previewGroupRoundResults,
   projectBracket,
   recordFinalRound,
   recordThirdRound,
@@ -46,8 +52,8 @@ import {
   POSTMATCH,
   mulberryUi,
 } from "./ui";
-import { ManagerCrest, FormGrid, HistoryRow, MatchStatsPanel, SegBlock, StandingsTable, Stars, StyleRing, TeamName } from "./components";
-import { BracketBody, BracketModal } from "./Bracket";
+import { ConfirmInline, ManagerCrest, FormGrid, GroupRoundResultsPanel, HistoryRow, MatchStatsPanel, ScreenTransition, SegBlock, StandingsTable, Stars, StrengthVS, StyleRing, TeamName } from "./components";
+import { BracketBody, BracketModal, KoRoundBody, NextMatchPair } from "./Bracket";
 import { LiveMatch, PlanSummary } from "./LiveMatch";
 import { PenaltyShootout } from "./PenaltyShootout";
 import { teamColors } from "./teamColors";
@@ -68,6 +74,7 @@ type Screen =
   | "draft"
   | "hub"
   | "groupClassif"
+  | "koResults"
   | "tactics"
   | "live"
   | "penalties"
@@ -94,6 +101,11 @@ export function ManagerPage() {
   const [campaignSeed, setCampaignSeed] = useState(0);
   const [rerollsUsed, setRerollsUsed] = useState(0);
   const [myTac, setMyTac] = useState<Tactic>(() => loadTactic());
+
+  // ITEM D: rodada de mata-mata recém-fechada a exibir na tela de resultados da fase
+  // (id da rodada em camp.koRounds: "R16"/"QF"/"SF"/"FINAL"/"THIRD"). Setado antes do
+  // advance, lido pela tela koResults.
+  const [koRoundView, setKoRoundView] = useState<string | null>(null);
 
   // contexto da partida corrente
   const [matchOpp, setMatchOpp] = useState<Team | null>(null);
@@ -224,6 +236,17 @@ export function ManagerPage() {
     [go, matchKind, matchOpp],
   );
 
+  // -------- sair da partida em andamento (controle/liberdade, Nielsen #3) --------
+  // Descarta a partida sem registrar resultado: a campanha NÃO é mutada (nada de
+  // resolve/advance), volta pro hub. Ao reabrir o mesmo jogo, a seed é a mesma —
+  // determinismo preservado.
+  const exitMatch = useCallback(() => {
+    setMatchResult(null);
+    setMatchOpp(null);
+    setAiTac(null);
+    go("hub");
+  }, [go]);
+
   // -------- fechar estágio sem meu jogo (simular IA) --------
   const closeStageAndAdvance = useCallback(() => {
     const c = campRef.current;
@@ -239,7 +262,18 @@ export function ManagerPage() {
       advanceCampaign(c, finishFinalGroup(c));
     } else if (st.kind === "knockout") {
       finishKnockoutStage(c, st.bye ? true : false);
+      // ITEM D: apurei a fase sem jogo meu (ou passei direto). Mostra os resultados
+      // paralelos desta rodada antes do hub.
+      const closedRound = lastKoRoundId(c);
       advanceCampaign(c, true);
+      commit();
+      if (closedRound) {
+        setKoRoundView(closedRound);
+        go("koResults");
+        return;
+      }
+      go("hub");
+      return;
     } else if (st.kind === "third_place") {
       advanceCampaign(c, false);
     } else if (st.kind === "final") {
@@ -274,7 +308,19 @@ export function ManagerPage() {
     } else if (kind === "knockout") {
       const iWin = resolveKnockoutMatch(c, gf, ga, matchSeed);
       finishKnockoutStage(c, iWin);
+      // ITEM D: guarda a rodada recém-fechada e advança a campanha; a tela koResults
+      // mostra TODOS os confrontos paralelos desta fase (de camp.koRounds) antes do hub.
+      const closedRound = lastKoRoundId(c);
       advanceCampaign(c, iWin);
+      maybeAwardTrophies(c);
+      commit();
+      if (closedRound) {
+        setKoRoundView(closedRound);
+        go("koResults");
+        return;
+      }
+      go("hub");
+      return;
     } else if (kind === "third_place") {
       const kr = knockoutResult(c.myTeam, opp, gf, ga, matchSeed);
       const iWin = kr.winner === "A";
@@ -354,46 +400,10 @@ export function ManagerPage() {
   // ===================================================================
   // RENDER por tela
   // ===================================================================
-  if (screen === "intro")
-    return (
-      <IntroScreen
-        firstTime={introPending}
-        resumable={resumable}
-        onResume={resumeCampaign}
-        onPlay={() => {
-          markIntroSeen();
-          resetToEditions();
-        }}
-      />
-    );
-
-  if (screen === "editions") return <EditionSelect onPick={selectEdition} onBack={() => go("intro")} />;
-
-  if (screen === "draft" && edition)
-    return (
-      <DraftView
-        edition={edition}
-        cards={draft}
-        worldMode={worldMode}
-        rerollsUsed={rerollsUsed}
-        onWorldMode={setWorldMode}
-        onChoose={chooseTeam}
-        onReroll={reroll}
-        onBack={() => go("editions")}
-      />
-    );
-
-  if (screen === "tactics" && camp && matchOpp)
-    return (
-      <TacticPicker
-        campaign={camp}
-        opp={matchOpp}
-        myTac={myTac}
-        onMyTac={onMyTacChange}
-        onWhistle={() => go("live")}
-      />
-    );
-
+  // As telas com PLACAR sticky (live/penalties) ficam FORA do ScreenTransition: o
+  // translateY da entrada criaria um ancestral transformado e quebraria o position:
+  // sticky do placar durante a animação. Elas têm motion próprio (placar/posse/
+  // ticker). As demais ganham a entrada suave (fade + slide-up) keyed por screen.
   if (screen === "live" && camp && matchOpp && aiTac)
     return (
       <LiveMatch
@@ -404,6 +414,7 @@ export function ManagerPage() {
         matchSeed={matchSeed}
         onMyTacChange={onMyTacChange}
         onFinish={onLiveFinish}
+        onExit={exitMatch}
       />
     );
 
@@ -417,8 +428,46 @@ export function ManagerPage() {
       />
     );
 
-  if (screen === "result" && camp && matchResult)
-    return (
+  let content: ReactNode;
+  if (screen === "intro")
+    content = (
+      <IntroScreen
+        firstTime={introPending}
+        resumable={resumable}
+        onResume={resumeCampaign}
+        onPlay={() => {
+          markIntroSeen();
+          resetToEditions();
+        }}
+      />
+    );
+  else if (screen === "editions")
+    content = <EditionSelect onPick={selectEdition} onBack={() => go("intro")} />;
+  else if (screen === "draft" && edition)
+    content = (
+      <DraftView
+        edition={edition}
+        cards={draft}
+        worldMode={worldMode}
+        rerollsUsed={rerollsUsed}
+        onWorldMode={setWorldMode}
+        onChoose={chooseTeam}
+        onReroll={reroll}
+        onBack={() => go("editions")}
+      />
+    );
+  else if (screen === "tactics" && camp && matchOpp)
+    content = (
+      <TacticPicker
+        campaign={camp}
+        opp={matchOpp}
+        myTac={myTac}
+        onMyTac={onMyTacChange}
+        onWhistle={() => go("live")}
+      />
+    );
+  else if (screen === "result" && camp && matchResult)
+    content = (
       <MatchResult
         campaign={camp}
         result={matchResult}
@@ -427,24 +476,52 @@ export function ManagerPage() {
         onContinue={commitMatchResult}
       />
     );
-
-  if (screen === "groupClassif" && camp && edition)
-    return <GroupClassif campaign={camp} edition={edition} onContinue={continueFromGroupClassif} />;
-
-  if (screen === "hub" && camp && edition)
-    return (
+  else if (screen === "groupClassif" && camp && edition)
+    content = <GroupClassif campaign={camp} edition={edition} onContinue={continueFromGroupClassif} />;
+  else if (screen === "koResults" && camp && edition && koRoundView)
+    content = (
+      <KnockoutResults
+        campaign={camp}
+        edition={edition}
+        roundId={koRoundView}
+        onContinue={() => {
+          setKoRoundView(null);
+          go("hub");
+        }}
+      />
+    );
+  else if (screen === "hub" && camp && edition)
+    content = (
       <TournamentHub
         campaign={camp}
         edition={edition}
+        myTac={myTac}
         onStartMatch={startMatch}
         onCloseStage={closeStageAndAdvance}
         onNewCampaign={resetToEditions}
         onReplay={replaySameEdition}
       />
     );
-
   // fallback defensivo
-  return <IntroScreen firstTime={false} resumable={null} onResume={() => {}} onPlay={resetToEditions} />;
+  else
+    content = (
+      <IntroScreen firstTime={false} resumable={null} onResume={() => {}} onPlay={resetToEditions} />
+    );
+
+  // ITEM C: o canvas do shell é largo no desktop (lg+). As telas que se beneficiam da
+  // largura (hub e resultado têm grade 2-col interna no lg) ocupam o canvas inteiro; as
+  // naturalmente estreitas (intro, editions, draft, tática, classificação) se centralizam
+  // num bloco confortável (~560px) pra não esticar feio. No mobile todas são full-width.
+  const wideScreen = screen === "hub" || screen === "result";
+  return (
+    <ScreenTransition screenKey={screen}>
+      {wideScreen ? (
+        content
+      ) : (
+        <div className="lg:mx-auto lg:max-w-[560px]">{content}</div>
+      )}
+    </ScreenTransition>
+  );
 }
 
 // concede troféus locais conforme o desfecho (gamificação client-side)
@@ -474,6 +551,10 @@ function IntroScreen({
   onResume: () => void;
   onPlay: () => void;
 }) {
+  // Prevenção de erro (Nielsen #5): se há campanha salva, "Nova campanha" pede
+  // confirmação antes de descartá-la (clearCampaign é irreversível).
+  const [confirmNew, setConfirmNew] = useState(false);
+  const hasSaved = !!resumable && !firstTime;
   return (
     <div className="flex flex-col">
       <div className="h-[4vh]" />
@@ -496,10 +577,10 @@ function IntroScreen({
             <b>Sorteie</b> uma seleção (favorita, média ou zebra).
           </li>
           <li>
-            <b>Monte a tática</b> às cegas — formação, estilo, postura e marcação, tudo na sua mão.
+            <b>Monte a tática</b> às cegas: formação, estilo, postura e marcação, tudo na sua mão.
           </li>
           <li>
-            <b>No jogo</b>, leia posse e placar: pressione com a bola, recue sem ela.
+            <b>No jogo</b>, leia posse e placar e ajuste estilo, postura e marcação ao vivo.
           </li>
           <li>
             <b>No intervalo</b>, a tática do rival é revelada. Vire a chave.
@@ -510,19 +591,27 @@ function IntroScreen({
         </ul>
       </div>
       <div className="mt-5 space-y-2">
-        {resumable && !firstTime && (
+        {hasSaved && (
           <Button size="lg" fullWidth className="font-bold" onClick={onResume}>
-            ▶︎ Retomar a campanha ({resumable.edition.year} · {resumable.myTeam.n})
+            ▶︎ Retomar a campanha ({resumable!.edition.year} · {resumable!.myTeam.n})
           </Button>
         )}
         <Button
           size="lg"
           fullWidth
           className="bg-gold-600 font-bold text-ink-950 hover:bg-gold-700"
-          onClick={onPlay}
+          onClick={() => (hasSaved ? setConfirmNew(true) : onPlay())}
         >
-          ⚽ {resumable && !firstTime ? "Nova campanha" : "Jogar"}
+          ⚽ {hasSaved ? "Nova campanha" : "Jogar"}
         </Button>
+        {confirmNew && (
+          <ConfirmInline
+            message={`Começar uma nova campanha vai descartar a atual (${resumable!.edition.year} · ${resumable!.myTeam.n}). Tem certeza?`}
+            confirmLabel="Descartar e começar"
+            onConfirm={onPlay}
+            onCancel={() => setConfirmNew(false)}
+          />
+        )}
       </div>
       <p className="mt-5 text-center text-[11px] text-ink-500">
         Mini-jogo do Resultadismo · motor no cliente, sem backend.
@@ -566,13 +655,13 @@ function EditionSelect({ onPick, onBack }: { onPick: (ed: Edition) => void; onBa
       <div className="flex flex-col gap-2.5">
         {editions.map((ed) => {
           const pool = poolForYear(ed.year);
-          const champ = ed.champion_real ? `🏆 ${ed.champion_real}` : "— futura —";
+          const champ = ed.champion_real ? `🏆 ${ed.champion_real}` : "Copa ainda sem campeão";
           return (
             <button
               key={ed.year}
               type="button"
               onClick={() => onPick(ed)}
-              className="flex items-center gap-3 rounded-[15px] border border-border bg-surface px-3.5 py-3 text-left transition-colors hover:border-brand-400 active:scale-[0.985]"
+              className="group flex items-center gap-3 rounded-[15px] border border-border bg-surface px-3.5 py-3 text-left transition-[transform,border-color] duration-150 ease-out hover:border-brand-400 active:scale-[0.985]"
             >
               <div className="w-[54px] shrink-0 text-[21px] font-black tabular-nums text-brand-700">
                 {ed.year}
@@ -584,7 +673,9 @@ function EditionSelect({ onPick, onBack }: { onPick: (ed: Edition) => void; onBa
                 </div>
                 <div className="text-[10.5px] font-extrabold text-gold-700">{champ}</div>
               </div>
-              <div className="shrink-0 text-lg text-ink-400">›</div>
+              <div className="shrink-0 text-lg text-ink-400 transition-transform duration-150 ease-out group-hover:translate-x-0.5 group-hover:text-brand-500">
+                ›
+              </div>
             </button>
           );
         })}
@@ -648,8 +739,8 @@ function DraftView({
               type="button"
               aria-pressed={worldMode === v}
               onClick={() => onWorldMode(v)}
-              className={`min-h-[42px] flex-1 rounded-[10px] px-2 text-[13px] font-bold transition-colors ${
-                worldMode === v ? "bg-brand-600 text-white shadow-sm" : "text-ink-600"
+              className={`min-h-[42px] flex-1 rounded-[10px] px-2 text-[13px] font-bold transition-[transform,background-color,color,box-shadow] duration-150 ease-out active:scale-[0.97] ${
+                worldMode === v ? "scale-[1.02] bg-brand-600 text-white shadow-sm" : "text-ink-600 hover:text-ink-800"
               }`}
             >
               {lbl}
@@ -658,7 +749,7 @@ function DraftView({
         </div>
         <div className="mt-1.5 text-[11.5px] text-ink-600">
           {worldMode === "real"
-            ? "Os jogos paralelos tendem a repetir a hierarquia real — os favoritos avançam como avançaram."
+            ? "Os jogos paralelos tendem a repetir a hierarquia real: os favoritos avançam como avançaram."
             : "O motor simula tudo do zero: zebras e viradas podem reescrever a história."}
         </div>
       </div>
@@ -669,7 +760,7 @@ function DraftView({
             key={t.s}
             type="button"
             onClick={() => onChoose(t)}
-            className="relative rounded-[18px] border-2 border-border bg-surface p-3.5 text-left transition-all hover:border-brand-400 active:scale-[0.99]"
+            className="relative rounded-[18px] border-2 border-border bg-surface p-3.5 text-left transition-[transform,border-color,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:border-brand-400 hover:shadow-[var(--shadow-soft)] active:translate-y-0 active:scale-[0.99]"
           >
             <span className="absolute right-3 top-3">
               <TierBadge tier={t.t} label={BAND[i] ?? TIER_LABEL[t.t]} />
@@ -736,6 +827,7 @@ function Rate({ lab, v, color }: { lab: string; v: number; color: string }) {
 function TournamentHub({
   campaign,
   edition,
+  myTac,
   onStartMatch,
   onCloseStage,
   onNewCampaign,
@@ -743,6 +835,7 @@ function TournamentHub({
 }: {
   campaign: Campaign;
   edition: Edition;
+  myTac: Tactic;
   onStartMatch: (opp: Team, kind: MatchKind) => void;
   onCloseStage: () => void;
   onNewCampaign: () => void;
@@ -752,6 +845,7 @@ function TournamentHub({
   const mt = camp.myTeam;
   const steps = campaignProgress(camp);
   const [bracketOpen, setBracketOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   // o botão "Ver chaveamento" só aparece quando a edição tem mata-mata (projeção
   // não-nula). É puro e barato; memoiza por referência da campanha.
   const hasBracket = useMemo(() => projectBracket(camp) != null, [camp]);
@@ -763,6 +857,10 @@ function TournamentHub({
   const stage = camp.stages[camp.stageIdx];
   const st = camp.state;
   const nm = myNextMatch(camp);
+  // ITEM C: os IA×IA do meu grupo apurados na ÚLTIMA rodada que joguei (log gravado
+  // no commit). Some quando ainda não joguei nenhuma (lastRoundIdx < 0).
+  const lastRoundIdx = lastGroupRoundPlayed(camp);
+  const lastRoundResults = lastRoundIdx >= 0 ? groupRoundResults(camp, lastRoundIdx) : [];
 
   return (
     <div className="flex flex-col">
@@ -784,19 +882,32 @@ function TournamentHub({
         {steps.map((p, i) => (
           <span key={`${p.label}-${i}`} className="flex items-center gap-1">
             {i > 0 && <span className="text-[10px] text-ink-300">›</span>}
-            <span className={`shrink-0 whitespace-nowrap rounded-md px-2 py-1 text-[10.5px] font-extrabold ${progressTone(p.status)}`}>
+            <span className={`shrink-0 whitespace-nowrap rounded-md px-2 py-1 text-[10.5px] font-extrabold transition-[background-color,color,box-shadow] duration-200 ease-out ${progressTone(p.status)}`}>
               {p.label}
             </span>
           </span>
         ))}
       </div>
 
-      {/* ITEM 17: abre a árvore inteira do mata-mata a qualquer momento. */}
+      {/* visibilidade #1: saldo parcial da campanha (vitórias/empates/saldo de gols) +
+          bônus de tier projetado, atualizado a cada jogo — feedback de progressão. */}
+      {camp.history.length > 0 && <HubScoreStrip camp={camp} />}
+
+      {/* ITEM C (desktop lg+): abaixo do cabeçalho de campanha, DUAS COLUNAS aproveitam a
+          largura — à esquerda o que fazer agora (regras, chaveamento, próximo jogo + CTA);
+          à direita o estado da campanha (resultados paralelos, tabela do grupo, histórico).
+          No mobile tudo empilha numa coluna só (mobile-first intacto). */}
+      <div className="mt-4 grid grid-cols-1 gap-x-6 lg:mt-5 lg:grid-cols-2 lg:items-start">
+        {/* COLUNA 1 — ações */}
+        <div className="flex flex-col">
+      {/* ITEM #11: o "Como funciona / Regras" saiu daqui (topo) pro FIM da tela, pra não
+          competir com a ação principal (o card do próximo jogo + CTA). "Ver chaveamento"
+          fica, pois é uma ação ligada ao estado atual da campanha (não é ajuda). */}
       {hasBracket && (
         <button
           type="button"
           onClick={() => setBracketOpen(true)}
-          className="mt-2.5 inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-[12px] border border-border bg-surface-2 px-3 text-[13px] font-bold text-ink-700 transition-colors hover:bg-surface"
+          className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-[12px] border border-border bg-surface-2 px-3 text-[13px] font-bold text-ink-700 transition-[transform,background-color] duration-150 ease-out hover:bg-surface active:scale-[0.99]"
         >
           <span aria-hidden>🏆</span> Ver chaveamento
         </button>
@@ -811,18 +922,22 @@ function TournamentHub({
                 ` · seu jogo ${(st as GroupsStageState).myMatchIdx + 1}`}
             </div>
             <div className="my-2.5 flex items-center justify-center gap-3">
-              <span className="flex flex-1 flex-col items-center gap-1 text-center text-[17px] font-black">
+              {/* ROBUSTEZ (v9): min-w-0 + overflow-wrap garante que nome longo quebre entre
+                  palavras e NUNCA empurre o "VS" do centro nem estoure o card. */}
+              <span className="flex min-w-0 flex-1 flex-col items-center gap-1 text-center text-[17px] font-black leading-tight [overflow-wrap:anywhere]">
                 <ManagerCrest slug={mt.s} name={mt.n} size={34} />
                 {mt.n}
               </span>
-              <span className="text-[12px] font-extrabold opacity-70">VS</span>
-              <span className="flex flex-1 flex-col items-center gap-1 text-center text-[17px] font-black">
+              <span className="shrink-0 text-[12px] font-extrabold opacity-70">VS</span>
+              <span className="flex min-w-0 flex-1 flex-col items-center gap-1 text-center text-[17px] font-black leading-tight [overflow-wrap:anywhere]">
                 <ManagerCrest slug={nm.opp.s} name={nm.opp.n} size={34} />
                 {nm.opp.n}
               </span>
             </div>
-            <div className="flex items-center justify-center gap-1.5 text-center text-[12px] opacity-90">
-              {TIER_LABEL[nm.opp.t]} · <Stars o={nm.opp.o} light />
+            {/* ITEM F: força das DUAS seleções, lado a lado e comparável (estrelas +
+                tier de cada uma), em vez de só a do adversário com "Média" solto. */}
+            <div className="mt-1 border-t border-white/10 pt-2.5">
+              <StrengthVS mine={mt} opp={nm.opp} light />
             </div>
           </div>
           <Button
@@ -835,38 +950,72 @@ function TournamentHub({
           </Button>
         </>
       ) : (
-        <Button size="lg" fullWidth className="mt-3.5" onClick={onCloseStage}>
-          {closeLabel(camp)}
-        </Button>
+        <CloseStageControl camp={camp} onCloseStage={onCloseStage} />
+      )}
+        </div>
+
+        {/* COLUNA 2 — estado da campanha (tabela, paralelos, histórico). No lg+ o 1º bloco
+            renderizado alinha ao topo da coluna (zera o mt herdado do fluxo mobile). */}
+        <div className="mt-5 flex flex-col lg:mt-0 lg:[&>*:first-child]:mt-0">
+      {/* ITEM C: no hub, "outros jogos da rodada N do seu grupo" — os IA×IA recém
+          apurados (a tabela não muda mais em silêncio). lastGroupRoundPlayed é a
+          rodada que acabei de jogar; groupRoundResults lê o log gravado no commit. */}
+      {st?.kind === "groups" && lastRoundResults.length > 0 && (
+        <GroupRoundResultsPanel
+          results={lastRoundResults}
+          title={`Outros jogos · rodada ${lastRoundIdx + 1} do seu grupo`}
+          note="Esses resultados acabaram de entrar na tabela abaixo."
+        />
       )}
 
       {/* tabela do meu grupo / quadrangular */}
       {(st?.kind === "groups" || st?.kind === "final_group") && (
         <>
-          <div className="mt-5 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
-            {st.kind === "final_group"
-              ? "Quadrangular final"
-              : `Seu grupo${(st as GroupsStageState).isSecond ? " (2ª fase)" : ""}`}
+          <div className="mt-5 flex items-baseline justify-between gap-2">
+            <span className="text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
+              {st.kind === "final_group"
+                ? "Quadrangular final"
+                : `Seu grupo${(st as GroupsStageState).isSecond ? " (2ª fase)" : ""}`}
+            </span>
+            {st.kind === "groups" && (st as GroupsStageState).myMatchIdx > 0 && (
+              <span className="text-[10.5px] font-bold text-ink-500">
+                após a rodada {(st as GroupsStageState).myMatchIdx}
+              </span>
+            )}
           </div>
           {st.kind === "groups" ? (
             <StandingsTable
               standings={(st as GroupsStageState).standings[(st as GroupsStageState).myG]}
               advance={(st as GroupsStageState).advance}
               myKey={camp.myKey}
+              showLegend
             />
           ) : (
             <StandingsTable
               standings={(st as FinalGroupStageState).standings}
               advance={1}
               myKey={camp.myKey}
+              showLegend
             />
+          )}
+          {/* ITEM C / off-by-one: a coluna J explicita que todos jogaram o mesmo nº de
+              partidas — a tabela está balanceada, sem rival "na frente". */}
+          {st.kind === "groups" && (st as GroupsStageState).myMatchIdx > 0 && (
+            <p className="mt-1.5 text-[11px] leading-snug text-ink-500">
+              Todos do grupo já jogaram {(st as GroupsStageState).myMatchIdx}{" "}
+              {(st as GroupsStageState).myMatchIdx === 1 ? "partida" : "partidas"} (coluna J), a
+              tabela está balanceada.
+            </p>
           )}
         </>
       )}
       {st?.kind === "knockout" && (st as KnockoutStageState).bye && (
         <div className="mt-4 rounded-[14px] border border-border bg-surface p-3.5">
-          <b>Você passou direto (bye)</b>
-          <div className="text-sm text-ink-600">Sem adversário nesta rodada — avance.</div>
+          <b>Você avança sem jogar</b>
+          <div className="text-sm text-ink-600">
+            Sua chave não teve sorteio de adversário nesta rodada, então você passa direto para a
+            próxima fase (no futebol, isso é o &ldquo;bye&rdquo;).
+          </div>
         </div>
       )}
 
@@ -883,17 +1032,169 @@ function TournamentHub({
           </div>
         </>
       )}
+        </div>
+      </div>
+
+      {/* ITEM #11: "Como funciona / Regras" no FIM da tela (full-width nas duas colunas),
+          depois da campanha/tabela/chaveamento — acessível a quem retomou a campanha e
+          pulou a intro, mas sem roubar o topo da ação principal. Separador discreto pra
+          marcar que é um apoio, não um passo do fluxo. */}
+      <button
+        type="button"
+        onClick={() => setHelpOpen(true)}
+        className="mt-6 inline-flex min-h-[44px] w-full items-center justify-center gap-2 border-t border-border bg-transparent px-3 pt-4 text-[13px] font-bold text-ink-600 transition-colors duration-150 ease-out hover:text-ink-800"
+      >
+        <span aria-hidden>❔</span> Como funciona / Regras
+      </button>
 
       {bracketOpen && (
         <BracketModal campaign={camp} edition={edition} onClose={() => setBracketOpen(false)} />
       )}
+      {helpOpen && <HelpSheet myTac={myTac} onClose={() => setHelpOpen(false)} />}
+    </div>
+  );
+}
+
+// prevenção de erro (Nielsen #5) + visibilidade (#1) — botão de apurar a fase: pede
+// confirmação quando a ação é irreversível (closeNeedsConfirm) e mostra "Apurando…"
+// enquanto o motor simula em bloco. O bye (avançar sem jogo) dispensa confirmação.
+function CloseStageControl({ camp, onCloseStage }: { camp: Campaign; onCloseStage: () => void }) {
+  const [confirm, setConfirm] = useState(false);
+  const [apurando, setApurando] = useState(false);
+  if (confirm) {
+    return (
+      <ConfirmInline
+        message={closeConfirmMsg(camp)}
+        confirmLabel="Apurar e avançar"
+        tone="brand"
+        onConfirm={() => {
+          setApurando(true);
+          // deixa o "Apurando…" pintar antes da simulação síncrona (que é instantânea).
+          requestAnimationFrame(() => onCloseStage());
+        }}
+        onCancel={() => setConfirm(false)}
+      />
+    );
+  }
+  return (
+    <Button
+      size="lg"
+      fullWidth
+      className="mt-3.5"
+      loading={apurando}
+      onClick={() => (closeNeedsConfirm(camp) ? setConfirm(true) : onCloseStage())}
+    >
+      {apurando ? "Apurando…" : closeLabel(camp)}
+    </Button>
+  );
+}
+
+// visibilidade #1 — saldo parcial da campanha em andamento: vitórias, empates, saldo
+// de gols e o multiplicador de dificuldade projetado pelo tier. Reusa campaignScore
+// (mesma conta do fim) só pra o multiplicador; as tallies vêm do histórico.
+function HubScoreStrip({ camp }: { camp: Campaign }) {
+  const sc = campaignScore(camp);
+  let wins = 0;
+  let draws = 0;
+  let gd = 0;
+  camp.history.forEach((h) => {
+    if (h.win) wins++;
+    else if (h.draw) draws++;
+    gd += h.gf - h.ga;
+  });
+  const cell = (label: string, value: string, tone?: string) => (
+    <div className="flex min-w-0 flex-1 flex-col items-center">
+      <span className={`text-[15px] font-black tabular-nums ${tone ?? "text-ink-900"}`}>{value}</span>
+      <span className="text-[9.5px] font-extrabold uppercase tracking-wide text-ink-500">{label}</span>
+    </div>
+  );
+  return (
+    <div className="mt-2.5 flex items-stretch gap-1 rounded-[12px] border border-border bg-surface-2 px-2 py-2">
+      {cell("Vitórias", String(wins), "text-grass-700")}
+      <span className="w-px self-stretch bg-border" />
+      {cell("Empates", String(draws))}
+      <span className="w-px self-stretch bg-border" />
+      {cell("Saldo", `${gd > 0 ? "+" : ""}${gd}`, gd >= 0 ? "text-ink-900" : "text-flame-700")}
+      {sc.pctExtra > 0 && (
+        <>
+          <span className="w-px self-stretch bg-border" />
+          {cell("Bônus", `×${sc.mult.toFixed(2)}`, "text-gold-700")}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ajuda #10 — folha "Como funciona / Regras" acessível do hub e da tática. Reúne o
+// conteúdo da intro + pontuação 3/2/1 (e o desempate) + o bônus de tier + o anel de
+// estilos. Sheet acessível (role=dialog, ESC fecha, foco no botão). Sem hex.
+function HelpSheet({ myTac, onClose }: { myTac: Tactic; onClose: () => void }) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    closeRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Como funciona o Resultadismo Manager"
+      className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
+    >
+      <button type="button" aria-label="Fechar" tabIndex={-1} onClick={onClose} className="absolute inset-0 bg-ink-950/60" />
+      <div className="relative flex max-h-[92vh] w-full max-w-md flex-col rounded-t-[20px] border border-border bg-surface shadow-xl sm:rounded-[20px]">
+        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+          <h2 className="text-[18px] font-black text-ink-950">Como funciona</h2>
+          <button
+            ref={closeRef}
+            type="button"
+            onClick={onClose}
+            className="grid size-11 shrink-0 place-items-center rounded-full text-ink-600 transition-colors hover:bg-surface-2"
+          >
+            <span aria-hidden className="text-[20px] leading-none">✕</span>
+            <span className="sr-only">Fechar</span>
+          </button>
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+          <ul className="space-y-1.5 text-sm text-ink-700">
+            <li><b>Monte a tática</b> às cegas: formação, estilo, postura e marcação são suas.</li>
+            <li><b>No jogo</b>, leia posse e placar e ajuste a tática ao vivo: estilo, postura, marcação.</li>
+            <li><b>No intervalo</b>, a tática do rival é revelada. Vire a chave.</li>
+          </ul>
+          <div className="mt-4 rounded-[12px] border border-border bg-surface-2 px-3 py-2.5">
+            <div className="text-[11px] font-extrabold uppercase tracking-wide text-ink-500">Pontuação na fase de grupos</div>
+            <div className="mt-1 text-sm text-ink-700">
+              Vitória vale <b>3 pontos</b>, empate <b>1</b>, derrota <b>0</b>. Em caso de igualdade, decide o saldo de gols e depois os gols marcados.
+            </div>
+          </div>
+          <div className="mt-2.5 rounded-[12px] border border-border bg-surface-2 px-3 py-2.5">
+            <div className="text-[11px] font-extrabold uppercase tracking-wide text-ink-500">Bônus por dificuldade</div>
+            <div className="mt-1 text-sm text-ink-700">
+              Quanto mais fraca a seleção que você comanda, maior o bônus na pontuação final. Comandar uma zebra ao título vale muito mais.
+            </div>
+          </div>
+          <div className="mt-2.5">
+            <StyleRing estilo={myTac.estilo} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
 function progressTone(status: string): string {
   if (status === "done") return "bg-grass-100 text-grass-700";
-  if (status === "now") return "bg-brand-600 text-white";
+  // "now": halo discreto (ring brand) que diz "você está aqui", além da cor.
+  if (status === "now") return "bg-brand-600 text-white ring-2 ring-brand-500/30";
   if (status === "out") return "bg-flame-100 text-flame-700";
   return "border border-border bg-surface-2 text-ink-500";
 }
@@ -901,11 +1202,36 @@ function closeLabel(camp: Campaign): string {
   const st = camp.state;
   if (st?.kind === "groups") return "Encerrar a fase de grupos ›";
   if (st?.kind === "final_group") return "Encerrar o quadrangular ›";
-  if (st?.kind === "knockout" && (st as KnockoutStageState).bye) return "Avançar (você passou direto) ›";
+  if (st?.kind === "knockout" && (st as KnockoutStageState).bye) return "Avançar sem jogar ›";
   if (st?.kind === "knockout") return "Apurar a rodada ›";
   if (st?.kind === "third_place") return "Apurar (você não está no 3º lugar) ›";
   if (st?.kind === "final") return "Apurar a final ›";
   return "Avançar ›";
+}
+// prevenção de erro (Nielsen #5): a apuração em bloco simula o resto da fase e é
+// irreversível — confirma. O bye (avançar sem jogo) NÃO destrói nada, então dispensa.
+function closeNeedsConfirm(camp: Campaign): boolean {
+  const st = camp.state;
+  if (st?.kind === "knockout" && (st as KnockoutStageState).bye) return false;
+  return (
+    st?.kind === "groups" ||
+    st?.kind === "final_group" ||
+    st?.kind === "knockout" ||
+    st?.kind === "third_place" ||
+    st?.kind === "final"
+  );
+}
+function closeConfirmMsg(camp: Campaign): string {
+  const st = camp.state;
+  if (st?.kind === "groups")
+    return "Isto simula os jogos restantes da fase de grupos e fecha a classificação. Não dá pra voltar atrás.";
+  if (st?.kind === "final_group")
+    return "Isto simula os jogos restantes do quadrangular e fecha a classificação. Não dá pra voltar atrás.";
+  if (st?.kind === "third_place")
+    return "Você não está na disputa de 3º lugar. Isto apura o confronto e segue. Não dá pra voltar atrás.";
+  if (st?.kind === "final")
+    return "Isto apura a final e encerra a Copa. Não dá pra voltar atrás.";
+  return "Isto simula os jogos restantes desta fase e avança no chaveamento. Não dá pra voltar atrás.";
 }
 
 // ---------------- TELA DE CLASSIFICAÇÃO DOS GRUPOS ----------------
@@ -922,6 +1248,8 @@ function GroupClassif({
   const st = camp.state as GroupsStageState;
   const advanced = camp.pendingAdvance ?? false;
   const qualifiedKeys = new Set((st.qualified ?? []).map((t) => t.s));
+  // ITEM C: jogos decisivos da última rodada do meu grupo (definiram quem passou).
+  const decisive = finalGroupRoundResults(camp);
   return (
     <div className="flex flex-col">
       <div className="mt-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand-600">
@@ -934,9 +1262,19 @@ function GroupClassif({
           : "✕ Você caiu na fase de grupos. Cabeça erguida."}
       </p>
       <p className="mb-2.5 text-[11.5px] text-ink-600">
-        Quem passou (▲) e quem caiu — composição real da Copa, jogos paralelos pelo modo{" "}
+        Quem passou (▲) e quem caiu, na composição real da Copa. Jogos paralelos pelo modo{" "}
         {camp.worldMode === "real" ? "História Real" : "Mundo Alternativo"}.
       </p>
+      {/* ITEM C: os jogos decisivos da última rodada do meu grupo, que fecharam a
+          classificação — o usuário vê o que definiu quem passou. */}
+      {decisive.length > 0 && (
+        <GroupRoundResultsPanel
+          results={decisive}
+          title="Jogos decisivos do seu grupo"
+          note="A última rodada do seu grupo, que fechou a classificação acima."
+          highlight
+        />
+      )}
       {(st.sortedStandings ?? []).map((sorted, gIdx) => (
         <div key={gIdx}>
           <div className="mt-3.5 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
@@ -948,6 +1286,7 @@ function GroupClassif({
             advance={st.advance}
             myKey={camp.myKey}
             qualifiedKeys={qualifiedKeys}
+            showLegend={gIdx === 0}
           />
         </div>
       ))}
@@ -963,6 +1302,103 @@ function GroupClassif({
         onClick={onContinue}
       >
         {advanced ? "Seguir pro mata-mata ›" : "Ver fim de campanha ›"}
+      </Button>
+    </div>
+  );
+}
+
+// ITEM #9: rótulo da fase do PRÓXIMO confronto (a campanha já avançou, então é o estágio
+// corrente). Ex.: "Semifinais", "A Final". "" se não houver um estágio claro.
+function nextRoundLabel(camp: Campaign): string {
+  const st = camp.stages[camp.stageIdx];
+  return st ? stageLong(st) : "";
+}
+
+// ---------------- TELA DE RESULTADOS DO MATA-MATA (ITEM D) ----------------
+// Após uma rodada eliminatória fechar, mostra TODOS os confrontos paralelos dessa fase
+// (placar + pênaltis), destacando quem avançou — reusando o MatchCard do bracket. Os
+// dados vêm de camp.koRounds (o que a campanha de fato apurou; nada recalculado aqui).
+function KnockoutResults({
+  campaign,
+  edition,
+  roundId,
+  onContinue,
+}: {
+  campaign: Campaign;
+  edition: Edition;
+  roundId: string;
+  onContinue: () => void;
+}) {
+  const camp = campaign;
+  const round = useMemo(() => koRoundView(camp, roundId), [camp, roundId]);
+  // meu confronto nesta rodada: avancei? (slot meu venceu). Bye conta como avanço.
+  const mineMatch = round?.matches.find((m) => m.mine);
+  const iAdvanced =
+    !!mineMatch &&
+    ((mineMatch.a.isMe && mineMatch.a.winner) ||
+      (mineMatch.b.isMe && mineMatch.b.winner) ||
+      mineMatch.bye);
+  // próximo adversário (a campanha já avançou): só se eu sigo vivo e há jogo meu.
+  const nextOpp = camp.alive ? myNextMatch(camp)?.opp ?? null : null;
+
+  if (!round) {
+    // salvaguarda: sem rodada projetável, segue direto (não trava o fluxo).
+    return (
+      <div className="flex flex-col">
+        <div className="h-[6vh]" />
+        <Button size="lg" fullWidth onClick={onContinue}>
+          Continuar ›
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col">
+      <div className="mt-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand-600">
+        {edition.year} · {edition.host}
+      </div>
+      <h2 className="mb-0.5 mt-1.5 text-[23px] font-bold text-ink-950">Resultados · {round.label}</h2>
+      {mineMatch && (
+        <p className={`mb-1.5 text-sm font-bold ${iAdvanced ? "text-grass-700" : "text-flame-700"}`}>
+          {iAdvanced
+            ? mineMatch.bye
+              ? "✓ Você passou direto e avançou."
+              : "✓ Você avançou de fase!"
+            : "✕ Você caiu nesta fase. Cabeça erguida."}
+        </p>
+      )}
+      <p className="mb-2.5 text-[11.5px] text-ink-600">
+        Como ficaram todos os confrontos desta fase. Quem venceu (fundo verde) avança no chaveamento.
+      </p>
+
+      <KoRoundBody round={round} />
+
+      {/* ITEM #9: o encaminhamento pra próxima fase fala a MESMA língua dos confrontos
+          acima — o "próximo confronto" vem montado como PAR (escudo × escudo, sem placar),
+          não mais um card solto de layout diferente. A força das duas fica logo abaixo. */}
+      {iAdvanced && nextOpp && (
+        <div className="mt-4">
+          <div className="mb-1.5 flex items-baseline gap-2">
+            <span className="text-[11px] font-extrabold uppercase tracking-wide text-brand-700">
+              Próximo confronto
+            </span>
+            <span className="text-[11px] font-bold text-ink-500">{nextRoundLabel(camp)}</span>
+          </div>
+          <NextMatchPair mine={camp.myTeam} opp={nextOpp} />
+          <div className="mt-2 rounded-[12px] border border-border bg-surface-2 px-3 py-2">
+            <StrengthVS mine={camp.myTeam} opp={nextOpp} />
+          </div>
+        </div>
+      )}
+
+      <Button
+        size="lg"
+        fullWidth
+        className="mt-4.5 mt-[18px] bg-gold-600 font-bold text-ink-950 hover:bg-gold-700"
+        onClick={onContinue}
+      >
+        {camp.alive ? "Seguir ›" : "Ver fim de campanha ›"}
       </Button>
     </div>
   );
@@ -994,8 +1430,13 @@ function TacticPicker({
         <span className="font-bold text-ink-500">vs</span>
         <TeamName team={opp} />
       </div>
-      <p className="mb-2 text-[11.5px] text-ink-600">
-        A tática do {opp.n} só será revelada no intervalo. Monte seu plano — as escolhas são todas
+      {/* ITEM F: força das duas, comparável, antes de montar a tática (sou favorito
+          ou zebra neste jogo?). */}
+      <div className="mt-1.5 rounded-[12px] border border-border bg-surface-2 px-3 py-2">
+        <StrengthVS mine={campaign.myTeam} opp={opp} />
+      </div>
+      <p className="mb-2 mt-2 text-[11.5px] text-ink-600">
+        A tática do {opp.n} só será revelada no intervalo. Monte seu plano: as escolhas são todas
         suas.
       </p>
 
@@ -1044,6 +1485,17 @@ function MatchResult({
   const camp = campaign;
   const { gf, ga, opp } = result;
   const stage = camp.stages[camp.stageIdx];
+  // ITEM C: no resultado de um jogo de grupo, a rodada que estou jogando é o
+  // myMatchIdx ATUAL (ainda não incrementado — só sobe no commit). previewGroupRound
+  // calcula os IA×IA paralelos sem mutar a campanha (determinístico, bate com o log).
+  const myGroupRound =
+    kind === "groups" && camp.state?.kind === "groups"
+      ? (camp.state as GroupsStageState).myMatchIdx
+      : -1;
+  const otherGroupResults = useMemo(
+    () => (myGroupRound >= 0 ? previewGroupRoundResults(camp, myGroupRound) : []),
+    [camp, myGroupRound],
+  );
   const isKO = kind === "knockout" || kind === "third_place" || kind === "final";
   const koInfo: { winner: "A" | "B"; pens: string | null } | null = isKO
     ? knockoutResult(camp.myTeam, opp, gf, ga, matchSeed)
@@ -1081,8 +1533,11 @@ function MatchResult({
       >
         <div className="flex items-center justify-between gap-2">
           <ResultTeamCard name={camp.myTeam.n} slug={camp.myTeam.s} align="left" />
+          {/* ROBUSTEZ (v9): score com clamp — herói (54px) no desktop/telas largas, encolhe
+              no mobile estreito pra sobrar largura aos nomes das seleções (que passam a
+              quebrar em 2 linhas em vez de cortar). gap menor no mesmo espírito. */}
           <div
-            className="flex shrink-0 items-center justify-center gap-3 px-1 text-[54px] font-black tabular-nums leading-none text-gold-400"
+            className="flex shrink-0 items-center justify-center gap-2 px-1 text-[clamp(40px,12vw,54px)] font-black tabular-nums leading-none text-gold-400"
             style={{ fontWeight: 900 }}
           >
             <span>{gf}</span>
@@ -1101,25 +1556,51 @@ function MatchResult({
           </div>
         )}
       </div>
-      <div className="text-[20px] font-black text-ink-950">
-        {headlineFor(outcome, gf, ga, koInfo, kind)}
-      </div>
-      <p className="mb-0.5 mt-1 text-sm leading-relaxed text-ink-600">{blurb}</p>
-      <div className="my-2.5">
-        <span className={`inline-block rounded-md px-2.5 py-1 text-[13px] font-extrabold ${badge.tone}`}>
+      {/* ITEM C (desktop lg+): abaixo do placar (full-width), DUAS COLUNAS — à esquerda a
+          leitura do MEU jogo (manchete, veredito, recado do técnico); à direita os DADOS
+          (estatísticas + os jogos paralelos do grupo). No mobile empilha (mobile-first). */}
+      <div className="grid grid-cols-1 gap-x-6 lg:grid-cols-2 lg:items-start">
+        {/* COLUNA 1 — meu jogo */}
+        <div className="flex flex-col">
+      <div className="flex items-start gap-2.5">
+        <h2 className="text-[22px] font-black leading-tight text-ink-950">
+          {headlineFor(outcome, gf, ga, koInfo, kind)}
+        </h2>
+        <span className={`mt-0.5 shrink-0 rounded-md px-2.5 py-1 text-[12px] font-extrabold ${badge.tone}`}>
           {badge.txt}
         </span>
       </div>
+      <p className="mt-1.5 text-sm leading-relaxed text-ink-600">{blurb}</p>
+      <div className="mt-3 rounded-[14px] border border-border bg-surface p-3.5">
+        {/* Coerência: rótulo "Recado do técnico" (era "No banco") — depois que o banco de
+            comandos Pressionar/Recuar saiu, "No banco" podia confundir. É a leitura humana
+            do técnico sobre o jogo. */}
+        <div className="mb-1 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
+          Recado do técnico
+        </div>
+        <div className="text-sm leading-snug text-ink-700">{hint}</div>
+      </div>
+        </div>
+
+        {/* COLUNA 2 — dados (estatísticas + jogos paralelos do grupo). No lg+ o 1º bloco
+            renderizado alinha ao topo da coluna (zera o mt herdado do fluxo mobile). */}
+        <div className="mt-3 flex flex-col lg:mt-0 lg:[&>*:first-child]:mt-0">
       {result.stats && (
-        <div className="mt-3">
+        <div>
           <MatchStatsPanel stats={result.stats} myName={camp.myTeam.n} oppName={opp.n} />
         </div>
       )}
-      <div className="mt-3 rounded-[14px] border border-border bg-surface p-3.5">
-        <div className="mb-1 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
-          No banco
+      {/* ITEM C: na fase de grupos, "enquanto você jogava" — os outros jogos da MESMA
+          rodada do meu grupo (IA×IA), pré-computados deterministicamente (idênticos ao
+          que será gravado no commit). Explica a tabela que muda ao voltar pro hub. */}
+      {kind === "groups" && otherGroupResults.length > 0 && (
+        <GroupRoundResultsPanel
+          results={otherGroupResults}
+          title={`Enquanto você jogava · rodada ${myGroupRound + 1}`}
+          note="Esses jogos do seu grupo correram em paralelo. É por isso que a tabela vai mexer quando você voltar."
+        />
+      )}
         </div>
-        <div className="text-sm leading-snug text-ink-700">{hint}</div>
       </div>
       <Button size="lg" fullWidth className="mt-3.5" onClick={onContinue}>
         Continuar ›
@@ -1134,8 +1615,12 @@ function ResultTeamCard({ name, slug, align }: { name: string; slug?: string; al
   return (
     <div className={`flex min-w-0 flex-1 items-center gap-1.5 ${align === "right" ? "flex-row-reverse" : ""}`}>
       <ManagerCrest slug={slug} name={name} size={28} />
+      {/* CLAREZA/ROBUSTEZ (v9): no placar-herói do resultado o nome QUEBRA em até 2 linhas
+          em vez de truncar — antes até "Alemanha" virava "ALEM…" (o score grande comia a
+          largura). overflow-wrap:anywhere parte a palavra só em último caso; leading
+          apertado mantém o board compacto. Par com o TeamPanel do ao vivo. */}
       <span
-        className="max-w-full truncate rounded-md px-2 py-0.5 text-[12px] font-black uppercase tracking-wide"
+        className="max-w-full rounded-md px-2 py-0.5 text-center text-[12px] font-black uppercase leading-[1.08] tracking-wide [overflow-wrap:anywhere]"
         style={{ background: c.bg, color: c.text }}
       >
         {name}
@@ -1219,6 +1704,37 @@ function headlineFor(
 }
 
 // ---------------- 10. FIM DE CAMPANHA ----------------
+// Conta a pontuação subindo de 0→total (~900ms, ease-out) ao montar o fim de
+// campanha — transmite a CONQUISTA. Respeita prefers-reduced-motion mostrando o
+// número final direto. requestAnimationFrame (sem timers de layout).
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+function useCountUp(target: number, durationMs = 900): number {
+  // Inicializa já no valor final quando reduced-motion (ou SSR): a animação nem
+  // começa, sem setState síncrono no efeito.
+  const [value, setValue] = useState(() => (prefersReducedMotion() ? target : 0));
+  useEffect(() => {
+    if (prefersReducedMotion()) return;
+    let raf = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / durationMs);
+      // ease-out-quart, mesmo sabor do motion do app
+      const eased = 1 - Math.pow(1 - t, 4);
+      setValue(Math.round(target * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, durationMs]);
+  return value;
+}
+
 function CampaignEnd({
   campaign,
   edition,
@@ -1234,7 +1750,11 @@ function CampaignEnd({
   const sc = campaignScore(camp);
   const champ = camp.champion;
   const shareText = buildShareText(camp, sc);
-  const [copied, setCopied] = useState(false);
+  const shownScore = useCountUp(sc.total);
+  // recuperação de erro (Nielsen #9): "idle"|"ok"|"fail" — em falha, dá feedback
+  // explícito e seleciona o texto pra o usuário copiar à mão.
+  const [copyState, setCopyState] = useState<"idle" | "ok" | "fail">("idle");
+  const preRef = useRef<HTMLPreElement>(null);
   // ITEM 17: no fim de campanha, mostra OBRIGATORIAMENTE a árvore inteira do
   // mata-mata preenchida — inclusive os cruzamentos/resultados das IAs simulados
   // até a final depois da minha eliminação, revelando o campeão. Só nas edições
@@ -1243,12 +1763,30 @@ function CampaignEnd({
   // eu parei) — aqui já acabou, então não é spoiler.
   const bracketView = useMemo(() => projectBracket(camp, true), [camp]);
 
+  // seleciona o texto do <pre> como alternativa quando a clipboard API falha/inexiste.
+  function selectShareText() {
+    const el = preRef.current;
+    if (!el || typeof window === "undefined") return;
+    const sel = window.getSelection();
+    if (!sel) return;
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
   function copy() {
     if (navigator.clipboard?.writeText) {
       navigator.clipboard.writeText(shareText).then(
-        () => setCopied(true),
-        () => setCopied(false),
+        () => setCopyState("ok"),
+        () => {
+          setCopyState("fail");
+          selectShareText();
+        },
       );
+    } else {
+      // sem clipboard API (alguns navegadores mobile/embed): seleciona pra copiar à mão.
+      setCopyState("fail");
+      selectShareText();
     }
   }
 
@@ -1257,12 +1795,12 @@ function CampaignEnd({
       <div className="h-[2vh]" />
       {champ ? (
         <>
-          <div className="text-center text-[52px]">🏆</div>
-          <h2 className="mt-1.5 text-center text-[26px] font-bold text-ink-950">CAMPEÃO DO MUNDO!</h2>
+          <div className="animate-pop-in text-center text-[52px]">🏆</div>
+          <h2 className="mt-1.5 text-center text-[26px] font-black text-ink-950">CAMPEÃO DO MUNDO!</h2>
         </>
       ) : (
         <>
-          <div className="text-center text-[52px]">{camp.eliminated ? "😤" : "🥈"}</div>
+          <div className="animate-pop-in text-center text-[52px]">{camp.eliminated ? "😤" : "🥈"}</div>
           <h2 className="mt-1.5 text-center text-[23px] font-bold text-ink-950">
             {camp.placement ?? "Fim de campanha"}
           </h2>
@@ -1287,7 +1825,7 @@ function CampaignEnd({
       >
         <div className="text-[11px] font-extrabold uppercase tracking-widest opacity-85">Pontuação</div>
         <div className="text-[40px] font-black tabular-nums leading-none">
-          {sc.total.toLocaleString("pt-BR")}
+          {shownScore.toLocaleString("pt-BR")}
         </div>
         <div className="text-[12px]">
           {difficultyLabel(camp.myTeam.t, sc)}
@@ -1301,9 +1839,9 @@ function CampaignEnd({
           </div>
           <p className="mb-2.5 mt-0.5 text-[11.5px] text-ink-600">
             {camp.champion
-              ? "Você levantou a taça — a árvore inteira do mata-mata."
+              ? "Você levantou a taça. A árvore inteira do mata-mata."
               : camp.eliminated
-                ? "Como terminou o mata-mata depois que você caiu — até a final."
+                ? "Como o mata-mata terminou depois que você caiu, até a final."
                 : "A árvore completa do mata-mata desta Copa."}
           </p>
           <BracketBody view={bracketView} />
@@ -1326,12 +1864,21 @@ function CampaignEnd({
       <div className="mt-4 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
         Compartilhar
       </div>
-      <pre className="mt-1 overflow-x-auto whitespace-pre-wrap rounded-[14px] border border-border bg-surface-2 p-3 text-[12px] text-ink-700">
+      <pre
+        ref={preRef}
+        className="mt-1 overflow-x-auto whitespace-pre-wrap rounded-[14px] border border-border bg-surface-2 p-3 text-[12px] text-ink-700"
+      >
         {shareText}
       </pre>
       <Button variant="outline" fullWidth className="mt-2.5" onClick={copy}>
-        {copied ? "✓ Copiado!" : "📋 Copiar resultado"}
+        {copyState === "ok" ? "✓ Copiado!" : "📋 Copiar resultado"}
       </Button>
+      {copyState === "fail" && (
+        <p className="mt-1.5 text-center text-[11.5px] text-flame-700">
+          Não consegui copiar automaticamente. Selecionei o texto acima, é só copiar (toque e
+          segure, depois Copiar).
+        </p>
+      )}
       <Button size="lg" fullWidth className="mt-3 bg-gold-600 font-bold text-ink-950 hover:bg-gold-700" onClick={onNewCampaign}>
         🔄 Nova campanha
       </Button>
@@ -1343,16 +1890,16 @@ function CampaignEnd({
 }
 // rótulo do bônus de dificuldade — deriva do TIER (item 18), nunca chama elite de "fraco".
 function difficultyLabel(tier: Team["t"], sc: ReturnType<typeof campaignScore>): string {
-  if (sc.pctExtra <= 0) return "Seleção de elite — sem bônus de dificuldade";
+  if (sc.pctExtra <= 0) return "Seleção de elite, sem bônus de dificuldade";
   const noun = tier === "D" ? "uma zebra" : tier === "C" ? "um azarão" : "uma seleção sem favoritismo";
   return `+${sc.pctExtra}% por comandar ${noun} (×${sc.mult.toFixed(2)})`;
 }
 function nearMissMsg(camp: Campaign): string {
   const last = camp.history[camp.history.length - 1];
   if (!last) return "Você caiu cedo, mas o jogo é rejogável.";
-  if (last.pens) return "Eliminado nos pênaltis — não dá pra pedir mais coração.";
+  if (last.pens) return "Eliminado nos pênaltis. Não dá pra pedir mais coração.";
   if (last.draw) return "Faltou um gol pra virar a chave.";
-  return `Perdeu por ${last.ga - last.gf} — dá pra reverter na próxima.`;
+  return `Perdeu por ${last.ga - last.gf}. Dá pra reverter na próxima.`;
 }
 function buildShareText(camp: Campaign, sc: ReturnType<typeof campaignScore>): string {
   const res = camp.champion ? "🏆 CAMPEÃO" : (camp.placement ?? "Eliminado");
@@ -1365,9 +1912,9 @@ function buildShareText(camp: Campaign, sc: ReturnType<typeof campaignScore>): s
   return (
     "RESULTADISMO MANAGER\n" +
     `Copa ${camp.edition.year} (${camp.edition.host})\n` +
-    `${flagEmoji(camp.myTeam.n)} ${camp.myTeam.n} ${camp.myTeam.y} — ${res}\n` +
+    `${flagEmoji(camp.myTeam.n)} ${camp.myTeam.n} ${camp.myTeam.y}: ${res}\n` +
     `Pontuação: ${sc.total.toLocaleString("pt-BR")}${sc.pctExtra > 0 ? ` (+${sc.pctExtra}% dificuldade)` : ""}\n\n` +
     path +
-    "\n\nVocê não palpita — você comanda. /manager"
+    "\n\nVocê não palpita, você comanda. /manager"
   );
 }

@@ -309,12 +309,12 @@ export const TACTICAL_HINTS_SUBTLE: string[] = [
   "Sentiu como a barreira deles anulou nossas jogadas pelo meio? Pra próxima, abrir mais pelos lados pode soltar o time.",
   "Hoje a leitura do banco fez diferença: quando você fechou atrás na hora certa, o jogo deles emperrou de vez.",
   "Reparou que o adversário corria atrás o tempo todo? Seu jeito de propor o jogo encaixou direitinho com o que eles ofereciam.",
-  "Faltou um plano pra furar aquela retranca — com mais paciência na troca de passes, aquele muro cai.",
+  "Faltou um plano pra furar aquela retranca. Com mais paciência na troca de passes, aquele muro cai.",
   "Quando você mandou pressionar lá em cima, a bola passou a sobrar no nosso campo de ataque. Detalhe que pesou.",
   "A escolha de sair em velocidade castigou os espaços que eles deixaram nas costas. Casou como uma luva.",
-  "Eles te empurraram pro campo de defesa e a sua postura não soube respirar — segurar a bola um pouco mais teria aliviado.",
+  "Eles te empurraram pro campo de defesa e a sua postura não soube respirar. Segurar a bola um pouco mais teria aliviado.",
   "Pequeno detalhe tático, grande resultado: você leu o que o adversário oferecia e jogou no contrapé deles o jogo inteiro.",
-  "A formação deles tampou nosso corredor central — insistir por ali custou caro. Pelas pontas o caminho estava mais livre.",
+  "A formação deles tampou nosso corredor central, e insistir por ali custou caro. Pelas pontas o caminho estava mais livre.",
   "O time encaixou quando você ajustou a marcação: o adversário perdeu as referências e a gente cresceu na partida.",
   "Deu pra notar que a tática certa rendeu mais que o talento bruto hoje. No detalhe do plano você ganhou o duelo.",
   "Quando você recuou e cedeu o campo, eles esbarraram na sua muralha e a gente saiu mortal no contragolpe.",
@@ -326,10 +326,10 @@ export const POSTMATCH: Record<string, string[]> = {
     "Era pra ser passeio e foi passeio. O time deles nunca achou onde se segurar e a gente fez a festa do começo ao fim.",
     "Aula. Cada bola que sobrava virava chance, cada chance virava gol. O adversário entrou pra cumprir tabela e saiu atropelado.",
     "Quando o teu time é muito melhor e ainda joga concentrado, dá nisso: baile de bola, goleada e torcida cantando antes do apito final.",
-    "Sufoco do início ao fim. Eles se fecharam, mas a represa estourou e foi gol atrás de gol — placar de números redondos.",
+    "Sufoco do início ao fim. Eles se fecharam, mas a represa estourou e foi gol atrás de gol, num placar de números redondos.",
     "Foi quase treino. O rival não conseguiu sair do campo de defesa e a gente transformou superioridade em pendurada de bolas na rede.",
     "Bola pra cá, bola pra lá, e sempre terminando no fundo do gol deles. Goleada construída no peso do elenco.",
-    "Domínio total. Eles tentaram aguentar, mas não tinha como — diferença de qualidade gritante e o placar só confirmou o óbvio.",
+    "Domínio total. Eles tentaram aguentar, mas não tinha como: diferença de qualidade gritante e o placar só confirmou o óbvio.",
   ],
   vitoria_normal: [
     "Vitória suada, mas merecida. A gente propôs o jogo, segurou os nervos e carimbou o resultado.",
@@ -347,7 +347,7 @@ export const POSTMATCH: Record<string, string[]> = {
     "Empatou e a sensação é de gol perdido. A gente teve as chances, eles tiveram as deles, e no fim ninguém balançou a rede.",
     "Dividiram os pontos num duelo de marca-marca. Foi mais luta do que futebol, mas ponto fora não é ruim.",
     "Equilíbrio do início ao fim. Cada time mandou no seu pedaço e o empate acabou sendo o retrato fiel da partida.",
-    "Um ponto que pode pesar lá na frente — pra bem ou pra mal. O jogo pediu um vencedor e não teve.",
+    "Um ponto que pode pesar lá na frente, pra bem ou pra mal. O jogo pediu um vencedor e não teve.",
   ],
   derrota_normal: [
     "Não foi o nosso dia. Criamos, batemos na trave do destino, mas saiu na frente quem aproveitou melhor. Cabeça erguida.",
@@ -359,12 +359,12 @@ export const POSTMATCH: Record<string, string[]> = {
     "Saiu derrotado o time que arriscou mais e não foi premiado. Doeu, mas tem próxima.",
   ],
   zebra_grande: [
-    "ESCREVAM ESSE JOGO NA HISTÓRIA! Davi engoliu Golias! Ninguém apostava um centavo no teu time — e foi ele que calou o gigante!",
+    "ESCREVAM ESSE JOGO NA HISTÓRIA! Davi engoliu Golias! Ninguém apostava um centavo no teu time, e foi ele que calou o gigante!",
     "FEITO HISTÓRICO! O favoritão veio com toda a pompa e voltou pra casa de orelha murcha. Zebra das antigas, dessas que viram lenda!",
     "INACREDITÁVEL! O time que era pra ser atropelado virou o atropelador. Tirem o chapéu: a maior zebra da Copa!",
-    "Caiu o coloso! Era a partida mais desigual da rodada no papel — e no gramado o teu time provou que papel não joga futebol. Épico!",
+    "Caiu o coloso! Era a partida mais desigual da rodada no papel, e no gramado o teu time provou que papel não joga futebol. Épico!",
     "GUARDEM ESSA DATA! O azarão sem nenhuma chance derrubou o favorito absoluto. Isso não é resultado, é milagre de Copa do Mundo!",
-    "O mundo inteiro torcia contra, os números riam do teu time — e vocês transformaram zombaria em festa. Zebra colossal!",
+    "O mundo inteiro torcia contra, os números riam do teu time, e vocês transformaram zombaria em festa. Zebra colossal!",
     "Davi não só enfrentou Golias: pendurou a cabeça dele na parede. Vitória impossível, improvável, inesquecível.",
   ],
   zebra_media: [
@@ -377,7 +377,7 @@ export const POSTMATCH: Record<string, string[]> = {
     "Time pequeno, jogo grande. A zebra apareceu porque alguém teve a ousadia de não baixar a cabeça pro favorito.",
   ],
   ko_passou_penaltis: [
-    "Empate no tempo normal, decisão nos pênaltis — e a gente teve sangue frio na hora H. Classificou no sufoco!",
+    "Empate no tempo normal, decisão nos pênaltis, e a gente teve sangue frio na hora H. Classificou no sufoco!",
     "Não saiu do zero a zero do peito, foi pro mano a mano da marca da cal e o goleiro virou herói. Passou de fase!",
     "Jogo travado, ninguém cedeu, e a sorte sorriu pra quem teve coragem de bater. Avançou nos pênaltis!",
     "Coração na boca até a última cobrança, mas no fim foi a gente que estourou a rede e seguiu vivo na Copa.",
@@ -390,11 +390,11 @@ export const POSTMATCH: Record<string, string[]> = {
   ],
   vexame: [
     "QUE VERGONHA! Com toda a folga de elenco, o teu time se atrapalhou inteiro e deixou escapar o que era tranquilo.",
-    "Vexame puro. Era favorito disparado e tratou o jogo com a barriga cheia — o azarão agradeceu e humilhou. Inadmissível.",
+    "Vexame puro. Era favorito disparado e tratou o jogo com a barriga cheia. O azarão agradeceu e humilhou. Inadmissível.",
     "Tropeço feio, desses que mancham campanha. O time inferior fez a lição de casa e o teu, que tinha tudo, entregou de graça.",
     "Decepção total. A torcida veio ver baile e viu naufrágio. Perder assim cobra preço caro.",
     "Que papelão! Superioridade no papel, apatia no gramado. O adversário menor foi mais time, mais fome, mais tudo.",
-    "Doeu no orgulho. Favorito não pode dar esse mole — relaxou, subestimou e foi pego de jeito por quem ninguém respeitava.",
+    "Doeu no orgulho. Favorito não pode dar esse mole: relaxou, subestimou e foi pego de jeito por quem ninguém respeitava.",
     "O gigante dormiu e levou o troco. Esse resultado não tem desculpa: era pra ganhar fácil e virou motivo de chacota.",
   ],
   goleada_sofrida: [
@@ -426,8 +426,8 @@ export function postMatchBank(gf: number, ga: number, myO: number, oppO: number)
 
 // observação leiga do que o rival mostrou — SEM prescrever o contra-plano
 export function aiReadHint(ai: { postura: Postura; marcacao: Marcacao }): string {
-  if (ai.postura === "all_in") return "Eles vieram com tudo pra cima — o time inteiro acampado no nosso campo.";
-  if (ai.postura === "retranca") return "Estacionaram o ônibus na frente do gol — só pensam em segurar.";
+  if (ai.postura === "all_in") return "Eles vieram com tudo pra cima, o time inteiro acampado no nosso campo.";
+  if (ai.postura === "retranca") return "Estacionaram o ônibus na frente do gol: só pensam em segurar.";
   if (ai.marcacao === "alta") return "Estão pressionando lá em cima, marcando em cima da nossa saída de bola.";
   if (ai.marcacao === "baixa") return "Recuaram o bloco e estão esperando a gente na própria área.";
   if (ai.postura === "atk") return "Soltaram os laterais e estão indo pra cima com gente no ataque.";

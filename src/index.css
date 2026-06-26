@@ -378,3 +378,44 @@
   40% { transform: scale(1.5); color: #fff; }
   100% { transform: scale(1); }
 }
+
+/* Entrada de tela do Manager: fade + slide-up sutil, disparado na montagem de
+   CADA tela (key = screen). Só transform/opacity (nunca layout). O kill-switch
+   global de prefers-reduced-motion zera, deixando a troca instantânea. */
+@keyframes managerScreenIn {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-manager-screen { animation: managerScreenIn 0.19s var(--ease-out-quart) both; }
+
+/* Realce da linha da classificação que MUDOU após a rodada (P/J novos). Pulso de
+   fundo brand→transparente (~700ms), só background-color — não mexe no layout,
+   não reordena. Transmite "esta linha foi afetada pela rodada". */
+@keyframes managerRowFlash {
+  0% { background-color: oklch(0.66 0.16 143 / 0.34); }
+  100% { background-color: transparent; }
+}
+.animate-manager-row-flash {
+  animation: managerRowFlash 0.7s var(--ease-out-quart);
+}
+
+/* ITEM F — PERIGO ao vivo: o card do lado que detém a posse PISCA só quando o
+   build-up corrente vai concluir num lance de perigo (gol/trave/grande chance
+   defendida). Fora do lance, o realce é estático (ring fixo, sem piscar). Pulso
+   de chama no ring + leve respiração de opacidade, em loop curto enquanto durar
+   o suspense. O kill-switch global de reduced-motion zera (vira realce estático). */
+@keyframes managerDanger {
+  0%, 100% { box-shadow: 0 0 0 2px oklch(0.64 0.22 27 / 0.95), 0 0 14px 1px oklch(0.64 0.22 27 / 0.55); }
+  50% { box-shadow: 0 0 0 3px oklch(0.71 0.19 27 / 1), 0 0 22px 4px oklch(0.64 0.22 27 / 0.8); }
+}
+.animate-manager-danger { animation: managerDanger 0.62s ease-in-out infinite; }
+
+/* ITEM D — número da estatística ao vivo "tweenando": quando o valor muda, um
+   bump curto (escala + cor brand) chama o olho sem o número pular seco. Só
+   transform/cor; reduced-motion zera (troca direta). */
+@keyframes managerStatBump {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+.animate-manager-stat-bump { animation: managerStatBump 0.3s var(--ease-out-quart); }

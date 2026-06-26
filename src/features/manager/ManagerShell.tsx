@@ -22,9 +22,14 @@ function ManagerStripes({ className = "" }: { className?: string }) {
 export function ManagerShell() {
   return (
     <div className="min-h-dvh bg-background text-ink-900">
-      <header className="sticky top-0 z-30 border-b border-border bg-surface/90 backdrop-blur-md">
+      {/* ITEM E: header NÃO-fixo — rola junto com a página. Durante a partida ao vivo
+          o único chrome fixo passa a ser o placar eletrônico do LiveMatch (sticky
+          top-0), sem duas barras fixas competindo pela altura útil no mobile. */}
+      <header className="border-b border-border bg-surface">
         <ManagerStripes />
-        <div className="mx-auto flex h-11 w-full max-w-[480px] items-center justify-between px-4">
+        {/* ITEM C: a barra do header acompanha a MESMA largura do canvas — estreita no
+            mobile, larga no desktop (lg+) — pra alinhar a borda com o conteúdo abaixo. */}
+        <div className="mx-auto flex h-11 w-full max-w-[480px] items-center justify-between px-4 lg:max-w-[960px]">
           <Link to="/manager" className="flex items-center gap-1.5 text-sm font-bold tracking-tight">
             <span>⚽ Resultadismo <span className="text-brand-700">Manager</span></span>
             <span
@@ -42,7 +47,11 @@ export function ManagerShell() {
           </Link>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-[480px] px-4 py-4">
+      {/* ITEM C: canvas RESPONSIVO — estreito no mobile, LARGO no desktop (lg+) pra a
+          tela AO VIVO (lg:grid 2 colunas), o CHAVEAMENTO e o HUB/RESULTADO usarem as
+          laterais. As telas naturalmente estreitas (intro, draft, tática, classificação)
+          se auto-centralizam num bloco confortável DENTRO deste canvas largo. */}
+      <main className="mx-auto w-full max-w-[480px] px-4 py-4 lg:max-w-[960px] lg:py-6">
         <Outlet />
       </main>
       <ConsentBanner />

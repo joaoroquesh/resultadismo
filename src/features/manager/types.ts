@@ -72,16 +72,9 @@ export interface Tactic {
 }
 
 // ---- Motor ----
-export type CommandType = "press" | "recuo";
-export type CommandQuality = "good" | "ok" | "bad";
-
-export interface CmdState {
-  type: CommandType | null;
-  quality: CommandQuality;
-  startedMin: number;
-  untilMin: number;
-  cooldownUntilMin: number;
-}
+// ITEM H: o "banco de comandos" (Pressionar/Recuar) foi REMOVIDO — não há mais
+// CommandType/CommandQuality/CmdState/CommandResult/PossessionState. O controle ao vivo
+// é só o Ajuste tático (Estilo/Postura/Marcação), que recomputa as forças.
 
 export interface SideStrength {
   off: number;
@@ -126,9 +119,6 @@ export interface MatchState {
   gB: number;
   minute: number;
   half: number;
-  cmdA: CmdState;
-  cmdB: CmdState;
-  lastOwner: "A" | "B" | null;
   finished: boolean;
   events: MatchEvent[];
   schedule: number[];
@@ -155,21 +145,6 @@ export interface StepResult {
   score: { a: number; b: number };
   halftime: boolean;
   finished: boolean;
-}
-
-export interface CommandResult {
-  ok: boolean;
-  quality: CommandQuality;
-  poss: number;
-  hint: string;
-  cooldownUntilMin: number;
-  untilMin: number;
-}
-
-export interface PossessionState {
-  poss: number;
-  withBall: boolean;
-  without: boolean;
 }
 
 export type WorldMode = "real" | "alt";
@@ -224,6 +199,23 @@ export interface Shootout {
   pens: string; // "5×4" coerente com o total real
 }
 
+// ITEM C: um confronto IA×IA do MEU grupo apurado numa rodada (placar + os dois
+// times). Guardado por rodada pra a UI narrar "enquanto você jogava" — o usuário vê
+// POR QUE a tabela mudou, em vez de a pontuação dos rivais aparecer do nada.
+export interface GroupOtherResult {
+  a: Team;
+  b: Team;
+  ga: number;
+  gb: number;
+}
+// resultados IA×IA do meu grupo por rodada (índice = nº da rodada, 0-based). Cada
+// entrada lista os jogos paralelos do meu grupo apurados quando eu joguei aquela
+// rodada. Determinístico (mesma semente por par) e persistível.
+export interface GroupRoundLog {
+  round: number; // 0-based: a rodada do round-robin do meu grupo
+  results: GroupOtherResult[];
+}
+
 // estado do estágio corrente — união discriminada por `kind`
 export interface GroupsStageState {
   kind: "groups";
@@ -241,6 +233,10 @@ export interface GroupsStageState {
   // item 1: pares IA×IA já apurados, por "gIdx:i:j" (i<j índices no grupo). Garante
   // idempotência — a tabela avança rodada a rodada sem dupla contagem no fim.
   playedPairs?: string[];
+  // ITEM C: log dos resultados IA×IA do MEU grupo, por rodada (placar + times). A UI
+  // mostra "enquanto você jogava (rodada N)" pra explicar a tabela que antes mudava
+  // em silêncio. Idempotente (não duplica a mesma rodada).
+  roundLog?: GroupRoundLog[];
   sortedStandings?: Standing[][];
   qualified?: Team[];
   myAdvanced?: boolean;
@@ -358,11 +354,15 @@ export interface CampaignScore {
 // até a final mesmo após a eliminação — e revelando o campeão. Tudo puro.
 export interface BracketSlot {
   team: Team | null; // null = bye / vaga ainda não definida
-  score: number | null; // gols no confronto (null se bye ou não jogado)
+  score: number | null; // gols no confronto (null se bye, não jogado ou pendente)
   pens: string | null; // string de pênaltis ("5×4") se decidiu nos pênaltis
   winner: boolean; // venceu o confronto e avança
   isMe: boolean; // é o time que eu comando
   champion: boolean; // marca o campeão na coluna final
+  // ITEM B: confronto JÁ pareado mas AINDA NÃO disputado (rodada atual em andamento).
+  // O par é conhecido (camp.state.pairs), mas sem placar/vencedor — a UI renderiza como
+  // "a definir / próximo". Não é spoiler: é só a chave, não o resultado.
+  pending: boolean;
 }
 export interface BracketMatch {
   a: BracketSlot;
@@ -371,6 +371,8 @@ export interface BracketMatch {
   mine: boolean; // este é o MEU confronto nesta rodada
   real: boolean; // resultado veio do meu jogo real (não de simulação)
   pens: string | null; // pênaltis do confronto, se houve
+  // ITEM B: a rodada está pareada mas ainda não foi jogada (sem placar/vencedor).
+  pending: boolean;
 }
 export interface BracketRound {
   label: string; // "Oitavas", "Quartas", "Semis", "3º lugar", "Final"…
