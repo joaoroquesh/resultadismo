@@ -1,5 +1,11 @@
 import { Link, Outlet } from "react-router-dom";
+import { LogIn } from "lucide-react";
 import { ConsentBanner } from "@/features/consent/ConsentBanner";
+import { MiniGameFooter } from "@/components/layout/MiniGameFooter";
+import { Escudo } from "@/components/ui/Escudo";
+import { Button } from "@/components/ui/Button";
+import { useAuth } from "@/features/auth/AuthProvider";
+import { useLoginModal } from "@/features/auth/LoginModalProvider";
 
 // Faixa de listras (motivo visual do mini-jogo). Inline aqui pra não acoplar o
 // Manager ao slice do Retrô (cada mini-jogo é isolado).
@@ -20,8 +26,10 @@ function ManagerStripes({ className = "" }: { className?: string }) {
 // BottomNav, sem header do Resultadismo, sem PresenceTracker. Mini-header com
 // a volta explícita pro Resultadismo. Espelha o RetroShell.
 export function ManagerShell() {
+  const { user, profile } = useAuth();
+  const { open: openLogin } = useLoginModal();
   return (
-    <div className="min-h-dvh bg-background text-ink-900">
+    <div className="flex min-h-dvh flex-col bg-background text-ink-900">
       {/* ITEM E: header NÃO-fixo — rola junto com a página. Durante a partida ao vivo
           o único chrome fixo passa a ser o placar eletrônico do LiveMatch (sticky
           top-0), sem duas barras fixas competindo pela altura útil no mobile. */}
@@ -39,21 +47,27 @@ export function ManagerShell() {
               beta
             </span>
           </Link>
-          <Link
-            to="/"
-            className="text-xs font-semibold text-ink-500 underline-offset-2 hover:underline"
-          >
-            ir pro Resultadismo →
-          </Link>
+          {user ? (
+            <Link to="/perfil" aria-label="Meu perfil" className="shrink-0">
+              <Escudo src={profile?.avatar_url} name={profile?.display_name} size="sm" className="size-7" />
+            </Link>
+          ) : (
+            <Button size="sm" onClick={openLogin}>
+              <LogIn className="size-4" /> Entrar
+            </Button>
+          )}
         </div>
       </header>
       {/* ITEM C: canvas RESPONSIVO — estreito no mobile, LARGO no desktop (lg+) pra a
           tela AO VIVO (lg:grid 2 colunas), o CHAVEAMENTO e o HUB/RESULTADO usarem as
           laterais. As telas naturalmente estreitas (intro, draft, tática, classificação)
           se auto-centralizam num bloco confortável DENTRO deste canvas largo. */}
-      <main className="mx-auto w-full max-w-[480px] px-4 py-4 lg:max-w-[960px] lg:py-6">
+      <main className="mx-auto w-full max-w-[480px] flex-1 px-4 py-4 lg:max-w-[960px] lg:py-6">
         <Outlet />
       </main>
+      {/* "Como funciona" do Manager é in-page (folha de regras no hub) — sem rota, então
+          o rodapé omite o link; o resto segue o padrão da Home deslogada. */}
+      <MiniGameFooter gameName="Manager" />
       <ConsentBanner />
     </div>
   );

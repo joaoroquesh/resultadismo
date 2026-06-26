@@ -13,7 +13,8 @@ export function MiniGameFooter({
   comoFuncionaTo,
 }: {
   gameName: string;
-  comoFuncionaTo: string;
+  /** rota da "Como funciona" do jogo; omita se a ajuda do jogo for in-page (ex.: Manager) */
+  comoFuncionaTo?: string;
 }) {
   const navigate = useNavigate();
   return (
@@ -31,9 +32,11 @@ export function MiniGameFooter({
         {/* navegação + tema (mesma linguagem da Home deslogada) */}
         <div className="flex flex-col items-center gap-4 pt-5">
           <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm font-medium text-ink-500">
-            <Link to={comoFuncionaTo} className="transition-colors hover:text-ink-900">
-              Como funciona
-            </Link>
+            {comoFuncionaTo && (
+              <Link to={comoFuncionaTo} className="transition-colors hover:text-ink-900">
+                Como funciona
+              </Link>
+            )}
             <Link to="/termos" className="transition-colors hover:text-ink-900">
               Termos
             </Link>

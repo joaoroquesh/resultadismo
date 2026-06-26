@@ -988,6 +988,7 @@ export type Database = {
           home_score: number | null
           id: string
           kickoff_at: string | null
+          live_phase: string | null
           match_id: string
           provider: Database["public"]["Enums"]["data_provider"]
           provider_ref: string | null
@@ -1002,6 +1003,7 @@ export type Database = {
           home_score?: number | null
           id?: string
           kickoff_at?: string | null
+          live_phase?: string | null
           match_id: string
           provider: Database["public"]["Enums"]["data_provider"]
           provider_ref?: string | null
@@ -1016,6 +1018,7 @@ export type Database = {
           home_score?: number | null
           id?: string
           kickoff_at?: string | null
+          live_phase?: string | null
           match_id?: string
           provider?: Database["public"]["Enums"]["data_provider"]
           provider_ref?: string | null
@@ -1034,7 +1037,6 @@ export type Database = {
       }
       matches: {
         Row: {
-          advanced_team_id: string | null
           away_pen: number | null
           away_score: number | null
           away_team_id: string | null
@@ -1050,9 +1052,9 @@ export type Database = {
           home_team_id: string | null
           home_team_name: string | null
           id: string
-          is_knockout: boolean
           kickoff_at: string | null
           last_synced_at: string | null
+          live_phase: string | null
           manual_lock: boolean
           manually_edited_at: string | null
           manually_edited_by: string | null
@@ -1068,7 +1070,6 @@ export type Database = {
           winner: string | null
         }
         Insert: {
-          advanced_team_id?: string | null
           away_pen?: number | null
           away_score?: number | null
           away_team_id?: string | null
@@ -1084,9 +1085,9 @@ export type Database = {
           home_team_id?: string | null
           home_team_name?: string | null
           id?: string
-          is_knockout?: boolean
           kickoff_at?: string | null
           last_synced_at?: string | null
+          live_phase?: string | null
           manual_lock?: boolean
           manually_edited_at?: string | null
           manually_edited_by?: string | null
@@ -1102,7 +1103,6 @@ export type Database = {
           winner?: string | null
         }
         Update: {
-          advanced_team_id?: string | null
           away_pen?: number | null
           away_score?: number | null
           away_team_id?: string | null
@@ -1118,9 +1118,9 @@ export type Database = {
           home_team_id?: string | null
           home_team_name?: string | null
           id?: string
-          is_knockout?: boolean
           kickoff_at?: string | null
           last_synced_at?: string | null
+          live_phase?: string | null
           manual_lock?: boolean
           manually_edited_at?: string | null
           manually_edited_by?: string | null
@@ -1136,13 +1136,6 @@ export type Database = {
           winner?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "matches_advanced_team_id_fkey"
-            columns: ["advanced_team_id"]
-            isOneToOne: false
-            referencedRelation: "teams"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "matches_away_team_id_fkey"
             columns: ["away_team_id"]
@@ -1280,8 +1273,6 @@ export type Database = {
       }
       predictions: {
         Row: {
-          advance_bonus: number | null
-          advance_team_id: string | null
           away_pred: number
           created_at: string
           home_pred: number
@@ -1295,8 +1286,6 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          advance_bonus?: number | null
-          advance_team_id?: string | null
           away_pred: number
           created_at?: string
           home_pred: number
@@ -1310,8 +1299,6 @@ export type Database = {
           user_id: string
         }
         Update: {
-          advance_bonus?: number | null
-          advance_team_id?: string | null
           away_pred?: number
           created_at?: string
           home_pred?: number
@@ -1325,13 +1312,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "predictions_advance_team_id_fkey"
-            columns: ["advance_team_id"]
-            isOneToOne: false
-            referencedRelation: "teams"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "predictions_match_id_fkey"
             columns: ["match_id"]
@@ -2530,17 +2510,6 @@ export type Database = {
       }
       admin_usage_stats: { Args: never; Returns: Json }
       admin_user_moderation: { Args: { p_user_id: string }; Returns: Json }
-      advance_bonus: {
-        Args: {
-          p_away_pred: number
-          p_away_team: string
-          p_home_pred: number
-          p_home_team: string
-          p_pred_advance: string
-          p_real_advance: string
-        }
-        Returns: number
-      }
       advance_confronto_cup: { Args: { p_lc_id: string }; Returns: number }
       append_confronto_ties: {
         Args: { p_lc_id: string; p_ties: Json }
@@ -2932,7 +2901,6 @@ export type Database = {
       get_unread_count: { Args: never; Returns: number }
       heartbeat_access: { Args: { p_token: string }; Returns: Json }
       is_app_admin: { Args: never; Returns: boolean }
-      is_knockout_stage: { Args: { p_stage: string }; Returns: boolean }
       is_league_admin: { Args: { p_league_id: string }; Returns: boolean }
       is_league_member: { Args: { p_league_id: string }; Returns: boolean }
       join_league_by_code: {
@@ -3039,6 +3007,7 @@ export type Database = {
           p_home_pen: number
           p_home_score: number
           p_kickoff_at: string
+          p_live_phase?: string
           p_match_id: string
           p_provider: string
           p_provider_ref: string
@@ -3086,10 +3055,6 @@ export type Database = {
       resolve_match_golden: {
         Args: { p_match_ids?: string[] }
         Returns: number
-      }
-      resolved_advancer: {
-        Args: { m: Database["public"]["Tables"]["matches"]["Row"] }
-        Returns: string
       }
       retro_abandon: {
         Args: { p_anon_token?: string; p_run_id: string }

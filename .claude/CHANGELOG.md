@@ -37,6 +37,21 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   `20260624020000`.
 
 ### Adicionado
+- **Retrô — 5 ondas de viralização + dicas + nova casca (rodada 22, migrations `20260610150017`–
+  `150023`).** **Dicas por partida:** pista curta/apelido ("O Maracanazzo", "Gol de mão do Maradona")
+  no jogo, antes do palpite — `retro_matches.fact_pt` + anti-spoiler (`retro_fact_is_spoiler`) + só
+  desce revisada (gate `retro_match_payload`); painel de curadoria no `/admin/retro`
+  (`admin_set_match_fact`/`admin_list_match_facts`); 5 publicadas + 23 rascunhos IA pra aprovar.
+  **Onda 0:** som+vibração (`retroSfx`), Seleção do Dia com #edição/time/countdown/streak-em-risco/
+  campeão-de-ontem, share "#N·TIME", "você seria ~Nº" pro anônimo, desafio cai na mesma Copa.
+  **Onda 1:** conquistas persistentes (`retro_achievements`) + perfil **/retro/eu** + coleção de
+  seleções + recordes + XP/título. **Onda 2:** ranking "Meus grupos" (`p_scope`) + vizinhança +
+  duelo (placar lado a lado) + apelido do anônimo. **Onda 3:** lembrete diário push opt-in (cron
+  `retro-daily-reminders`) + streak local do anônimo. **Casca dos mini-jogos (Retrô e Manager):**
+  topo à direita com **Entrar** (deslogado) ou **escudo do jogador → perfil** (logado); **rodapé** no
+  estilo da Home deslogada (Como funciona do jogo · Termos · Privacidade · Compartilhamento de dados ·
+  tema) + botão **Ir pro Resultadismo** (a ponte saiu do topo pro rodapé). Componente
+  `MiniGameFooter` reusável.
 - **Jogos: rolagem e arraste do dia repensados.** Ao entrar num dia, a lista vai até o jogo **AO
   VIVO** (ou o próximo a começar, quando há encerrados e ele está abaixo da dobra), parando com um
   **pedaço do card de cima à mostra** (deixa claro que há jogos pra cima). **Arrastar pro lado** troca
