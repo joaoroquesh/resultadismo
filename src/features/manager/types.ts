@@ -58,24 +58,52 @@ export interface WcGroupsEdition {
   seeding_rules?: string;
 }
 
-// ---- Tática (eixos manuais do jogador / da IA) ----
-export type Form = "433" | "442" | "352" | "4231" | "532" | "4312" | "343" | "424";
-export type Estilo = "passes" | "meio" | "lados" | "longas" | "contra";
-export type Postura = "all_in" | "atk" | "eq" | "def" | "retranca";
-export type Marcacao = "alta" | "media" | "baixa";
+// ---- Tática (estudo-taticas-v3 · rev 4) ----
+// NOVO FORMATO (substitui Estilo/Postura/Marcação por estilo de ataque + de defesa +
+// 4 sliders). O encaixe vira a soma ponderada de dois grupos (Estrutura 0.60 × Táticas
+// 0.40, invertendo a 0.45/0.55) — ver engine.ts §16/§7.
+//
+// 9 FORMAÇÕES num grid 3×3 (linha = afinidade primária ATA/MEI/DEF). Os slugs são as
+// strings do §16 (FORM): 4-2-4 · 3-4-3 · 4-3-3 · 4-4-2 · 3-5-2 · 4-5-1 · 5-3-2 · 5-4-1 ·
+// 6-3-1.
+export type Form =
+  | "4-2-4"
+  | "3-4-3"
+  | "4-3-3"
+  | "4-4-2"
+  | "3-5-2"
+  | "4-5-1"
+  | "5-3-2"
+  | "5-4-1"
+  | "6-3-1";
+// 5 estilos de ATAQUE (identidade ofensiva).
+export type AtkStyle = "posse" | "vertical" | "bolalonga" | "contra" | "drible";
+// 5 estilos de DEFESA (como se marca).
+export type DefStyle = "zona" | "individual" | "mista" | "libero" | "dobra";
 
+// 4 SLIDERS 0–100 (refinamentos de intensidade, ajustáveis ao vivo com atraso):
+//  · postura      — aloca a força ataque↔defesa (NÃO entra no encaixe; realoca · §6.1)
+//  · pressao      — altura do bloco / onde está o espaço (§5)
+//  · amplitude    — meio (0) ↔ alas (100) (§6.3)
+//  · agressividade— duelo e cartão / pegada (§6.4/§13)
 export interface Tactic {
   form: Form;
-  estilo: Estilo;
-  postura: Postura;
-  marcacao: Marcacao;
+  atk: AtkStyle;
+  def: DefStyle;
+  postura: number; // 0–100
+  pressao: number; // 0–100
+  amplitude: number; // 0–100
+  agressividade: number; // 0–100
 }
 
 // ---- Motor ----
-// ITEM H: o "banco de comandos" (Pressionar/Recuar) foi REMOVIDO — não há mais
-// CommandType/CommandQuality/CmdState/CommandResult/PossessionState. O controle ao vivo
-// é só o Ajuste tático (Estilo/Postura/Marcação), que recomputa as forças.
-
+// ITEM H: o "banco de comandos" (Pressionar/Recuar) foi REMOVIDO. O controle ao vivo é
+// só o Ajuste tático (estilos + sliders), que recomputa as forças.
+//
+// rev 4: o encaixe é a soma ponderada de Estrutura (formação + estilos × matriz) e
+// Táticas (pressão + amplitude + sintonia + agressividade), com peso que inverte ao
+// longo do jogo. `netEdge` é o edge final do ataque (já com teto de fase + fadiga);
+// `estruturaEdge`/`taticasEdge` guardam os dois grupos crus pra leitura/depuração.
 export interface SideStrength {
   off: number;
   ft: number;
@@ -85,10 +113,10 @@ export interface SideStrength {
   fadiga2T: number;
   rivalConvVsMe: number;
   postureIsOff: boolean;
-  markIsHigh: boolean;
-  netEdge: number;
-  formEdge: number;
-  tacticEdge: number;
+  markIsHigh: boolean; // pressão alta (slider de pressão no terço superior)
+  netEdge: number; // edge final do ataque (multiplicador − 1), já com teto/fadiga
+  estruturaEdge: number; // grupo Estrutura cru (matriz + coerência + afinidade + drible/contra)
+  taticasEdge: number; // grupo Táticas cru (pressão + amplitude + sintonia + agressividade)
   possSwing: number;
 }
 
@@ -101,6 +129,12 @@ export interface MatchEvent {
   kind: ChanceKind;
   m: number;
 }
+
+// fase do torneio que define a faixa do TETO do edge (§11): estreia (mais baixa) ·
+// grupos/oitavas (pico) · quartas/semis (afina) · final (mais apertada). Mesmas chaves do
+// TETO_FASE do engine; guardada no MatchState pra o teto valer durante a partida inteira
+// (createMatch + recomputes do intervalo/ao vivo).
+export type MatchFase = "estreia" | "grupos" | "quartas" | "final";
 
 export interface MatchState {
   rnd: () => number;
@@ -122,6 +156,8 @@ export interface MatchState {
   finished: boolean;
   events: MatchEvent[];
   schedule: number[];
+  // §11: fase do torneio pra o teto do edge. Opcional (default "grupos") pra retrocompat.
+  fase?: MatchFase;
 }
 
 // ITEM 12: painel de estatísticas pós-jogo. Derivado DETERMINISTICAMENTE dos eventos

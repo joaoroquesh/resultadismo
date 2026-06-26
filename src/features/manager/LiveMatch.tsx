@@ -1,21 +1,24 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Campaign, MatchEvent, MatchState, Tactic } from "./types";
 import {
+  commissionRead,
   createMatch,
   deriveStatsFromEvents,
+  liveAdjustHints,
   reactiveAiPosture,
+  reactiveAiTactic,
   recomputeFromMinute,
   recomputeStrengths,
   stageLong,
   stepMinute,
-  P,
 } from "./engine";
+import type { CommissionRead, LiveHint } from "./engine";
 import type { MatchStats } from "./types";
 import {
-  ESTILO_NM,
+  ATK_NM,
+  DEF_NM,
   FORM_NM,
-  MARC_NM,
-  POSTURA_NM,
+  sliderZone,
   TICKER_BUILDUP,
   TICKER_CONCLUSION,
   TICKER_INTERRUPT,
@@ -30,8 +33,9 @@ import {
   MatchupBadges,
   SegBlock,
   StatsLegend,
+  TacticSliders,
 } from "./components";
-import { ESTILO_OPTS, FORM_OPTS, MARC_OPTS, POSTURA_OPTS, TICKER_ICON } from "./ui";
+import { ATK_OPTS, DEF_OPTS, FORM_OPTS, TICKER_ICON } from "./ui";
 import { teamColors } from "./teamColors";
 import { loadSpeed, saveSpeed } from "./managerLocal";
 import type { LiveSpeed } from "./managerLocal";
@@ -59,7 +63,9 @@ function buildupDelayMs(speed: number): number {
 }
 
 type TickerKind = "info" | "buildup" | "goal" | "miss" | "cmd";
-interface TickerLine {
+// ITEM 3: exportado pra o fim de jogo (MatchResult) revisar a transmissão na aba
+// Transmissão — as mesmas linhas geradas ao vivo, sem regenerar narração.
+export interface TickerLine {
   id: number;
   min: number;
   kind: TickerKind;
@@ -117,6 +123,8 @@ export function LiveMatch({
   opp,
   myTac,
   aiTac,
+  aiPhase,
+  fase,
   matchSeed,
   onMyTacChange,
   onFinish,
@@ -126,6 +134,13 @@ export function LiveMatch({
   opp: import("./types").Team;
   myTac: Tactic;
   aiTac: Tactic;
+  // ITEM 14 (IA por fase, §14): regime da IA neste jogo. "ao_vivo" (semi/final) libera a
+  // reação tática COMPLETA (forma/estilos/sliders) no intervalo e a cada mudança SUA; nas
+  // demais fases a IA só ajusta a POSTURA ao vivo (comportamento do v9).
+  aiPhase: import("./engine").MatchPhase;
+  // §11: fase do torneio pro TETO do edge (estreia baixa · grupos/oitavas pico · quartas/
+  // semis afina · final apertada). Passada ao motor no createMatch e nos recomputes.
+  fase: import("./types").MatchFase;
   matchSeed: number;
   onMyTacChange: (tac: Tactic) => void;
   onFinish: (
@@ -133,6 +148,8 @@ export function LiveMatch({
     gB: number,
     goals: { side: "A" | "B"; m: number }[],
     stats: MatchStats,
+    // ITEM 3: a transmissão completa (linhas do ticker) pra a aba Transmissão do fim de jogo.
+    lines: TickerLine[],
   ) => void;
   // controle/liberdade (Nielsen #3): sair da partida em andamento (com confirmação na
   // UI). Descarta o jogo sem registrar resultado — volta pro hub.
@@ -142,7 +159,7 @@ export function LiveMatch({
   // identidade estável (é mutado in-place pelo motor), então pode ser lido na render.
   // É a fonte de verdade em STATE; `stateRef` espelha p/ os callbacks/loop lerem.
   const [engine] = useState<MatchState>(() =>
-    createMatch(campaign.myTeam, opp, myTac, aiTac, matchSeed || 1),
+    createMatch(campaign.myTeam, opp, myTac, aiTac, matchSeed || 1, fase),
   );
   const stateRef = useRef<MatchState>(engine);
   const timerRef = useRef<number | null>(null);
@@ -170,18 +187,43 @@ export function LiveMatch({
   // cooldown próprio evita "metralhar" os eixos.
   const [liveTac, setLiveTac] = useState<Tactic>(myTac);
   const liveTacRef = useRef<Tactic>(myTac);
-  const liveTacCooldownRef = useRef(-999);
-  const [liveTacCooldownUntil, setLiveTacCooldownUntil] = useState(-999);
+  // ITEM 4 (ajuste com DEBOUNCE em TEMPO REAL): o usuário mexe os sliders à vontade; a
+  // cada mexida resetamos um timer de 2s REAIS — só quando ele PARA por 2s a orientação é
+  // aplicada (recomputa do minuto seguinte). Depois de aplicar, um cooldown de 1s REAL
+  // antes de poder aplicar de novo. NÃO mais cooldown em minutos de jogo. O motor segue
+  // determinístico (o debounce só decide QUANDO a UI dispara o recompute). Timers em
+  // tempo real (setTimeout), limpos no unmount/pausa/fim.
+  const RELAY_DEBOUNCE_MS = 2000; // parar por 2s reais → aplica
+  const RELAY_COOLDOWN_MS = 1000; // 1s real depois de aplicar, antes de reaplicar
+  const relayDebounceRef = useRef<number | null>(null);
+  const relayCooldownRef = useRef(0); // nowMs() até quando um novo commit fica bloqueado
+  const pendingTacRef = useRef<Tactic | null>(null); // a orientação aguardando commit
+  const lastCommittedTacRef = useRef<Tactic>(myTac); // base p/ derivar a dica/diff no commit
+  // guarda o commit mais recente — o reagendamento (cooldown) chama via ref, evitando
+  // referência ao const antes da sua declaração (TDZ) e mantendo o closure sempre fresco.
+  const commitRef = useRef<() => void>(() => {});
+  // "Passando orientações para os jogadores" — acende enquanto a mudança está pendente
+  // (durante o debounce) e some quando a orientação é aplicada.
+  const [relaying, setRelaying] = useState(false);
   // ITEM #3: confirmação transitória "✓ aplicada" no próprio painel de ajuste ao vivo
   // (além da linha no ticker) — feedback no lugar onde o usuário agiu, importante no
   // mobile (o ticker pode estar na outra aba). Some sozinha após ~2,2s.
   const [liveTacJustApplied, setLiveTacJustApplied] = useState(false);
   const liveTacAppliedTimer = useRef<number | null>(null);
+  // §14: a DICA DE IMPACTO do último ajuste — lida do estado real (sintonia/matriz) e
+  // mostrada no painel onde o usuário agiu (além da linha no ticker). Some no próximo
+  // ajuste / ao recolher.
+  const [lastHints, setLastHints] = useState<LiveHint[]>([]);
   const [tacDrawerOpen, setTacDrawerOpen] = useState(false);
   // ITEM 14 reativo: postura corrente da IA (pode mudar conforme o placar ao vivo).
   const aiPostureRef = useRef(aiTac.postura);
   const [lines, setLines] = useState<TickerLine[]>([]);
+  const linesRef = useRef<TickerLine[]>([]); // ITEM 3: espelho das linhas p/ o fim de jogo
   const [phase, setPhase] = useState<"live" | "halftime">("live");
+  // ITEM 14 (§14): snapshot da tática da IA pra REVELAR no Vestiário (congelado no
+  // openHalftime). Começa = tática inicial; na semi/final reflete o que a IA jogou no 1º
+  // tempo (pode ter mudado ao vivo). A UI mostra formação + estilos, nunca sliders.
+  const [aiTacShown, setAiTacShown] = useState<Tactic>(aiTac);
   // controle/liberdade (Nielsen #3): pausar congela o relógio (para o setInterval) pra
   // pensar a tática sem usar 1x; sair abre uma confirmação inline antes de descartar.
   const [paused, setPaused] = useState(false);
@@ -200,6 +242,10 @@ export function LiveMatch({
   // vivo (uma de cada vez). No desktop as duas convivem lado a lado (item C), então a
   // aba é ignorada lá. Estado efêmero (não persiste).
   const [liveTab, setLiveTab] = useState<"feed" | "stats">("feed");
+  // ITEM 3: no INTERVALO, as mesmas abas Transmissão | Estatísticas, mas o default é
+  // Estatísticas (que então aparece ACIMA da análise da comissão). A Transmissão fica
+  // disponível pra revisar os lances do 1º tempo.
+  const [breakTab, setBreakTab] = useState<"feed" | "stats">("stats");
 
   // BUG 1.3 — TIMELINE ÚNICA: a fonte de verdade do que o usuário JÁ VIU. Cada lance
   // resolvido (revelado) entra aqui com seu gol/minuto/lado. O PLACAR e os GOLS da UI
@@ -242,14 +288,22 @@ export function LiveMatch({
   const pushLine = useCallback(
     (min: number, html: string, kind: TickerKind, meta?: Partial<TickerLine>): number => {
       const id = ++lineSeq.current;
-      setLines((cur) => [{ id, min, kind, html, ...meta }, ...cur].slice(0, 40));
+      setLines((cur) => {
+        const nextLines = [{ id, min, kind, html, ...meta }, ...cur].slice(0, 40);
+        linesRef.current = nextLines; // ITEM 3: espelho síncrono p/ o fim de jogo
+        return nextLines;
+      });
       return id;
     },
     [],
   );
   const replaceLine = useCallback(
     (id: number, html: string, kind: TickerKind, meta?: Partial<TickerLine>) => {
-      setLines((cur) => cur.map((l) => (l.id === id ? { ...l, html, kind, ...meta } : l)));
+      setLines((cur) => {
+        const nextLines = cur.map((l) => (l.id === id ? { ...l, html, kind, ...meta } : l));
+        linesRef.current = nextLines;
+        return nextLines;
+      });
     },
     [],
   );
@@ -261,42 +315,115 @@ export function LiveMatch({
     saveSpeed(next);
   }, []);
 
-  // ITEM 7: aplica um AJUSTE TÁTICO ao vivo (3 eixos; formação fica travada). Valida
-  // o cooldown próprio, recomputa minhas forças do MINUTO SEGUINTE em diante e dá um
-  // micro-feedback no ticker. Não reseta gols/minuto. (ITEM H: o banco de comandos
-  // Pressionar/Recuar foi removido — este ajuste é o único controle ao vivo.)
-  const applyLiveTac = useCallback(
-    (patch: Partial<Pick<Tactic, "estilo" | "postura" | "marcacao">>) => {
+  // ITEM 7 (rev 4): aplica um AJUSTE ao vivo — SÓ OS SLIDERS (postura/pressão/amplitude/
+  // pegada). Formação e estilos ficam travados ao vivo (só mudam no intervalo). Valida o
+  // cooldown próprio, recomputa minhas forças do MINUTO SEGUINTE em diante e dá um
+  // micro-feedback no ticker. Não reseta gols/minuto.
+  // COMMIT — aplica de fato a orientação pendente (pendingTacRef): recomputa o futuro do
+  // minuto seguinte (BUG #3), faz a IA reagir (semi/final), narra e confirma. Gated por um
+  // cooldown REAL de 1s: se ainda está no cooldown, reagenda o commit pra quando ele
+  // expirar (assim a última mudança sempre vale). Determinismo do motor preservado.
+  const commitLiveTac = useCallback(() => {
+    const st = stateRef.current;
+    if (!st || st.finished) {
+      pendingTacRef.current = null;
+      setRelaying(false);
+      return;
+    }
+    const next = pendingTacRef.current;
+    if (!next) {
+      setRelaying(false);
+      return;
+    }
+    // cooldown REAL de 1s: se ainda não passou, reagenda o commit pro fim do cooldown.
+    const wait = relayCooldownRef.current - nowMs();
+    if (wait > 0) {
+      if (relayDebounceRef.current != null) window.clearTimeout(relayDebounceRef.current);
+      relayDebounceRef.current = window.setTimeout(() => commitRef.current(), wait + 16);
+      return;
+    }
+    pendingTacRef.current = null;
+    const cur = lastCommittedTacRef.current;
+    lastCommittedTacRef.current = next;
+    // §14: a DICA DE IMPACTO — lida do ESTADO REAL (sintonia §6.5 do novo valor + a matriz
+    // §4/pressão §5 contra a tática vigente da IA). Ensina o efeito sem dar o número. O
+    // "eixo" da dica é o que mais mudou desde a última orientação aplicada.
+    const keys: ("postura" | "pressao" | "amplitude" | "agressividade")[] = [
+      "postura",
+      "pressao",
+      "amplitude",
+      "agressividade",
+    ];
+    let changedKey: (typeof keys)[number] | undefined;
+    let maxDelta = 0;
+    for (const k of keys) {
+      const d = Math.abs(next[k] - cur[k]);
+      if (d > maxDelta) {
+        maxDelta = d;
+        changedKey = k;
+      }
+    }
+    const hints = changedKey ? liveAdjustHints(changedKey, next, cur, campaign.myTeam, st.tacB) : [];
+    setLastHints(hints);
+    // ITEM 14 (§14): na semi/final, a IA REAGE à sua mudança — re-afina os sliders dela
+    // (estrutura travada ao vivo) contra o seu novo plano + o ânimo do placar.
+    let aiNext: Tactic = st.tacB;
+    if (aiPhase === "ao_vivo") {
+      aiNext = reactiveAiTactic(opp, campaign.myTeam, next, st.tacB, st.gB, st.gA, st.minute, true);
+      aiPostureRef.current = aiNext.postura;
+    }
+    // BUG #3: o ajuste ao vivo recomputa o FUTURO (do minuto seguinte em diante) com a nova
+    // tática minha vs a da IA (já reagida) — re-semeado de forma estável. O passado fica
+    // intacto; o placar segue derivando só dos gols revelados.
+    recomputeFromMinute(st, next, aiNext, st.minute);
+    // a orientação foi passada: some o aviso e arma o cooldown real de 1s.
+    setRelaying(false);
+    relayCooldownRef.current = nowMs() + RELAY_COOLDOWN_MS;
+    // ITEM #3 + §14: o ticker confirma que o ajuste já vale E entrega a 1ª DICA DE IMPACTO.
+    const detail = changedKey ? `${sliderZone(changedKey, next[changedKey])}` : "ajuste";
+    pushLine(
+      st.minute,
+      `Ajuste aplicado (vale do ${Math.min(90, st.minute + 1)}'): ${detail}.`,
+      "cmd",
+      { icon: "✅" },
+    );
+    if (hints[0]) {
+      const ic = hints[0].tone === "good" ? "▲" : hints[0].tone === "bad" ? "⚠️" : "💡";
+      pushLine(st.minute, hints[0].text, "cmd", { icon: ic });
+    }
+    // confirmação no painel: acende e some sozinha (não persiste).
+    setLiveTacJustApplied(true);
+    if (liveTacAppliedTimer.current != null) window.clearTimeout(liveTacAppliedTimer.current);
+    liveTacAppliedTimer.current = window.setTimeout(() => setLiveTacJustApplied(false), 2200);
+    syncView();
+  }, [aiPhase, campaign.myTeam, opp, pushLine, syncView]);
+
+  // STAGE — chamado a cada mexida de slider. Move o slider NA HORA (a UI acompanha o
+  // dedo), persiste a posição e RESETA o debounce de 2s reais. Não recomputa aqui: o
+  // recompute só dispara quando o usuário PARA por 2s (commitLiveTac). Acende o aviso
+  // "Passando orientações…". Livre de cooldown-em-minutos: dá pra mexer à vontade.
+  const stageLiveTac = useCallback(
+    (patch: Partial<Pick<Tactic, "postura" | "pressao" | "amplitude" | "agressividade">>) => {
       const st = stateRef.current;
       if (!st || st.finished) return;
-      if (st.minute < liveTacCooldownRef.current) return; // em cooldown
-      const next: Tactic = { ...liveTacRef.current, ...patch, form: liveTacRef.current.form };
+      const cur = liveTacRef.current;
+      const next: Tactic = { ...cur, ...patch, form: cur.form, atk: cur.atk, def: cur.def };
       liveTacRef.current = next;
-      setLiveTac(next);
-      onMyTacChange(next); // persiste a tática (sem mexer na formação travada)
-      // BUG #3: o ajuste ao vivo recomputa o FUTURO (do minuto seguinte em diante) com a
-      // nova tática minha vs a do rival — re-semeado de forma estável. O passado fica
-      // intacto; o placar segue derivando só dos gols revelados.
-      recomputeFromMinute(st, next, st.tacB, st.minute);
-      const until = st.minute + P.LIVETAC_COOLDOWN_MIN;
-      liveTacCooldownRef.current = until;
-      setLiveTacCooldownUntil(until);
-      // ITEM #3: deixa CLARO que o ajuste já vale (a partir do minuto seguinte) — o
-      // trecho futuro foi recomputado com a nova tática.
-      pushLine(
-        st.minute,
-        `Tática aplicada (vale do ${Math.min(90, st.minute + 1)}'): ${ESTILO_NM[next.estilo]} · ${POSTURA_NM[next.postura]} · ${MARC_NM[next.marcacao]}.`,
-        "cmd",
-        { icon: "✅" },
-      );
-      // confirmação no painel: acende e some sozinha (não persiste).
-      setLiveTacJustApplied(true);
-      if (liveTacAppliedTimer.current != null) window.clearTimeout(liveTacAppliedTimer.current);
-      liveTacAppliedTimer.current = window.setTimeout(() => setLiveTacJustApplied(false), 2200);
-      syncView();
+      setLiveTac(next); // a posição do slider acompanha o movimento imediatamente
+      onMyTacChange(next); // persiste a tática (sem mexer na formação/estilos travados)
+      pendingTacRef.current = next; // a orientação a ser aplicada quando ele parar
+      setRelaying(true);
+      // reseta o timer de 2s: cada mexida adia o commit (debounce).
+      if (relayDebounceRef.current != null) window.clearTimeout(relayDebounceRef.current);
+      relayDebounceRef.current = window.setTimeout(() => commitRef.current(), RELAY_DEBOUNCE_MS);
     },
-    [onMyTacChange, pushLine, syncView],
+    [onMyTacChange],
   );
+
+  // mantém o commitRef sempre apontando pro commit mais recente (closure fresco).
+  useEffect(() => {
+    commitRef.current = commitLiveTac;
+  }, [commitLiveTac]);
 
   // ----- suspense em 2 etapas -----
   const teamSlugFor = useCallback(
@@ -307,8 +434,12 @@ export function LiveMatch({
   const stageChance = useCallback(
     (ev: MatchEvent) => {
       const attackerSide = ev.ownerSide;
-      const atkTac = attackerSide === "A" ? myTac : aiTac;
-      const styleKey = TICKER_BUILDUP[atkTac.estilo] ? atkTac.estilo : "lados";
+      // narração casa com o estilo de ataque CORRENTE do motor (st.tacA/tacB) — na semi/
+      // final a IA pode ter trocado o estilo no intervalo, então não usamos o aiTac
+      // inicial. Fallback pros props se o estado ainda não existir.
+      const st = stateRef.current;
+      const atkTac = attackerSide === "A" ? (st?.tacA ?? myTac) : (st?.tacB ?? aiTac);
+      const styleKey = TICKER_BUILDUP[atkTac.atk] ? atkTac.atk : "posse";
       const html = fillTeam(pickArr(uiRnd.current, TICKER_BUILDUP[styleKey]), ev.team);
       const lineId = pushLine(ev.m, html, "buildup", {
         icon: "🔵",
@@ -404,18 +535,37 @@ export function LiveMatch({
     }
   }, []);
 
+  // ITEM 4: cancela o debounce do ajuste ao vivo e descarta a orientação pendente. Chamado
+  // ao PAUSAR, no INTERVALO e no FIM — o ajuste em tempo real não deve disparar fora do
+  // jogo correndo (o intervalo tem seu próprio fluxo de tática). Some o aviso.
+  const clearRelay = useCallback(() => {
+    if (relayDebounceRef.current != null) {
+      window.clearTimeout(relayDebounceRef.current);
+      relayDebounceRef.current = null;
+    }
+    pendingTacRef.current = null;
+    setRelaying(false);
+  }, []);
+
   const openHalftime = useCallback(() => {
     if (halftimeShownRef.current) return;
     halftimeShownRef.current = true;
     stopTimer();
+    clearRelay(); // ITEM 4: descarta debounce pendente ao entrar no intervalo.
     flushAll(); // BUG 1.3: nenhum gol do 1º tempo pode ficar pra trás.
     setActivePossSide(null);
     setDangerSide(null);
+    // ITEM 14 (§14): o Vestiário revela a tática que a IA REALMENTE jogou no 1º tempo —
+    // na semi/final ela pode ter mexido na postura/sliders ao vivo, então congelamos
+    // st.tacB aqui (não o aiTac inicial). Revela formação + estilos (NÃO sliders, §14).
+    const st = stateRef.current;
+    if (st) setAiTacShown(st.tacB);
     setPhase("halftime");
-  }, [flushAll, stopTimer]);
+  }, [flushAll, stopTimer, clearRelay]);
 
   const endMatch = useCallback(() => {
     stopTimer();
+    clearRelay(); // ITEM 4: descarta debounce pendente ao encerrar.
     flushAll(); // BUG 1.3: revela tudo antes de fechar — placar final == soma dos gols.
     setActivePossSide(null);
     setDangerSide(null);
@@ -430,33 +580,51 @@ export function LiveMatch({
     const gB = finalGoals.filter((g) => g.side === "B").length;
     // ITEM 12: stats da partida derivadas dos MESMOS lances revelados — batem 100% com
     // o que foi visto na transmissão (e com o placar).
-    onFinish(gA, gB, finalGoals, deriveStatsFromEvents(st, revealedRef.current));
-  }, [onFinish, stopTimer, flushAll]);
+    onFinish(gA, gB, finalGoals, deriveStatsFromEvents(st, revealedRef.current), linesRef.current);
+  }, [onFinish, stopTimer, flushAll, clearRelay]);
 
   // roda UM minuto do motor (com a IA reativa antes) e ENFILEIRA os lances do minuto.
   const liveTick = useCallback(() => {
     const st = stateRef.current;
     if (!st) return;
-    // ITEM 14 reativo: antes de rodar o minuto, a IA relê o placar e pode mudar a
-    // POSTURA (forma/estilo/marcação do plano inicial ficam). Se mudou, recomputa SB.
-    const newPosture = reactiveAiPosture(
-      aiTac,
-      opp.o,
-      campaign.myTeam.o,
-      st.gB,
-      st.gA,
-      st.minute,
-    );
-    if (newPosture !== aiPostureRef.current) {
-      aiPostureRef.current = newPosture;
-      const nextB: Tactic = { ...st.tacB, postura: newPosture };
-      recomputeStrengths(st, st.tacA, nextB);
+    // ITEM 14 reativo (§14) — antes de rodar o minuto, a IA relê o placar (e, na semi/
+    // final, o SEU plano corrente) e pode mexer na tática. AO VIVO a estrutura fica
+    // travada pros dois lados (§1): a IA só re-afina os sliders.
+    if (aiPhase === "ao_vivo") {
+      // semi/final: re-afina sliders contra o meu plano atual + ânimo do placar.
+      const nextB = reactiveAiTactic(
+        opp,
+        campaign.myTeam,
+        st.tacA, // meu plano corrente (mantido em sync pelo motor)
+        st.tacB,
+        st.gB,
+        st.gA,
+        st.minute,
+        true, // keepStructure: estrutura só muda no intervalo
+      );
+      if (
+        nextB.postura !== st.tacB.postura ||
+        nextB.pressao !== st.tacB.pressao ||
+        nextB.amplitude !== st.tacB.amplitude ||
+        nextB.agressividade !== st.tacB.agressividade
+      ) {
+        aiPostureRef.current = nextB.postura;
+        recomputeStrengths(st, st.tacA, nextB);
+      }
+    } else {
+      // grupos/oitavas/quartas: só a POSTURA reage (v9). Estrutura+estilos do plano ficam.
+      const newPosture = reactiveAiPosture(aiTac, opp.o, campaign.myTeam.o, st.gB, st.gA, st.minute);
+      if (newPosture !== aiPostureRef.current) {
+        aiPostureRef.current = newPosture;
+        const nextB: Tactic = { ...st.tacB, postura: newPosture };
+        recomputeStrengths(st, st.tacA, nextB);
+      }
     }
     const r = stepMinute(st);
     setMinute(r.minute);
     r.events.forEach((ev) => stageChance(ev));
     syncView();
-  }, [aiTac, campaign.myTeam.o, opp.o, stageChance, syncView]);
+  }, [aiPhase, aiTac, campaign.myTeam, opp, stageChance, syncView]);
 
   const liveFrame = useCallback(() => {
     const st = stateRef.current;
@@ -529,6 +697,8 @@ export function LiveMatch({
     return () => {
       stopTimer();
       if (liveTacAppliedTimer.current != null) window.clearTimeout(liveTacAppliedTimer.current);
+      // ITEM 4: limpa o debounce do ajuste ao vivo no unmount.
+      if (relayDebounceRef.current != null) window.clearTimeout(relayDebounceRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -540,11 +710,22 @@ export function LiveMatch({
     const st = stateRef.current;
     if (!st) return;
     liveTacRef.current = myTac; // sincroniza o ajuste ao vivo com a tática do intervalo
+    lastCommittedTacRef.current = myTac; // ITEM 4: base do diff reinicia na tática do vestiário
+    clearRelay(); // ITEM 4: garante que nenhum debounce do 1º tempo sobrou
+    // ITEM 14 (§14): na semi/final, a IA também AJUSTA NO INTERVALO — aqui ela pode
+    // RE-ESTRUTURAR (formação + estilos + sliders), lendo o seu novo plano do vestiário e
+    // o placar do 1º tempo. Nas demais fases a tática da IA segue como entrou no jogo
+    // (apenas a postura reagiu ao vivo).
+    let aiNext: Tactic = st.tacB;
+    if (aiPhase === "ao_vivo") {
+      aiNext = reactiveAiTactic(opp, campaign.myTeam, myTac, st.tacB, st.gB, st.gA, 45, false);
+      aiPostureRef.current = aiNext.postura;
+    }
     // BUG #3: a tática do intervalo (formação + eixos) recomputa o 2º TEMPO inteiro a
     // partir do minuto 45, re-semeado de forma estável (seed + placar + hash da tática).
     // Mudar o plano no vestiário REALMENTE muda os lances/placar do 2º tempo. O 1º tempo
     // (passado) e os gols já revelados ficam intactos.
-    recomputeFromMinute(st, myTac, st.tacB, 45);
+    recomputeFromMinute(st, myTac, aiNext, 45);
     pendingRef.current = [];
     setActivePossSide(null);
     setDangerSide(null);
@@ -552,14 +733,14 @@ export function LiveMatch({
     // futuro (2º tempo) foi recomputado com este plano.
     pushLine(
       45,
-      `Tática aplicada a partir do 2º tempo: ${FORM_NM[myTac.form]} · ${ESTILO_NM[myTac.estilo]} · ${POSTURA_NM[myTac.postura]} · ${MARC_NM[myTac.marcacao]}.`,
+      `Tática aplicada a partir do 2º tempo: ${FORM_NM[myTac.form]} · ${ATK_NM[myTac.atk]} · ${DEF_NM[myTac.def]}.`,
       "cmd",
       { icon: "✅" },
     );
     setPhase("live");
     syncView();
     startTimer();
-  }, [myTac, pushLine, startTimer, syncView]);
+  }, [aiPhase, campaign.myTeam, myTac, opp, pushLine, startTimer, syncView, clearRelay]);
 
   // ITEM G: pausa/retoma a partida — congela o RELÓGIO, o PLAYBACK e as STATS. Pausar
   // para o setInterval (o motor não avança, nada é revelado, as stats — derivadas dos
@@ -575,6 +756,7 @@ export function LiveMatch({
       if (next) {
         pauseStartRef.current = nowMs();
         stopTimer();
+        clearRelay(); // ITEM 4: pausar congela o jogo — descarta o debounce do ajuste.
       } else {
         const delta = nowMs() - pauseStartRef.current;
         if (delta > 0) {
@@ -584,7 +766,7 @@ export function LiveMatch({
       }
       return next;
     });
-  }, [finished, phase, startTimer, stopTimer]);
+  }, [finished, phase, startTimer, stopTimer, clearRelay]);
 
   // sair da partida: para o relógio e devolve o controle ao orquestrador (volta pro
   // hub sem registrar o resultado). A confirmação acontece na UI antes de chamar isto.
@@ -615,7 +797,7 @@ export function LiveMatch({
 
   // ---- intervalo ----
   if (phase === "halftime") {
-    const aiFormLabel = FORM_OPTS.find((o) => o[0] === aiTac.form)?.[1] ?? aiTac.form;
+    const aiFormLabel = FORM_OPTS.find((o) => o[0] === aiTacShown.form)?.[1] ?? aiTacShown.form;
     return (
       <div className="flex flex-col">
         <div className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand-600">
@@ -632,6 +814,41 @@ export function LiveMatch({
           goals={goals}
           small
         />
+        {/* ITEM 3: abas Transmissão | Estatísticas (default Estatísticas) ACIMA da análise
+            — o usuário revê os números do 1º tempo ou os lances, antes de ler a comissão. */}
+        <div className="mt-3">
+          <LiveTabs value={breakTab} onChange={setBreakTab} />
+          <div className="mt-2">
+            {breakTab === "stats" ? (
+              <div role="tabpanel" id="live-panel-stats" aria-labelledby="live-tab-stats">
+                {/* ITEM #6: leitura do 1º tempo com as 6 métricas completas. */}
+                {halftimeStats ? (
+                  <MatchStatsPanel
+                    stats={halftimeStats}
+                    myName={campaign.myTeam.n}
+                    oppName={opp.n}
+                    title="1º tempo"
+                  />
+                ) : (
+                  <div className="rounded-[14px] border border-border bg-surface px-3 py-4 text-center text-[13px] text-ink-600">
+                    Sem lances no 1º tempo.
+                  </div>
+                )}
+                <div className="mt-2.5 flex flex-wrap gap-1.5 text-[12px]">
+                  <span className="rounded-md bg-surface-2 px-2 py-1 font-semibold text-ink-700">
+                    Jogo {view.gameVol > 1.05 ? "aberto" : view.gameVol < 0.92 ? "truncado" : "equilibrado"}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div role="tabpanel" id="live-panel-feed" aria-labelledby="live-tab-feed">
+                <Ticker lines={lines} />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ITEM 3: a análise da comissão segue ABAIXO da área com abas. */}
         <div className="mt-3 rounded-[14px] border border-border bg-surface p-3.5">
           {/* ITEM #8: título sem citar o nome do rival; o conteúdo abaixo mostra a tática
               dele + a leitura da comissão. */}
@@ -639,63 +856,42 @@ export function LiveMatch({
             🔍 Análise da Comissão técnica
           </div>
           <div className="mt-2 flex flex-wrap gap-1.5">
-            {[aiFormLabel, ESTILO_NM[aiTac.estilo], POSTURA_NM[aiTac.postura], MARC_NM[aiTac.marcacao]].map(
-              (chip) => (
-                <span
-                  key={chip}
-                  className="rounded-md bg-surface-2 px-2 py-1 text-[12px] font-bold text-ink-800"
-                >
-                  {chip}
-                </span>
-              ),
-            )}
+            {[aiFormLabel, ATK_NM[aiTacShown.atk], DEF_NM[aiTacShown.def]].map((chip) => (
+              <span
+                key={chip}
+                className="rounded-md bg-surface-2 px-2 py-1 text-[12px] font-bold text-ink-800"
+              >
+                {chip}
+              </span>
+            ))}
           </div>
-          <div className="mt-2 text-sm text-ink-600">{aiReadHint(aiTac)}</div>
+          <div className="mt-2 text-sm text-ink-600">{aiReadHint(aiTacShown)}</div>
           {/* ITEM 8: vantagens CONCRETAS do meu plano agora que a tática deles apareceu */}
-          <MatchupBadges my={myTac} opp={aiTac} />
-        </div>
-
-        {/* ITEM #6: leitura do 1º tempo com as 6 métricas completas (iguais ao ao vivo e
-            ao pós-jogo) — não mais um resumo de 3. */}
-        {halftimeStats && (
-          <div className="mt-3">
-            <MatchStatsPanel
-              stats={halftimeStats}
-              myName={campaign.myTeam.n}
-              oppName={opp.n}
-              title="1º tempo"
-            />
-          </div>
-        )}
-        <div className="mt-3 flex flex-wrap gap-1.5 text-[12px]">
-          <span className="rounded-md bg-surface-2 px-2 py-1 font-semibold text-ink-700">
-            Jogo {view.gameVol > 1.05 ? "aberto" : view.gameVol < 0.92 ? "truncado" : "equilibrado"}
-          </span>
+          <MatchupBadges my={myTac} opp={aiTacShown} />
+          {/* §14: a LEITURA DO QUE FAZER no 2º tempo — lê a matriz §4 (meu ataque × a
+              defesa deles E o ataque deles × a minha) + a força §10. Recados práticos,
+              sem número cru, que ensinam o contra-plano sem entregar a regra oculta. */}
+          <CommissionAdvice my={myTac} opp={aiTacShown} myTeam={campaign.myTeam} oppTeam={opp} />
         </div>
 
         <div className="mb-1.5 mt-4 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
           Ajuste sua tática (2º tempo)
         </div>
-        <FormGrid opts={FORM_OPTS} value={myTac.form} onPick={(v) => onMyTacChange({ ...myTac, form: v })} />
+        <FormGrid value={myTac.form} onPick={(v) => onMyTacChange({ ...myTac, form: v })} />
         <SegBlock
-          label="Estilo"
-          opts={ESTILO_OPTS}
-          value={myTac.estilo}
-          onPick={(v) => onMyTacChange({ ...myTac, estilo: v })}
+          label="Ataque"
+          opts={ATK_OPTS}
+          value={myTac.atk}
+          onPick={(v) => onMyTacChange({ ...myTac, atk: v })}
         />
         <SegBlock
-          label="Postura"
-          opts={POSTURA_OPTS}
-          value={myTac.postura}
-          onPick={(v) => onMyTacChange({ ...myTac, postura: v })}
+          label="Defesa"
+          opts={DEF_OPTS}
+          value={myTac.def}
+          onPick={(v) => onMyTacChange({ ...myTac, def: v })}
         />
-        <SegBlock
-          label="Marcação"
-          opts={MARC_OPTS}
-          value={myTac.marcacao}
-          onPick={(v) => onMyTacChange({ ...myTac, marcacao: v })}
-        />
-        <PlanSummary tac={myTac} />
+        <TacticSliders tac={myTac} onPatch={(k, v) => onMyTacChange({ ...myTac, [k]: v })} />
+        <PlanSummary tac={myTac} className="mt-2.5" />
         <Button size="lg" fullWidth className="mt-3.5 bg-gold-600 text-ink-950 hover:bg-gold-700" onClick={resumeSecondHalf}>
           Apitar o 2º tempo ›
         </Button>
@@ -719,10 +915,11 @@ export function LiveMatch({
       tac={liveTac}
       open={tacDrawerOpen}
       onToggle={() => setTacDrawerOpen((v) => !v)}
-      cooldownLeft={Math.max(0, liveTacCooldownUntil - minute)}
       justApplied={liveTacJustApplied}
+      relaying={relaying}
+      hints={lastHints}
       disabled={finished || minute >= 90}
-      onChange={applyLiveTac}
+      onChange={stageLiveTac}
     />
   );
 
@@ -914,7 +1111,9 @@ function SpeedBar({
 
 // ITEM E — abas Transmissão | Estatísticas ao vivo (mobile). Acessível (role=tablist/
 // tab), pílula com a aba ativa nítida, alvos ≥44px. Anima só transform/cor.
-function LiveTabs({
+// ITEM 3: abas Transmissão | Estatísticas — reusadas no ao vivo (mobile), no intervalo e
+// no fim de jogo. Acessível (role=tab/tablist), ≥44px de alvo.
+export function LiveTabs({
   value,
   onChange,
 }: {
@@ -956,7 +1155,8 @@ function LiveTabs({
 }
 
 // ITEM 6 — ticker da transmissão (extraído pra ser reutilizado nos dois layouts).
-function Ticker({ lines }: { lines: TickerLine[] }) {
+// ITEM 3: exportado pra a aba Transmissão do fim de jogo (revisar os lances).
+export function Ticker({ lines }: { lines: TickerLine[] }) {
   return (
     <div
       aria-live="polite"
@@ -1101,27 +1301,34 @@ function LiveStatsPanel({
   );
 }
 
-// ITEM 7: painel de ajuste tático ao vivo. Drawer recolhível pra não poluir o mobile.
-// Só os 3 eixos editáveis (formação travada — mantém a leitura "às cegas"). Em
-// cooldown, os controles ficam inertes e o rótulo mostra os minutos restantes.
+// ITEM 7 (rev 4) / ITEM 4: painel de ajuste ao vivo. Drawer recolhível pra não poluir o
+// mobile. SÓ OS 4 SLIDERS (formação e estilos travados ao vivo — só mudam no intervalo).
+// O usuário mexe à vontade; quando PARA por 2s a orientação é passada (debounce real,
+// ITEM 4). Enquanto está pendente, mostra "Passando orientações para os jogadores".
 function LiveTacPanel({
   tac,
   open,
   onToggle,
-  cooldownLeft,
   justApplied,
+  relaying,
+  hints,
   disabled,
   onChange,
 }: {
   tac: Tactic;
   open: boolean;
   onToggle: () => void;
-  cooldownLeft: number;
   justApplied: boolean;
+  // ITEM 4: orientação pendente (debounce de 2s reais correndo). Acende o aviso.
+  relaying: boolean;
+  // §14: as DICAS DE IMPACTO do último ajuste (sintonia/matriz/pressão), no painel.
+  hints: LiveHint[];
   disabled: boolean;
-  onChange: (patch: Partial<Pick<Tactic, "estilo" | "postura" | "marcacao">>) => void;
+  onChange: (patch: Partial<Pick<Tactic, "postura" | "pressao" | "amplitude" | "agressividade">>) => void;
 }) {
-  const locked = disabled || cooldownLeft > 0;
+  // ITEM 4: cooldown-em-minutos REMOVIDO. Os sliders só ficam inertes se a partida acabou
+  // (disabled); fora isso, dá pra mexer livremente — o commit é debounced no container.
+  const reduced = REDUCED;
   return (
     <div className="mt-3 overflow-hidden rounded-[14px] border border-border bg-surface">
       <button
@@ -1134,52 +1341,114 @@ function LiveTacPanel({
           <span aria-hidden>🔧</span> Ajuste tático ao vivo
         </span>
         <span className="flex items-center gap-2">
-          {/* ITEM #3: confirmação transitória de que o ajuste foi aplicado, no lugar onde
-              o usuário agiu. Tem prioridade visual sobre o cooldown nos ~2s iniciais. */}
-          {justApplied && (
+          {/* ITEM 4: "Passando orientações…" tem prioridade (a mudança está sendo levada ao
+              time). Depois vem a confirmação "✓ aplicada". reduced-motion: sem animação. */}
+          {relaying ? (
+            <span
+              role="status"
+              className={`flex items-center gap-1 rounded-md bg-gold-500/15 px-2 py-0.5 text-[11px] font-extrabold text-gold-700 ${reduced ? "" : "animate-pulse"}`}
+            >
+              <span aria-hidden>📣</span> Passando orientações para os jogadores
+            </span>
+          ) : justApplied ? (
             <span
               role="status"
               className="flex items-center gap-1 rounded-md bg-grass-500/15 px-2 py-0.5 text-[11px] font-extrabold text-grass-700"
             >
               <span aria-hidden>✓</span> aplicada
             </span>
-          )}
-          {!justApplied && cooldownLeft > 0 && (
-            <span className="rounded-md bg-surface-2 px-2 py-0.5 text-[11px] font-bold tabular-nums text-ink-500">
-              {cooldownLeft}&apos; p/ reusar
-            </span>
-          )}
+          ) : null}
           <span aria-hidden className={`text-ink-400 transition-transform ${open ? "rotate-180" : ""}`}>
             ▾
           </span>
         </span>
       </button>
       {open && (
-        <div className={`animate-rise border-t border-border px-3.5 pb-3.5 pt-1 ${locked ? "opacity-55" : ""}`}>
-          <div className="mt-1.5 text-[11px] text-ink-500">
-            A <b>formação</b> só muda no intervalo. Mexa em estilo, postura e marcação: vale do
-            minuto seguinte.
+        <div className="animate-rise border-t border-border px-3.5 pb-3.5 pt-1">
+          <div className={`mt-1.5 text-[11px] text-ink-500 ${disabled ? "opacity-55" : ""}`}>
+            Formação e estilos só mudam no intervalo. Ao vivo, mexa nos sliders à vontade:
+            quando você parar, a orientação é passada (vale do minuto seguinte).
           </div>
-          <SegBlock
-            label="Estilo"
-            opts={ESTILO_OPTS}
-            value={tac.estilo}
-            onPick={(v) => !locked && onChange({ estilo: v })}
-          />
-          <SegBlock
-            label="Postura"
-            opts={POSTURA_OPTS}
-            value={tac.postura}
-            onPick={(v) => !locked && onChange({ postura: v })}
-          />
-          <SegBlock
-            label="Marcação"
-            opts={MARC_OPTS}
-            value={tac.marcacao}
-            onPick={(v) => !locked && onChange({ marcacao: v })}
-          />
+          {/* §14: a DICA DE IMPACTO fica FORA do bloco esmaecido — é leitura, não controle.
+              Mostra o que o último ajuste mudou (matriz/pressão + sintonia). */}
+          {hints.length > 0 && <LiveHintList hints={hints} />}
+          <div className={disabled ? "opacity-55" : ""}>
+            <TacticSliders tac={tac} onPatch={(k, v) => !disabled && onChange({ [k]: v })} disabled={disabled} />
+          </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// §14: lista das DICAS DE IMPACTO de um ajuste ao vivo. Cada dica é uma leitura boleira do
+// efeito (sintonia/matriz/pressão), com tom (▲ ajuda · ⚠ custa · 💡 neutro). Sem número
+// cru do motor. reduced-motion respeitado (sem animação própria). aria-live pra o leitor
+// de tela anunciar a leitura quando ela troca.
+function LiveHintList({ hints }: { hints: LiveHint[] }) {
+  const tone = (k: LiveHint["tone"]) =>
+    k === "good"
+      ? "border border-grass-600/30 bg-grass-500/10 text-grass-700"
+      : k === "bad"
+        ? "border border-flame-600/30 bg-flame-500/10 text-flame-700"
+        : "border border-border bg-surface-2 text-ink-700";
+  const mark = (k: LiveHint["tone"]) => (k === "good" ? "▲" : k === "bad" ? "⚠️" : "💡");
+  return (
+    <div aria-live="polite" className="mt-2.5 flex flex-col gap-1.5">
+      {hints.map((h, i) => (
+        <div
+          key={i}
+          className={`flex items-start gap-2 rounded-[10px] px-2.5 py-1.5 text-[12px] font-semibold leading-snug ${tone(h.tone)}`}
+        >
+          <span aria-hidden className="mt-px shrink-0 text-[11px] font-black">
+            {mark(h.tone)}
+          </span>
+          <span className="min-w-0">{h.text}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// §14: LEITURA DO QUE FAZER no 2º tempo (Vestiário). Deriva de commissionRead (matriz §4
+// + pressão §5 + força §10) — recados práticos do que ajustar, sem número cru. Tom por
+// dica (▲ a favor · ⚠ atenção · 💡 leitura). Separado dos MatchupBadges: aqueles dizem
+// "como está o confronto"; este diz "o que fazer". Legível em claro e escuro.
+function CommissionAdvice({
+  my,
+  opp,
+  myTeam,
+  oppTeam,
+}: {
+  my: Tactic;
+  opp: Tactic;
+  myTeam: import("./types").Team;
+  oppTeam: import("./types").Team;
+}) {
+  const reads: CommissionRead[] = commissionRead(my, opp, myTeam, oppTeam);
+  if (reads.length === 0) return null;
+  const tone = (k: CommissionRead["tone"]) =>
+    k === "good"
+      ? "text-grass-700"
+      : k === "bad"
+        ? "text-flame-700"
+        : "text-ink-700";
+  const mark = (k: CommissionRead["tone"]) => (k === "good" ? "▲" : k === "bad" ? "⚠️" : "💡");
+  return (
+    <div className="mt-3 border-t border-border pt-2.5">
+      <div className="text-[10.5px] font-extrabold uppercase tracking-wide text-ink-500">
+        O que fazer no 2º tempo
+      </div>
+      <ul className="mt-1.5 flex flex-col gap-1.5">
+        {reads.map((r, i) => (
+          <li key={i} className={`flex items-start gap-2 text-[12.5px] font-semibold leading-snug ${tone(r.tone)}`}>
+            <span aria-hidden className="mt-px shrink-0 text-[11px] font-black">
+              {mark(r.tone)}
+            </span>
+            <span className="min-w-0">{r.text}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -1229,16 +1498,24 @@ function TeamPanel({
   // box-shadow base por nível. A animação managerDanger define o box-shadow inteiro nos
   // keyframes, então só aplicamos um boxShadow inline quando NÃO estamos animando.
   const baseShadow = danger ? DANGER_RING_STATIC : active ? POSS_RING : undefined;
+  // CLAREZA/ROBUSTEZ (v10): nome longo (ex.: "União Soviética", "Coreia do Sul",
+  // "Estados Unidos", "Costa do Marfim") ESTOURAVA a pílula e quebrava NO MEIO da palavra
+  // ("SOVIÉTIC|A"). Em vez de partir palavra, ENCOLHE a fonte + aperta o tracking conforme
+  // o nome (e a maior palavra) cresce — aí cabe em 2 linhas limpas, quebrando só entre
+  // palavras (break-words só parte palavra única gigante, em último caso). Nunca trunca: o
+  // nome é a identidade do placar.
+  const longestWord = name.split(/\s+/).reduce((m, w) => Math.max(m, w.length), 0);
+  // palavra única de 10+ letras (Inglaterra, Eslováquia) não cabe em 1 linha a 10.5px na
+  // pílula estreita do placar — desce pra 9.5px com folga (margem anti-quebra).
+  const veryLong = longestWord >= 10 || name.length >= 18;
+  const longName = longestWord >= 8 || name.length >= 13;
+  const sizeCls = veryLong ? "text-[9.5px]" : longName ? "text-[10.5px]" : "text-[12.5px]";
+  const trackCls = longName ? "tracking-normal" : "tracking-wide";
   return (
     <div className="flex min-w-0 flex-1 flex-col items-center gap-1.5">
       <ManagerCrest slug={slug} name={name} size={40} className="shrink-0" />
-      {/* CLAREZA/ROBUSTEZ (v9): nome longo (ex.: "Coreia do Sul", "Estados Unidos")
-          QUEBRA em até 2 linhas em vez de truncar com "…" — o nome da seleção é a
-          identidade do placar, não pode sumir. overflow-wrap:anywhere só parte a palavra
-          em último caso (nome de uma palavra gigante); o normal quebra entre palavras.
-          leading apertado mantém o respiro do board. */}
       <span
-        className={`w-full rounded-md px-2 py-1 text-center text-[12.5px] font-black uppercase leading-[1.08] tracking-wide [overflow-wrap:anywhere] transition-shadow duration-150 ease-out ${
+        className={`w-full break-words rounded-md px-2 py-1 text-center font-black uppercase leading-[1.08] transition-shadow duration-150 ease-out ${sizeCls} ${trackCls} ${
           dangerBlink ? "animate-manager-danger" : ""
         }`}
         style={{
@@ -1378,12 +1655,14 @@ function GoalTimeline({ goals }: { goals: { side: "A" | "B"; m: number }[] }) {
   );
 }
 
-// resumo do plano: apenas ECOA as escolhas do jogador, neutro, sem ⚠/✓ nem "ideal"
-export function PlanSummary({ tac }: { tac: Tactic }) {
+// resumo do plano: apenas ECOA as escolhas do jogador, neutro, sem ⚠/✓ nem "ideal".
+// Mostra formação + estilos (atk/def) + o resumo dos 4 sliders (zona de cada um).
+export function PlanSummary({ tac, className = "" }: { tac: Tactic; className?: string }) {
   return (
-    <div className="mt-2.5 rounded-[10px] bg-surface-2 px-3 py-2 text-[12px] font-semibold text-ink-600">
-      Seu plano: <b className="text-ink-900">{FORM_NM[tac.form]}</b> · {ESTILO_NM[tac.estilo]} ·{" "}
-      {POSTURA_NM[tac.postura]} · {MARC_NM[tac.marcacao]}
+    <div className={`rounded-[10px] bg-surface-2 px-3 py-2 text-[12px] font-semibold text-ink-600 ${className}`}>
+      Seu plano: <b className="text-ink-900">{FORM_NM[tac.form]}</b> · {ATK_NM[tac.atk]} ·{" "}
+      {DEF_NM[tac.def]} · postura {sliderZone("postura", tac.postura).toLowerCase()} ·{" "}
+      {sliderZone("pressao", tac.pressao).toLowerCase()}
     </div>
   );
 }

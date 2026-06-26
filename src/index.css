@@ -373,6 +373,46 @@
 [data-theme="dark"] {
   --color-board: oklch(0.13 0.02 236);
 }
+
+/* Slider de tática (.mgr-range): thumb circular de marca sobre o trilho preenchido
+   (desenhado no JSX). Pseudo-elementos por engine (WebKit/Firefox). O thumb cresce
+   no arraste (.mgr-range--drag) e ganha anel no foco de teclado. transition curta
+   (150ms); o kill-switch global de reduced-motion zera. ≥44px de área de toque pela
+   altura do input (h-5) + alvo grande do polegar. */
+.mgr-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 9999px;
+  background: var(--color-brand-600);
+  border: 3px solid var(--color-surface);
+  box-shadow: 0 1px 3px oklch(0 0 0 / 0.28);
+  cursor: grab;
+  transition: transform 150ms var(--ease-out-quart);
+}
+.mgr-range::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 9999px;
+  background: var(--color-brand-600);
+  border: 3px solid var(--color-surface);
+  box-shadow: 0 1px 3px oklch(0 0 0 / 0.28);
+  cursor: grab;
+  transition: transform 150ms var(--ease-out-quart);
+}
+.mgr-range--drag::-webkit-slider-thumb { transform: scale(1.18); cursor: grabbing; }
+.mgr-range--drag::-moz-range-thumb { transform: scale(1.18); cursor: grabbing; }
+.mgr-range:focus-visible::-webkit-slider-thumb {
+  outline: none;
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--color-brand-500) 38%, transparent), 0 1px 3px oklch(0 0 0 / 0.28);
+}
+.mgr-range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--color-brand-500) 38%, transparent), 0 1px 3px oklch(0 0 0 / 0.28);
+}
+.mgr-range:disabled::-webkit-slider-thumb { background: var(--color-ink-400); cursor: not-allowed; }
+.mgr-range:disabled::-moz-range-thumb { background: var(--color-ink-400); cursor: not-allowed; }
+
 @keyframes managerPop {
   0% { transform: scale(1); }
   40% { transform: scale(1.5); color: #fff; }

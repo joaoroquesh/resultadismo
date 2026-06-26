@@ -9,10 +9,13 @@
 // dado puro (snake/standings/pairs) e sobrevive ao JSON.stringify.
 
 import type { Campaign, Tactic } from "./types";
-import { rngFrom } from "./engine";
+import { applyPreset, rngFrom } from "./engine";
 
-const TAC_KEY = "rd_manager_tactic_v1";
-const CAMP_KEY = "rd_manager_campaign_v1";
+// rev 4: o FORMATO da Tactic mudou (formação 9 + estilos atk/def + 4 sliders). As chaves
+// sobem pra v2 — saves antigos (v1, formato incompatível) ficam IGNORADOS (fresh start;
+// beta, aceitável). Nada de crash ao topar com um save velho.
+const TAC_KEY = "rd_manager_tactic_v2";
+const CAMP_KEY = "rd_manager_campaign_v2";
 const TROPHY_KEY = "rd_manager_trophies_v1";
 const SPEED_KEY = "rd_manager_speed_v1";
 
@@ -39,14 +42,15 @@ export function saveSpeed(s: LiveSpeed): void {
   }
 }
 
-// ---------- tática persistida ----------
-const VALID_FORM = new Set(["433", "442", "352", "4231", "532", "4312", "343", "424"]);
-const VALID_ESTILO = new Set(["passes", "meio", "lados", "longas", "contra"]);
-const VALID_POSTURA = new Set(["all_in", "atk", "eq", "def", "retranca"]);
-const VALID_MARC = new Set(["alta", "media", "baixa"]);
+// ---------- tática persistida (formato rev 4) ----------
+const VALID_FORM = new Set(["4-2-4", "3-4-3", "4-3-3", "4-4-2", "3-5-2", "4-5-1", "5-3-2", "5-4-1", "6-3-1"]);
+const VALID_ATK = new Set(["posse", "vertical", "bolalonga", "contra", "drible"]);
+const VALID_DEF = new Set(["zona", "individual", "mista", "libero", "dobra"]);
+const isSlider = (v: unknown): v is number => typeof v === "number" && v >= 0 && v <= 100;
 
+// default = preset Toque (coerente: 4-4-2 + Posse + Mista, sliders moderados).
 export function defaultTactic(): Tactic {
-  return { form: "442", estilo: "lados", postura: "eq", marcacao: "media" };
+  return applyPreset("toque");
 }
 
 export function loadTactic(): Tactic {
@@ -55,14 +59,25 @@ export function loadTactic(): Tactic {
     if (
       raw &&
       VALID_FORM.has(raw.form) &&
-      VALID_ESTILO.has(raw.estilo) &&
-      VALID_POSTURA.has(raw.postura) &&
-      VALID_MARC.has(raw.marcacao)
+      VALID_ATK.has(raw.atk) &&
+      VALID_DEF.has(raw.def) &&
+      isSlider(raw.postura) &&
+      isSlider(raw.pressao) &&
+      isSlider(raw.amplitude) &&
+      isSlider(raw.agressividade)
     ) {
-      return { form: raw.form, estilo: raw.estilo, postura: raw.postura, marcacao: raw.marcacao };
+      return {
+        form: raw.form,
+        atk: raw.atk,
+        def: raw.def,
+        postura: raw.postura,
+        pressao: raw.pressao,
+        amplitude: raw.amplitude,
+        agressividade: raw.agressividade,
+      };
     }
   } catch {
-    /* sem storage: cai no default */
+    /* sem storage ou save velho (v1 incompatível): cai no default */
   }
   return defaultTactic();
 }

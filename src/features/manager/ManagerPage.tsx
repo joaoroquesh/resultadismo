@@ -2,10 +2,15 @@ import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useFirstSeen } from "@/lib/useFirstSeen";
 import { Button } from "@/components/ui/Button";
 import type { Campaign, Edition, MatchKind, MatchStats, Tactic, Team, WorldMode } from "./types";
+import type { MatchPhase } from "./engine";
 import {
   FORMATS,
   advanceCampaign,
-  aiTactic,
+  aiTacticForPhase,
+  matchPhaseForCampaign,
+  faseForCampaignMatch,
+  applyPreset,
+  nearestPreset,
   buildCampaign,
   campaignProgress,
   campaignScore,
@@ -21,6 +26,7 @@ import {
   lastKoRoundId,
   myNextMatch,
   poolForYear,
+  postMatchCoachRead,
   previewGroupRoundResults,
   projectBracket,
   recordFinalRound,
@@ -40,10 +46,7 @@ import type {
   KnockoutStageState,
 } from "./types";
 import {
-  ESTILO_OPTS,
-  FORM_OPTS,
-  MARC_OPTS,
-  POSTURA_OPTS,
+  type SliderKey,
   TACTICAL_HINTS_SUBTLE,
   TIER_LABEL,
   barPct,
@@ -52,9 +55,10 @@ import {
   POSTMATCH,
   mulberryUi,
 } from "./ui";
-import { ConfirmInline, ManagerCrest, FormGrid, GroupRoundResultsPanel, HistoryRow, MatchStatsPanel, ScreenTransition, SegBlock, StandingsTable, Stars, StrengthVS, StyleRing, TeamName } from "./components";
+import { AttackDefenseColumns, ConfirmInline, ManagerCrest, FormGrid, GroupRoundResultsPanel, HistoryRow, MatchPreview, MatchStatsPanel, PresetPicker, ScreenTransition, StandingsTable, Stars, StrengthVS, StyleRing, TacticSliders } from "./components";
 import { BracketBody, BracketModal, KoRoundBody, NextMatchPair } from "./Bracket";
-import { LiveMatch, PlanSummary } from "./LiveMatch";
+import { LiveMatch, LiveTabs, PlanSummary, Ticker } from "./LiveMatch";
+import type { TickerLine } from "./LiveMatch";
 import { PenaltyShootout } from "./PenaltyShootout";
 import { teamColors } from "./teamColors";
 import {
@@ -111,6 +115,11 @@ export function ManagerPage() {
   const [matchOpp, setMatchOpp] = useState<Team | null>(null);
   const [matchKind, setMatchKind] = useState<MatchKind>("groups");
   const [aiTac, setAiTac] = useState<Tactic | null>(null);
+  // ITEM 14 (IA por fase, §14): regime da IA NESTE jogo — "grupos" (preset puro),
+  // "ajusta" (oitavas/quartas: adapta no pré-jogo) ou "ao_vivo" (semi/final: adapta +
+  // reage ao vivo). Setado no startMatch a partir da rodada da campanha; passado ao
+  // LiveMatch pra ele liberar (ou não) a reação tática completa da IA.
+  const [aiPhase, setAiPhase] = useState<MatchPhase>("grupos");
   const [matchSeed, setMatchSeed] = useState(0);
   const [matchResult, setMatchResult] = useState<{
     gf: number;
@@ -118,6 +127,8 @@ export function ManagerPage() {
     opp: Team;
     goals?: { side: "A" | "B"; m: number }[];
     stats?: MatchStats;
+    // ITEM 3: a transmissão completa pra a aba Transmissão no fim de jogo.
+    lines?: TickerLine[];
   } | null>(null);
 
   // commit: persiste e publica a campanha mutada como NOVA referência em state
@@ -200,17 +211,20 @@ export function ManagerPage() {
   );
 
   // -------- iniciar partida (tática às cegas) --------
+  // O regime da IA (§14) é definido AQUI pela rodada da campanha; a tática DA IA, porém,
+  // só é decidida no apito (kickoff) — assim, nas fases que adaptam (oitavas+), a IA lê o
+  // plano que você REALMENTE leva pro jogo (escolhido na tela de tática), não um plano
+  // velho. Nos grupos isso não muda nada (preset puro, não lê o jogador).
   const startMatch = useCallback(
     (opp: Team, kind: MatchKind) => {
       const camp = campRef.current;
       if (!camp) return;
       const seed =
         (camp.seed ^ (opp.o * 40503 + camp.stageIdx * 7349 + camp.history.length * 131)) >>> 0;
-      const r = rngFrom(seed);
       setMatchOpp(opp);
       setMatchKind(kind);
-      // a IA é o adversário: gap = força DELE − minha força (item 14)
-      setAiTac(aiTactic(r, opp.o, camp.myTeam.o));
+      setAiPhase(matchPhaseForCampaign(camp));
+      setAiTac(null); // decidida no kickoff (lê o seu plano final nas fases que adaptam)
       setMatchSeed(seed);
       go("tactics");
     },
@@ -222,11 +236,33 @@ export function ManagerPage() {
     saveTactic(tac); // persiste pro próximo jogo
   }, []);
 
+  // -------- apito inicial: decide a tática da IA por fase e entra ao vivo --------
+  // grupos → preset puro (não lê o jogador). oitavas/quartas → a IA adapta lendo o SEU
+  // plano final (myTac). semi/final → adapta no pré-jogo e ainda reage ao vivo (a reação
+  // ao vivo é entregue dentro do LiveMatch, via aiPhase). Determinístico (seed do jogo).
+  const kickoff = useCallback(() => {
+    const camp = campRef.current;
+    if (!camp || !matchOpp) return;
+    const round =
+      camp.state?.kind === "knockout" ? camp.state.stage.round : undefined;
+    const r = rngFrom(matchSeed);
+    setAiTac(
+      aiTacticForPhase(r, matchOpp, camp.myTeam, myTac, aiPhase, round),
+    );
+    go("live");
+  }, [aiPhase, go, matchOpp, matchSeed, myTac]);
+
   // -------- fim da partida ao vivo --------
   const onLiveFinish = useCallback(
-    (gA: number, gB: number, goals: { side: "A" | "B"; m: number }[], stats: MatchStats) => {
+    (
+      gA: number,
+      gB: number,
+      goals: { side: "A" | "B"; m: number }[],
+      stats: MatchStats,
+      lines: TickerLine[],
+    ) => {
       if (!matchOpp) return;
-      setMatchResult({ gf: gA, ga: gB, opp: matchOpp, goals, stats });
+      setMatchResult({ gf: gA, ga: gB, opp: matchOpp, goals, stats, lines });
       // ITEM 10: mata-mata empatado entra na disputa de pênaltis cobrança a cobrança
       // (só no MEU jogo); senão segue direto pro resultado.
       const isKO = matchKind === "knockout" || matchKind === "third_place" || matchKind === "final";
@@ -411,6 +447,8 @@ export function ManagerPage() {
         opp={matchOpp}
         myTac={myTac}
         aiTac={aiTac}
+        aiPhase={aiPhase}
+        fase={faseForCampaignMatch(camp)}
         matchSeed={matchSeed}
         onMyTacChange={onMyTacChange}
         onFinish={onLiveFinish}
@@ -463,7 +501,7 @@ export function ManagerPage() {
         opp={matchOpp}
         myTac={myTac}
         onMyTac={onMyTacChange}
-        onWhistle={() => go("live")}
+        onWhistle={kickoff}
       />
     );
   else if (screen === "result" && camp && matchResult)
@@ -473,6 +511,8 @@ export function ManagerPage() {
         result={matchResult}
         kind={matchKind}
         matchSeed={matchSeed}
+        myTac={myTac}
+        aiTac={aiTac}
         onContinue={commitMatchResult}
       />
     );
@@ -577,10 +617,11 @@ function IntroScreen({
             <b>Sorteie</b> uma seleção (favorita, média ou zebra).
           </li>
           <li>
-            <b>Monte a tática</b> às cegas: formação, estilo, postura e marcação, tudo na sua mão.
+            <b>Monte a tática</b> às cegas: formação, ataque, defesa e 4 sliders, tudo na sua mão.
           </li>
           <li>
-            <b>No jogo</b>, leia posse e placar e ajuste estilo, postura e marcação ao vivo.
+            <b>No jogo</b>, leia posse e placar e ajuste os sliders ao vivo (cada mexida dá uma
+            dica de impacto).
           </li>
           <li>
             <b>No intervalo</b>, a tática do rival é revelada. Vire a chave.
@@ -615,7 +656,7 @@ function IntroScreen({
       </div>
       <p className="mt-5 text-center text-[11px] text-ink-500">
         Mini-jogo do Resultadismo · motor no cliente, sem backend.
-        <br />8 formações · 5 estilos · 5 posturas · 3 marcações · grupos reais · 23 edições.
+        <br />9 formações · 5 ataques · 5 defesas · 4 sliders · grupos reais · 23 edições.
       </p>
     </div>
   );
@@ -1166,8 +1207,8 @@ function HelpSheet({ myTac, onClose }: { myTac: Tactic; onClose: () => void }) {
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
           <ul className="space-y-1.5 text-sm text-ink-700">
-            <li><b>Monte a tática</b> às cegas: formação, estilo, postura e marcação são suas.</li>
-            <li><b>No jogo</b>, leia posse e placar e ajuste a tática ao vivo: estilo, postura, marcação.</li>
+            <li><b>Monte a tática</b> às cegas: formação, ataque, defesa e os 4 sliders são seus. Comece por um preset e ajuste na mão.</li>
+            <li><b>No jogo</b>, leia posse e placar e ajuste os sliders ao vivo (a formação e os estilos só mudam no intervalo).</li>
             <li><b>No intervalo</b>, a tática do rival é revelada. Vire a chave.</li>
           </ul>
           <div className="mt-4 rounded-[12px] border border-border bg-surface-2 px-3 py-2.5">
@@ -1183,7 +1224,7 @@ function HelpSheet({ myTac, onClose }: { myTac: Tactic; onClose: () => void }) {
             </div>
           </div>
           <div className="mt-2.5">
-            <StyleRing estilo={myTac.estilo} />
+            <StyleRing atk={myTac.atk} />
           </div>
         </div>
       </div>
@@ -1420,40 +1461,77 @@ function TacticPicker({
 }) {
   const stage = campaign.stages[campaign.stageIdx];
   return (
-    <div className="flex flex-col">
-      <div className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand-600">
-        {stageLong(stage)}
+    <div className="flex flex-col gap-4">
+      {/* CABEÇALHO — fase + título + as 2 forças (você vs adversário) sempre à vista no
+          topo (ITEM F: sou favorito ou zebra neste jogo?). */}
+      <div className="flex flex-col">
+        <div className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand-600">
+          {stageLong(stage)}
+        </div>
+        <h2 className="mb-0 mt-1.5 text-[22px] font-bold text-ink-950">Tática às cegas</h2>
+        <div className="mt-2 rounded-[12px] border border-border bg-surface-2 px-3 py-2.5">
+          <StrengthVS mine={campaign.myTeam} opp={opp} withName />
+        </div>
+        <p className="mt-2 text-[11.5px] leading-snug text-ink-600">
+          A tática do {opp.n} só aparece no intervalo. Monte seu plano: as escolhas são todas suas.
+        </p>
       </div>
-      <h2 className="mb-0 mt-1.5 text-[22px] font-bold text-ink-950">Tática às cegas</h2>
-      <div className="my-1 flex items-center gap-2 font-extrabold text-ink-800">
-        <TeamName team={campaign.myTeam} />
-        <span className="font-bold text-ink-500">vs</span>
-        <TeamName team={opp} />
-      </div>
-      {/* ITEM F: força das duas, comparável, antes de montar a tática (sou favorito
-          ou zebra neste jogo?). */}
-      <div className="mt-1.5 rounded-[12px] border border-border bg-surface-2 px-3 py-2">
-        <StrengthVS mine={campaign.myTeam} opp={opp} />
-      </div>
-      <p className="mb-2 mt-2 text-[11.5px] text-ink-600">
-        A tática do {opp.n} só será revelada no intervalo. Monte seu plano: as escolhas são todas
-        suas.
-      </p>
 
-      <div className="mb-1.5 mt-1 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
-        Formação
-      </div>
-      <FormGrid opts={FORM_OPTS} value={myTac.form} onPick={(v) => onMyTac({ ...myTac, form: v })} />
-      <SegBlock label="Estilo" opts={ESTILO_OPTS} value={myTac.estilo} onPick={(v) => onMyTac({ ...myTac, estilo: v })} />
-      <SegBlock label="Postura" opts={POSTURA_OPTS} value={myTac.postura} onPick={(v) => onMyTac({ ...myTac, postura: v })} />
-      <SegBlock label="Marcação" opts={MARC_OPTS} value={myTac.marcacao} onPick={(v) => onMyTac({ ...myTac, marcacao: v })} />
+      {/* ITEM 6 · SEU ELENCO — as 3 forças da MINHA seleção (ATA·MEI·DEF) em barras (sem
+          número cru, item 13). Ajuda a escolher formação/estilo que casa com o elenco
+          (afinidade §8). Só a minha — a do adversário fica oculta (tática às cegas). */}
+      <section aria-labelledby="mgr-squad-h" className="rounded-[12px] border border-border bg-surface-2 px-3 py-2.5">
+        <h3 id="mgr-squad-h" className="mb-1 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
+          Seu elenco
+        </h3>
+        <Rate lab="ATA" v={campaign.myTeam.a} color="var(--color-brand-500)" />
+        <Rate lab="MEI" v={campaign.myTeam.m} color="var(--color-aqua-500)" />
+        <Rate lab="DEF" v={campaign.myTeam.d} color="var(--color-grass-500)" />
+      </section>
+
+      {/* 1 · PRESETS — atalho rápido (5). Um toque carrega o conjunto; ajuste na mão. */}
+      <PresetPicker active={nearestPreset(myTac)} onPick={(k) => onMyTac(applyPreset(k))} />
+
+      {/* 2 · FORMAÇÃO — grid 3×3 (linha = afinidade ATA/MEI/DEF). Só muda antes/no
+          intervalo. */}
+      <section aria-labelledby="mgr-form-h">
+        <div className="mb-1.5 flex items-baseline justify-between gap-2">
+          <h3 id="mgr-form-h" className="text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
+            Formação
+          </h3>
+          <span className="shrink-0 text-[10.5px] font-semibold text-ink-400">muda só no intervalo</span>
+        </div>
+        <FormGrid value={myTac.form} onPick={(v) => onMyTac({ ...myTac, form: v })} />
+      </section>
+
+      {/* 3 · ESTILOS — ataque (5) + defesa (5) LADO A LADO (ITEM 5), descrição curtíssima. */}
+      <AttackDefenseColumns
+        atk={myTac.atk}
+        def={myTac.def}
+        onAtk={(v) => onMyTac({ ...myTac, atk: v })}
+        onDef={(v) => onMyTac({ ...myTac, def: v })}
+      />
+
+      {/* 4 · SLIDERS — ajustes finos 0–100. Ao vivo, só estes mudam. */}
+      <section aria-labelledby="mgr-sliders-h">
+        <div className="mb-2 flex items-baseline justify-between gap-2">
+          <h3 id="mgr-sliders-h" className="text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
+            Ajustes finos
+          </h3>
+          <span className="shrink-0 text-[10.5px] font-semibold text-ink-400">muda ao vivo</span>
+        </div>
+        <TacticSliders tac={myTac} onPatch={(k: SliderKey, v) => onMyTac({ ...myTac, [k]: v })} />
+      </section>
+
+      {/* 5 · TRANSPARÊNCIA — o que vence o que + a sintonia atual (honesto, §14). */}
+      <MatchPreview my={myTac} team={campaign.myTeam} />
+
+      {/* recap em 1 linha + CTA */}
       <PlanSummary tac={myTac} />
-      <StyleRing estilo={myTac.estilo} />
-
       <Button
         size="lg"
         fullWidth
-        className="mt-3.5 bg-gold-600 font-bold text-ink-950 hover:bg-gold-700"
+        className="bg-gold-600 font-bold text-ink-950 hover:bg-gold-700"
         onClick={onWhistle}
       >
         Apitar o jogo ›
@@ -1468,6 +1546,8 @@ function MatchResult({
   result,
   kind,
   matchSeed,
+  myTac,
+  aiTac,
   onContinue,
 }: {
   campaign: Campaign;
@@ -1477,14 +1557,24 @@ function MatchResult({
     opp: Team;
     goals?: { side: "A" | "B"; m: number }[];
     stats?: MatchStats;
+    // ITEM 3: a transmissão da partida pra a aba Transmissão (revisar os lances).
+    lines?: TickerLine[];
   };
   kind: MatchKind;
   matchSeed: number;
+  // §14: o plano FINAL meu + o da IA (no apito) — pra o "Recado do técnico" ler o
+  // confronto real (matriz §4 + sintonia §6.5 + força §10) em vez de uma frase genérica.
+  myTac: Tactic;
+  aiTac: Tactic | null;
   onContinue: () => void;
 }) {
   const camp = campaign;
   const { gf, ga, opp } = result;
   const stage = camp.stages[camp.stageIdx];
+  // ITEM 3: no fim de jogo, abas Transmissão | Estatísticas (default Estatísticas) — o
+  // usuário revê os números ou os lances da partida, ao lado do balanço.
+  const [resultTab, setResultTab] = useState<"feed" | "stats">("stats");
+  const hasLines = !!result.lines && result.lines.length > 0;
   // ITEM C: no resultado de um jogo de grupo, a rodada que estou jogando é o
   // myMatchIdx ATUAL (ainda não incrementado — só sobe no commit). previewGroupRound
   // calcula os IA×IA paralelos sem mutar a campanha (determinístico, bate com o log).
@@ -1519,7 +1609,16 @@ function MatchResult({
     return bank[Math.floor(r() * bank.length)];
   }, [camp.myTeam.o, gf, ga, isKO, matchSeed, opp.o, outcome]);
 
-  const hint = TACTICAL_HINTS_SUBTLE[(matchSeed >>> 0) % TACTICAL_HINTS_SUBTLE.length];
+  // §14: o "Recado do técnico" agora LÊ o confronto real (meu plano final × o da IA, a
+  // matriz §4 + sintonia §6.5 + força §10 + placar) — a lição que ensina "o que venceu o
+  // que" desta partida. Sem o aiTac (caso defensivo) cai no banco boleiro genérico.
+  const hint = useMemo(
+    () =>
+      aiTac
+        ? postMatchCoachRead(myTac, aiTac, camp.myTeam, opp, gf, ga, matchSeed)
+        : TACTICAL_HINTS_SUBTLE[(matchSeed >>> 0) % TACTICAL_HINTS_SUBTLE.length],
+    [aiTac, myTac, camp.myTeam, opp, gf, ga, matchSeed],
+  );
   const badge = resultBadge(kind, outcome, camp.threePts);
 
   return (
@@ -1582,12 +1681,35 @@ function MatchResult({
       </div>
         </div>
 
-        {/* COLUNA 2 — dados (estatísticas + jogos paralelos do grupo). No lg+ o 1º bloco
-            renderizado alinha ao topo da coluna (zera o mt herdado do fluxo mobile). */}
+        {/* COLUNA 2 — dados. ITEM 3: abas Transmissão | Estatísticas (default Estatísticas)
+            pra rever os números OU os lances da partida. No lg+ o 1º bloco alinha ao topo. */}
         <div className="mt-3 flex flex-col lg:mt-0 lg:[&>*:first-child]:mt-0">
-      {result.stats && (
+      {(result.stats || hasLines) && (
         <div>
-          <MatchStatsPanel stats={result.stats} myName={camp.myTeam.n} oppName={opp.n} />
+          {hasLines ? (
+            <>
+              <LiveTabs value={resultTab} onChange={setResultTab} />
+              <div className="mt-2">
+                {resultTab === "stats" ? (
+                  <div role="tabpanel" id="live-panel-stats" aria-labelledby="live-tab-stats">
+                    {result.stats ? (
+                      <MatchStatsPanel stats={result.stats} myName={camp.myTeam.n} oppName={opp.n} />
+                    ) : (
+                      <div className="rounded-[14px] border border-border bg-surface px-3 py-4 text-center text-[13px] text-ink-600">
+                        Sem estatísticas desta partida.
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div role="tabpanel" id="live-panel-feed" aria-labelledby="live-tab-feed">
+                    <Ticker lines={result.lines!} />
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            result.stats && <MatchStatsPanel stats={result.stats} myName={camp.myTeam.n} oppName={opp.n} />
+          )}
         </div>
       )}
       {/* ITEM C: na fase de grupos, "enquanto você jogava" — os outros jogos da MESMA

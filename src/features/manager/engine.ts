@@ -8,14 +8,15 @@
 // e retomável. A UI (manager) e o managerLocal só consomem este módulo.
 // =====================================================================
 import type {
+  AtkStyle,
   BracketMatch,
   BracketRound,
   BracketSlot,
   BracketView,
   Campaign,
   ChanceKind,
+  DefStyle,
   Edition,
-  Estilo,
   FinalGroupStageState,
   Form,
   GroupOtherResult,
@@ -31,12 +32,10 @@ import type {
   PenResult,
   Shootout,
   KnockoutStageState,
-  Marcacao,
   MatchEvent,
   MatchKind,
   MatchState,
   MatchStats,
-  Postura,
   ProgressStep,
   SideStrength,
   Stage,
@@ -238,35 +237,29 @@ function gammaSample(rnd: () => number, k: number): number {
 export const P = {
   RAW_CHANCES_PER_HALF: 4.7,
   CONV_BASE: 0.246,
-  SHARE_SOFT: 1.55,
+  // ——— CALIBRAÇÃO DE FORÇA (validação Monte Carlo §17, rev 4) ———
+  // SHARE_SOFT amplia a fatia de chances pelo GAP de força (off^SHARE no share). Em força
+  // IGUAL é ~neutro (1:1 → 0.5), então NÃO mexe na simetria entre iguais (§17 meta 1: Brasil
+  // ×Brasil ~38/24/38), mas faz o GIGANTE dominar o gap grande (§17 meta 4). O §16 ancorava
+  // 1.55 (protótipo); a validação MC mostrou que 1.55 deixava o gigante em ~48% de vitória
+  // num gap de 18 (força não dominava). 2.2 recoloca a força no comando sem inverter nada.
+  SHARE_SOFT: 2.2,
   CONV_DEF_PULL: 0.95,
-  CONV_SPAN_FACTOR: 0.8,
+  // CONV_SPAN_FACTOR pesa o quanto a razão off/def (a FORÇA, canal literal §16) move a
+  // conversão. 0.8→1.1: amplia o domínio do gap E o impacto da SINTONIA (§6.5) — a validação
+  // MC (§17 meta 3) mostrou a sintonia fraca (38%×35%) em 0.8; 1.1 leva a ~46%×30% (alvo
+  // 44×29). Entre iguais a razão é 1:1, então segue ~neutro (não quebra as metas 1/2).
+  CONV_SPAN_FACTOR: 1.1,
   CHANCE_QUALITY_VAR: 0.28,
   FATIGUE_2H: 1.05,
   CONV_MIN: 0.04,
   CONV_MAX: 0.52,
   W_ATK: 0.6,
   W_MID: 0.4,
-  // v4: 5 estilos · 5 posturas · 3 marcações · 8 formações
-  // item 8: pesos dos componentes táticos ELEVADOS de forma equilibrada (~1.8×) pra
-  // que tática+formação COERENTES possam sobrepor a força base — sem ignorá-la (gap
-  // grande ainda manda). Calibrado com simulateFull (média de gols ~2.5–2.8 mantida).
-  STYLE_CROSS_BONUS: 0.1,
-  MARK_CROSS_EDGE: 0.08,
-  STYLE_VS_STYLE: 0.045,
-  POSTURE_EDGE_OFF: 0.05,
-  POSTURE_EDGE_EXT: 0.085,
-  COHERENCE_SYNERGY: 0.05,
-  COHERENCE_PENALTY: 0.45,
-  LAT_AMP: 1.25,
-  LAT_NEG: 0.9,
-  CENTER_DENS: 0.06,
-  // tetos do edge tático elevados moderadamente (item 8): formação ±0.11, total ±0.20.
-  FORM_EDGE_CAP: 0.11,
-  EDGE_CAP: 0.2,
-  // item 8: o netEdge agora é BIDIRECIONAL — além do ataque (tacMul), também pesa na
-  // defesa e na conversão. kDef/kConv calibram quanto do edge vaza pra esses canais
-  // (frações do edge), pra um plano coerente render um swing real ~±20% no resultado.
+  // ——— rev 4 (estudo-taticas-v3 §16): o encaixe vira 2 grupos com peso que inverte.
+  // O edge BIDIRECIONAL (item 8) continua: além do ataque (offEf), o edge endurece a
+  // defesa e qualifica a conversão. kDef/kConv calibram a fração que vaza pra esses
+  // canais — sem ignorar a força base (gap grande ainda manda).
   EDGE_DEF_K: 0.78,
   EDGE_CONV_K: 0.32,
   OD_GAMMA_K: 8.0,
@@ -307,353 +300,706 @@ export const P = {
   LIVETAC_COOLDOWN_MIN: 8,
 } as const;
 
-// 5 POSTURAS (multiplicador interno)
-type MentVal = { atk: number; def: number; conv: number };
-const MENT: Record<Postura, MentVal> = {
-  all_in: { atk: 1.3, def: 0.7, conv: 1.14 },
-  atk: { atk: 1.16, def: 0.86, conv: 1.08 },
-  eq: { atk: 1, def: 1, conv: 1 },
-  def: { atk: 0.84, def: 1.16, conv: 0.94 },
-  retranca: { atk: 0.7, def: 1.3, conv: 0.86 },
+// =====================================================================
+// NÚCLEO TÁTICO — estudo-taticas-v3 · rev 4 (§16, implementation-ready)
+// Encaixe = soma ponderada de Estrutura (0.60→0.45) e Táticas (0.40→0.55), com peso
+// que inverte ao longo do jogo. Os valores abaixo são os do §16, copiados como estão.
+// =====================================================================
+
+// ordem canônica dos eixos (índices das matrizes).
+const FORM: Form[] = ["4-2-4", "3-4-3", "4-3-3", "4-4-2", "3-5-2", "4-5-1", "5-3-2", "5-4-1", "6-3-1"];
+const ATK: AtkStyle[] = ["posse", "vertical", "bolalonga", "contra", "drible"];
+const DEF: DefStyle[] = ["zona", "individual", "mista", "libero", "dobra"];
+
+// ——— Matriz Ataque × Defesa (§4, duplamente balanceada, em meios) ———
+// linhas = ataque; colunas = defesa, na ordem de DEF [zona, individual, mista, libero, dobra].
+const AD: Record<AtkStyle, number[]> = {
+  posse: [0, -1, 0.5, 1, -0.5],
+  vertical: [-1, -0.5, 1, 0, 0.5],
+  bolalonga: [-0.5, 0, -1, 0.5, 1],
+  contra: [0.5, 1, -0.5, -1, 0],
+  drible: [1, 0.5, 0, -0.5, -1],
 };
-function postureEdge(p: Postura, mul: number): number {
-  const e =
-    p === "all_in"
-      ? P.POSTURE_EDGE_EXT
-      : p === "atk"
-        ? P.POSTURE_EDGE_OFF
-        : p === "def"
-          ? -P.POSTURE_EDGE_OFF
-          : p === "retranca"
-            ? -P.POSTURE_EDGE_EXT
-            : 0;
-  return e * mul;
+// ——— Pressão / bloco (§5): ataque × bloco do rival [alta, media, baixa] ———
+const PR: Record<AtkStyle, number[]> = {
+  posse: [0, 0, -0.5],
+  vertical: [1, 0.5, -1],
+  bolalonga: [1, 0, -0.5],
+  contra: [1, 0, -1],
+  drible: [0, 0.5, 0.5],
+};
+
+// ——— 9 formações (grid 3×3): afinidade de elenco [ATA, MEI, DEF] (§8, do grid) ———
+const AFIN_FORM: Record<Form, number[]> = {
+  "4-2-4": [2, -1, -1],
+  "3-4-3": [2, 0, -2],
+  "4-3-3": [2, -2, 0],
+  "4-4-2": [0, 2, -2],
+  "3-5-2": [-1, 2, -1],
+  "4-5-1": [-2, 2, 0],
+  "5-3-2": [0, -2, 2],
+  "5-4-1": [-2, 0, 2],
+  "6-3-1": [-1, -1, 2],
+};
+// linha do grid: 0 = ATA (4-2-4/3-4-3/4-3-3), 1 = MEI (4-4-2/3-5-2/4-5-1), 2 = DEF (5-3-2/5-4-1/6-3-1).
+function formRow(f: Form): 0 | 1 | 2 {
+  const i = FORM.indexOf(f);
+  return (i < 3 ? 0 : i < 6 ? 1 : 2) as 0 | 1 | 2;
 }
 
-// 8 FORMAÇÕES: pesos de linha + largura(W) / densidade central(C)
-type FormVal = { atk: number; mid: number; def: number; W: number; C: number };
-export const FORMATIONS: Record<Form, FormVal> = {
-  "433": { atk: 1.02, mid: 1.05, def: 1.0, W: 1, C: 1 },
-  "442": { atk: 1.03, mid: 0.97, def: 1.02, W: 1, C: -1 },
-  "352": { atk: 1.0, mid: 1.06, def: 1.0, W: 0, C: 1 },
-  "4231": { atk: 0.98, mid: 1.03, def: 1.05, W: 0, C: 1 },
-  "532": { atk: 0.93, mid: 0.98, def: 1.12, W: -1, C: 0 },
-  "4312": { atk: 1.04, mid: 1.07, def: 0.96, W: -1, C: 1 },
-  "343": { atk: 1.1, mid: 1.0, def: 0.9, W: 1, C: 0 },
-  "424": { atk: 1.12, mid: 0.92, def: 0.92, W: 1, C: -1 },
+// ——— Coerência da formação (§2): casamento estilo↔formação, clamp [-.10,+.10] ———
+// EST_CASA/DEF_CASA listam as formações que CASAM com cada estilo (1º item = casa forte).
+const EST_CASA: Record<AtkStyle, Form[]> = {
+  posse: ["4-4-2", "3-5-2", "4-5-1"],
+  vertical: ["4-3-3", "3-4-3", "4-2-4"],
+  bolalonga: ["4-2-4", "5-3-2", "4-4-2"],
+  contra: ["5-3-2", "5-4-1", "4-5-1"],
+  drible: ["4-3-3", "3-4-3", "4-4-2"],
 };
-// anel dirigido de 8 + 5 cordas (peso bruto baixo: formação é TENDÊNCIA)
-const FORM_EDGES: [Form, Form, number][] = [
-  ["433", "442", 0.045],
-  ["442", "352", 0.04],
-  ["352", "4312", 0.05],
-  ["4312", "4231", 0.04],
-  ["4231", "532", 0.045],
-  ["532", "343", 0.045],
-  ["343", "424", 0.04],
-  ["424", "433", 0.035],
-  ["433", "4231", 0.02],
-  ["352", "343", 0.02],
-  ["4231", "442", 0.02],
-  ["532", "424", 0.03],
-  ["4312", "424", 0.025],
-];
-const FORM_MATRIX: Record<Form, Record<Form, number>> = {} as Record<Form, Record<Form, number>>;
-(function buildFormMatrix() {
-  const F = Object.keys(FORMATIONS) as Form[];
-  F.forEach((a) => {
-    FORM_MATRIX[a] = {} as Record<Form, number>;
-    F.forEach((b) => {
-      FORM_MATRIX[a][b] = 0;
-    });
-  });
-  FORM_EDGES.forEach((e) => {
-    FORM_MATRIX[e[0]][e[1]] = +e[2];
-    FORM_MATRIX[e[1]][e[0]] = -e[2];
-  });
-})();
-function formBonus(my: Form, opp: Form): number {
-  if (my === opp) return 0;
-  return (FORM_MATRIX[my] && FORM_MATRIX[my][opp]) || 0;
+const DEF_CASA: Record<DefStyle, Form[]> = {
+  zona: ["4-4-2", "4-3-3", "4-2-4"],
+  individual: ["4-3-3", "3-4-3", "4-5-1"],
+  mista: ["4-4-2", "3-5-2", "4-5-1"],
+  libero: ["5-3-2", "5-4-1", "6-3-1"],
+  dobra: ["3-5-2", "4-5-1", "5-4-1"],
+};
+function coerenciaForm(form: Form, atk: AtkStyle, def: DefStyle): number {
+  const ea = EST_CASA[atk];
+  const ec = ea.indexOf(form) === 0 ? 0.06 : ea.indexOf(form) > 0 ? 0.04 : -0.03;
+  const da = DEF_CASA[def];
+  const dc = da.indexOf(form) >= 0 ? 0.04 : -0.02;
+  return clamp(ec + dc, -0.1, 0.1);
 }
 
-// 5 ESTILOS (atk/mid/conv/ritmo)
-type StyleVal = { atk: number; mid: number; conv: number; ritmo: number };
-export const STYLE: Record<Estilo, StyleVal> = {
-  passes: { atk: 1.04, mid: 1.08, conv: 1.0, ritmo: 0.88 },
-  meio: { atk: 1.05, mid: 1.04, conv: 1.05, ritmo: 1.0 },
-  lados: { atk: 1.06, mid: 0.98, conv: 1.02, ritmo: 1.02 },
-  longas: { atk: 1.07, mid: 0.9, conv: 1.06, ritmo: 1.18 },
-  contra: { atk: 1.0, mid: 0.94, conv: 1.13, ritmo: 1.16 },
+// ——— Afinidade de elenco (§8): bônus por distribuição de força do PRÓPRIO time ———
+const AFIN_ATK: Record<AtkStyle, number[]> = {
+  posse: [-1, 2, -1],
+  vertical: [2, -1, -1],
+  bolalonga: [-1, -1, 2],
+  contra: [-1, -1, 2],
+  drible: [2, -1, -1],
 };
-// mini-anel não-transitivo de 5: passes>meio>longas>contra>lados>passes
-const STYLE_RING: Record<Estilo, Estilo> = {
-  passes: "meio",
-  meio: "longas",
-  longas: "contra",
-  contra: "lados",
-  lados: "passes",
+const AFIN_DEF: Record<DefStyle, number[]> = {
+  zona: [-1, -1, 2],
+  individual: [-1, -1, 2],
+  libero: [-1, -1, 2],
+  mista: [-1, 2, -1],
+  dobra: [-1, 2, -1],
 };
-function styleVsStyle(my: Estilo, opp: Estilo): number {
-  if (my === opp) return 0;
-  if (STYLE_RING[my] === opp) return P.STYLE_VS_STYLE;
-  if (STYLE_RING[opp] === my) return -P.STYLE_VS_STYLE;
-  return 0;
+function dot(v: number[], w: number[]): number {
+  return v[0] * w[0] + v[1] * w[1] + v[2] * w[2];
+}
+// dev = (X − média)/média por linha (ATA/MEI/DEF) do time. clamp ±0.08.
+function afinidadeElenco(team: Team, atk: AtkStyle, def: DefStyle, form: Form): number {
+  const mean = (team.a + team.m + team.d) / 3 || 1;
+  const dev = [(team.a - mean) / mean, (team.m - mean) / mean, (team.d - mean) / mean];
+  const raw = (dot(AFIN_ATK[atk], dev) + dot(AFIN_DEF[def], dev) + dot(AFIN_FORM[form], dev)) / 3;
+  return clamp(0.12 * raw, -0.08, 0.08);
 }
 
-// ===== TRANSPARÊNCIA DO CONFRONTO (item 8) =====
-// "O que vence o que", legível, SEM número cru — só o anel pedra-papel-tesoura dos
-// estilos. A UI mostra isto na seleção de tática (anel geral, às cegas) e badges de
-// vantagem no intervalo (quando a tática do rival é revelada).
-export const STYLE_BEATS: Record<Estilo, Estilo> = { ...STYLE_RING };
-// rótulo curto de cada estilo (espelha ESTILO_NM da ui, mas o engine não importa ui).
-const ESTILO_SHORT: Record<Estilo, string> = {
-  passes: "Troca de Passes",
-  meio: "Pelo Meio",
-  lados: "Pelos Lados",
-  longas: "Bolas Longas",
+// ——— SINTONIA dos sliders (§6.5): leans -1..+1 que puxam o ideal ———
+const PRESS_ATK: Record<AtkStyle, number> = { posse: 0.3, vertical: 1, bolalonga: 0, contra: -1, drible: 0 };
+const PRESS_DEF: Record<DefStyle, number> = { zona: 0, individual: 0.7, mista: 0, libero: -1, dobra: 0.7 };
+const PRESS_FORMROW = [1, 0, -1]; // ATA, MEI, DEF
+const AMPL_ATK: Record<AtkStyle, number> = { posse: -0.7, vertical: 0.5, bolalonga: 1, contra: 0, drible: -1 };
+const AMPL_FORM: Record<Form, number> = {
+  "4-2-4": 0.5,
+  "3-4-3": 0.5,
+  "4-3-3": 0.5,
+  "4-4-2": -0.3,
+  "3-5-2": -0.3,
+  "4-5-1": 0.4,
+  "5-3-2": -0.3,
+  "5-4-1": -0.5,
+  "6-3-1": -0.5,
+};
+const PEG_ATK: Record<AtkStyle, number> = { posse: -1, vertical: 0.3, bolalonga: 0, contra: 0.7, drible: -0.5 };
+const PEG_DEF: Record<DefStyle, number> = { zona: -0.3, individual: 1, mista: 0, libero: -0.3, dobra: 1 };
+
+// força do time numa escala -1..+1 (pivô 80, ±20 = clamp). + = forte.
+function forcaTier(team: Team): number {
+  return clamp((teamMean(team) - 80) / 20, -1, 1);
+}
+function teamMean(team: Team): number {
+  return (team.a + team.m + team.d) / 3;
+}
+function align(v: number, ideal: number): number {
+  return 1 - (2 * Math.abs(v - ideal)) / 100; // +1 no ideal, −1 no oposto
+}
+// sintonia ∈ [-1,+1]: o quanto os sliders batem o ideal do seu estilo/formação/força.
+function sintonia(tac: Tactic, team: Team): number {
+  const ft = forcaTier(team);
+  const idealPress = 50 + 30 * clamp((PRESS_ATK[tac.atk] + PRESS_DEF[tac.def] + PRESS_FORMROW[formRow(tac.form)] + ft) / 4, -1, 1);
+  const idealAmpl = 50 + 30 * clamp((AMPL_ATK[tac.atk] + AMPL_FORM[tac.form]) / 2, -1, 1);
+  const idealPeg = 50 + 30 * clamp((PEG_ATK[tac.atk] + PEG_DEF[tac.def] - 0.3 * ft) / 2, -1, 1);
+  return (
+    0.5 * align(tac.pressao, idealPress) +
+    0.3 * align(tac.amplitude, idealAmpl) +
+    0.2 * align(tac.agressividade, idealPeg)
+  );
+}
+
+// ——— Constantes / pesos (§16) ———
+const kPost = 0.12;
+// ônus dos EXTREMOS de slider (exponencial, só nas pontas). Castiga SÓ quando um slider
+// está em [0,10] ou [90,100], crescendo de forma EXPONENCIAL (não linear): 0 na borda
+// (90 ou 10), ONUS_MAX no talo (100 ou 0). t ∈ (0,1] é o quão fundo no extremo está; a
+// curva exp(K·t) torna o castigo desprezível perto da borda e perceptível só no talo.
+// O edge total continua clampado (±0.32), então o ônus afina, não domina.
+const ONUS_K = 3.5; // acentua a curva (quanto maior, mais "tudo no fim do extremo")
+const ONUS_MAX = 0.05; // castigo por slider no talo (100/0); 4 no talo ≈ 0.20 de edge
+function sliderOnus(v: number): number {
+  const t = v > 90 ? (v - 90) / 10 : v < 10 ? (10 - v) / 10 : 0;
+  if (t <= 0) return 0;
+  return (ONUS_MAX * (Math.exp(ONUS_K * t) - 1)) / (Math.exp(ONUS_K) - 1);
+}
+// ônus dos extremos = soma do sliderOnus dos 4 sliders (postura, pressão, amplitude, pegada).
+function onusExtremos(tac: Tactic): number {
+  return (
+    sliderOnus(tac.postura) +
+    sliderOnus(tac.pressao) +
+    sliderOnus(tac.amplitude) +
+    sliderOnus(tac.agressividade)
+  );
+}
+// peso da Estrutura ao longo do jogo: 0.60 (início) → 0.45 (fim). `feeling` ∈ [0,1].
+function wEstrutura(feeling: number): number {
+  return 0.6 - 0.15 * clamp(feeling, 0, 1);
+}
+// fadiga (§12): suave na força (−8%), forte na execução tática (−55%). F ∈ [0,1].
+function fadigaTat(F: number): number {
+  return 1 - 0.55 * clamp(F, 0, 1);
+}
+function fadigaForca(F: number): number {
+  return 1 - 0.08 * clamp(F, 0, 1);
+}
+// Drible/Contra leem a Força Base (§3): Drible premia o FORTE, Contra premia o FRACO.
+// Leitura RELATIVA ao rival (pivô = a força do oponente), pra ser NEUTRA entre iguais
+// (§3 "neutros entre iguais") e crescer só no descasamento. O forte não ganha no Contra;
+// o fraco não ganha no Drible. Clampado pra não estourar o teto sozinho.
+function dribleForca(team: Team, opp: Team): number {
+  return clamp(((team.a - opp.a) / 20) * 0.6, -0.6, 0.6);
+}
+function contraForca(team: Team, opp: Team): number {
+  return clamp(((teamMean(opp) - teamMean(team)) / 20) * 0.6, -0.6, 0.6);
+}
+// largura da defesa do rival: "estreita" (meio/sem alas) deixa as alas livres → bônus
+// pra amplitude alta. narrow(def) ∈ {+1 estreita, 0 neutra}. (§16: 0.12·amplitude·narrow)
+const NARROW_DEF: Record<DefStyle, number> = { zona: 0, individual: 0, mista: 0, libero: 1, dobra: 1 };
+
+// helper de clamp (min,max)
+function clamp(v: number, lo: number, hi: number): number {
+  return v < lo ? lo : v > hi ? hi : v;
+}
+// bucket do slider de pressão → índice [0=alta,1=media,2=baixa] da matriz PR.
+function blocoIdx(pressao: number): 0 | 1 | 2 {
+  return (pressao >= 67 ? 0 : pressao >= 34 ? 1 : 2) as 0 | 1 | 2;
+}
+
+// ===== ESTRUTURA + TÁTICAS (§7) — crus, antes do teto/fadiga/peso =====
+// estrutura olha SÓ o meu ataque vs a defesa DELE (matriz §4) + a minha coerência +
+// minha afinidade de elenco + o bônus de Drible/Contra (leem a Força Base vs o rival).
+function estruturaEdge(team: Team, tac: Tactic, oppTeam: Team, oppTac: Tactic): number {
+  const ad = AD[tac.atk][DEF.indexOf(oppTac.def)];
+  const coh = coerenciaForm(tac.form, tac.atk, tac.def);
+  const af = afinidadeElenco(team, tac.atk, tac.def, tac.form);
+  const drb = tac.atk === "drible" ? dribleForca(team, oppTeam) : 0;
+  const ctr = tac.atk === "contra" ? contraForca(team, oppTeam) : 0;
+  return ad + coh + af + drb + ctr;
+}
+// táticas olham a pressão (vs o bloco dele), a amplitude (vs a largura da defesa dele),
+// a sintonia (sliders × meu estilo/formação/força) e a agressividade (pegada).
+function taticasEdge(tac: Tactic, oppTac: Tactic, team: Team): number {
+  const pr = 0.34 * PR[tac.atk][blocoIdx(oppTac.pressao)];
+  const amp = 0.12 * (((tac.amplitude - 50) / 50) * NARROW_DEF[oppTac.def]);
+  const sin = 0.34 * sintonia(tac, team);
+  const agr = 0.1 * (((tac.agressividade - 50) / 50) * 0.5);
+  return pr + amp + sin + agr;
+}
+
+// teto por fase (§11): faixa do edge total por fase + jitter ±2%. Determinístico
+// (semeado por seed do confronto). Default = grupos.
+type FaseKey = "estreia" | "grupos" | "quartas" | "final";
+const TETO_FASE: Record<FaseKey, [number, number]> = {
+  estreia: [0.18, 0.22],
+  grupos: [0.26, 0.3],
+  quartas: [0.22, 0.27],
+  final: [0.15, 0.2],
+};
+function tetoFase(fase: FaseKey, rnd?: () => number): number {
+  const [lo, hi] = TETO_FASE[fase] ?? TETO_FASE.grupos;
+  const base = (lo + hi) / 2;
+  const jitter = rnd ? (rnd() * 2 - 1) * 0.02 : 0;
+  return base + jitter;
+}
+
+// COERÊNCIA — derivada do novo modelo, p/ a UI ("Análise da comissão"). Mantém a
+// assinatura {postureMul, synergy, latKill} que pontos antigos podem consultar; aqui o
+// "synergy" = coerenciaForm e o "postureMul" reflete o quão extrema é a postura.
+export function coherence(tac: Tactic): { postureMul: number; synergy: number; latKill: number } {
+  const synergy = coerenciaForm(tac.form, tac.atk, tac.def);
+  const p = (tac.postura - 50) / 50; // -1..+1
+  return { postureMul: 1 + kPost * p, synergy, latKill: 1 };
+}
+
+// =====================================================================
+// TRANSPARÊNCIA DO CONFRONTO (UI) — legível, SEM número cru. Espelha a matriz §4 (AD:
+// ataque × defesa) e a pressão §5. A UI mostra "o que o seu ATAQUE supera/teme" na
+// seleção (às cegas) e badges concretos no intervalo (tática do rival revelada).
+// =====================================================================
+const ATK_SHORT: Record<AtkStyle, string> = {
+  posse: "Posse",
+  vertical: "Vertical",
+  bolalonga: "Bola longa",
   contra: "Contra-ataque",
+  drible: "Drible",
 };
-// quem o estilo X "supera" e por quem é "superado" no anel não-transitivo.
-export function styleMatchup(e: Estilo): { beats: Estilo; beatsLabel: string; losesTo: Estilo; losesToLabel: string } {
-  const beats = STYLE_RING[e];
-  let losesTo: Estilo = e;
-  (Object.keys(STYLE_RING) as Estilo[]).forEach((k) => {
-    if (STYLE_RING[k] === e) losesTo = k;
-  });
-  return { beats, beatsLabel: ESTILO_SHORT[beats], losesTo, losesToLabel: ESTILO_SHORT[losesTo] };
+const DEF_SHORT: Record<DefStyle, string> = {
+  zona: "Zona",
+  individual: "Individual",
+  mista: "Mista",
+  libero: "Líbero",
+  dobra: "Dobra",
+};
+// p/ um ATAQUE, a defesa que ele mais castiga (AD máx) e a que mais o sufoca (AD mín).
+export function styleMatchup(atk: AtkStyle): {
+  beats: DefStyle;
+  beatsLabel: string;
+  losesTo: DefStyle;
+  losesToLabel: string;
+} {
+  const row = AD[atk];
+  let bi = 0;
+  let wi = 0;
+  for (let i = 1; i < DEF.length; i++) {
+    if (row[i] > row[bi]) bi = i;
+    if (row[i] < row[wi]) wi = i;
+  }
+  return {
+    beats: DEF[bi],
+    beatsLabel: DEF_SHORT[DEF[bi]],
+    losesTo: DEF[wi],
+    losesToLabel: DEF_SHORT[DEF[wi]],
+  };
 }
 
-// Vantagens CONCRETAS do meu plano contra o do rival (usado no intervalo, com a
-// tática da IA revelada). Devolve sinais legíveis — sem expor o netEdge numérico.
-// Regras data-driven (espelham styleCross/markCross), avaliadas em sequência.
+// p/ uma DEFESA, o ataque que ela mais SUFOCA (AD mín na coluna) e o que mais a CASTIGA
+// (AD máx na coluna) — espelha §3.2. Lê a matriz §4 por coluna (perspectiva do atacante,
+// invertida: AD baixo = defesa ganha). SEM número cru.
+export function defenseMatchup(def: DefStyle): {
+  stops: AtkStyle;
+  stopsLabel: string;
+  weakTo: AtkStyle;
+  weakToLabel: string;
+} {
+  const col = DEF.indexOf(def);
+  let si = 0;
+  let wi = 0;
+  for (let i = 1; i < ATK.length; i++) {
+    if (AD[ATK[i]][col] < AD[ATK[si]][col]) si = i; // atacante mais sufocado
+    if (AD[ATK[i]][col] > AD[ATK[wi]][col]) wi = i; // atacante que mais castiga
+  }
+  return {
+    stops: ATK[si],
+    stopsLabel: ATK_SHORT[ATK[si]],
+    weakTo: ATK[wi],
+    weakToLabel: ATK_SHORT[ATK[wi]],
+  };
+}
+
+// Vantagens CONCRETAS do meu plano contra o do rival (intervalo, tática da IA revelada).
+// Derivado das MESMAS regras do motor (AD + pressão), sem expor o edge numérico.
 export type MatchupSignal = { kind: "good" | "bad" | "neutral"; text: string };
-type MatchupRule = { when: (my: Tactic, opp: Tactic) => boolean; kind: MatchupSignal["kind"]; text: string };
-const inSet = <T,>(v: T, ...xs: T[]) => xs.indexOf(v) >= 0;
-const MATCHUP_RULES: MatchupRule[] = [
-  { when: (m, o) => m.estilo === "passes" && o.marcacao === "baixa", kind: "good", text: "Troca de passes fura o bloco baixo deles." },
-  { when: (m, o) => m.estilo === "passes" && o.marcacao === "alta", kind: "bad", text: "A pressão alta deles atrapalha sua troca de passes." },
-  { when: (m, o) => m.estilo === "longas" && o.marcacao === "alta", kind: "good", text: "Bolas longas passam por cima da pressão alta deles." },
-  { when: (m, o) => m.estilo === "longas" && o.marcacao === "baixa", kind: "bad", text: "Bola longa rende pouco contra o bloco baixo deles." },
-  { when: (m, o) => m.estilo === "meio" && o.marcacao === "alta", kind: "good", text: "Jogar pelo meio quebra a marcação alta deles." },
-  { when: (m, o) => m.estilo === "contra" && inSet(o.postura, "atk", "all_in"), kind: "good", text: "Eles se lançam: seu contra-ataque acha o espaço nas costas." },
-  { when: (m, o) => m.marcacao === "alta" && inSet(o.estilo, "passes", "meio"), kind: "good", text: "Pressão alta sufoca a saída de bola deles." },
-  { when: (m, o) => m.marcacao === "alta" && inSet(o.estilo, "contra", "longas"), kind: "bad", text: "Marcar alto deixa espaço pro contra/bola longa deles." },
-  { when: (m, o) => m.marcacao === "baixa" && inSet(o.estilo, "contra", "lados"), kind: "good", text: "Bloco baixo fecha o contra-ataque e as pontas deles." },
-  { when: (m, o) => inSet(o.postura, "retranca", "def") && inSet(m.postura, "atk", "all_in"), kind: "neutral", text: "Eles se fecham e você vai pra cima: paciência pra furar." },
-];
 export function matchupHints(my: Tactic, opp: Tactic): MatchupSignal[] {
   const out: MatchupSignal[] = [];
-  // estilo × estilo (anel não-transitivo)
-  const sv = styleVsStyle(my.estilo, opp.estilo);
-  if (sv > 0) out.push({ kind: "good", text: `Seu ${ESTILO_SHORT[my.estilo]} leva a melhor sobre o ${ESTILO_SHORT[opp.estilo]} deles.` });
-  else if (sv < 0) out.push({ kind: "bad", text: `O ${ESTILO_SHORT[opp.estilo]} deles neutraliza seu ${ESTILO_SHORT[my.estilo]}.` });
-  MATCHUP_RULES.forEach((r) => {
-    if (r.when(my, opp)) out.push({ kind: r.kind, text: r.text });
-  });
+  // 1) meu ataque × a defesa DELES (matriz §4).
+  const ad = AD[my.atk][DEF.indexOf(opp.def)];
+  if (ad >= 1)
+    out.push({ kind: "good", text: `Seu ${ATK_SHORT[my.atk]} machuca a marcação ${DEF_SHORT[opp.def].toLowerCase()} deles.` });
+  else if (ad >= 0.5)
+    out.push({ kind: "good", text: `Seu ${ATK_SHORT[my.atk]} leva leve vantagem sobre a defesa deles.` });
+  else if (ad <= -1)
+    out.push({ kind: "bad", text: `A marcação ${DEF_SHORT[opp.def].toLowerCase()} deles abafa seu ${ATK_SHORT[my.atk]}.` });
+  else if (ad <= -0.5)
+    out.push({ kind: "bad", text: `A defesa deles leva leve vantagem sobre seu ${ATK_SHORT[my.atk]}.` });
+  // 2) minha pressão × o meu ataque (§5): bloco do rival deixa (ou não) o espaço certo.
+  const pr = PR[my.atk][blocoIdx(opp.pressao)];
+  if (pr >= 1)
+    out.push({ kind: "good", text: "O bloco deles deixa exatamente o espaço que seu ataque procura." });
+  else if (pr <= -1)
+    out.push({ kind: "bad", text: "O bloco deles fecha o espaço que seu ataque precisa." });
+  // 3) Drible/Contra leem a força (premiam forte/fraco) — leitura boleira.
+  if (my.atk === "drible")
+    out.push({ kind: "neutral", text: "Drible rende no pé do craque: brilha quando você é o time mais forte." });
+  if (my.atk === "contra")
+    out.push({ kind: "neutral", text: "Contra-ataque premia o azarão: explode no espaço de quem se lança." });
   return out;
 }
 
-// 3 MARCAÇÕES
-type MarkVal = { defEff: number; fadiga2T: number };
-const MARK: Record<Marcacao, MarkVal> = {
-  alta: { defEff: 1.08, fadiga2T: 1.07 },
-  media: { defEff: 1.0, fadiga2T: 1.0 },
-  baixa: { defEff: 1.06, fadiga2T: 0.95 },
+// ===== SINTONIA (§6.5), legível pra UI — SEM número cru do motor =====
+// "Sua pressão está alta, mas o seu Contra pede bloco baixo." Cada eixo (pressão/
+// amplitude/pegada) tem um IDEAL que sai do seu estilo + formação + força (as MESMAS
+// fórmulas do `sintonia()` acima). A UI mostra: a direção pedida (alto/baixo/neutro), se
+// o seu slider BATE esse pedido (estado), e o quanto está perto. O `score` global é o
+// `sintonia` interno (−1..+1) remapeado pra 0..1 — vira estrelas/barra, nunca um edge.
+export type TuneState = "match" | "off" | "neutral";
+export interface TuneAxis {
+  key: "pressao" | "amplitude" | "agressividade";
+  wants: "alto" | "baixo" | "neutro"; // direção que o seu setup pede
+  state: TuneState; // match = bate · off = contraria · neutral = pedido fraco
+  ideal: number; // 0–100 (alvo do slider; a UI pode marcar no trilho)
+}
+export interface SintoniaReadout {
+  score: number; // 0..1 (estrelas/barra; 1 = totalmente sintonizado)
+  axes: TuneAxis[]; // pressão, amplitude, pegada — na ordem de peso
+}
+// classifica um lean cru (-1..+1) em direção pedida; |lean|<0.34 conta como "neutro"
+// (o pedido é fraco, qualquer valor serve). Espelha o idealPress/Ampl/Peg do motor.
+function tuneDir(lean: number): "alto" | "baixo" | "neutro" {
+  if (lean >= 0.34) return "alto";
+  if (lean <= -0.34) return "baixo";
+  return "neutro";
+}
+// estado do slider vs o ideal: bate (perto), contraria (longe pro lado errado) ou neutro.
+function tuneState(v: number, ideal: number, wants: "alto" | "baixo" | "neutro"): TuneState {
+  if (wants === "neutro") return "neutral";
+  const a = align(v, ideal); // +1 no ideal, −1 no oposto
+  if (a >= 0.34) return "match";
+  if (a <= -0.34) return "off";
+  return "neutral";
+}
+export function sintoniaReadout(tac: Tactic, team: Team): SintoniaReadout {
+  const ft = forcaTier(team);
+  const pressLean = clamp((PRESS_ATK[tac.atk] + PRESS_DEF[tac.def] + PRESS_FORMROW[formRow(tac.form)] + ft) / 4, -1, 1);
+  const amplLean = clamp((AMPL_ATK[tac.atk] + AMPL_FORM[tac.form]) / 2, -1, 1);
+  const pegLean = clamp((PEG_ATK[tac.atk] + PEG_DEF[tac.def] - 0.3 * ft) / 2, -1, 1);
+  const idealPress = 50 + 30 * pressLean;
+  const idealAmpl = 50 + 30 * amplLean;
+  const idealPeg = 50 + 30 * pegLean;
+  const axes: TuneAxis[] = [
+    { key: "pressao", wants: tuneDir(pressLean), state: tuneState(tac.pressao, idealPress, tuneDir(pressLean)), ideal: Math.round(idealPress) },
+    { key: "amplitude", wants: tuneDir(amplLean), state: tuneState(tac.amplitude, idealAmpl, tuneDir(amplLean)), ideal: Math.round(idealAmpl) },
+    { key: "agressividade", wants: tuneDir(pegLean), state: tuneState(tac.agressividade, idealPeg, tuneDir(pegLean)), ideal: Math.round(idealPeg) },
+  ];
+  // sintonia interna (−1..+1) → 0..1, mesmos pesos do motor (0.5/0.3/0.2).
+  const raw = sintonia(tac, team);
+  const score = clamp((raw + 1) / 2, 0, 1);
+  return { score, axes };
+}
+
+// ===== DICA DE IMPACTO DO AJUSTE AO VIVO (§14) — o coração da camada de ensino =====
+// Quando o jogador mexe UM slider durante a partida, esta função lê o ESTADO REAL (a
+// sintonia §6.5 do novo valor + a matriz §4/pressão §5 contra a tática vigente do rival)
+// e devolve 1 ou 2 frases boleiras que explicam o efeito — inclusive a SINTONIA ("sua
+// pressão está alta, mas o Contra pede bloco baixo"). NÃO entrega o edge numérico nem a
+// regra oculta: ensina o "o que ajuda / o que custa" lendo o seu setup. Pura e
+// determinística (sem rnd) — função só do estado.
+//
+// `key` é o slider que mudou; `next`/`prev` são a tática depois/antes; `team` é o meu time
+// (pra a sintonia ler a minha força); `opp`/`oppTac` é o rival (já revelado no intervalo
+// ou a tática vigente da IA ao vivo — a matriz/pressão usam o estilo/bloco DELE).
+export type LiveHintTone = "good" | "bad" | "neutral";
+export interface LiveHint {
+  tone: LiveHintTone;
+  text: string;
+}
+// os 4 sliders ajustáveis (mesmas chaves do Tactic; tipado aqui pra o engine não depender
+// da ui — a ui reexporta como SliderKey).
+export type AdjustKey = "postura" | "pressao" | "amplitude" | "agressividade";
+// rótulo curto da DIREÇÃO que cada eixo pede, na voz de boteco (não "alto/baixo" cru).
+const TUNE_WANT_PHRASE: Record<"pressao" | "amplitude" | "agressividade", { alto: string; baixo: string }> = {
+  pressao: { alto: "bloco alto", baixo: "bloco baixo" },
+  amplitude: { alto: "jogo pelas alas", baixo: "jogo pelo meio" },
+  agressividade: { alto: "pegada forte", baixo: "pegada leve" },
 };
-
-// ESTILO meu × MARCAÇÃO/POSTURA do rival (ft + conv)
-function styleCross(
-  myStyle: Estilo,
-  oppStyle: Estilo,
-  oppMark: Marcacao,
-  oppPosture: Postura,
-): { ft: number; conv: number } {
-  let ft = 0;
-  let conv = 1.0;
-  const B = P.STYLE_CROSS_BONUS;
-  const oppHigh = oppPosture === "atk" || oppPosture === "all_in";
-  if (myStyle === "passes") {
-    if (oppMark === "baixa") ft += B;
-    if (oppMark === "alta") ft -= B;
-  } else if (myStyle === "meio") {
-    if (oppMark === "alta") ft += B;
-    if (oppMark === "media") ft -= B * 0.6;
-  } else if (myStyle === "longas") {
-    if (oppMark === "alta") ft += B * 1.1;
-    if (oppMark === "baixa") ft -= B;
-  } else if (myStyle === "contra") {
-    if (oppMark === "alta") ft += B;
-    if (oppHigh) conv *= 1 + B;
-    if (oppMark === "baixa") ft -= B;
-  } else if (myStyle === "lados") {
-    if (oppMark === "media") ft += B * 0.6;
-    if (oppMark === "baixa") ft -= B * 0.8;
+const ATK_POSSESSIVE: Record<AtkStyle, string> = {
+  posse: "a sua Posse",
+  vertical: "o seu jogo Vertical",
+  bolalonga: "a sua Bola longa",
+  contra: "o seu Contra-ataque",
+  drible: "o seu Drible",
+};
+// frase de SINTONIA pro eixo que mudou: lê o lean real do meu setup (idêntico ao motor) e
+// diz se o novo valor casa ou contraria o que o meu estilo/formação/força pede. É a frase
+// que ensina "subir a pressão ajuda o Vertical e atrapalha o Contra".
+function sintoniaHintFor(key: "pressao" | "amplitude" | "agressividade", next: Tactic, team: Team): LiveHint {
+  const r = sintoniaReadout(next, team);
+  const ax = r.axes.find((a) => a.key === key)!;
+  const want = TUNE_WANT_PHRASE[key];
+  const atkWord = ATK_POSSESSIVE[next.atk];
+  if (ax.wants === "neutro") {
+    return { tone: "neutral", text: `${cap(atkWord)} não faz exigência forte aqui: dá pra calibrar pelo jogo.` };
   }
-  ft += styleVsStyle(myStyle, oppStyle);
-  return { ft, conv };
+  const wantWord = ax.wants === "alto" ? want.alto : want.baixo;
+  if (ax.state === "match") {
+    return { tone: "good", text: `Casou: ${atkWord} pede ${wantWord}, e é pra lá que você foi.` };
+  }
+  if (ax.state === "off") {
+    return { tone: "bad", text: `Cuidado: ${atkWord} pede ${wantWord}, e você foi pro lado oposto.` };
+  }
+  return { tone: "neutral", text: `${cap(atkWord)} pede ${wantWord}: você está quase lá, vale chegar mais perto.` };
 }
-
-// MINHA marcação × ESTILO do rival (edge espelho + rivalConv)
-function markCross(
-  myMark: Marcacao,
-  oppStyle: Estilo,
-): { defEff: number; fadiga2T: number; rivalConv: number; edge: number } {
-  const m = MARK[myMark];
-  let rivalConv = 1.0;
-  const defEff = m.defEff;
-  let edge = 0;
-  const E = P.MARK_CROSS_EDGE;
-  if (myMark === "alta") {
-    if (oppStyle === "passes" || oppStyle === "meio") {
-      rivalConv *= 0.94;
-      edge += E;
-    }
-    if (oppStyle === "contra" || oppStyle === "longas") {
-      edge -= E;
-    }
-  } else if (myMark === "baixa") {
-    if (oppStyle === "contra" || oppStyle === "lados") {
-      rivalConv *= 0.94;
-      edge += E;
-    }
-    if (oppStyle === "passes" || oppStyle === "longas") {
-      edge -= E;
-    }
-  }
-  return { defEff, fadiga2T: m.fadiga2T, rivalConv, edge };
+function cap(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
-
-// FORMAÇÃO × ESTILO próprio: largura (W) e densidade central (C)
-function formStyleTune(
-  form: Form,
-  style: Estilo,
-  formEdge: number,
-): { formEdge: number; latKill: number; dens: number } {
-  const f = FORMATIONS[form] || FORMATIONS["433"];
-  const out = { formEdge, latKill: 1.0, dens: 0 };
-  if (style === "lados") {
-    if (f.W > 0 && formEdge > 0) out.formEdge = formEdge * P.LAT_AMP;
-    if (f.W > 0 && formEdge < 0) out.formEdge = formEdge * P.LAT_NEG;
-    if (f.W < 0) {
-      out.formEdge = formEdge * P.LAT_NEG;
-      out.latKill = form === "4312" ? 0.5 : 0.8;
-      out.dens -= P.CENTER_DENS * 0.5;
-    }
-  }
-  if (style === "meio") {
-    out.dens += f.C > 0 ? P.CENTER_DENS : f.C < 0 ? -P.CENTER_DENS : 0;
-  }
-  if (style === "passes") {
-    out.dens +=
-      f.C > 0 ? P.CENTER_DENS * 0.6 : form === "442" || form === "424" ? -P.CENTER_DENS * 0.8 : 0;
-  }
-  if (style === "longas") {
-    out.dens +=
-      form === "424" || form === "442" || form === "532"
-        ? P.CENTER_DENS * 0.7
-        : form === "433" || form === "4312"
-          ? -P.CENTER_DENS * 0.6
-          : 0;
-  }
-  if (style === "contra") {
-    out.dens += form === "343" || form === "424" ? -P.CENTER_DENS * 0.5 : 0;
+// o PAPEL da PRESSÃO (§6.1/§12): o MEU slider de pressão decide ONDE eu espero a bola
+// (altura do bloco) — sobe a recuperação alta mas é o maior driver de fadiga (§12). NÃO se
+// confunde com a matriz §5 (que cruza o meu ATAQUE com o bloco DO RIVAL, não com o meu); a
+// sintonia §6.5 (linha 2 da dica) é quem diz se essa altura casa com o meu estilo.
+function pressaoRoleHint(next: Tactic, dir: number): LiveHint {
+  const bloco = blocoIdx(next.pressao); // 0 alta · 1 média · 2 baixa
+  if (bloco === 0) return { tone: "neutral", text: "Bloco alto: você sufoca a saída deles e rouba mais perto do gol, mas o time cansa mais rápido." };
+  if (bloco === 2) return { tone: "neutral", text: "Bloco baixo: você cede o campo, espera atrás e poupa fôlego pro contragolpe." };
+  return { tone: "neutral", text: dir > 0 ? "Você subiu a linha de marcação: rouba um pouco mais alto." : "Você recuou a linha: fica mais compacto atrás." };
+}
+// o PAPEL da AMPLITUDE (§6.3): cruza com a LARGURA da defesa do rival (§16: narrow → alas livres).
+function amplitudeRoleHint(next: Tactic, dir: number, oppTac: Tactic): LiveHint {
+  const wide = next.amplitude >= 60;
+  if (wide && NARROW_DEF[oppTac.def] > 0)
+    return { tone: "good", text: `Indo pelas alas você ataca o ponto fraco da ${DEF_SHORT[oppTac.def].toLowerCase()}: ela aperta o miolo e larga as pontas.` };
+  if (!wide && next.amplitude <= 40)
+    return { tone: "neutral", text: "Fechando pelo meio você concentra o ataque no miolo: bom contra defesa aberta, arriscado contra muita gente no centro." };
+  return { tone: "neutral", text: dir > 0 ? "Você abriu o jogo pelas pontas." : "Você puxou o jogo mais pro meio." };
+}
+// o PAPEL da PEGADA (§6.4/§13): intensidade do duelo (e risco de cartão).
+function pegadaRoleHint(next: Tactic, dir: number): LiveHint {
+  if (next.agressividade >= 67) return { tone: "neutral", text: "Pegada forte ganha mais duelo, mas o risco de cartão sobe." };
+  if (next.agressividade <= 33) return { tone: "neutral", text: "Pegada leve evita cartão, mas cede o corpo a corpo." };
+  return { tone: "neutral", text: dir > 0 ? "Você endureceu a marcação no duelo." : "Você aliviou a pegada nos duelos." };
+}
+// o PAPEL da POSTURA (§6.1): realoca a força ataque↔defesa (não soma no encaixe).
+function posturaRoleHint(next: Tactic, dir: number): LiveHint {
+  if (next.postura >= 67) return { tone: "neutral", text: "Postura ofensiva: joga mais peso no ataque e arrisca atrás." };
+  if (next.postura <= 33) return { tone: "neutral", text: "Postura recuada: reforça a defesa e abre mão de gente na frente." };
+  return { tone: "neutral", text: dir > 0 ? "Você puxou o time um pouco mais pra frente." : "Você recuou um pouco o time." };
+}
+export function liveAdjustHints(key: AdjustKey, next: Tactic, prev: Tactic, team: Team, oppTac: Tactic): LiveHint[] {
+  const out: LiveHint[] = [];
+  const dir = next[key] - prev[key]; // + subiu, − desceu
+  // 1) o PAPEL do eixo (§5/§6.1/§6.3/§6.4) + a interação concreta com o rival.
+  if (key === "pressao") out.push(pressaoRoleHint(next, dir));
+  else if (key === "amplitude") out.push(amplitudeRoleHint(next, dir, oppTac));
+  else if (key === "agressividade") out.push(pegadaRoleHint(next, dir));
+  else out.push(posturaRoleHint(next, dir));
+  // 2) a SINTONIA do eixo (§6.5) — a leitura que casa o valor com o seu estilo/força. A
+  //    postura não tem eixo de sintonia (ela realoca), então só os 3 sliders táticos.
+  if (key === "pressao" || key === "amplitude" || key === "agressividade") {
+    out.push(sintoniaHintFor(key, next, team));
   }
   return out;
 }
 
-// COERÊNCIA formação ↔ 3 eixos (postureMul, synergy; latKill via formStyleTune)
-export function coherence(tac: Tactic): { postureMul: number; synergy: number; latKill: number } {
-  const form = tac.form;
-  const p = tac.postura;
-  const style = tac.estilo;
-  const mark = tac.marcacao;
-  const out = { postureMul: 1.0, synergy: 0, latKill: 1.0 };
-  const ext_off = p === "all_in" || p === "atk";
-  const ext_def = p === "retranca" || p === "def";
-  const heavyOff = p === "all_in";
-  const heavyDef = p === "retranca";
-  if ((form === "532" || form === "4231") && ext_off) {
-    out.postureMul = P.COHERENCE_PENALTY;
-    out.synergy -= heavyOff ? 0.04 : 0.02;
+// ===== LEITURA DA COMISSÃO TÉCNICA (intervalo, §14) — o que fazer no 2º tempo =====
+// No Vestiário, a tática do rival JÁ apareceu (formação + estilos, nunca os sliders dele).
+// Esta função lê a matriz §4 (meu ataque × a defesa dele E o ataque dele × a minha defesa),
+// a pressão §5 e a FORÇA (§10) pra entregar 2 a 3 recados práticos do que ajustar — sem
+// número cru. É a "leitura do que fazer" que o produto pede (lê a matriz + pressão + força).
+// Pura: função do meu plano + o do rival + as duas forças.
+export interface CommissionRead {
+  tone: LiveHintTone;
+  text: string;
+}
+export function commissionRead(my: Tactic, oppTac: Tactic, team: Team, opp: Team): CommissionRead[] {
+  const out: CommissionRead[] = [];
+  // 1) MEU ATAQUE × a defesa DELES (matriz §4). O que melhor fura a marcação que apareceu.
+  const myAd = AD[my.atk][DEF.indexOf(oppTac.def)];
+  if (myAd <= -0.5) {
+    // o meu ataque sofre: sugere o ataque que CASTIGA a defesa deles (sem dar o número).
+    const better = bestAtkVsDef(oppTac.def);
+    if (better !== my.atk)
+      out.push({ tone: "bad", text: `A marcação ${DEF_SHORT[oppTac.def].toLowerCase()} deles abafa ${ATK_POSSESSIVE[my.atk]}. ${cap(ATK_POSSESSIVE[better])} machucaria mais essa defesa.` });
+    else
+      out.push({ tone: "bad", text: `${cap(ATK_POSSESSIVE[my.atk])} esbarra na marcação ${DEF_SHORT[oppTac.def].toLowerCase()} deles. Pense em variar o caminho do gol.` });
+  } else if (myAd >= 0.5) {
+    out.push({ tone: "good", text: `${cap(ATK_POSSESSIVE[my.atk])} leva vantagem sobre a marcação ${DEF_SHORT[oppTac.def].toLowerCase()} deles: insista nesse caminho.` });
   }
-  if ((form === "343" || form === "424") && ext_def) {
-    out.postureMul = P.COHERENCE_PENALTY;
-    out.synergy -= heavyDef ? 0.04 : 0.02;
+  // 2) O ATAQUE DELES × a minha defesa (coluna da matriz §4): a minha marcação segura?
+  const theirAd = AD[oppTac.atk][DEF.indexOf(my.def)];
+  if (theirAd >= 0.5) {
+    const shield = bestDefVsAtk(oppTac.atk);
+    if (shield !== my.def)
+      out.push({ tone: "bad", text: `${cap(ATK_POSSESSIVE_THIRD(oppTac.atk))} deles está achando brecha na sua ${DEF_SHORT[my.def].toLowerCase()}. A marcação ${DEF_SHORT[shield].toLowerCase()} seguraria melhor.` });
+    else
+      out.push({ tone: "bad", text: `${cap(ATK_POSSESSIVE_THIRD(oppTac.atk))} deles está incomodando. Atenção redobrada atrás.` });
+  } else if (theirAd <= -0.5) {
+    out.push({ tone: "good", text: `Sua marcação ${DEF_SHORT[my.def].toLowerCase()} segura bem ${ATK_POSSESSIVE_THIRD(oppTac.atk)} deles. Pode soltar mais o time.` });
   }
-  if (form === "532" && mark === "alta") {
-    out.synergy -= 0.03;
-  }
-  if (form === "4312" && style === "lados") {
-    out.latKill = 0.5;
-  }
-  const off = form === "343" || form === "433" || form === "4312" || form === "424";
-  if (off && ext_off && mark === "alta") {
-    out.synergy += P.COHERENCE_SYNERGY;
-  }
-  const def = form === "532" || form === "4231";
-  if (def && ext_def && mark === "baixa") {
-    out.synergy += P.COHERENCE_SYNERGY;
-  }
-  return out;
+  // 3) FORÇA (§10): quem é favorito decide o tom do 2º tempo (sem mostrar número).
+  const gap = teamMean(team) - teamMean(opp);
+  if (gap >= 8)
+    out.push({ tone: "neutral", text: "Você tem o elenco mais forte: proponha o jogo e force o erro deles." });
+  else if (gap <= -8)
+    out.push({ tone: "neutral", text: "Eles têm mais talento no papel: feche os espaços e seja mortal no contragolpe." });
+  // garante ao menos um recado (confronto parelho de planos e forças).
+  if (out.length === 0)
+    out.push({ tone: "neutral", text: "Planos e forças parelhos: o detalhe e a sintonia dos sliders decidem." });
+  return out.slice(0, 3);
+}
+// possessivo em 3ª pessoa (o ataque DELES) — pra não repetir "o seu".
+const ATK_THIRD: Record<AtkStyle, string> = {
+  posse: "a Posse",
+  vertical: "o jogo Vertical",
+  bolalonga: "a Bola longa",
+  contra: "o Contra-ataque",
+  drible: "o Drible",
+};
+function ATK_POSSESSIVE_THIRD(a: AtkStyle): string {
+  return ATK_THIRD[a];
+}
+// melhor ATAQUE contra uma defesa (AD máx na coluna) — o caminho que mais castiga.
+function bestAtkVsDef(def: DefStyle): AtkStyle {
+  const col = DEF.indexOf(def);
+  let bi = 0;
+  for (let i = 1; i < ATK.length; i++) if (AD[ATK[i]][col] > AD[ATK[bi]][col]) bi = i;
+  return ATK[bi];
+}
+// melhor DEFESA contra um ataque (AD mín na linha do ataque) — a que mais sufoca.
+function bestDefVsAtk(atk: AtkStyle): DefStyle {
+  const row = AD[atk];
+  let bi = 0;
+  for (let i = 1; i < DEF.length; i++) if (row[i] < row[bi]) bi = i;
+  return DEF[bi];
 }
 
-export function sideStrength(team: Team, tac: Tactic, oppTac: Tactic): SideStrength {
-  const posture = MENT[tac.postura] || MENT.eq;
-  const fw = FORMATIONS[tac.form] || FORMATIONS["433"];
-  const st = STYLE[tac.estilo] || STYLE.lados;
-  const coh = coherence(tac);
-  const postAtk = 1 + (posture.atk - 1) * coh.postureMul;
-  const postDef = 1 + (posture.def - 1) * coh.postureMul;
-  const postConv = 1 + (posture.conv - 1) * coh.postureMul;
-  let formEdge = formBonus(tac.form, oppTac.form);
-  const fst = formStyleTune(tac.form, tac.estilo, formEdge);
-  formEdge = fst.formEdge;
-  if (formEdge > P.FORM_EDGE_CAP) formEdge = P.FORM_EDGE_CAP;
-  if (formEdge < -P.FORM_EDGE_CAP) formEdge = -P.FORM_EDGE_CAP;
-  const sc = styleCross(tac.estilo, oppTac.estilo, oppTac.marcacao, oppTac.postura);
-  const mc = markCross(tac.marcacao, oppTac.estilo);
-  const tacticEdge =
-    sc.ft + mc.edge + postureEdge(tac.postura, coh.postureMul) + coh.synergy + fst.dens;
-  let netEdge = formEdge + tacticEdge;
-  if (netEdge > P.EDGE_CAP) netEdge = P.EDGE_CAP;
-  if (netEdge < -P.EDGE_CAP) netEdge = -P.EDGE_CAP;
+// ===== RECADO DO TÉCNICO pós-jogo (§14) — UMA lição coerente com o que ROLOU =====
+// Em vez de uma frase genérica sorteada, lê o confronto REAL de planos (meu ataque × a
+// defesa deles via matriz §4, a minha sintonia §6.5, a força §10) E o placar pra escolher
+// a lição mais honesta — o "o que venceu o que" desta partida, sem número cru. Quando o
+// jogo foi parelho/sem um fator dominante, cai num pool boleiro neutro (escolha
+// determinística por seed, pra reprodutibilidade). `gf/ga` = meu placar; `seed` desempata.
+// Devolve UMA string (a UI mostra um único recado). Pura.
+const COACH_NEUTRAL_FALLBACK: string[] = [
+  "Jogo de detalhe: no fim, quem sintonizou melhor os sliders levou a melhor.",
+  "Pouca coisa separou os planos. A leitura do banco e a hora de cada ajuste pesaram.",
+  "Tática parelha. Daqui pra frente, casar o ataque com a defesa deles vira ouro.",
+  "No xadrez dos planos ninguém abriu vantagem grande. O acerto fino é que decide.",
+];
+export function postMatchCoachRead(
+  my: Tactic,
+  aiTac: Tactic,
+  team: Team,
+  opp: Team,
+  gf: number,
+  ga: number,
+  seed: number,
+): string {
+  const won = gf > ga;
+  const lost = gf < ga;
+  // 1) o eixo MAIS forte do confronto: meu ataque × a defesa deles (matriz §4).
+  const myAd = AD[my.atk][DEF.indexOf(aiTac.def)];
+  if (myAd >= 1) {
+    return won
+      ? `${cap(ATK_POSSESSIVE[my.atk])} achou o caminho certo: a marcação ${DEF_SHORT[aiTac.def].toLowerCase()} deles não tinha resposta. Plano premiado.`
+      : `${cap(ATK_POSSESSIVE[my.atk])} casava bem com a defesa deles, mas faltou pontaria pra transformar o domínio em gol.`;
+  }
+  if (myAd <= -1) {
+    const better = bestAtkVsDef(aiTac.def);
+    return lost
+      ? `A marcação ${DEF_SHORT[aiTac.def].toLowerCase()} deles engoliu ${ATK_POSSESSIVE[my.atk]}. ${cap(ATK_POSSESSIVE[better])} teria furado mais aquele bloco.`
+      : `${cap(ATK_POSSESSIVE[my.atk])} apanhou da marcação ${DEF_SHORT[aiTac.def].toLowerCase()} deles, mas você segurou o resultado. Pra próxima, ${ATK_POSSESSIVE[better]} sofre menos ali.`;
+  }
+  // 2) a SINTONIA dos sliders (§6.5) — se estava afiada ou fora, a lição é essa.
+  const tune = sintoniaReadout(my, team).score;
+  if (tune >= 0.72) {
+    return won
+      ? "Os sliders estavam afiados: pressão, amplitude e pegada casaram com o seu estilo. Sintonia que rende."
+      : "Os sliders estavam bem sintonizados; o que faltou veio da força bruta, não do plano.";
+  }
+  if (tune <= 0.4) {
+    const off = sintoniaReadout(my, team).axes.find((a) => a.state === "off");
+    if (off) {
+      const want = TUNE_WANT_PHRASE[off.key][off.wants === "alto" ? "alto" : "baixo"];
+      return `Faltou sintonia: ${ATK_POSSESSIVE[my.atk]} pedia ${want}, e os sliders foram pro outro lado. Ajustar isso muda o próximo jogo.`;
+    }
+    return "Os sliders ficaram fora de sintonia com o seu estilo. Um acerto fino ali soltaria o time.";
+  }
+  // 3) a FORÇA (§10) — quando nada tático dominou, o talento explica.
+  const gap = teamMean(team) - teamMean(opp);
+  if (won && gap <= -8) return "Zebra de coragem: você comandou o azarão e tirou ouro de um plano bem montado contra um time mais forte.";
+  if (lost && gap <= -8) return "Eles tinham mais talento no papel e fizeram valer. Seu plano deu trabalho, faltou pouco.";
+  if (won && gap >= 8) return "Favoritismo confirmado, mas sem relaxar: o plano manteve o controle e não deu brecha.";
+  // 4) fallback boleiro neutro (determinístico por seed).
+  return COACH_NEUTRAL_FALLBACK[(seed >>> 0) % COACH_NEUTRAL_FALLBACK.length];
+}
+
+// contexto temporal do encaixe (§11 inversão + §12 fadiga + §11 teto por fase). Tudo
+// opcional: o kickoff usa o default (estrutura dominando, sem fadiga, teto de grupos).
+export interface EdgeCtx {
+  feeling?: number; // 0 (início) → 1 (fim): inverte o peso Estrutura↔Táticas
+  fatigue?: number; // 0..1: cansaço (suave na força, forte no edge tático)
+  teto?: number; // teto explícito do edge total (sobrepõe `fase`)
+  fase?: FaseKey; // fase do torneio (§11): define a faixa do teto (default = grupos)
+}
+// ritmo do jogo por estilo de ataque (volume/abertura) — substitui o antigo STYLE.ritmo.
+const ATK_RITMO: Record<AtkStyle, number> = {
+  posse: 0.88,
+  vertical: 1.08,
+  bolalonga: 1.16,
+  contra: 1.14,
+  drible: 1.0,
+};
+// fadiga 2º tempo por pressão do bloco (pressão alta cansa mais; baixa cansa menos).
+function fadiga2TFromPressao(pressao: number): number {
+  const b = blocoIdx(pressao);
+  return b === 0 ? 1.07 : b === 2 ? 0.95 : 1.0;
+}
+
+// ===== ENCAIXE (§7/§16) =====
+// edge = tetoFase·fadigaTat·( wE·estrutura + wT·taticas ) − onus.
+// A POSTURA NÃO entra no encaixe: ela REALOCA a força (kPost) no off/def.
+export function sideStrength(
+  team: Team,
+  tac: Tactic,
+  oppTeam: Team,
+  oppTac: Tactic,
+  ctx: EdgeCtx = {},
+): SideStrength {
+  const feeling = ctx.feeling ?? 0;
+  const F = ctx.fatigue ?? 0;
+  const teto = ctx.teto ?? tetoFase(ctx.fase ?? "grupos");
+  const estrutura = estruturaEdge(team, tac, oppTeam, oppTac);
+  const taticas = taticasEdge(tac, oppTac, team);
+  const wE = wEstrutura(feeling);
+  const wT = 1 - wE;
+  let edge = teto * fadigaTat(F) * (wE * estrutura + wT * taticas) - onusExtremos(tac);
+  // trava de segurança (o encaixe nunca vira o jogo sozinho): clampa o edge final.
+  edge = clamp(edge, -0.32, 0.32);
+
+  // POSTURA realoca a força (não soma no encaixe): ofensiva tira da defesa e vice-versa.
+  const p = (tac.postura - 50) / 50; // -1..+1
+  const ff = fadigaForca(F);
   const baseOff = team.a * P.W_ATK + team.m * P.W_MID;
-  const styleOff = st.atk * st.mid;
-  let tacMul = 1 + netEdge;
-  if (tacMul < 0.55) tacMul = 0.55;
-  const off = baseOff * postAtk * styleOff * tacMul;
-  // item 8: edge BIDIRECIONAL — um plano coerente (netEdge>0) também endurece a minha
-  // defesa e qualifica minha conversão; um plano furado (netEdge<0) cobra nos dois. Sem
-  // ignorar a base: a força (team.d, baseOff) segue dominando o gap grande.
-  const defEdge = 1 + netEdge * P.EDGE_DEF_K;
-  const convEdge = 1 + netEdge * P.EDGE_CONV_K;
-  const defEff = team.d * fw.def * postDef * mc.defEff * defEdge;
-  const convMod = postConv * st.conv * sc.conv * convEdge;
-  const aggressive = tac.postura === "atk" || tac.postura === "all_in";
+  const offEf = baseOff * (1 + kPost * p) * ff * (1 + edge);
+  // edge BIDIRECIONAL (preservado do v9): um plano coerente também endurece a defesa e
+  // qualifica a conversão; um furado cobra nos dois. A força base segue dominando.
+  const defEff = team.d * (1 - kPost * p) * ff * (1 + edge * P.EDGE_DEF_K);
+  const convMod = 1 + edge * P.EDGE_CONV_K;
+
+  const ritmo = ATK_RITMO[tac.atk];
+  const press = blocoIdx(tac.pressao); // 0 alta
+  const aggressive = tac.postura >= 62; // postura ofensiva
+  // swing de posse: postura defensiva/contra cede a bola; ofensiva/posse toma.
+  let possSwing = 0;
+  if (tac.postura <= 30) possSwing = -P.POSS_SWING;
+  else if (tac.postura <= 44) possSwing = -P.POSS_SWING * 0.5;
+  else if (aggressive) possSwing = P.POSS_SWING * (tac.postura >= 80 ? 1.3 : 1);
+  else if (tac.atk === "contra") possSwing = -P.POSS_SWING * 0.8;
+  else if (tac.atk === "posse") possSwing = P.POSS_SWING * 0.6;
+
   return {
-    off,
-    ft: off,
+    off: offEf,
+    ft: offEf,
     defEff,
     convMod,
-    ritmo: st.ritmo,
-    fadiga2T: mc.fadiga2T,
-    rivalConvVsMe: mc.rivalConv,
+    ritmo,
+    fadiga2T: fadiga2TFromPressao(tac.pressao),
+    rivalConvVsMe: 1.0,
     postureIsOff: aggressive,
-    markIsHigh: tac.marcacao === "alta",
-    netEdge,
-    formEdge,
-    tacticEdge,
-    possSwing:
-      tac.postura === "retranca"
-        ? -P.POSS_SWING
-        : tac.postura === "def"
-          ? -P.POSS_SWING * 0.5
-          : aggressive
-            ? P.POSS_SWING * (tac.postura === "all_in" ? 1.3 : 1)
-            : tac.estilo === "contra"
-              ? -P.POSS_SWING * 0.8
-              : 0,
+    markIsHigh: press === 0,
+    netEdge: edge,
+    estruturaEdge: estrutura,
+    taticasEdge: taticas,
+    possSwing,
   };
 }
 
@@ -661,9 +1007,12 @@ export function sideStrength(team: Team, tac: Tactic, oppTac: Tactic): SideStren
 // partida (meu ajuste ao vivo, ou a reação da IA). Recalcula SA/SB e o share de
 // chances, SEM tocar gols/minuto/comandos. `tacA`/`tacB` viram as táticas correntes.
 // Preserva o determinismo do resto (não consome o rnd da partida).
-export function recomputeStrengths(state: MatchState, tacA: Tactic, tacB: Tactic): void {
-  const SA = sideStrength(state.teamA, tacA, tacB);
-  const SB = sideStrength(state.teamB, tacB, tacA);
+export function recomputeStrengths(state: MatchState, tacA: Tactic, tacB: Tactic, ctx: EdgeCtx = {}): void {
+  // §11: o teto da fase vale a partida inteira — se o ctx não trouxe `fase`, herda a do
+  // MatchState (setada no createMatch). Assim a reação ao vivo da IA mantém o teto certo.
+  const c: EdgeCtx = ctx.fase ? ctx : { ...ctx, fase: (state.fase as FaseKey | undefined) };
+  const SA = sideStrength(state.teamA, tacA, state.teamB, tacB, c);
+  const SB = sideStrength(state.teamB, tacB, state.teamA, tacA, c);
   state.SA = SA;
   state.SB = SB;
   state.tacA = tacA;
@@ -671,6 +1020,22 @@ export function recomputeStrengths(state: MatchState, tacA: Tactic, tacB: Tactic
   const ftA = Math.pow(SA.ft, P.SHARE_SOFT);
   const ftB = Math.pow(SB.ft, P.SHARE_SOFT);
   state.shareA = ftA / (ftA + ftB);
+}
+
+// §11 — peso por minuto (inversão Estrutura↔Táticas) + §12 fadiga aproximada.
+// `feeling(t)` sobe de 0→1 do começo ao fim de cada tempo; o intervalo RESETA pra cima
+// (o 2º tempo recomeça com a estrutura pesando mais e decai de novo, mais fundo). A
+// fadiga sobe suave com o minuto (mais no 2º tempo). Determinístico (só função do minuto).
+function feelingFromMinute(minute: number): number {
+  // 1º tempo: 0..~0.5 ; 2º tempo: reseta pra ~0.25 e vai até ~1.0.
+  if (minute <= 45) return clamp(minute / 90, 0, 1); // 0 → 0.5
+  return clamp(0.25 + (minute - 45) / 60, 0, 1); // 0.25 → ~1.0 no 90'
+}
+function fatigueFromMinute(minute: number): number {
+  return clamp(minute / 110, 0, 1); // ~0.82 no 90'
+}
+function edgeCtxForMinute(minute: number, fase?: FaseKey): EdgeCtx {
+  return { feeling: feelingFromMinute(minute), fatigue: fatigueFromMinute(minute), fase };
 }
 
 // BUG #3: o "volume" do jogo (quão aberto/truncado, nº e qualidade de chances) deixa de
@@ -701,17 +1066,21 @@ function deriveVolumes(
 // diferente (tática importa), e a MESMA tática no MESMO ponto recomputa o MESMO futuro
 // (determinismo). 32-bit, sem colisão prática entre os combos do jogo.
 function tacticHash(tacA: Tactic, tacB: Tactic): number {
-  const FORMS: Form[] = ["433", "442", "352", "4231", "532", "4312", "343", "424"];
-  const ESTILOS: Estilo[] = ["passes", "meio", "lados", "longas", "contra"];
-  const POSTURAS: Postura[] = ["all_in", "atk", "eq", "def", "retranca"];
-  const MARCS: Marcacao[] = ["alta", "media", "baixa"];
-  const code = (t: Tactic): number =>
-    ((FORMS.indexOf(t.form) & 7) << 0) |
-    ((ESTILOS.indexOf(t.estilo) & 7) << 3) |
-    ((POSTURAS.indexOf(t.postura) & 7) << 6) |
-    ((MARCS.indexOf(t.marcacao) & 3) << 9);
-  // mistura os dois lados em 32 bits (11 bits cada) com constantes ímpares grandes.
-  return (((code(tacA) * 2654435761) ^ (code(tacB) * 40503)) >>> 0) || 1;
+  // hash dos campos NOVOS: formação (4b) + ataque (3b) + defesa (3b) + os 4 sliders
+  // quantizados em 5 níveis (0..4, ~3b cada). Combinados num inteiro estável por lado.
+  const q = (v: number): number => Math.max(0, Math.min(4, Math.round(v / 25))); // 0..4
+  const code = (t: Tactic): number => {
+    let c = (FORM.indexOf(t.form) & 15) >>> 0;
+    c = c * 5 + (ATK.indexOf(t.atk) & 7);
+    c = c * 5 + (DEF.indexOf(t.def) & 7);
+    c = c * 5 + q(t.postura);
+    c = c * 5 + q(t.pressao);
+    c = c * 5 + q(t.amplitude);
+    c = c * 5 + q(t.agressividade);
+    return c >>> 0;
+  };
+  // mistura os dois lados em 32 bits com constantes ímpares grandes.
+  return ((Math.imul(code(tacA), 2654435761) ^ Math.imul(code(tacB), 40503)) >>> 0) || 1;
 }
 
 // BUG #3 — RECOMPUTAÇÃO DETERMINÍSTICA DO FUTURO. A timeline é estruturada em SEGMENTOS:
@@ -732,8 +1101,10 @@ export function recomputeFromMinute(
   tacB: Tactic,
   fromMinute: number,
 ): void {
-  // 1) forças correntes com a nova tática (atualiza SA/SB/share/tac).
-  recomputeStrengths(state, tacA, tacB);
+  // 1) forças correntes com a nova tática (atualiza SA/SB/share/tac). O contexto de
+  //    minuto entra aqui (§11 inversão Estrutura↔Táticas + §12 fadiga): no intervalo
+  //    (fromMinute=45) o feeling reseta pra cima e o 2º tempo volta a decair.
+  recomputeStrengths(state, tacA, tacB, edgeCtxForMinute(fromMinute, state.fase as FaseKey | undefined));
   // 2) re-semeia o futuro com uma seed estável do ponto de virada. mistura o estado
   //    (minuto + placar) e o hash das táticas — assim o trecho futuro depende SÓ de
   //    (seed da partida, momento, placar, planos), nunca do timing real de playback.
@@ -787,11 +1158,11 @@ export function recomputeFromMinute(
   state.schedule = merged;
 }
 
-// ITEM 14 (reativo, ligado ao item 7): a IA ajusta a MENTALIDADE conforme o placar
-// ao vivo. Mantém forma/estilo/marcação do plano inicial; só a POSTURA reage ao
-// contexto (gap de força + diferença de gols + minuto). Regra dura herdada do item
-// 14: um time MUITO mais forte que está perdendo vai pra cima (nunca retranca); um
-// time que ganha e é mais fraco fecha pra segurar. Determinístico (sem rnd).
+// ITEM 14 (reativo, ligado ao item 7): a IA ajusta a POSTURA (slider 0–100) conforme o
+// placar ao vivo. Mantém formação/estilos/sliders restantes do plano inicial; só a
+// postura reage (gap de força + diferença de gols + minuto). Regra dura: um time MUITO
+// mais forte que está perdendo vai pra cima (nunca retranca); um time que ganha e é mais
+// fraco fecha pra segurar. Determinístico (sem rnd). Devolve a NOVA postura (0–100).
 export function reactiveAiPosture(
   base: Tactic,
   aiStrength: number,
@@ -799,24 +1170,24 @@ export function reactiveAiPosture(
   aiGoals: number,
   oppGoals: number,
   minute: number,
-): Postura {
+): number {
   if (minute < 25) return base.postura; // cedo demais pra reagir
   const gap = aiStrength - oppStrength; // + = IA mais forte
   const diff = aiGoals - oppGoals; // + = IA na frente
   const late = minute >= 65;
-  // IA perdendo → sobe a mentalidade (mais ainda se for favorita / se for tarde).
+  // IA perdendo → sobe a postura (mais ainda se for favorita / se for tarde).
   if (diff < 0) {
-    if (gap >= 5 || late) return diff <= -2 ? "all_in" : "atk";
-    return "atk";
+    if (gap >= 5 || late) return diff <= -2 ? 92 : 76; // all-in / ofensiva
+    return 76;
   }
-  // IA ganhando → segura, proporcional à vantagem e ao relógio (mas favorita não retranca).
+  // IA ganhando → segura, proporcional à vantagem e ao relógio (favorita não retranca).
   if (diff > 0) {
-    if (late && diff >= 2) return gap >= 12 ? "def" : "retranca";
-    if (late) return "def";
-    return diff >= 2 ? "def" : base.postura;
+    if (late && diff >= 2) return gap >= 12 ? 30 : 14; // defensiva / retranca
+    if (late) return 30;
+    return diff >= 2 ? 30 : base.postura;
   }
   // empate tarde: favorito propõe, azarão segura o ponto/pênalti.
-  if (late) return gap >= 8 ? "atk" : gap <= -8 ? "def" : base.postura;
+  if (late) return gap >= 8 ? 76 : gap <= -8 ? 30 : base.postura;
   return base.postura;
 }
 
@@ -831,10 +1202,13 @@ export function createMatch(
   tacA: Tactic,
   tacB: Tactic,
   seed: number,
+  fase?: FaseKey,
 ): MatchState {
   const rnd = mulberry32((seed >>> 0) || 1);
-  const SA = sideStrength(teamA, tacA, tacB);
-  const SB = sideStrength(teamB, tacB, tacA);
+  // §11: o teto da fase vale a partida toda — entra já no kickoff (e nos recomputes).
+  const ctx0: EdgeCtx = { fase };
+  const SA = sideStrength(teamA, tacA, teamB, tacB, ctx0);
+  const SB = sideStrength(teamB, tacB, teamA, tacA, ctx0);
   const odRaw = gammaSample(rnd, P.OD_GAMMA_K) / P.OD_GAMMA_K;
   let openStruct = 1.0;
   if (SA.postureIsOff) openStruct += P.OPEN_POSTURE_GAIN * 0.15;
@@ -868,6 +1242,7 @@ export function createMatch(
     finished: false,
     events: [],
     schedule: [],
+    fase,
   };
 }
 
@@ -1255,90 +1630,307 @@ export function stageLong(stage: Stage): string {
   return stage.type;
 }
 
-// A IA escolhe uma tática plausível e coerente (uso INTERNO do bot, NÃO é mostrado
-// ao jogador como "ideal"). Mentalidade por ARQUÉTIPO de gap de força (item 14).
-// ===== ARQUÉTIPOS DA IA POR GAP DE FORÇA (item 14) =====
-// A mentalidade INICIAL do bot agora vem do gap = minhaForça − forçaDoRival, não da
-// força absoluta. Regra dura: GIGANTE e FAVORITO NUNCA retrancam contra um fraco; o
-// AZARÃO/UNDERDOG se fecha contra um gigante. Cada arquétipo sorteia de subconjuntos
-// COERENTES (formação ↔ postura ↔ marcação) pra não cair nos combos penalizados por
-// coherence() (ex.: 532+all_in, 343+retranca).
-type Archetype = {
-  forms: Form[];
-  estilos: Estilo[];
-  posturas: Postura[];
-  marcacoes: Marcacao[];
+// =====================================================================
+// 5 PRESETS (§9) — pentágono balanceado. Cada um vence 2 / perde 2 (em escala). São o
+// "modo simples": ponto de partida que o jogador AJUSTA na mão (sliders/estilo/formação)
+// — o ajuste muda o jogo via sintonia (§6.5) + postura (§6.1).
+// Valores do §16 {form, atk, def, post, press, larg, agr} mapeados pros campos do Tactic.
+// =====================================================================
+export type PresetKey = "pressao" | "craque" | "toque" | "direto" | "ferrolho";
+export const PRESETS: Record<PresetKey, Tactic> = {
+  pressao: { form: "3-4-3", atk: "vertical", def: "individual", postura: 70, pressao: 88, amplitude: 60, agressividade: 62 },
+  craque: { form: "4-3-3", atk: "drible", def: "dobra", postura: 62, pressao: 50, amplitude: 35, agressividade: 48 },
+  toque: { form: "4-4-2", atk: "posse", def: "mista", postura: 58, pressao: 58, amplitude: 38, agressividade: 35 },
+  direto: { form: "4-2-4", atk: "bolalonga", def: "zona", postura: 78, pressao: 55, amplitude: 75, agressividade: 50 },
+  ferrolho: { form: "5-3-2", atk: "contra", def: "libero", postura: 22, pressao: 26, amplitude: 48, agressividade: 60 },
 };
-const AI_ARCHETYPES: { min: number; arch: Archetype }[] = [
-  // GIGANTE (gap ≥ +12): propõe o jogo, vai pra cima, nunca recua.
-  {
-    min: 12,
-    arch: {
-      forms: ["433", "343", "424", "4312", "352"],
-      estilos: ["lados", "meio", "passes"],
-      posturas: ["atk", "all_in", "eq"],
-      marcacoes: ["alta", "media"],
-    },
-  },
-  // FAVORITO (+5..+12): ofensivo/equilibrado, sem retranca.
-  {
-    min: 5,
-    arch: {
-      forms: ["433", "442", "352", "4312", "343"],
-      estilos: ["lados", "meio", "passes", "longas"],
-      posturas: ["atk", "eq"],
-      marcacoes: ["alta", "media"],
-    },
-  },
-  // EQUILIBRADO (|gap| < 5): leque completo, o jogo decide no detalhe.
-  {
-    min: -5,
-    arch: {
-      forms: ["433", "442", "352", "4231", "4312", "343"],
-      estilos: ["lados", "meio", "passes", "longas", "contra"],
-      posturas: ["eq", "atk", "def"],
-      marcacoes: ["alta", "media", "baixa"],
-    },
-  },
-  // AZARÃO (-12..-5): cauteloso, contra-ataque, bloco mais baixo.
-  {
-    min: -12,
-    arch: {
-      forms: ["442", "4231", "532", "352"],
-      estilos: ["contra", "longas", "lados"],
-      posturas: ["eq", "def"],
-      marcacoes: ["media", "baixa"],
-    },
-  },
-  // UNDERDOG EXTREMO (gap ≤ -12): se fecha, joga no erro do gigante.
-  {
-    min: -Infinity,
-    arch: {
-      forms: ["532", "4231", "442"],
-      estilos: ["contra", "longas"],
-      posturas: ["retranca", "def"],
-      marcacoes: ["baixa", "media"],
-    },
-  },
-];
-function archetypeFor(gap: number): Archetype {
-  for (const a of AI_ARCHETYPES) if (gap >= a.min) return a.arch;
-  return AI_ARCHETYPES[AI_ARCHETYPES.length - 1].arch;
+export const PRESET_ORDER: PresetKey[] = ["pressao", "craque", "toque", "direto", "ferrolho"];
+// rótulos curtos pros presets (a UI pode reusar; o engine não importa a ui).
+export const PRESET_LABEL: Record<PresetKey, string> = {
+  pressao: "Pressão",
+  craque: "Craque",
+  toque: "Toque",
+  direto: "Direto",
+  ferrolho: "Ferrolho",
+};
+// aplica um preset (cópia nova — o jogador edita à vontade depois).
+export function applyPreset(key: PresetKey): Tactic {
+  return { ...PRESETS[key] };
 }
-function pickFrom<T>(rnd: () => number, arr: T[]): T {
-  return arr[Math.floor(rnd() * arr.length)];
+// qual preset um Tactic corrente "é" (o mais próximo) — pra a UI marcar o chip ativo
+// mesmo após ajustes na mão. Distância por formação/estilos (peso alto) + sliders.
+export function nearestPreset(tac: Tactic): PresetKey {
+  let best: PresetKey = "toque";
+  let bestD = Infinity;
+  for (const k of PRESET_ORDER) {
+    const p = PRESETS[k];
+    let d = 0;
+    if (p.form !== tac.form) d += 3;
+    if (p.atk !== tac.atk) d += 3;
+    if (p.def !== tac.def) d += 3;
+    d += Math.abs(p.postura - tac.postura) / 25;
+    d += Math.abs(p.pressao - tac.pressao) / 25;
+    d += Math.abs(p.amplitude - tac.amplitude) / 25;
+    d += Math.abs(p.agressividade - tac.agressividade) / 25;
+    if (d < bestD) {
+      bestD = d;
+      best = k;
+    }
+  }
+  return best;
 }
-// myStrength/oppStrength = forças base (overall) dos dois times. Se oppStrength não
-// for passado, cai no EQUILIBRADO (gap 0) — compatível com chamadas antigas.
+
+// =====================================================================
+// ⭐ IA POR FASE (§14) — o nó tático que aperta conforme o torneio avança.
+//
+// O produto define TRÊS regimes da IA (estudo-taticas-v3 §14/§16):
+//   · "grupos"  (estreia + fase de grupos + quadrangular): a IA joga com PRESET PURO —
+//     escolhe um dos 5 presets coerente com a própria força (gap vs o jogador), com um
+//     leve jitter pra variar. SIMPLES e LEGÍVEL. NÃO lê o seu plano. É aqui que o
+//     azarão-Ferrolho dá trabalho ao gigante que ERRA o preset (§17).
+//   · "ajusta" (oitavas + quartas): a IA começa a LER o seu setup (atk/def/form/sliders)
+//     e responde com a tática que te NEUTRALIZA — varre presets + variações e fica com o
+//     de melhor encaixe contra você (matriz §4 + pressão §5 + sintonia §6.5). Aperta o
+//     nó já no pré-jogo. A intensidade da adaptação cresce de oitavas → quartas.
+//   · "ao_vivo" (semi + final): além de adaptar no pré-jogo (forte), a IA também adapta
+//     AO VIVO — no intervalo (reage ao 1º tempo) e em resposta às SUAS mudanças (a UI
+//     chama reactiveAiTactic quando você muda a tática). É quando o gigante que adapta
+//     derruba o azarão (§17). Tudo DETERMINÍSTICO por seed (sem Date.now/Math.random).
+//
+// `matchPhaseForKind` mapeia o MatchKind + a rodada do mata-mata pro regime. A UI usa
+// isso pra saber se entrega a reação ao vivo completa (semi/final) ou só a postura (v9).
+// =====================================================================
+export type MatchPhase = "grupos" | "ajusta" | "ao_vivo";
+
+// regime da IA a partir do tipo de jogo + (se mata-mata) a rodada. Oitavas/quartas =
+// "ajusta"; semi/final = "ao_vivo"; grupos/quadrangular/32-avos = "grupos" (preset puro).
+// `round` = stage.round do KnockoutStageState (R32/R16/QF/SF) quando kind==="knockout".
+export function matchPhaseForKind(kind: MatchKind, round?: KnockoutRound): MatchPhase {
+  if (kind === "final") return "ao_vivo"; // a final é sempre o regime máximo
+  if (kind === "third_place") return "ajusta"; // disputa de 3º: adapta no pré-jogo
+  if (kind === "knockout") {
+    if (round === "SF") return "ao_vivo"; // semifinal
+    if (round === "R16" || round === "QF") return "ajusta"; // oitavas/quartas
+    return "grupos"; // 32-avos (fase ainda cedo): preset puro
+  }
+  return "grupos"; // groups / final_group
+}
+
+// a fase do PRÓXIMO jogo do jogador, lida direto do estado da campanha (pra a UI e o
+// startMatch não recalcularem a rodada na mão). null se não há jogo meu pendente.
+export function matchPhaseForCampaign(camp: Campaign): MatchPhase {
+  const s = camp.state;
+  if (!s) return "grupos";
+  if (s.kind === "knockout") return matchPhaseForKind("knockout", s.stage.round);
+  if (s.kind === "final") return "ao_vivo";
+  if (s.kind === "third_place") return "ajusta";
+  return "grupos";
+}
+
+// fase do torneio → faixa do teto do edge (§11). A "estreia" (1º jogo da campanha) tem o
+// teto mais baixo (a tática mexe pouco); grupos/oitavas é o pico; quartas/semis afina; a
+// final é a mais apertada. Deriva do MatchKind + rodada + se é a estreia. (= MatchFase.)
+export function faseKeyFor(kind: MatchKind, round: KnockoutRound | undefined, isOpener: boolean): FaseKey {
+  if (kind === "final") return "final";
+  if (kind === "knockout") {
+    if (round === "SF") return "quartas"; // semis afina (faixa quartas/semis do §11)
+    if (round === "QF") return "quartas";
+    if (round === "R16") return "grupos"; // oitavas: pico, junto com grupos
+    return "grupos"; // 32-avos
+  }
+  if (kind === "third_place") return "quartas";
+  // grupos/quadrangular: estreia tem teto baixo; demais rodadas = pico de grupos.
+  return isOpener ? "estreia" : "grupos";
+}
+
+// fase (§11) do PRÓXIMO jogo do jogador, lida da campanha — pra a UI passar ao createMatch
+// e o teto do edge valer já no kickoff. "estreia" = o jogador ainda não disputou nenhum
+// jogo nesta campanha (history vazia).
+export function faseForCampaignMatch(camp: Campaign): FaseKey {
+  const s = camp.state;
+  const isOpener = camp.history.length === 0;
+  if (s?.kind === "knockout") return faseKeyFor("knockout", s.stage.round, isOpener);
+  if (s?.kind === "final") return faseKeyFor("final", undefined, isOpener);
+  if (s?.kind === "third_place") return faseKeyFor("third_place", undefined, isOpener);
+  return faseKeyFor("groups", undefined, isOpener);
+}
+
+// ===== IA por gap (§14) — usa PRESET cedo, com leve jitter pra variar =====
+// myStrength/oppStrength = forças base (overall) dos dois times. Mapeia o gap a um preset
+// coerente (gigante propõe, azarão se fecha) e dá um pequeno empurrão nos sliders pra
+// não ficar idêntica jogo a jogo (determinístico via rnd). Compatível com a assinatura
+// antiga (oppStrength opcional → preset neutro).
+function presetForGap(gap: number): PresetKey {
+  if (gap >= 12) return "pressao"; // gigante: sufoca
+  if (gap >= 5) return "toque"; // favorito: domina a bola
+  if (gap > -5) return "craque"; // parelho: no detalhe
+  if (gap > -12) return "direto"; // azarão: vertical/peso ofensivo
+  return "ferrolho"; // underdog extremo: se fecha
+}
+function jitterSlider(rnd: () => number, v: number, amp: number): number {
+  return Math.round(clamp(v + (rnd() * 2 - 1) * amp, 0, 100));
+}
 export function aiTactic(rnd: () => number, myStrength: number, oppStrength?: number): Tactic {
   const gap = myStrength - (oppStrength ?? myStrength);
-  const arch = archetypeFor(gap);
+  const base = applyPreset(presetForGap(gap));
   return {
-    form: pickFrom(rnd, arch.forms),
-    estilo: pickFrom(rnd, arch.estilos),
-    postura: pickFrom(rnd, arch.posturas),
-    marcacao: pickFrom(rnd, arch.marcacoes),
+    ...base,
+    postura: jitterSlider(rnd, base.postura, 8),
+    pressao: jitterSlider(rnd, base.pressao, 8),
+    amplitude: jitterSlider(rnd, base.amplitude, 8),
+    agressividade: jitterSlider(rnd, base.agressividade, 8),
   };
+}
+
+// ===== IA que ADAPTA (§14) — o nó tático =====
+// A partir das oitavas, a IA lê o setup do jogador e responde pra MAXIMIZAR o próprio
+// encaixe contra ele (desata o nó): testa cada preset + ajustes e fica com o de melhor
+// DOMÍNIO (meu edge − o edge dele) contra o plano do jogador. Determinística (varre um
+// conjunto fixo). `playerTac` é a tática conhecida do jogador (no pré-jogo a IA só vê
+// isso nas fases que o produto libera, oitavas+). Tudo SEM rnd no núcleo da varredura.
+
+// domínio tático de `mine` (tática da IA) sobre `theirs` (tática do jogador), nos dois
+// times. = (estrutura+táticas da IA contra o jogador) − (estrutura+táticas do jogador
+// contra a IA). Quanto maior, mais a IA neutraliza/explora o plano do jogador. Espelha
+// EXATAMENTE o núcleo de sideStrength (mesmas funções §4/§5/§6.5), sem teto/fadiga — é
+// um ranqueador relativo, não o edge final do jogo.
+function tacticDomination(aiTeam: Team, mine: Tactic, oppTeam: Team, theirs: Tactic): number {
+  const ai = estruturaEdge(aiTeam, mine, oppTeam, theirs) + taticasEdge(mine, theirs, aiTeam);
+  const pl = estruturaEdge(oppTeam, theirs, aiTeam, mine) + taticasEdge(theirs, mine, oppTeam);
+  return ai - pl;
+}
+
+// conjunto de CANDIDATAS da IA: os 5 presets + variações de slider (em cima dos eixos
+// que a sintonia §6.5 e a pressão §5 mais mexem). Determinístico (lista fixa). É o leque
+// de respostas que a IA pondera contra o seu plano.
+function aiCandidateTactics(): Tactic[] {
+  const out: Tactic[] = [];
+  for (const k of PRESET_ORDER) {
+    const c = applyPreset(k);
+    out.push(c);
+    // sobe a pressão + pegada (sufoca / aperta o duelo).
+    out.push({ ...c, pressao: clamp(c.pressao + 18, 0, 100), agressividade: clamp(c.agressividade + 12, 0, 100) });
+    // fecha pelo meio + recua a postura (tira o espaço das alas, segura).
+    out.push({ ...c, amplitude: clamp(c.amplitude - 18, 0, 100), postura: clamp(c.postura - 12, 0, 100) });
+    // abre pelas alas + sobe a postura (vai pra cima e amplia).
+    out.push({ ...c, amplitude: clamp(c.amplitude + 18, 0, 100), postura: clamp(c.postura + 12, 0, 100) });
+    // baixa o bloco (espera o rival lá atrás — castiga quem precisa de espaço alto).
+    out.push({ ...c, pressao: clamp(c.pressao - 20, 0, 100) });
+  }
+  return out;
+}
+
+// a melhor tática-resposta CRUA da IA contra `playerTac` (a que mais domina), ignorando a
+// fase. É o "100% adaptada". A intensidade da fase mistura isto com o preset puro (abaixo).
+function bestCounterTactic(aiTeam: Team, oppTeam: Team, playerTac: Tactic): Tactic {
+  const cands = aiCandidateTactics();
+  let best = cands[0];
+  let bestScore = -Infinity;
+  for (const v of cands) {
+    const score = tacticDomination(aiTeam, v, oppTeam, playerTac);
+    if (score > bestScore) {
+      bestScore = score;
+      best = v;
+    }
+  }
+  return best;
+}
+
+// mistura discreta entre a tática-resposta e o preset puro, por `intensity` ∈ [0,1]:
+//  · estrutura (formação/estilos): adota a da resposta a partir de intensity ≥ 0.5
+//    (oitavas adapta os estilos só "meio caminho" → 50/50 por hash; quartas+ sempre).
+//  · sliders: interpola linearmente puro→resposta por intensity (adaptação contínua).
+// `hash` desempata o caso 50/50 de forma determinística (sem rnd).
+function blendTactics(pure: Tactic, counter: Tactic, intensity: number, hash: number): Tactic {
+  const t = clamp(intensity, 0, 1);
+  const lerp = (a: number, b: number) => Math.round(a + (b - a) * t);
+  const takeStruct = t >= 0.999 ? true : t < 0.5 ? false : (hash & 1) === 1;
+  return {
+    form: takeStruct ? counter.form : pure.form,
+    atk: takeStruct ? counter.atk : pure.atk,
+    def: takeStruct ? counter.def : pure.def,
+    postura: lerp(pure.postura, counter.postura),
+    pressao: lerp(pure.pressao, counter.pressao),
+    amplitude: lerp(pure.amplitude, counter.amplitude),
+    agressividade: lerp(pure.agressividade, counter.agressividade),
+  };
+}
+
+// quanto a IA adapta em cada fase de pré-jogo. grupos = 0 (preset puro); oitavas ajusta
+// parcial; quartas ajusta forte; semi/final praticamente 100% (e ainda reage ao vivo).
+function adaptIntensity(phase: MatchPhase, round?: KnockoutRound): number {
+  if (phase === "grupos") return 0;
+  if (phase === "ao_vivo") return 1; // semi/final: pré-jogo já no talo (e adapta ao vivo)
+  // "ajusta": oitavas mais leve, quartas mais pesada.
+  return round === "QF" ? 0.85 : 0.55; // R16 / 3º lugar = 0.55
+}
+
+// ⭐ DECISÃO TÁTICA DA IA POR FASE (§14) — entrada única usada pela UI no pré-jogo.
+// `phase` vem de matchPhaseForKind/ForCampaign. Em "grupos" devolve o preset puro (com
+// jitter, sem ler o jogador). Em "ajusta"/"ao_vivo" mistura o preset puro com a melhor
+// resposta ao plano do jogador, por intensidade da fase. Determinístico (o jitter usa o
+// `rnd` semeado; o resto é função pura das táticas).
+export function aiTacticForPhase(
+  rnd: () => number,
+  aiTeam: Team,
+  oppTeam: Team,
+  playerTac: Tactic,
+  phase: MatchPhase,
+  round?: KnockoutRound,
+): Tactic {
+  const pure = aiTactic(rnd, aiTeam.o, oppTeam.o); // preset por gap + jitter (com rnd)
+  if (phase === "grupos") return pure;
+  const counter = bestCounterTactic(aiTeam, oppTeam, playerTac);
+  // hash estável do confronto (forças + plano do jogador) pra o desempate 50/50 de
+  // estrutura nas oitavas ser determinístico e variar por jogo.
+  const hash = tacticHash(playerTac, pure) ^ ((aiTeam.o * 73856093) ^ (oppTeam.o * 19349663));
+  return blendTactics(pure, counter, adaptIntensity(phase, round), hash >>> 0);
+}
+
+// compat: assinatura antiga (sempre adapta 100%). Mantida pra não quebrar chamadas
+// existentes; o caminho novo é aiTacticForPhase.
+export function adaptAiTactic(
+  _rnd: () => number,
+  aiTeam: Team,
+  oppTeam: Team,
+  playerTac: Tactic,
+): Tactic {
+  return bestCounterTactic(aiTeam, oppTeam, playerTac);
+}
+
+// ⭐ IA REATIVA AO VIVO NA SEMI/FINAL (§14) — re-adapta lendo o placar e o plano CORRENTE
+// do jogador. Usada pelos ganchos do v9 (recomputeStrengths/recomputeFromMinute) quando a
+// fase é "ao_vivo":
+//   · no INTERVALO (keepStructure=false): a IA pode RE-ESTRUTURAR — muda formação/estilos
+//     E sliders pra responder ao 1º tempo e ao seu novo plano do vestiário;
+//   · AO VIVO (keepStructure=true): respeita a mesma lei que você (estrutura só muda no
+//     intervalo, §1) — mantém formação/estilos da IA e só RE-AFINA os sliders contra o
+//     que você faz agora + o ânimo do placar.
+// Combina o nó tático (bestCounterTactic vs o seu plano atual) com o ânimo do placar:
+// reusa reactiveAiPosture pra empurrar a postura conforme quem ganha/perde (favorito não
+// retranca; azarão segura). DETERMINÍSTICO (sem rnd) — a UI fornece a re-sementagem
+// estável via recomputeFromMinute. `current` é a tática vigente da IA (preserva a
+// estrutura ao vivo). Devolve a NOVA tática da IA.
+export function reactiveAiTactic(
+  aiTeam: Team,
+  oppTeam: Team,
+  playerTacNow: Tactic,
+  current: Tactic,
+  aiGoals: number,
+  oppGoals: number,
+  minute: number,
+  keepStructure: boolean,
+): Tactic {
+  // 1) o nó tático: melhor resposta (estrutura+sliders) contra o que o jogador faz AGORA.
+  const counter = bestCounterTactic(aiTeam, oppTeam, playerTacNow);
+  // 2) ao vivo, a estrutura fica TRAVADA (só os sliders da resposta entram); no intervalo
+  //    a IA adota também a formação/estilos da resposta.
+  const merged: Tactic = keepStructure
+    ? { form: current.form, atk: current.atk, def: current.def, postura: counter.postura, pressao: counter.pressao, amplitude: counter.amplitude, agressividade: counter.agressividade }
+    : counter;
+  // 3) o ânimo do placar ajusta a postura por cima (regra do v9, sobre a postura adaptada).
+  const postura = reactiveAiPosture(merged, aiTeam.o, oppTeam.o, aiGoals, oppGoals, minute);
+  return { ...merged, postura };
 }
 
 // contexto p/ casar o resultado REAL (bug 1.1): ano da edição + classe de fase.

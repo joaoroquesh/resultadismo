@@ -1,6 +1,6 @@
 // Helpers de apresentação do Manager (sem JSX): bandeiras, estrelas, rótulos e
 // bancos de texto boleiros. Tudo client-side, espelhando o protótipo v4.
-import type { Estilo, Form, Marcacao, Postura, Tier } from "./types";
+import type { AtkStyle, DefStyle, Form, Tier } from "./types";
 
 // PRNG só pra variedade de TEXTO da narração (não afeta o placar; o motor é o
 // dono do resultado). Semeado pela partida pra a transmissão ser reproduzível.
@@ -120,64 +120,141 @@ export function barPct(v: number): number {
   return Math.max(4, Math.min(100, ((v - 30) / (99 - 30)) * 100));
 }
 
-// rótulos de tática
+// ===== rótulos de tática (estudo-taticas-v3 · rev 4) =====
+// 9 FORMAÇÕES (grid 3×3) na ORDEM do grid (linha ATA → MEI → DEF).
 export const FORM_OPTS: [Form, string][] = [
-  ["433", "4-3-3"],
-  ["442", "4-4-2"],
-  ["352", "3-5-2"],
-  ["4231", "4-2-3-1"],
-  ["532", "5-3-2"],
-  ["4312", "Losango"],
-  ["343", "3-4-3"],
-  ["424", "4-2-4"],
-];
-export const ESTILO_OPTS: [Estilo, string][] = [
-  ["passes", "Troca de Passes"],
-  ["meio", "Pelo Meio"],
-  ["lados", "Pelos Lados"],
-  ["longas", "Bolas Longas"],
-  ["contra", "Contra-ataque"],
-];
-export const POSTURA_OPTS: [Postura, string][] = [
-  ["all_in", "Todos ao Ataque"],
-  ["atk", "Ofensiva"],
-  ["eq", "Equilibrada"],
-  ["def", "Defensiva"],
-  ["retranca", "Retranca"],
-];
-export const MARC_OPTS: [Marcacao, string][] = [
-  ["alta", "Pressão Alta"],
-  ["media", "Bloco Médio"],
-  ["baixa", "Bloco Baixo"],
+  ["4-2-4", "4-2-4"],
+  ["3-4-3", "3-4-3"],
+  ["4-3-3", "4-3-3"],
+  ["4-4-2", "4-4-2"],
+  ["3-5-2", "3-5-2"],
+  ["4-5-1", "4-5-1"],
+  ["5-3-2", "5-3-2"],
+  ["5-4-1", "5-4-1"],
+  ["6-3-1", "6-3-1"],
 ];
 export const FORM_NM: Record<Form, string> = {
-  "433": "4-3-3",
-  "442": "4-4-2",
-  "352": "3-5-2",
-  "4231": "4-2-3-1",
-  "532": "5-3-2",
-  "4312": "Losango (4-3-1-2)",
-  "343": "3-4-3",
-  "424": "4-2-4",
+  "4-2-4": "4-2-4",
+  "3-4-3": "3-4-3",
+  "4-3-3": "4-3-3",
+  "4-4-2": "4-4-2",
+  "3-5-2": "3-5-2",
+  "4-5-1": "4-5-1",
+  "5-3-2": "5-3-2",
+  "5-4-1": "5-4-1",
+  "6-3-1": "6-3-1",
 };
-export const ESTILO_NM: Record<Estilo, string> = {
-  passes: "Troca de Passes",
-  meio: "Pelo Meio",
-  lados: "Pelos Lados",
-  longas: "Bolas Longas",
+// 5 ESTILOS de ATAQUE.
+export const ATK_OPTS: [AtkStyle, string][] = [
+  ["posse", "Posse"],
+  ["vertical", "Vertical"],
+  ["bolalonga", "Bola longa"],
+  ["contra", "Contra-ataque"],
+  ["drible", "Drible"],
+];
+export const ATK_NM: Record<AtkStyle, string> = {
+  posse: "Posse",
+  vertical: "Vertical",
+  bolalonga: "Bola longa",
   contra: "Contra-ataque",
+  drible: "Drible",
 };
-export const POSTURA_NM: Record<Postura, string> = {
-  all_in: "Todos ao Ataque",
-  atk: "Ofensiva",
-  eq: "Equilibrada",
-  def: "Defensiva",
-  retranca: "Retranca",
+// 5 ESTILOS de DEFESA.
+export const DEF_OPTS: [DefStyle, string][] = [
+  ["zona", "Zona"],
+  ["individual", "Individual"],
+  ["mista", "Mista"],
+  ["libero", "Líbero"],
+  ["dobra", "Dobra"],
+];
+export const DEF_NM: Record<DefStyle, string> = {
+  zona: "Zona",
+  individual: "Individual",
+  mista: "Mista",
+  libero: "Líbero",
+  dobra: "Dobra",
 };
-export const MARC_NM: Record<Marcacao, string> = {
-  alta: "Pressão Alta",
-  media: "Bloco Médio",
-  baixa: "Bloco Baixo",
+
+// 1 LINHA de identidade por estilo (§3) — pro picker (ataque/defesa) explicar a escolha
+// sem jargão de motor. Curtas, escaneáveis, sem em dash.
+export const ATK_IDENTITY: Record<AtkStyle, string> = {
+  posse: "Toque e paciência: fura defesa fechada na circulação.",
+  vertical: "Verticaliza em 2 ou 3 toques, antes da defesa postar.",
+  bolalonga: "Chuveirinho e segunda bola. Ignora a pressão.",
+  contra: "Cede a bola e explode no espaço. Premia o azarão.",
+  drible: "No pé do craque. Brilha no time mais forte.",
+};
+export const DEF_IDENTITY: Record<DefStyle, string> = {
+  zona: "Cada um cobre um espaço, bloco coletivo.",
+  individual: "Cada um cola no seu homem.",
+  mista: "Zona com vigias de marcação.",
+  libero: "Recuo com um varredor atrás.",
+  dobra: "Sempre dois homens na bola.",
+};
+// ITEM 5: descrições CURTÍSSIMAS (poucas palavras) pros pickers de ataque/defesa lado a
+// lado (2 colunas) — cabem no mobile estreito sem quebrar. A identidade completa segue
+// em ATK_IDENTITY/DEF_IDENTITY (usada em outros pontos).
+export const ATK_IDENTITY_SHORT: Record<AtkStyle, string> = {
+  posse: "toque e paciência",
+  vertical: "rápido e direto",
+  bolalonga: "chuveirinho na área",
+  contra: "explode no espaço",
+  drible: "no pé do craque",
+};
+export const DEF_IDENTITY_SHORT: Record<DefStyle, string> = {
+  zona: "cobre o espaço",
+  individual: "cola no homem",
+  mista: "zona com vigias",
+  libero: "varredor atrás",
+  dobra: "dois na bola",
+};
+
+// ===== FORMAÇÃO — grid 3×3 (§2): a LINHA é a afinidade primária ATA/MEI/DEF =====
+// rótulo + tom de cada linha do grid, pra deixar legível qual faixa é ofensiva /
+// equilíbrio / defensiva. As 3 formações de cada linha vêm na ordem do FORM_OPTS.
+export type FormRowKey = "ata" | "mei" | "def";
+export const FORM_ROWS: { key: FormRowKey; label: string; hint: string; forms: Form[] }[] = [
+  { key: "ata", label: "Ofensiva", hint: "no ataque", forms: ["4-2-4", "3-4-3", "4-3-3"] },
+  { key: "mei", label: "Equilíbrio", hint: "no meio", forms: ["4-4-2", "3-5-2", "4-5-1"] },
+  { key: "def", label: "Defensiva", hint: "na defesa", forms: ["5-3-2", "5-4-1", "6-3-1"] },
+];
+// micro-rótulo da coluna do grid (tendência secundária ATA→MEI→DEF, §2).
+export const FORM_COL_LABEL = ["mais ofensiva", "equilíbrio", "mais defensiva"] as const;
+
+// ===== 4 SLIDERS 0–100 (extremos = rótulo das pontas + valor descritivo) =====
+export type SliderKey = "postura" | "pressao" | "amplitude" | "agressividade";
+export const SLIDER_META: Record<
+  SliderKey,
+  { label: string; lo: string; hi: string; hint: string }
+> = {
+  postura: { label: "Postura", lo: "Recuada", hi: "Ofensiva", hint: "Aloca a força entre defesa e ataque." },
+  pressao: { label: "Pressão", lo: "Bloco baixo", hi: "Pressão alta", hint: "Onde o time espera a bola: lá em cima ou recuado." },
+  amplitude: { label: "Amplitude", lo: "Pelo meio", hi: "Pelas alas", hint: "Por onde o time ataca: miolo ou pontas." },
+  agressividade: { label: "Pegada", lo: "Suave", hi: "Forte", hint: "Intensidade no duelo (e risco de cartão)." },
+};
+export const SLIDER_ORDER: SliderKey[] = ["postura", "pressao", "amplitude", "agressividade"];
+// rótulo curto do valor de um slider (3 zonas) — pro resumo do plano / chips.
+export function sliderZone(key: SliderKey, v: number): string {
+  const m = SLIDER_META[key];
+  if (v >= 67) return m.hi;
+  if (v <= 33) return m.lo;
+  return "Equilíbrio";
+}
+
+// 5 PRESETS — rótulo + uma linha boleira (modo simples, ajustável na mão).
+export const PRESET_OPTS: [import("./engine").PresetKey, string][] = [
+  ["pressao", "Pressão"],
+  ["craque", "Craque"],
+  ["toque", "Toque"],
+  ["direto", "Direto"],
+  ["ferrolho", "Ferrolho"],
+];
+export const PRESET_DESC: Record<import("./engine").PresetKey, string> = {
+  pressao: "Sufoca lá em cima, vertical e marcação individual.",
+  craque: "No pé do craque: drible e dobra de marcação atrás.",
+  toque: "Troca de passes paciente, domina a bola pelo meio.",
+  direto: "Bola longa e jogo pelas alas, sem rodeio.",
+  ferrolho: "Ferrolho: bloco baixo, contra-ataque e pegada forte.",
 };
 
 export const TIER_LABEL: Record<Tier, string> = {
@@ -203,8 +280,8 @@ export const TICKER_ICON: Record<"goal" | "quase" | "defesa" | "fora" | "bloquei
   interrupt: ["🚩", "🟨", "✋", "🔁", "↩️"],
 };
 
-export const TICKER_BUILDUP: Record<Estilo, string[]> = {
-  passes: [
+export const TICKER_BUILDUP: Record<AtkStyle, string[]> = {
+  posse: [
     "[Time] roda a bola, paciência total.",
     "[Time] troca passes, busca a brecha.",
     "[Time] tabela curta no meio.",
@@ -212,23 +289,15 @@ export const TICKER_BUILDUP: Record<Estilo, string[]> = {
     "[Time] paredinha, esperando o espaço.",
     "[Time] domina a posse, sem pressa.",
   ],
-  meio: [
+  vertical: [
     "[Time] verticaliza pelo miolo.",
     "[Time] rasga pelo centro.",
-    "[Time] infiltra pelo meio.",
+    "[Time] infiltra em 2 toques.",
     "[Time] enfia a bola no eixo.",
     "[Time] busca o pivô na entrada.",
     "[Time] tabela rápida no coração da área.",
   ],
-  lados: [
-    "[Time] abre na ponta.",
-    "[Time] arma o cruzamento.",
-    "[Time] estica pela linha de fundo.",
-    "[Time] triangula pela beirada.",
-    "[Time] ataca pela banda.",
-    "[Time] lateral sobe e cruza.",
-  ],
-  longas: [
+  bolalonga: [
     "[Time] lança lá na frente.",
     "[Time] joga o bolão por cima.",
     "[Time] arma o chuveirinho.",
@@ -243,6 +312,14 @@ export const TICKER_BUILDUP: Record<Estilo, string[]> = {
     "[Time] explode pelo espaço.",
     "[Time] transição relâmpago.",
     "[Time] roubou e saiu voando.",
+  ],
+  drible: [
+    "[Time] no pé do craque.",
+    "[Time] tira o marcador no drible.",
+    "[Time] caneta e segue.",
+    "[Time] individual genial pela frente.",
+    "[Time] encara e parte pra cima.",
+    "[Time] o camisa 10 conduz e arrisca.",
   ],
 };
 export const TICKER_CONCLUSION: Record<string, string[]> = {
@@ -424,13 +501,15 @@ export function postMatchBank(gf: number, ga: number, myO: number, oppO: number)
   return "derrota_normal";
 }
 
-// observação leiga do que o rival mostrou — SEM prescrever o contra-plano
-export function aiReadHint(ai: { postura: Postura; marcacao: Marcacao }): string {
-  if (ai.postura === "all_in") return "Eles vieram com tudo pra cima, o time inteiro acampado no nosso campo.";
-  if (ai.postura === "retranca") return "Estacionaram o ônibus na frente do gol: só pensam em segurar.";
-  if (ai.marcacao === "alta") return "Estão pressionando lá em cima, marcando em cima da nossa saída de bola.";
-  if (ai.marcacao === "baixa") return "Recuaram o bloco e estão esperando a gente na própria área.";
-  if (ai.postura === "atk") return "Soltaram os laterais e estão indo pra cima com gente no ataque.";
-  if (ai.postura === "def") return "Estão jogando mais cautelosos, com as linhas baixas e compactas.";
+// observação leiga do que o rival mostrou — SEM prescrever o contra-plano. Lê os sliders
+// do novo formato (postura/pressão 0–100) + o estilo de ataque.
+export function aiReadHint(ai: { postura: number; pressao: number; atk: AtkStyle }): string {
+  if (ai.postura >= 82) return "Eles vieram com tudo pra cima, o time inteiro acampado no nosso campo.";
+  if (ai.postura <= 22) return "Estacionaram o ônibus na frente do gol: só pensam em segurar.";
+  if (ai.pressao >= 70) return "Estão pressionando lá em cima, marcando em cima da nossa saída de bola.";
+  if (ai.pressao <= 30) return "Recuaram o bloco e estão esperando a gente na própria área.";
+  if (ai.atk === "contra") return "Cederam a bola de propósito: estão à espreita pra sair no contra-ataque.";
+  if (ai.postura >= 62) return "Soltaram os laterais e estão indo pra cima com gente no ataque.";
+  if (ai.postura <= 38) return "Estão jogando mais cautelosos, com as linhas baixas e compactas.";
   return "Time equilibrado, sem se abrir nem se fechar demais. O detalhe vai decidir.";
 }

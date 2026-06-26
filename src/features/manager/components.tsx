@@ -1,8 +1,24 @@
 // Componentes de apresentação compartilhados do Manager.
 import { type ReactNode, useEffect, useRef, useState } from "react";
-import type { GroupOtherResult, Estilo, MatchStats, Standing, Tactic, Team } from "./types";
-import { matchupHints, sortStandings, styleMatchup } from "./engine";
-import { ESTILO_NM, TIER_LABEL, flagEmoji, flagSigla, starsFor } from "./ui";
+import type { AtkStyle, DefStyle, Form, GroupOtherResult, MatchStats, Standing, Tactic, Team } from "./types";
+import { defenseMatchup, matchupHints, sintoniaReadout, sortStandings, styleMatchup } from "./engine";
+import type { PresetKey } from "./engine";
+import { PRESET_DESC } from "./ui";
+import {
+  ATK_IDENTITY_SHORT,
+  ATK_NM,
+  DEF_IDENTITY_SHORT,
+  DEF_NM,
+  FORM_COL_LABEL,
+  FORM_ROWS,
+  type SliderKey,
+  SLIDER_META,
+  sliderZone,
+  TIER_LABEL,
+  flagEmoji,
+  flagSigla,
+  starsFor,
+} from "./ui";
 import { teamColors } from "./teamColors";
 import { Button } from "@/components/ui/Button";
 import { teamCrestPath } from "@/lib/teamCrests";
@@ -420,22 +436,24 @@ export function StrengthVS({
   mine,
   opp,
   light = false,
+  withName = false,
 }: {
   mine: Team;
   opp: Team;
   light?: boolean;
+  withName?: boolean; // mostra escudo + nome do time (cabeçalho da tela de tática)
 }) {
   const muted = light ? "text-white/70" : "text-ink-500";
   return (
     <div
-      className="grid grid-cols-[1fr_auto_1fr] items-start gap-2"
+      className="grid grid-cols-[1fr_auto_1fr] items-center gap-2"
       aria-label={`Comparação de força: ${mine.n} contra ${opp.n}`}
     >
-      <StrengthSide team={mine} sideLabel="Você" align="left" light={light} />
+      <StrengthSide team={mine} sideLabel="Você" align="left" light={light} withName={withName} />
       <span className={`self-center text-[10px] font-extrabold uppercase tracking-wide ${muted}`}>
-        força
+        {withName ? "vs" : "força"}
       </span>
-      <StrengthSide team={opp} sideLabel={TIER_LABEL[opp.t]} align="right" light={light} />
+      <StrengthSide team={opp} sideLabel={TIER_LABEL[opp.t]} align="right" light={light} withName={withName} />
     </div>
   );
 }
@@ -445,15 +463,26 @@ function StrengthSide({
   sideLabel,
   align,
   light,
+  withName = false,
 }: {
   team: Team;
   sideLabel: string;
   align: "left" | "right";
   light: boolean;
+  withName?: boolean;
 }) {
   const muted = light ? "text-white/70" : "text-ink-500";
+  const right = align === "right";
   return (
-    <div className={`flex flex-col gap-0.5 ${align === "right" ? "items-end text-right" : "items-start"}`}>
+    <div className={`flex min-w-0 flex-col gap-0.5 ${right ? "items-end text-right" : "items-start"}`}>
+      {withName && (
+        <span className={`flex min-w-0 max-w-full items-center gap-1.5 ${right ? "flex-row-reverse" : ""}`}>
+          <ManagerCrest slug={team.s} name={team.n} size={20} className="shrink-0" />
+          <span className={`truncate text-[13.5px] font-extrabold ${light ? "text-white" : "text-ink-900"}`}>
+            {team.n}
+          </span>
+        </span>
+      )}
       <Stars o={team.o} light={light} />
       <span className={`text-[10.5px] font-bold uppercase tracking-wide ${muted}`}>{sideLabel}</span>
     </div>
@@ -491,13 +520,13 @@ export function HistoryRow({
         : "lose";
   const tone =
     cls === "win"
-      ? "bg-grass-500/15 border-l-grass-600"
+      ? "bg-grass-500/15 border border-grass-600/30"
       : cls === "lose"
-        ? "bg-flame-500/12 border-l-flame-600"
-        : "bg-surface-2 border-l-transparent";
+        ? "bg-flame-500/12 border border-flame-600/30"
+        : "bg-surface-2 border border-border";
   return (
     <div
-      className={`my-1 flex items-center justify-between gap-2 rounded-[10px] border-l-[3px] px-3 py-2 text-[13px] text-ink-800 ${tone}`}
+      className={`my-1 flex items-center justify-between gap-2 rounded-[10px] px-3 py-2 text-[13px] text-ink-800 ${tone}`}
     >
       <span className="inline-flex min-w-0 items-center gap-1.5">
         <span className="shrink-0">{stage} ·</span>
@@ -548,6 +577,95 @@ export function SegBlock<T extends string>({
           );
         })}
       </div>
+    </div>
+  );
+}
+
+// ===== ESTILO (ataque OU defesa) — picker com 1 LINHA de identidade por opção (§3).
+// Lista vertical: cada linha = nome + identidade, escaneável e nunca quebra (mobile→
+// desktop). role=radiogroup; a opção marcada ganha o realce de marca. Os números do
+// motor NÃO aparecem aqui (decisão item 13) — só a identidade boleira. =====
+type StyleOpt<T> = { value: T; name: string; short: string };
+const ATK_PICK: StyleOpt<AtkStyle>[] = (
+  ["posse", "vertical", "bolalonga", "contra", "drible"] as AtkStyle[]
+).map((v) => ({ value: v, name: ATK_NM[v], short: ATK_IDENTITY_SHORT[v] }));
+const DEF_PICK: StyleOpt<DefStyle>[] = (
+  ["zona", "individual", "mista", "libero", "dobra"] as DefStyle[]
+).map((v) => ({ value: v, name: DEF_NM[v], short: DEF_IDENTITY_SHORT[v] }));
+
+// ITEM 5: COLUNA compacta de estilo — radio + nome + 1 linha CURTA. Pensada pra ficar
+// lado a lado (2 colunas) já a partir de ~360px sem quebrar: alvo ≥44px, texto trunca,
+// descrição curtíssima (ATK/DEF_IDENTITY_SHORT). role=radiogroup por coluna.
+function StyleColumn<T extends string>({
+  label,
+  opts,
+  value,
+  onPick,
+}: {
+  label: string;
+  opts: StyleOpt<T>[];
+  value: T;
+  onPick: (v: T) => void;
+}) {
+  const hid = `mgr-stylecol-${label}`;
+  return (
+    <section aria-labelledby={hid} className="min-w-0">
+      <h3 id={hid} className="mb-1.5 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
+        {label}
+      </h3>
+      <div role="radiogroup" aria-label={label} className="flex flex-col gap-1.5">
+        {opts.map((o) => {
+          const on = value === o.value;
+          return (
+            <button
+              key={o.value}
+              type="button"
+              role="radio"
+              aria-checked={on}
+              onClick={() => onPick(o.value)}
+              className={`flex min-h-[44px] min-w-0 items-center gap-2 rounded-[12px] border px-2.5 py-1.5 text-left transition-[transform,background-color,color,border-color,box-shadow] duration-150 ease-out active:scale-[0.99] ${
+                on ? "border-brand-500 bg-brand-500/10 shadow-sm" : "border-border bg-surface-2 hover:border-brand-400"
+              }`}
+            >
+              <span
+                aria-hidden
+                className={`grid h-4 w-4 shrink-0 place-items-center rounded-full border-2 transition-colors ${
+                  on ? "border-brand-600" : "border-ink-300"
+                }`}
+              >
+                <span className={`h-2 w-2 rounded-full bg-brand-600 transition-transform duration-150 ${on ? "scale-100" : "scale-0"}`} />
+              </span>
+              <span className="min-w-0">
+                <span className={`block truncate text-[13px] font-bold leading-tight ${on ? "text-brand-800" : "text-ink-800"}`}>
+                  {o.name}
+                </span>
+                <span className="block truncate text-[10.5px] leading-snug text-ink-500">{o.short}</span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+// ITEM 5: os dois pickers (ataque · defesa) LADO A LADO em 2 colunas, descrição reduzida.
+// 2 colunas desde ~360px; o gap encolhe no mobile. Cada coluna com seu título.
+export function AttackDefenseColumns({
+  atk,
+  def,
+  onAtk,
+  onDef,
+}: {
+  atk: AtkStyle;
+  def: DefStyle;
+  onAtk: (v: AtkStyle) => void;
+  onDef: (v: DefStyle) => void;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-2 sm:gap-3">
+      <StyleColumn label="Estilo de ataque" opts={ATK_PICK} value={atk} onPick={onAtk} />
+      <StyleColumn label="Estilo de defesa" opts={DEF_PICK} value={def} onPick={onDef} />
     </div>
   );
 }
@@ -640,18 +758,18 @@ export function MatchStatsPanel({
 // ITEM 8 (transparência) — "O QUE VENCE O QUE", às cegas, na seleção de tática.
 // Mostra o anel pedra-papel-tesoura do MEU estilo: quem ele supera e por quem é
 // superado. SEM número cru (mantém o tom boleiro), só a regra existente revelada.
-export function StyleRing({ estilo }: { estilo: Estilo }) {
-  const m = styleMatchup(estilo);
+export function StyleRing({ atk }: { atk: AtkStyle }) {
+  const m = styleMatchup(atk);
   return (
     <div className="mt-2.5 rounded-[12px] border border-border bg-surface-2 px-3 py-2.5">
       <div className="text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
-        O que vence o que
+        O que seu ataque enfrenta
       </div>
       <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[12.5px]">
         <span className="rounded-md bg-brand-600 px-2 py-1 font-bold text-white">
-          {ESTILO_NM[estilo]}
+          {ATK_NM[atk]}
         </span>
-        <span className="font-bold text-grass-600">vence ›</span>
+        <span className="font-bold text-grass-600">machuca ›</span>
         <span className="rounded-md bg-grass-500/15 px-2 py-1 font-bold text-grass-700">
           {m.beatsLabel}
         </span>
@@ -660,13 +778,271 @@ export function StyleRing({ estilo }: { estilo: Estilo }) {
         <span className="rounded-md bg-flame-500/12 px-2 py-1 font-bold text-flame-700">
           {m.losesToLabel}
         </span>
-        <span className="font-bold text-flame-600">› supera o seu</span>
+        <span className="font-bold text-flame-600">› sufoca o seu</span>
       </div>
       <div className="mt-1.5 text-[11.5px] leading-snug text-ink-600">
-        Estilo certo pode virar o jogo, mas a força base ainda pesa muito. Formação,
-        postura e marcação somam ao plano.
+        Escolher o ataque certo pra defesa deles ajuda, mas a força base ainda pesa muito.
+        Formação, pressão e sliders somam ao plano.
       </div>
     </div>
+  );
+}
+
+// ===== "O QUE VENCE O QUE" (§14 transparência) — resumo HONESTO e legível do efeito das
+// escolhas, ANTES de apitar (tática do rival ainda às cegas). Mostra: o confronto do meu
+// ATAQUE (quem ele machuca / o que o sufoca), a leitura da minha DEFESA (o que ela segura
+// / o que a fura) e a SINTONIA atual (meus sliders × o ideal do meu estilo/formação/força).
+// Estrelas e chips, SEM número cru do motor (item 13) — só o valor 0–100 dos sliders já
+// aparece no próprio slider, escolha do usuário. Determinístico (puro). =====
+function TuneStars({ score }: { score: number }) {
+  // 0..1 → 5 pontos (meia em meia). Reusa o vocabulário de estrelas do app.
+  const n = Math.round(score * 10) / 2;
+  const pct = Math.max(0, Math.min(100, score * 100));
+  return (
+    <span aria-label={`Sintonia: ${n} de 5`} className="relative inline-block select-none align-middle leading-none tracking-[0.12em]">
+      <span aria-hidden className="text-ink-300">
+        ★★★★★
+      </span>
+      <span aria-hidden className="absolute inset-0 overflow-hidden whitespace-nowrap text-gold-500" style={{ width: `${pct}%` }}>
+        ★★★★★
+      </span>
+    </span>
+  );
+}
+const TUNE_AXIS_LABEL: Record<"pressao" | "amplitude" | "agressividade", string> = {
+  pressao: "Pressão",
+  amplitude: "Amplitude",
+  agressividade: "Pegada",
+};
+const TUNE_WANT_WORD: Record<"pressao" | "amplitude" | "agressividade", { alto: string; baixo: string }> = {
+  pressao: { alto: "bloco alto", baixo: "bloco baixo" },
+  amplitude: { alto: "pelas alas", baixo: "pelo meio" },
+  agressividade: { alto: "pegada forte", baixo: "pegada suave" },
+};
+export function MatchPreview({ my, team }: { my: Tactic; team: Team }) {
+  const atk = styleMatchup(my.atk);
+  const def = defenseMatchup(my.def);
+  const tune = sintoniaReadout(my, team);
+  const sintoniaWord = tune.score >= 0.7 ? "afiada" : tune.score >= 0.45 ? "ok" : "fora de sintonia";
+  return (
+    <section
+      aria-labelledby="mgr-preview-h"
+      className="rounded-[14px] border border-border bg-surface-2 p-3.5"
+    >
+      <h3 id="mgr-preview-h" className="text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
+        O que vence o que
+      </h3>
+
+      {/* ataque + defesa, lado a lado no desktop, empilhado no mobile */}
+      <div className="mt-2 grid gap-2 sm:grid-cols-2">
+        <div className="rounded-[11px] border border-border bg-surface px-3 py-2.5">
+          <div className="text-[10px] font-extrabold uppercase tracking-wide text-ink-400">Seu ataque</div>
+          <div className="mt-1 flex items-baseline gap-1.5 text-[12.5px] leading-snug">
+            <b className="font-extrabold text-brand-800">{ATK_NM[my.atk]}</b>
+          </div>
+          <div className="mt-1 text-[12px] leading-snug text-ink-700">
+            machuca <b className="font-bold text-grass-700">{atk.beatsLabel}</b> · sofre com{" "}
+            <b className="font-bold text-flame-700">{atk.losesToLabel}</b>
+          </div>
+        </div>
+        <div className="rounded-[11px] border border-border bg-surface px-3 py-2.5">
+          <div className="text-[10px] font-extrabold uppercase tracking-wide text-ink-400">Sua defesa</div>
+          <div className="mt-1 flex items-baseline gap-1.5 text-[12.5px] leading-snug">
+            <b className="font-extrabold text-brand-800">{DEF_NM[my.def]}</b>
+          </div>
+          <div className="mt-1 text-[12px] leading-snug text-ink-700">
+            segura <b className="font-bold text-grass-700">{def.stopsLabel}</b> · cede pra{" "}
+            <b className="font-bold text-flame-700">{def.weakToLabel}</b>
+          </div>
+        </div>
+      </div>
+
+      {/* SINTONIA — estrelas + 3 chips (pressão/amplitude/pegada), §6.5 */}
+      <div className="mt-2.5 rounded-[11px] border border-border bg-surface px-3 py-2.5">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[10px] font-extrabold uppercase tracking-wide text-ink-400">
+            Sintonia dos sliders
+          </span>
+          <span className="flex items-center gap-1.5">
+            <TuneStars score={tune.score} />
+            <span className="text-[11px] font-bold text-ink-600">{sintoniaWord}</span>
+          </span>
+        </div>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {tune.axes.map((ax) => {
+            const labels = TUNE_WANT_WORD[ax.key];
+            const want = ax.wants === "neutro" ? "tanto faz" : ax.wants === "alto" ? labels.alto : labels.baixo;
+            const tone =
+              ax.state === "match"
+                ? "border border-grass-600/30 bg-grass-500/12 text-grass-700"
+                : ax.state === "off"
+                  ? "border border-flame-600/30 bg-flame-500/10 text-flame-700"
+                  : "border border-border bg-surface-2 text-ink-600";
+            const mark = ax.state === "match" ? "▲" : ax.state === "off" ? "▼" : "•";
+            return (
+              <span
+                key={ax.key}
+                className={`inline-flex items-center gap-1.5 rounded-[9px] px-2 py-1 text-[11.5px] font-semibold ${tone}`}
+              >
+                <span aria-hidden className="text-[10px] font-black">
+                  {mark}
+                </span>
+                <span>
+                  {TUNE_AXIS_LABEL[ax.key]}: pede {want}
+                </span>
+              </span>
+            );
+          })}
+        </div>
+      </div>
+
+      <p className="mt-2 text-[11px] leading-snug text-ink-500">
+        Casar o ataque com a defesa deles e sintonizar os sliders ajuda, mas a força base ainda
+        pesa muito. O plano estreita a diferença, não vira um abismo.
+      </p>
+    </section>
+  );
+}
+
+// ===== SLIDER de tática (0–100) — rótulo dos polos + valor cru (escolha do usuário, ok
+// mostrar o 0–100, item 13) + feedback de arraste. O trilho enche até o valor; o thumb
+// cresce no toque/arraste. Acessível: input range nativo (role=slider) com aria-valuetext
+// = a zona ("Pressão alta"). Tokens do tema (claro/escuro). =====
+export function TacticSlider({
+  slider,
+  value,
+  onChange,
+  disabled,
+}: {
+  slider: SliderKey;
+  value: number;
+  onChange: (v: number) => void;
+  disabled?: boolean;
+}) {
+  const meta = SLIDER_META[slider];
+  const [dragging, setDragging] = useState(false);
+  const zone = sliderZone(slider, value);
+  const stop = () => setDragging(false);
+  return (
+    <div className={`select-none ${disabled ? "opacity-55" : ""}`}>
+      <div className="flex items-baseline justify-between gap-2">
+        <label className="text-[12.5px] font-bold text-ink-900">{meta.label}</label>
+        <span className="flex items-baseline gap-1.5">
+          <span className="text-[11px] font-semibold text-brand-700">{zone}</span>
+          <span
+            className={`min-w-[2.25rem] rounded-md px-1.5 py-0.5 text-center text-[11px] font-extrabold tabular-nums transition-colors duration-150 ${
+              dragging ? "bg-brand-600 text-white" : "bg-surface-2 text-ink-700"
+            }`}
+          >
+            {value}
+          </span>
+        </span>
+      </div>
+      {/* trilho com preenchimento até o valor (sem libs; só transform/cor) */}
+      <div className="relative mt-2 h-5">
+        <div className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 overflow-hidden rounded-full bg-surface-2">
+          <span
+            className="block h-full rounded-full bg-brand-500"
+            style={{ width: `${value}%`, transition: dragging ? "none" : "width 150ms ease-out" }}
+          />
+        </div>
+        <input
+          type="range"
+          min={0}
+          max={100}
+          step={1}
+          value={value}
+          disabled={disabled}
+          onChange={(e) => onChange(Number(e.currentTarget.value))}
+          onPointerDown={() => setDragging(true)}
+          onPointerUp={stop}
+          onPointerCancel={stop}
+          onBlur={stop}
+          aria-label={meta.label}
+          aria-valuetext={`${value}, ${zone}`}
+          className={`mgr-range absolute inset-0 h-5 w-full cursor-pointer appearance-none bg-transparent disabled:cursor-not-allowed ${
+            dragging ? "mgr-range--drag" : ""
+          }`}
+        />
+      </div>
+      <div className="mt-0.5 flex items-center justify-between text-[10.5px] font-semibold text-ink-500">
+        <span>{meta.lo}</span>
+        <span>{meta.hi}</span>
+      </div>
+    </div>
+  );
+}
+
+// bloco com os 4 sliders na ordem canônica. `onPatch` recebe o campo + valor. Espaço
+// generoso entre eles (respiro), legível em qualquer largura.
+export function TacticSliders({
+  tac,
+  onPatch,
+  disabled,
+}: {
+  tac: Tactic;
+  onPatch: (key: SliderKey, v: number) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-3.5">
+      {(["postura", "pressao", "amplitude", "agressividade"] as SliderKey[]).map((k) => (
+        <TacticSlider key={k} slider={k} value={tac[k]} onChange={(v) => onPatch(k, v)} disabled={disabled} />
+      ))}
+    </div>
+  );
+}
+
+// ===== PRESETS (§9) — atalho rápido (5). Um toque carrega o conjunto pronto; o preset
+// é só o PONTO DE PARTIDA, ajustável na mão sem salvar. Pílulas roláveis no mobile,
+// linha cheia no desktop. role=radiogroup (cada pílula é uma opção de partida). =====
+const PRESET_ORDER_UI: PresetKey[] = ["pressao", "craque", "toque", "direto", "ferrolho"];
+const PRESET_LABEL_UI: Record<PresetKey, string> = {
+  pressao: "Pressão",
+  craque: "Craque",
+  toque: "Toque",
+  direto: "Direto",
+  ferrolho: "Ferrolho",
+};
+export function PresetPicker({
+  active,
+  onPick,
+}: {
+  active: PresetKey;
+  onPick: (k: PresetKey) => void;
+}) {
+  return (
+    <section aria-labelledby="mgr-preset-h">
+      <div className="mb-1.5 flex items-baseline justify-between gap-2">
+        <h3 id="mgr-preset-h" className="text-[11px] font-extrabold uppercase tracking-wide text-ink-500">
+          Começe por um preset
+        </h3>
+        <span className="shrink-0 text-[10.5px] font-semibold text-ink-400">ajuste na mão depois</span>
+      </div>
+      <div role="radiogroup" aria-label="Preset de partida" className="grid grid-cols-5 gap-1">
+        {PRESET_ORDER_UI.map((k) => {
+          const on = active === k;
+          return (
+            <button
+              key={k}
+              type="button"
+              role="radio"
+              aria-checked={on}
+              title={PRESET_DESC[k]}
+              onClick={() => onPick(k)}
+              className={`flex min-h-[44px] min-w-0 items-center justify-center rounded-[11px] border px-1 text-center text-[12px] font-bold leading-tight transition-[transform,background-color,color,border-color,box-shadow] duration-150 ease-out active:scale-[0.96] sm:text-[13px] ${
+                on
+                  ? "border-transparent bg-brand-600 text-white shadow-sm"
+                  : "border-border bg-surface-2 text-ink-700 hover:border-brand-400 hover:text-ink-900"
+              }`}
+            >
+              {PRESET_LABEL_UI[k]}
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-1.5 text-[11px] leading-snug text-ink-500">{PRESET_DESC[active]}</p>
+    </section>
   );
 }
 
@@ -683,17 +1059,17 @@ export function MatchupBadges({ my, opp }: { my: Tactic; opp: Tactic }) {
     );
   const tone = (k: "good" | "bad" | "neutral") =>
     k === "good"
-      ? "border-l-grass-600 bg-grass-500/12 text-grass-700"
+      ? "border border-grass-600/30 bg-grass-500/12 text-grass-700"
       : k === "bad"
-        ? "border-l-flame-600 bg-flame-500/10 text-flame-700"
-        : "border-l-ink-300 bg-surface-2 text-ink-700";
+        ? "border border-flame-600/30 bg-flame-500/10 text-flame-700"
+        : "border border-border bg-surface-2 text-ink-700";
   const mark = (k: "good" | "bad" | "neutral") => (k === "good" ? "▲" : k === "bad" ? "▼" : "•");
   return (
     <div className="mt-2 flex flex-col gap-1.5">
       {hints.map((h, i) => (
         <div
           key={i}
-          className={`flex items-start gap-2 rounded-[10px] border-l-[3px] px-2.5 py-1.5 text-[12.5px] font-semibold ${tone(h.kind)}`}
+          className={`flex items-start gap-2 rounded-[10px] px-2.5 py-1.5 text-[12.5px] font-semibold ${tone(h.kind)}`}
         >
           <span aria-hidden className="mt-px shrink-0 text-[11px] font-black">
             {mark(h.kind)}
@@ -705,34 +1081,60 @@ export function MatchupBadges({ my, opp }: { my: Tactic; opp: Tactic }) {
   );
 }
 
-// grid das 8 formações (manual; clicar NÃO mexe nos outros eixos)
-export function FormGrid<T extends string>({
-  opts,
+// ===== FORMAÇÃO — grid 3×3 (§2). A LINHA é a afinidade primária (Ofensiva / Equilíbrio
+// / Defensiva), legível por um rótulo à esquerda e uma faixa de cor sutil. A COLUNA é a
+// tendência secundária (mais ofensiva → mais defensiva). role=radiogroup; clicar só muda
+// a formação (não mexe nos estilos/sliders). Robusto em 360→1280, claro e escuro. =====
+const ROW_TONE: Record<string, { rail: string; tag: string }> = {
+  ata: { rail: "bg-flame-500/60", tag: "text-flame-700" },
+  mei: { rail: "bg-gold-500/60", tag: "text-gold-700" },
+  def: { rail: "bg-aqua-500/60", tag: "text-aqua-700" },
+};
+export function FormGrid({
   value,
   onPick,
 }: {
-  opts: [T, string][];
-  value: T;
-  onPick: (v: T) => void;
+  value: Form;
+  onPick: (v: Form) => void;
 }) {
   return (
-    <div className="grid grid-cols-4 gap-1.5">
-      {opts.map(([v, lbl]) => {
-        const on = value === v;
+    <div role="radiogroup" aria-label="Formação" className="flex flex-col gap-1.5">
+      {FORM_ROWS.map((row) => {
+        const tone = ROW_TONE[row.key];
         return (
-          <button
-            key={v}
-            type="button"
-            aria-pressed={on}
-            onClick={() => onPick(v)}
-            className={`min-h-[42px] rounded-[10px] border px-1 text-[12.5px] font-bold transition-[transform,background-color,color,border-color,box-shadow] duration-150 ease-out active:scale-[0.96] ${
-              on
-                ? "scale-[1.04] border-transparent bg-brand-600 text-white shadow-sm"
-                : "border-border bg-surface-2 text-ink-600 hover:border-brand-400"
-            }`}
-          >
-            {lbl}
-          </button>
+          <div key={row.key} className="grid grid-cols-[4.75rem_1fr] items-stretch gap-2">
+            <div className="flex items-center gap-1.5">
+              <span aria-hidden className={`h-full w-1 shrink-0 rounded-full ${tone.rail}`} />
+              <div className="min-w-0 leading-tight">
+                <div className={`text-[10.5px] font-extrabold uppercase tracking-wide ${tone.tag}`}>
+                  {row.label}
+                </div>
+                <div className="truncate text-[9.5px] font-semibold text-ink-400">{row.hint}</div>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-1.5">
+              {row.forms.map((f, ci) => {
+                const on = value === f;
+                return (
+                  <button
+                    key={f}
+                    type="button"
+                    role="radio"
+                    aria-checked={on}
+                    aria-label={`${f}, ${row.label.toLowerCase()}, ${FORM_COL_LABEL[ci]}`}
+                    onClick={() => onPick(f)}
+                    className={`min-h-[46px] rounded-[11px] border text-[14px] font-extrabold tabular-nums tracking-tight transition-[transform,background-color,color,border-color,box-shadow] duration-150 ease-out active:scale-[0.96] ${
+                      on
+                        ? "border-transparent bg-brand-600 text-white shadow-sm"
+                        : "border-border bg-surface-2 text-ink-700 hover:border-brand-400 hover:text-ink-900"
+                    }`}
+                  >
+                    {f}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         );
       })}
     </div>
