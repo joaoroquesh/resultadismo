@@ -59,13 +59,15 @@ begin
   -- garante seleções suficientes (o seed base tem só 8) — nomes reais p/ ficar bonito
   insert into public.teams(name)
   select n from unnest(array['Holanda','Bélgica','Itália','Uruguai','México','Japão',
-                             'Marrocos','Senegal','Estados Unidos','Canadá','Suíça','Colômbia']) as n
+                             'Marrocos','Senegal','Estados Unidos','Canadá','Suíça','Colômbia',
+                             'Coreia do Sul','Austrália','Equador','Polônia','Sérvia','Dinamarca',
+                             'Costa Rica','Gana','Camarões','Nigéria','Catar','Tunísia']) as n
   where n not in (select name from public.teams);
 
   -- pool de times (os 8 com escudo primeiro)
-  select array_agg(id) into v_t from (select id from public.teams order by (local_crest is not null) desc, name limit 24) s;
+  select array_agg(id) into v_t from (select id from public.teams order by (local_crest is not null) desc, name limit 40) s;
   v_n := coalesce(array_length(v_t,1),0);
-  if v_comp is null or v_n < 18 then raise exception 'faltou competição ou times (comp=% times=%)', v_comp, v_n; end if;
+  if v_comp is null or v_n < 32 then raise exception 'faltou competição ou times (comp=% times=%)', v_comp, v_n; end if;
 
   -- zera os jogos da competição (predictions é RESTRICT → apaga antes)
   delete from public.predictions pr using public.matches m
@@ -105,6 +107,20 @@ begin
   perform pg_temp.caso(v_comp,'QUARTER_FINALS', v_d+interval '11 hours', 'finished', v_t[15],v_t[16], 1,1,5,4, v_joao, 1,1,v_t[15], v_members);
   -- 9) ERRANDO por PÊNALTIS (final +5): 1x1 (pên 3x5 visitante), João empate+mandante → sem "Passou" + (pên.)
   perform pg_temp.caso(v_comp,'FINAL', v_d+interval '12 hours', 'finished', v_t[17],v_t[18], 1,1,3,5, v_joao, 1,1,v_t[17], v_members);
+
+  -- ============ FUTUROS (agendados, p/ TESTAR o palpite + seletor por fase) ============
+  -- sem palpite do João nem galera (galera só aparece após o início) → seletor do zero.
+  -- + 2 oitavas ainda hoje, mais tarde, além das 2 que já existem acima.
+  perform pg_temp.caso(v_comp,'LAST_16', v_d+interval '23 hours', 'scheduled', v_t[19],v_t[20], null,null,null,null, v_joao, null,null,null, v_members);
+  -- QUARTAS (amanhã, +3)
+  perform pg_temp.caso(v_comp,'QUARTER_FINALS', v_d+interval '1 day'+interval '16 hours', 'scheduled', v_t[21],v_t[22], null,null,null,null, v_joao, null,null,null, v_members);
+  perform pg_temp.caso(v_comp,'QUARTER_FINALS', v_d+interval '1 day'+interval '19 hours', 'scheduled', v_t[23],v_t[24], null,null,null,null, v_joao, null,null,null, v_members);
+  -- SEMIS (+2 dias, +4)
+  perform pg_temp.caso(v_comp,'SEMI_FINALS', v_d+interval '2 days'+interval '16 hours', 'scheduled', v_t[25],v_t[26], null,null,null,null, v_joao, null,null,null, v_members);
+  perform pg_temp.caso(v_comp,'SEMI_FINALS', v_d+interval '2 days'+interval '19 hours', 'scheduled', v_t[27],v_t[28], null,null,null,null, v_joao, null,null,null, v_members);
+  -- 3º LUGAR (+3 dias, +4) e FINAL (+3 dias, +5)
+  perform pg_temp.caso(v_comp,'THIRD_PLACE', v_d+interval '3 days'+interval '13 hours', 'scheduled', v_t[29],v_t[30], null,null,null,null, v_joao, null,null,null, v_members);
+  perform pg_temp.caso(v_comp,'FINAL', v_d+interval '3 days'+interval '17 hours', 'scheduled', v_t[31],v_t[32], null,null,null,null, v_joao, null,null,null, v_members);
 
   raise notice 'CASOS mata-mata prontos em copa-do-mundo-2026 (comp=%)', v_comp;
 end $$;
