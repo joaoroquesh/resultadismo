@@ -39,6 +39,22 @@
   `competitions.jokers_per_week` ficou **vestigial** (o trigger não a lê mais). O badge "X/2 dobros
   nesta semana" (tela de Jogos, **todas as abas**) lê o contador global via RPC `my_joker_week_counts`.
 
+### Ponto extra "quem passa" — mata-mata (migration `20260627000000`)
+- **O que é:** SÓ em jogo de mata-mata (`matches.is_knockout`), pontos por acertar **quem se
+  classifica**, dimensão **paralela** ao placar 3/2/1. **Escalonado por fase** (`knockout_phase_points`):
+  16-avos (LAST_32) 1, oitavas (LAST_16) 2, quartas 3, semi/3º 4, final 5; mata-mata sem fase → 1.
+- **É mata-mata? automático:** `is_knockout` derivado da `stage` por trigger (`matches_set_knockout`).
+  Pênaltis vêm do sync; `resolved_advancer()` cai neles no empate. Admin só intervém em W.O./sem fase.
+- **Classificado previsto:** vitória → vencedor do placar (implícito); **empate → `advance_team_id`,
+  obrigatório, com o MANDANTE pré-marcado** (editável, nunca vazio — decisão João 2026-06-22).
+- **AO VIVO (provisório):** durante o jogo o classificado sai do **placar atual** (sem pênaltis;
+  empate ao vivo = indefinido) e o bônus conta provisório — `provisional_advance_bonus()` nas funções
+  `_live`; o card mostra "passa +N"/"não passa". No encerrado vale `predictions.advance_bonus` (com
+  pênaltis). Decisão João 2026-06-27.
+- **Regras:** **não dobra** com o 2× (placar dobra, bônus soma por cima); soma nos pontos; **entra no
+  aproveitamento** (teto sobe pelo peso da fase); **não** é desempate. Somado em `get_league_standings`
+  (+ `_live`), ranking global oficial **e** ao vivo, `get_player_profile` e no Confronto. **Retrô fora.**
+
 ---
 
 ## 2. Ciclo de vida do palpite e do jogo

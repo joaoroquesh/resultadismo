@@ -52,6 +52,10 @@ begin
   select array_agg(id) into v_members from public.profiles where id <> v_joao;   -- galera = todos menos João
   select id into v_comp from public.competitions where slug='copa-do-mundo-2026';
 
+  -- o feed corta jogos com kickoff < created_at da competição; recua p/ os de hoje aparecerem
+  update public.competitions set created_at = now() - interval '40 days'
+   where id = v_comp and created_at > now() - interval '1 day';
+
   -- garante seleções suficientes (o seed base tem só 8) — nomes reais p/ ficar bonito
   insert into public.teams(name)
   select n from unnest(array['Holanda','Bélgica','Itália','Uruguai','México','Japão',

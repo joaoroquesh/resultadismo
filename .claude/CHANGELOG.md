@@ -37,6 +37,17 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
   `20260624020000`.
 
 ### Adicionado
+- **Ponto extra "quem passa" no mata-mata (escalonado por fase + AO VIVO provisório).** Em jogo
+  eliminatório, além do placar 3/2/1, pontos por acertar **quem se classifica**, valendo **mais
+  quanto mais fundo**: 16-avos +1, oitavas +2, quartas +3, semi e 3º +4, final +5. **É mata-mata?
+  automático** pela fase (`stage` → trigger deriva `is_knockout`); pênaltis vêm do sync. Palpite de
+  vitória → classificado implícito; **empate → seletor "Quem passa?" obrigatório, com o mandante
+  pré-marcado** (dá pra trocar, nunca fica vazio). **No AO VIVO o bônus conta provisório** pelo placar
+  do momento (`provisional_advance_bonus`; empate ao vivo = indefinido), atualizando quando vira — o
+  card mostra "passa +N"/"não passa". **Não dobra** com o 2× (placar dobra, bônus soma por cima),
+  entra no aproveitamento, **não** vira desempate. Somado em standings (oficial+live), ranking global
+  (oficial+live), perfil e confronto. Aviso de 1ª vez (modal NOVIDADE) + seção no Como Funciona.
+  (migration `20260627000000`; `06-REGRAS-DE-NEGOCIO.md` §1.) Retrô fica de fora.
 - **Retrô — 5 ondas de viralização + dicas + nova casca (rodada 22, migrations `20260610150017`–
   `150023`).** **Dicas por partida:** pista curta/apelido ("O Maracanazzo", "Gol de mão do Maradona")
   no jogo, antes do palpite — `retro_matches.fact_pt` + anti-spoiler (`retro_fact_is_spoiler`) + só
