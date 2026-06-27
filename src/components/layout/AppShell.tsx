@@ -12,6 +12,7 @@ import { AccessGate } from "@/features/access/AccessGate";
 import { PresenceTracker } from "@/features/presence/PresenceTracker";
 import { ConsentBanner } from "@/features/consent/ConsentBanner";
 import { PersonalizationGate } from "@/features/onboarding/PersonalizationGate";
+import { NovidadeQuemPassaModal } from "@/features/matches/NovidadeQuemPassaModal";
 import { useAuth } from "@/features/auth/AuthProvider";
 
 // DevPanel de homologação — SÓ em dev. Lazy + gate garantem que não entra no
@@ -59,6 +60,7 @@ export function AppShell() {
             <NotifPrompt />
         </div>
         <PersonalizationGate />
+        <NovidadeQuemPassaModal />
       </AccessGate>
     );
   }

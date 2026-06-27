@@ -87,6 +87,31 @@ export function formatStage(stage: string | null | undefined): string | null {
   return pretty ? pretty.charAt(0).toUpperCase() + pretty.slice(1) : null;
 }
 
+/** Pontos do bônus "quem passa" por fase do mata-mata (espelha knockout_phase_points
+ *  no banco): 16-avos 1, oitavas 2, quartas 3, semi/3º 4, final 5; outro mata-mata 1;
+ *  não-mata-mata 0. Usado só para a PRÉVIA (o valor oficial vem do banco). */
+export function knockoutPhasePoints(stage: string | null | undefined): number {
+  if (!stage) return 0;
+  const key = stage.trim().toUpperCase().replace(/\s+/g, "_");
+  switch (key) {
+    case "LAST_32":
+      return 1;
+    case "LAST_16":
+      return 2;
+    case "QUARTER_FINAL":
+    case "QUARTER_FINALS":
+      return 3;
+    case "SEMI_FINAL":
+    case "SEMI_FINALS":
+    case "THIRD_PLACE":
+      return 4;
+    case "FINAL":
+      return 5;
+    default:
+      return /(LAST_[0-9]+|QUARTER|SEMI|FINAL|THIRD|PLAYOFF)/.test(key) ? 1 : 0;
+  }
+}
+
 /** Rótulo de fase para o card: grupo tem prioridade; senão a fase do mata-mata. */
 export function matchPhaseLabel(m: {
   group_name?: string | null;

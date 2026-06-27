@@ -13,6 +13,8 @@ export type ShareRow = {
   live: boolean;
   type: ScoreType;
   joker: boolean;
+  /** bônus "quem passa" (+1) já apurado no mata-mata; 0/ausente nos demais. */
+  advanceBonus?: number;
   /** data curta do jogo ("QUA 10/06") — dá contexto quando a imagem junta dias. */
   date?: string | null;
   /** caminho do escudo já resolvido (ex.: pelo nome COMPLETO do time); se
@@ -124,7 +126,10 @@ export async function buildScoreShareImage(rows: ShareRow[], playerName: string)
   g.fillText(`Palpites de ${playerName}`, PAD + 108, 124);
 
   // total no canto
-  const total = rows.reduce((s, r) => s + SCORE_POINTS[r.type] * (r.joker ? 2 : 1), 0);
+  const total = rows.reduce(
+    (s, r) => s + SCORE_POINTS[r.type] * (r.joker ? 2 : 1) + (r.advanceBonus ?? 0),
+    0,
+  );
   g.fillStyle = C.brand;
   g.textAlign = "right";
   g.font = "800 52px system-ui, -apple-system, sans-serif";
@@ -181,7 +186,7 @@ export async function buildScoreShareImage(rows: ShareRow[], playerName: string)
     const showBolt = r.joker && r.type !== "erro";
     const seg1 = `${r.type === "erro" ? "0" : `+${pts}`} ${SCORE_LABEL[r.type]}`;
     const seg2 = showBolt ? "2×" : "";
-    const seg3 = r.live ? " · ao vivo" : "";
+    const seg3 = `${r.live ? " · ao vivo" : ""}${(r.advanceBonus ?? 0) > 0 ? ` · passou +${r.advanceBonus}` : ""}`;
     g.font = "700 26px system-ui, -apple-system, sans-serif";
     const BOLT_W = 12; // largura do raio + respiro à direita
     const w1 = g.measureText(seg1).width;

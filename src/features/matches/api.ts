@@ -196,18 +196,30 @@ export function useSavePrediction() {
   const { user } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { matchId: string; home: number; away: number }) => {
+    mutationFn: async (input: {
+      matchId: string;
+      home: number;
+      away: number;
+      /** "quem passa" no mata-mata (só usado em palpite de empate); o trigger
+       * normaliza p/ null fora desse caso. Omitir = não mexe na coluna. */
+      advanceTeamId?: string | null;
+    }) => {
+      const payload: {
+        user_id: string;
+        match_id: string;
+        home_pred: number;
+        away_pred: number;
+        advance_team_id?: string | null;
+      } = {
+        user_id: user!.id,
+        match_id: input.matchId,
+        home_pred: input.home,
+        away_pred: input.away,
+      };
+      if (input.advanceTeamId !== undefined) payload.advance_team_id = input.advanceTeamId;
       const { data, error } = await supabase
         .from("predictions")
-        .upsert(
-          {
-            user_id: user!.id,
-            match_id: input.matchId,
-            home_pred: input.home,
-            away_pred: input.away,
-          },
-          { onConflict: "user_id,match_id" },
-        )
+        .upsert(payload, { onConflict: "user_id,match_id" })
         .select()
         .single();
       if (error) throw new Error(error.message);
@@ -264,6 +276,8 @@ export type MatchPrediction = {
   score_type: import("@/lib/types").ScoreType | null;
   points: number | null;
   is_joker: boolean | null;
+  advance_bonus: number | null;
+  advance_team_id: string | null;
   user: { id: string; display_name: string; avatar_url: string | null } | null;
 };
 
@@ -276,7 +290,7 @@ export function useMatchPredictions(matchId: string, enabled: boolean) {
       const { data, error } = await supabase
         .from("predictions")
         .select(
-          "home_pred, away_pred, score_type, points, is_joker, user:profiles!predictions_user_id_fkey(id, display_name, avatar_url)",
+          "home_pred, away_pred, score_type, points, is_joker, advance_bonus, advance_team_id, user:profiles!predictions_user_id_fkey(id, display_name, avatar_url)",
         )
         .eq("match_id", matchId)
         .order("points", { ascending: false, nullsFirst: false });
@@ -325,12 +339,6 @@ export function useMatchesRealtime(competitionId: string | undefined) {
         qc.invalidateQueries({ queryKey: ["matches"] });
         qc.invalidateQueries({ queryKey: ["my-predictions"] });
         qc.invalidateQueries({ queryKey: ["standings"] });
-        qc.invalidateQueries({ queryKey: ["standings-live"] });
-        // AO VIVO em todo lugar: ranking global + previews da aba Grupos.
-        qc.invalidateQueries({ queryKey: ["rtb-standings-live"] });
-        qc.invalidateQueries({ queryKey: ["rtb-my-rank-live"] });
-        qc.invalidateQueries({ queryKey: ["my-league-positions-live"] });
-        qc.invalidateQueries({ queryKey: ["group-rank-window-live"] });
       }, 1200);
     };
     // Sem competição (visão "Todos") assina a tabela inteira; com competição,

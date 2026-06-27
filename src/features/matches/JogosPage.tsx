@@ -260,6 +260,7 @@ export function JogosPage() {
           live: !finished && isLiveish(m),
           type,
           joker: pred.is_joker ?? false,
+          advanceBonus: finished ? pred.advance_bonus ?? 0 : 0,
           date: m.kickoff_at
             ? dayjs(m.kickoff_at).format("ddd DD/MM").replace(".", "").toUpperCase()
             : null,

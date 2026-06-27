@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { track } from "@/lib/analytics";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
-import { Check, Loader2, Lock, ChevronDown, Users, Zap, Hand, Plus, Minus, Star, Share2 } from "lucide-react";
+import { Check, Loader2, Lock, ChevronDown, Users, Zap, Hand, Plus, Minus, Star, Share2, Swords } from "lucide-react";
 import { TeamCrest } from "@/components/TeamCrest";
 import { ScorePill } from "@/components/ScorePill";
 import { Avatar } from "@/components/ui/Avatar";
 import { cn } from "@/lib/utils";
-import { formatTime, isLocked, formatDeadline, matchPhaseLabel } from "@/lib/format";
+import { formatTime, isLocked, formatDeadline, matchPhaseLabel, knockoutPhasePoints } from "@/lib/format";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useToast } from "@/components/ui/Toast";
 import { useSavePrediction, useSetJoker, useMatchPredictions, useMatchPredictStatus } from "./api";
@@ -97,14 +97,47 @@ export function MatchCard({
   const liveHome = match.home_score ?? 0;
   const liveAway = match.away_score ?? 0;
   const isJoker = prediction?.is_joker ?? false;
+  const isKnockout = match.is_knockout;
+  // pontos do bônus "quem passa" desta fase (16-avos 1 … final 5). Prévia; o oficial vem do banco.
+  const phasePts = isKnockout ? knockoutPhasePoints(match.stage) || 1 : 0;
 
   const save = useSavePrediction();
   const joker = useSetJoker();
   const [home, setHome] = useState(prediction ? String(prediction.home_pred) : "");
   const [away, setAway] = useState(prediction ? String(prediction.away_pred) : "");
+  // "quem passa" no mata-mata. Atualizada nos HANDLERS do placar (sem effect):
+  // vitória → o vencedor; empate → mantém o anterior (carry-over) ou o mandante por padrão.
+  // Nunca fica vazio: se há placar de empate, há sempre um classificado marcado (obrigatório).
+  const [advanceChoice, setAdvanceChoice] = useState<string | null>(
+    prediction?.advance_team_id ??
+      (prediction
+        ? prediction.home_pred > prediction.away_pred
+          ? match.home_team_id
+          : prediction.away_pred > prediction.home_pred
+            ? match.away_team_id
+            : match.home_team_id // empate salvo sem escolha → mandante (padrão obrigatório)
+        : null),
+  );
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [showGalera, setShowGalera] = useState(false);
   const firstRender = useRef(true);
+
+  const hNum = parseInt(home, 10);
+  const aNum = parseInt(away, 10);
+  const bothFilled = !Number.isNaN(hNum) && !Number.isNaN(aNum);
+  const isDrawPred = bothFilled && hNum === aNum;
+  const winnerTeamId = !bothFilled
+    ? null
+    : hNum > aNum
+      ? match.home_team_id
+      : aNum > hNum
+        ? match.away_team_id
+        : null;
+  // vitória segue o vencedor do placar; empate = escolha (carry-over) ou MANDANTE por padrão.
+  // o `?? home` garante que NUNCA fique sem classificado (cobre o 0×0 vindo do startPredicting).
+  const advancerSelected = !isKnockout ? null : isDrawPred ? advanceChoice ?? match.home_team_id : winnerTeamId;
+  // salva: vitória = implícito (null no banco); empate = o selecionado (mandante por padrão, nunca null)
+  const advanceToSave = isKnockout && isDrawPred ? advanceChoice ?? match.home_team_id : null;
 
   useEffect(() => {
     if (!canEdit) return;
@@ -115,11 +148,17 @@ export function MatchCard({
     const h = parseInt(home, 10);
     const a = parseInt(away, 10);
     if (Number.isNaN(h) || Number.isNaN(a)) return;
-    if (prediction && prediction.home_pred === h && prediction.away_pred === a) return;
+    if (
+      prediction &&
+      prediction.home_pred === h &&
+      prediction.away_pred === a &&
+      (prediction.advance_team_id ?? null) === advanceToSave
+    )
+      return;
     const t = setTimeout(() => {
       setSaveState("saving");
       save.mutate(
-        { matchId: match.id, home: h, away: a },
+        { matchId: match.id, home: h, away: a, advanceTeamId: advanceToSave },
         {
           onSuccess: () => {
             setSaveState("saved");
@@ -131,16 +170,31 @@ export function MatchCard({
     }, 700);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [home, away]);
+  }, [home, away, advanceToSave]);
 
-  // Stepper: mexer num placar inicializa o outro em "0" (palpite começa 0×0).
+  // Stepper: mexer num placar inicializa o outro em "0"; e sincroniza "quem passa"
+  // (vitória → vencedor; empate → carry-over do anterior, ou mandante por padrão).
+  // Empate NUNCA fica sem classificado: escolha obrigatória, mandante como default.
+  const syncAdvance = (hs: string, as: string) => {
+    if (!isKnockout) return;
+    const h = parseInt(hs, 10);
+    const a = parseInt(as, 10);
+    if (Number.isNaN(h) || Number.isNaN(a)) return;
+    if (h > a) setAdvanceChoice(match.home_team_id);
+    else if (a > h) setAdvanceChoice(match.away_team_id);
+    else setAdvanceChoice((prev) => prev ?? match.home_team_id); // empate: mandante por padrão
+  };
   const setHomeScore = (v: string) => {
     setHome(v);
-    setAway((a) => (a === "" ? "0" : a));
+    const a = away === "" ? "0" : away;
+    setAway(a);
+    syncAdvance(v, a);
   };
   const setAwayScore = (v: string) => {
     setAway(v);
-    setHome((h) => (h === "" ? "0" : h));
+    const h = home === "" ? "0" : home;
+    setHome(h);
+    syncAdvance(h, v);
   };
 
   // EDIÇÃO é temporária: o +/− só aparece enquanto a pessoa está editando.
@@ -168,6 +222,26 @@ export function MatchCard({
   const liveType: ScoreType | null =
     live && prediction ? provisionalScoreType(prediction.home_pred, prediction.away_pred, liveHome, liveAway) : null;
 
+  // quem passa AO VIVO (provisório): classificado pelo PLACAR ATUAL vs o previsto.
+  // Espelha provisional_advance_bonus do banco (sem pênaltis; empate ao vivo = indefinido).
+  const liveAdvancer: string | null =
+    live && isKnockout
+      ? liveHome > liveAway
+        ? match.home_team_id
+        : liveAway > liveHome
+          ? match.away_team_id
+          : null
+      : null;
+  const predAdvancer: string | null =
+    !isKnockout || !prediction
+      ? null
+      : prediction.home_pred > prediction.away_pred
+        ? match.home_team_id
+        : prediction.away_pred > prediction.home_pred
+          ? match.away_team_id
+          : prediction.advance_team_id ?? match.home_team_id;
+  const liveBonus = live && isKnockout && !!liveAdvancer && predAdvancer === liveAdvancer ? phasePts : 0;
+
   const shareType = scoreType ?? liveType;
 
   return (
@@ -177,7 +251,7 @@ export function MatchCard({
         finished ? "bg-ink-100 ring-border" : "bg-surface ring-border shadow-[var(--shadow-soft)]",
         live && "ring-2 ring-flame-400",
         pending && "ring-2 ring-gold-300",
-        isJoker && !pending && "ring-2 ring-brand-500",
+        isJoker && !pending && "ring-2 ring-gold-400",
       )}
     >
       {/* label */}
@@ -244,6 +318,65 @@ export function MatchCard({
         <TeamSide name={match.away_team?.short_name ?? match.away_team_name} team={match.away_team} align="left" />
       </div>
 
+      {/* mata-mata: quem passa de fase (+1). Vitória = travado pelo placar; empate = escolha. */}
+      {canEdit &&
+        isKnockout &&
+        bothFilled &&
+        (() => {
+          const sides = [
+            {
+              id: match.home_team_id,
+              team: match.home_team,
+              name: match.home_team?.short_name ?? match.home_team_name,
+            },
+            {
+              id: match.away_team_id,
+              team: match.away_team,
+              name: match.away_team?.short_name ?? match.away_team_name,
+            },
+          ];
+          return (
+            <div className="border-t border-border px-3 py-2.5">
+              <div className="mb-1.5 flex items-center justify-center gap-1.5 text-[11px] font-semibold text-ink-500">
+                <Swords className="size-3.5" /> Quem passa de fase?
+                <span className="rounded-pill bg-grass-600/15 px-1.5 py-px text-[10px] font-extrabold text-grass-700">
+                  +{phasePts}
+                </span>
+              </div>
+              <div role="group" aria-label="Quem passa de fase" className="flex gap-2">
+                {sides.map((s) => {
+                  const sel = !!s.id && advancerSelected === s.id;
+                  const interactive = isDrawPred && !!s.id;
+                  return (
+                    <button
+                      key={s.id ?? s.name}
+                      type="button"
+                      disabled={!interactive}
+                      aria-pressed={sel}
+                      onClick={() => {
+                        if (interactive && s.id) setAdvanceChoice(s.id);
+                      }}
+                      className={cn(
+                        "flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-md border px-2 py-1.5 text-xs font-bold transition",
+                        sel
+                          ? "border-brand-600 bg-brand-600/10 text-brand-800 ring-1 ring-brand-600/30"
+                          : "border-border bg-surface text-ink-600",
+                        interactive && !sel && "hover:border-ink-300 active:scale-[0.98]",
+                        !isDrawPred && !sel && "opacity-45",
+                        !interactive && "cursor-default",
+                      )}
+                    >
+                      <TeamCrest team={s.team} name={s.name} size={18} />
+                      <span className="truncate">{s.name}</span>
+                      {sel && <Check className="size-3.5 shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
+
       {/* resultado real (ao vivo mostra 0×0 enquanto a API não confirma) */}
       {(finished || live) && (
         <div className="flex items-center justify-center gap-2 border-t border-border py-1.5 text-xs">
@@ -251,13 +384,35 @@ export function MatchCard({
           <span className={cn("font-extrabold tabular-nums", live ? "text-flame-600" : "text-ink-800")}>
             {finished ? `${match.home_score} × ${match.away_score}` : `${liveHome} × ${liveAway}`}
           </span>
+          {finished && isKnockout && match.home_pen != null && match.away_pen != null && (
+            <span className="text-[10px] text-ink-400">
+              (pên. {match.home_pen}×{match.away_pen})
+            </span>
+          )}
           {finished && scoreType && <ScorePill type={scoreType} withLabel doubled={isJoker} />}
+          {finished && (prediction?.advance_bonus ?? 0) > 0 && (
+            <span className="flex items-center gap-0.5 rounded-pill bg-grass-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+              <Check className="size-2.5" /> Passou +{prediction!.advance_bonus}
+            </span>
+          )}
           {live && liveType && (
             <span className={cn("text-xs font-semibold tabular-nums", liveTextByType[liveType])}>
               {SCORE_LABEL[liveType]}{" "}
               {liveType === "erro" ? "0" : `+${SCORE_POINTS[liveType] * (isJoker ? 2 : 1)}`}
             </span>
           )}
+          {live &&
+            isKnockout &&
+            liveAdvancer &&
+            (liveBonus > 0 ? (
+              <span className="flex items-center gap-0.5 rounded-pill bg-grass-600/15 px-1.5 py-0.5 text-[10px] font-bold text-grass-700">
+                <Check className="size-2.5" /> passa +{liveBonus}
+              </span>
+            ) : (
+              <span className="rounded-pill bg-ink-400/10 px-1.5 py-0.5 text-[10px] font-semibold text-ink-400">
+                não passa
+              </span>
+            ))}
           {prediction && shareType && onShare && (
             <button
               type="button"
@@ -285,9 +440,7 @@ export function MatchCard({
                 <Check className="size-3" /> salvo
               </span>
             )}
-            {saveState === "error" && (
-              <span className="text-flame-600">não salvou, tente de novo</span>
-            )}
+            {saveState === "error" && <span className="text-flame-600">erro</span>}
             {saveState === "idle" &&
               (pending ? (
                 <span className="text-gold-700">faça seu palpite</span>
@@ -301,17 +454,7 @@ export function MatchCard({
               onClick={() =>
                 joker.mutate(
                   { matchId: match.id, value: !isJoker },
-                  {
-                    onError: (e) => {
-                      const msg = e instanceof Error ? e.message : "";
-                      toast(
-                        /dobros? (desta|nesta) semana/i.test(msg)
-                          ? "Você já usou seus 2 dobros nesta semana. Zera na próxima segunda. 😉"
-                          : "Não rolou ativar o dobro agora. Tenta de novo daqui a pouco.",
-                        "error",
-                      );
-                    },
-                  },
+                  { onError: (e) => toast(e instanceof Error ? e.message : "Erro no dobro", "error") },
                 )
               }
               className={cn(
@@ -324,8 +467,8 @@ export function MatchCard({
               aria-label="Dobrar pontos (2x)"
               title={
                 !isJoker && jokersUsed >= maxJokers
-                  ? "Você já usou seus 2 dobros desta semana. Zera na próxima segunda."
-                  : "Dobrar os pontos deste jogo (2 por semana, seg a dom)"
+                  ? "Você já usou seus dobros desta semana"
+                  : "Dobrar os pontos deste jogo"
               }
             >
               <Zap className={cn("size-3.5", isJoker && "fill-white")} /> 2×
@@ -367,7 +510,9 @@ export function MatchCard({
               live={live}
               liveHome={liveHome}
               liveAway={liveAway}
-              teamsDefined={!!match.home_team && !!match.away_team}
+              isKnockout={isKnockout}
+              homeTeam={match.home_team}
+              awayTeam={match.away_team}
             />
           )}
         </>
@@ -482,7 +627,9 @@ function GaleraArea({
   live,
   liveHome,
   liveAway,
-  teamsDefined,
+  isKnockout,
+  homeTeam,
+  awayTeam,
 }: {
   matchId: string;
   locked: boolean;
@@ -490,7 +637,9 @@ function GaleraArea({
   live: boolean;
   liveHome: number;
   liveAway: number;
-  teamsDefined: boolean;
+  isKnockout: boolean;
+  homeTeam: MatchWithTeams["home_team"];
+  awayTeam: MatchWithTeams["home_team"];
 }) {
   const { session, user } = useAuth();
   const { data: leagues } = useMyLeagues();
@@ -569,15 +718,12 @@ function GaleraArea({
           isFav={isFav}
           onStar={session ? star : undefined}
           myId={user?.id ?? null}
+          isKnockout={isKnockout}
+          homeTeam={homeTeam}
+          awayTeam={awayTeam}
         />
       ) : (
-        <PredictStatus
-          matchId={matchId}
-          memberIds={memberIds}
-          isFav={isFav}
-          onStar={star}
-          teamsDefined={teamsDefined}
-        />
+        <PredictStatus matchId={matchId} memberIds={memberIds} isFav={isFav} onStar={star} />
       )}
     </div>
   );
@@ -633,6 +779,9 @@ function Galera({
   isFav,
   onStar,
   myId,
+  isKnockout,
+  homeTeam,
+  awayTeam,
 }: {
   matchId: string;
   finished: boolean;
@@ -643,6 +792,9 @@ function Galera({
   isFav: (id: string) => boolean;
   onStar?: (id: string) => void;
   myId: string | null;
+  isKnockout: boolean;
+  homeTeam: MatchWithTeams["home_team"];
+  awayTeam: MatchWithTeams["home_team"];
 }) {
   const { data, isLoading } = useMatchPredictions(matchId, true);
 
@@ -662,12 +814,27 @@ function Galera({
   const rowPts = (p: (typeof filtered)[number]) => {
     const t = rowType(p);
     if (!t) return -1;
-    return SCORE_POINTS[t] * (p.is_joker ? 2 : 1);
+    return SCORE_POINTS[t] * (p.is_joker ? 2 : 1) + (finished ? p.advance_bonus ?? 0 : 0);
   };
   // Desempate (regra do PO): vitória do mandante → empate → vitória do
   // visitante; dentro, mais gols do lado decisivo, depois do outro lado.
   const outcomeRank = (p: (typeof filtered)[number]) =>
     p.home_pred > p.away_pred ? 0 : p.home_pred === p.away_pred ? 1 : 2;
+  // quem cada um indicou que passa (mata-mata): vitória → vencedor; empate → escolha
+  const advancerTeam = (p: (typeof filtered)[number]): MatchWithTeams["home_team"] => {
+    if (!isKnockout) return null;
+    if (p.home_pred > p.away_pred) return homeTeam;
+    if (p.away_pred > p.home_pred) return awayTeam;
+    if (p.advance_team_id && homeTeam && p.advance_team_id === homeTeam.id) return homeTeam;
+    if (p.advance_team_id && awayTeam && p.advance_team_id === awayTeam.id) return awayTeam;
+    return null;
+  };
+  // desempate de palpites iguais pela escolha do avançador (mandante → visitante → sem escolha)
+  const advanceRank = (p: (typeof filtered)[number]) => {
+    const t = advancerTeam(p);
+    if (!t) return 2;
+    return homeTeam && t.id === homeTeam.id ? 0 : 1;
+  };
   const scoring = finished || live;
   const rows = filtered
     .map((p, i) => ({ p, i }))
@@ -683,6 +850,9 @@ function Galera({
         const offA = outcomeRank(a.p) === 2 ? a.p.home_pred : a.p.away_pred;
         const offB = outcomeRank(b.p) === 2 ? b.p.home_pred : b.p.away_pred;
         if (offB !== offA) return offB - offA;
+        // empates com mesmo placar: agrupa por quem cada um indicou que passa
+        const adv = advanceRank(a.p) - advanceRank(b.p);
+        if (adv) return adv;
       }
       return (
         Number(isFav(b.p.user?.id ?? "")) - Number(isFav(a.p.user?.id ?? "")) || a.i - b.i
@@ -693,6 +863,7 @@ function Galera({
     <ul className="divide-y divide-border border-t border-border bg-surface/60 px-1 py-1">
       {rows.map(({ p, i }) => {
         const t = rowType(p);
+        const adv = advancerTeam(p);
         return (
           <li key={p.user?.id ?? i} className="flex items-center gap-2 px-2.5 py-1.5">
             <Avatar src={p.user?.avatar_url} name={p.user?.display_name} size="xs" />
@@ -701,6 +872,15 @@ function Galera({
             </span>
             {onStar && p.user?.id && p.user.id !== myId && (
               <FavStar on={isFav(p.user.id)} onClick={() => onStar(p.user!.id)} />
+            )}
+            {/* mata-mata: escudo de quem a pessoa indicou que passa (discreto) */}
+            {adv && (
+              <span
+                className="shrink-0"
+                title={`Indicou ${adv.short_name ?? adv.name ?? "este time"} pra passar de fase`}
+              >
+                <TeamCrest team={adv} name={adv.short_name ?? adv.name} size={16} />
+              </span>
             )}
             {/* trovão 2× à ESQUERDA do placar (ao lado da estrela): assim os
                 placares ficam alinhados em coluna. SEMPRE que usou o dobro,
@@ -720,6 +900,14 @@ function Galera({
             {finished && p.score_type && (
               <ScorePill type={p.score_type} doubled={!!p.is_joker} showZap={false} />
             )}
+            {finished && (p.advance_bonus ?? 0) > 0 && (
+              <span
+                title="Acertou quem passou de fase"
+                className="shrink-0 text-[10px] font-bold text-grass-600"
+              >
+                +{p.advance_bonus}
+              </span>
+            )}
             {!finished && live && t && (
               <span
                 className={cn("w-7 text-right text-xs font-bold tabular-nums", liveTextByType[t])}
@@ -734,54 +922,17 @@ function Galera({
   );
 }
 
-/**
- * Traduz o erro cru do backend da cutucada em recado curto e amigável.
- * A regra é toda validada no banco (nudge_for_match): anti-spam de ~30 min por
- * par, jogo precisa estar aberto, alvo ainda sem palpite, par compartilha grupo.
- * Aqui a gente só dá um tom boleiro e nunca deixa escapar um "Erro" seco.
- */
-function nudgeErrorMessage(e: unknown): string {
-  const raw = e instanceof Error ? e.message : "";
-  const msg = raw.toLowerCase();
-
-  // Anti-spam: segunda cutucada no mesmo par dentro de ~30 min.
-  if (msg.includes("já cutucou") || msg.includes("ha pouco") || msg.includes("há pouco"))
-    return "Você já cutucou essa pessoa faz pouco. 😄 Espera um tiquinho.";
-
-  // Jogo já começou: não dá mais pra cobrar palpite.
-  if (msg.includes("já começou") || msg.includes("apito"))
-    return "A bola já rolou nesse jogo. Cutucada é só antes do apito. ⏱️";
-
-  // Times ainda não saíram (mata-mata com marcação): sem cutucada.
-  if (msg.includes("times definidos") || msg.includes("times saírem"))
-    return "Esse jogo ainda não tem os times. Dá pra cutucar quando eles saírem. ⏳";
-
-  // O alvo já mandou o palpite dele.
-  if (msg.includes("já palpitou"))
-    return "Relaxa, essa pessoa já cravou o palpite. 👍";
-
-  // Não compartilham grupo que dispute esse jogo.
-  if (msg.includes("compartilham") || msg.includes("federação"))
-    return "Vocês não estão no mesmo grupo nesse campeonato. Sem cutucada por aqui. 🤝";
-
-  // Qualquer outra causa: recado genérico, mas ainda gente boa.
-  return "Não rolou a cutucada agora. Tenta de novo daqui a pouco. 😉";
-}
-
 /** Antes do kickoff: membros do grupo e quem já palpitou (sem revelar o placar). */
 function PredictStatus({
   matchId,
   memberIds,
   isFav,
   onStar,
-  teamsDefined = true,
 }: {
   matchId: string;
   memberIds: Set<string> | null;
   isFav: (id: string) => boolean;
   onStar: (id: string) => void;
-  /** Times já saíram? Sem times definidos (mata-mata com marcação) não dá pra cutucar. */
-  teamsDefined?: boolean;
 }) {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -830,18 +981,17 @@ function PredictStatus({
               <span className="text-[11px] font-semibold text-gold-700">falta você!</span>
             ) : (
               <button
-                disabled={nudge.isPending || !teamsDefined}
-                title={teamsDefined ? undefined : "Dá pra cutucar quando os times saírem"}
+                disabled={nudge.isPending}
                 onClick={() =>
                   nudge.mutate(
                     { matchId, toUser: m.user_id },
                     {
                       onSuccess: () => toast("Cutucada enviada! 👉", "success"),
-                      onError: (e) => toast(nudgeErrorMessage(e), "info"),
+                      onError: (e) => toast(e instanceof Error ? e.message : "Erro", "error"),
                     },
                   )
                 }
-                className="flex items-center gap-1 rounded-pill px-2 py-0.5 text-[11px] font-semibold text-gold-700 transition-colors hover:bg-ink-100 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex items-center gap-1 rounded-pill px-2 py-0.5 text-[11px] font-semibold text-gold-700 transition-colors hover:bg-ink-100 disabled:opacity-50"
               >
                 <Hand className="size-3.5" /> cutucar
               </button>

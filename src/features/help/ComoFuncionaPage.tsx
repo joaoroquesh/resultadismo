@@ -220,6 +220,52 @@ export function ComoFuncionaPage() {
           </div>
         </Section>
 
+        {/* Ponto extra: quem passa no mata-mata (logo após "Como pontuar" — é pontuação) */}
+        <Section icon={<Swords className="size-4" strokeWidth={2.4} />} title="Quem passa no mata-mata">
+          <Card className="space-y-3 p-4">
+            <p className="text-sm leading-relaxed text-ink-600">
+              A partir das <span className="font-bold text-ink-900">fases eliminatórias</span>{" "}
+              (mata-mata), além do placar você ganha um{" "}
+              <span className="font-bold text-ink-900">ponto extra</span> por acertar{" "}
+              <span className="font-bold text-ink-900">quem se classifica</span> — e vale{" "}
+              <span className="font-bold text-ink-900">mais quanto mais fundo</span> na Copa. Na fase de
+              grupos isso não existe.
+            </p>
+            <div className="grid grid-cols-2 gap-1.5 text-xs">
+              <span className="rounded-md bg-surface-2 px-2 py-1">16-avos <span className="font-bold text-grass-700">+1</span></span>
+              <span className="rounded-md bg-surface-2 px-2 py-1">Oitavas <span className="font-bold text-grass-700">+2</span></span>
+              <span className="rounded-md bg-surface-2 px-2 py-1">Quartas <span className="font-bold text-grass-700">+3</span></span>
+              <span className="rounded-md bg-surface-2 px-2 py-1">Semi e 3º <span className="font-bold text-grass-700">+4</span></span>
+              <span className="col-span-2 rounded-md bg-surface-2 px-2 py-1">Final <span className="font-bold text-grass-700">+5</span></span>
+            </div>
+            <p className="text-sm leading-relaxed text-ink-600">
+              Se você palpita <span className="font-bold text-ink-900">vitória</span>, o classificado é
+              o vencedor do seu placar (automático). Se palpita{" "}
+              <span className="font-bold text-ink-900">empate</span>, o{" "}
+              <span className="font-bold text-ink-900">"Quem passa?"</span> já vem com o{" "}
+              <span className="font-bold text-ink-900">mandante</span> marcado — toque no outro time se
+              quiser trocar. Sempre fica um time escolhido.
+            </p>
+            <p className="rounded-md bg-surface-2 px-3 py-2 text-xs font-medium text-ink-600">
+              É uma pontuação <span className="font-bold text-ink-900">à parte</span> e{" "}
+              <span className="font-bold text-ink-900">soma junto</span> com o placar. Dá pra usar o{" "}
+              <span className="font-bold">2×</span> no mesmo jogo: ele dobra só o placar e o ponto extra
+              é <span className="font-bold">somado por cima</span> (não dobra). No{" "}
+              <span className="font-bold">ao vivo</span> ele já conta provisório pelo placar do momento;
+              pode ser decidida nos <span className="font-bold">pênaltis</span> (que seguem sem contar
+              para a cravada/saldo/acerto) e entra no seu aproveitamento.
+            </p>
+            <div className="flex items-center gap-2 rounded-md bg-grass-600/10 px-3 py-2 text-xs font-semibold text-grass-800">
+              <Swords className="size-4 shrink-0" strokeWidth={2.4} />
+              <span>
+                Ex.: nas oitavas, uma cravada com 2× = <span className="font-bold">+6</span> do placar{" "}
+                <span className="font-bold">+2</span> de quem passa ={" "}
+                <span className="font-bold">8 pontos</span>.
+              </span>
+            </div>
+          </Card>
+        </Section>
+
         {/* Dobro de pontos */}
         <Section icon={<Zap className="size-4" strokeWidth={2.4} />} title="Dobro de pontos (2×)">
           <Card className="space-y-3 p-4">
