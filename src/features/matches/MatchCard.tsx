@@ -563,6 +563,9 @@ export function MatchCard({
               isKnockout={isKnockout}
               homeTeam={match.home_team}
               awayTeam={match.away_team}
+              homePen={match.home_pen}
+              awayPen={match.away_pen}
+              phasePts={phasePts}
             />
           )}
         </>
@@ -680,6 +683,9 @@ function GaleraArea({
   isKnockout,
   homeTeam,
   awayTeam,
+  homePen,
+  awayPen,
+  phasePts,
 }: {
   matchId: string;
   locked: boolean;
@@ -690,6 +696,9 @@ function GaleraArea({
   isKnockout: boolean;
   homeTeam: MatchWithTeams["home_team"];
   awayTeam: MatchWithTeams["home_team"];
+  homePen: number | null;
+  awayPen: number | null;
+  phasePts: number;
 }) {
   const { session, user } = useAuth();
   const { data: leagues } = useMyLeagues();
@@ -771,6 +780,9 @@ function GaleraArea({
           isKnockout={isKnockout}
           homeTeam={homeTeam}
           awayTeam={awayTeam}
+          homePen={homePen}
+          awayPen={awayPen}
+          phasePts={phasePts}
         />
       ) : (
         <PredictStatus matchId={matchId} memberIds={memberIds} isFav={isFav} onStar={star} />
@@ -832,6 +844,9 @@ function Galera({
   isKnockout,
   homeTeam,
   awayTeam,
+  homePen,
+  awayPen,
+  phasePts,
 }: {
   matchId: string;
   finished: boolean;
@@ -845,6 +860,9 @@ function Galera({
   isKnockout: boolean;
   homeTeam: MatchWithTeams["home_team"];
   awayTeam: MatchWithTeams["home_team"];
+  homePen: number | null;
+  awayPen: number | null;
+  phasePts: number;
 }) {
   const { data, isLoading } = useMatchPredictions(matchId, true);
 
@@ -861,15 +879,6 @@ function Galera({
       : live
         ? provisionalScoreType(p.home_pred, p.away_pred, liveHome, liveAway)
         : null;
-  const rowPts = (p: (typeof filtered)[number]) => {
-    const t = rowType(p);
-    if (!t) return -1;
-    return SCORE_POINTS[t] * (p.is_joker ? 2 : 1) + (finished ? p.advance_bonus ?? 0 : 0);
-  };
-  // Desempate (regra do PO): vitória do mandante → empate → vitória do
-  // visitante; dentro, mais gols do lado decisivo, depois do outro lado.
-  const outcomeRank = (p: (typeof filtered)[number]) =>
-    p.home_pred > p.away_pred ? 0 : p.home_pred === p.away_pred ? 1 : 2;
   // quem cada um indicou que passa (mata-mata): vitória → vencedor; empate → escolha
   const advancerTeam = (p: (typeof filtered)[number]): MatchWithTeams["home_team"] => {
     if (!isKnockout) return null;
@@ -879,6 +888,36 @@ function Galera({
     if (p.advance_team_id && awayTeam && p.advance_team_id === awayTeam.id) return awayTeam;
     return null;
   };
+  // classificado REAL ao vivo (placar atual; empate → pênaltis se já houver)
+  const liveAdv: string | null =
+    live && isKnockout
+      ? liveHome > liveAway
+        ? homeTeam?.id ?? null
+        : liveAway > liveHome
+          ? awayTeam?.id ?? null
+          : homePen != null && awayPen != null && homePen > awayPen
+            ? homeTeam?.id ?? null
+            : homePen != null && awayPen != null && awayPen > homePen
+              ? awayTeam?.id ?? null
+              : null
+      : null;
+  // ponto extra "quem passa" da pessoa: encerrado = oficial; ao vivo = provisório
+  const memberBonus = (p: (typeof filtered)[number]): number => {
+    if (!isKnockout) return 0;
+    if (finished) return p.advance_bonus ?? 0;
+    if (!live || !liveAdv) return 0;
+    const picked = advancerTeam(p);
+    return picked && picked.id === liveAdv ? phasePts : 0;
+  };
+  const rowPts = (p: (typeof filtered)[number]) => {
+    const t = rowType(p);
+    if (!t) return -1;
+    return SCORE_POINTS[t] * (p.is_joker ? 2 : 1) + (finished || live ? memberBonus(p) : 0);
+  };
+  // Desempate (regra do PO): vitória do mandante → empate → vitória do
+  // visitante; dentro, mais gols do lado decisivo, depois do outro lado.
+  const outcomeRank = (p: (typeof filtered)[number]) =>
+    p.home_pred > p.away_pred ? 0 : p.home_pred === p.away_pred ? 1 : 2;
   // desempate de palpites iguais pela escolha do avançador (mandante → visitante → sem escolha)
   const advanceRank = (p: (typeof filtered)[number]) => {
     const t = advancerTeam(p);
@@ -950,19 +989,24 @@ function Galera({
             {finished && p.score_type && (
               <ScorePill type={p.score_type} doubled={!!p.is_joker} showZap={false} />
             )}
-            {finished && (p.advance_bonus ?? 0) > 0 && (
-              <span
-                title="Acertou quem passou de fase"
-                className="shrink-0 text-[10px] font-bold text-grass-600"
-              >
-                +{p.advance_bonus}
-              </span>
-            )}
             {!finished && live && t && (
               <span
                 className={cn("w-7 text-right text-xs font-bold tabular-nums", liveTextByType[t])}
               >
                 {t === "erro" ? "0" : `+${SCORE_POINTS[t] * (p.is_joker ? 2 : 1)}`}
+              </span>
+            )}
+            {/* ponto extra "quem passa": coluna SEMPRE presente no mata-mata (até 0),
+                espaçamento padrão; ao vivo é provisório */}
+            {isKnockout && (finished || live) && (
+              <span
+                title={memberBonus(p) > 0 ? "Ponto extra: acertou quem passa" : "Ponto extra"}
+                className={cn(
+                  "w-6 shrink-0 text-right text-[10px] font-bold tabular-nums",
+                  memberBonus(p) > 0 ? "text-grass-600" : "text-ink-300",
+                )}
+              >
+                {memberBonus(p) > 0 ? `+${memberBonus(p)}` : "0"}
               </span>
             )}
           </li>
