@@ -145,13 +145,13 @@ grant execute on function public.resolved_advancer(public.matches) to authentica
 grant execute on function public.advance_bonus(int, int, uuid, uuid, uuid, uuid) to authenticated;
 
 -- Bônus "quem passa" PROVISÓRIO ao vivo: durante o jogo o classificado é deduzido do
--- PLACAR ATUAL (sem pênaltis — empate ao vivo = ninguém definido), escalado pela fase.
--- As funções _live usam isto enquanto o jogo está 'live'; no encerrado vale a coluna
--- predictions.advance_bonus (que aí já considera os pênaltis). Decisão do João 2026-06-27.
+-- PLACAR ATUAL; se empatar e a disputa de PÊNALTIS já tiver placar (fase de pênaltis ao
+-- vivo), os pênaltis decidem — senão fica indefinido. Escalado pela fase. As funções _live
+-- usam isto enquanto 'live'; no encerrado vale predictions.advance_bonus. Decisão João 2026-06-27.
 create or replace function public.provisional_advance_bonus(
   p_home_pred int, p_away_pred int, p_pred_advance uuid,
   p_home_team uuid, p_away_team uuid,
-  p_home_score int, p_away_score int, p_stage text
+  p_home_score int, p_away_score int, p_home_pen int, p_away_pen int, p_stage text
 )
 returns int
 language sql
@@ -163,11 +163,13 @@ as $$
       when p_home_score is null or p_away_score is null then null
       when p_home_score > p_away_score then p_home_team
       when p_away_score > p_home_score then p_away_team
+      when p_home_pen is not null and p_away_pen is not null and p_home_pen > p_away_pen then p_home_team
+      when p_home_pen is not null and p_away_pen is not null and p_away_pen > p_home_pen then p_away_team
       else null
     end
   ), 0) * public.knockout_phase_points(p_stage);
 $$;
-grant execute on function public.provisional_advance_bonus(int, int, uuid, uuid, uuid, int, int, text) to authenticated;
+grant execute on function public.provisional_advance_bonus(int, int, uuid, uuid, uuid, int, int, int, int, text) to authenticated;
 
 -- ---------------------------------------------------------------------------
 -- 4. Triggers de pontuação ganham o ramo do bônus (idempotente, re-pontua)
@@ -439,7 +441,7 @@ begin
       case when m.status = 'finished' then coalesce(pr.advance_bonus, 0)
            when coalesce(m.is_knockout, false) then public.provisional_advance_bonus(
              pr.home_pred, pr.away_pred, pr.advance_team_id, m.home_team_id, m.away_team_id,
-             m.home_score, m.away_score, m.stage)
+             m.home_score, m.away_score, m.home_pen, m.away_pen, m.stage)
            else 0 end as bonus,
       case when coalesce(m.is_knockout, false) and m.status in ('finished', 'live')
            then public.knockout_phase_points(m.stage) else 0 end as bonus_max
@@ -628,7 +630,7 @@ language sql stable security definer set search_path = '' as $$
       case when m.status = 'finished' then coalesce(pr.advance_bonus, 0)
            when coalesce(m.is_knockout, false) then public.provisional_advance_bonus(
              pr.home_pred, pr.away_pred, pr.advance_team_id, m.home_team_id, m.away_team_id,
-             m.home_score, m.away_score, m.stage)
+             m.home_score, m.away_score, m.home_pen, m.away_pen, m.stage)
            else 0 end as bonus
     from public.predictions pr join public.matches m on m.id = pr.match_id
     where m.hidden = false
@@ -685,7 +687,7 @@ language sql stable security definer set search_path = '' as $$
       case when m.status = 'finished' then coalesce(pr.advance_bonus, 0)
            when coalesce(m.is_knockout, false) then public.provisional_advance_bonus(
              pr.home_pred, pr.away_pred, pr.advance_team_id, m.home_team_id, m.away_team_id,
-             m.home_score, m.away_score, m.stage)
+             m.home_score, m.away_score, m.home_pen, m.away_pen, m.stage)
            else 0 end as bonus
     from public.predictions pr join public.matches m on m.id = pr.match_id
     where m.hidden = false

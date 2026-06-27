@@ -3037,9 +3037,11 @@ export type Database = {
       }
       provisional_advance_bonus: {
         Args: {
+          p_away_pen: number
           p_away_pred: number
           p_away_score: number
           p_away_team: string
+          p_home_pen: number
           p_home_pred: number
           p_home_score: number
           p_home_team: string

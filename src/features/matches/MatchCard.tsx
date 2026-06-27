@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { track } from "@/lib/analytics";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
-import { Check, Loader2, Lock, ChevronDown, Users, Zap, Hand, Plus, Minus, Star, Share2, Swords } from "lucide-react";
+import { Check, X, Loader2, Lock, ChevronDown, Users, Zap, Hand, Plus, Minus, Star, Share2, Swords } from "lucide-react";
 import { TeamCrest } from "@/components/TeamCrest";
 import { ScorePill } from "@/components/ScorePill";
 import { Avatar } from "@/components/ui/Avatar";
@@ -222,16 +222,26 @@ export function MatchCard({
   const liveType: ScoreType | null =
     live && prediction ? provisionalScoreType(prediction.home_pred, prediction.away_pred, liveHome, liveAway) : null;
 
-  // quem passa AO VIVO (provisório): classificado pelo PLACAR ATUAL vs o previsto.
-  // Espelha provisional_advance_bonus do banco (sem pênaltis; empate ao vivo = indefinido).
+  // quem passa: classificado REAL. Ao vivo = pelo placar atual; se empatar e a disputa de
+  // pênaltis já tiver placar (fase de pênaltis ao vivo), os pênaltis decidem. Encerrado =
+  // oficial (advanced_team_id > placar > pênaltis). Espelha resolved_advancer/provisional do banco.
+  const advancerFromScore = (h: number | null, a: number | null, hp: number | null, ap: number | null): string | null => {
+    if (h == null || a == null) return null;
+    if (h > a) return match.home_team_id;
+    if (a > h) return match.away_team_id;
+    if (hp != null && ap != null && hp > ap) return match.home_team_id;
+    if (hp != null && ap != null && ap > hp) return match.away_team_id;
+    return null;
+  };
   const liveAdvancer: string | null =
-    live && isKnockout
-      ? liveHome > liveAway
-        ? match.home_team_id
-        : liveAway > liveHome
-          ? match.away_team_id
-          : null
+    live && isKnockout ? advancerFromScore(liveHome, liveAway, match.home_pen, match.away_pen) : null;
+  const finishedAdvancer: string | null =
+    finished && isKnockout
+      ? match.advanced_team_id ??
+        advancerFromScore(match.home_score, match.away_score, match.home_pen, match.away_pen)
       : null;
+  const realAdvancer = finished ? finishedAdvancer : liveAdvancer;
+  // o time que VOCÊ marcou pra passar (vitória → vencedor do palpite; empate → escolha/mandante)
   const predAdvancer: string | null =
     !isKnockout || !prediction
       ? null
@@ -240,7 +250,14 @@ export function MatchCard({
         : prediction.away_pred > prediction.home_pred
           ? match.away_team_id
           : prediction.advance_team_id ?? match.home_team_id;
-  const liveBonus = live && isKnockout && !!liveAdvancer && predAdvancer === liveAdvancer ? phasePts : 0;
+  const advanceHit = predAdvancer != null && realAdvancer != null && predAdvancer === realAdvancer;
+  // {team, name} de um lado, pra desenhar o escudo na linha "você marcou …"
+  const teamMeta = (id: string | null) =>
+    id && id === match.home_team_id
+      ? { team: match.home_team, name: match.home_team?.short_name ?? match.home_team_name }
+      : id && id === match.away_team_id
+        ? { team: match.away_team, name: match.away_team?.short_name ?? match.away_team_name }
+        : null;
 
   const shareType = scoreType ?? liveType;
 
@@ -390,29 +407,12 @@ export function MatchCard({
             </span>
           )}
           {finished && scoreType && <ScorePill type={scoreType} withLabel doubled={isJoker} />}
-          {finished && (prediction?.advance_bonus ?? 0) > 0 && (
-            <span className="flex items-center gap-0.5 rounded-pill bg-grass-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
-              <Check className="size-2.5" /> Passou +{prediction!.advance_bonus}
-            </span>
-          )}
           {live && liveType && (
             <span className={cn("text-xs font-semibold tabular-nums", liveTextByType[liveType])}>
               {SCORE_LABEL[liveType]}{" "}
               {liveType === "erro" ? "0" : `+${SCORE_POINTS[liveType] * (isJoker ? 2 : 1)}`}
             </span>
           )}
-          {live &&
-            isKnockout &&
-            liveAdvancer &&
-            (liveBonus > 0 ? (
-              <span className="flex items-center gap-0.5 rounded-pill bg-grass-600/15 px-1.5 py-0.5 text-[10px] font-bold text-grass-700">
-                <Check className="size-2.5" /> passa +{liveBonus}
-              </span>
-            ) : (
-              <span className="rounded-pill bg-ink-400/10 px-1.5 py-0.5 text-[10px] font-semibold text-ink-400">
-                não passa
-              </span>
-            ))}
           {prediction && shareType && onShare && (
             <button
               type="button"
@@ -425,6 +425,63 @@ export function MatchCard({
           )}
         </div>
       )}
+
+      {/* quem passa — resultado: o time que VOCÊ marcou + acerto/erro (ao vivo e encerrado) */}
+      {(finished || live) &&
+        isKnockout &&
+        predAdvancer &&
+        (() => {
+          const picked = teamMeta(predAdvancer);
+          if (!picked) return null;
+          const real = teamMeta(realAdvancer);
+          let cls = "text-ink-400";
+          let status: ReactNode = "· indefinido";
+          if (finished) {
+            if (advanceHit) {
+              cls = "text-grass-700";
+              status = (
+                <>
+                  <Check className="size-3" /> passou +{prediction?.advance_bonus || phasePts}
+                </>
+              );
+            } else {
+              cls = "text-flame-600";
+              status = (
+                <span className="flex items-center gap-1">
+                  <X className="size-3" /> não passou
+                  {real && (
+                    <span className="flex items-center gap-1 text-ink-500">
+                      — passou <TeamCrest team={real.team} name={real.name} size={13} />
+                      {real.name}
+                    </span>
+                  )}
+                </span>
+              );
+            }
+          } else if (!realAdvancer) {
+            cls = "text-ink-400";
+            status = "· indefinido (empate)";
+          } else if (advanceHit) {
+            cls = "text-grass-700";
+            status = (
+              <>
+                <Check className="size-3" /> passando +{phasePts} (prov.)
+              </>
+            );
+          } else {
+            cls = "text-ink-400";
+            status = "· atrás (não passa)";
+          }
+          return (
+            <div className="flex flex-wrap items-center justify-center gap-1.5 border-t border-border px-3 py-1.5 text-[11px] font-semibold">
+              <Swords className="size-3 shrink-0 text-ink-400" />
+              <span className="text-ink-400">Quem passa: você marcou</span>
+              <TeamCrest team={picked.team} name={picked.name} size={14} />
+              <span className="text-ink-700">{picked.name}</span>
+              <span className={cn("flex items-center gap-0.5", cls)}>{status}</span>
+            </div>
+          );
+        })()}
 
       {/* footer: ações de palpite */}
       {canEdit ? (

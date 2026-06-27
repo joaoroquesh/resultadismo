@@ -9,7 +9,8 @@ create or replace function pg_temp.caso(
   p_comp uuid, p_stage text, p_kick timestamptz, p_status text,
   p_home uuid, p_away uuid, p_hs int, p_as int, p_hpen int, p_apen int,
   p_joao uuid, p_jh int, p_ja int, p_jadv uuid,         -- palpite do João (jadv só no empate)
-  p_members uuid[]                                       -- galera (todos menos João já filtrado fora)
+  p_members uuid[],                                      -- galera (todos menos João já filtrado fora)
+  p_live_phase text default null                         -- fase ao vivo (ex.: 'penaltis')
 ) returns void language plpgsql as $fn$
 declare
   v_m uuid; v_i int; v_k int; v_hp int; v_ap int; v_choice uuid; v_n int := coalesce(array_length(p_members,1),0);
@@ -18,10 +19,10 @@ declare
   v_gadv int[] := array[1,2,1,2,1];   -- empate: 1=mandante, 2=visitante (sempre escolhe)
 begin
   insert into public.matches(competition_id, stage, kickoff_at, status, home_team_id, away_team_id,
-    home_team_name, away_team_name, home_score, away_score, home_pen, away_pen)
+    home_team_name, away_team_name, home_score, away_score, home_pen, away_pen, live_phase)
   values(p_comp, p_stage, p_kick, p_status::public.match_status, p_home, p_away,
     (select name from public.teams where id=p_home), (select name from public.teams where id=p_away),
-    p_hs, p_as, p_hpen, p_apen)
+    p_hs, p_as, p_hpen, p_apen, p_live_phase)
   returning id into v_m;
 
   -- palpite do João (o "ator" dos casos)
@@ -61,13 +62,14 @@ begin
   select n from unnest(array['Holanda','Bélgica','Itália','Uruguai','México','Japão',
                              'Marrocos','Senegal','Estados Unidos','Canadá','Suíça','Colômbia',
                              'Coreia do Sul','Austrália','Equador','Polônia','Sérvia','Dinamarca',
-                             'Costa Rica','Gana','Camarões','Nigéria','Catar','Tunísia']) as n
+                             'Costa Rica','Gana','Camarões','Nigéria','Catar','Tunísia',
+                             'Peru','Chile','Egito','Argélia']) as n
   where n not in (select name from public.teams);
 
   -- pool de times (os 8 com escudo primeiro)
-  select array_agg(id) into v_t from (select id from public.teams order by (local_crest is not null) desc, name limit 40) s;
+  select array_agg(id) into v_t from (select id from public.teams order by (local_crest is not null) desc, name limit 44) s;
   v_n := coalesce(array_length(v_t,1),0);
-  if v_comp is null or v_n < 32 then raise exception 'faltou competição ou times (comp=% times=%)', v_comp, v_n; end if;
+  if v_comp is null or v_n < 36 then raise exception 'faltou competição ou times (comp=% times=%)', v_comp, v_n; end if;
 
   -- zera os jogos da competição (predictions é RESTRICT → apaga antes)
   delete from public.predictions pr using public.matches m
@@ -97,6 +99,12 @@ begin
   perform pg_temp.caso(v_comp,'LAST_16', v_d+interval '15 hours', 'live', v_t[7],v_t[8], 0,1,null,null, v_joao, 2,1,null, v_members);
   -- 5) EMPATE ao vivo (1x1) → ninguém definido ainda (sem pílula de quem passa)
   perform pg_temp.caso(v_comp,'LAST_16', v_d+interval '16 hours', 'live', v_t[9],v_t[10], 1,1,null,null, v_joao, 1,1,v_t[9], v_members);
+  -- 5b) AO VIVO na DISPUTA DE PÊNALTIS — ACERTO (quartas +3): 1x1 (pên 4x3 mandante),
+  --     João empate+mandante → "passando ✓ +3 (prov.)" (os pênaltis ao vivo já decidem)
+  perform pg_temp.caso(v_comp,'QUARTER_FINALS', v_d+interval '13 hours', 'live', v_t[33],v_t[34], 1,1,4,3, v_joao, 1,1,v_t[33], v_members, 'penaltis');
+  -- 5c) AO VIVO na DISPUTA DE PÊNALTIS — ERRO (semi +4): 1x1 (pên 2x4 visitante),
+  --     João empate+mandante → "atrás (não passa)"
+  perform pg_temp.caso(v_comp,'SEMI_FINALS', v_d+interval '13 hours 30 minutes', 'live', v_t[35],v_t[36], 1,1,2,4, v_joao, 1,1,v_t[35], v_members, 'penaltis');
 
   -- ============ ENCERRADO ============
   -- 6) ACERTANDO por placar (oitavas): 2x1, João cravou 2x1 → "Passou +2" + cravada
