@@ -433,7 +433,6 @@ export function MatchCard({
         (() => {
           const picked = teamMeta(predAdvancer);
           if (!picked) return null;
-          const real = teamMeta(realAdvancer);
           let cls = "text-ink-400";
           let status: ReactNode = "· indefinido";
           if (finished) {
@@ -447,30 +446,24 @@ export function MatchCard({
             } else {
               cls = "text-flame-600";
               status = (
-                <span className="flex items-center gap-1">
+                <>
                   <X className="size-3" /> não passou
-                  {real && (
-                    <span className="flex items-center gap-1 text-ink-500">
-                      — passou <TeamCrest team={real.team} name={real.name} size={13} />
-                      {real.name}
-                    </span>
-                  )}
-                </span>
+                </>
               );
             }
           } else if (!realAdvancer) {
             cls = "text-ink-400";
-            status = "· indefinido (empate)";
+            status = "· indefinido";
           } else if (advanceHit) {
             cls = "text-grass-700";
             status = (
               <>
-                <Check className="size-3" /> passando +{phasePts} (prov.)
+                <Check className="size-3" /> passando +{phasePts}
               </>
             );
           } else {
             cls = "text-ink-400";
-            status = "· atrás (não passa)";
+            status = "· atrás";
           }
           return (
             <div className="flex flex-wrap items-center justify-center gap-1.5 border-t border-border px-3 py-1.5 text-[11px] font-semibold">
