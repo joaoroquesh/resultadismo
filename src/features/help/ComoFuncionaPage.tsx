@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { track } from "@/lib/analytics";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
@@ -35,13 +35,15 @@ function Section({
   icon,
   title,
   children,
+  id,
 }: {
   icon: ReactNode;
   title: string;
   children: ReactNode;
+  id?: string;
 }) {
   return (
-    <section className="space-y-3">
+    <section id={id} className="scroll-mt-20 space-y-3">
       <h2 className="flex items-center gap-2 text-base font-extrabold tracking-tight text-ink-950">
         <span className="grid size-7 shrink-0 place-items-center rounded-md bg-surface-2 text-brand-600">
           {icon}
@@ -134,6 +136,17 @@ export function ComoFuncionaPage() {
   const navigate = useNavigate();
   const { session } = useAuth();
 
+  // CTA "Ver como funciona" (modal NOVIDADE) cai direto na seção via #hash.
+  // Re-afirma o scroll algumas vezes p/ vencer a restauração de scroll do browser
+  // (no reload) e o layout que ainda assenta (conteúdo/imagens).
+  useEffect(() => {
+    const id = window.location.hash.replace("#", "");
+    if (!id) return;
+    const scroll = () => document.getElementById(id)?.scrollIntoView({ block: "start" });
+    const ts = [60, 250, 500].map((d) => window.setTimeout(scroll, d));
+    return () => ts.forEach((t) => window.clearTimeout(t));
+  }, []);
+
   return (
     <Page
       title="Como funciona"
@@ -221,7 +234,7 @@ export function ComoFuncionaPage() {
         </Section>
 
         {/* Ponto extra: quem passa no mata-mata (logo após "Como pontuar" — é pontuação) */}
-        <Section icon={<Swords className="size-4" strokeWidth={2.4} />} title="Quem passa no mata-mata">
+        <Section id="quem-passa" icon={<Swords className="size-4" strokeWidth={2.4} />} title="Quem passa no mata-mata">
           <Card className="space-y-3 p-4">
             <p className="text-sm leading-relaxed text-ink-600">
               A partir das <span className="font-bold text-ink-900">fases eliminatórias</span>{" "}

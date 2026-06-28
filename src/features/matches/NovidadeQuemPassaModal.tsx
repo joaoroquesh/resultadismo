@@ -77,7 +77,7 @@ export function NovidadeQuemPassaModal() {
 
         <div className="mt-5 flex flex-col gap-2 sm:flex-row-reverse">
           <Link
-            to="/como-funciona"
+            to="/como-funciona#quem-passa"
             onClick={() => {
               track("novidade_cta", { content_type: "quem_passa" });
               markSeen();
