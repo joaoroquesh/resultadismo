@@ -21,6 +21,8 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+## [2.6.0] — 2026-06-27
+
 ### Corrigido
 - **Sync ao vivo travava em jogos noturnos depois das ~21h BRT.** Bug introduzido na Etapa 1:
   `syncEspn` no modo scores usava `today` em UTC para decidir o dia a consultar. Após a virada do
