@@ -47,8 +47,8 @@
     "aliases": [
       "South Africa"
     ],
-    "crest_file": null,
-    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20South%20Africa.svg"
+    "crest_file": "africadosul.png",
+    "crest_source": "https://img.sofascore.com/api/v1/team/4736/image"
   },
   {
     "slug": "aguasanta",
@@ -439,8 +439,8 @@
     "aliases": [
       "Saudi Arabia"
     ],
-    "crest_file": null,
-    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Saudi%20Arabia.svg"
+    "crest_file": "arabiasaudita.png",
+    "crest_source": "https://img.sofascore.com/api/v1/team/4834/image"
   },
   {
     "slug": "argelia",
@@ -455,8 +455,8 @@
     "aliases": [
       "Algeria"
     ],
-    "crest_file": null,
-    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Algeria.svg"
+    "crest_file": "argelia.png",
+    "crest_source": "https://img.sofascore.com/api/v1/team/4691/image"
   },
   {
     "slug": "argentina",
@@ -751,8 +751,8 @@
       "Austria",
       "Österreich"
     ],
-    "crest_file": null,
-    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Austria.svg"
+    "crest_file": "austria.png",
+    "crest_source": "https://img.sofascore.com/api/v1/team/4718/image"
   },
   {
     "slug": "avai",
@@ -1422,8 +1422,8 @@
       "Cape Verde",
       "Cabo Verde"
     ],
-    "crest_file": null,
-    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Cape%20Verde.svg"
+    "crest_file": "caboverde.png",
+    "crest_source": "https://img.sofascore.com/api/v1/team/4753/image"
   },
   {
     "slug": "cagliari",
@@ -1471,8 +1471,8 @@
     "aliases": [
       "Canada"
     ],
-    "crest_file": null,
-    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Canada%20(Pantone).svg"
+    "crest_file": "canada.png",
+    "crest_source": "https://img.sofascore.com/api/v1/team/4752/image"
   },
   {
     "slug": "capital",
@@ -1845,8 +1845,8 @@
       "DRC",
       "Democratic Republic of the Congo"
     ],
-    "crest_file": null,
-    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20the%20Democratic%20Republic%20of%20the%20Congo.svg"
+    "crest_file": "congord.png",
+    "crest_source": "https://img.sofascore.com/api/v1/team/4823/image"
   },
   {
     "slug": "coreiadosul",
@@ -1862,8 +1862,8 @@
       "South Korea",
       "Korea Republic"
     ],
-    "crest_file": null,
-    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20South%20Korea.svg"
+    "crest_file": "coreiadosul.png",
+    "crest_source": "https://img.sofascore.com/api/v1/team/4735/image"
   },
   {
     "slug": "corinthians",
@@ -1918,8 +1918,8 @@
       "Cote d'Ivoire",
       "Côte d'Ivoire"
     ],
-    "crest_file": null,
-    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Ivory%20Coast.svg"
+    "crest_file": "costadomarfim.png",
+    "crest_source": "https://img.sofascore.com/api/v1/team/4768/image"
   },
   {
     "slug": "costarica",
@@ -2092,8 +2092,8 @@
       "Curaçao",
       "CUR"
     ],
-    "crest_file": null,
-    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Cura%C3%A7ao.svg"
+    "crest_file": "curacao.png",
+    "crest_source": "https://img.sofascore.com/api/v1/team/55827/image"
   },
   {
     "slug": "defensayjusticia",
@@ -2259,8 +2259,8 @@
     "aliases": [
       "Scotland"
     ],
-    "crest_file": null,
-    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Scotland.svg"
+    "crest_file": "escocia.png",
+    "crest_source": "https://img.sofascore.com/api/v1/team/4695/image"
   },
   {
     "slug": "eslovaquia",
@@ -2672,8 +2672,8 @@
     "aliases": [
       "Ghana"
     ],
-    "crest_file": null,
-    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Ghana.svg"
+    "crest_file": "gana.png",
+    "crest_source": "https://img.sofascore.com/api/v1/team/4764/image"
   },
   {
     "slug": "genoa",
@@ -3225,8 +3225,8 @@
     "aliases": [
       "Iraq"
     ],
-    "crest_file": null,
-    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Iraq.svg"
+    "crest_file": "iraque.png",
+    "crest_source": "https://img.sofascore.com/api/v1/team/4767/image"
   },
   {
     "slug": "irlanda",
@@ -3335,8 +3335,8 @@
     "aliases": [
       "Japan"
     ],
-    "crest_file": null,
-    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Japan.svg"
+    "crest_file": "japao.png",
+    "crest_source": "https://img.sofascore.com/api/v1/team/4770/image"
   },
   {
     "slug": "jordania",
@@ -3998,8 +3998,8 @@
     "aliases": [
       "Morocco"
     ],
-    "crest_file": null,
-    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Morocco.svg"
+    "crest_file": "marrocos.png",
+    "crest_source": "https://img.sofascore.com/api/v1/team/4778/image"
   },
   {
     "slug": "melgar",
@@ -5562,8 +5562,8 @@
       "Sweden",
       "Sverige"
     ],
-    "crest_file": null,
-    "crest_source": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Sweden.svg"
+    "crest_file": "suecia.png",
+    "crest_source": "https://img.sofascore.com/api/v1/team/4688/image"
   },
   {
     "slug": "suica",
