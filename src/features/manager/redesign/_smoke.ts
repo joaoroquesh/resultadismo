@@ -1,0 +1,12 @@
+import * as t from "./tactics.ts";
+import * as s from "./sim.ts";
+import * as n from "./narration.ts";
+import * as a from "./archetypes.ts";
+const tac = t.tacticFromPreset("mandaNoJogo");
+const st = s.simulateFull(s.createMatch({a:88,m:90,d:85,o:88}, {a:70,m:70,d:72,o:71}, tac, t.tacticFromPreset("ganharSofrendo"), 123));
+const tk = n.buildTicker(st.events, ["Brasil","Suécia"], 123);
+console.log("placar:", st.score.join("-"), "| narrados:", tk.length);
+tk.slice(0,5).forEach((e)=>console.log("  "+e.minute+"'", e.text));
+console.log("artigos:", n.artigo("Brasil"), n.artigo("Suécia"), n.artigo("Estados Unidos"), n.artigo("Catar"), n.artigo("África do Sul"));
+console.log("arquetipos:", a.ARCHETYPE_LIST.length, "| bonus posicional:", a.archetypeBonus("posicional", tac).toFixed(1), "| dilemas:", a.DILEMAS.length);
+console.log("SMOKE OK");

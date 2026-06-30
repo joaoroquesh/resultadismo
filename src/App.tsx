@@ -39,6 +39,8 @@ const EstudoViewerPage = lazy(() => import("@/features/estudos/EstudoViewerPage"
 // mini-jogo Manager: rota OCULTA (/manager), casca própria, sem link em lugar nenhum
 const ManagerShell = lazy(() => import("@/features/manager/ManagerShell").then((m) => ({ default: m.ManagerShell })));
 const ManagerPage = lazy(() => import("@/features/manager/ManagerPage").then((m) => ({ default: m.ManagerPage })));
+// Maneiger reformulado (Fases 3/4): rota OCULTA (/manager-v2), mesma casca, sem link.
+const RedesignManagerApp = lazy(() => import("@/features/manager/redesign/RedesignManagerApp").then((m) => ({ default: m.RedesignManagerApp })));
 
 // Redireciona links antigos /ligas/:slug para /grupos/:slug (rename Liga -> Grupo)
 function FederacaoSlugRedirect() {
@@ -92,6 +94,8 @@ export default function App() {
               puro. NÃO linkado em Sidebar/BottomNav/landing/Perfil/Retrô. */}
           <Route element={<ManagerShell />}>
             <Route path="/manager" element={<ManagerPage />} />
+            {/* Maneiger reformulado (Fases 3/4): rota oculta, mesma casca, não linkada */}
+            <Route path="/manager-v2" element={<RedesignManagerApp />} />
           </Route>
 
           <Route element={<AppShell />}>

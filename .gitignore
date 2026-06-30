@@ -44,3 +44,5 @@ supabase/.temp
 **/.playwright-mcp/
 test-results/
 playwright-report/
+.vite-redesign/
+.fuse_hidden*

@@ -5,6 +5,9 @@ import { VitePWA } from "vite-plugin-pwa";
 import path from "node:path";
 
 export default defineConfig({
+  // Esta worktree compartilha node_modules com os outros dev servers via symlink.
+  // Cache próprio evita conflito do otimizador/Fast Refresh entre servidores concorrentes.
+  cacheDir: path.resolve(import.meta.dirname, ".vite-redesign"),
   plugins: [
     react(),
     tailwindcss(),
