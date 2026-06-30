@@ -51,6 +51,15 @@ const scoreBoxByType: Record<ScoreType, string> = {
   erro: "bg-ink-200 text-ink-400 border-ink-200",
 };
 
+// Destaque "Placar real": a linha "Seu palpite" ganha um leve fundo + texto na
+// cor do tipo da pontuação (decisão João: só a linha, sem borda).
+const realLineByType: Record<ScoreType, string> = {
+  cravada: "bg-gold-500/10 text-gold-700",
+  saldo: "bg-grass-600/10 text-grass-700",
+  acerto: "bg-aqua-700/10 text-aqua-700",
+  erro: "bg-ink-200/50 text-ink-500",
+};
+
 export function MatchCard({
   match,
   prediction,
@@ -103,6 +112,9 @@ export function MatchCard({
   const isKnockout = match.is_knockout;
   // pontos do bônus "quem passa" desta fase (16-avos 1 … final 5). Prévia; o oficial vem do banco.
   const phasePts = isKnockout ? knockoutPhasePoints(match.stage) || 1 : 0;
+  // pênaltis (mata-mata): placar da disputa, mostrado nos DOIS modos de card, ao
+  // vivo (fase pênaltis) e encerrado, sempre que a fonte já trouxe os números.
+  const hasPen = isKnockout && match.home_pen != null && match.away_pen != null;
 
   const save = useSavePrediction();
   const joker = useSetJoker();
@@ -264,25 +276,32 @@ export function MatchCard({
 
   const shareType = scoreType ?? liveType;
   const showRealScoreAsHero = (finished || live) && scoreLayout === "real";
+  // No modo Placar real, a linha "Seu palpite" ganha um leve destaque na cor da
+  // pontuação do usuário (cravada/saldo/acerto/erro).
+  const realLine = showRealScoreAsHero && shareType ? realLineByType[shareType] : "";
 
   return (
     <div
       className={cn(
         "animate-rise overflow-hidden rounded-lg ring-1 transition-shadow",
         finished ? "bg-ink-100 ring-border" : "bg-surface ring-border shadow-[var(--shadow-soft)]",
-        live && "ring-2 ring-flame-400",
-        pending && "ring-2 ring-gold-300",
-        isJoker && !pending && "ring-2 ring-gold-400",
+        // Precedência explícita da borda: dobro ativo SEMPRE manda (cor primary),
+        // pois é o sinal mais forte; senão ao vivo (flame); senão pendente (gold).
+        live && !isJoker && "ring-2 ring-flame-400",
+        pending && !isJoker && "ring-2 ring-gold-300",
+        isJoker && "ring-2 ring-brand-400",
       )}
     >
-      {/* label */}
-      <div className="flex items-center justify-center gap-2 px-3 pt-2.5 text-[11px] text-ink-500">
+      {/* label: topo espalhado (space-between) e quebrável (wrap) — horário/fase à
+          esquerda, campeonato/prazo seguem; evita aperto e centralização forçada. */}
+      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5 px-3 pt-2.5 text-[11px] text-ink-500">
         {live ? (
+          // Com fase detalhada (ESPN: 1º tempo/intervalo/…) mostra SÓ a fase — o
+          // ponto pulsante já sinaliza "ao vivo" e o rótulo curto evita quebra de
+          // linha. Sem fase, mantém "AO VIVO".
           <span className="flex items-center gap-1 font-bold text-flame-600">
-            <span className="size-1.5 animate-pulse-live rounded-full bg-flame-500" /> AO VIVO
-            {match.live_phase && PHASE_LABEL[match.live_phase] && (
-              <span className="font-semibold">· {PHASE_LABEL[match.live_phase]}</span>
-            )}
+            <span className="size-1.5 animate-pulse-live rounded-full bg-flame-500" />
+            {(match.live_phase && PHASE_LABEL[match.live_phase]) || "AO VIVO"}
           </span>
         ) : (
           <span className="font-semibold text-ink-600">{formatTime(match.kickoff_at)}</span>
@@ -306,7 +325,9 @@ export function MatchCard({
               </span>
             ) : null;
           })()}
-        {isJoker && (
+        {/* selo "2×" no topo só DEPOIS do apito (ao vivo/encerrado). Antes do
+            jogo o controle é o toggle do rodapé — evita o raio duplicado. */}
+        {isJoker && (live || finished) && (
           <span className="ml-auto flex items-center gap-0.5 rounded-pill bg-brand-600 px-1.5 py-0 text-[10px] font-bold text-white">
             <Zap className="size-2.5 fill-white" /> 2×
           </span>
@@ -324,15 +345,22 @@ export function MatchCard({
             </div>
             <TeamSide name={match.away_team?.short_name ?? match.away_team_name} team={match.away_team} align="left" />
           </div>
-          {finished && isKnockout && match.home_pen != null && match.away_pen != null && (
-            <div className="-mt-2 pb-1 text-center text-[10px] text-ink-400">
-              pên. {match.home_pen}×{match.away_pen}
+          {hasPen && (
+            <div className="-mt-2 pb-1 text-center text-[11px] font-semibold text-ink-500">
+              pênaltis {match.home_pen}×{match.away_pen}
             </div>
           )}
           {prediction && (
-            <div className="flex flex-wrap items-center justify-center gap-2 border-t border-border px-3 py-1.5 text-xs">
-              <span className="text-ink-400">Seu palpite</span>
-              <span className="font-bold tabular-nums text-ink-700">
+            <div
+              className={cn(
+                "flex flex-wrap items-center justify-center gap-2 border-t border-border px-3 py-1.5 text-xs",
+                // EXPERIMENTAL: linha inteira na cor suave da pontuação (modo Placar real).
+                realLine,
+              )}
+            >
+              {/* com a linha colorida, os textos herdam a cor do tipo (text-inherit). */}
+              <span className={cn(realLine ? "text-inherit opacity-80" : "text-ink-400")}>Seu palpite</span>
+              <span className={cn("font-bold tabular-nums", realLine ? "text-inherit" : "text-ink-700")}>
                 {prediction.home_pred} × {prediction.away_pred}
               </span>
               {finished && scoreType && <ScorePill type={scoreType} withLabel doubled={isJoker} />}
@@ -448,8 +476,8 @@ export function MatchCard({
           <span className={cn("font-extrabold tabular-nums", live ? "text-flame-600" : "text-ink-800")}>
             {finished ? `${match.home_score} × ${match.away_score}` : `${liveHome} × ${liveAway}`}
           </span>
-          {finished && isKnockout && match.home_pen != null && match.away_pen != null && (
-            <span className="text-[10px] text-ink-400">
+          {hasPen && (
+            <span className="text-[11px] font-semibold text-ink-500">
               (pên. {match.home_pen}×{match.away_pen})
             </span>
           )}
@@ -940,13 +968,15 @@ function Galera({
         ? provisionalScoreType(p.home_pred, p.away_pred, liveHome, liveAway)
         : null;
   // quem cada um indicou que passa (mata-mata): vitória → vencedor; empate → escolha
+  // ou mandante por padrão. O fallback cobre palpites antigos gravados antes do
+  // seletor existir, em linha com a trigger/backfill do banco.
   const advancerTeam = (p: (typeof filtered)[number]): MatchWithTeams["home_team"] => {
     if (!isKnockout) return null;
     if (p.home_pred > p.away_pred) return homeTeam;
     if (p.away_pred > p.home_pred) return awayTeam;
     if (p.advance_team_id && homeTeam && p.advance_team_id === homeTeam.id) return homeTeam;
     if (p.advance_team_id && awayTeam && p.advance_team_id === awayTeam.id) return awayTeam;
-    return null;
+    return homeTeam;
   };
   // classificado REAL ao vivo (placar atual; empate → pênaltis se já houver)
   const liveAdv: string | null =
@@ -1019,56 +1049,64 @@ function Galera({
             <span className="min-w-0 flex-1 truncate text-xs font-medium text-ink-800">
               {p.user?.display_name ?? "—"}
             </span>
-            {onStar && p.user?.id && p.user.id !== myId && (
-              <FavStar on={isFav(p.user.id)} onClick={() => onStar(p.user!.id)} />
-            )}
-            {/* mata-mata: escudo de quem a pessoa indicou que passa (discreto) */}
-            {adv && (
-              <span
-                className="shrink-0"
-                title={`Indicou ${adv.short_name ?? adv.name ?? "este time"} pra passar de fase`}
-              >
-                <TeamCrest team={adv} name={adv.short_name ?? adv.name} size={16} />
+            {/* Cluster à DIREITA com colunas de largura FIXA e gap pequeno: tudo
+                alinhado (favoritar → avançador → placar → pontos → raio → bônus),
+                reservando o espaço mesmo quando o item não aparece (ex.: a sua
+                própria linha não tem estrela). */}
+            <div className="flex shrink-0 items-center gap-1.5">
+              <span className="grid size-6 shrink-0 place-items-center">
+                {onStar && p.user?.id && p.user.id !== myId && (
+                  <FavStar on={isFav(p.user.id)} onClick={() => onStar(p.user!.id)} />
+                )}
               </span>
-            )}
-            {/* trovão 2× à ESQUERDA do placar (ao lado da estrela): assim os
-                placares ficam alinhados em coluna. SEMPRE que usou o dobro,
-                mesmo sem pontuar (o ⚡ do ScorePill é suprimido p/ não duplicar). */}
-            {p.is_joker && (
+              {/* mata-mata: escudo de quem a pessoa indicou que passa (slot fixo) */}
+              {isKnockout && (
+                <span
+                  className="grid size-4 shrink-0 place-items-center"
+                  title={adv ? `Indicou ${adv.short_name ?? adv.name ?? "este time"} pra passar de fase` : undefined}
+                >
+                  {adv && <TeamCrest team={adv} name={adv.short_name ?? adv.name} size={16} />}
+                </span>
+              )}
+              <span className="w-11 shrink-0 text-right text-xs font-bold tabular-nums text-ink-600">
+                {p.home_pred} × {p.away_pred}
+              </span>
+              {/* pontuação da PARTIDA (largura fixa, à direita): encerrado = oficial dobrada; ao vivo = prévia */}
+              <span className="flex w-10 shrink-0 items-center justify-end">
+                {finished && p.score_type && (
+                  <ScorePill type={p.score_type} doubled={!!p.is_joker} showZap={false} />
+                )}
+                {!finished && live && t && (
+                  <span className={cn("text-xs font-bold tabular-nums", liveTextByType[t])}>
+                    {t === "erro" ? "0" : `+${SCORE_POINTS[t] * (p.is_joker ? 2 : 1)}`}
+                  </span>
+                )}
+              </span>
+              {/* dobro 2× (slot fixo; reservado mesmo SEM dobro). No mata-mata fica
+                  ENTRE as duas pontuações. ⚡ do ScorePill suprimido p/ não duplicar. */}
               <span
-                title="Usou o Dobro de pontos (2×)"
-                className="grid size-4 shrink-0 place-items-center rounded-full bg-brand-600/15 text-brand-600"
+                className={cn(
+                  "grid size-4 shrink-0 place-items-center rounded-full",
+                  p.is_joker ? "bg-brand-600/15 text-brand-600" : "opacity-0",
+                )}
+                title={p.is_joker ? "Usou o Dobro de pontos (2×)" : undefined}
+                aria-hidden={!p.is_joker}
               >
                 <Zap className="size-2.5 fill-current" />
               </span>
-            )}
-            <span className="text-xs font-bold tabular-nums text-ink-600">
-              {p.home_pred} × {p.away_pred}
-            </span>
-            {/* pontuação SEMPRE visível (encerrado: oficial dobrada; ao vivo: prévia) */}
-            {finished && p.score_type && (
-              <ScorePill type={p.score_type} doubled={!!p.is_joker} showZap={false} />
-            )}
-            {!finished && live && t && (
-              <span
-                className={cn("w-7 text-right text-xs font-bold tabular-nums", liveTextByType[t])}
-              >
-                {t === "erro" ? "0" : `+${SCORE_POINTS[t] * (p.is_joker ? 2 : 1)}`}
-              </span>
-            )}
-            {/* ponto extra "quem passa": coluna SEMPRE presente no mata-mata (até 0),
-                espaçamento padrão; ao vivo é provisório */}
-            {isKnockout && (finished || live) && (
-              <span
-                title={memberBonus(p) > 0 ? "Ponto extra: acertou quem passa" : "Ponto extra"}
-                className={cn(
-                  "w-6 shrink-0 text-right text-[10px] font-bold tabular-nums",
-                  memberBonus(p) > 0 ? "text-grass-600" : "text-ink-300",
-                )}
-              >
-                {memberBonus(p) > 0 ? `+${memberBonus(p)}` : "0"}
-              </span>
-            )}
+              {/* ponto extra "quem passa" (largura fixa; sempre no mata-mata, até 0) */}
+              {isKnockout && (finished || live) && (
+                <span
+                  title={memberBonus(p) > 0 ? "Ponto extra: acertou quem passa" : "Ponto extra"}
+                  className={cn(
+                    "w-5 shrink-0 text-right text-[10px] font-bold tabular-nums",
+                    memberBonus(p) > 0 ? "text-grass-600" : "text-ink-300",
+                  )}
+                >
+                  {memberBonus(p) > 0 ? `+${memberBonus(p)}` : "0"}
+                </span>
+              )}
+            </div>
           </li>
         );
       })}

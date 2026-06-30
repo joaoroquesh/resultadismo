@@ -21,11 +21,50 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+## [2.7.0] — 2026-06-30
+
+### Corrigido
+- **Pênaltis não subiam para `matches` → "não passou" para todos.** Em mata-mata decidido nos
+  pênaltis, `matches.home_pen/away_pen` ficavam nulos no fluxo ao vivo (o sync grava os pênaltis em
+  `match_sources`, mas o `resolve_match_golden` só reconcilia o placar e o `reconcilePrimary` só
+  grava pênaltis no modo catalog). Sem os pênaltis no jogo, `resolved_advancer()` não achava o
+  classificado e o card dava **"não passou"** para todo mundo. Fix **aditivo**: `sync_match_pens()`
+  copia os pênaltis da observação mais recente para o jogo (não travado), na cadência do cron de 25s.
+  Não altera `resolve_match_golden` nem `reconcilePrimary`. (migration `20260630000000`.)
+- **"Quem passa" vazio em palpites antigos de mata-mata.** Empates gravados antes do seletor subir
+  agora recebem automaticamente o mandante como classificado, apenas quando `advance_team_id` estava
+  vazio. Quem já tinha escolhido uma seleção não é alterado. A trigger também passa a preencher esse
+  default em novas escritas sem escolha. (migration `20260629010000`.)
+- **Pênaltis não apareciam no card.** O placar dos pênaltis (mata-mata) agora aparece nos **dois
+  modos** do card (Meu palpite / Placar real), **ao vivo** (fase pênaltis) e encerrado.
+- **Card ao vivo quebrava no "AO VIVO · fase".** Com fase detalhada (1º tempo/intervalo/2º tempo/
+  prorrogação/pênaltis) o card mostra **só a fase** (o ponto pulsante já sinaliza o ao vivo); sem
+  fase, mantém "AO VIVO". Evita a quebra de linha.
+- **Topo do card apertado/centralizado.** A linha de rótulo (horário/fase · campeonato · prazo)
+  passou a usar `flex-wrap` + `justify-between`: horário/fase à esquerda, prazo à direita, quebra
+  natural no estreito — sem aperto nem centralização forçada (pedido do João).
+- **Raio do dobro (2×) duplicado e desalinhando os placares.** O selo "2×" do topo só aparece
+  **após o apito** (ao vivo/encerrado) — antes, o controle é o toggle do rodapé. Na lista da galera
+  o raio virou **coluna fixa à direita** do placar (entre as duas pontuações no mata-mata),
+  reservando espaço tenha ou não dobro → placares e pontos alinhados. E a **borda** do card com
+  dobro ativo passou a ser a **cor primary** (não mais amarela).
+
 ### Adicionado
 - **Preferência de formato do card após o apito.** Em Perfil > Aparência, o usuário pode escolher
   entre manter **Meu palpite** como destaque (padrão atual) ou destacar o **Placar real** quando o
   jogo estiver ao vivo/encerrado, levando o palpite para uma linha "Seu palpite". Preferência local
   do dispositivo, sem mudança de banco nem pontuação.
+- **Destaque da pontuação no "Placar real".** No modo Placar real, a linha "Seu palpite" ganha um
+  leve realce de fundo + texto na **cor da pontuação** (cravada dourado / saldo verde / acerto ciano /
+  erro neutro) — sem ajuste de preferência (decisão João).
+- **Admin — override manual do mata-mata, situação e trava contra a API.** No editor de jogo (aba
+  Jogos): **pênaltis**, **"quem avançou"** (Automático / mandante / visitante → `advanced_team_id`,
+  prioridade no `resolved_advancer`), toggle **"é mata-mata"** (só em jogo sem fase — o resto é
+  automático pela `stage`), **situação ao vivo** (`live_phase`) e **dois modos de trava**:
+  **Adiantar** (crava o placar e a API segue, liberando sozinho quando a fonte trouxer o mesmo —
+  `soft_lock` + cron `release_soft_overrides`, 25s) e **Travar** (fixa placar **e pênaltis** contra
+  qualquer atualização — `manual_lock`; o sync e o golden já pulam jogo travado). (migration
+  `20260629020000`.)
 
 ## [2.6.0] — 2026-06-27
 

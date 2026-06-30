@@ -1066,6 +1066,7 @@ export type Database = {
           round: string | null
           score_conflict: boolean
           score_sources_count: number
+          soft_lock: boolean
           stage: string | null
           status: Database["public"]["Enums"]["match_status"]
           updated_at: string
@@ -1101,6 +1102,7 @@ export type Database = {
           round?: string | null
           score_conflict?: boolean
           score_sources_count?: number
+          soft_lock?: boolean
           stage?: string | null
           status?: Database["public"]["Enums"]["match_status"]
           updated_at?: string
@@ -1136,6 +1138,7 @@ export type Database = {
           round?: string | null
           score_conflict?: boolean
           score_sources_count?: number
+          soft_lock?: boolean
           stage?: string | null
           status?: Database["public"]["Enums"]["match_status"]
           updated_at?: string
@@ -3104,6 +3107,7 @@ export type Database = {
       release_access: { Args: { p_token: string }; Returns: undefined }
       release_confronto_if_due: { Args: { p_lc_id: string }; Returns: boolean }
       release_scheduled_confrontos: { Args: never; Returns: number }
+      release_soft_overrides: { Args: never; Returns: number }
       release_sync_lock: { Args: { p_name: string }; Returns: undefined }
       request_access: { Args: { p_token?: string }; Returns: Json }
       resolve_match_golden: {

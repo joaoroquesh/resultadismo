@@ -1,6 +1,20 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import type { Competition, League, MatchStatus, DataProvider } from "@/lib/types";
+
+// Invalida tudo que depende de placar/pontuação após uma edição de jogo: a lista
+// do admin + os palpites + as classificações oficiais e AO VIVO (grupo e global)
+// e os previews da aba Grupos. Centralizado p/ não divergir entre os hooks.
+function invalidateScoringQueries(qc: QueryClient) {
+  qc.invalidateQueries({ queryKey: ["admin", "matches"] });
+  qc.invalidateQueries({ queryKey: ["matches"] });
+  qc.invalidateQueries({ queryKey: ["standings"] });
+  qc.invalidateQueries({ queryKey: ["standings-live"] });
+  qc.invalidateQueries({ queryKey: ["rtb-standings-live"] });
+  qc.invalidateQueries({ queryKey: ["rtb-my-rank-live"] });
+  qc.invalidateQueries({ queryKey: ["my-league-positions-live"] });
+  qc.invalidateQueries({ queryKey: ["group-rank-window-live"] });
+}
 
 export function usePendingLeagues() {
   return useQuery({
@@ -121,6 +135,8 @@ export type AdminMatch = {
   round: string | null;
   home_team_name: string | null;
   away_team_name: string | null;
+  home_team_id: string | null;
+  away_team_id: string | null;
   home_team: { name: string | null; short_name: string | null; crest_url: string | null } | null;
   away_team: { name: string | null; short_name: string | null; crest_url: string | null } | null;
   kickoff_at: string | null;
@@ -130,10 +146,18 @@ export type AdminMatch = {
   home_pen: number | null;
   away_pen: number | null;
   hidden: boolean;
+  // mata-mata "quem passa" + situação ao vivo + travas de fonte (override manual).
+  stage: string | null;
+  is_knockout: boolean;
+  advanced_team_id: string | null;
+  live_phase: string | null;
+  frozen: boolean;
+  manual_lock: boolean;
+  soft_lock: boolean;
 };
 
 const ADMIN_MATCH_SELECT =
-  "id, competition_id, provider, round, home_team_name, away_team_name, kickoff_at, status, home_score, away_score, home_pen, away_pen, hidden, home_team:teams!matches_home_team_id_fkey(name,short_name,crest_url), away_team:teams!matches_away_team_id_fkey(name,short_name,crest_url)";
+  "id, competition_id, provider, round, home_team_name, away_team_name, home_team_id, away_team_id, kickoff_at, status, home_score, away_score, home_pen, away_pen, hidden, stage, is_knockout, advanced_team_id, live_phase, frozen, manual_lock, soft_lock, home_team:teams!matches_home_team_id_fkey(name,short_name,crest_url), away_team:teams!matches_away_team_id_fkey(name,short_name,crest_url)";
 
 export function useAdminMatches(competitionId: string | undefined) {
   return useQuery({
@@ -176,28 +200,85 @@ export function useSaveMatchResult() {
       home: number | null;
       away: number | null;
       status: MatchStatus;
+      // Opcionais (mata-mata / situação): só entram no UPDATE quando definidos,
+      // pra não sobrescrever quem não foi editado. Pênaltis e "quem avançou"
+      // re-pontuam sozinhos (trigger matches_rescore reage a essas colunas).
+      homePen?: number | null;
+      awayPen?: number | null;
+      advancedTeamId?: string | null;
+      livePhase?: string | null;
     }) => {
+      const patch = {
+        home_score: input.home,
+        away_score: input.away,
+        status: input.status,
+        ...(input.homePen !== undefined ? { home_pen: input.homePen } : {}),
+        ...(input.awayPen !== undefined ? { away_pen: input.awayPen } : {}),
+        ...(input.advancedTeamId !== undefined ? { advanced_team_id: input.advancedTeamId } : {}),
+        ...(input.livePhase !== undefined ? { live_phase: input.livePhase } : {}),
+      };
+      const { error } = await supabase.from("matches").update(patch).eq("id", input.matchId);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => invalidateScoringQueries(qc),
+  });
+}
+
+// Toggle "é mata-mata" (matches.is_knockout). Atenção: o trigger
+// matches_set_knockout DERIVA is_knockout da `stage` quando ela existe — então
+// este override só PERSISTE em jogo sem fase (manual/W.O.). A UI só oferece o
+// toggle nesse caso. Re-pontua via trigger matches_rescore.
+export function useSetMatchKnockout() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { matchId: string; isKnockout: boolean }) => {
       const { error } = await supabase
         .from("matches")
-        .update({
-          home_score: input.home,
-          away_score: input.away,
-          status: input.status,
-        })
+        .update({ is_knockout: input.isKnockout })
         .eq("id", input.matchId);
       if (error) throw new Error(error.message);
     },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["admin", "matches"] });
-      qc.invalidateQueries({ queryKey: ["matches"] });
-      qc.invalidateQueries({ queryKey: ["standings"] });
-      qc.invalidateQueries({ queryKey: ["standings-live"] });
-      // AO VIVO: ranking global + previews da aba Grupos acompanham a edição.
-      qc.invalidateQueries({ queryKey: ["rtb-standings-live"] });
-      qc.invalidateQueries({ queryKey: ["rtb-my-rank-live"] });
-      qc.invalidateQueries({ queryKey: ["my-league-positions-live"] });
-      qc.invalidateQueries({ queryKey: ["group-rank-window-live"] });
+    onSuccess: () => invalidateScoringQueries(qc),
+  });
+}
+
+// Override do admin contra a API, em dois modos (+ destravar):
+//  - "soft" (adiantar): grava o placar/pênaltis e SEGURA (manual_lock+soft_lock);
+//    o cron release_soft_overrides libera sozinho quando a API trouxer o mesmo.
+//  - "hard" (travar): fixa placar/pênaltis contra QUALQUER update da API
+//    (manual_lock, sem soft). reconcilePrimary e resolve_match_golden já pulam
+//    jogo travado — pênaltis inclusos.
+//  - "off" (destravar): a API volta a mandar.
+// soft/hard também limpam o congelamento (frozen) p/ o valor manual valer.
+export function useSetMatchOverride() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      matchId: string;
+      mode: "soft" | "hard" | "off";
+      home?: number | null;
+      away?: number | null;
+      homePen?: number | null;
+      awayPen?: number | null;
+      status?: MatchStatus;
+    }) => {
+      const patch =
+        input.mode === "off"
+          ? { manual_lock: false, soft_lock: false }
+          : {
+              ...(input.home !== undefined ? { home_score: input.home } : {}),
+              ...(input.away !== undefined ? { away_score: input.away } : {}),
+              ...(input.homePen !== undefined ? { home_pen: input.homePen } : {}),
+              ...(input.awayPen !== undefined ? { away_pen: input.awayPen } : {}),
+              ...(input.status !== undefined ? { status: input.status } : {}),
+              manual_lock: true,
+              soft_lock: input.mode === "soft",
+              frozen: false,
+            };
+      const { error } = await supabase.from("matches").update(patch).eq("id", input.matchId);
+      if (error) throw new Error(error.message);
     },
+    onSuccess: () => invalidateScoringQueries(qc),
   });
 }
 
