@@ -47,6 +47,8 @@
   Pênaltis vêm do sync; `resolved_advancer()` cai neles no empate. Admin só intervém em W.O./sem fase.
 - **Classificado previsto:** vitória → vencedor do placar (implícito); **empate → `advance_team_id`,
   obrigatório, com o MANDANTE pré-marcado** (editável, nunca vazio — decisão João 2026-06-22).
+  A correção `20260629010000` reforça isso no banco: empate vazio em mata-mata passa a gravar o
+  mandante e os palpites antigos vazios foram preenchidos sem mexer em quem já escolheu.
 - **AO VIVO (provisório):** durante o jogo o classificado sai do **placar atual** (sem pênaltis;
   empate ao vivo = indefinido) e o bônus conta provisório — `provisional_advance_bonus()` nas funções
   `_live`; o card mostra "passa +N"/"não passa". No encerrado vale `predictions.advance_bonus` (com

@@ -176,6 +176,19 @@ Pagamento · Avisos · Construa · Qualidade · Changelog**. Todas as ações ch
   reabrir palpites) e **Comparar fontes** (`admin_match_sources_for_competition`): por jogo, o que
   **cada API** reportou lado a lado (scroll horizontal/swipe no mobile), divergências em vermelho, com
   override/travar/descongelar. Separada da tela de palpites.
+- **Editor do jogo (aba Jogos → Editar)** — além de placar/status, escrita direta em `matches`
+  (RLS `matches_admin_write`):
+  - **Mata-mata "quem passa":** **pênaltis** (`home_pen`/`away_pen`), **quem avançou** (Automático /
+    mandante / visitante → `advanced_team_id`, que tem prioridade no `resolved_advancer`) e toggle
+    **"é mata-mata"** (`is_knockout`) — este só aparece em **jogo sem fase** (com fase, o trigger
+    `matches_set_knockout` deriva da `stage` e o toggle não pega). Re-pontua via `matches_rescore`.
+  - **Situação ao vivo** (`live_phase`): 1º tempo / intervalo / 2º tempo / prorrogação / pênaltis;
+    só com o status "Ao vivo". Enquanto o jogo **não** estiver travado, a API pode sobrescrever no
+    próximo sync.
+  - **Trava contra a API**, em dois modos: **Adiantar** (`soft_lock`+`manual_lock`) crava o placar/
+    pênaltis na frente da API e **libera sozinho** quando alguma fonte trouxer o **mesmo** valor
+    (`release_soft_overrides`, cron 25s); **Travar** (`manual_lock`) fixa placar **e** pênaltis
+    contra **qualquer** atualização; **Destravar** volta o controle à API. (→ [`05`](05-DADOS-E-AUTH.md) §sync.)
 - **Reabrir palpites** (`admin_reopen_match`): emergência (jogo adiado) — empurra o `kickoff_at`
   ~15 min e destrava os palpites.
 - ℹ️ O ideal é a API atualizar sozinha (sync inteligente — §sync abaixo); o override é exceção.

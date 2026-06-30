@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, RefreshCw, Eye, EyeOff, Pencil, Check, X, ExternalLink, Clock, ChevronDown, ChevronRight, Lock, Unlock, Snowflake, AlertTriangle } from "lucide-react";
+import { ArrowLeft, RefreshCw, Eye, EyeOff, Pencil, Check, X, ExternalLink, Clock, ChevronDown, ChevronRight, Lock, Unlock, Snowflake, AlertTriangle, Swords } from "lucide-react";
 import { Page } from "@/components/layout/Page";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -16,6 +16,8 @@ import {
   useAdminMatches,
   useSaveMatchResult,
   useSetMatchHidden,
+  useSetMatchKnockout,
+  useSetMatchOverride,
   useSyncFootball,
   type AdminMatch,
 } from "./api";
@@ -37,6 +39,16 @@ const STATUS_OPTS: { value: MatchStatus; label: string }[] = [
   { value: "finished", label: "Encerrado" },
   { value: "postponed", label: "Adiado" },
   { value: "cancelled", label: "Cancelado" },
+];
+
+// Situação ao vivo (matches.live_phase). Códigos iguais aos do card (MatchCard).
+const LIVE_PHASE_OPTS: { value: string; label: string }[] = [
+  { value: "", label: "—" },
+  { value: "1t", label: "1º tempo" },
+  { value: "intervalo", label: "Intervalo" },
+  { value: "2t", label: "2º tempo" },
+  { value: "prorrogacao", label: "Prorrogação" },
+  { value: "penaltis", label: "Pênaltis" },
 ];
 
 function statusPill(s: MatchStatus): { tone: "neutral" | "flame" | "grass" | "gold"; label: string } {
@@ -249,17 +261,38 @@ function DaySection({ list, defaultOpen }: { list: AdminMatch[]; defaultOpen: bo
 function AdminMatchRow({ match }: { match: AdminMatch }) {
   const save = useSaveMatchResult();
   const setHidden = useSetMatchHidden();
+  const setKnockout = useSetMatchKnockout();
+  const override = useSetMatchOverride();
   const reopen = useReopenMatch();
   const { toast } = useToast();
   const [editing, setEditing] = useState(false);
   const [home, setHome] = useState(match.home_score?.toString() ?? "");
   const [away, setAway] = useState(match.away_score?.toString() ?? "");
   const [status, setStatus] = useState<MatchStatus>(match.status);
+  // mata-mata: pênaltis + "quem avançou" ("" = automático). situação: live_phase.
+  const [homePen, setHomePen] = useState(match.home_pen?.toString() ?? "");
+  const [awayPen, setAwayPen] = useState(match.away_pen?.toString() ?? "");
+  const [advancer, setAdvancer] = useState<string>(match.advanced_team_id ?? "");
+  const [livePhase, setLivePhase] = useState<string>(match.live_phase ?? "");
 
   const homeName = match.home_team?.short_name || match.home_team_name || "A definir";
   const awayName = match.away_team?.short_name || match.away_team_name || "A definir";
   const pill = statusPill(match.status);
   const hasScore = match.home_score != null && match.away_score != null;
+  // "é mata-mata" é automático quando há fase reconhecida (trigger deriva da stage);
+  // só dá pra forçar na mão em jogo SEM fase (manual/W.O.).
+  const stageLocked = !!match.stage && match.stage.trim() !== "";
+  const isKnockout = match.is_knockout;
+
+  function resetFields() {
+    setHome(match.home_score?.toString() ?? "");
+    setAway(match.away_score?.toString() ?? "");
+    setStatus(match.status);
+    setHomePen(match.home_pen?.toString() ?? "");
+    setAwayPen(match.away_pen?.toString() ?? "");
+    setAdvancer(match.advanced_team_id ?? "");
+    setLivePhase(match.live_phase ?? "");
+  }
 
   async function handleSave() {
     try {
@@ -268,11 +301,57 @@ function AdminMatchRow({ match }: { match: AdminMatch }) {
         home: home === "" ? null : Number(home),
         away: away === "" ? null : Number(away),
         status,
+        // pênaltis + quem avançou só fazem sentido no mata-mata (undefined = não toca).
+        homePen: isKnockout ? (homePen === "" ? null : Number(homePen)) : undefined,
+        awayPen: isKnockout ? (awayPen === "" ? null : Number(awayPen)) : undefined,
+        advancedTeamId: isKnockout ? (advancer === "" ? null : advancer) : undefined,
+        // situação só existe ao vivo; em qualquer outro status, limpa.
+        livePhase: status === "live" ? (livePhase === "" ? null : livePhase) : null,
       });
       toast("Resultado salvo.", "success");
       setEditing(false);
     } catch (e) {
       toast(e instanceof Error ? e.message : "Não deu pra salvar agora. Tenta de novo?", "error");
+    }
+  }
+
+  async function toggleKnockout() {
+    try {
+      await setKnockout.mutateAsync({ matchId: match.id, isKnockout: !match.is_knockout });
+      toast(match.is_knockout ? "Não é mais mata-mata." : "Marcado como mata-mata.", "success");
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Não deu agora. Tenta de novo?", "error");
+    }
+  }
+
+  // Trava contra a API: "soft"/"hard" gravam os valores do editor + travam;
+  // "off" só destrava. Pênaltis só entram no mata-mata.
+  async function applyOverride(mode: "soft" | "hard" | "off") {
+    try {
+      await override.mutateAsync(
+        mode === "off"
+          ? { matchId: match.id, mode }
+          : {
+              matchId: match.id,
+              mode,
+              home: home === "" ? null : Number(home),
+              away: away === "" ? null : Number(away),
+              homePen: isKnockout ? (homePen === "" ? null : Number(homePen)) : undefined,
+              awayPen: isKnockout ? (awayPen === "" ? null : Number(awayPen)) : undefined,
+              status,
+            },
+      );
+      toast(
+        mode === "off"
+          ? "Destravado — a API volta a atualizar."
+          : mode === "soft"
+            ? "Placar adiantado. A API libera quando trouxer o mesmo."
+            : "Placar travado contra a API.",
+        "success",
+      );
+      setEditing(false);
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Não deu agora. Tenta de novo?", "error");
     }
   }
 
@@ -357,15 +436,153 @@ function AdminMatchRow({ match }: { match: AdminMatch }) {
               </button>
             ))}
           </div>
+          {/* Situação ao vivo (live_phase): só quando o status escolhido é "Ao vivo". */}
+          {status === "live" && (
+            <div className="space-y-1.5">
+              <p className="text-xs font-semibold text-ink-600">Situação (ao vivo)</p>
+              <div className="flex flex-wrap gap-1.5">
+                {LIVE_PHASE_OPTS.map((o) => (
+                  <button
+                    key={o.value || "none"}
+                    type="button"
+                    onClick={() => setLivePhase(o.value)}
+                    className={cn(
+                      "rounded-pill px-3 py-1.5 text-xs font-semibold transition",
+                      livePhase === o.value
+                        ? "bg-brand-600 text-white"
+                        : "bg-ink-100 text-ink-600 hover:bg-ink-200",
+                    )}
+                  >
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+              {!match.manual_lock && (
+                <p className="text-[11px] leading-snug text-ink-400">
+                  Enquanto o jogo não estiver <strong>travado</strong>, a API pode sobrescrever a
+                  situação no próximo sync.
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Mata-mata: é-mata-mata + pênaltis + quem avançou. Escondido p/ jogo de
+              fase reconhecida que NÃO é mata-mata (ex.: fase de grupos). */}
+          {(isKnockout || !stageLocked) && (
+            <div className="space-y-2 rounded-md border border-border bg-surface p-2.5">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-ink-700">
+                <Swords className="size-3.5" /> Mata-mata
+              </div>
+              {stageLocked ? (
+                <p className="text-[11px] leading-snug text-ink-500">
+                  {isKnockout ? "É mata-mata" : "Não é mata-mata"} — automático pela fase{" "}
+                  <span className="font-semibold">{match.stage}</span>.
+                </p>
+              ) : (
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs text-ink-600">É mata-mata? (jogo sem fase)</span>
+                  <Button
+                    size="sm"
+                    variant={isKnockout ? "secondary" : "ghost"}
+                    loading={setKnockout.isPending}
+                    onClick={toggleKnockout}
+                    aria-pressed={isKnockout}
+                  >
+                    {isKnockout ? "Sim" : "Não"}
+                  </Button>
+                </div>
+              )}
+              {isKnockout && (
+                <>
+                  <div className="flex items-center justify-center gap-2 pt-1">
+                    <span className="flex-1 truncate text-right text-xs text-ink-600">pên. {homeName}</span>
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      value={homePen}
+                      onChange={(e) => setHomePen(e.target.value)}
+                      aria-label={`Pênaltis ${homeName}`}
+                      className="size-10 rounded-md border border-ink-200 bg-surface text-center font-bold outline-none focus:border-brand-500"
+                    />
+                    <span className="text-ink-300">×</span>
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      value={awayPen}
+                      onChange={(e) => setAwayPen(e.target.value)}
+                      aria-label={`Pênaltis ${awayName}`}
+                      className="size-10 rounded-md border border-ink-200 bg-surface text-center font-bold outline-none focus:border-brand-500"
+                    />
+                    <span className="flex-1 truncate text-xs text-ink-600">{awayName}</span>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[11px] font-semibold text-ink-600">Quem avançou</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {[
+                        { v: "", label: "Automático" },
+                        ...(match.home_team_id ? [{ v: match.home_team_id, label: homeName }] : []),
+                        ...(match.away_team_id ? [{ v: match.away_team_id, label: awayName }] : []),
+                      ].map((o) => (
+                        <button
+                          key={o.v || "auto"}
+                          type="button"
+                          onClick={() => setAdvancer(o.v)}
+                          aria-pressed={advancer === o.v}
+                          className={cn(
+                            "rounded-pill px-3 py-1.5 text-xs font-semibold transition",
+                            advancer === o.v
+                              ? "bg-brand-600 text-white"
+                              : "bg-ink-100 text-ink-600 hover:bg-ink-200",
+                          )}
+                        >
+                          {o.label}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-[11px] leading-snug text-ink-400">
+                      Automático = pelo placar e pênaltis. Defina um time só p/ W.O. ou erro da fonte.
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Trava contra a API (sync): adiantar (segura até a API alcançar) ou
+              travar de vez. Grava os valores do editor junto. */}
+          <div className="space-y-2 rounded-md border border-border bg-surface p-2.5">
+            <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-ink-700">
+              <Lock className="size-3.5" /> Trava contra a API
+              {match.manual_lock && match.soft_lock && <Badge tone="gold">adiantado</Badge>}
+              {match.manual_lock && !match.soft_lock && <Badge tone="gold">travado</Badge>}
+              {match.frozen && <Badge tone="neutral">congelado</Badge>}
+            </div>
+            <p className="text-[11px] leading-snug text-ink-400">
+              <strong>Adiantar</strong>: crava o placar agora e a API segue — libera sozinho quando ela
+              trouxer o mesmo. <strong>Travar</strong>: fixa placar e pênaltis contra qualquer update.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" variant="outline" loading={override.isPending} onClick={() => applyOverride("soft")}>
+                <Clock className="size-4" /> Adiantar
+              </Button>
+              <Button size="sm" variant="outline" loading={override.isPending} onClick={() => applyOverride("hard")}>
+                <Lock className="size-4" /> Travar
+              </Button>
+              {match.manual_lock && (
+                <Button size="sm" variant="ghost" loading={override.isPending} onClick={() => applyOverride("off")}>
+                  <Unlock className="size-4" /> Destravar
+                </Button>
+              )}
+            </div>
+          </div>
+
           <div className="flex gap-2">
             <Button
               size="sm"
               variant="ghost"
               onClick={() => {
                 setEditing(false);
-                setHome(match.home_score?.toString() ?? "");
-                setAway(match.away_score?.toString() ?? "");
-                setStatus(match.status);
+                resetFields();
               }}
             >
               <X className="size-4" /> Cancelar

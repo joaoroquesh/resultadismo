@@ -130,10 +130,16 @@ Realtime**); `nudge_member` (cutucar, anti-spam 30 min).
   N `secondary` que só validam placar; cadeia de fallback) e **`match_sources`** (1 observação por
   `(jogo, fonte)` — base do voto e da detecção de divergência). Ambas RLS-on **sem policy** (só via
   RPC). `competitions.in_personalization` (flag) e colunas em `matches`: `frozen`/`frozen_at`,
-  `manual_lock`/`manually_edited_*`, `score_sources_count`, `score_conflict`.
+  `manual_lock`/`manually_edited_*`, **`soft_lock`**, `score_sources_count`, `score_conflict`.
 - `resolve_match_golden(p_match_ids[])` (interna, grant só `service_role`; **cron a cada 10 min**):
   placar golden = voto da maioria das fontes (empate → mais recente); marca `score_conflict`; e
   **congela** (decisão #3) finalizado + ≥2 fontes + >1h. **Nunca** toca `manual_lock`/`frozen`.
+- **Override do admin (2 modos):** **Travar** (`manual_lock=true`) blinda placar **e pênaltis** —
+  `reconcilePrimary` e `resolve_match_golden` pulam jogo travado (só gravam observação). **Adiantar**
+  (`soft_lock=true`+`manual_lock=true`) segura o placar adiantado até a API alcançar:
+  `release_soft_overrides()` (grant `service_role`, **cron `resultadismo-release-soft` 25s**) destrava
+  (`manual_lock`/`soft_lock`→false) assim que alguma fonte reporta o **mesmo** placar (pênaltis entram
+  só se o admin os definiu). Aditivo: não altera `resolve_match_golden`/`reconcilePrimary`.
 - RPCs de admin (gate `is_app_admin()`): `admin_override_match` (placar/status + lock, decisão #8),
   `admin_set_match_lock`, `admin_unfreeze_match`, `admin_list_match_conflicts`,
   `admin_{list,upsert,set_enabled,remove}_competition_source`. → [`04`](04-ADMIN.md) aba Dados.
@@ -148,6 +154,10 @@ Realtime**); `nudge_member` (cutucar, anti-spam 30 min).
   `score_type`/`points`/`scored_at`; senão deixa nulo (aguardando resultado).
 - `matches_rescore_predictions` (AFTER UPDATE de placar/status): **recalcula todos os palpites** do
   jogo quando o resultado muda (e reverte se voltar a não-finalizado).
+- `predictions_score_on_write` também normaliza o "quem passa" do mata-mata: vitória mantém
+  `advance_team_id` nulo (classificado implícito pelo placar), empate exige/assume o mandante. A
+  migration `20260629010000` fez backfill dos empates antigos de mata-mata que estavam vazios,
+  preservando escolhas já preenchidas.
 - `leagues_before_insert` (gera `join_code`, força status/payment conforme modo/papel) +
   `leagues_after_insert` (adiciona o dono como membro).
 - Guards: `leagues_guard_status`, `protect_league_owner`, `leagues_guard_confronto_enabled`,
