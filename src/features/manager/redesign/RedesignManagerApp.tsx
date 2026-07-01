@@ -3,16 +3,18 @@
 // Vestiário -> Ao vivo (2T) -> Pós-jogo. Determinístico: o adversário e a tática
 // dele saem de um seed estável. Reaproveita os dados/escudos/cores do manager no ar.
 import { useCallback, useMemo, useRef, useState } from "react";
-import type { Team, Edition } from "../types";
+import type { Team, Edition, WorldMode } from "../types";
 import type { Tactic, PresetKey } from "./tactics.ts";
 import { DEFAULT_TACTIC, PRESETS, tacticFromPreset } from "./tactics.ts";
 import type { MatchState } from "./sim.ts";
 import { createMatch, recompute } from "./sim.ts";
-import type { ArchetypeKey } from "./archetypes.ts";
-import { teamsForYear, latestEditionWithBrazil, toLite } from "./data";
+import { archetypeBonus } from "./archetypes.ts";
+import { teamsForYear, toLite, editionsDesc } from "./data";
+import { useManagerArchetype } from "./useManagerArchetype";
 import { Home, HowItWorks, type HomeAction } from "./Home";
 import { ArchetypeQuiz } from "./ArchetypeQuiz";
 import { SelectCopaTeam } from "./SelectCopaTeam";
+import { DraftSelection } from "./DraftSelection";
 import { TacticPicker, type PickerMode } from "./TacticPicker";
 import { LiveMatchView, type LiveResult } from "./LiveMatchView";
 import { Halftime } from "./Halftime";
@@ -21,7 +23,7 @@ import type { ScoreboardGoal } from "./Scoreboard";
 import { ManagerCrest } from "../components";
 import { ArrowLeftIcon, ArrowRightIcon } from "./icons";
 
-type Screen = "home" | "quiz" | "selectCopa" | "tactic" | "live1" | "halftime" | "live2" | "post";
+type Screen = "home" | "quiz" | "draft" | "selectCopa" | "tactic" | "live1" | "halftime" | "live2" | "post";
 
 // PRNG estável (mulberry32) pro adversário/tática dele.
 function rng(seed: number): () => number {
@@ -79,7 +81,8 @@ function ScreenFrame({
 
 export function RedesignManagerApp() {
   const [screen, setScreen] = useState<Screen>("home");
-  const [archetype, setArchetype] = useState<ArchetypeKey | null>(null);
+  // identidade de treinador persistida (localStorage + Supabase quando logado).
+  const { archetype, setArchetype } = useManagerArchetype();
 
   // contexto da partida
   const [edition, setEdition] = useState<Edition | null>(null);
@@ -88,6 +91,9 @@ export function RedesignManagerApp() {
   const [oppTac, setOppTac] = useState<Tactic>(DEFAULT_TACTIC);
   const [tac, setTac] = useState<Tactic>({ ...DEFAULT_TACTIC });
   const [mode, setMode] = useState<PickerMode>("rapido");
+  // mundo da campanha escolhido no sorteio (real / alternativo). Guardado pra futuras
+  // fases (pré-jogo/campanha); no jogo único não altera a mecânica da minha partida.
+  const [, setWorldMode] = useState<WorldMode>("real");
   const seedRef = useRef<number>((Date.now() ^ 0x1234) >>> 0);
 
   // resultado ao vivo (placar + estado) pra o pós-jogo e o vestiário
@@ -100,12 +106,13 @@ export function RedesignManagerApp() {
   const matchStateRef = useRef<MatchState | null>(null);
   const [matchTick, setMatchTick] = useState(0);
 
-  // monta a partida ao escolher a seleção
-  const startMatchWith = useCallback((ed: Edition, team: Team) => {
+  // monta a partida ao escolher a seleção. `world` guarda o mundo da campanha (do sorteio).
+  const startMatchWith = useCallback((ed: Edition, team: Team, world: WorldMode = "real") => {
     const seed = (Date.now() ^ (ed.year * 2654435761) ^ team.o) >>> 0;
     seedRef.current = seed;
     setEdition(ed);
     setMyTeam(team);
+    setWorldMode(world);
     const opp = pickOpponent(team, ed.year, seed);
     setOppTeam(opp);
     setOppTac(aiTactic(seed));
@@ -120,12 +127,10 @@ export function RedesignManagerApp() {
     if (a === "quiz") setScreen("quiz");
     else if (a === "how") setScreen("how" as Screen);
     else if (a === "selectCopa") setScreen("selectCopa");
-    else if (a === "playBrasil") {
-      const br = latestEditionWithBrazil();
-      if (br) startMatchWith(br.edition, br.brasil);
-      else setScreen("selectCopa");
-    }
-  }, [startMatchWith]);
+    // "Jogar Mata-Mata 2026": abre o sorteio por dificuldade (Sua seleção). Lá dá pra
+    // pegar a favorita (o topo da edição, o Brasil quando ele sai) ou a zebra.
+    else if (a === "playBrasil") setScreen("draft");
+  }, []);
 
   // ==== captura dos eventos do ao vivo ====
   const goalsFromState = useCallback((st: MatchState): ScoreboardGoal[] => {
@@ -154,12 +159,16 @@ export function RedesignManagerApp() {
     setScreen("live2");
   }, []);
 
-  // garante o estado do motor criado pra esta partida (chamado ao apitar).
+  // garante o estado do motor criado pra esta partida (chamado ao apitar). Injeta a
+  // identidade do treinador no MEU lado (archUnits) via archetypeBonus. A IA fica 0.
   const ensureMatch = useCallback(() => {
     if (!myTeam || !oppTeam) return;
-    matchStateRef.current = createMatch(toLite(myTeam), toLite(oppTeam), { ...tac }, { ...oppTac }, seedRef.current);
+    const archA = archetypeBonus(archetype, tac);
+    matchStateRef.current = createMatch(
+      toLite(myTeam), toLite(oppTeam), { ...tac }, { ...oppTac }, seedRef.current, { a: archA, b: 0 },
+    );
     setMatchTick((n) => n + 1);
-  }, [myTeam, oppTeam, tac, oppTac]);
+  }, [myTeam, oppTeam, tac, oppTac, archetype]);
 
   // O LiveMatchView recebe o state (dono do orquestrador). matchTick muda só ao apitar.
   const liveView = useMemo(() => {
@@ -190,14 +199,7 @@ export function RedesignManagerApp() {
   if (screen === ("how" as Screen)) {
     return (
       <ScreenFrame>
-        <HowItWorks
-          onBack={() => setScreen("home")}
-          onPlay={() => {
-            const br = latestEditionWithBrazil();
-            if (br) startMatchWith(br.edition, br.brasil);
-            else setScreen("selectCopa");
-          }}
-        />
+        <HowItWorks onBack={() => setScreen("home")} onPlay={() => setScreen("draft")} />
       </ScreenFrame>
     );
   }
@@ -217,6 +219,22 @@ export function RedesignManagerApp() {
     );
   }
 
+  // "Sua seleção": sorteio por dificuldade (3 seleções + mundo da campanha).
+  if (screen === "draft") {
+    return (
+      <ScreenFrame>
+        {/* "Jogar Mata-Mata 2026": abre direto na edição mais recente (2026); dá pra
+            trocar a Copa lá dentro. */}
+        <DraftSelection
+          initialEdition={editionsDesc()[0] ?? null}
+          onPick={(ed, t, world) => startMatchWith(ed, t, world)}
+          onBack={() => setScreen("home")}
+        />
+      </ScreenFrame>
+    );
+  }
+
+  // "Selecionar Copa": picker manual de edição + seleção (lista completa).
   if (screen === "selectCopa") {
     return (
       <ScreenFrame>
@@ -242,7 +260,7 @@ export function RedesignManagerApp() {
             </div>
           </div>
         </div>
-        <TacticPicker tac={tac} onChange={setTac} mode={mode} onModeChange={setMode} blind />
+        <TacticPicker tac={tac} onChange={setTac} mode={mode} onModeChange={setMode} blind archetype={archetype} />
         <button
           type="button"
           onClick={() => {
@@ -273,6 +291,7 @@ export function RedesignManagerApp() {
           oppTac={oppTac}
           mode={mode}
           onModeChange={setMode}
+          archetype={archetype}
           onChange={(t) => {
             setTac(t);
             // aplica o replanejamento ao estado vivo do motor (formação/estilos/bloco/postura)

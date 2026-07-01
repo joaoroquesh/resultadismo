@@ -6,7 +6,8 @@ import { useMemo, useState } from "react";
 import type { Team } from "../types";
 import type { Tactic, SignalLevel } from "./tactics.ts";
 import { matchupSignals, coherenceSignals } from "./tactics.ts";
-import { CoherenceList, MatchupList } from "./Signals";
+import type { ArchetypeKey } from "./archetypes.ts";
+import { CoherenceList, MatchupList, IdentityFitRow } from "./Signals";
 import { TacticPicker, type PickerMode } from "./TacticPicker";
 import { ManagerCrest } from "../components";
 import { CompassIcon, ShieldIcon, ArrowUpIcon, ArrowDownIcon, EqualIcon } from "./icons";
@@ -67,6 +68,7 @@ export function Halftime({
   onModeChange,
   onChange,
   onResume,
+  archetype = null,
 }: {
   myTeam: Team;
   oppTeam: Team;
@@ -77,6 +79,7 @@ export function Halftime({
   onModeChange: (m: PickerMode) => void;
   onChange: (t: Tactic) => void;
   onResume: () => void;
+  archetype?: ArchetypeKey | null;
 }) {
   const [pane, setPane] = useState<"plano" | "encaixe">("encaixe");
   const matchups = useMemo(() => matchupSignals(tac, oppTac), [tac, oppTac]);
@@ -164,13 +167,18 @@ export function Halftime({
             <h3 className="text-[12.5px] font-bold text-ink-900">As suas escolhas continuam combinando</h3>
           </div>
           <CoherenceList signals={coherences} />
+          {archetype && (
+            <div className="mt-1.5">
+              <IdentityFitRow arch={archetype} tac={tac} />
+            </div>
+          )}
         </section>
       )}
 
       {/* replanejar o 2º tempo (rápido/tático) */}
       <section>
         <h3 className="mb-2 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">Replaneje o segundo tempo</h3>
-        <TacticPicker tac={tac} onChange={onChange} mode={mode} onModeChange={onModeChange} blind={false} />
+        <TacticPicker tac={tac} onChange={onChange} mode={mode} onModeChange={onModeChange} blind={false} archetype={archetype} />
       </section>
 
       <button

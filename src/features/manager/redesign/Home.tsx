@@ -1,62 +1,23 @@
-// Home do Maneiger reformulado: cards de entrada. "Jogar Mata-Mata 2026" é o
-// primário (permite escolher o Brasil); perfil de técnico é opcional; "Selecionar
-// Copa" abre o seletor de edição; "Como funciona" é um guia simples e completo.
+// Home do Maneiger reformulado (TASK 2). Fluxo de cima pra baixo: manchete +
+// descrição curta -> "Como funciona" enxuto (2-3 linhas) com "Saiba mais" abrindo o
+// guia completo -> identidade de treinador (card do arquétipo, ou convite ao quiz) ->
+// CTA primário "Jogar Mata-Mata 2026" (sorteio por dificuldade OU Brasil) -> "Selecionar
+// Copa". Mobile-first, microinterações discretas (entrada escalonada, hover suave),
+// prefers-reduced-motion coberto pelo kill-switch global do index.css.
 import { latestEditionWithBrazil } from "./data";
 import { ArchetypeCard } from "./ArchetypeQuiz";
 import type { ArchetypeKey } from "./archetypes.ts";
-import { CompassIcon, TrophyIcon, FlagIcon, BookIcon, ArrowRightIcon, BallIcon } from "./icons";
+import { CompassIcon, FlagIcon, ArrowRightIcon, BallIcon, BookIcon } from "./icons";
 
 export type HomeAction = "quiz" | "playBrasil" | "selectCopa" | "how";
 
-function Card({
-  title,
-  desc,
-  Icon,
-  primary,
-  onClick,
-  badge,
-}: {
-  title: string;
-  desc: string;
-  Icon: typeof TrophyIcon;
-  primary?: boolean;
-  onClick: () => void;
-  badge?: string;
-}) {
+// ícone oficial (public/icons) num selo tintado. Glifo cinza-escuro fixo, legível em
+// qualquer superfície; o container dá a cor de marca. Usado nas 3 linhas do "Como funciona".
+function StepGlyph({ src }: { src: string }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`group flex w-full items-center gap-3.5 rounded-[16px] border p-4 text-left transition-[transform,border-color,box-shadow,background-color] duration-150 ease-out active:scale-[0.98] ${
-        primary
-          ? "border-transparent bg-brand-600 text-white shadow-[var(--shadow-brand)] hover:bg-brand-700"
-          : "border-border bg-surface text-ink-900 hover:border-brand-400 hover:bg-surface-2"
-      }`}
-    >
-      <span
-        className={`grid size-11 shrink-0 place-items-center rounded-full ${
-          primary ? "bg-white/15 text-white" : "bg-brand-500/12 text-brand-700"
-        }`}
-      >
-        <Icon size={22} />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="flex items-center gap-2">
-          <span className="text-[15.5px] font-bold leading-tight">{title}</span>
-          {badge && (
-            <span
-              className={`rounded-full px-1.5 py-px text-[9.5px] font-black uppercase tracking-wider ${
-                primary ? "bg-white/20 text-white" : "bg-gold-500/20 text-gold-700"
-              }`}
-            >
-              {badge}
-            </span>
-          )}
-        </span>
-        <span className={`mt-0.5 block text-[12px] leading-snug ${primary ? "text-white/80" : "text-ink-500"}`}>{desc}</span>
-      </span>
-      <ArrowRightIcon size={18} className={primary ? "text-white/70" : "text-ink-400 transition-transform group-hover:translate-x-0.5"} />
-    </button>
+    <span className="grid size-8 shrink-0 place-items-center rounded-[10px] bg-brand-500/12">
+      <img src={src} alt="" aria-hidden width={17} height={17} className="opacity-80" />
+    </span>
   );
 }
 
@@ -69,58 +30,127 @@ export function Home({
 }) {
   const brasil = latestEditionWithBrazil();
   const year = brasil?.edition.year ?? 2026;
+
+  // 3 passos curtos do "Como funciona" (2-3 linhas no total), cada um com um ícone oficial.
+  const comoFunciona: { src: string; text: string }[] = [
+    { src: "/icons/copa.svg", text: "Pegue uma seleção e monte a tática antes de ver o rival." },
+    { src: "/icons/jogos.svg", text: "Assista ao jogo ao vivo e ajuste a postura na hora." },
+    { src: "/icons/premiacao.svg", text: "Vire a chave no intervalo e decida no detalhe." },
+  ];
+
   return (
-    <div className="flex flex-col gap-5">
-      <header className="text-center">
-        <div className="mx-auto flex w-fit items-center gap-2 rounded-full bg-brand-500/12 px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.12em] text-brand-700">
+    <div className="flex flex-col gap-6">
+      {/* manchete + descrição */}
+      <header className="animate-rise text-center" style={{ animationDelay: "0ms" }}>
+        <div className="mx-auto flex w-fit items-center gap-1.5 rounded-full bg-brand-500/12 px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand-700">
           <BallIcon size={14} color="var(--color-brand-600)" /> Maneiger
         </div>
-        <h1 className="mt-3 text-[26px] font-black leading-tight text-ink-900">Você no comando da seleção</h1>
-        <p className="mx-auto mt-2 max-w-[34ch] text-[13.5px] leading-snug text-ink-500">
-          Monte a tática às cegas, leia o jogo ao vivo e ajuste no intervalo. Copa curta, decisão no detalhe.
+        <h1 className="mt-3 text-[30px] font-black leading-[1.05] tracking-tight text-ink-900">
+          Você no comando<br />da seleção
+        </h1>
+        <p className="mx-auto mt-2.5 max-w-[36ch] text-[14px] leading-snug text-ink-500">
+          Monte a tática às cegas, leia o jogo ao vivo e vire a chave no intervalo. Copa curta, decisão no detalhe.
         </p>
       </header>
 
-      <div className="flex flex-col gap-2.5">
-        <Card
-          title={`Jogar Mata-Mata ${year}`}
-          desc="Comande o Brasil direto, ou escolha outra seleção."
-          Icon={TrophyIcon}
-          primary
-          badge="Começar"
-          onClick={() => onAction("playBrasil")}
-        />
-        <Card
-          title="Perfil de técnico"
-          desc={archetype ? `Seu perfil: ${labelFor(archetype)}. Toque para refazer.` : "5 perguntas para achar a sua escola. Opcional."}
-          Icon={CompassIcon}
-          onClick={() => onAction("quiz")}
-        />
-        <Card title="Selecionar Copa" desc="Escolha a edição e a seleção que quiser." Icon={FlagIcon} onClick={() => onAction("selectCopa")} />
-        <Card title="Como funciona" desc="Entenda o jogo em um minuto." Icon={BookIcon} onClick={() => onAction("how")} />
-      </div>
+      {/* Como funciona (enxuto) + Saiba mais */}
+      <section className="animate-rise rounded-[18px] border border-border bg-surface p-4" style={{ animationDelay: "60ms" }} aria-labelledby="home-como-h">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 id="home-como-h" className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-ink-500">Como funciona</h2>
+          <button
+            type="button"
+            onClick={() => onAction("how")}
+            className="group flex items-center gap-0.5 text-[12px] font-bold text-brand-700 hover:text-brand-800"
+          >
+            Saiba mais
+            <ArrowRightIcon size={13} className="transition-transform duration-150 ease-out group-hover:translate-x-0.5" />
+          </button>
+        </div>
+        <ul className="flex flex-col gap-2.5">
+          {comoFunciona.map((s, i) => (
+            <li key={i} className="flex items-center gap-3">
+              <StepGlyph src={s.src} />
+              <span className="text-[12.5px] leading-snug text-ink-700">{s.text}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-      {archetype && (
-        <section aria-label="Seu perfil de técnico">
-          <div className="mb-2 text-[11px] font-extrabold uppercase tracking-wide text-ink-500">Seu técnico</div>
-          <ArchetypeCard keyId={archetype} />
-        </section>
-      )}
+      {/* identidade de treinador */}
+      <section className="animate-rise" style={{ animationDelay: "120ms" }} aria-label="Sua identidade de treinador">
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-ink-500">Sua identidade de treinador</h2>
+          {archetype && (
+            <button type="button" onClick={() => onAction("quiz")} className="text-[12px] font-bold text-brand-700 hover:text-brand-800">
+              Refazer
+            </button>
+          )}
+        </div>
+        {archetype ? (
+          <button type="button" onClick={() => onAction("quiz")} className="block w-full text-left transition-transform duration-200 ease-out active:scale-[0.99]">
+            <ArchetypeCard keyId={archetype} />
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => onAction("quiz")}
+            className="group flex w-full items-center gap-3.5 rounded-[16px] border border-dashed border-brand-400/60 bg-brand-500/[0.05] p-4 text-left transition-[transform,border-color,background-color] duration-200 ease-out hover:border-brand-500 hover:bg-brand-500/[0.09] active:scale-[0.99]"
+          >
+            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-brand-500/15 text-brand-700">
+              <CompassIcon size={22} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[14.5px] font-bold text-ink-900">Descubra a sua escola</span>
+              <span className="mt-0.5 block text-[12px] leading-snug text-ink-500">
+                5 perguntas rápidas revelam o seu estilo de treinador. Ele dá um tempero à sua tática. Opcional.
+              </span>
+            </span>
+            <ArrowRightIcon size={18} className="text-brand-500 transition-transform duration-150 ease-out group-hover:translate-x-0.5" />
+          </button>
+        )}
+      </section>
+
+      {/* ações de jogo */}
+      <section className="animate-rise flex flex-col gap-2.5" style={{ animationDelay: "180ms" }} aria-label="Começar a jogar">
+        {/* CTA primário: sorteio por dificuldade (Sua seleção), com a favorita/Brasil no topo */}
+        <button
+          type="button"
+          onClick={() => onAction("playBrasil")}
+          className="group relative flex w-full items-center gap-4 overflow-hidden rounded-[18px] bg-brand-600 p-4 text-left text-white shadow-[var(--shadow-brand)] transition-[transform,background-color] duration-200 ease-out hover:bg-brand-700 active:scale-[0.98]"
+        >
+          <span className="grid size-12 shrink-0 place-items-center rounded-[14px] bg-white/15">
+            <img src="/icons/copa.svg" alt="" aria-hidden width={26} height={26} className="brightness-0 invert" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="flex items-center gap-2">
+              <span className="text-[17px] font-black leading-tight">Jogar Mata-Mata {year}</span>
+              <span className="rounded-full bg-white/20 px-1.5 py-px text-[9.5px] font-black uppercase tracking-wider">Começar</span>
+            </span>
+            <span className="mt-0.5 block text-[12.5px] leading-snug text-white/85">
+              Sorteie a sua dificuldade, da favorita à zebra, e comande o mata-mata.
+            </span>
+          </span>
+          <ArrowRightIcon size={20} className="text-white/80 transition-transform duration-150 ease-out group-hover:translate-x-0.5" />
+        </button>
+
+        {/* secundário: picker manual de edição + seleção */}
+        <button
+          type="button"
+          onClick={() => onAction("selectCopa")}
+          className="group flex w-full items-center gap-3.5 rounded-[16px] border border-border bg-surface p-4 text-left text-ink-900 transition-[transform,border-color,background-color] duration-200 ease-out hover:border-brand-400 hover:bg-surface-2 active:scale-[0.98]"
+        >
+          <span className="grid size-11 shrink-0 place-items-center rounded-full bg-brand-500/12 text-brand-700">
+            <FlagIcon size={22} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[15px] font-bold leading-tight">Selecionar Copa</span>
+            <span className="mt-0.5 block text-[12px] leading-snug text-ink-500">Escolha a edição e a seleção que você quiser, na mão.</span>
+          </span>
+          <ArrowRightIcon size={18} className="text-ink-400 transition-transform duration-150 ease-out group-hover:translate-x-0.5" />
+        </button>
+      </section>
     </div>
   );
-}
-
-function labelFor(k: ArchetypeKey): string {
-  return (
-    {
-      posicional: "Posicional",
-      reativo: "Reativo",
-      intenso: "Intenso",
-      equilibrista: "Equilibrista",
-      relacional: "Relacional",
-      copeiro: "Copeiro",
-    } as Record<ArchetypeKey, string>
-  )[k];
 }
 
 // ==== Como funciona (guia simples e completo, in-page) ====

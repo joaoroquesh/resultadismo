@@ -1,4 +1,4 @@
-// Resultadismo Manager — simulação de jogo real, minuto a minuto (Fase 2).
+// Resultadismo Manager: simulação de jogo real, minuto a minuto (Fase 2).
 // Determinística (mulberry32). Tudo sai de força base + tática + aleatoriedade.
 // Regra de ouro: nem tudo é narrado, mas tudo que é narrado entra nas estatísticas.
 import { sideStrength, postureMul, type Tactic, type TeamLite } from "./tactics.ts";
@@ -40,6 +40,11 @@ export interface MatchState {
   tactics: [Tactic, Tactic];
   posseShareA: number;  // alvo de posse de A (0..1), recomputado se a tática muda
   ballSide: 0 | 1;      // quem está com a bola agora (para o destaque ao vivo)
+  // bônus de identidade do treinador em unidades de sinal, por lado. Só o MEU lado (A)
+  // costuma ter técnico; a IA fica 0. Some 0 em média entre arquétipos (tempero, não
+  // decide) e entra no motor via sideStrength(archUnits). Ver archetypeBonus.
+  archUnitsA: number;
+  archUnitsB: number;
   rnd: () => number;
 }
 
@@ -75,13 +80,16 @@ export function recompute(state: MatchState): void {
 
 export function createMatch(
   teamA: TeamLite, teamB: TeamLite, tacA: Tactic, tacB: Tactic, seed: number,
+  archUnits: { a?: number; b?: number } = {},
 ): MatchState {
   const st: MatchState = {
     seed: seed >>> 0, minute: 0, half: 1, score: [0, 0],
     posseMin: [0, 0], passOk: [0, 0], passTot: [0, 0],
     stats: { posse: [50, 50], finalizacoes: [0, 0], chutesNoGol: [0, 0], grandesChances: [0, 0], escanteios: [0, 0], passeCerto: [0, 0], faltas: [0, 0] },
     events: [], finished: false, teams: [teamA, teamB], tactics: [tacA, tacB],
-    posseShareA: 0.5, ballSide: 0, rnd: mulberry32((seed >>> 0) || 1),
+    posseShareA: 0.5, ballSide: 0,
+    archUnitsA: archUnits.a ?? 0, archUnitsB: archUnits.b ?? 0,
+    rnd: mulberry32((seed >>> 0) || 1),
   };
   recompute(st);
   return st;
@@ -108,8 +116,9 @@ export function stepMinute(state: MatchState): MatchEvent[] {
   const opp: 0 | 1 = poss === 1 ? 0 : 1;
 
   // 2) passes do minuto (passe certo mantém posse). qualidade ~ meio + coerência.
-  const sA = sideStrength(state.teams[0], state.tactics[0], state.tactics[1], state.teams[1]);
-  const sB = sideStrength(state.teams[1], state.tactics[1], state.tactics[0], state.teams[0]);
+  // archUnits injeta a identidade do treinador de cada lado (0 = sem técnico).
+  const sA = sideStrength(state.teams[0], state.tactics[0], state.tactics[1], state.teams[1], state.archUnitsA);
+  const sB = sideStrength(state.teams[1], state.tactics[1], state.tactics[0], state.teams[0], state.archUnitsB);
   const sMe = poss === 0 ? sA : sB;
   const sOpp = poss === 0 ? sB : sA;
   const passBase = 0.80 + 0.0016 * (state.teams[poss].m - 70);

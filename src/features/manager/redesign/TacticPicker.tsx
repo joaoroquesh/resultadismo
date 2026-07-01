@@ -6,11 +6,12 @@
 import { useMemo } from "react";
 import type { Tactic, Form, ComBola, SemBola, Bloco, PresetKey } from "./tactics.ts";
 import { PRESETS, COMBOLA, SEMBOLA, BLOCOS, coherenceSignals, tacticFromPreset } from "./tactics.ts";
+import type { ArchetypeKey } from "./archetypes.ts";
 import {
   FORM_GRID, FORM_LABEL, COMBOLA_LABEL, COMBOLA_DESC, SEMBOLA_LABEL, SEMBOLA_DESC,
   BLOCO_LABEL, BLOCO_DESC, posturaZone,
 } from "./data";
-import { CoherenceList } from "./Signals";
+import { CoherenceList, IdentityFitRow } from "./Signals";
 import { CompassIcon } from "./icons";
 
 export type PickerMode = "rapido" | "tatico";
@@ -226,12 +227,14 @@ export function TacticPicker({
   mode,
   onModeChange,
   blind = true,
+  archetype = null,
 }: {
   tac: Tactic;
   onChange: (t: Tactic) => void;
   mode: PickerMode;
   onModeChange: (m: PickerMode) => void;
   blind?: boolean; // true = pré-jogo (sem rival). Aqui é sempre true.
+  archetype?: ArchetypeKey | null; // identidade do treinador (mostra o encaixe da escola)
 }) {
   const signals = useMemo(() => coherenceSignals(tac), [tac]);
   const patch = (p: Partial<Tactic>) => onChange({ ...tac, ...p });
@@ -296,6 +299,11 @@ export function TacticPicker({
           </h3>
         </div>
         <CoherenceList signals={signals} />
+        {archetype && (
+          <div className="mt-1.5">
+            <IdentityFitRow arch={archetype} tac={tac} />
+          </div>
+        )}
         {blind && (
           <p className="mt-2.5 text-[11px] leading-snug text-ink-500">
             Tática às cegas: você ainda não viu o adversário. O encaixe contra o rival aparece no intervalo.

@@ -4,7 +4,7 @@
 // do TeamLite {a,m,d,o}. Nada de número cru de tática vaza pra UI: só overall,
 // forças (ATA/MEI/DEF/FIS) e % de postura.
 import type { Team, Edition, Tier } from "../types";
-import { FORMATS, poolForYear, teamBySlug, TIER_LABEL } from "../engine";
+import { FORMATS, poolForYear, TIER_LABEL } from "../engine";
 import type { TeamLite, Form, ComBola, SemBola, Bloco } from "./tactics.ts";
 
 export type { Team, Edition, Tier };
@@ -20,9 +20,15 @@ export function teamsForYear(year: number): Team[] {
   return poolForYear(year);
 }
 
-// O Brasil daquela edição (para o atalho "Jogar com o Brasil").
+// O Brasil daquela edição (para o atalho "Jogar com o Brasil"). Em algumas edições
+// (ex.: 2026) o slug vem com sufixo de ano ("brasil2026"); então buscamos no pool do
+// ano casando o slug SEM os 4 dígitos finais de ano contra "brasil".
 export function brazilForYear(year: number): Team | null {
-  return teamBySlug(year, "brasil");
+  const pool = poolForYear(year);
+  for (const t of pool) {
+    if (t.s.replace(/\d{4}$/, "") === "brasil") return t;
+  }
+  return null;
 }
 
 // Edição mais recente que tem o Brasil (atalho "Jogar Mata-Mata 2026" com Brasil).

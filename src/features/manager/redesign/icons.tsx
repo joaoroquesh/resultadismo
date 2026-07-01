@@ -2,7 +2,7 @@
 // emoji em lugar nenhum, então tudo que parece ícone vem daqui. currentColor por
 // padrão (herda a cor do texto); a bola aceita uma cor explícita (marcador de gol
 // na cor da seleção). Traço fino, cantos arredondados, sem dependência externa.
-import type { CSSProperties } from "react";
+import { useId, type CSSProperties } from "react";
 
 interface IconProps {
   size?: number;
@@ -216,6 +216,54 @@ export function CardIcon({ size = 16, className = "", style, title }: IconProps)
   return (
     <svg {...base(size, title)} className={className} style={style}>
       <rect x="6" y="4" width="12" height="16" rx="2" fill="currentColor" />
+    </svg>
+  );
+}
+
+// Dado (sorteio). Contorno arredondado + 5 pontos, na cor do texto.
+export function DiceIcon({ size = 16, className = "", style, title }: IconProps) {
+  return (
+    <svg {...base(size, title)} className={className} style={style} stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3.5" y="3.5" width="17" height="17" rx="4" />
+      <circle cx="8" cy="8" r="1.15" fill="currentColor" stroke="none" />
+      <circle cx="16" cy="8" r="1.15" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="12" r="1.15" fill="currentColor" stroke="none" />
+      <circle cx="8" cy="16" r="1.15" fill="currentColor" stroke="none" />
+      <circle cx="16" cy="16" r="1.15" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+// Estrela do overall. filled = cheia (gold), half = meia (metade gold), senão vazia.
+// Usa gold cravado do sistema de pontuação (o overall é celebratório, como a nota).
+export function StarIcon({
+  size = 12,
+  className = "",
+  style,
+  filled = false,
+  half = false,
+}: IconProps & { filled?: boolean; half?: boolean }) {
+  const gold = "var(--color-gold-500)";
+  const empty = "var(--color-ink-300, rgba(0,0,0,0.14))";
+  const d = "M12 3.2l2.6 5.27 5.82.85-4.21 4.1.99 5.8L12 16.9l-5.2 2.72.99-5.8-4.21-4.1 5.82-.85L12 3.2z";
+  // id estável do gradiente da meia-estrela (useId evita colisão E impureza de render).
+  const gid = `star-half-${useId()}`;
+  if (half) {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" className={className} style={style} aria-hidden focusable="false">
+        <defs>
+          <linearGradient id={gid} x1="0" x2="1" y1="0" y2="0">
+            <stop offset="50%" stopColor={gold} />
+            <stop offset="50%" stopColor={empty} />
+          </linearGradient>
+        </defs>
+        <path d={d} fill={`url(#${gid})`} />
+      </svg>
+    );
+  }
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} style={style} aria-hidden focusable="false">
+      <path d={d} fill={filled ? gold : empty} />
     </svg>
   );
 }

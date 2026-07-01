@@ -2,8 +2,11 @@
 // (pp/p/z/m/mm) viram cor + ícone + frase curta. A cor segue o sistema de
 // pontuação do Resultadismo: grass/aqua positivo, ink neutro, flame negativo.
 // Reaproveitado pela tática às cegas (coerência) e pelo intervalo (encaixe).
-import type { SignalLevel } from "./tactics.ts";
-import { ArrowUpIcon, ArrowDownIcon, EqualIcon, CheckIcon } from "./icons";
+import type { SignalLevel, Tactic } from "./tactics.ts";
+import { toSignal } from "./tactics.ts";
+import type { ArchetypeKey } from "./archetypes.ts";
+import { archetypeBonus, ARCHETYPES } from "./archetypes.ts";
+import { ArrowUpIcon, ArrowDownIcon, EqualIcon, CheckIcon, CompassIcon } from "./icons";
 
 // ==== aparência por nível (sem número, só sinal) ====
 interface LevelStyle {
@@ -180,5 +183,44 @@ export function MatchupList({
         <SignalRow key={s.key} title={matchupTitle(s.key)} phrase={matchupPhrase(s.key, s.level)} level={s.level} />
       ))}
     </ul>
+  );
+}
+
+// ==== ENCAIXE POR IDENTIDADE DO TREINADOR (arquétipo) ====
+// Um sinal individual de coerência A MAIS: o quanto a tática combina com a ESCOLA do
+// treinador (archetypeBonus). Mesmo idioma (sinal + frase), nunca número cru. Só some
+// se houver perfil escolhido. Entra na tática às cegas e no vestiário.
+const IDENTITY_PHRASE: Partial<Record<SignalLevel, string>> = {
+  pp: "É a cara da sua escola: o time joga do seu jeito.",
+  p: "Combina com a sua escola de técnico.",
+  z: "Neutro pra sua escola: nem a favor, nem contra.",
+  m: "Foge um pouco do seu jeito de treinar.",
+  mm: "Contraria a sua escola: você joga contra o seu instinto.",
+};
+
+export function identityFit(arch: ArchetypeKey, t: Tactic): { level: SignalLevel; title: string; phrase: string } {
+  const level = toSignal(archetypeBonus(arch, t));
+  return {
+    level,
+    title: `Combina com sua escola (${ARCHETYPES[arch].nome})`,
+    phrase: IDENTITY_PHRASE[level] ?? "",
+  };
+}
+
+// Linha pronta do encaixe de identidade (ícone de bússola + frase + chip). Standalone
+// pra caber dentro do card de coerência existente, sem virar outra seção pesada.
+export function IdentityFitRow({ arch, tac }: { arch: ArchetypeKey; tac: Tactic }) {
+  const fit = identityFit(arch, tac);
+  return (
+    <div className="flex items-start justify-between gap-3 rounded-[12px] bg-brand-500/[0.06] px-3 py-2.5">
+      <span className="flex min-w-0 items-start gap-2">
+        <CompassIcon size={15} className="mt-0.5 shrink-0 text-brand-600" />
+        <span className="min-w-0">
+          <span className="block text-[12.5px] font-bold text-ink-900">{fit.title}</span>
+          {fit.phrase && <span className="mt-0.5 block text-[11.5px] leading-snug text-ink-600">{fit.phrase}</span>}
+        </span>
+      </span>
+      <SignalChip level={fit.level} className="mt-0.5" />
+    </div>
   );
 }
