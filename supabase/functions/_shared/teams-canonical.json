@@ -28,17 +28,17 @@
   "africadosul": {
    "name": "África do Sul",
    "short": "Á. do Sul",
-   "crest": "/teams/africadosul.svg"
+   "crest": "/teams/africadosul.png"
   },
   "adosul": {
    "name": "África do Sul",
    "short": "Á. do Sul",
-   "crest": "/teams/africadosul.svg"
+   "crest": "/teams/africadosul.png"
   },
   "southafrica": {
    "name": "África do Sul",
    "short": "Á. do Sul",
-   "crest": "/teams/africadosul.svg"
+   "crest": "/teams/africadosul.png"
   },
   "aguasanta": {
    "name": "Água Santa",
@@ -258,27 +258,27 @@
   "arabiasaudita": {
    "name": "Arábia Saudita",
    "short": "Arábia S.",
-   "crest": "/teams/arabiasaudita.svg"
+   "crest": "/teams/arabiasaudita.png"
   },
   "arabias": {
    "name": "Arábia Saudita",
    "short": "Arábia S.",
-   "crest": "/teams/arabiasaudita.svg"
+   "crest": "/teams/arabiasaudita.png"
   },
   "saudiarabia": {
    "name": "Arábia Saudita",
    "short": "Arábia S.",
-   "crest": "/teams/arabiasaudita.svg"
+   "crest": "/teams/arabiasaudita.png"
   },
   "argelia": {
    "name": "Argélia",
    "short": "Argélia",
-   "crest": "/teams/argelia.svg"
+   "crest": "/teams/argelia.png"
   },
   "algeria": {
    "name": "Argélia",
    "short": "Argélia",
-   "crest": "/teams/argelia.svg"
+   "crest": "/teams/argelia.png"
   },
   "argentina": {
    "name": "Argentina",
@@ -443,12 +443,12 @@
   "austria": {
    "name": "Áustria",
    "short": "Áustria",
-   "crest": "/teams/austria.svg"
+   "crest": "/teams/austria.png"
   },
   "osterreich": {
    "name": "Áustria",
    "short": "Áustria",
-   "crest": "/teams/austria.svg"
+   "crest": "/teams/austria.png"
   },
   "avai": {
    "name": "Avaí",
@@ -853,12 +853,12 @@
   "caboverde": {
    "name": "Cabo Verde",
    "short": "Cabo Verde",
-   "crest": "/teams/caboverde.svg"
+   "crest": "/teams/caboverde.png"
   },
   "capeverde": {
    "name": "Cabo Verde",
    "short": "Cabo Verde",
-   "crest": "/teams/caboverde.svg"
+   "crest": "/teams/caboverde.png"
   },
   "cagliari": {
    "name": "Cagliari",
@@ -883,7 +883,7 @@
   "canada": {
    "name": "Canadá",
    "short": "Canadá",
-   "crest": "/teams/canada.svg"
+   "crest": "/teams/canada.png"
   },
   "capital": {
    "name": "Capital-DF",
@@ -1088,47 +1088,47 @@
   "congord": {
    "name": "Congo (RD)",
    "short": "Congo RD",
-   "crest": "/teams/congord.svg"
+   "crest": "/teams/congord.png"
   },
   "drcongo": {
    "name": "Congo (RD)",
    "short": "Congo RD",
-   "crest": "/teams/congord.svg"
+   "crest": "/teams/congord.png"
   },
   "congodr": {
    "name": "Congo (RD)",
    "short": "Congo RD",
-   "crest": "/teams/congord.svg"
+   "crest": "/teams/congord.png"
   },
   "drc": {
    "name": "Congo (RD)",
    "short": "Congo RD",
-   "crest": "/teams/congord.svg"
+   "crest": "/teams/congord.png"
   },
   "democraticrepublicofthecongo": {
    "name": "Congo (RD)",
    "short": "Congo RD",
-   "crest": "/teams/congord.svg"
+   "crest": "/teams/congord.png"
   },
   "coreiadosul": {
    "name": "Coreia do Sul",
    "short": "Coreia",
-   "crest": "/teams/coreiadosul.svg"
+   "crest": "/teams/coreiadosul.png"
   },
   "coreia": {
    "name": "Coreia do Sul",
    "short": "Coreia",
-   "crest": "/teams/coreiadosul.svg"
+   "crest": "/teams/coreiadosul.png"
   },
   "southkorea": {
    "name": "Coreia do Sul",
    "short": "Coreia",
-   "crest": "/teams/coreiadosul.svg"
+   "crest": "/teams/coreiadosul.png"
   },
   "korearepublic": {
    "name": "Coreia do Sul",
    "short": "Coreia",
-   "crest": "/teams/coreiadosul.svg"
+   "crest": "/teams/coreiadosul.png"
   },
   "corinthians": {
    "name": "Corinthians",
@@ -1153,22 +1153,22 @@
   "costadomarfim": {
    "name": "Costa do Marfim",
    "short": "C. Marfim",
-   "crest": "/teams/costadomarfim.svg"
+   "crest": "/teams/costadomarfim.png"
   },
   "cmarfim": {
    "name": "Costa do Marfim",
    "short": "C. Marfim",
-   "crest": "/teams/costadomarfim.svg"
+   "crest": "/teams/costadomarfim.png"
   },
   "ivorycoast": {
    "name": "Costa do Marfim",
    "short": "C. Marfim",
-   "crest": "/teams/costadomarfim.svg"
+   "crest": "/teams/costadomarfim.png"
   },
   "cotedivoire": {
    "name": "Costa do Marfim",
    "short": "C. Marfim",
-   "crest": "/teams/costadomarfim.svg"
+   "crest": "/teams/costadomarfim.png"
   },
   "costarica": {
    "name": "Costa Rica",
@@ -1253,12 +1253,12 @@
   "curacao": {
    "name": "Curaçao",
    "short": "Curaçao",
-   "crest": "/teams/curacao.svg"
+   "crest": "/teams/curacao.png"
   },
   "cur": {
    "name": "Curaçao",
    "short": "Curaçao",
-   "crest": "/teams/curacao.svg"
+   "crest": "/teams/curacao.png"
   },
   "defensayjusticia": {
    "name": "Defensa y Justicia",
@@ -1358,12 +1358,12 @@
   "escocia": {
    "name": "Escócia",
    "short": "Escócia",
-   "crest": "/teams/escocia.svg"
+   "crest": "/teams/escocia.png"
   },
   "scotland": {
    "name": "Escócia",
    "short": "Escócia",
-   "crest": "/teams/escocia.svg"
+   "crest": "/teams/escocia.png"
   },
   "eslovaquia": {
    "name": "Eslováquia",
@@ -1628,12 +1628,12 @@
   "gana": {
    "name": "Gana",
    "short": "Gana",
-   "crest": "/teams/gana.svg"
+   "crest": "/teams/gana.png"
   },
   "ghana": {
    "name": "Gana",
    "short": "Gana",
-   "crest": "/teams/gana.svg"
+   "crest": "/teams/gana.png"
   },
   "genoa": {
    "name": "Genoa",
@@ -1973,12 +1973,12 @@
   "iraque": {
    "name": "Iraque",
    "short": "Iraque",
-   "crest": "/teams/iraque.svg"
+   "crest": "/teams/iraque.png"
   },
   "iraq": {
    "name": "Iraque",
    "short": "Iraque",
-   "crest": "/teams/iraque.svg"
+   "crest": "/teams/iraque.png"
   },
   "irlanda": {
    "name": "Irlanda",
@@ -2043,12 +2043,12 @@
   "japao": {
    "name": "Japão",
    "short": "Japão",
-   "crest": "/teams/japao.svg"
+   "crest": "/teams/japao.png"
   },
   "japan": {
    "name": "Japão",
    "short": "Japão",
-   "crest": "/teams/japao.svg"
+   "crest": "/teams/japao.png"
   },
   "jordania": {
    "name": "Jordânia",
@@ -2433,12 +2433,12 @@
   "marrocos": {
    "name": "Marrocos",
    "short": "Marrocos",
-   "crest": "/teams/marrocos.svg"
+   "crest": "/teams/marrocos.png"
   },
   "morocco": {
    "name": "Marrocos",
    "short": "Marrocos",
-   "crest": "/teams/marrocos.svg"
+   "crest": "/teams/marrocos.png"
   },
   "melgar": {
    "name": "Melgar",
@@ -3428,17 +3428,17 @@
   "suecia": {
    "name": "Suécia",
    "short": "Suécia",
-   "crest": "/teams/suecia.svg"
+   "crest": "/teams/suecia.png"
   },
   "sweden": {
    "name": "Suécia",
    "short": "Suécia",
-   "crest": "/teams/suecia.svg"
+   "crest": "/teams/suecia.png"
   },
   "sverige": {
    "name": "Suécia",
    "short": "Suécia",
-   "crest": "/teams/suecia.svg"
+   "crest": "/teams/suecia.png"
   },
   "suica": {
    "name": "Suíça",
@@ -3965,17 +3965,17 @@
   "africadosul": {
    "name": "África do Sul",
    "short": "Á. do Sul",
-   "crest": "/teams/africadosul.svg"
+   "crest": "/teams/africadosul.png"
   },
   "adosul": {
    "name": "África do Sul",
    "short": "Á. do Sul",
-   "crest": "/teams/africadosul.svg"
+   "crest": "/teams/africadosul.png"
   },
   "southafrica": {
    "name": "África do Sul",
    "short": "Á. do Sul",
-   "crest": "/teams/africadosul.svg"
+   "crest": "/teams/africadosul.png"
   },
   "aguasanta": {
    "name": "Água Santa",
@@ -4165,27 +4165,27 @@
   "arabiasaudita": {
    "name": "Arábia Saudita",
    "short": "Arábia S.",
-   "crest": "/teams/arabiasaudita.svg"
+   "crest": "/teams/arabiasaudita.png"
   },
   "arabias": {
    "name": "Arábia Saudita",
    "short": "Arábia S.",
-   "crest": "/teams/arabiasaudita.svg"
+   "crest": "/teams/arabiasaudita.png"
   },
   "saudiarabia": {
    "name": "Arábia Saudita",
    "short": "Arábia S.",
-   "crest": "/teams/arabiasaudita.svg"
+   "crest": "/teams/arabiasaudita.png"
   },
   "argelia": {
    "name": "Argélia",
    "short": "Argélia",
-   "crest": "/teams/argelia.svg"
+   "crest": "/teams/argelia.png"
   },
   "algeria": {
    "name": "Argélia",
    "short": "Argélia",
-   "crest": "/teams/argelia.svg"
+   "crest": "/teams/argelia.png"
   },
   "argentina": {
    "name": "Argentina",
@@ -4350,12 +4350,12 @@
   "austria": {
    "name": "Áustria",
    "short": "Áustria",
-   "crest": "/teams/austria.svg"
+   "crest": "/teams/austria.png"
   },
   "osterreich": {
    "name": "Áustria",
    "short": "Áustria",
-   "crest": "/teams/austria.svg"
+   "crest": "/teams/austria.png"
   },
   "avai": {
    "name": "Avaí",
@@ -4700,12 +4700,12 @@
   "caboverde": {
    "name": "Cabo Verde",
    "short": "Cabo Verde",
-   "crest": "/teams/caboverde.svg"
+   "crest": "/teams/caboverde.png"
   },
   "capeverde": {
    "name": "Cabo Verde",
    "short": "Cabo Verde",
-   "crest": "/teams/caboverde.svg"
+   "crest": "/teams/caboverde.png"
   },
   "cagliari": {
    "name": "Cagliari",
@@ -4730,7 +4730,7 @@
   "canada": {
    "name": "Canadá",
    "short": "Canadá",
-   "crest": "/teams/canada.svg"
+   "crest": "/teams/canada.png"
   },
   "capital": {
    "name": "Capital-DF",
@@ -4905,47 +4905,47 @@
   "congord": {
    "name": "Congo (RD)",
    "short": "Congo RD",
-   "crest": "/teams/congord.svg"
+   "crest": "/teams/congord.png"
   },
   "drcongo": {
    "name": "Congo (RD)",
    "short": "Congo RD",
-   "crest": "/teams/congord.svg"
+   "crest": "/teams/congord.png"
   },
   "congodr": {
    "name": "Congo (RD)",
    "short": "Congo RD",
-   "crest": "/teams/congord.svg"
+   "crest": "/teams/congord.png"
   },
   "drc": {
    "name": "Congo (RD)",
    "short": "Congo RD",
-   "crest": "/teams/congord.svg"
+   "crest": "/teams/congord.png"
   },
   "democraticrepublicofthecongo": {
    "name": "Congo (RD)",
    "short": "Congo RD",
-   "crest": "/teams/congord.svg"
+   "crest": "/teams/congord.png"
   },
   "coreiadosul": {
    "name": "Coreia do Sul",
    "short": "Coreia",
-   "crest": "/teams/coreiadosul.svg"
+   "crest": "/teams/coreiadosul.png"
   },
   "coreia": {
    "name": "Coreia do Sul",
    "short": "Coreia",
-   "crest": "/teams/coreiadosul.svg"
+   "crest": "/teams/coreiadosul.png"
   },
   "southkorea": {
    "name": "Coreia do Sul",
    "short": "Coreia",
-   "crest": "/teams/coreiadosul.svg"
+   "crest": "/teams/coreiadosul.png"
   },
   "korearepublic": {
    "name": "Coreia do Sul",
    "short": "Coreia",
-   "crest": "/teams/coreiadosul.svg"
+   "crest": "/teams/coreiadosul.png"
   },
   "corinthians": {
    "name": "Corinthians",
@@ -4960,22 +4960,22 @@
   "costadomarfim": {
    "name": "Costa do Marfim",
    "short": "C. Marfim",
-   "crest": "/teams/costadomarfim.svg"
+   "crest": "/teams/costadomarfim.png"
   },
   "cmarfim": {
    "name": "Costa do Marfim",
    "short": "C. Marfim",
-   "crest": "/teams/costadomarfim.svg"
+   "crest": "/teams/costadomarfim.png"
   },
   "ivorycoast": {
    "name": "Costa do Marfim",
    "short": "C. Marfim",
-   "crest": "/teams/costadomarfim.svg"
+   "crest": "/teams/costadomarfim.png"
   },
   "cotedivoire": {
    "name": "Costa do Marfim",
    "short": "C. Marfim",
-   "crest": "/teams/costadomarfim.svg"
+   "crest": "/teams/costadomarfim.png"
   },
   "costarica": {
    "name": "Costa Rica",
@@ -5045,12 +5045,12 @@
   "curacao": {
    "name": "Curaçao",
    "short": "Curaçao",
-   "crest": "/teams/curacao.svg"
+   "crest": "/teams/curacao.png"
   },
   "cur": {
    "name": "Curaçao",
    "short": "Curaçao",
-   "crest": "/teams/curacao.svg"
+   "crest": "/teams/curacao.png"
   },
   "defensayjusticia": {
    "name": "Defensa y Justicia",
@@ -5145,12 +5145,12 @@
   "escocia": {
    "name": "Escócia",
    "short": "Escócia",
-   "crest": "/teams/escocia.svg"
+   "crest": "/teams/escocia.png"
   },
   "scotland": {
    "name": "Escócia",
    "short": "Escócia",
-   "crest": "/teams/escocia.svg"
+   "crest": "/teams/escocia.png"
   },
   "eslovaquia": {
    "name": "Eslováquia",
@@ -5385,12 +5385,12 @@
   "gana": {
    "name": "Gana",
    "short": "Gana",
-   "crest": "/teams/gana.svg"
+   "crest": "/teams/gana.png"
   },
   "ghana": {
    "name": "Gana",
    "short": "Gana",
-   "crest": "/teams/gana.svg"
+   "crest": "/teams/gana.png"
   },
   "genoa": {
    "name": "Genoa",
@@ -5705,12 +5705,12 @@
   "iraque": {
    "name": "Iraque",
    "short": "Iraque",
-   "crest": "/teams/iraque.svg"
+   "crest": "/teams/iraque.png"
   },
   "iraq": {
    "name": "Iraque",
    "short": "Iraque",
-   "crest": "/teams/iraque.svg"
+   "crest": "/teams/iraque.png"
   },
   "irlanda": {
    "name": "Irlanda",
@@ -5775,12 +5775,12 @@
   "japao": {
    "name": "Japão",
    "short": "Japão",
-   "crest": "/teams/japao.svg"
+   "crest": "/teams/japao.png"
   },
   "japan": {
    "name": "Japão",
    "short": "Japão",
-   "crest": "/teams/japao.svg"
+   "crest": "/teams/japao.png"
   },
   "jordania": {
    "name": "Jordânia",
@@ -6135,12 +6135,12 @@
   "marrocos": {
    "name": "Marrocos",
    "short": "Marrocos",
-   "crest": "/teams/marrocos.svg"
+   "crest": "/teams/marrocos.png"
   },
   "morocco": {
    "name": "Marrocos",
    "short": "Marrocos",
-   "crest": "/teams/marrocos.svg"
+   "crest": "/teams/marrocos.png"
   },
   "melgar": {
    "name": "Melgar",
@@ -7030,17 +7030,17 @@
   "suecia": {
    "name": "Suécia",
    "short": "Suécia",
-   "crest": "/teams/suecia.svg"
+   "crest": "/teams/suecia.png"
   },
   "sweden": {
    "name": "Suécia",
    "short": "Suécia",
-   "crest": "/teams/suecia.svg"
+   "crest": "/teams/suecia.png"
   },
   "sverige": {
    "name": "Suécia",
    "short": "Suécia",
-   "crest": "/teams/suecia.svg"
+   "crest": "/teams/suecia.png"
   },
   "suica": {
    "name": "Suíça",

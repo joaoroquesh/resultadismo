@@ -47,7 +47,7 @@
     "aliases": [
       "South Africa"
     ],
-    "crest_file": "africadosul.svg",
+    "crest_file": "africadosul.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -439,7 +439,7 @@
     "aliases": [
       "Saudi Arabia"
     ],
-    "crest_file": "arabiasaudita.svg",
+    "crest_file": "arabiasaudita.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -455,7 +455,7 @@
     "aliases": [
       "Algeria"
     ],
-    "crest_file": "argelia.svg",
+    "crest_file": "argelia.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -751,7 +751,7 @@
       "Austria",
       "Österreich"
     ],
-    "crest_file": "austria.svg",
+    "crest_file": "austria.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -1422,7 +1422,7 @@
       "Cape Verde",
       "Cabo Verde"
     ],
-    "crest_file": "caboverde.svg",
+    "crest_file": "caboverde.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -1471,7 +1471,7 @@
     "aliases": [
       "Canada"
     ],
-    "crest_file": "canada.svg",
+    "crest_file": "canada.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -1845,7 +1845,7 @@
       "DRC",
       "Democratic Republic of the Congo"
     ],
-    "crest_file": "congord.svg",
+    "crest_file": "congord.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -1862,7 +1862,7 @@
       "South Korea",
       "Korea Republic"
     ],
-    "crest_file": "coreiadosul.svg",
+    "crest_file": "coreiadosul.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -1918,7 +1918,7 @@
       "Cote d'Ivoire",
       "Côte d'Ivoire"
     ],
-    "crest_file": "costadomarfim.svg",
+    "crest_file": "costadomarfim.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -2092,7 +2092,7 @@
       "Curaçao",
       "CUR"
     ],
-    "crest_file": "curacao.svg",
+    "crest_file": "curacao.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -2259,7 +2259,7 @@
     "aliases": [
       "Scotland"
     ],
-    "crest_file": "escocia.svg",
+    "crest_file": "escocia.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -2672,7 +2672,7 @@
     "aliases": [
       "Ghana"
     ],
-    "crest_file": "gana.svg",
+    "crest_file": "gana.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -3225,7 +3225,7 @@
     "aliases": [
       "Iraq"
     ],
-    "crest_file": "iraque.svg",
+    "crest_file": "iraque.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -3335,7 +3335,7 @@
     "aliases": [
       "Japan"
     ],
-    "crest_file": "japao.svg",
+    "crest_file": "japao.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -3998,7 +3998,7 @@
     "aliases": [
       "Morocco"
     ],
-    "crest_file": "marrocos.svg",
+    "crest_file": "marrocos.png",
     "crest_source": "repo (public/teams)"
   },
   {
@@ -5562,7 +5562,7 @@
       "Sweden",
       "Sverige"
     ],
-    "crest_file": "suecia.svg",
+    "crest_file": "suecia.png",
     "crest_source": "repo (public/teams)"
   },
   {

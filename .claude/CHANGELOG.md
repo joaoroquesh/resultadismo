@@ -21,6 +21,11 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+## [2.7.1] — 2026-06-30
+
+### Alterado
+- **Escudos de seleções padronizados.** 16 seleções passaram a usar PNGs 150×150 do SofaScore.
+
 ## [2.7.0] — 2026-06-30
 
 ### Corrigido

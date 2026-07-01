@@ -374,12 +374,10 @@ Identidade visual de **perfis** e **grupos** por **máscara SVG**: o SVG recorta
   Escudos: `public/teams/<arquivo>` resolvidos pelo manifest `src/lib/teamCrests.ts` (fonte primária,
   CDN custo zero). O `competitions` por time alimenta o "**seguir em todos** os campeonatos". Lógica
   em `src/features/onboarding/teamsCatalog.ts`.
-  - **Como encorpar (adicionar clubes/seleções/campeonatos):** edite `src/data/teams-catalog.json`
-    (slug + name_pt + kind + competitions + aliases). Para escudo novo: ponha o arquivo em
-    `public/teams/<slug>.png|svg` (ou rode `scripts/fetch-crests.mjs` p/ baixar do `crest_source`) e
-    rode `scripts/gen-team-crests.mjs` (regenera o manifest). Builder do catálogo:
-    `scripts/gen-teams-catalog.mjs`. Faltam só escudos de **Costa do Marfim** e **Suécia** (Wikimedia
-    quebrado p/ esses 2).
+  - **Como encorpar (adicionar clubes/seleções/campeonatos):** edite a fonte única
+    `data/teams-registry.json`, salve escudos em `public/teams/<slug>.png|svg` e rode
+    `npm run gen:all` para regenerar manifest, catálogos e mapa canônico. Detalhe operacional em
+    [`13-TIMES-E-ESCUDOS.md`](13-TIMES-E-ESCUDOS.md).
 
 ---
 
