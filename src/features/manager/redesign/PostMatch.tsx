@@ -63,6 +63,7 @@ export function PostMatch({
   archetype,
   onPlayAgain,
   onHome,
+  continueLabel = "Jogar de novo",
 }: {
   myTeam: Team;
   oppTeam: Team;
@@ -73,6 +74,8 @@ export function PostMatch({
   archetype: ArchetypeKey | null;
   onPlayAgain: () => void;
   onHome: () => void;
+  // rótulo do botão primário (na campanha vira "Avançar na Copa" / "Continuar campanha").
+  continueLabel?: string;
 }) {
   const matchups = useMemo(() => matchupSignals(tac, oppTac), [tac, oppTac]);
   const coherences = useMemo(() => coherenceSignals(tac), [tac]);
@@ -82,7 +85,7 @@ export function PostMatch({
   const win = score[0] > score[1];
   const draw = score[0] === score[1];
   const resultLabel = win ? "Vitória" : draw ? "Empate" : "Derrota";
-  const resultTone = win ? "text-grass-700" : draw ? "text-ink-700" : "text-flame-700";
+  const resultTone = win ? "text-grass-700 dark:text-grass-300" : draw ? "text-ink-700" : "text-flame-700 dark:text-flame-300";
 
   const selRead = selecaoRead(score[0], score[1], myTeam.o, oppTeam.o, myTeam.n);
   const rivRead = rivalRead(attackFit, defenseFit, oppTeam.n);
@@ -105,7 +108,7 @@ export function PostMatch({
       {/* leitura da seleção */}
       <section className="rounded-[14px] border border-border bg-surface p-3.5">
         <div className="mb-1.5 flex items-center gap-2">
-          <TrophyIcon size={16} className="text-gold-600" />
+          <TrophyIcon size={16} className="text-gold-600 dark:text-gold-300" />
           <h3 className="text-[12.5px] font-bold text-ink-900">A seleção</h3>
         </div>
         <p className="text-[12.5px] leading-snug text-ink-700">{selRead}</p>
@@ -114,7 +117,7 @@ export function PostMatch({
       {/* leitura do rival (encaixe) */}
       <section className="rounded-[14px] border border-border bg-surface p-3.5">
         <div className="mb-1.5 flex items-center gap-2">
-          <ShieldIcon size={16} className="text-aqua-700" />
+          <ShieldIcon size={16} className="text-aqua-700 dark:text-aqua-300" />
           <h3 className="text-[12.5px] font-bold text-ink-900">O confronto com {oppTeam.n}</h3>
         </div>
         <p className="mb-2.5 text-[12.5px] leading-snug text-ink-700">{rivRead}</p>
@@ -124,7 +127,7 @@ export function PostMatch({
       {/* leitura do arquétipo (se houver) */}
       {arqRead && (
         <section className="flex items-start gap-2.5 rounded-[14px] border border-border bg-surface p-3.5">
-          <CompassIcon size={16} className="mt-0.5 shrink-0 text-brand-600" />
+          <CompassIcon size={16} className="mt-0.5 shrink-0 text-brand-600 dark:text-brand-300" />
           <div>
             <h3 className="text-[12.5px] font-bold text-ink-900">A sua escola</h3>
             <p className="mt-0.5 text-[12.5px] leading-snug text-ink-700">{arqRead}</p>
@@ -146,7 +149,7 @@ export function PostMatch({
           onClick={onPlayAgain}
           className="flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-pill bg-brand-600 px-5 text-[15px] font-bold text-white shadow-[var(--shadow-brand)] transition-all hover:bg-brand-700 active:scale-[0.98]"
         >
-          Jogar de novo
+          {continueLabel}
         </button>
         <button
           type="button"

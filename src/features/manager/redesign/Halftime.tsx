@@ -53,8 +53,8 @@ function posturaHint(
 }
 
 function HintIcon({ tone }: { tone: "up" | "down" | "hold" }) {
-  if (tone === "up") return <ArrowUpIcon size={16} className="text-grass-700" />;
-  if (tone === "down") return <ArrowDownIcon size={16} className="text-aqua-700" />;
+  if (tone === "up") return <ArrowUpIcon size={16} className="text-grass-700 dark:text-grass-300" />;
+  if (tone === "down") return <ArrowDownIcon size={16} className="text-aqua-700 dark:text-aqua-300" />;
   return <EqualIcon size={16} className="text-ink-600" />;
 }
 
@@ -99,7 +99,7 @@ export function Halftime({
   return (
     <div className="flex flex-col gap-4">
       <header className="rounded-[16px] border border-border bg-surface p-4">
-        <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand-600">
+        <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand-600 dark:text-brand-300">
           <ShieldIcon size={14} /> Vestiário, intervalo
         </div>
         <div className="mt-2 flex items-center justify-center gap-3 text-ink-900">
@@ -107,7 +107,7 @@ export function Halftime({
             <ManagerCrest slug={myTeam.s} name={myTeam.n} size={26} />
             <span className="text-[14px] font-bold">{myTeam.n}</span>
           </span>
-          <span className="text-[26px] font-black tabular-nums text-brand-700">
+          <span className="text-[26px] font-black tabular-nums text-brand-700 dark:text-brand-300">
             {score[0]} <span className="text-ink-400">x</span> {score[1]}
           </span>
           <span className="flex items-center gap-2">
@@ -155,7 +155,7 @@ export function Halftime({
       {pane === "encaixe" ? (
         <section className="rounded-[14px] border border-border bg-surface p-3.5">
           <div className="mb-2 flex items-center gap-2">
-            <CompassIcon size={16} className="text-brand-600" />
+            <CompassIcon size={16} className="text-brand-600 dark:text-brand-300" />
             <h3 className="text-[12.5px] font-bold text-ink-900">Como a sua tática encaixa contra {oppTeam.n}</h3>
           </div>
           <MatchupList signals={matchups} />
@@ -163,7 +163,7 @@ export function Halftime({
       ) : (
         <section className="rounded-[14px] border border-border bg-surface p-3.5">
           <div className="mb-2 flex items-center gap-2">
-            <CompassIcon size={16} className="text-brand-600" />
+            <CompassIcon size={16} className="text-brand-600 dark:text-brand-300" />
             <h3 className="text-[12.5px] font-bold text-ink-900">As suas escolhas continuam combinando</h3>
           </div>
           <CoherenceList signals={coherences} />

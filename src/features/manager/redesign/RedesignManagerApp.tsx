@@ -1,20 +1,32 @@
-// Orquestrador do Maneiger reformulado. Mantém o estado de tela e o fluxo:
-// Home -> (Quiz) -> (Selecionar Copa) -> Tática às cegas -> Ao vivo (1T) ->
-// Vestiário -> Ao vivo (2T) -> Pós-jogo. Determinístico: o adversário e a tática
-// dele saem de um seed estável. Reaproveita os dados/escudos/cores do manager no ar.
+// Orquestrador do Maneiger reformulado. Agora e uma CAMPANHA, nao um jogo unico:
+// Home -> (Quiz) -> Sorteio (3 selecoes) -> Hub da campanha -> por partida minha:
+// Tatica as cegas -> Ao vivo (1T) -> Vestiario -> Ao vivo (2T) -> Pos-jogo -> Hub.
+// O motor de campanha (engine.ts, via redesign/campaign.ts) e a fonte da verdade do
+// chaveamento; as MINHAS partidas sao jogadas pelo sim do redesign e o placar volta pro
+// engine (resolve*/advance). Os jogos que nao sao meus saem do engine (worldMode).
+//
+// Mata-Mata 2026 = comeca no R32 (16 avos) com a minha selecao como convidada. Copas
+// antigas = campanha completa (grupos + mata-mata da estrutura real), pelo MESMO sorteio
+// de 3 selecoes. Determinismo preservado (seeds estaveis por campanha/partida).
 import { useCallback, useMemo, useRef, useState } from "react";
-import type { Team, Edition, WorldMode } from "../types";
+import type { Team, Edition, WorldMode, Campaign, MatchKind } from "../types";
 import type { Tactic, PresetKey } from "./tactics.ts";
 import { DEFAULT_TACTIC, PRESETS, tacticFromPreset } from "./tactics.ts";
 import type { MatchState } from "./sim.ts";
 import { createMatch, recompute } from "./sim.ts";
 import { archetypeBonus } from "./archetypes.ts";
-import { teamsForYear, toLite, editionsDesc } from "./data";
+import { toLite, editionsDesc } from "./data";
+import {
+  buildKnockout2026,
+  buildFullCampaign,
+  applyUserMatch,
+  matchSeedFor,
+} from "./campaign";
 import { useManagerArchetype } from "./useManagerArchetype";
 import { Home, HowItWorks, type HomeAction } from "./Home";
 import { ArchetypeQuiz } from "./ArchetypeQuiz";
-import { SelectCopaTeam } from "./SelectCopaTeam";
 import { DraftSelection } from "./DraftSelection";
+import { CampaignHub, CampaignEnd } from "./CampaignHub";
 import { TacticPicker, type PickerMode } from "./TacticPicker";
 import { LiveMatchView, type LiveResult } from "./LiveMatchView";
 import { Halftime } from "./Halftime";
@@ -23,9 +35,22 @@ import type { ScoreboardGoal } from "./Scoreboard";
 import { ManagerCrest } from "../components";
 import { ArrowLeftIcon, ArrowRightIcon } from "./icons";
 
-type Screen = "home" | "quiz" | "draft" | "selectCopa" | "tactic" | "live1" | "halftime" | "live2" | "post";
+// telas do fluxo. "draftBrasil" abre no 2026; "draftCopa" abre no seletor de edicao.
+type Screen =
+  | "home"
+  | "how"
+  | "quiz"
+  | "draftBrasil"
+  | "draftCopa"
+  | "campaignHub"
+  | "campaignEnd"
+  | "tactic"
+  | "live1"
+  | "halftime"
+  | "live2"
+  | "post";
 
-// PRNG estável (mulberry32) pro adversário/tática dele.
+// PRNG estável (mulberry32) pra a tática do adversário na partida corrente.
 function rng(seed: number): () => number {
   let a = seed >>> 0;
   return function () {
@@ -35,18 +60,6 @@ function rng(seed: number): () => number {
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
-}
-
-// escolhe um adversário plausível: a seleção mais próxima da minha força (excluindo eu).
-function pickOpponent(myTeam: Team, year: number, seed: number): Team {
-  const pool = teamsForYear(year).filter((t) => t.s !== myTeam.s);
-  if (pool.length === 0) return myTeam;
-  const sorted = pool
-    .map((t) => ({ t, d: Math.abs(t.o - myTeam.o) }))
-    .sort((x, y) => x.d - y.d)
-    .slice(0, Math.min(6, pool.length));
-  const r = rng(seed ^ 0x9e3779b9)();
-  return sorted[Math.floor(r * sorted.length)].t;
 }
 
 // tática do adversário: escolhe um preset por seed e mexe levemente na postura.
@@ -84,52 +97,75 @@ export function RedesignManagerApp() {
   // identidade de treinador persistida (localStorage + Supabase quando logado).
   const { archetype, setArchetype } = useManagerArchetype();
 
-  // contexto da partida
+  // ---- estado da CAMPANHA ----
+  // o engine MUTA o objeto da campanha em lugar (campRef); `camp` e a copia render-safe
+  // publicada por commit() (nova referencia => re-render). O render le de `camp`.
+  const campRef = useRef<Campaign | null>(null);
+  const [camp, setCamp] = useState<Campaign | null>(null);
   const [edition, setEdition] = useState<Edition | null>(null);
+
+  // ---- contexto da partida MINHA corrente ----
   const [myTeam, setMyTeam] = useState<Team | null>(null);
   const [oppTeam, setOppTeam] = useState<Team | null>(null);
+  const [matchKind, setMatchKind] = useState<MatchKind>("knockout");
   const [oppTac, setOppTac] = useState<Tactic>(DEFAULT_TACTIC);
   const [tac, setTac] = useState<Tactic>({ ...DEFAULT_TACTIC });
   const [mode, setMode] = useState<PickerMode>("rapido");
-  // mundo da campanha escolhido no sorteio (real / alternativo). Guardado pra futuras
-  // fases (pré-jogo/campanha); no jogo único não altera a mecânica da minha partida.
-  const [, setWorldMode] = useState<WorldMode>("real");
-  const seedRef = useRef<number>((Date.now() ^ 0x1234) >>> 0);
+  const matchSeedRef = useRef<number>(0);
 
-  // resultado ao vivo (placar + estado) pra o pós-jogo e o vestiário
+  // resultado ao vivo (placar + estado) pro pós-jogo e o vestiário
   const [liveScore, setLiveScore] = useState<[number, number]>([0, 0]);
   const [liveGoals, setLiveGoals] = useState<ScoreboardGoal[]>([]);
 
-  // estado do motor é DONO daqui: sobrevive ao Vestiário (tela sobreposta) pra o
-  // 1º e o 2º tempo serem a MESMA partida. matchTick força a recriação do <LiveMatchView>
-  // só quando começa uma partida nova (apito), nunca entre os tempos.
+  // estado do motor de PARTIDA (sim do redesign) - dono do orquestrador: sobrevive ao
+  // Vestiário. Guardado em ref (pra mutacao em lugar no intervalo) E espelhado em state
+  // (mesmo objeto) pra o render nunca ler .current durante o render. matchState so troca
+  // de referencia ao apitar uma partida nova (nunca entre os tempos).
   const matchStateRef = useRef<MatchState | null>(null);
-  const [matchTick, setMatchTick] = useState(0);
+  const [matchState, setMatchState] = useState<MatchState | null>(null);
 
-  // monta a partida ao escolher a seleção. `world` guarda o mundo da campanha (do sorteio).
-  const startMatchWith = useCallback((ed: Edition, team: Team, world: WorldMode = "real") => {
+  // publica a campanha mutada como NOVA referência (dispara re-render).
+  const commitCampaign = useCallback(() => {
+    setCamp(campRef.current ? { ...campRef.current } : null);
+  }, []);
+
+  // ---- monta a campanha ao escolher a seleção no sorteio ----
+  const startCampaign = useCallback((ed: Edition, team: Team, world: WorldMode = "real") => {
     const seed = (Date.now() ^ (ed.year * 2654435761) ^ team.o) >>> 0;
-    seedRef.current = seed;
+    // 2026 = mata-mata direto no R32 (convidada). Demais edicoes = campanha completa.
+    const isKnockout2026 = ed.year === 2026;
+    const built = isKnockout2026
+      ? buildKnockout2026(ed, team, seed, world)
+      : buildFullCampaign(ed, team, seed, world);
+    campRef.current = built;
     setEdition(ed);
-    setMyTeam(team);
-    setWorldMode(world);
-    const opp = pickOpponent(team, ed.year, seed);
-    setOppTeam(opp);
-    setOppTac(aiTactic(seed));
-    setTac({ ...DEFAULT_TACTIC });
-    setLiveScore([0, 0]);
-    setLiveGoals([]);
-    matchStateRef.current = null; // o motor é criado ao apitar (com a tática final)
-    setScreen("tactic");
+    setCamp({ ...built });
+    setScreen(built.alive ? "campaignHub" : "campaignEnd");
   }, []);
 
   const onHome = useCallback((a: HomeAction) => {
     if (a === "quiz") setScreen("quiz");
-    else if (a === "how") setScreen("how" as Screen);
-    else if (a === "selectCopa") setScreen("selectCopa");
-    // "Jogar Mata-Mata 2026": abre o sorteio por dificuldade (Sua seleção). Lá dá pra
-    // pegar a favorita (o topo da edição, o Brasil quando ele sai) ou a zebra.
-    else if (a === "playBrasil") setScreen("draft");
+    else if (a === "how") setScreen("how");
+    else if (a === "selectCopa") setScreen("draftCopa");
+    // "Jogar Mata-Mata 2026": abre o sorteio direto na edicao 2026.
+    else if (a === "playBrasil") setScreen("draftBrasil");
+  }, []);
+
+  // ---- inicia uma partida MINHA a partir do hub (monta o contexto e vai pra tatica) ----
+  const startMatch = useCallback((opp: Team, kind: MatchKind) => {
+    const c = campRef.current;
+    if (!c) return;
+    const seed = matchSeedFor(c, opp);
+    matchSeedRef.current = seed;
+    setMyTeam(c.myTeam);
+    setOppTeam(opp);
+    setMatchKind(kind);
+    setOppTac(aiTactic(seed));
+    setTac({ ...DEFAULT_TACTIC });
+    setLiveScore([0, 0]);
+    setLiveGoals([]);
+    matchStateRef.current = null; // criado ao apitar (com a tatica final)
+    setScreen("tactic");
   }, []);
 
   // ==== captura dos eventos do ao vivo ====
@@ -140,7 +176,7 @@ export function RedesignManagerApp() {
   }, []);
 
   const onHalftime = useCallback((st: MatchState) => {
-    matchStateRef.current = st; // mesmo objeto que o LiveMatchView dirige
+    matchStateRef.current = st;
     setLiveScore([st.score[0], st.score[1]]);
     setLiveGoals(goalsFromState(st));
     setScreen("halftime");
@@ -153,39 +189,50 @@ export function RedesignManagerApp() {
   }, [goalsFromState]);
 
   const resumeSecondHalf = useCallback(() => {
-    // o estado do motor (matchStateRef) já avançou até o 45 e recebeu o replanejamento
-    // do Vestiário. O 2º tempo remonta o LiveMatchView com o MESMO state: ele detecta
-    // minute >= 45 e segue de onde parou (sem recriar a partida).
     setScreen("live2");
   }, []);
 
-  // garante o estado do motor criado pra esta partida (chamado ao apitar). Injeta a
-  // identidade do treinador no MEU lado (archUnits) via archetypeBonus. A IA fica 0.
+  // cria o estado do motor de partida (ao apitar). Injeta a identidade do treinador no
+  // MEU lado (archUnits); a IA fica 0.
   const ensureMatch = useCallback(() => {
     if (!myTeam || !oppTeam) return;
     const archA = archetypeBonus(archetype, tac);
-    matchStateRef.current = createMatch(
-      toLite(myTeam), toLite(oppTeam), { ...tac }, { ...oppTac }, seedRef.current, { a: archA, b: 0 },
+    const st = createMatch(
+      toLite(myTeam), toLite(oppTeam), { ...tac }, { ...oppTac }, matchSeedRef.current, { a: archA, b: 0 },
     );
-    setMatchTick((n) => n + 1);
+    matchStateRef.current = st; // mesma referencia no ref (mutada no intervalo) e no state
+    setMatchState(st);
   }, [myTeam, oppTeam, tac, oppTac, archetype]);
 
-  // O LiveMatchView recebe o state (dono do orquestrador). matchTick muda só ao apitar.
+  // aplica o placar da minha partida na campanha e volta pro hub (ou fim de campanha).
+  const finishCampaignMatch = useCallback(() => {
+    const c = campRef.current;
+    if (!c) {
+      setScreen("home");
+      return;
+    }
+    applyUserMatch(c, liveScore[0], liveScore[1], matchSeedRef.current);
+    commitCampaign();
+    setScreen(c.alive ? "campaignHub" : "campaignEnd");
+  }, [liveScore, commitCampaign]);
+
+  // O LiveMatchView recebe o state (dono do orquestrador). matchState (mesma referencia
+  // do ref) so troca ao apitar; entre os tempos e o MESMO objeto (mutado no intervalo),
+  // entao a key nao muda e a partida nao e recriada.
   const liveView = useMemo(() => {
-    if (!myTeam || !oppTeam || !matchStateRef.current) return null;
+    if (!myTeam || !oppTeam || !matchState) return null;
     return (
       <LiveMatchView
-        key={`live-${seedRef.current}-${matchTick}`}
+        key={`live-${matchState.seed}`}
         teamA={myTeam}
         teamB={oppTeam}
-        state={matchStateRef.current}
+        state={matchState}
         onPosturaChange={(p) => setTac((t) => ({ ...t, postura: p }))}
         onHalftime={onHalftime}
         onFinish={onFinish}
       />
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [myTeam, oppTeam, matchTick]);
+  }, [myTeam, oppTeam, matchState, onHalftime, onFinish]);
 
   // ================================================================ render
   if (screen === "home") {
@@ -196,10 +243,10 @@ export function RedesignManagerApp() {
     );
   }
 
-  if (screen === ("how" as Screen)) {
+  if (screen === "how") {
     return (
       <ScreenFrame>
-        <HowItWorks onBack={() => setScreen("home")} onPlay={() => setScreen("draft")} />
+        <HowItWorks onBack={() => setScreen("home")} onPlay={() => setScreen("draftBrasil")} />
       </ScreenFrame>
     );
   }
@@ -219,35 +266,64 @@ export function RedesignManagerApp() {
     );
   }
 
-  // "Sua seleção": sorteio por dificuldade (3 seleções + mundo da campanha).
-  if (screen === "draft") {
+  // "Jogar Mata-Mata 2026": sorteio de 3 seleções direto na edição 2026.
+  if (screen === "draftBrasil") {
     return (
       <ScreenFrame>
-        {/* "Jogar Mata-Mata 2026": abre direto na edição mais recente (2026); dá pra
-            trocar a Copa lá dentro. */}
         <DraftSelection
           initialEdition={editionsDesc()[0] ?? null}
-          onPick={(ed, t, world) => startMatchWith(ed, t, world)}
+          onPick={(ed, t, world) => startCampaign(ed, t, world)}
           onBack={() => setScreen("home")}
         />
       </ScreenFrame>
     );
   }
 
-  // "Selecionar Copa": picker manual de edição + seleção (lista completa).
-  if (screen === "selectCopa") {
+  // "Selecionar Copa": MESMO sorteio de 3, mas comeca no seletor de edicao (sem lista
+  // livre de selecao). Escolhida a edicao, o sorteio de 3 seleciona a sua selecao.
+  if (screen === "draftCopa") {
     return (
       <ScreenFrame>
-        <SelectCopaTeam onPick={(ed, t) => startMatchWith(ed, t)} onBack={() => setScreen("home")} />
+        <DraftSelection
+          initialEdition={null}
+          onPick={(ed, t, world) => startCampaign(ed, t, world)}
+          onBack={() => setScreen("home")}
+        />
+      </ScreenFrame>
+    );
+  }
+
+  if (screen === "campaignHub" && camp && edition) {
+    return (
+      <ScreenFrame>
+        <CampaignHub
+          campaign={camp}
+          edition={edition}
+          onPlay={(opp, kind) => startMatch(opp, kind)}
+          onHome={() => setScreen("home")}
+        />
+      </ScreenFrame>
+    );
+  }
+
+  if (screen === "campaignEnd" && camp && edition) {
+    return (
+      <ScreenFrame>
+        <CampaignEnd
+          campaign={camp}
+          edition={edition}
+          onHome={() => setScreen("home")}
+          onReplay={() => setScreen("draftBrasil")}
+        />
       </ScreenFrame>
     );
   }
 
   if (screen === "tactic" && myTeam && oppTeam) {
     return (
-      <ScreenFrame onBack={() => setScreen("home")}>
+      <ScreenFrame onBack={() => setScreen("campaignHub")}>
         <div className="mb-4">
-          <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand-600">
+          <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand-600 dark:text-brand-300">
             Tática às cegas
           </div>
           <div className="mt-2 flex items-center gap-2.5 rounded-[14px] border border-border bg-surface px-3.5 py-2.5">
@@ -294,7 +370,6 @@ export function RedesignManagerApp() {
           archetype={archetype}
           onChange={(t) => {
             setTac(t);
-            // aplica o replanejamento ao estado vivo do motor (formação/estilos/bloco/postura)
             const st = matchStateRef.current;
             if (st) {
               st.tactics[0].form = t.form;
@@ -302,7 +377,7 @@ export function RedesignManagerApp() {
               st.tactics[0].semBola = t.semBola;
               st.tactics[0].bloco = t.bloco;
               st.tactics[0].postura = t.postura;
-              recompute(st); // a posse-alvo depende do estilo/bloco/postura
+              recompute(st);
             }
           }}
           onResume={resumeSecondHalf}
@@ -312,6 +387,9 @@ export function RedesignManagerApp() {
   }
 
   if (screen === "post" && myTeam && oppTeam) {
+    // rótulos do pós-jogo conforme a fase (mata-mata mostra "avançar", grupo mostra
+    // "continuar campanha"). Botao primario aplica o placar na campanha.
+    const isKO = matchKind === "knockout" || matchKind === "final" || matchKind === "third_place";
     return (
       <ScreenFrame>
         <PostMatch
@@ -322,10 +400,9 @@ export function RedesignManagerApp() {
           tac={tac}
           oppTac={oppTac}
           archetype={archetype}
-          onPlayAgain={() => {
-            if (edition && myTeam) startMatchWith(edition, myTeam);
-          }}
-          onHome={() => setScreen("home")}
+          continueLabel={isKO ? "Avançar na Copa" : "Continuar campanha"}
+          onPlayAgain={finishCampaignMatch}
+          onHome={finishCampaignMatch}
         />
       </ScreenFrame>
     );

@@ -21,11 +21,11 @@ export function ArchetypeCard({ keyId }: { keyId: ArchetypeKey }) {
   return (
     <div className="rounded-[16px] border border-border bg-surface p-4">
       <div className="flex items-center gap-2.5">
-        <span className="grid size-10 place-items-center rounded-full bg-brand-500/15 text-brand-700">
+        <span className="grid size-10 place-items-center rounded-full bg-brand-500/15 text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">
           <CompassIcon size={20} />
         </span>
         <div>
-          <div className="text-[11px] font-extrabold uppercase tracking-wide text-brand-600">Técnico</div>
+          <div className="text-[11px] font-extrabold uppercase tracking-wide text-brand-600 dark:text-brand-300">Técnico</div>
           <div className="text-[18px] font-black leading-tight text-ink-900">{a.nome}</div>
         </div>
       </div>
@@ -72,10 +72,10 @@ export function ArchetypeQuiz({
     return (
       <div className="flex flex-col gap-4">
         <div className="animate-rise text-center">
-          <span className="mx-auto grid size-14 place-items-center rounded-full bg-brand-500/15 text-brand-700 animate-pop-in">
+          <span className="mx-auto grid size-14 place-items-center rounded-full bg-brand-500/15 text-brand-700 animate-pop-in dark:bg-brand-500/20 dark:text-brand-300">
             <CompassIcon size={28} />
           </span>
-          <div className="mt-3 text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand-600">A sua escola é</div>
+          <div className="mt-3 text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand-600 dark:text-brand-300">A sua escola é</div>
           <p className="mt-1 text-[12.5px] leading-snug text-ink-500">
             Ela dá um tempero leve à sua tática. Você pode mudar a qualquer momento.
           </p>

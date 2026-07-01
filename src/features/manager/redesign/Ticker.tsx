@@ -8,15 +8,15 @@ import { BallIcon, GoalNetIcon, WhistleIcon, FlagIcon, CardIcon, ShieldIcon, Dot
 function toneClass(kind: EventKind): string {
   switch (kind) {
     case "gol":
-      return "font-extrabold text-grass-700";
+      return "font-extrabold text-grass-700 dark:text-grass-300";
     case "grande_chance":
-      return "font-bold text-brand-700";
+      return "font-bold text-brand-700 dark:text-brand-300";
     case "defesa":
-      return "text-aqua-700";
+      return "text-aqua-700 dark:text-aqua-300";
     case "finaliza_fora":
       return "text-ink-600";
     case "falta":
-      return "text-flame-700";
+      return "text-flame-700 dark:text-flame-300";
     case "inicio":
     case "intervalo":
     case "fim":
@@ -30,17 +30,17 @@ function EventIcon({ kind }: { kind: EventKind }) {
   const common = "shrink-0";
   switch (kind) {
     case "gol":
-      return <BallIcon size={15} className={common} color="var(--color-grass-600)" />;
+      return <BallIcon size={15} className={common} color="var(--color-grass-500)" />;
     case "grande_chance":
-      return <FlagIcon size={15} className={`${common} text-brand-600`} />;
+      return <FlagIcon size={15} className={`${common} text-brand-600 dark:text-brand-300`} />;
     case "defesa":
-      return <ShieldIcon size={15} className={`${common} text-aqua-700`} />;
+      return <ShieldIcon size={15} className={`${common} text-aqua-700 dark:text-aqua-300`} />;
     case "finaliza_fora":
       return <GoalNetIcon size={15} className={`${common} text-ink-500`} />;
     case "escanteio":
       return <FlagIcon size={15} className={`${common} text-ink-500`} />;
     case "falta":
-      return <CardIcon size={14} className={`${common} text-flame-600`} />;
+      return <CardIcon size={14} className={`${common} text-flame-600 dark:text-flame-300`} />;
     case "inicio":
     case "fim":
     case "intervalo":

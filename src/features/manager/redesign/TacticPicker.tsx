@@ -38,7 +38,7 @@ function ModeToggle({ mode, onChange }: { mode: PickerMode; onChange: (m: Picker
             }`}
           >
             <span className="text-[13px] font-bold">{o.label}</span>
-            <span className={`text-[10px] font-semibold ${on ? "text-white/75" : "text-ink-400"}`}>{o.hint}</span>
+            <span className={`text-[10px] font-semibold ${on ? "text-white/75" : "text-ink-500 dark:text-ink-400"}`}>{o.hint}</span>
           </button>
         );
       })}
@@ -71,7 +71,7 @@ function OptionChip({
       }`}
     >
       <span className="text-[12.5px] font-bold">{label}</span>
-      {desc && <span className={`text-[9.5px] font-medium ${on ? "text-white/75" : "text-ink-400"}`}>{desc}</span>}
+      {desc && <span className={`text-[9.5px] font-medium ${on ? "text-white/75" : "text-ink-500 dark:text-ink-400"}`}>{desc}</span>}
     </button>
   );
 }
@@ -96,7 +96,7 @@ export function PosturaSlider({
       <div className="flex items-baseline justify-between gap-2">
         <label className="text-[12.5px] font-bold text-ink-900">{label}</label>
         <span className="flex items-baseline gap-1.5">
-          <span className="text-[11px] font-semibold text-brand-700">{zone}</span>
+          <span className="text-[11px] font-semibold text-brand-700 dark:text-brand-300">{zone}</span>
           <span className="min-w-[2.6rem] rounded-md bg-surface-2 px-1.5 py-0.5 text-center text-[11px] font-extrabold tabular-nums text-ink-700">
             {value}%
           </span>
@@ -130,14 +130,14 @@ export function PosturaSlider({
 
 // grid 3x3 de formação (linha = vocação)
 function FormGrid({ value, onPick }: { value: Form; onPick: (f: Form) => void }) {
-  const tone: Record<string, string> = { ofe: "text-flame-700", equ: "text-gold-700", def: "text-aqua-700" };
+  const tone: Record<string, string> = { ofe: "text-flame-700 dark:text-flame-300", equ: "text-gold-700 dark:text-gold-300", def: "text-aqua-700 dark:text-aqua-300" };
   return (
     <div role="radiogroup" aria-label="Formação" className="flex flex-col gap-1.5">
       {FORM_GRID.map((row) => (
         <div key={row.key} className="grid grid-cols-[5rem_1fr] items-stretch gap-2">
           <div className="min-w-0 self-center leading-tight">
             <div className={`text-[10.5px] font-extrabold uppercase tracking-wide ${tone[row.key]}`}>{row.label}</div>
-            <div className="truncate text-[9.5px] font-semibold text-ink-400">{row.hint}</div>
+            <div className="truncate text-[9.5px] font-semibold text-ink-500 dark:text-ink-400">{row.hint}</div>
           </div>
           <div className="grid grid-cols-3 gap-1.5">
             {row.forms.map((f) => {
@@ -293,7 +293,7 @@ export function TacticPicker({
       {/* coerência individual: chips + frase, nunca um total */}
       <section aria-labelledby="picker-coh-h" className="rounded-[14px] border border-border bg-surface p-3.5">
         <div className="mb-2 flex items-center gap-2">
-          <CompassIcon size={16} className="text-brand-600" />
+          <CompassIcon size={16} className="text-brand-600 dark:text-brand-300" />
           <h3 id="picker-coh-h" className="text-[12.5px] font-bold text-ink-900">
             Como as suas escolhas combinam
           </h3>

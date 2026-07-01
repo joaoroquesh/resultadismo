@@ -17,11 +17,11 @@ interface LevelStyle {
 }
 
 const LEVEL: Record<SignalLevel, LevelStyle> = {
-  pp: { label: "Casou", chipBg: "bg-grass-500/18", chipText: "text-grass-700", Icon: CheckIcon },
-  p:  { label: "Combina", chipBg: "bg-aqua-500/18", chipText: "text-aqua-700", Icon: ArrowUpIcon },
-  z:  { label: "Neutro", chipBg: "bg-ink-400/15", chipText: "text-ink-600", Icon: EqualIcon },
-  m:  { label: "Atrito", chipBg: "bg-flame-500/14", chipText: "text-flame-700", Icon: ArrowDownIcon },
-  mm: { label: "Briga", chipBg: "bg-flame-500/20", chipText: "text-flame-700", Icon: ArrowDownIcon },
+  pp: { label: "Casou", chipBg: "bg-grass-500/18 dark:bg-grass-500/25", chipText: "text-grass-700 dark:text-grass-300", Icon: CheckIcon },
+  p:  { label: "Combina", chipBg: "bg-aqua-500/18 dark:bg-aqua-500/25", chipText: "text-aqua-700 dark:text-aqua-300", Icon: ArrowUpIcon },
+  z:  { label: "Neutro", chipBg: "bg-ink-400/15 dark:bg-ink-400/20", chipText: "text-ink-600", Icon: EqualIcon },
+  m:  { label: "Atrito", chipBg: "bg-flame-500/14 dark:bg-flame-500/22", chipText: "text-flame-700 dark:text-flame-300", Icon: ArrowDownIcon },
+  mm: { label: "Briga", chipBg: "bg-flame-500/20 dark:bg-flame-500/28", chipText: "text-flame-700 dark:text-flame-300", Icon: ArrowDownIcon },
 };
 
 export function levelLabel(level: SignalLevel): string {
@@ -212,9 +212,9 @@ export function identityFit(arch: ArchetypeKey, t: Tactic): { level: SignalLevel
 export function IdentityFitRow({ arch, tac }: { arch: ArchetypeKey; tac: Tactic }) {
   const fit = identityFit(arch, tac);
   return (
-    <div className="flex items-start justify-between gap-3 rounded-[12px] bg-brand-500/[0.06] px-3 py-2.5">
+    <div className="flex items-start justify-between gap-3 rounded-[12px] bg-brand-500/[0.06] px-3 py-2.5 dark:bg-brand-500/[0.12]">
       <span className="flex min-w-0 items-start gap-2">
-        <CompassIcon size={15} className="mt-0.5 shrink-0 text-brand-600" />
+        <CompassIcon size={15} className="mt-0.5 shrink-0 text-brand-600 dark:text-brand-300" />
         <span className="min-w-0">
           <span className="block text-[12.5px] font-bold text-ink-900">{fit.title}</span>
           {fit.phrase && <span className="mt-0.5 block text-[11.5px] leading-snug text-ink-600">{fit.phrase}</span>}

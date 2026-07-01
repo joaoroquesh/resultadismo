@@ -1,6 +1,14 @@
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------ */
+/*  Variante `dark:` presa ao ATRIBUTO do tema (não ao prefers do SO). */
+/*  O ThemeProvider grava data-theme="dark" na raiz; assim dark:* segue */
+/*  o toggle do app, não a preferência do sistema. Sem isso, o dark: do */
+/*  Tailwind v4 cairia no media query e ignoraria o botão de tema.      */
+/* ------------------------------------------------------------------ */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ------------------------------------------------------------------ */
 /*  Ubuntu (fonte da marca) — self-hosted em public/fonts (subset      */
 /*  latin). Não usar Google Fonts: o CSP do vercel.json só permite     */
 /*  font-src 'self', e self-hosted carrega mais rápido (mesmo domínio).*/

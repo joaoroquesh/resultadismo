@@ -51,9 +51,9 @@ function OverallStars({ o }: { o: number }) {
 // cor de acento por nível (semântica de dificuldade, sem inventar cor nova):
 // favorita = gold (peso), média = brand, zebra = aqua (surpresa).
 const LEVEL_ACCENT: Record<DraftLevel, { chipBg: string; chipText: string; ring: string }> = {
-  favorita: { chipBg: "bg-gold-500/18", chipText: "text-gold-700", ring: "ring-gold-500/40" },
-  media: { chipBg: "bg-brand-500/15", chipText: "text-brand-700", ring: "ring-brand-500/50" },
-  zebra: { chipBg: "bg-aqua-500/18", chipText: "text-aqua-700", ring: "ring-aqua-500/40" },
+  favorita: { chipBg: "bg-gold-500/18 dark:bg-gold-500/25", chipText: "text-gold-700 dark:text-gold-300", ring: "ring-gold-500/40 dark:ring-gold-400/50" },
+  media: { chipBg: "bg-brand-500/15 dark:bg-brand-500/25", chipText: "text-brand-700 dark:text-brand-300", ring: "ring-brand-500/50 dark:ring-brand-400/55" },
+  zebra: { chipBg: "bg-aqua-500/18 dark:bg-aqua-500/25", chipText: "text-aqua-700 dark:text-aqua-300", ring: "ring-aqua-500/40 dark:ring-aqua-400/50" },
 };
 
 // ---------------------------------------------------------------- card de seleção
@@ -86,12 +86,12 @@ function DraftCard({
             <span className={`rounded-full px-2 py-0.5 text-[9.5px] font-black uppercase tracking-wider ${acc.chipBg} ${acc.chipText}`}>
               {DRAFT_LEVEL_LABEL[pick.level]}
             </span>
-            <span className="truncate text-[10px] font-semibold text-ink-400">{TIER_LABEL[t.t]}</span>
+            <span className="truncate text-[10px] font-semibold text-ink-500 dark:text-ink-400">{TIER_LABEL[t.t]}</span>
           </div>
           <div className="mt-0.5 truncate text-[16px] font-black leading-tight text-ink-900">{t.n}</div>
         </div>
         <div className="flex flex-col items-end">
-          <span className="text-[20px] font-black tabular-nums leading-none text-brand-700">{t.o}</span>
+          <span className="text-[20px] font-black tabular-nums leading-none text-brand-700 dark:text-brand-300">{t.o}</span>
           <span className="mt-1"><OverallStars o={t.o} /></span>
         </div>
       </div>
@@ -106,7 +106,7 @@ function DraftCard({
       <p className={`text-[10.5px] font-semibold leading-snug ${acc.chipText}`}>{DRAFT_LEVEL_HINT[pick.level]}</p>
 
       <span
-        className={`pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 items-center text-brand-600 ${
+        className={`pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 items-center text-brand-600 dark:text-brand-300 ${
           selected ? "sm:flex" : ""
         }`}
         aria-hidden
@@ -140,7 +140,7 @@ function WorldToggle({ value, onChange }: { value: WorldMode; onChange: (w: Worl
                 on ? "border-brand-500 bg-brand-50/60" : "border-border bg-surface hover:border-brand-400"
               }`}
             >
-              <span className={`text-[13px] font-bold ${on ? "text-brand-700" : "text-ink-900"}`}>{o.label}</span>
+              <span className={`text-[13px] font-bold ${on ? "text-brand-700 dark:text-brand-300" : "text-ink-900"}`}>{o.label}</span>
               <span className="text-[11px] leading-snug text-ink-500">{o.hint}</span>
             </button>
           );
@@ -256,7 +256,7 @@ function DraftBoard({
           type="button"
           onClick={reroll}
           disabled={!canReroll}
-          className="flex shrink-0 items-center gap-1.5 rounded-pill border border-border bg-surface px-3 py-2 text-[12px] font-bold text-ink-700 transition-[transform,border-color,color] duration-150 ease-out hover:border-brand-400 hover:text-brand-700 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-45"
+          className="flex shrink-0 items-center gap-1.5 rounded-pill border border-border bg-surface px-3 py-2 text-[12px] font-bold text-ink-700 transition-[transform,border-color,color] duration-150 ease-out hover:border-brand-400 hover:text-brand-700 dark:hover:text-brand-300 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-45"
         >
           <DiceIcon size={15} />
           {canReroll ? "Sortear de novo" : "Sorteio usado"}

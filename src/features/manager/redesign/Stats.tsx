@@ -57,7 +57,7 @@ function StatLine({ row }: { row: Row }) {
   return (
     <div>
       <div className="flex items-center justify-between text-[12.5px] font-bold tabular-nums text-ink-800">
-        <span className={aWins ? "text-brand-700" : undefined}>
+        <span className={aWins ? "text-brand-700 dark:text-brand-300" : undefined}>
           {row.a}
           {sfx}
         </span>
@@ -92,7 +92,7 @@ export function StatsPanel({
   return (
     <div className="rounded-[14px] border border-border bg-surface p-3.5">
       <div className="mb-2 flex items-center justify-between text-[10.5px] font-extrabold uppercase tracking-wide text-ink-500">
-        <span className="min-w-0 flex-1 truncate text-brand-700">{myName}</span>
+        <span className="min-w-0 flex-1 truncate text-brand-700 dark:text-brand-300">{myName}</span>
         <span className="shrink-0 px-2">ao vivo</span>
         <span className="min-w-0 flex-1 truncate text-right text-ink-700">{oppName}</span>
       </div>

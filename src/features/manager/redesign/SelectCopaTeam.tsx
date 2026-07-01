@@ -109,7 +109,7 @@ function TeamPicker({
                     <span className="rounded-md bg-surface-2 px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-ink-600">
                       {TIER_LABEL[t.t]}
                     </span>
-                    <span className="text-[15px] font-black tabular-nums text-brand-700">{t.o}</span>
+                    <span className="text-[15px] font-black tabular-nums text-brand-700 dark:text-brand-300">{t.o}</span>
                   </span>
                 </div>
                 {on && (
