@@ -46,3 +46,9 @@ test-results/
 playwright-report/
 .vite-redesign/
 .fuse_hidden*
+.ds-sync/
+ds-bundle/
+.design-sync/.cache/
+.design-sync/learnings/
+.design-sync/node_modules
+.design-sync/compiled-tailwind.css
