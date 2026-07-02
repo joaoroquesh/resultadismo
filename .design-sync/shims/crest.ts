@@ -1,0 +1,321 @@
+// GERADO por .design-sync/shims/gen-crest-shim.mjs — NÃO editar à mão.
+// Espelho de src/lib/crest.ts com import.meta.glob → imports estáticos.
+
+import __e0 from "@/assets/escudos/escudo-1.svg";
+import __e1 from "@/assets/escudos/escudo-10.svg";
+import __e2 from "@/assets/escudos/escudo-11.svg";
+import __e3 from "@/assets/escudos/escudo-12.svg";
+import __e4 from "@/assets/escudos/escudo-13.svg";
+import __e5 from "@/assets/escudos/escudo-14.svg";
+import __e6 from "@/assets/escudos/escudo-15.svg";
+import __e7 from "@/assets/escudos/escudo-16.svg";
+import __e8 from "@/assets/escudos/escudo-2.svg";
+import __e9 from "@/assets/escudos/escudo-3.svg";
+import __e10 from "@/assets/escudos/escudo-4.svg";
+import __e11 from "@/assets/escudos/escudo-5.svg";
+import __e12 from "@/assets/escudos/escudo-6.svg";
+import __e13 from "@/assets/escudos/escudo-7.svg";
+import __e14 from "@/assets/escudos/escudo-8.svg";
+import __e15 from "@/assets/escudos/escudo-9.svg";
+import __e16 from "@/assets/escudos/escudo-padrao.svg";
+import __f0 from "@/assets/grupos/flamula-1.svg";
+import __f1 from "@/assets/grupos/flamula-2.svg";
+import __f2 from "@/assets/grupos/flamula-3.svg";
+
+// Sistema de escudos/flâmulas baseado em MÁSCARA de SVG.
+// O SVG (em /public/escudos ou /public/grupos) recorta um fundo de cor
+// (sólido, listras, grade ou bola) ou uma foto. A identidade visual fica
+// codificada numa string `crest:` salva em profiles.avatar_url e leagues.logo_url.
+//
+// Formato (posicional, separado por ":"):
+//   crest:<kind>:<shape>:<fill>:<cor1-cor2-...>:<rotação>:<fotoEncoded>
+// Ex.: crest:escudo:padrao:stripes:verde-dourado:45:
+//      crest:flamula:2:ball:azul-dourado:0:
+//      crest:escudo:3:photo:grafite::https%3A%2F%2F...
+//
+// A foto é encodeURIComponent — então nunca contém ":" e não quebra o split.
+import { AVATAR_COLORS, parseGenAvatar } from "@/lib/avatar";
+
+export type CrestKind = "escudo" | "flamula";
+export type CrestFill = "solid" | "stripes" | "grid" | "ball" | "photo";
+const CREST_FILLS: readonly CrestFill[] = ["solid", "stripes", "grid", "ball", "photo"];
+
+// ---------------------------------------------------------------------------
+// Catálogo de formas — montado AUTOMATICAMENTE a partir das pastas:
+//   src/assets/escudos/escudo-<id>.svg    (perfil; "escudo-padrao" é o default)
+//   src/assets/grupos/flamula-<id>.svg (grupo)
+// Pra adicionar/remover/trocar uma forma, é só largar/apagar o SVG na pasta
+// (nome no padrão "escudo-<id>.svg" / "flamula-<id>.svg") e rebuildar. O <id>
+// vira o identificador salvo no crest, então mantenha nomes estáveis.
+// import.meta.glob lê em tempo de build (Vite não enxerga a pasta public).
+// ---------------------------------------------------------------------------
+const ESCUDO_FILES: Record<string, string> = {
+  "../assets/escudos/escudo-1.svg": __e0,
+  "../assets/escudos/escudo-10.svg": __e1,
+  "../assets/escudos/escudo-11.svg": __e2,
+  "../assets/escudos/escudo-12.svg": __e3,
+  "../assets/escudos/escudo-13.svg": __e4,
+  "../assets/escudos/escudo-14.svg": __e5,
+  "../assets/escudos/escudo-15.svg": __e6,
+  "../assets/escudos/escudo-16.svg": __e7,
+  "../assets/escudos/escudo-2.svg": __e8,
+  "../assets/escudos/escudo-3.svg": __e9,
+  "../assets/escudos/escudo-4.svg": __e10,
+  "../assets/escudos/escudo-5.svg": __e11,
+  "../assets/escudos/escudo-6.svg": __e12,
+  "../assets/escudos/escudo-7.svg": __e13,
+  "../assets/escudos/escudo-8.svg": __e14,
+  "../assets/escudos/escudo-9.svg": __e15,
+  "../assets/escudos/escudo-padrao.svg": __e16,
+};
+const FLAMULA_FILES: Record<string, string> = {
+  "../assets/grupos/flamula-1.svg": __f0,
+  "../assets/grupos/flamula-2.svg": __f1,
+  "../assets/grupos/flamula-3.svg": __f2,
+};
+
+// id (estável) -> url empacotada. id = nome sem o prefixo e sem ".svg".
+function buildCatalog(files: Record<string, string>, prefix: string): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const [path, url] of Object.entries(files)) {
+    const stem = (path.split("/").pop() ?? "").replace(/\.svg$/i, "");
+    const id = stem.startsWith(`${prefix}-`) ? stem.slice(prefix.length + 1) : stem;
+    if (id) map.set(id, url);
+  }
+  return map;
+}
+
+// "padrao" primeiro; depois numéricos crescentes; depois alfabético.
+function sortShapeIds(ids: string[]): string[] {
+  return [...ids].sort((a, b) => {
+    if (a === "padrao") return -1;
+    if (b === "padrao") return 1;
+    const na = Number(a);
+    const nb = Number(b);
+    const aNum = a !== "" && !Number.isNaN(na);
+    const bNum = b !== "" && !Number.isNaN(nb);
+    if (aNum && bNum) return na - nb;
+    if (aNum) return -1;
+    if (bNum) return 1;
+    return a.localeCompare(b);
+  });
+}
+
+const ESCUDO_CATALOG = buildCatalog(ESCUDO_FILES, "escudo");
+const FLAMULA_CATALOG = buildCatalog(FLAMULA_FILES, "flamula");
+
+export const ESCUDO_SHAPES: string[] = sortShapeIds([...ESCUDO_CATALOG.keys()]);
+export const FLAMULA_SHAPES: string[] = sortShapeIds([...FLAMULA_CATALOG.keys()]);
+
+// Default de cada tipo (resiliente: usa "padrao" se existir, senão a 1ª forma).
+export const DEFAULT_ESCUDO_SHAPE =
+  ESCUDO_CATALOG.has("padrao") ? "padrao" : ESCUDO_SHAPES[0] ?? "padrao";
+export const DEFAULT_FLAMULA_SHAPE = FLAMULA_SHAPES[0] ?? "1";
+
+/** URL empacotada da forma. Cai no default se o id não existir mais (forma removida). */
+export function crestShapeUrl(kind: CrestKind, shape: string): string {
+  const catalog = kind === "flamula" ? FLAMULA_CATALOG : ESCUDO_CATALOG;
+  const fallback = kind === "flamula" ? DEFAULT_FLAMULA_SHAPE : DEFAULT_ESCUDO_SHAPE;
+  return catalog.get(shape) ?? catalog.get(fallback) ?? "";
+}
+
+// ---------------------------------------------------------------------------
+// Cores (reaproveita a paleta do avatar)
+// ---------------------------------------------------------------------------
+export const CREST_COLORS = AVATAR_COLORS;
+export const CREST_ROTATIONS = [0, 45, 90, 135];
+
+function hexOf(key: string): string {
+  return AVATAR_COLORS.find((c) => c.key === key)?.hex ?? AVATAR_COLORS[0]!.hex;
+}
+function isDark(key: string): boolean {
+  return !!AVATAR_COLORS.find((c) => c.key === key)?.dark;
+}
+
+// ---------------------------------------------------------------------------
+// Config + encode/parse
+// ---------------------------------------------------------------------------
+export type CrestConfig = {
+  kind: CrestKind;
+  shape: string;
+  fill: CrestFill;
+  colors: string[];
+  rotation: number;
+  photo?: string;
+};
+
+export function isCrest(src: string | null | undefined): boolean {
+  return !!src && src.startsWith("crest:");
+}
+
+export function buildCrest(cfg: CrestConfig): string {
+  const colors = cfg.colors.join("-");
+  const photo = cfg.fill === "photo" && cfg.photo ? encodeURIComponent(cfg.photo) : "";
+  return `crest:${cfg.kind}:${cfg.shape}:${cfg.fill}:${colors}:${Math.round(cfg.rotation)}:${photo}`;
+}
+
+export function parseCrest(src: string | null | undefined): CrestConfig | null {
+  if (!isCrest(src)) return null;
+  const parts = src!.split(":");
+  const kind: CrestKind = parts[1] === "flamula" ? "flamula" : "escudo";
+  const shape = parts[2] || (kind === "flamula" ? DEFAULT_FLAMULA_SHAPE : DEFAULT_ESCUDO_SHAPE);
+  const fill: CrestFill = CREST_FILLS.includes(parts[3] as CrestFill)
+    ? (parts[3] as CrestFill)
+    : "solid";
+  const colors = (parts[4] || "").split("-").filter(Boolean);
+  const rotation = Number.parseInt(parts[5] ?? "0", 10) || 0;
+  // foto vem encodada e sem ":", mas faço join por segurança.
+  const photoEnc = parts.slice(6).join(":");
+  // sanitiza: avatar_url/logo_url são texto livre escrito pelo usuário; sem isso,
+  // uma foto forjada quebra o url("...") do CSS e injeta background (CSS injection).
+  const photo = photoEnc ? sanitizePhotoUrl(safeDecode(photoEnc)) : undefined;
+  return {
+    kind,
+    shape,
+    fill,
+    colors: colors.length ? colors : ["turquesa"],
+    rotation,
+    photo,
+  };
+}
+
+function safeDecode(s: string): string | undefined {
+  try {
+    return decodeURIComponent(s);
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Sanitiza a URL da foto antes de virar CSS `url(...)`. Rejeita qualquer coisa que
+ * quebre o `url("...")` ou injete outra declaração (aspas, parênteses, espaço, `;`,
+ * `<`, `>`, barra invertida) e só aceita http(s) absoluto. Caso contrário → undefined
+ * (o render cai no fundo sólido). Defesa contra CSS injection armazenada.
+ */
+function sanitizePhotoUrl(raw: string | null | undefined): string | undefined {
+  if (!raw) return undefined;
+  const s = raw.trim();
+  if (!s || /[\s"'()\\;<>]/.test(s)) return undefined;
+  try {
+    const u = new URL(s);
+    if (u.protocol === "https:" || u.protocol === "http:") return u.href;
+  } catch {
+    // não é URL absoluta válida
+  }
+  return undefined;
+}
+
+// ---------------------------------------------------------------------------
+// Defaults
+// ---------------------------------------------------------------------------
+// Hash estável (djb2) p/ defaults determinísticos a partir do nome.
+function hashStr(s: string): number {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = (h * 33) ^ s.charCodeAt(i);
+  return Math.abs(h | 0);
+}
+
+/** Default de todo mundo: escudo padrão (recorte da logo) com cor estável do nome. */
+export function defaultCrestFromName(
+  name: string | null | undefined,
+  kind: CrestKind = "escudo",
+): CrestConfig {
+  const h = hashStr(name ?? "Resultadismo");
+  const color = AVATAR_COLORS[h % AVATAR_COLORS.length]!.key;
+  if (kind === "flamula") {
+    const c2 = AVATAR_COLORS[(h >> 3) % AVATAR_COLORS.length]!.key;
+    return {
+      kind,
+      shape: DEFAULT_FLAMULA_SHAPE,
+      fill: c2 === color ? "solid" : "stripes",
+      colors: c2 === color ? [color] : [color, c2],
+      rotation: 0,
+    };
+  }
+  return { kind, shape: DEFAULT_ESCUDO_SHAPE, fill: "solid", colors: [color], rotation: 0 };
+}
+
+/**
+ * Normaliza QUALQUER avatar_url antigo para um crest de escudo — ninguém fica
+ * sem escudo:
+ *  - crest:...      → passa direto
+ *  - gen:...        → escudo com as cores do avatar antigo
+ *  - foto crua (URL)→ escudo recortando a foto
+ *  - null/vazio     → null (o render usa o default determinístico do nome)
+ */
+export function legacyToCrest(src: string | null | undefined): string | null {
+  if (!src) return null;
+  if (isCrest(src)) return src;
+  if (src.startsWith("gen:")) {
+    const g = parseGenAvatar(src);
+    const colors = g?.colors?.length ? g.colors : ["turquesa"];
+    return buildCrest({
+      kind: "escudo",
+      shape: DEFAULT_ESCUDO_SHAPE,
+      fill: colors.length > 1 ? "stripes" : "solid",
+      colors,
+      rotation: g?.rotation ?? 0,
+    });
+  }
+  // sobra: foto crua (URL do Google salva direto) → recorta no escudo padrão
+  return buildCrest({
+    kind: "escudo",
+    shape: DEFAULT_ESCUDO_SHAPE,
+    fill: "photo",
+    colors: ["turquesa"],
+    rotation: 0,
+    photo: src,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Render do fundo (CSS background) para a config
+// ---------------------------------------------------------------------------
+/** background CSS que será recortado pela máscara do SVG. */
+export function crestBackground(cfg: CrestConfig): string {
+  const c = cfg.colors.map(hexOf);
+  const rot = cfg.rotation;
+  switch (cfg.fill) {
+    case "photo": {
+      // sanitiza no sink (cobre qualquer caller, não só o que passou por parseCrest);
+      // sem foto válida cai num sólido (a letra entra por cima no Avatar)
+      const safe = sanitizePhotoUrl(cfg.photo);
+      return safe ? `center / cover no-repeat url("${safe}")` : c[0] ?? hexOf("turquesa");
+    }
+    case "stripes":
+      if (c.length <= 1) return c[0] ?? hexOf("turquesa");
+      if (c.length === 2)
+        return `linear-gradient(${rot}deg, ${c[0]} 0 50%, ${c[1]} 50% 100%)`;
+      return `linear-gradient(${rot}deg, ${c[0]} 0 33.34%, ${c[1]} 33.34% 66.67%, ${c[2]} 66.67% 100%)`;
+    case "grid": {
+      // 2x2 via conic-gradient. Ordem das cores em leitura natural:
+      // [0]=sup-esq, [1]=sup-dir, [2]=inf-esq, [3]=inf-dir.
+      // Setores do conic (from 0deg): 0–90=sup-dir, 90–180=inf-dir,
+      // 180–270=inf-esq, 270–360=sup-esq.
+      const tl = c[0];
+      const tr = c[1] ?? c[0];
+      const bl = c[2] ?? c[0];
+      const br = c[3] ?? c[1] ?? c[0];
+      return `conic-gradient(from ${rot}deg at 50% 50%, ${tr} 0 90deg, ${br} 90deg 180deg, ${bl} 180deg 270deg, ${tl} 270deg 360deg)`;
+    }
+    case "ball": {
+      // fundo + bola central (flâmula). cor2 = bola, cor1 = fundo.
+      const bg = c[0] ?? hexOf("verde");
+      const ball = c[1] ?? hexOf("dourado");
+      return `radial-gradient(circle at 50% 50%, ${ball} 0 30%, ${bg} 30.5% 100%)`;
+    }
+    case "solid":
+    default:
+      return c[0] ?? hexOf("turquesa");
+  }
+}
+
+/** cor de texto da inicial (perfil) — contraste sobre o fundo. */
+export function crestTextColor(cfg: CrestConfig): string {
+  // multicolor / grade / foto: branco com sombra; sólido: contraste pela cor.
+  if (cfg.fill === "solid" || (cfg.fill === "photo" && !cfg.photo)) {
+    return isDark(cfg.colors[0] ?? "") ? "#232323" : "#ffffff";
+  }
+  return "#ffffff";
+}

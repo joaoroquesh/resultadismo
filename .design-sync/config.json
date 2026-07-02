@@ -1,0 +1,47 @@
+{
+  "pkg": "resultadismo",
+  "globalName": "ResultaDS",
+  "shape": "package",
+  "buildCmd": "npm run build",
+  "readmeHeader": ".design-sync/conventions.md",
+  "srcDir": "src",
+  "tsconfig": ".design-sync/tsconfig.paths.json",
+  "cssEntry": ".design-sync/compiled-tailwind.css",
+  "componentSrcMap": {
+    "Avatar": "src/components/ui/Avatar.tsx",
+    "Badge": "src/components/ui/Badge.tsx",
+    "Button": "src/components/ui/Button.tsx",
+    "Card": "src/components/ui/Card.tsx",
+    "Coachmark": "src/components/ui/Coachmark.tsx",
+    "Combobox": "src/components/ui/Combobox.tsx",
+    "ConfirmDialog": "src/components/ui/ConfirmDialog.tsx",
+    "CrestEditor": "src/components/ui/CrestEditor.tsx",
+    "CrestMask": "src/components/ui/CrestMask.tsx",
+    "EmptyState": "src/components/ui/EmptyState.tsx",
+    "Escudo": "src/components/ui/Escudo.tsx",
+    "Input": "src/components/ui/Input.tsx",
+    "Modal": "src/components/ui/Modal.tsx",
+    "ScrollRow": "src/components/ui/ScrollRow.tsx",
+    "SegmentedControl": "src/components/ui/SegmentedControl.tsx",
+    "Select": "src/components/ui/Select.tsx",
+    "Skeleton": "src/components/ui/Skeleton.tsx",
+    "SortControl": "src/components/ui/SortControl.tsx",
+    "Spinner": "src/components/ui/Spinner.tsx",
+    "Switch": "src/components/ui/Switch.tsx",
+    "ToastProvider": "src/components/ui/Toast.tsx",
+    "ScorePill": "src/components/ScorePill.tsx"
+  },
+  "overrides": {
+    "Modal": { "cardMode": "single", "viewport": "700x360" },
+    "ConfirmDialog": { "cardMode": "single", "viewport": "700x380", "primaryStory": "Destrutivo" },
+    "ToastProvider": { "cardMode": "single", "viewport": "480x400" }
+  },
+  "extraFonts": [
+    "public/fonts/ubuntu-latin-300.woff2",
+    "public/fonts/ubuntu-latin-400.woff2",
+    "public/fonts/ubuntu-latin-400italic.woff2",
+    "public/fonts/ubuntu-latin-500.woff2",
+    "public/fonts/ubuntu-latin-500italic.woff2",
+    "public/fonts/ubuntu-latin-700.woff2"
+  ]
+}

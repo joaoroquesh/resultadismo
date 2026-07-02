@@ -1,0 +1,10 @@
+{
+  "comment": "tsconfig minimo so com o alias @/ para o esbuild do design-sync. Nao usar tsconfig.app.json aqui: seus globs include/exclude com /**/_* quebram o comment-stripper do tsconfigPathsPlugin (le /* ... */ como comentario e apaga paths). Ver .design-sync/NOTES.md.",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/lib/crest": ["./shims/crest.ts"],
+      "@/*": ["../src/*"]
+    }
+  }
+}
