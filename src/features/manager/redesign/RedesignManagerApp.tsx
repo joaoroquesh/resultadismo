@@ -34,6 +34,7 @@ import { PostMatch } from "./PostMatch";
 import type { ScoreboardGoal } from "./Scoreboard";
 import { ManagerCrest } from "../components";
 import { ArrowLeftIcon, ArrowRightIcon } from "./icons";
+import { trackProductEvent } from "@/lib/productAnalytics";
 
 // telas do fluxo. "draftBrasil" abre no 2026; "draftCopa" abre no seletor de edicao.
 type Screen =
@@ -211,10 +212,23 @@ export function RedesignManagerApp() {
       setScreen("home");
       return;
     }
+    void trackProductEvent({
+      product: "manager",
+      route: "/manager/partida",
+      eventType: "manager_match_complete",
+      meta: {
+        edition: edition?.year,
+        kind: matchKind,
+        my_team: myTeam?.s ?? myTeam?.n,
+        opponent: oppTeam?.s ?? oppTeam?.n,
+        goals_for: liveScore[0],
+        goals_against: liveScore[1],
+      },
+    }).catch(() => {});
     applyUserMatch(c, liveScore[0], liveScore[1], matchSeedRef.current);
     commitCampaign();
     setScreen(c.alive ? "campaignHub" : "campaignEnd");
-  }, [liveScore, commitCampaign]);
+  }, [commitCampaign, edition?.year, liveScore, matchKind, myTeam, oppTeam]);
 
   // O LiveMatchView recebe o state (dono do orquestrador). matchState (mesma referencia
   // do ref) so troca ao apitar; entre os tempos e o MESMO objeto (mutado no intervalo),

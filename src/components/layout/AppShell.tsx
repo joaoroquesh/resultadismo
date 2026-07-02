@@ -14,6 +14,7 @@ import { ConsentBanner } from "@/features/consent/ConsentBanner";
 import { PersonalizationGate } from "@/features/onboarding/PersonalizationGate";
 import { NovidadeQuemPassaModal } from "@/features/matches/NovidadeQuemPassaModal";
 import { useAuth } from "@/features/auth/AuthProvider";
+import { useProductAnalytics } from "@/lib/productAnalytics";
 
 // DevPanel de homologação — SÓ em dev. Lazy + gate garantem que não entra no
 // bundle de produção (em prod, import.meta.env.DEV é false → nunca importa).
@@ -24,6 +25,7 @@ const DevPanel = import.meta.env.DEV
 export function AppShell() {
   const { session, loading, isAppAdmin } = useAuth();
   const { data: maint } = useMaintenance();
+  useProductAnalytics("app", { disabled: loading || isAppAdmin, signedIn: !!session });
 
   let content: ReactNode;
 

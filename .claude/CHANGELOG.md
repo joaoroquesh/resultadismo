@@ -21,6 +21,19 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ## [Não lançado]
 
+### Adicionado
+- **Admin → Métricas: painel first-party de saúde do aplicativo.** Nova aba com presets **1/3/7/30
+  dias**, seletor único de período com dois handles e produto **Todos / Resultadismo / Retrô / Manager**,
+  medindo sessões, páginas com detalhe diário, tempo de tela, ativos logados/anônimos, crescimento
+  diário, média de acessos por usuário/dia, palpites, grupos, bolões pagos/Gestão do Bolão, partidas
+  do Retrô, partidas concluídas no Manager e inatividade 2/7/30 dias. A coleta usa
+  `app_analytics_sessions`/`app_analytics_events` + RPCs `track_app_usage`/`admin_app_metrics_range`,
+  com rotas normalizadas, separação entre `Home pública` e `Jogos` na raiz e **app-admins excluídos**
+  da coleta e dos agregados.
+- **Perfil do jogador → Dados de uso só admin.** O detalhamento individual saiu da tela geral e foi
+  para `/jogador/:id`, com produtos acessados, grupos/origem, minigames, ritmo de palpites e indício
+  de palpites feitos em bloco rápido via RPC `admin_player_metrics`.
+
 ## [2.7.1] — 2026-06-30
 
 ### Alterado

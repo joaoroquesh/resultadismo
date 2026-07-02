@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { dayjs } from "@/lib/format";
 import { useAuth } from "@/features/auth/AuthProvider";
+import { UserAnalyticsPanel } from "@/features/admin/UserAnalyticsPanel";
 import { UserModerationPanel } from "@/features/admin/UserModerationPanel";
 import { usePlayerProfile } from "./api";
 import { catalogClubs, catalogNations } from "@/features/onboarding/teamsCatalog";
@@ -154,6 +155,8 @@ export function PlayerProfilePage() {
               </Card>
             </div>
           )}
+
+          {isAppAdmin && id && <UserAnalyticsPanel userId={id} />}
 
           {canModerate && id && (
             <UserModerationPanel

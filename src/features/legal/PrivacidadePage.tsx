@@ -4,7 +4,7 @@ const CONTATO = "resultadismoapp@gmail.com";
 
 export function PrivacidadePage() {
   return (
-    <LegalLayout title="Política de Privacidade" updatedAt="4 de junho de 2026">
+    <LegalLayout title="Política de Privacidade" updatedAt="1 de julho de 2026">
       <p>
         Esta Política explica como o <strong>Resultadismo</strong> ("nós", "app") coleta, usa e
         protege seus dados quando você usa o site e o aplicativo em{" "}
@@ -45,10 +45,17 @@ export function PrivacidadePage() {
             manter o serviço estável e prevenir abusos.
           </li>
           <li>
-            <strong>Dados de uso (apenas com seu consentimento):</strong> se você aceitar no banner
-            de cookies, usamos o <strong>Google Analytics 4</strong> para entender de forma agregada
-            como o app é usado (telas mais visitadas, dispositivo, país aproximado pelo IP). O IP é
-            anonimizado pelo próprio Google. Se você recusar, esse rastreamento não acontece.
+            <strong>Dados de uso operacionais:</strong> registramos de forma agregada páginas
+            acessadas, produto usado (Resultadismo, Retrô ou Manager), sessões, tempo de tela,
+            eventos de jogo/minigame e data de último acesso. Para visitantes deslogados, usamos um
+            identificador aleatório do navegador; não coletamos nome ou e-mail nesse caso. Esses dados
+            ajudam a melhorar o app, entender uso e identificar usuários inativos.
+          </li>
+          <li>
+            <strong>Google Analytics 4 (apenas com seu consentimento):</strong> se você aceitar no
+            banner de cookies, usamos o Google Analytics 4 para entender de forma agregada como o app
+            é usado (telas mais visitadas, dispositivo, país aproximado pelo IP). O IP é anonimizado
+            pelo próprio Google. Se você recusar, esse rastreamento não acontece.
           </li>
         </ul>
         <p>
@@ -64,6 +71,7 @@ export function PrivacidadePage() {
           <li>Registrar palpites, calcular a pontuação e montar as classificações dos grupos.</li>
           <li>Mostrar seu perfil público (nome, avatar e estatísticas) a outros jogadores.</li>
           <li>Enviar notificações que você ativou (lembretes de palpite e cutucadas).</li>
+          <li>Medir uso agregado, saúde do jogo e pontos de melhoria do aplicativo.</li>
           <li>Manter a segurança, prevenir abusos e operar o serviço.</li>
         </ul>
       </LegalSection>
@@ -72,8 +80,8 @@ export function PrivacidadePage() {
         <p>
           Tratamos seus dados para a <strong>execução do serviço</strong> que você solicitou (jogar),
           com base no seu <strong>consentimento</strong> (ex.: login com Google e notificações) e no{" "}
-          <strong>legítimo interesse</strong> de operar e proteger o app. Você pode retirar o
-          consentimento a qualquer momento (ver "Seus direitos").
+          <strong>legítimo interesse</strong> de operar, proteger, medir e melhorar o app. Você pode
+          retirar o consentimento a qualquer momento (ver "Seus direitos").
         </p>
       </LegalSection>
 
@@ -124,8 +132,8 @@ export function PrivacidadePage() {
         <p>
           Usamos armazenamento local do navegador (localStorage) e um service worker para manter você
           conectado, lembrar preferências (tema, dispensa de avisos, sua escolha no banner de
-          consentimento) e permitir o uso como app instalável (PWA). Não são cookies de rastreamento
-          publicitário.
+          consentimento), guardar um identificador aleatório de métricas operacionais e permitir o uso
+          como app instalável (PWA). Não são cookies de rastreamento publicitário.
         </p>
         <p>
           Se você aceitar no banner de cookies, o Google Analytics grava também cookies próprios

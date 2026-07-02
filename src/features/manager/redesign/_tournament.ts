@@ -1,4 +1,5 @@
 // Fase 5 — balanceamento com o MOTOR REAL (sim.ts), não com proxy.
+/* eslint-disable @typescript-eslint/no-explicit-any */
 //   node --experimental-strip-types src/features/manager/redesign/_tournament.ts
 import { createMatch, simulateFull } from "./sim.ts";
 import { tacticFromPreset, type Tactic, type ComBola, type SemBola, type Bloco, COMBOLA, SEMBOLA, BLOCOS } from "./tactics.ts";

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Page } from "@/components/layout/Page";
@@ -11,6 +12,7 @@ import { AdminDashboard } from "./AdminDashboard";
 import { SyncAlertsPanel } from "./SyncAlertsPanel";
 import { BroadcastPanel } from "./BroadcastPanel";
 import { DadosAdmin } from "./DadosAdmin";
+import { MetricsAdmin } from "./MetricsAdmin";
 import { FeedbackAdmin } from "@/features/feedback/FeedbackAdmin";
 import { ChangelogTab } from "./ChangelogTab";
 import { useSystemHealth } from "./sync";
@@ -20,6 +22,7 @@ const NAV = [
   { key: "alertas", label: "Alertas" },
   { key: "avisos", label: "Avisos" },
   { key: "construa", label: "Construa" },
+  { key: "metricas", label: "Métricas" },
   { key: "grupos", label: "Grupos" },
   { key: "competicoes", label: "Competições" },
   { key: "dados", label: "Qualidade" },
@@ -32,12 +35,17 @@ type TabKey = (typeof NAV)[number]["key"];
 
 export function AdminPage() {
   const navigate = useNavigate();
+  const tabRefs = useRef<Partial<Record<TabKey, HTMLButtonElement | null>>>({});
   // Aba na URL (?t=) — voltar de "ver jogos" cai na aba certa, e dá pra
   // recarregar/compartilhar mantendo o contexto (Nielsen #3: controle do usuário).
   const [params, setParams] = useSearchParams();
   const raw = params.get("t");
   const tab: TabKey = (NAV.some((n) => n.key === raw) ? raw : "visao") as TabKey;
   const setTab = (t: TabKey) => setParams(t === "visao" ? {} : { t }, { replace: true });
+
+  useEffect(() => {
+    tabRefs.current[tab]?.scrollIntoView({ block: "nearest", inline: "center" });
+  }, [tab]);
 
   // Só pro badge de alertas — cacheado, compartilhado com o dashboard.
   const { data: health } = useSystemHealth();
@@ -46,6 +54,7 @@ export function AdminPage() {
   return (
     <Page
       title="Admin"
+      wide={tab === "metricas"}
       action={
         <Button variant="ghost" size="icon" onClick={() => navigate("/perfil")} aria-label="Voltar">
           <ArrowLeft className="size-5" />
@@ -60,6 +69,9 @@ export function AdminPage() {
           return (
             <button
               key={n.key}
+              ref={(node) => {
+                tabRefs.current[n.key] = node;
+              }}
               type="button"
               onClick={() => setTab(n.key)}
               className={cn(
@@ -103,6 +115,7 @@ export function AdminPage() {
       {tab === "alertas" && <SyncAlertsPanel />}
       {tab === "avisos" && <BroadcastPanel />}
       {tab === "construa" && <FeedbackAdmin />}
+      {tab === "metricas" && <MetricsAdmin />}
       {tab === "grupos" && <LigasAdmin />}
       {tab === "competicoes" && <CompeticoesAdmin />}
       {tab === "dados" && <DadosAdmin />}

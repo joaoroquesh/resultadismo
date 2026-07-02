@@ -1,6 +1,6 @@
 // Validação agregada da simulação. Roda com:
 //   node --experimental-strip-types src/features/manager/redesign/_simcheck.ts
-import { createMatch, simulateFull, type MatchState } from "./sim.ts";
+import { createMatch, simulateFull } from "./sim.ts";
 import { tacticFromPreset, type Tactic } from "./tactics.ts";
 
 const equal = { a: 80, m: 80, d: 80, o: 80 };

@@ -1,4 +1,5 @@
 // Identidade de treinador persistida (TASK 4). Regra:
+/* eslint-disable react-hooks/set-state-in-effect */
 //   · localStorage (rd_manager_v2_archetype) é a fonte da verdade client-side;
 //   · logado, espelhamos em profiles.manager_archetype (best-effort, try/catch: se a
 //     coluna ainda não foi migrada em produção, NUNCA quebra o app);

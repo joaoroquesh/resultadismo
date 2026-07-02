@@ -1,4 +1,5 @@
 // Feedback de sinal individual (nunca um total). Os 5 estados do motor
+/* eslint-disable react-refresh/only-export-components */
 // (pp/p/z/m/mm) viram cor + ícone + frase curta. A cor segue o sistema de
 // pontuação do Resultadismo: grass/aqua positivo, ink neutro, flame negativo.
 // Reaproveitado pela tática às cegas (coerência) e pelo intervalo (encaixe).

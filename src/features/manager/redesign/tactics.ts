@@ -118,8 +118,7 @@ export function clampN(v: number, lo: number, hi: number): number {
 function doubleCenter<R extends string, C extends string>(m: Record<R, Record<C, number>>): Record<R, Record<C, number>> {
   const rows = Object.keys(m) as R[];
   const cols = Object.keys(m[rows[0]]) as C[];
-  const out: Record<R, Record<C, number>> = {} as any;
-  for (const r of rows) out[r] = { ...m[r] };
+  const out = Object.fromEntries(rows.map((r) => [r, { ...m[r] }])) as Record<R, Record<C, number>>;
   for (let it = 0; it < 12; it++) {
     for (const r of rows) { const mean = cols.reduce((a, c) => a + out[r][c], 0) / cols.length; for (const c of cols) out[r][c] -= mean; }
     for (const c of cols) { const mean = rows.reduce((a, r) => a + out[r][c], 0) / rows.length; for (const r of rows) out[r][c] -= mean; }

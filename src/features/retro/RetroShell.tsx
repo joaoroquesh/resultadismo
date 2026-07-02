@@ -9,14 +9,16 @@ import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
 import { track } from "@/lib/analytics";
+import { useProductAnalytics } from "@/lib/productAnalytics";
 import { RetroStripes } from "./RetroFx";
 
 // Casca própria do Retrô — produto separado do app-mãe (rumo ao subdomínio próprio):
 // sem Sidebar/BottomNav/header do Resultadismo. No topo à direita: ENTRAR (deslogado)
 // ou o escudo do jogador (logado). A ponte pro bolão vive no rodapé, não no topo.
 export function RetroShell() {
-  const { user, profile } = useAuth();
+  const { user, profile, loading, isAppAdmin } = useAuth();
   const { open: openLogin } = useLoginModal();
+  useProductAnalytics("retro", { disabled: loading || isAppAdmin });
 
   // funil: marca a abertura do Retrô (origem inferida pelo referrer) uma vez por sessão
   useEffect(() => {

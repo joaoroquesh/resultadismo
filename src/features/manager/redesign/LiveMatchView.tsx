@@ -154,7 +154,6 @@ export function LiveMatchView({
 }) {
   // estado do motor vive na ref recebida; espelhamos o que a UI precisa em useState.
   const stateRef = useRef<MatchState>(state);
-  stateRef.current = state;
 
   // se já passou do 45 (voltando pro 2º tempo), o intervalo já foi mostrado.
   const resuming = state.minute >= 45;
@@ -178,6 +177,10 @@ export function LiveMatchView({
   const accRef = useRef(0);
   const halftimeShownRef = useRef(resuming);
   const popTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   const syncFromState = useCallback(() => {
     const st = stateRef.current!;

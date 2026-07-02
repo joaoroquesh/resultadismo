@@ -1,4 +1,5 @@
 // Harness de balanceamento do núcleo tático. Roda fora do app:
+/* eslint-disable @typescript-eslint/no-explicit-any */
 //   node --experimental-strip-types src/features/manager/redesign/_balance.ts
 // Valida: (1) somas das matrizes ~0, (2) impacto tático na faixa 25-50%,
 // (3) odds de título por tier (D quase impossível, ~1%).

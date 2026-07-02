@@ -6,6 +6,7 @@ import { Escudo } from "@/components/ui/Escudo";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useLoginModal } from "@/features/auth/LoginModalProvider";
+import { useProductAnalytics } from "@/lib/productAnalytics";
 
 // Faixa de listras (motivo visual do mini-jogo). Inline aqui pra não acoplar o
 // Manager ao slice do Retrô (cada mini-jogo é isolado).
@@ -26,8 +27,10 @@ function ManagerStripes({ className = "" }: { className?: string }) {
 // BottomNav, sem header do Resultadismo, sem PresenceTracker. Mini-header com
 // a volta explícita pro Resultadismo. Espelha o RetroShell.
 export function ManagerShell() {
-  const { user, profile } = useAuth();
+  const { user, profile, loading, isAppAdmin } = useAuth();
   const { open: openLogin } = useLoginModal();
+  useProductAnalytics("manager", { disabled: loading || isAppAdmin });
+
   return (
     <div className="flex min-h-dvh flex-col bg-background text-ink-900">
       {/* ITEM E: header NÃO-fixo — rola junto com a página. Durante a partida ao vivo

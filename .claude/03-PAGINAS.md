@@ -20,8 +20,13 @@
 | `/perfil/editar` | `profile/EditarPerfilPage` | Logado |
 | `/jogador/:id` | `players/PlayerProfilePage` | Logado |
 | `/simulador` | `confronto/SimuladorPage` | Logado (uso típico: app-admin) |
+| `/manager` | `manager/ManagerPage` dentro de `manager/ManagerShell` | Público/oculto (mini-jogo client-side) |
+| `/manager-v2` | `manager/redesign/RedesignManagerApp` dentro de `manager/ManagerShell` | Público/oculto (reformulação em teste) |
 | `/admin` | `admin/AdminPage` | **App-admin** (`RequireAdmin`) |
 | `/admin/competicoes/:id/jogos` | `admin/AdminCompMatchesPage` | **App-admin** |
+| `/admin/qualidade/travados` / `/admin/qualidade/times-fora` | Subpáginas de Qualidade | **App-admin** |
+| `/admin/retro` | `retro/RetroAdminPage` | **App-admin** |
+| `/admin/estudos` / `/admin/estudos/:slug` | biblioteca de estudos | **App-admin** |
 | `/classificacao` | → redireciona p/ `/grupos` | — |
 | `/ligas`, `/ligas/nova`, `/ligas/:slug` | → redireciona p/ `/grupos/*` | Compat (renames Liga→Federação→Grupo) |
 | `*` | → redireciona p/ `/` | 404 |
@@ -104,10 +109,17 @@ as duas de admin ficam dentro de `<RequireAdmin>`.
   é capturado no boot e preenche o campo. Depois vêm, nesta ordem: o **carrossel de boas-vindas**
   (`Onboarding`, 3 slides de conceito) e o **tour guiado** (`GuidedTour`, coach-marks na UI real).
 - **`PlayerProfilePage`** (`/jogador/:id`): perfil público de outro jogador (stats + grupos
-  visíveis).
+  visíveis). Para app-admin, inclui painel privado de dados de uso do jogador (produtos acessados,
+  grupos/origem, minigames, ritmo de palpites e blocos rápidos) + painel de moderação.
 
 ### Admin — `features/admin` → ver [`04-ADMIN.md`](04-ADMIN.md)
-- **`AdminPage`** (`/admin`): abas **Grupos / Comp. / Users / Pgto**.
+- **`AdminPage`** (`/admin`): abas por URL (`?t=`) incluindo **Visão, Alertas, Avisos, Construa,
+  Métricas, Grupos, Competições, Qualidade, Usuários, Pagamento e Changelog**.
+- **`MetricsAdmin`** (`?t=metricas`): painel first-party de métricas do app, com presets 1/3/7/30
+  dias + seletor único de período com dois handles (mais recente/mais antigo) e produto
+  **Todos / Resultadismo / Retrô / Manager** em largura total.
+  Mede sessões, páginas/rotas com detalhe diário, tempo, ativos logados/anônimos, inatividade
+  agregada e KPIs separados de Resultadismo/Retrô/Manager; app-admins ficam fora dos números.
 - **`AdminCompMatchesPage`** (`/admin/competicoes/:id/jogos`): gerir jogos de uma competição
   (curadoria `hidden`, override de placar/status).
 

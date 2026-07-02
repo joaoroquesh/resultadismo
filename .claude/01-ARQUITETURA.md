@@ -19,7 +19,7 @@
 | **Utils de classe** | `clsx` + `tailwind-merge` (helper `cn`) |
 | **Dados de futebol** | football-data.org, **ESPN (JSON público)**, TheSportsDB — via Edge Function |
 | **Pagamento** | Mercado Pago (Checkout Pro hosted) |
-| **Analytics** | **Google Analytics 4** (`G-P86V27WXK2`) com Consent Mode v2; default `denied`, liberado só com o "Aceitar" do banner LGPD em `features/consent`. Eventos de funil via `track()` (`src/lib/analytics.ts`): `login`, `cta_click`, `save_prediction`, `set_joker`, `create_group`, `join_group`, `share`, `copy_invite`, `nudge_sent`, `consent_set` — **sem PII** nos parâmetros |
+| **Analytics** | **First-party no Supabase** para gestão do app (`app_analytics_sessions`/`app_analytics_events` + RPCs `track_app_usage`, `admin_app_metrics_range` e `admin_player_metrics`): mede sessões, páginas, tempo, inatividade e eventos de minigame por produto (`app`/`retro`/`manager`), incluindo anônimos e **excluindo app-admins**. **Google Analytics 4** (`G-P86V27WXK2`) segue como leitura externa com Consent Mode v2; default `denied`, liberado só com "Aceitar" no banner LGPD. Eventos de funil via `track()` (`src/lib/analytics.ts`) — **sem PII** nos parâmetros |
 | **Deploy** | **Vercel** (frontend estático) + **Supabase** (backend), disparados por push na `main` |
 
 > Não há servidor próprio nem ORM: o app fala direto com o Supabase (PostgREST + RPC + functions).
@@ -101,6 +101,7 @@ Usuário → React Router → Página (feature)
 | `supabase.ts` | Cria o client `createClient<Database>` (auth PKCE, `persistSession`, `autoRefreshToken`). Lê `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`. |
 | `types.ts` | Aliases de tipos do schema (`Profile`, `Competition`, `Match`, `League`, `Prediction`, `StandingRow`…) + constantes (`SCORE_POINTS`, `SCORE_LABEL`). |
 | `rpc.ts` | `rpcCall<T>` — wrapper de `supabase.rpc` (evita problemas de binding `this`). |
+| `productAnalytics.ts` | Hook first-party de uso por produto (`useProductAnalytics`/`trackProductEvent`): normaliza rotas, separa `/home-publica` de `/jogos`, cria visitante/sessão anônimos no navegador e chama `track_app_usage` sem PII. |
 | `format.ts` | `dayjs` pt-br + formatadores (kickoff, dia, fase, grupo, deadline, `isLocked`). |
 | `crest.ts` | Sistema de escudos/flâmulas por máscara SVG: catálogo via `import.meta.glob`, encoding `crest:…`, `legacyToCrest`. → [`06`](06-REGRAS-DE-NEGOCIO.md) §escudos. |
 | `avatar.ts` | Avatar gerado legado (`gen:shape:cores:rot`) — compat. |

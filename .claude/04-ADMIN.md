@@ -23,8 +23,8 @@
 ## 2. Painel do app-admin (`/admin` — `features/admin/AdminPage.tsx`)
 
 **Dashboard-first**, navegação por **abas na URL** (`?t=`) — rolável (não espreme no mobile);
-voltar de "ver jogos" cai na aba certa. Abas: **Visão · Alertas · Grupos · Competições · Usuários ·
-Pagamento · Avisos · Construa · Qualidade · Changelog**. Todas as ações chamam RPCs que **revalidam `is_app_admin()` no banco** — o guard de UI
+voltar de "ver jogos" cai na aba certa. Abas: **Visão · Alertas · Avisos · Construa · Métricas ·
+Grupos · Competições · Qualidade · Usuários · Pagamento · Changelog**. Todas as ações chamam RPCs que **revalidam `is_app_admin()` no banco** — o guard de UI
 é conveniência, não segurança.
 
 ### Aba **Visão** (`AdminDashboard`) — saúde e uso (curta, clicável)
@@ -44,6 +44,26 @@ Pagamento · Avisos · Construa · Qualidade · Changelog**. Todas as ações ch
   editável ou texto padrão). O **admin continua usando o app** e vê só a faixa `MaintenanceBanner`
   (lembrete). Visitante **deslogado** segue na landing (o flag só é legível por logado; gate em
   `AppShell`; tour de onboarding suprimido na manutenção). **Atividade recente** (`admin_recent_audit`).
+
+### Aba **Métricas** (`MetricsAdmin`, chave de URL `?t=metricas`) — saúde do app e produto
+- Painel first-party para gestão diária e conversa com investidores, alimentado por
+  `admin_app_metrics_range` (RPC `SECURITY DEFINER`, só app-admin). Filtros: presets **1 / 3 / 7 /
+  30 dias**, seletor único de período com dois handles (mais recente/mais antigo) dentro dos últimos
+  30 dias e produto **Todos · Resultadismo · Retrô · Manager** em largura total.
+- **Admins excluídos:** `track_app_usage` ignora app-admin logado e a RPC também exclui
+  `profiles.is_app_admin=true` de contas, palpites, grupos, uso e inatividade.
+- Métricas principais: ativos no período, logados/anônimos, sessões, acessos médios por usuário/dia,
+  tempo médio diário, novas contas, palpites, grupos ativos, grupos com palpite, bolões pagos/Gestão
+  do Bolão ativa, partidas do Retrô, partidas concluídas no Manager e inativos 2/7/30 dias.
+- **Separação por produto:** o app normal separa `/home-publica` (visitante) de `/jogos` (usuário
+  logado na raiz); o Retrô mede `/retro*` com anônimos; o Manager mede `/manager`/`/manager-v2` e
+  dispara `manager_match_complete` ao concluir partida. A opção "Todos" agrega os três.
+- **Rotas/páginas:** mostra views, pessoas, sessões, tempo, melhor dia e distribuição diária por rota
+  normalizada (`/grupos/:slug`, `/retro/r/:code`, `/jogador/:id`) para evitar gravar identificadores
+  sensíveis como métrica.
+- **Usuários:** a aba geral mostra só inatividade agregada. O detalhamento por pessoa fica no perfil
+  do jogador (`/jogador/:id`), em painel app-admin privado com produtos acessados, origem por grupo
+  (criador/dono), minigames, ritmo de palpites e indício de bloco rápido.
 
 ### Aba **Alertas** (`SyncAlertsPanel`)
 - **Precisam de você** (pendentes): jogo novo (`new_match`→inserir), cancelamento (`cancelled`),
