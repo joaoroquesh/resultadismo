@@ -16,9 +16,9 @@ import { RetroStripes } from "./RetroFx";
 // sem Sidebar/BottomNav/header do Resultadismo. No topo à direita: ENTRAR (deslogado)
 // ou o escudo do jogador (logado). A ponte pro bolão vive no rodapé, não no topo.
 export function RetroShell() {
-  const { user, profile, loading, isAppAdmin } = useAuth();
+  const { user, profile, loading } = useAuth();
   const { open: openLogin } = useLoginModal();
-  useProductAnalytics("retro", { disabled: loading || isAppAdmin });
+  useProductAnalytics("retro", { disabled: loading });
 
   // funil: marca a abertura do Retrô (origem inferida pelo referrer) uma vez por sessão
   useEffect(() => {

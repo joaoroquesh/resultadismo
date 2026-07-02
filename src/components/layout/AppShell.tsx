@@ -25,7 +25,7 @@ const DevPanel = import.meta.env.DEV
 export function AppShell() {
   const { session, loading, isAppAdmin } = useAuth();
   const { data: maint } = useMaintenance();
-  useProductAnalytics("app", { disabled: loading || isAppAdmin, signedIn: !!session });
+  useProductAnalytics("app", { disabled: loading, signedIn: !!session });
 
   let content: ReactNode;
 

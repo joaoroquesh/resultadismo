@@ -23,16 +23,22 @@ Tipos de entrada: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **S
 
 ### Adicionado
 - **Admin → Métricas: painel first-party de saúde do aplicativo.** Nova aba com presets **1/3/7/30
-  dias**, seletor único de período com dois handles e produto **Todos / Resultadismo / Retrô / Manager**,
+  dias/Tudo**, seletor único de período com dois handles e produto **Todos / Resultadismo / Retrô / Manager**,
   medindo sessões, páginas com detalhe diário, tempo de tela, ativos logados/anônimos, crescimento
-  diário, média de acessos por usuário/dia, palpites, grupos, bolões pagos/Gestão do Bolão, partidas
+  diário, sessões por usuário-dia ativo, palpites, grupos, bolões pagos/Gestão do Bolão, partidas
   do Retrô, partidas concluídas no Manager e inatividade 2/7/30 dias. A coleta usa
   `app_analytics_sessions`/`app_analytics_events` + RPCs `track_app_usage`/`admin_app_metrics_range`,
-  com rotas normalizadas, separação entre `Home pública` e `Jogos` na raiz e **app-admins excluídos**
-  da coleta e dos agregados.
+  com rotas normalizadas, separação entre `Home pública` e `Jogos` na raiz e **app-admins filtrados
+  por padrão**, com toggle para comparar admins gravados daqui para frente.
 - **Perfil do jogador → Dados de uso só admin.** O detalhamento individual saiu da tela geral e foi
   para `/jogador/:id`, com produtos acessados, grupos/origem, minigames, ritmo de palpites e indício
   de palpites feitos em bloco rápido via RPC `admin_player_metrics`.
+
+### Corrigido
+- **Admin → Métricas: médias de acesso e tempo mais fiéis.** As médias deixam de diluir dias sem
+  coleta no calendário e passam a separar total do período, média por usuário ativo e média por
+  usuário-dia ativo; a tela também mostra usuários totais, ativos e inativos do período de forma
+  explícita, além da série diária de palpites.
 
 ## [2.7.1] — 2026-06-30
 

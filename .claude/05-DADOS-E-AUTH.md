@@ -43,7 +43,7 @@
 | `discount_codes` | Cupons | `code`, `percent_off` **ou** `amount_off_cents`, `max_uses`/`used_count`, `active`, `expires_at` |
 | `league_payments` | Trilha de pagamentos (auditoria/idempotência) | `league_id`,`user_id`, `provider` (mercadopago/comp/test), `payment_id` (único), `status`, `amount_cents`, `discount_code` |
 | `access_control` / `access_sessions` | Sala de espera (fila FIFO) | config singleton + 1 linha por aba (`state` active/waiting) |
-| `app_analytics_sessions` / `app_analytics_events` | Analytics first-party do app-admin | Sessões, page views, tempo e eventos de minigame por produto (`app`/`retro`/`manager`), com `visitor_key` aleatório para anônimo, `user_id` quando logado, rota normalizada e **RLS-on sem policy** — escrita só via `track_app_usage`, leitura só via RPCs admin. App-admin logado é ignorado na coleta. |
+| `app_analytics_sessions` / `app_analytics_events` | Analytics first-party do app-admin | Sessões, page views, tempo e eventos de minigame por produto (`app`/`retro`/`manager`), com `visitor_key` aleatório para anônimo, `user_id` quando logado, rota normalizada, `is_app_admin` para filtro operacional e **RLS-on sem policy** — escrita só via `track_app_usage`, leitura só via RPCs admin. `/admin` não entra na coleta. |
 | `rate_limits` | Rate limit das Edge Functions (janela fixa por bucket) — **1.1.0** | `bucket` (pk), `window_start`, `count`. Sem acesso de cliente; só `service_role`/`rate_limit_hit`. |
 | `private.sync_config` | Config server-side do sync (URL das functions + service_key) | schema **`private`** — não exposto na API |
 | `retro_matches` / `retro_runs` / `retro_run_matches` / `retro_daily` / `retro_usage_daily` | **Mini-jogo Retrô** (placares históricos) — 964 jogos de Copas (seed CC0), runs (permanentes só Copa do Dia de logado; resto purgado por cron), desafio do dia e agregado de uso anônimo | **Todas RLS-on SEM policy** (gabarito nunca desce ao client) — acesso só via RPCs `retro_*`. → [`12-RETRO-MINIJOGO.md`](12-RETRO-MINIJOGO.md) |
@@ -118,11 +118,13 @@ Realtime**); `nudge_member` (cutucar, anti-spam 30 min).
 **Analytics first-party (2026-07-01)**
 - `track_app_usage(session_key, visitor_key, product, route, event_type, seconds, meta)` — coleta
   best-effort de page view/heartbeat. Produtos válidos: `app`, `retro`, `manager`; eventos:
-  `page_view`, `heartbeat`, `manager_match_complete`; segundos capados a 90. Se `auth.uid()` é
-  app-admin, retorna `{ok:true, skipped:"admin"}` e não grava nada.
-- `admin_app_metrics_range(start_day, end_day, product)` — painel agregado para app-admin: período
-  flexível dentro dos últimos 30 dias e produto `all|app|retro|manager`; retorna resumo, série
-  diária, páginas com detalhe diário e produtos. Inatividade aparece agregada.
+  `page_view`, `heartbeat`, `manager_match_complete`; segundos capados a 90. App-admin é gravado com
+  `is_app_admin=true` para filtro no painel; a rota `/admin` segue bloqueada no client.
+- `admin_app_metrics_range(start_day, end_day, product, include_admins)` — painel agregado para
+  app-admin: período flexível até o dia mais antigo com registro e produto `all|app|retro|manager`;
+  retorna resumo, série diária, páginas com detalhe diário e produtos. Por padrão filtra admins;
+  com `include_admins=true`, inclui os acessos de admin que foram gravados já com flag. As médias
+  de sessão/tempo usam usuários ou usuário-dia ativos, não dias zerados do calendário.
 - `admin_player_metrics(user_id)` — painel privado no perfil do jogador para app-admin: produtos
   acessados, grupos/origem, minigames, ritmo de palpites e blocos rápidos. Cruza `auth.users` só
   nessa leitura operacional de admin.

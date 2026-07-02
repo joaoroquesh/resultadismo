@@ -48,13 +48,16 @@ Grupos · Competições · Qualidade · Usuários · Pagamento · Changelog**. T
 ### Aba **Métricas** (`MetricsAdmin`, chave de URL `?t=metricas`) — saúde do app e produto
 - Painel first-party para gestão diária e conversa com investidores, alimentado por
   `admin_app_metrics_range` (RPC `SECURITY DEFINER`, só app-admin). Filtros: presets **1 / 3 / 7 /
-  30 dias**, seletor único de período com dois handles (mais recente/mais antigo) dentro dos últimos
-  30 dias e produto **Todos · Resultadismo · Retrô · Manager** em largura total.
-- **Admins excluídos:** `track_app_usage` ignora app-admin logado e a RPC também exclui
-  `profiles.is_app_admin=true` de contas, palpites, grupos, uso e inatividade.
-- Métricas principais: ativos no período, logados/anônimos, sessões, acessos médios por usuário/dia,
-  tempo médio diário, novas contas, palpites, grupos ativos, grupos com palpite, bolões pagos/Gestão
-  do Bolão ativa, partidas do Retrô, partidas concluídas no Manager e inativos 2/7/30 dias.
+  30 dias / Tudo**, seletor único de período com dois handles (mais recente/mais antigo) até o dia
+  mais antigo com registro e produto **Todos · Resultadismo · Retrô · Manager** em largura total.
+- **Admins filtrados por padrão:** `track_app_usage` grava app-admin com `is_app_admin=true` (exceto
+  `/admin`, que continua fora para não auto-inflar a tela) e a RPC exclui esses acessos por padrão.
+  O toggle **Admins** permite comparar incluindo admins daqui para frente; acessos de admin anteriores
+  à mudança não existem para recuperar.
+- Métricas principais: usuários totais, ativos no período, logados/anônimos, sessões totais, sessões
+  por usuário-dia ativo, tempo por usuário-dia ativo, tempo por ativo no período, novas contas,
+  palpites totais e série diária, grupos ativos, grupos com palpite, bolões pagos/Gestão do Bolão
+  ativa, partidas do Retrô, partidas concluídas no Manager e inativos no período/2/7/30 dias.
 - **Separação por produto:** o app normal separa `/home-publica` (visitante) de `/jogos` (usuário
   logado na raiz); o Retrô mede `/retro*` com anônimos; o Manager mede `/manager`/`/manager-v2` e
   dispara `manager_match_complete` ao concluir partida. A opção "Todos" agrega os três.

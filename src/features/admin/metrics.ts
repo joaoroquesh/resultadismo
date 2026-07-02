@@ -6,19 +6,30 @@ export type MetricsProduct = "all" | "app" | "retro" | "manager";
 export type MetricsSummary = {
   days: number;
   product: MetricsProduct;
+  include_admins: boolean;
   start_day: string;
   end_day: string;
+  oldest_day_available: string;
+  collection_started_day: string | null;
   active_total: number;
   active_logged: number;
   active_anon: number;
   sessions_total: number;
   page_views_total: number;
   screen_seconds_total: number;
+  days_with_activity: number;
   avg_daily_active: number;
   avg_sessions_per_active_day: number;
   avg_seconds_per_active_day: number;
+  avg_sessions_per_active_user: number;
+  avg_sessions_per_active_user_day: number;
+  avg_seconds_per_active_user: number;
+  avg_seconds_per_active_user_day: number;
+  avg_daily_predictions: number;
+  prediction_days: number;
   new_accounts: number;
   total_accounts: number;
+  inactive_in_period: number;
   predictions_total: number;
   active_groups_total: number;
   groups_with_predictions: number;
@@ -144,9 +155,14 @@ export type AdminPlayerMetrics = {
   };
 };
 
-export function useAdminMetrics(startDay: string, endDay: string, product: MetricsProduct) {
+export function useAdminMetrics(
+  startDay: string,
+  endDay: string,
+  product: MetricsProduct,
+  includeAdmins: boolean,
+) {
   return useQuery({
-    queryKey: ["admin", "app-metrics", startDay, endDay, product],
+    queryKey: ["admin", "app-metrics", startDay, endDay, product, includeAdmins],
     refetchInterval: 60_000,
     placeholderData: (previousData) => previousData,
     queryFn: async (): Promise<AdminMetricsResponse> => {
@@ -154,6 +170,7 @@ export function useAdminMetrics(startDay: string, endDay: string, product: Metri
         p_start_day: startDay,
         p_end_day: endDay,
         p_product: product,
+        p_include_admins: includeAdmins,
       });
       if (error) throw new Error(error.message);
       return data as AdminMetricsResponse;

@@ -124,11 +124,23 @@ export function useProductAnalytics(
   const disabled = options.disabled || (product === "app" && route === "/admin");
 
   useEffect(() => {
+    if (disabled) {
+      routeRef.current = route;
+      return;
+    }
+    const previousRoute = routeRef.current;
+    const now = Date.now();
+    const seconds = Math.max(0, Math.min(Math.round((now - lastBeatRef.current) / 1000), 90));
+    if (lastBeatRef.current > 0 && previousRoute !== route && seconds > 0) {
+      void sendUsage({
+        product,
+        route: previousRoute,
+        eventType: "heartbeat",
+        seconds,
+      }).catch(() => {});
+      lastBeatRef.current = now;
+    }
     routeRef.current = route;
-  }, [route]);
-
-  useEffect(() => {
-    if (disabled) return;
     void sendUsage({ product, route, eventType: "page_view" }).catch(() => {});
   }, [disabled, product, route]);
 

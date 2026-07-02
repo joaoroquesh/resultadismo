@@ -17,6 +17,7 @@ import {
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { Switch } from "@/components/ui/Switch";
 import { dayjs } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import {
@@ -37,8 +38,8 @@ const PRODUCT_OPTIONS: { value: MetricsProduct; label: string }[] = [
 ];
 
 const PRESET_DAYS = [1, 3, 7, 30] as const;
-const MAX_WINDOW_DAYS = 30;
-const MAX_DAY_OFFSET = MAX_WINDOW_DAYS - 1;
+const FALLBACK_WINDOW_DAYS = 30;
+const FALLBACK_MAX_DAY_OFFSET = FALLBACK_WINDOW_DAYS - 1;
 
 const PRODUCT_LABEL: Record<string, string> = {
   all: "Todos",
@@ -94,8 +95,14 @@ function dayText(offset: number): string {
   return dayjs().subtract(offset, "day").format("DD/MM");
 }
 
-function clampOffset(value: number, maxOffset = MAX_DAY_OFFSET): number {
+function clampOffset(value: number, maxOffset = FALLBACK_MAX_DAY_OFFSET): number {
   return Math.max(0, Math.min(maxOffset, Math.round(value)));
+}
+
+function offsetFromDay(day: string | null | undefined): number {
+  if (!day) return FALLBACK_MAX_DAY_OFFSET;
+  const diff = dayjs().startOf("day").diff(dayjs(day).startOf("day"), "day");
+  return Math.max(0, Number.isFinite(diff) ? diff : FALLBACK_MAX_DAY_OFFSET);
 }
 
 function sliderViewport(recentOffset: number, oldestOffset: number, maxOffset: number) {
@@ -145,24 +152,30 @@ function productRowsByKey(rows: MetricsProductRow[]) {
 
 export function MetricsAdmin() {
   const [product, setProduct] = useState<MetricsProduct>("all");
+  const [includeAdmins, setIncludeAdmins] = useState(false);
   const [recentOffset, setRecentOffset] = useState<number>(0);
-  const [oldestOffset, setOldestOffset] = useState<number>(MAX_DAY_OFFSET);
-  const safeRecentOffset = clampOffset(Math.min(recentOffset, oldestOffset));
-  const safeOldestOffset = clampOffset(Math.max(recentOffset, oldestOffset));
-  const selectedDays = safeOldestOffset - safeRecentOffset + 1;
+  const [oldestOffset, setOldestOffset] = useState<number>(FALLBACK_MAX_DAY_OFFSET);
+  const queryMaxOffset = Math.max(FALLBACK_MAX_DAY_OFFSET, recentOffset, oldestOffset);
+  const safeRecentOffset = clampOffset(Math.min(recentOffset, oldestOffset), queryMaxOffset);
+  const safeOldestOffset = clampOffset(Math.max(recentOffset, oldestOffset), queryMaxOffset);
   const endDay = dayjs().subtract(safeRecentOffset, "day").format("YYYY-MM-DD");
   const startDay = dayjs().subtract(safeOldestOffset, "day").format("YYYY-MM-DD");
-  const selectedPeriodLabel = periodLabel(startDay, endDay, selectedDays, safeRecentOffset);
-  const { data, isLoading, isFetching, error } = useAdminMetrics(startDay, endDay, product);
+  const { data, isLoading, isFetching, error } = useAdminMetrics(startDay, endDay, product, includeAdmins);
+  const maxAvailableOffset = data ? offsetFromDay(data.summary.oldest_day_available) : queryMaxOffset;
 
   function setPreset(days: number) {
     setRecentOffset(0);
-    setOldestOffset(Math.min(MAX_DAY_OFFSET, days - 1));
+    setOldestOffset(Math.min(maxAvailableOffset, days - 1));
+  }
+
+  function setFullPeriod() {
+    setRecentOffset(0);
+    setOldestOffset(maxAvailableOffset);
   }
 
   function setPeriodRange(nextRecentOffset: number, nextOldestOffset: number) {
-    const nextRecent = clampOffset(nextRecentOffset);
-    const nextOldest = clampOffset(nextOldestOffset);
+    const nextRecent = clampOffset(nextRecentOffset, maxAvailableOffset);
+    const nextOldest = clampOffset(nextOldestOffset, maxAvailableOffset);
     setRecentOffset(Math.min(nextRecent, nextOldest));
     setOldestOffset(Math.max(nextRecent, nextOldest));
   }
@@ -187,25 +200,39 @@ export function MetricsAdmin() {
     );
   }
 
+  const displayRecentOffset = offsetFromDay(data.summary.end_day);
+  const displayOldestOffset = offsetFromDay(data.summary.start_day);
+  const displaySelectedDays = data.summary.days;
+  const displayPeriodLabel = periodLabel(
+    data.summary.start_day,
+    data.summary.end_day,
+    displaySelectedDays,
+    displayRecentOffset,
+  );
+
   return (
     <div className={cn("space-y-5 transition-opacity duration-200 ease-out", isFetching && "opacity-80")}>
       <div className="space-y-3">
         <div className="grid gap-3">
           <ProductScopeControl value={product} onChange={setProduct} />
           <PeriodPicker
-            recentOffset={safeRecentOffset}
-            oldestOffset={safeOldestOffset}
-            maxOffset={MAX_DAY_OFFSET}
-            selectedDays={selectedDays}
-            startDay={startDay}
-            endDay={endDay}
-            label={selectedPeriodLabel}
+            recentOffset={displayRecentOffset}
+            oldestOffset={displayOldestOffset}
+            maxOffset={maxAvailableOffset}
+            selectedDays={displaySelectedDays}
+            startDay={data.summary.start_day}
+            endDay={data.summary.end_day}
+            label={displayPeriodLabel}
+            includeAdmins={includeAdmins}
+            collectionStartedDay={data.summary.collection_started_day}
             onPreset={setPreset}
+            onFullPeriod={setFullPeriod}
+            onIncludeAdminsChange={setIncludeAdmins}
             onRangeChange={setPeriodRange}
           />
         </div>
         <div className="rounded-lg border border-border bg-surface-2 px-3 py-2 text-xs leading-relaxed text-ink-600">
-          Admins do app ficam fora da coleta e dos agregados. A raiz é separada em Home pública e Jogos quando o usuário está logado.
+          Admins ficam fora por padrão. Ao ligar o filtro, entram apenas os acessos gravados daqui em diante; a rota /admin segue fora da coleta.
         </div>
       </div>
 
@@ -257,7 +284,11 @@ function PeriodPicker({
   startDay,
   endDay,
   label,
+  includeAdmins,
+  collectionStartedDay,
   onPreset,
+  onFullPeriod,
+  onIncludeAdminsChange,
   onRangeChange,
 }: {
   recentOffset: number;
@@ -267,37 +298,60 @@ function PeriodPicker({
   startDay: string;
   endDay: string;
   label: string;
+  includeAdmins: boolean;
+  collectionStartedDay: string | null;
   onPreset: (days: number) => void;
+  onFullPeriod: () => void;
+  onIncludeAdminsChange: (include: boolean) => void;
   onRangeChange: (recentOffset: number, oldestOffset: number) => void;
 }) {
+  const isFullPeriod = recentOffset === 0 && oldestOffset === maxOffset;
+  const collectionLabel = collectionStartedDay ? `coleta desde ${shortDay(collectionStartedDay)}` : "coleta sem evento";
+
   return (
     <Card className="p-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
         <div className="flex min-w-0 items-center gap-2">
           <CalendarDays className="size-4 shrink-0 text-brand-700" />
           <div className="min-w-0">
             <p className="truncate text-base font-extrabold text-ink-950">{label}</p>
             <p className="text-[11px] text-ink-500">
-              {shortDay(startDay)} até {shortDay(endDay)} · {selectedDays} {selectedDays === 1 ? "dia" : "dias"}
+              {shortDay(startDay)} até {shortDay(endDay)} · {selectedDays} {selectedDays === 1 ? "dia" : "dias"} · {collectionLabel}
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-4 gap-1 rounded-pill bg-surface-2 p-1">
-          {PRESET_DAYS.map((days) => (
+        <div className="grid gap-2 sm:grid-cols-[auto_auto] sm:items-center lg:justify-end">
+          <div className="grid grid-cols-5 gap-1 rounded-pill bg-surface-2 p-1">
+            {PRESET_DAYS.map((days) => (
+              <button
+                key={days}
+                type="button"
+                onClick={() => onPreset(days)}
+                className={cn(
+                  "rounded-pill px-2.5 py-1.5 text-xs font-bold transition",
+                  selectedDays === days && recentOffset === 0
+                    ? "bg-brand-600 text-white"
+                    : "text-ink-500 hover:bg-surface hover:text-ink-900",
+                )}
+              >
+                {days}d
+              </button>
+            ))}
             <button
-              key={days}
               type="button"
-              onClick={() => onPreset(days)}
+              onClick={onFullPeriod}
               className={cn(
-                "rounded-pill px-3 py-1.5 text-xs font-bold transition",
-                selectedDays === days && recentOffset === 0
-                  ? "bg-brand-600 text-white"
-                  : "text-ink-500 hover:bg-surface hover:text-ink-900",
+                "rounded-pill px-2.5 py-1.5 text-xs font-bold transition",
+                isFullPeriod ? "bg-brand-600 text-white" : "text-ink-500 hover:bg-surface hover:text-ink-900",
               )}
             >
-              {days}d
+              Tudo
             </button>
-          ))}
+          </div>
+          <div className="flex items-center justify-between gap-2 rounded-pill bg-background px-3 py-2 text-xs font-bold text-ink-600 sm:justify-start">
+            <span>Admins</span>
+            <Switch checked={includeAdmins} onChange={onIncludeAdminsChange} label="Incluir admins nas métricas" />
+          </div>
         </div>
       </div>
 
@@ -495,33 +549,36 @@ function ExecutiveStrip({ summary }: { summary: MetricsSummary }) {
   const cards = [
     {
       icon: <Users2 className="size-4" />,
-      label: "Ativos no período",
-      value: int(summary.active_total),
-      hint: `${int(summary.active_logged)} logados · ${int(summary.active_anon)} anônimos`,
-    },
-    {
-      icon: <MousePointerClick className="size-4" />,
-      label: "Acessos por usuário/dia",
-      value: dec(summary.avg_sessions_per_active_day, 2),
-      hint: `${int(summary.sessions_total)} sessões no período`,
-    },
-    {
-      icon: <Clock3 className="size-4" />,
-      label: "Tempo médio diário",
-      value: duration(summary.avg_seconds_per_active_day),
-      hint: `${duration(summary.screen_seconds_total)} de tela somados`,
+      label: "Usuários totais",
+      value: int(summary.total_accounts),
+      hint: `${int(summary.active_logged)} logados ativos · ${int(summary.inactive_in_period)} sem uso no período`,
     },
     {
       icon: <Activity className="size-4" />,
-      label: "Novas contas",
-      value: int(summary.new_accounts),
-      hint: `${int(summary.total_accounts)} contas não-admin no total`,
+      label: "Ativos no período",
+      value: int(summary.active_total),
+      hint: `${int(summary.active_logged)} logados · ${int(summary.active_anon)} anônimos · ${int(summary.days_with_activity)} dias com uso`,
+    },
+    {
+      icon: <MousePointerClick className="size-4" />,
+      label: "Sessões / usuário-dia",
+      value: dec(summary.avg_sessions_per_active_user_day, 2),
+      hint: `${int(summary.sessions_total)} sessões · ${dec(summary.avg_sessions_per_active_user, 2)} por ativo no período`,
+    },
+    {
+      icon: <Clock3 className="size-4" />,
+      label: "Tempo / usuário-dia",
+      value: duration(summary.avg_seconds_per_active_user_day),
+      hint: `${duration(summary.avg_seconds_per_active_user)} por ativo · ${duration(summary.screen_seconds_total)} total`,
     },
     {
       icon: <Target className="size-4" />,
       label: "Palpites",
       value: int(summary.predictions_total),
-      hint: summary.product === "retro" || summary.product === "manager" ? "fora deste produto" : "no período selecionado",
+      hint:
+        summary.product === "retro" || summary.product === "manager"
+          ? "fora deste produto"
+          : `${dec(summary.avg_daily_predictions, 1)} por dia com palpite · ${int(summary.prediction_days)} dias`,
     },
     {
       icon: <UserRoundX className="size-4" />,
@@ -552,27 +609,84 @@ function ExecutiveStrip({ summary }: { summary: MetricsSummary }) {
 }
 
 function DailyPanel({ daily }: { daily: MetricsDaily[] }) {
+  const [zoomDays, setZoomDays] = useState<number | "all">("all");
+  const [startIndex, setStartIndex] = useState(0);
+  const visibleCount = zoomDays === "all" ? daily.length : Math.min(zoomDays, daily.length);
+  const maxStartIndex = Math.max(0, daily.length - Math.max(visibleCount, 1));
+  const safeStartIndex = Math.min(startIndex, maxStartIndex);
+  const visibleDaily = daily.slice(safeStartIndex, safeStartIndex + visibleCount);
+
+  function setZoom(next: number | "all") {
+    setZoomDays(next);
+    setStartIndex(0);
+  }
+
   return (
     <Card className="p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-base font-bold text-ink-950">Crescimento diário</h2>
-          <p className="text-xs text-ink-500">Ativos, novas contas e acessos por dia.</p>
+          <p className="text-xs text-ink-500">Ativos, novas contas, acessos e palpites por dia.</p>
         </div>
-        <span className="rounded-pill bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-700">
-          {daily.length ? `${shortDay(daily[0]!.day)} - ${shortDay(daily[daily.length - 1]!.day)}` : "sem dados"}
-        </span>
+        <div className="grid gap-2 sm:grid-cols-[auto_auto] sm:items-center">
+          <span className="rounded-pill bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-700">
+            {visibleDaily.length
+              ? `${shortDay(visibleDaily[0]!.day)} - ${shortDay(visibleDaily[visibleDaily.length - 1]!.day)}`
+              : "sem dados"}
+          </span>
+          <div className="grid grid-cols-4 gap-1 rounded-pill bg-surface-2 p-1">
+            {[
+              { label: "Tudo", value: "all" as const },
+              { label: "7d", value: 7 },
+              { label: "14d", value: 14 },
+              { label: "30d", value: 30 },
+            ].map((option) => (
+              <button
+                key={option.label}
+                type="button"
+                onClick={() => setZoom(option.value)}
+                disabled={option.value !== "all" && daily.length <= option.value}
+                className={cn(
+                  "rounded-pill px-2 py-1 text-[11px] font-bold transition disabled:opacity-40",
+                  zoomDays === option.value
+                    ? "bg-brand-600 text-white"
+                    : "text-ink-500 hover:bg-surface hover:text-ink-900",
+                )}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
+
+      {maxStartIndex > 0 && (
+        <div className="mt-4 rounded-lg border border-border bg-background px-3 py-2">
+          <input
+            type="range"
+            min={0}
+            max={maxStartIndex}
+            value={safeStartIndex}
+            onChange={(event) => setStartIndex(Number(event.target.value))}
+            className="h-2 w-full accent-brand-600"
+            aria-label="Mover janela do gráfico diário"
+          />
+          <div className="mt-1 flex justify-between text-[11px] text-ink-500">
+            <span>{shortDay(daily[0]!.day)}</span>
+            <span>{shortDay(daily[daily.length - 1]!.day)}</span>
+          </div>
+        </div>
+      )}
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
         <LineChart
-          data={daily}
+          data={visibleDaily}
           primaryKey="active_total"
           secondaryKey="new_accounts"
           primaryLabel="Ativos"
           secondaryLabel="Novos"
         />
-        <BarChart data={daily} />
+        <BarChart data={visibleDaily} />
       </div>
     </Card>
   );
@@ -637,31 +751,47 @@ function LineChart({
 }
 
 function BarChart({ data }: { data: MetricsDaily[] }) {
-  const max = safeMax(data.map((d) => d.sessions));
+  const max = safeMax(data.flatMap((d) => [d.sessions, d.predictions]));
   return (
     <div className="rounded-lg border border-border bg-background p-3">
-      <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-ink-600">
-        <MousePointerClick className="size-4 text-brand-700" />
-        Acessos por dia
+      <div className="mb-3 flex flex-wrap items-center gap-3 text-xs font-semibold text-ink-600">
+        <span className="inline-flex items-center gap-1.5">
+          <MousePointerClick className="size-4 text-brand-700" />
+          Acessos
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-gold-700">
+          <span className="size-2 rounded-full bg-gold-500" />
+          Palpites
+        </span>
       </div>
       <div className="flex h-48 items-end gap-1.5">
         {data.map((d) => {
-          const h = Math.max(3, Math.round((d.sessions / max) * 100));
+          const sessionsHeight = Math.max(3, Math.round((d.sessions / max) * 100));
+          const predictionsHeight = Math.max(3, Math.round((d.predictions / max) * 100));
           return (
-            <div key={d.day} className="flex min-w-0 flex-1 flex-col items-center gap-1">
-              <div
-                title={`${shortDay(d.day)} · ${int(d.sessions)} acessos`}
-                className="w-full rounded-t-sm bg-brand-600/80 transition hover:bg-brand-700"
-                style={{ height: `${h}%` }}
-              />
+            <div key={d.day} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1">
+              <div className="flex min-h-0 w-full flex-1 items-end gap-0.5">
+                <div
+                  title={`${shortDay(d.day)} · ${int(d.sessions)} acessos`}
+                  className="min-w-0 flex-1 rounded-t-sm bg-brand-600/80 transition hover:bg-brand-700"
+                  style={{ height: `${sessionsHeight}%` }}
+                />
+                <div
+                  title={`${shortDay(d.day)} · ${int(d.predictions)} palpites`}
+                  className="min-w-0 flex-1 rounded-t-sm bg-gold-500/85 transition hover:bg-gold-600"
+                  style={{ height: `${predictionsHeight}%` }}
+                />
+              </div>
               {data.length <= 10 && <span className="text-[10px] tabular-nums text-ink-400">{dayjs(d.day).format("DD")}</span>}
             </div>
           );
         })}
       </div>
-      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-ink-500">
+      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-ink-500 sm:grid-cols-4">
         <span>Total: <strong className="text-ink-800">{int(data.reduce((sum, d) => sum + d.sessions, 0))}</strong></span>
-        <span className="text-right">Páginas: <strong className="text-ink-800">{int(data.reduce((sum, d) => sum + d.page_views, 0))}</strong></span>
+        <span>Páginas: <strong className="text-ink-800">{int(data.reduce((sum, d) => sum + d.page_views, 0))}</strong></span>
+        <span>Palpites: <strong className="text-ink-800">{int(data.reduce((sum, d) => sum + d.predictions, 0))}</strong></span>
+        <span className="sm:text-right">Tempo: <strong className="text-ink-800">{duration(data.reduce((sum, d) => sum + d.screen_seconds, 0))}</strong></span>
       </div>
     </div>
   );
@@ -815,7 +945,8 @@ function RetentionPanel({ summary }: { summary: MetricsSummary }) {
         </div>
         <TimerReset className="size-5 text-gold-700" />
       </div>
-      <div className="mt-3 grid grid-cols-3 gap-2">
+      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <MetricMini label="Sem uso no período" value={int(summary.inactive_in_period)} />
         <MetricMini label="2+ dias" value={int(summary.inactive_2d)} />
         <MetricMini label="7+ dias" value={int(summary.inactive_7d)} />
         <MetricMini label="30+ dias" value={int(summary.inactive_30d)} />
@@ -823,7 +954,7 @@ function RetentionPanel({ summary }: { summary: MetricsSummary }) {
       <div className="mt-4 rounded-lg border border-border bg-background p-3">
         <p className="text-xs font-semibold text-ink-500">Ritmo médio</p>
         <p className="mt-1 text-2xl font-extrabold text-ink-950">{dec(summary.avg_daily_active, 1)}</p>
-        <p className="text-xs text-ink-500">ativos por dia no período selecionado</p>
+        <p className="text-xs text-ink-500">ativos por dia com movimento no período selecionado</p>
       </div>
     </Card>
   );

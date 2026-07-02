@@ -27,9 +27,9 @@ function ManagerStripes({ className = "" }: { className?: string }) {
 // BottomNav, sem header do Resultadismo, sem PresenceTracker. Mini-header com
 // a volta explícita pro Resultadismo. Espelha o RetroShell.
 export function ManagerShell() {
-  const { user, profile, loading, isAppAdmin } = useAuth();
+  const { user, profile, loading } = useAuth();
   const { open: openLogin } = useLoginModal();
-  useProductAnalytics("manager", { disabled: loading || isAppAdmin });
+  useProductAnalytics("manager", { disabled: loading });
 
   return (
     <div className="flex min-h-dvh flex-col bg-background text-ink-900">
